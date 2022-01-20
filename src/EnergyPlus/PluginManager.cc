@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -496,6 +496,34 @@ PluginManager::PluginManager(EnergyPlusData &state)
                 fs::path sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPath);
                 PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
             }
+
+            std::string epInDirFlagUC = "YES";
+            try {
+                epInDirFlagUC =
+                    EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_epin_environment_variable_to_search_path").get<std::string>());
+            } catch (nlohmann::json::out_of_range &e) {
+                // defaulted to YES
+            }
+            if (epInDirFlagUC == "YES") {
+                std::string epin_path;
+                get_environment_variable("epin", epin_path);
+                fs::path epinPathObject = fs::path(epin_path);
+                if (epinPathObject.empty()) {
+                    EnergyPlus::ShowWarningMessage(
+                        state,
+                        "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping.");
+                } else {
+                    if (FileSystem::pathExists(epinPathObject)) {
+                        fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinPathObject);
+                        PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
+                    } else {
+                        EnergyPlus::ShowWarningMessage(state,
+                                                       "PluginManager: Search path inputs requested adding epin variable to Python path, but epin "
+                                                       "variable value is not a valid existent path, skipping.");
+                    }
+                }
+            }
+
             try {
                 auto const vars = fields.at("py_search_paths");
                 for (const auto &var : vars) {
@@ -675,7 +703,7 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
     Py_DECREF(pModuleName);
 
     if (pyth_module == nullptr) {
-        EnergyPlus::ShowFatalError(state, "Cannot find 'traceback' module in reportPythonError(), this is weird");
+        EnergyPlus::ShowContinueError(state, "Cannot find 'traceback' module in reportPythonError(), this is weird");
         return;
     }
 
@@ -688,12 +716,13 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
 
         // traceback.format_exception returns a list, so iterate on that
         if (!pyth_val || !PyList_Check(pyth_val)) { // NOLINT(hicpp-signed-bitwise)
-            EnergyPlus::ShowFatalError(state, "In reportPythonError(), traceback.format_exception did not return a list.");
+            EnergyPlus::ShowContinueError(state, "In reportPythonError(), traceback.format_exception did not return a list.");
+            return;
         }
 
         unsigned long numVals = PyList_Size(pyth_val);
         if (numVals == 0) {
-            EnergyPlus::ShowFatalError(state, "No traceback available");
+            EnergyPlus::ShowContinueError(state, "No traceback available");
             return;
         }
 

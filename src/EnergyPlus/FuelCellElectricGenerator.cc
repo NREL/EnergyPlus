@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -253,7 +253,7 @@ namespace FuelCellElectricGenerator {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode = DataGenerators::CurveMode::Direct;
                 if (UtilityRoutines::SameString(AlphArray(2), "NORMALIZED"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode = DataGenerators::CurveMode::Normalized;
-                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode == DataGenerators::CurveMode::Unassigned) {
+                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode == DataGenerators::CurveMode::Invalid) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
@@ -293,7 +293,7 @@ namespace FuelCellElectricGenerator {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::SkinLoss::UADT;
                 if (UtilityRoutines::SameString(AlphArray(4), "QUADRATIC FUNCTION OF FUEL RATE"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::SkinLoss::QuadraticFuelNdot;
-                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode == DataGenerators::SkinLoss::Unassigned) {
+                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode == DataGenerators::SkinLoss::Invalid) {
                     // throw error
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -333,7 +333,7 @@ namespace FuelCellElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.DilutionExhaustNodeName = AlphArray(8);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.DilutionExhaustNode =
@@ -344,7 +344,7 @@ namespace FuelCellElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.PelMin = NumArray(24);
@@ -421,7 +421,7 @@ namespace FuelCellElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
@@ -648,7 +648,7 @@ namespace FuelCellElectricGenerator {
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::NodeConnectionType::Sensor,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
                 } else if (UtilityRoutines::SameString("TemperatureFromWaterNode", AlphArray(4))) {
@@ -664,7 +664,7 @@ namespace FuelCellElectricGenerator {
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Sensor,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
                 } else if (UtilityRoutines::SameString("MainsWaterTemperature", AlphArray(4))) {
@@ -821,7 +821,7 @@ namespace FuelCellElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterOutNode =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -831,7 +831,7 @@ namespace FuelCellElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(
                     state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
@@ -845,7 +845,7 @@ namespace FuelCellElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Secondary,
+                                                        NodeInputManager::CompFluidStream::Secondary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 if (UtilityRoutines::SameString("FixedEffectiveness", AlphArray(5))) {
@@ -985,7 +985,7 @@ namespace FuelCellElectricGenerator {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEfficiencyMode::Quadratic;
                 if (UtilityRoutines::SameString(AlphArray(2), "Constant"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEfficiencyMode::Constant;
-                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEfficiencyMode::Unassigned) {
+                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEfficiencyMode::Invalid) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
@@ -1053,7 +1053,7 @@ namespace FuelCellElectricGenerator {
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).StackCooler.WaterOutNode =
                         NodeInputManager::GetOnlySingleNode(state,
@@ -1063,7 +1063,7 @@ namespace FuelCellElectricGenerator {
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     BranchNodeConnections::TestCompSet(
                         state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
@@ -1207,7 +1207,6 @@ namespace FuelCellElectricGenerator {
         if (this->FCPM.ZoneID > 0) {
             SetupZoneInternalGain(state,
                                   this->FCPM.ZoneID,
-                                  "Generator:FuelCell",
                                   this->Name,
                                   DataHeatBalance::IntGainType::GeneratorFuelCell,
                                   &this->Report.SkinLossConvect,
@@ -1836,22 +1835,19 @@ namespace FuelCellElectricGenerator {
 
             // set inlet temp.  (could move to init)
 
-            {
-                auto const SELECT_CASE_var(this->WaterSup.WaterTempMode);
-
-                if (SELECT_CASE_var == DataGenerators::WaterTemperatureMode::WaterInReformMains) {
-
-                    this->WaterSup.TwaterIntoCompress = state.dataEnvrn->WaterMainsTemp;
-
-                } else if ((SELECT_CASE_var == DataGenerators::WaterTemperatureMode::WaterInReformAirNode) ||
-                           (SELECT_CASE_var == DataGenerators::WaterTemperatureMode::WaterInReformWaterNode)) {
-
-                    this->WaterSup.TwaterIntoCompress = state.dataLoopNodes->Node(this->WaterSup.NodeNum).Temp;
-
-                } else if (SELECT_CASE_var == DataGenerators::WaterTemperatureMode::WaterInReformSchedule) {
-
-                    this->WaterSup.TwaterIntoCompress = ScheduleManager::GetCurrentScheduleValue(state, this->WaterSup.SchedNum);
-                }
+            switch (this->WaterSup.WaterTempMode) {
+            case DataGenerators::WaterTemperatureMode::WaterInReformMains: {
+                this->WaterSup.TwaterIntoCompress = state.dataEnvrn->WaterMainsTemp;
+            } break;
+            case DataGenerators::WaterTemperatureMode::WaterInReformAirNode:
+            case DataGenerators::WaterTemperatureMode::WaterInReformWaterNode: {
+                this->WaterSup.TwaterIntoCompress = state.dataLoopNodes->Node(this->WaterSup.NodeNum).Temp;
+            } break;
+            case DataGenerators::WaterTemperatureMode::WaterInReformSchedule: {
+                this->WaterSup.TwaterIntoCompress = ScheduleManager::GetCurrentScheduleValue(state, this->WaterSup.SchedNum);
+            } break;
+            default:
+                break;
             }
 
             this->WaterSup.PwaterCompEl = CurveManager::CurveValue(state, this->WaterSup.PmpPowerCurveID, this->FCPM.NdotLiqwater);
@@ -1902,22 +1898,27 @@ namespace FuelCellElectricGenerator {
 
             // Figure heat recovery from Electrical Storage, power conditioning, and auxiliary burner
 
-            {
-                auto const SELECT_CASE_var(this->AirSup.IntakeRecoveryMode);
-
-                if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverBurnInvertBatt) {
-                    this->AirSup.QintakeRecovery = this->AuxilHeat.QairIntake + this->ElecStorage.QairIntake + this->Inverter.QairIntake;
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverAuxiliaryBurner) {
-                    this->AirSup.QintakeRecovery = this->AuxilHeat.QairIntake;
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverInverterBatt) {
-                    this->AirSup.QintakeRecovery = this->ElecStorage.QairIntake + this->Inverter.QairIntake;
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverInverter) {
-                    this->AirSup.QintakeRecovery = this->Inverter.QairIntake;
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverBattery) {
-                    this->AirSup.QintakeRecovery = this->ElecStorage.QairIntake;
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::NoRecoveryOnAirIntake) {
-                    this->AirSup.QintakeRecovery = 0.0;
-                }
+            switch (this->AirSup.IntakeRecoveryMode) {
+            case DataGenerators::RecoverMode::RecoverBurnInvertBatt: {
+                this->AirSup.QintakeRecovery = this->AuxilHeat.QairIntake + this->ElecStorage.QairIntake + this->Inverter.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverAuxiliaryBurner: {
+                this->AirSup.QintakeRecovery = this->AuxilHeat.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverInverterBatt: {
+                this->AirSup.QintakeRecovery = this->ElecStorage.QairIntake + this->Inverter.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverInverter: {
+                this->AirSup.QintakeRecovery = this->Inverter.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverBattery: {
+                this->AirSup.QintakeRecovery = this->ElecStorage.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::NoRecoveryOnAirIntake: {
+                this->AirSup.QintakeRecovery = 0.0;
+            } break;
+            default:
+                break;
             }
 
             if (this->FCPM.NdotAir <= 0.0) { // just pass through, domain probably collapsed in modeling
@@ -3091,44 +3092,132 @@ namespace FuelCellElectricGenerator {
 
         static constexpr std::string_view RoutineName("CalcFuelCellGenHeatRecovery");
 
-        {
-            auto const SELECT_CASE_var(this->ExhaustHX.HXmodelMode);
+        switch (this->ExhaustHX.HXmodelMode) {
+        case DataGenerators::ExhaustGasHX::FixedEffectiveness: { // Method 1
 
-            if (SELECT_CASE_var == DataGenerators::ExhaustGasHX::FixedEffectiveness) { // Method 1
+            Real64 eHX = this->ExhaustHX.HXEffect;
 
-                Real64 eHX = this->ExhaustHX.HXEffect;
+            Real64 MWwater = state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight;
+            Real64 NdotWater = this->ExhaustHX.WaterMassFlowRate / MWwater;
+            Real64 TwaterIn = this->ExhaustHX.WaterInletTemp;
 
-                Real64 MWwater = state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight;
-                Real64 NdotWater = this->ExhaustHX.WaterMassFlowRate / MWwater;
-                Real64 TwaterIn = this->ExhaustHX.WaterInletTemp;
+            Real64 CpWaterMol;
+            FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
 
-                Real64 CpWaterMol;
-                FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
+            Real64 NdotGas = this->AuxilHeat.NdotAuxMix;
+            Real64 TprodGasIn = this->AuxilHeat.TauxMix;
+            Real64 CpProdGasMol;
+            this->FigureAuxilHeatGasHeatCap(state, TprodGasIn, CpProdGasMol); // Cp in (J/mol*K)
+            // factor of 1000.0 for kmol -> mol
+            Real64 NdotCp = min(NdotGas * CpProdGasMol * 1000.0, NdotWater * CpWaterMol * 1000.0);
 
-                Real64 NdotGas = this->AuxilHeat.NdotAuxMix;
-                Real64 TprodGasIn = this->AuxilHeat.TauxMix;
-                Real64 CpProdGasMol;
-                this->FigureAuxilHeatGasHeatCap(state, TprodGasIn, CpProdGasMol); // Cp in (J/mol*K)
-                // factor of 1000.0 for kmol -> mol
-                Real64 NdotCp = min(NdotGas * CpProdGasMol * 1000.0, NdotWater * CpWaterMol * 1000.0);
+            this->ExhaustHX.qHX = eHX * NdotCp * (TprodGasIn - TwaterIn);
 
-                this->ExhaustHX.qHX = eHX * NdotCp * (TprodGasIn - TwaterIn);
+            this->ExhaustHX.THXexh = TprodGasIn - this->ExhaustHX.qHX / (NdotGas * CpProdGasMol * 1000.0);
 
-                this->ExhaustHX.THXexh = TprodGasIn - this->ExhaustHX.qHX / (NdotGas * CpProdGasMol * 1000.0);
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                               TwaterIn,
+                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                               RoutineName);
 
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
-                                                                   TwaterIn,
-                                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
-                                                                   RoutineName);
+            if (this->ExhaustHX.WaterMassFlowRate * Cp <= 0.0) {
+                this->ExhaustHX.WaterOutletTemp = TwaterIn;
+            } else {
+                this->ExhaustHX.WaterOutletTemp = TwaterIn + this->ExhaustHX.qHX / (this->ExhaustHX.WaterMassFlowRate * Cp);
+            }
 
-                if (this->ExhaustHX.WaterMassFlowRate * Cp <= 0.0) {
-                    this->ExhaustHX.WaterOutletTemp = TwaterIn;
-                } else {
-                    this->ExhaustHX.WaterOutletTemp = TwaterIn + this->ExhaustHX.qHX / (this->ExhaustHX.WaterMassFlowRate * Cp);
-                }
+        } break;
+        case DataGenerators::ExhaustGasHX::LMTDempiricalUAeff: { // method 2
+            Real64 MWwater = state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight;
+            Real64 NdotWater = this->ExhaustHX.WaterMassFlowRate / MWwater;
+            Real64 NdotGas = this->AuxilHeat.NdotAuxMix;
 
-            } else if (SELECT_CASE_var == DataGenerators::ExhaustGasHX::LMTDempiricalUAeff) { // method 2
+            Real64 UAeff = this->ExhaustHX.hxs0 + this->ExhaustHX.hxs1 * NdotWater + this->ExhaustHX.hxs2 * pow_2(NdotWater) +
+                           this->ExhaustHX.hxs3 * NdotGas + this->ExhaustHX.hxs4 * pow_2(NdotGas);
+
+            Real64 TauxMix = this->AuxilHeat.TauxMix;
+            Real64 TwaterIn = this->ExhaustHX.WaterInletTemp;
+            Real64 CpWaterMol;
+            FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
+            // factor of 1000.0 for kmol -> mol
+            Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
+            Real64 CpProdGasMol;
+            this->FigureAuxilHeatGasHeatCap(state, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
+            Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
+
+            if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
+                // now evaluate Eq. 44
+                this->ExhaustHX.THXexh =
+                    ((1.0 - NdotCpAuxMix / NdotCpWater) / (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
+                        TauxMix +
+                    ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - 1.0) /
+                     (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
+                        TwaterIn;
+
+                this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh); // Eq. 42
+
+            } else {
+                this->ExhaustHX.THXexh = TauxMix;
+                this->ExhaustHX.WaterOutletTemp = TwaterIn;
+            }
+            // ENDIF
+
+            if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0) { // trap divide by zero
+                this->ExhaustHX.qHX = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
+                                      std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn));
+            } else {
+                this->ExhaustHX.qHX = 0.0;
+            }
+
+        } break;
+        case DataGenerators::ExhaustGasHX::LMTDfundementalUAeff: { // method 3
+            Real64 NdotGas = this->AuxilHeat.NdotAuxMix;
+            Real64 MWwater = state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight;
+            Real64 NdotWater = this->ExhaustHX.WaterMassFlowRate / MWwater;
+
+            Real64 hgas = this->ExhaustHX.h0gas * std::pow(NdotGas / this->ExhaustHX.NdotGasRef, this->ExhaustHX.nCoeff);         // Eq. 48
+            Real64 hwater = this->ExhaustHX.h0Water * std::pow(NdotWater / this->ExhaustHX.NdotWaterRef, this->ExhaustHX.mCoeff); // Eq. 48
+
+            // now equation 47
+            Real64 UAeff = 1.0 / (1.0 / (hgas * this->ExhaustHX.AreaGas) + 1.0 / (hwater * this->ExhaustHX.AreaWater) + this->ExhaustHX.Fadjust);
+
+            Real64 TauxMix = this->AuxilHeat.TauxMix;
+            Real64 TwaterIn = this->ExhaustHX.WaterInletTemp;
+            Real64 CpWaterMol;
+            FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
+            Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
+            Real64 CpProdGasMol;
+            this->FigureAuxilHeatGasHeatCap(state, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
+            Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
+
+            if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
+                // now evaluate Eq. 44
+                this->ExhaustHX.THXexh =
+                    ((1.0 - NdotCpAuxMix / NdotCpWater) / (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
+                        TauxMix +
+                    ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - 1.0) /
+                     (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
+                        TwaterIn;
+
+                this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh); // Eq. 42
+
+            } else {
+                this->ExhaustHX.THXexh = TauxMix;
+                this->ExhaustHX.WaterOutletTemp = TwaterIn;
+            }
+
+            if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0) { // trap divide by zero
+                this->ExhaustHX.qHX = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
+                                      std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn));
+            } else {
+                this->ExhaustHX.qHX = 0.0;
+            }
+
+        } break;
+        case DataGenerators::ExhaustGasHX::Condensing: { // method 4
+            if (this->ExhaustHX.WaterMassFlowRate != 0.0) {
+
                 Real64 MWwater = state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight;
                 Real64 NdotWater = this->ExhaustHX.WaterMassFlowRate / MWwater;
                 Real64 NdotGas = this->AuxilHeat.NdotAuxMix;
@@ -3140,13 +3229,30 @@ namespace FuelCellElectricGenerator {
                 Real64 TwaterIn = this->ExhaustHX.WaterInletTemp;
                 Real64 CpWaterMol;
                 FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
-                // factor of 1000.0 for kmol -> mol
                 Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
                 Real64 CpProdGasMol;
                 this->FigureAuxilHeatGasHeatCap(state, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
                 Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
 
+                // find water fraction in incoming gas stream
+                for (int i = 1; i <= isize(this->AuxilHeat.GasLibID); ++i) {
+                    if (this->AuxilHeat.GasLibID(i) == 4) this->ExhaustHX.WaterVaporFractExh = this->AuxilHeat.ConstitMolalFract(i);
+                }
+                Real64 NdotWaterVapor = this->ExhaustHX.WaterVaporFractExh * NdotGas;
+
+                Real64 TcondThresh = this->ExhaustHX.CondensationThresholdTemp;
+                Real64 hxl1 = this->ExhaustHX.l1Coeff;
+                Real64 hxl2 = this->ExhaustHX.l2Coeff;
+
+                this->ExhaustHX.CondensateRate =
+                    (TcondThresh - TwaterIn) * (hxl1 * (NdotWaterVapor / NdotGas) + hxl2 * pow_2(NdotWaterVapor / NdotGas));
+
+                if (this->ExhaustHX.CondensateRate < 0.0) this->ExhaustHX.CondensateRate = 0.0;
+
+                Real64 hfpwater = 4.4004e+07; // molal heat of vaporization of water J/kmol)
+
                 if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
+
                     // now evaluate Eq. 44
                     this->ExhaustHX.THXexh = ((1.0 - NdotCpAuxMix / NdotCpWater) /
                                               (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
@@ -3155,177 +3261,73 @@ namespace FuelCellElectricGenerator {
                                               (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
                                                  TwaterIn;
 
-                    this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh); // Eq. 42
+                    this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh) +
+                                                      (this->ExhaustHX.CondensateRate * hfpwater) / NdotCpWater;
 
-                } else {
-                    this->ExhaustHX.THXexh = TauxMix;
-                    this->ExhaustHX.WaterOutletTemp = TwaterIn;
-                }
-                // ENDIF
+                    if (this->ExhaustHX.CondensateRate > 0) { // Eq. 44 is not correct. use its result as first guess for revised way...
+                        // iterative solution because in condensing case THXexh is function of qSens and qLatent
+                        for (int loop = 1; loop <= 5; ++loop) {
 
-                if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0) { // trap divide by zero
-                    this->ExhaustHX.qHX = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
-                                          std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn));
-                } else {
-                    this->ExhaustHX.qHX = 0.0;
-                }
+                            Real64 qSens;
+                            Real64 qLatent;
 
-            } else if (SELECT_CASE_var == DataGenerators::ExhaustGasHX::LMTDfundementalUAeff) { // method 3
-                Real64 NdotGas = this->AuxilHeat.NdotAuxMix;
-                Real64 MWwater = state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight;
-                Real64 NdotWater = this->ExhaustHX.WaterMassFlowRate / MWwater;
-
-                Real64 hgas = this->ExhaustHX.h0gas * std::pow(NdotGas / this->ExhaustHX.NdotGasRef, this->ExhaustHX.nCoeff);         // Eq. 48
-                Real64 hwater = this->ExhaustHX.h0Water * std::pow(NdotWater / this->ExhaustHX.NdotWaterRef, this->ExhaustHX.mCoeff); // Eq. 48
-
-                // now equation 47
-                Real64 UAeff = 1.0 / (1.0 / (hgas * this->ExhaustHX.AreaGas) + 1.0 / (hwater * this->ExhaustHX.AreaWater) + this->ExhaustHX.Fadjust);
-
-                Real64 TauxMix = this->AuxilHeat.TauxMix;
-                Real64 TwaterIn = this->ExhaustHX.WaterInletTemp;
-                Real64 CpWaterMol;
-                FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
-                Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
-                Real64 CpProdGasMol;
-                this->FigureAuxilHeatGasHeatCap(state, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
-                Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
-
-                if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
-                    // now evaluate Eq. 44
-                    this->ExhaustHX.THXexh = ((1.0 - NdotCpAuxMix / NdotCpWater) /
-                                              (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
-                                                 TauxMix +
-                                             ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - 1.0) /
-                                              (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
-                                                 TwaterIn;
-
-                    this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh); // Eq. 42
-
-                } else {
-                    this->ExhaustHX.THXexh = TauxMix;
-                    this->ExhaustHX.WaterOutletTemp = TwaterIn;
-                }
-
-                if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0) { // trap divide by zero
-                    this->ExhaustHX.qHX = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
-                                          std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn));
-                } else {
-                    this->ExhaustHX.qHX = 0.0;
-                }
-
-            } else if (SELECT_CASE_var == DataGenerators::ExhaustGasHX::Condensing) { // method 4
-                if (this->ExhaustHX.WaterMassFlowRate != 0.0) {
-
-                    Real64 MWwater = state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight;
-                    Real64 NdotWater = this->ExhaustHX.WaterMassFlowRate / MWwater;
-                    Real64 NdotGas = this->AuxilHeat.NdotAuxMix;
-
-                    Real64 UAeff = this->ExhaustHX.hxs0 + this->ExhaustHX.hxs1 * NdotWater + this->ExhaustHX.hxs2 * pow_2(NdotWater) +
-                                   this->ExhaustHX.hxs3 * NdotGas + this->ExhaustHX.hxs4 * pow_2(NdotGas);
-
-                    Real64 TauxMix = this->AuxilHeat.TauxMix;
-                    Real64 TwaterIn = this->ExhaustHX.WaterInletTemp;
-                    Real64 CpWaterMol;
-                    FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
-                    Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
-                    Real64 CpProdGasMol;
-                    this->FigureAuxilHeatGasHeatCap(state, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
-                    Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
-
-                    // find water fraction in incoming gas stream
-                    for (int i = 1; i <= isize(this->AuxilHeat.GasLibID); ++i) {
-                        if (this->AuxilHeat.GasLibID(i) == 4) this->ExhaustHX.WaterVaporFractExh = this->AuxilHeat.ConstitMolalFract(i);
-                    }
-                    Real64 NdotWaterVapor = this->ExhaustHX.WaterVaporFractExh * NdotGas;
-
-                    Real64 TcondThresh = this->ExhaustHX.CondensationThresholdTemp;
-                    Real64 hxl1 = this->ExhaustHX.l1Coeff;
-                    Real64 hxl2 = this->ExhaustHX.l2Coeff;
-
-                    this->ExhaustHX.CondensateRate =
-                        (TcondThresh - TwaterIn) * (hxl1 * (NdotWaterVapor / NdotGas) + hxl2 * pow_2(NdotWaterVapor / NdotGas));
-
-                    if (this->ExhaustHX.CondensateRate < 0.0) this->ExhaustHX.CondensateRate = 0.0;
-
-                    Real64 hfpwater = 4.4004e+07; // molal heat of vaporization of water J/kmol)
-
-                    if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
-
-                        // now evaluate Eq. 44
-                        this->ExhaustHX.THXexh = ((1.0 - NdotCpAuxMix / NdotCpWater) /
-                                                  (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
-                                                     TauxMix +
-                                                 ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - 1.0) /
-                                                  (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) - NdotCpAuxMix / NdotCpWater)) *
-                                                     TwaterIn;
-
-                        this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh) +
-                                                          (this->ExhaustHX.CondensateRate * hfpwater) / NdotCpWater;
-
-                        if (this->ExhaustHX.CondensateRate > 0) { // Eq. 44 is not correct. use its result as first guess for revised way...
-                            // iterative solution because in condensing case THXexh is function of qSens and qLatent
-                            for (int loop = 1; loop <= 5; ++loop) {
-
-                                Real64 qSens;
-                                Real64 qLatent;
-
-                                if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0 &&
-                                    ((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn) >
-                                     0.0001)) { // trap divide by zero and negative log
-                                    qSens = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
-                                            std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn));
-                                } else {
-                                    qSens = 0.0;
-                                }
-                                qLatent = this->ExhaustHX.CondensateRate * hfpwater;
-                                if (qSens > 0) {
-                                    this->ExhaustHX.THXexh =
-                                        TauxMix * ((1.0 - NdotCpAuxMix / NdotCpWater) / ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
-                                                                                          (std::exp((UAeff * qLatent) / (NdotCpWater * qSens)))) -
-                                                                                         NdotCpAuxMix / NdotCpWater)) +
-                                        TwaterIn * ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
-                                                         (std::exp((UAeff * qLatent) / (NdotCpWater * qSens))) -
-                                                     1.0) /
-                                                    (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
-                                                         (std::exp((UAeff * qLatent) / (NdotCpWater * qSens))) -
-                                                     NdotCpAuxMix / NdotCpWater)) -
-                                        ((qLatent / NdotCpWater) / (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
-                                                                        (std::exp((UAeff * qLatent) / (NdotCpWater * qSens))) -
-                                                                    NdotCpAuxMix / NdotCpWater));
-                                } else {
-                                    this->ExhaustHX.THXexh = TauxMix;
-                                }
-
-                                this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh) +
-                                                                  (this->ExhaustHX.CondensateRate * hfpwater) / NdotCpWater;
+                            if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0 &&
+                                ((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn) >
+                                 0.0001)) { // trap divide by zero and negative log
+                                qSens = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
+                                        std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn));
+                            } else {
+                                qSens = 0.0;
                             }
+                            qLatent = this->ExhaustHX.CondensateRate * hfpwater;
+                            if (qSens > 0) {
+                                this->ExhaustHX.THXexh =
+                                    TauxMix * ((1.0 - NdotCpAuxMix / NdotCpWater) / ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
+                                                                                      (std::exp((UAeff * qLatent) / (NdotCpWater * qSens)))) -
+                                                                                     NdotCpAuxMix / NdotCpWater)) +
+                                    TwaterIn * ((std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
+                                                     (std::exp((UAeff * qLatent) / (NdotCpWater * qSens))) -
+                                                 1.0) /
+                                                (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
+                                                     (std::exp((UAeff * qLatent) / (NdotCpWater * qSens))) -
+                                                 NdotCpAuxMix / NdotCpWater)) -
+                                    ((qLatent / NdotCpWater) / (std::exp(UAeff * (1.0 / NdotCpAuxMix - 1.0 / NdotCpWater)) /
+                                                                    (std::exp((UAeff * qLatent) / (NdotCpWater * qSens))) -
+                                                                NdotCpAuxMix / NdotCpWater));
+                            } else {
+                                this->ExhaustHX.THXexh = TauxMix;
+                            }
+
+                            this->ExhaustHX.WaterOutletTemp = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - this->ExhaustHX.THXexh) +
+                                                              (this->ExhaustHX.CondensateRate * hfpwater) / NdotCpWater;
                         }
-
-                    } else {
-                        this->ExhaustHX.THXexh = TauxMix;
-                        this->ExhaustHX.WaterOutletTemp = TwaterIn;
                     }
 
-                    if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0 &&
-                        ((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn) >
-                         0.0001)) { // trap divide by zero and negative log
-
-                        this->ExhaustHX.qHX = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
-                                                  std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn)) +
-                                              this->ExhaustHX.CondensateRate * hfpwater;
-                    } else {
-                        this->ExhaustHX.qHX = 0.0;
-                    }
-                } else { // no cooling water flow, model will blow up.
-                    this->ExhaustHX.qHX = 0.0;
-                    this->ExhaustHX.THXexh = this->AuxilHeat.TauxMix;
-                    this->ExhaustHX.WaterOutletTemp = this->ExhaustHX.WaterInletTemp;
-                    this->ExhaustHX.CondensateRate = 0.0;
-                    this->ExhaustHX.WaterVaporFractExh = -9999.0; // not defined
+                } else {
+                    this->ExhaustHX.THXexh = TauxMix;
+                    this->ExhaustHX.WaterOutletTemp = TwaterIn;
                 }
-            } else {
-                assert(false); // Variables not set are used below
+
+                if ((this->ExhaustHX.THXexh - TwaterIn) != 0.0 && ((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn) >
+                                                                   0.0001)) { // trap divide by zero and negative log
+
+                    this->ExhaustHX.qHX = UAeff * ((TauxMix - this->ExhaustHX.WaterOutletTemp) - (this->ExhaustHX.THXexh - TwaterIn)) /
+                                              std::log((TauxMix - this->ExhaustHX.WaterOutletTemp) / (this->ExhaustHX.THXexh - TwaterIn)) +
+                                          this->ExhaustHX.CondensateRate * hfpwater;
+                } else {
+                    this->ExhaustHX.qHX = 0.0;
+                }
+            } else { // no cooling water flow, model will blow up.
+                this->ExhaustHX.qHX = 0.0;
+                this->ExhaustHX.THXexh = this->AuxilHeat.TauxMix;
+                this->ExhaustHX.WaterOutletTemp = this->ExhaustHX.WaterInletTemp;
+                this->ExhaustHX.CondensateRate = 0.0;
+                this->ExhaustHX.WaterVaporFractExh = -9999.0; // not defined
             }
+        } break;
+        default: {
+            assert(false); // Variables not set are used below
+        } break;
         }
 
         // update results in data structure.
@@ -3351,8 +3353,8 @@ namespace FuelCellElectricGenerator {
     {
         if (this->Type == DataPlant::PlantEquipmentType::Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
-                                                            this->CWLoopNum,
-                                                            this->CWLoopSideNum,
+                                                            this->CWPlantLoc.loopNum,
+                                                            this->CWPlantLoc.loopSideNum,
                                                             DataPlant::PlantEquipmentType::Generator_FCStackCooler,
                                                             this->StackCooler.WaterInNode,
                                                             this->StackCooler.WaterOutNode,
@@ -3363,8 +3365,8 @@ namespace FuelCellElectricGenerator {
                                                             FirstHVACIteration);
         } else if (this->Type == DataPlant::PlantEquipmentType::Generator_FCExhaust) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
-                                                            this->CWLoopNum,
-                                                            this->CWLoopSideNum,
+                                                            this->CWPlantLoc.loopNum,
+                                                            this->CWPlantLoc.loopSideNum,
                                                             DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                             this->ExhaustHX.WaterInNode,
                                                             this->ExhaustHX.WaterOutNode,
@@ -3451,9 +3453,9 @@ namespace FuelCellElectricGenerator {
             this->Inverter.QairIntake = 0.0;
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                            DataGenerators::InitHRTemp,
-                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
             this->ExhaustHX.WaterMassFlowRateDesign = this->ExhaustHX.WaterVolumeFlowMax * rho;
@@ -3461,15 +3463,8 @@ namespace FuelCellElectricGenerator {
             state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp = DataGenerators::InitHRTemp;
             state.dataLoopNodes->Node(this->ExhaustHX.WaterOutNode).Temp = DataGenerators::InitHRTemp;
 
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->ExhaustHX.WaterMassFlowRateDesign,
-                                               this->ExhaustHX.WaterInNode,
-                                               this->ExhaustHX.WaterOutNode,
-                                               this->CWLoopNum,
-                                               this->CWLoopSideNum,
-                                               this->CWBranchNum,
-                                               this->CWCompNum);
+            PlantUtilities::InitComponentNodes(
+                state, 0.0, this->ExhaustHX.WaterMassFlowRateDesign, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode);
 
             this->MyEnvrnFlag_Init = false;
             this->MyWarmupFlag_Init = true;
@@ -3497,28 +3492,15 @@ namespace FuelCellElectricGenerator {
             // intialize flow rate in water loop, this is "requesting" flow
             Real64 mdot = this->ExhaustHX.WaterMassFlowRateDesign;
 
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 mdot,
-                                                 this->ExhaustHX.WaterInNode,
-                                                 this->ExhaustHX.WaterOutNode,
-                                                 this->CWLoopNum,
-                                                 this->CWLoopSideNum,
-                                                 this->CWBranchNum,
-                                                 this->CWCompNum);
+            PlantUtilities::SetComponentFlowRate(state, mdot, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode, this->CWPlantLoc);
 
             this->ExhaustHX.WaterMassFlowRate = mdot;
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
             this->TimeElapsed = timeElapsed;
         } else {
 
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->ExhaustHX.WaterMassFlowRate,
-                                                 this->ExhaustHX.WaterInNode,
-                                                 this->ExhaustHX.WaterOutNode,
-                                                 this->CWLoopNum,
-                                                 this->CWLoopSideNum,
-                                                 this->CWBranchNum,
-                                                 this->CWCompNum);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->ExhaustHX.WaterMassFlowRate, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode, this->CWPlantLoc);
 
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
         }
@@ -3582,25 +3564,27 @@ namespace FuelCellElectricGenerator {
                                                              // zone | power module (stack and reformer) losses to zone
 
             // now account for other subsystems that may or may not have air intake recovery
-            {
-                auto const SELECT_CASE_var(thisFC.AirSup.IntakeRecoveryMode);
-
-                if (SELECT_CASE_var == DataGenerators::RecoverMode::NoRecoveryOnAirIntake) { // then the heat has to go into zone
-                    TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.ElecStorage.QairIntake + thisFC.Inverter.QairIntake;
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverAuxiliaryBurner) {
-                    TotalZoneHeatGain += thisFC.ElecStorage.QairIntake + thisFC.Inverter.QairIntake;
-
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverInverterBatt) {
-                    TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake;
-
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverInverter) {
-                    TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.ElecStorage.QairIntake;
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverBattery) {
-                    TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.Inverter.QairIntake;
-
-                } else if (SELECT_CASE_var == DataGenerators::RecoverMode::RecoverBurnInvertBatt) {
-                    // do nothing
-                }
+            switch (thisFC.AirSup.IntakeRecoveryMode) {
+            case DataGenerators::RecoverMode::NoRecoveryOnAirIntake: { // then the heat has to go into zone
+                TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.ElecStorage.QairIntake + thisFC.Inverter.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverAuxiliaryBurner: {
+                TotalZoneHeatGain += thisFC.ElecStorage.QairIntake + thisFC.Inverter.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverInverterBatt: {
+                TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverInverter: {
+                TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.ElecStorage.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverBattery: {
+                TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.Inverter.QairIntake;
+            } break;
+            case DataGenerators::RecoverMode::RecoverBurnInvertBatt: {
+                // do nothing
+            } break;
+            default:
+                break;
             }
 
             thisFC.QconvZone = TotalZoneHeatGain * (1 - thisFC.FCPM.RadiativeFract);
@@ -3731,19 +3715,8 @@ namespace FuelCellElectricGenerator {
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
 
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->NameExhaustHX,
-                                                    DataPlant::PlantEquipmentType::Generator_FCExhaust,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->NameExhaustHX, DataPlant::PlantEquipmentType::Generator_FCExhaust, this->CWPlantLoc, errFlag, _, _, _, _, _);
 
             // if there is a stack cooler option it might be connected to plant as well
 

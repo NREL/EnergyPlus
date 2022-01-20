@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -151,6 +151,7 @@ enum class OutConvClass
     LeewardVertWall = 102,
     RoofStable = 103,
     RoofUnstable = 104,
+    Num
 };
 
 enum class ConvSurfDeltaT : int
@@ -159,7 +160,7 @@ enum class ConvSurfDeltaT : int
     Positive,
     Zero,
     Negative,
-    Num, // count, always the last element
+    Num // count, always the last element
 };
 
 enum class SurfConvOrientation : int
@@ -170,12 +171,13 @@ enum class SurfConvOrientation : int
     Vertical,
     TiltedUpward,
     HorizontalUp,
-    Num, // count, always the last element
+    Num // count, always the last element
 };
 
 // Parameters for fenestration relative location in zone
 enum class InConvWinLoc
 {
+    // TODO: enum check
     Invalid = -1,
     NotSet = 0,
     LowerPartOfExteriorWall = 1, // this is a window in the lower part of wall
@@ -183,6 +185,7 @@ enum class InConvWinLoc
     WindowAboveThis = 3,         // this is a wall with window above it
     WindowBelowThis = 4,         // this is a wall with window below it
     LargePartOfExteriorWall = 5, // this is a big window taking up most of wall
+    Num
 };
 
 // Parameters for adaptive convection algorithm's classification of inside face of surfaces
@@ -234,6 +237,7 @@ enum class InConvClass
     E_StableCeiling = 43,       // flow regime E
     E_UnstableCeiling = 44,     // flow regime E
     E_Windows = 45,             // flow regime E
+    Num
 };
 
 // Parameters to indicate user specified convection coefficients (for surface)
@@ -244,7 +248,7 @@ enum class ConvCoefOverrideType : int
     Schedule,       // User specified "schedule" as the override type
     UserCurve,      // User specified "UserCurve" as the override type
     SpecifiedModel, // one of the direct named model equation keys
-    Num,            // count, always last element
+    Num             // count, always last element
 };
 
 // parameters, by zone, for flow regimes for adaptive convection on inside face
@@ -258,6 +262,7 @@ enum class InConvFlowRegime
     C,  // central mechanical air
     D,  // zone mechanical air
     E,  // mixed. mechanical air and buoyancy
+    Num
 };
 
 // params for reference temperature type
@@ -267,6 +272,7 @@ enum class RefTemp
     MeanAirTemp,
     AdjacentAirTemp,
     SupplyAirTemp,
+    Num
 };
 
 // params for wind speed type
@@ -277,6 +283,7 @@ enum class RefWind
     AtZ,
     ParallelComp,
     ParallelCompAtZ,
+    Num
 };
 
 } // namespace EnergyPlus::ConvectionConstants

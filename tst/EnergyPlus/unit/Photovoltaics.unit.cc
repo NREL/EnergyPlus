@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,11 +99,11 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
 
     state->dataPhotovoltaic->NumPVs = 3;
     state->dataPhotovoltaic->PVarray(1).SurfacePtr = 1;
-    state->dataPhotovoltaic->PVarray(1).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(1).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Invalid;
     state->dataPhotovoltaic->PVarray(2).SurfacePtr = 2;
-    state->dataPhotovoltaic->PVarray(2).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(2).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Invalid;
     state->dataPhotovoltaic->PVarray(3).SurfacePtr = 3;
-    state->dataPhotovoltaic->PVarray(3).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(3).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Invalid;
 
     state->dataSurface->Surface(1).Zone = 1;
     state->dataSurface->Surface(1).ZoneName = "Zone1";

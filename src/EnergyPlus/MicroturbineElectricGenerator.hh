@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -130,10 +130,7 @@ namespace MicroturbineElectricGenerator {
         Real64 HeatRecMinMassFlowRate;    // Minimum heat recovery water mass flow rate (kg/s)
         Real64 HeatRecMaxMassFlowRate;    // Maximum heat recovery water mass flow rate (kg/s)
         Real64 HeatRecMdot;               // Heat Recovery Loop Mass flow rate (kg/s)
-        int HRLoopNum;                    // cooling water plant loop index number, for heat recovery
-        int HRLoopSideNum;                // cooling water plant loop side index, for heat recovery
-        int HRBranchNum;                  // cooling water plant loop branch index, for heat recovery
-        int HRCompNum;                    // cooling water plant loop component index, for heat recovery
+        PlantLocation HRPlantLoc;         // cooling water plant loop component index, for heat recovery
         Real64 FuelMdot;                  // Fuel Amount used (kg/s)
         Real64 ElecPowerGenerated;        // Electric power generated (W)
         Real64 StandbyPowerRate;          // Standby power rate this time step (W)
@@ -183,14 +180,14 @@ namespace MicroturbineElectricGenerator {
               ExhAirTempFPLRCurveNum(0), ExhaustAirTemperature(0.0), ExhaustAirHumRat(0.0), CompType_Num(GeneratorType::Microturbine),
               RefCombustAirInletDensity(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), FuelEnergyUseRateHHV(0.0), FuelEnergyUseRateLHV(0.0),
               QHeatRecovered(0.0), ExhaustEnergyRec(0.0), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletTemp(0.0),
-              HeatRecOutletTemp(0.0), HeatRecMinMassFlowRate(0.0), HeatRecMaxMassFlowRate(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0),
-              HRBranchNum(0), HRCompNum(0), FuelMdot(0.0), ElecPowerGenerated(0.0), StandbyPowerRate(0.0), AncillaryPowerRate(0.0),
-              PowerFTempElevErrorIndex(0), EffFTempErrorIndex(0), EffFPLRErrorIndex(0), ExhFlowFTempErrorIndex(0), ExhFlowFPLRErrorIndex(0),
-              ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0), HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0),
-              ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0), AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0),
-              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true), MyEnvrnFlag(true),
-              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), EnergyGen(0.0), FuelEnergyHHV(0.0), ElectricEfficiencyLHV(0.0),
-              ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0), myFlag(true)
+              HeatRecOutletTemp(0.0), HeatRecMinMassFlowRate(0.0), HeatRecMaxMassFlowRate(0.0), HeatRecMdot(0.0), HRPlantLoc{}, FuelMdot(0.0),
+              ElecPowerGenerated(0.0), StandbyPowerRate(0.0), AncillaryPowerRate(0.0), PowerFTempElevErrorIndex(0), EffFTempErrorIndex(0),
+              EffFPLRErrorIndex(0), ExhFlowFTempErrorIndex(0), ExhFlowFPLRErrorIndex(0), ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0),
+              HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0), ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0),
+              AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0), HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0),
+              ThermEffFTempElevErrorIndex(0), CheckEquipName(true), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true),
+              EnergyGen(0.0), FuelEnergyHHV(0.0), ElectricEfficiencyLHV(0.0), ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0),
+              myFlag(true)
         {
         }
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -71,10 +73,11 @@ namespace LowTempRadiantSystem {
 
     enum class SystemType
     {
-        Unassigned,
+        Invalid = -1,
         HydronicSystem,     // Variable flow hydronic radiant system
         ConstantFlowSystem, // Constant flow, variable (controlled) temperature radiant system
         ElectricSystem,     // Electric resistance radiant heating system
+        Num
     };
 
     // Operating modes:
@@ -85,42 +88,52 @@ namespace LowTempRadiantSystem {
     // Control types:
     enum class LowTempRadiantControlTypes
     {
-        MATControl,           // Controls system using mean air temperature
-        MRTControl,           // Controls system using mean radiant temperature
-        OperativeControl,     // Controls system using operative temperature
-        ODBControl,           // Controls system using outside air dry-bulb temperature
-        OWBControl,           // Controls system using outside air wet-bulb temperature
-        SurfFaceTempControl,  // Controls system using the surface inside face temperature
-        SurfIntTempControl,   // Controls system using a temperature inside the radiant system construction as defined by the Construction +
-                              // ConstructionProperty:InternalHeatSource inputs
-        RunningMeanODBControl // Controls system using the running mean outdoor dry-bulb temperature
+        Invalid = -1,
+        MATControl,            // Controls system using mean air temperature
+        MRTControl,            // Controls system using mean radiant temperature
+        OperativeControl,      // Controls system using operative temperature
+        ODBControl,            // Controls system using outside air dry-bulb temperature
+        OWBControl,            // Controls system using outside air wet-bulb temperature
+        SurfFaceTempControl,   // Controls system using the surface inside face temperature
+        SurfIntTempControl,    // Controls system using a temperature inside the radiant system construction as defined by the Construction +
+                               // ConstructionProperty:InternalHeatSource inputs
+        RunningMeanODBControl, // Controls system using the running mean outdoor dry-bulb temperature
+        Num
     };
+
     // Setpoint Types:
     enum class LowTempRadiantSetpointTypes
     {
-        halfFlowPower, // Controls system where the setpoint is at the 50% flow/power point
-        zeroFlowPower  // Controls system where the setpoint is at the 0% flow/power point
+        Invalid = -1,
+        HalfFlowPower, // Controls system where the setpoint is at the 50% flow/power point
+        ZeroFlowPower, // Controls system where the setpoint is at the 0% flow/power point
+        Num
     };
     // Fluid to Slab Heat Transfer Types:
     enum class FluidToSlabHeatTransferTypes
     {
+        Invalid = -1,
         ConvectionOnly, // Convection only model (legacy code, original model)
-        ISOStandard     // Using ISO Standard 1185-2 (convection, conduction through pipe, contact resistance)
+        ISOStandard,    // Using ISO Standard 1185-2 (convection, conduction through pipe, contact resistance)
+        Num
     };
 
     enum class CondContrlType
     {
+        Invalid = -1,
         CondCtrlNone,      // Condensation control--none, so system never shuts down
         CondCtrlSimpleOff, // Condensation control--simple off, system shuts off when condensation predicted
-        CondCtrlVariedOff  // Condensation control--variable off, system modulates to keep running if possible
+        CondCtrlVariedOff, // Condensation control--variable off, system modulates to keep running if possible
+        Num
     };
 
     // Number of Circuits per Surface Calculation Method
     enum class CircuitCalc
     {
-        Unassigned = -1,
-        OneCircuit,         // there is 1 circuit per surface
-        CalculateFromLength // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
+        Invalid = -1,
+        OneCircuit,          // there is 1 circuit per surface
+        CalculateFromLength, // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
+        Num
     };
 
     struct RadiantSystemBaseData
@@ -137,11 +150,11 @@ namespace LowTempRadiantSystem {
         Array1D_string SurfaceName;    // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFrac;   // Fraction of flow/pipe length or electric power for a particular surface
         Real64 TotalSurfaceArea = 0.0; // Total surface area for all surfaces that are part of this radiant system
-        LowTempRadiantControlTypes ControlType = LowTempRadiantControlTypes::MATControl; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
+        LowTempRadiantControlTypes controlType = LowTempRadiantControlTypes::MATControl; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
                                                                                          // Surface Face Temp, Surface Interior Temp, Running Mean
                                                                                          // Temp for Constant Flow systems only)
         LowTempRadiantSetpointTypes SetpointType =
-            LowTempRadiantSetpointTypes::halfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
+            LowTempRadiantSetpointTypes::HalfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
         int OperatingMode = NotOperating;               // Operating mode currently being used (NotOperating, Heating, Cooling)
         Real64 HeatPower;                               // heating sent to panel in Watts
         Real64 HeatEnergy;                              // heating sent to panel in Joules
@@ -192,23 +205,17 @@ namespace LowTempRadiantSystem {
         bool HeatingSystem = false;  // .TRUE. when the system is able to heat (parameters are valid)
         int HotWaterInNode = 0;      // hot water inlet node
         int HotWaterOutNode = 0;     // hot water outlet node
-        int HWLoopNum = 0;
-        int HWLoopSide = 0;
-        int HWBranchNum = 0;
-        int HWCompNum = 0;
+        PlantLocation HWPlantLoc{};
         bool CoolingSystem = false; // .TRUE. when the system is able to cool (parameters are valid)
         int ColdWaterInNode = 0;    // cold water inlet node
         int ColdWaterOutNode = 0;   // cold water outlet node
-        int CWLoopNum = 0;
-        int CWLoopSide = 0;
-        int CWBranchNum = 0;
-        int CWCompNum = 0;
+        PlantLocation CWPlantLoc{};
         int GlycolIndex = 0;             // Index to Glycol (Water) Properties
         int CondErrIndex = 0;            // Error index for recurring warning messages
         Real64 CondCausedTimeOff = 0.0;  // Amount of time condensation did or could have turned system off
         bool CondCausedShutDown = false; // .TRUE. when condensation predicted at surface
         CircuitCalc NumCircCalcMethod =
-            CircuitCalc::Unassigned;          // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
+            CircuitCalc::Invalid;             // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength = 0.0;              // Circuit length {m}
         std::string schedNameChangeoverDelay; // changeover delay schedule
         int schedPtrChangeoverDelay = 0;      // Pointer to the schedule for the changeover delay in hours
@@ -309,7 +316,7 @@ namespace LowTempRadiantSystem {
         // Surface Face Temp, Surface Interior Temp, Running Mean Temp
         // for Constant Flow systems only)
         LowTempRadiantSetpointTypes VarFlowSetpointType =
-            LowTempRadiantSetpointTypes::halfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
+            LowTempRadiantSetpointTypes::HalfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
         std::string DesignHeatingCapMethodInput;
         int DesignHeatingCapMethod = 0; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity,
         // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
@@ -470,9 +477,9 @@ namespace LowTempRadiantSystem {
     {
         // Members
         // This type used to track different components/types for efficiency
-        std::string Name;                                                                           // name of radiant system
-        LowTempRadiantSystem::SystemType SystemType = LowTempRadiantSystem::SystemType::Unassigned; // Type of System (see System Types in Parameters)
-        int CompIndex = 0;                                                                          // Index in specific system types
+        std::string Name;                                                                        // name of radiant system
+        LowTempRadiantSystem::SystemType SystemType = LowTempRadiantSystem::SystemType::Invalid; // Type of System (see System Types in Parameters)
+        int CompIndex = 0;                                                                       // Index in specific system types
 
         // Default Constructor
         RadSysTypeData() = default;

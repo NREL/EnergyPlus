@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,10 +78,7 @@ namespace OutsideEnergySources {
         Real64 EnergyRate = 0.0;                                                          // cooling power
         DataPlant::PlantEquipmentType EnergyType{DataPlant::PlantEquipmentType::Invalid}; // flag for district heating OR cooling
         // loop topology variables
-        int LoopNum = 0;
-        int LoopSideNum = 0;
-        int BranchNum = 0;
-        int CompNum = 0;
+        PlantLocation plantLoc{};
         // flags
         bool BeginEnvrnInitFlag = true;
         bool CheckEquipName = true;

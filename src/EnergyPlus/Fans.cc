@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -382,7 +382,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                     NodeInputManager::compFluidStream::Primary,
+                                                     NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(4),
@@ -391,7 +391,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                      NodeInputManager::compFluidStream::Primary,
+                                                      NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
         if (NumAlphas > 4) {
@@ -481,7 +481,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                     NodeInputManager::compFluidStream::Primary,
+                                                     NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(5),
@@ -490,7 +490,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                      NodeInputManager::compFluidStream::Primary,
+                                                      NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
         if (NumAlphas > 5) {
@@ -569,7 +569,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                     NodeInputManager::compFluidStream::Primary,
+                                                     NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(4),
@@ -578,7 +578,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                      NodeInputManager::compFluidStream::Primary,
+                                                      NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
         if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
@@ -734,7 +734,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                     NodeInputManager::compFluidStream::Primary,
+                                                     NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(4),
@@ -743,7 +743,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                      NodeInputManager::compFluidStream::Primary,
+                                                      NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
         if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
@@ -847,7 +847,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                     NodeInputManager::compFluidStream::Primary,
+                                                     NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent); // Air inlet node name
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(3),
@@ -856,7 +856,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                      NodeInputManager::compFluidStream::Primary,
+                                                      NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent); // Air outlet node name
 
         TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
@@ -2487,7 +2487,7 @@ void ReportFan(EnergyPlusData &state, int const FanNum)
     }
 }
 
-void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
+void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view ThisObjectType)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2507,8 +2507,8 @@ void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanInde
 
     FanIndex = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (FanIndex == 0) {
-        if (present(ThisObjectType)) {
-            ShowSevereError(state, ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName);
+        if (!ThisObjectType.empty()) {
+            ShowSevereError(state, fmt::format("{}, GetFanIndex: Fan not found={}", ThisObjectType, FanName));
         } else {
             ShowSevereError(state, "GetFanIndex: Fan not found=" + FanName);
         }
@@ -2556,11 +2556,11 @@ Real64 GetFanPower(EnergyPlusData &state, int const FanIndex)
 }
 
 void GetFanType(EnergyPlusData &state,
-                std::string const &FanName,           // Fan name
-                int &FanType,                         // returned fantype number
-                bool &ErrorsFound,                    // error indicator
-                Optional_string_const ThisObjectType, // parent object type (for error message)
-                Optional_string_const ThisObjectName  // parent object name (for error message)
+                std::string const &FanName,            // Fan name
+                int &FanType,                          // returned fantype number
+                bool &ErrorsFound,                     // error indicator
+                std::string_view const ThisObjectType, // parent object type (for error message)
+                std::string_view const ThisObjectName  // parent object name (for error message)
 )
 {
 
@@ -2586,10 +2586,10 @@ void GetFanType(EnergyPlusData &state,
 
     FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
     if (FanIndex == 0) {
-        if (present(ThisObjectType) && present(ThisObjectName)) {
-            ShowSevereError(state, "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\".");
-        } else if (present(ThisObjectType)) {
-            ShowSevereError(state, ThisObjectType() + ", GetFanType: Fan not found=" + FanName);
+        if ((!ThisObjectType.empty()) && (!ThisObjectName.empty())) {
+            ShowSevereError(state, fmt::format("GetFanType: {}=\"{}\", invalid Fan specified=\"{}\".", ThisObjectType, ThisObjectName, FanName));
+        } else if (!ThisObjectType.empty()) {
+            ShowSevereError(state, fmt::format("{}, GetFanType: Fan not found={}", ThisObjectType, FanName));
         } else {
             ShowSevereError(state, "GetFanType: Fan not found=" + FanName);
         }

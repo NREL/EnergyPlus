@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,17 +77,19 @@ namespace StandardRatings {
     // Defrost strategy (heat pump only)
     enum class DefrostStrat
     {
-        Unassigned = -1,
+        Invalid = -1,
         ReverseCycle, // uses reverse cycle defrost strategy
-        Resistive     // uses electric resistance heater for defrost
+        Resistive,    // uses electric resistance heater for defrost
+        Num,
     };
 
     // Defrost control  (heat pump only)
     enum class HPdefrostControl : int
     {
-        Unassigned = -1,
-        Timed,   // defrost cycle is timed
-        OnDemand // defrost cycle occurs only when required
+        Invalid = -1,
+        Timed,    // defrost cycle is timed
+        OnDemand, // defrost cycle occurs only when required
+        Num
     };
 
     // Functions

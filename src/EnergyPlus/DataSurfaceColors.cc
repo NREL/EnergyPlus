@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,9 +67,9 @@ namespace EnergyPlus::DataSurfaceColors {
 // other surface reporting.
 
 bool MatchAndSetColorTextString(EnergyPlusData &state,
-                                std::string const &String,   // string to be matched
-                                int const SetValue,          // value to be used for the color
-                                std::string const &ColorType // for now, must be DXF
+                                std::string const &String,       // string to be matched
+                                int const SetValue,              // value to be used for the color
+                                std::string_view const ColorType // for now, must be DXF and probably not a string in the future
 )
 {
 
@@ -79,7 +79,7 @@ bool MatchAndSetColorTextString(EnergyPlusData &state,
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataSurfaceColors::ColorNo::NUM)> colorkeys = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataSurfaceColors::ColorNo::Num)> colorkeys = {
         "TEXT",
         "WALLS",
         "WINDOWS",
@@ -109,7 +109,7 @@ bool MatchAndSetColorTextString(EnergyPlusData &state,
     return true;
 }
 
-void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType)
+void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std::string_view const ColorType)
 {
 
     // SUBROUTINE INFORMATION:

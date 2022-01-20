@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,7 +90,9 @@ namespace DataSurfaces {
 
     enum class SurfaceShape : int
     {
-        None = 0,
+        // TODO: enum check
+        Invalid = -1,
+        None,
         Triangle,
         Quadrilateral,
         Rectangle,
@@ -100,13 +102,14 @@ namespace DataSurfaces {
         RectangularRightFin,
         TriangularWindow,
         TriangularDoor,
-        Polygonal
+        Polygonal,
+        Num
     };
 
     enum class SurfaceClass : int
     {
-        INVALID = -1,
-        None = 0,
+        Invalid = -1,
+        None,
         Wall,
         Floor,
         Roof,
@@ -121,12 +124,12 @@ namespace DataSurfaces {
         Fin,
         TDD_Dome,
         TDD_Diffuser,
-        Count // The counter representing the total number of surface class, always stays at the bottom
+        Num // The counter representing the total number of surface class, always stays at the bottom
     };
 
     enum class WinShadingType : int
     {
-        INVALID = -1,
+        Invalid = -1,
         NoShade = 0,
         ShadeOff = 1,
         IntShade = 2,
@@ -143,11 +146,13 @@ namespace DataSurfaces {
         IntBlindConditionallyOff = 13,
         ExtBlindConditionallyOff = 14,
         BGShadeConditionallyOff = 15,
-        BGBlindConditionallyOff = 16
+        BGBlindConditionallyOff = 16,
+        Num
     }; // Valid window shading types: IntShade <= Type <= BGBlind; the rest are shading status
 
     enum class WindowShadingControlType : int
     {
+        Invalid = -1,
         UnControlled = 0,
         AlwaysOn = 1,
         AlwaysOff = 2,
@@ -169,7 +174,8 @@ namespace DataSurfaces {
         OnHiOutTemp_HiSolarWindow = 18,
         OnHiOutTemp_HiHorzSolar = 19,
         OnHiZoneTemp_HiSolarWindow = 20,
-        OnHiZoneTemp_HiHorzSolar = 21
+        OnHiZoneTemp_HiHorzSolar = 21,
+        Num
     };
 
     // Parameters to indicate exterior boundary conditions for use with
@@ -209,9 +215,9 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    enum class iHeatTransferModel : int
+    enum class HeatTransferModel
     {
-        NotSet = -1,
+        Invalid = -1,
         None, // shading surfaces
         CTF,
         EMPD,
@@ -222,10 +228,10 @@ namespace DataSurfaces {
         TDD,                 // tubular daylighting device
         Kiva,                // Kiva ground calculations
         AirBoundaryNoHT,     // Construction:AirBoundary - not IRT or interior window
-        Num,                 // count, always the final element
+        Num                  // count, always the final element
     };
 
-    static constexpr std::array<std::string_view, (int)DataSurfaces::iHeatTransferModel::Num> HeatTransAlgoStrs = {
+    static constexpr std::array<std::string_view, (int)DataSurfaces::HeatTransferModel::Num> HeatTransAlgoStrs = {
         "None",
         "CTF - ConductionTransferFunction",
         "EMPD - MoisturePenetrationDepthConductionTransferFunction",
@@ -241,13 +247,14 @@ namespace DataSurfaces {
     // derived type:
     enum class SurfaceRoughness
     {
-        Unassigned = -1,
+        Invalid = -1,
         VeryRough,
         Rough,
         MediumRough,
         MediumSmooth,
         Smooth,
-        VerySmooth
+        VerySmooth,
+        Num
     };
 
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
@@ -497,11 +504,11 @@ namespace DataSurfaces {
         Real64 ViewFactorSky;    // View factor to the sky from the exterior of the surface for diffuse solar radiation
 
         // Special Properties
-        iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        int IntConvCoeff;                         // Interior Convection Coefficient Algorithm pointer (different data structure)
-        int ExtConvCoeff;                         // Exterior Convection Coefficient Algorithm pointer (different data structure)
-        int OSCPtr;                               // Pointer to OSC data structure
-        int OSCMPtr;                              // "Pointer" to OSCM data structure (other side conditions from a model)
+        HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        int IntConvCoeff;                        // Interior Convection Coefficient Algorithm pointer (different data structure)
+        int ExtConvCoeff;                        // Exterior Convection Coefficient Algorithm pointer (different data structure)
+        int OSCPtr;                              // Pointer to OSC data structure
+        int OSCMPtr;                             // "Pointer" to OSCM data structure (other side conditions from a model)
 
         // Windows
         int FrameDivider;          // Pointer to frame and divider information (windows only)
@@ -547,7 +554,7 @@ namespace DataSurfaces {
                     hash<Real64>()(ViewFactorGround),
                     hash<Real64>()(ViewFactorSky),
 
-                    hash<iHeatTransferModel>()(HeatTransferAlgorithm),
+                    hash<HeatTransferModel>()(HeatTransferAlgorithm),
                     hash<int>()(IntConvCoeff),
                     hash<int>()(ExtConvCoeff),
                     hash<int>()(OSCPtr),
@@ -668,12 +675,12 @@ namespace DataSurfaces {
         Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
 
         // Boundary conditions and interconnections
-        bool HeatTransSurf;                       // True if surface is a heat transfer surface,
-        int OutsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
-        int InsideHeatSourceTermSchedule;         // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
-                                                  // False if a (detached) shadowing (sub)surface
-        iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        std::string BaseSurfName;                 // Name of BaseSurf
+        bool HeatTransSurf;                      // True if surface is a heat transfer surface,
+        int OutsideHeatSourceTermSchedule;       // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+        int InsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
+                                                 // False if a (detached) shadowing (sub)surface
+        HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        std::string BaseSurfName;                // Name of BaseSurf
         int BaseSurf;       // "Base surface" for this surface. Applies mainly to subsurfaces in which case it points back to the base surface number.
                             // Equals 0 for detached shading. BaseSurf equals surface number for all other surfaces.
         int NumSubSurfaces; // Number of subsurfaces this surface has (doors/windows)
@@ -735,11 +742,11 @@ namespace DataSurfaces {
         SurfaceData()
             : Construction(0), RepresentativeCalcSurfNum(-1), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None),
               Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0),
-              Width(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
+              Width(0.0), shapeCat(ShapeCat::Invalid), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
-              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
+              HeatTransferAlgorithm(HeatTransferModel::Invalid), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
               ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
@@ -861,8 +868,8 @@ namespace DataSurfaces {
               FrEdgeToCenterGlCondRatio(1.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.9), DividerType(0), DividerWidth(0.0),
               HorDividers(0), VertDividers(0), DividerProjectionOut(0.0), DividerProjectionIn(0.0), DividerEdgeWidth(0.06355),
               DividerConductance(0.0), DivEdgeToCenterGlCondRatio(1.0), DividerSolAbsorp(0.0), DividerVisAbsorp(0.0), DividerEmis(0.9),
-              MullionOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0),
-              InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
+              MullionOrientation(DataWindowEquivalentLayer::Orientation::Invalid), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0), InsideReveal(0.0),
+              InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
         {
         }
     };

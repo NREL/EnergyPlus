@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -190,12 +190,12 @@ void SimPIU(EnergyPlusData &state,
     // Select the correct unit type
     switch (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num) {
 
-    case DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat: { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
+    case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat: { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
 
         CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
         break;
     }
-    case DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat: { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
+    case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat: { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
 
         CalcParallelPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
         break;
@@ -296,7 +296,7 @@ void GetPIUs(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPowerInductionUnits->PIU(PIUNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPowerInductionUnits->PIU(PIUNum).UnitType = cCurrentModuleObject;
-        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
+        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
         state.dataPowerInductionUnits->PIU(PIUNum).Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -317,17 +317,17 @@ void GetPIUs(EnergyPlusData &state)
         state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
 
         state.dataPowerInductionUnits->PIU(PIUNum).HCoilType =
-            static_cast<iHCoilType>(getEnumerationValue(HCoilNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+            static_cast<HtgCoilType>(getEnumerationValue(HCoilNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
         switch (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType) {
-        case iHCoilType::SimpleHeating: {
+        case HtgCoilType::SimpleHeating: {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
             break;
         }
-        case iHCoilType::Electric:
-        case iHCoilType::Gas: {
+        case HtgCoilType::Electric:
+        case HtgCoilType::Gas: {
             break;
         }
-        case iHCoilType::SteamAirHeating: {
+        case HtgCoilType::SteamAirHeating: {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
@@ -352,7 +352,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(3));
 
@@ -363,7 +363,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(4));
 
@@ -374,7 +374,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsParent,
                                                                                   state.dataIPShortCut->cAlphaFieldNames(5));
 
@@ -385,16 +385,16 @@ void GetPIUs(EnergyPlusData &state)
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Internal,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent,
                                                                                       state.dataIPShortCut->cAlphaFieldNames(6));
         // The reheat coil control node is necessary for hot water reheat, but not necessary for
         // electric or gas reheat.
-        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == iHCoilType::SimpleHeating) {
+        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SimpleHeating) {
             state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode =
                 GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
-        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == iHCoilType::SteamAirHeating) {
+        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SteamAirHeating) {
             state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode =
                 GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
@@ -540,7 +540,7 @@ void GetPIUs(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPowerInductionUnits->PIU(PIUNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPowerInductionUnits->PIU(PIUNum).UnitType = cCurrentModuleObject;
-        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
+        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
         state.dataPowerInductionUnits->PIU(PIUNum).Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -560,12 +560,12 @@ void GetPIUs(EnergyPlusData &state)
         state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
         state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac = state.dataIPShortCut->rNumericArgs(4);
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = iHCoilType::SimpleHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = HtgCoilType::SimpleHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = iHCoilType::Gas;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = HtgCoilType::Gas;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = iHCoilType::SteamAirHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = HtgCoilType::SteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
@@ -575,7 +575,7 @@ void GetPIUs(EnergyPlusData &state)
                 SteamMessageNeeded = false;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = iHCoilType::Electric;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = HtgCoilType::Electric;
         } else {
             ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
             ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
@@ -589,7 +589,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(3));
 
@@ -600,7 +600,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(4));
 
@@ -611,7 +611,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsParent,
                                                                                   state.dataIPShortCut->cAlphaFieldNames(5));
 
@@ -622,7 +622,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Internal,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent,
                                                                                       state.dataIPShortCut->cAlphaFieldNames(6));
         // The reheat coil control node is necessary for hot water reheat, but not necessary for
@@ -643,11 +643,11 @@ void GetPIUs(EnergyPlusData &state)
         //      GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(11),ErrorsFound,TRIM(cCurrentModuleObject),cAlphaArgs(1), &
         //                        DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
         //  END IF
-        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == iHCoilType::SimpleHeating) {
+        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SimpleHeating) {
             state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode =
                 GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
-        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == iHCoilType::SteamAirHeating) {
+        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SteamAirHeating) {
             state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode =
                 GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
@@ -877,10 +877,7 @@ void InitPIU(EnergyPlusData &state,
             ScanPlantLoopsForObject(state,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HCoil,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum,
+                                    state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc,
                                     errFlag,
                                     _,
                                     _,
@@ -891,11 +888,7 @@ void InitPIU(EnergyPlusData &state,
                 ShowFatalError(state, "InitPIU: Program terminated due to previous condition(s).");
             }
             state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum =
-                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum)
-                    .LoopSide(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide)
-                    .Branch(state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum)
-                    .Comp(state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum)
-                    .NodeNumOut;
+                DataPlant::CompData::getPlantComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc).NodeNumOut;
         }
         MyPlantScanFlag(PIUNum) = false;
     } else if (MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
@@ -929,9 +922,9 @@ void InitPIU(EnergyPlusData &state,
         if (HotConNode > 0) {
             // plant upgrade note? why no separate handling of steam coil? add it ?
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
                                    DataGlobalConstants::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
                                    RoutineName);
 
             state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow = rho * state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow;
@@ -940,11 +933,7 @@ void InitPIU(EnergyPlusData &state,
                                state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum);
         }
 
         MySizeFlag(PIUNum) = false;
@@ -979,18 +968,14 @@ void InitPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirMassFlow;
         }
 
-        if (((state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == iHCoilType::SimpleHeating) ||
-             (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == iHCoilType::SteamAirHeating)) &&
+        if (((state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SimpleHeating) ||
+             (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SteamAirHeating)) &&
             !MyPlantScanFlag(PIUNum)) {
             InitComponentNodes(state,
                                state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum);
         }
 
         if (state.dataPowerInductionUnits->PIU(PIUNum).AirLoopNum == 0) { // fill air loop index
@@ -1436,9 +1421,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
     if (CurTermUnitSizingNum > 0) {
 
-        if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
+        if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
             TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow;
-        } else if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
+        } else if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
             TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow +
                 state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
@@ -1535,16 +1520,18 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                             DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
-                            rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
-                                                   RoutineName);
-                            Cp = GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
-                                                       RoutineName);
+                            rho =
+                                GetDensityGlycol(state,
+                                                 state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
+                                                 DataGlobalConstants::HWInitConvTemp,
+                                                 state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
+                                                 RoutineName);
+                            Cp = GetSpecificHeatGlycol(
+                                state,
+                                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
+                                DataGlobalConstants::HWInitConvTemp,
+                                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
+                                RoutineName);
 
                             MaxVolHotWaterFlowDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                         } else {
@@ -1715,7 +1702,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
         TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotSteamFlow;
         TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // coil report
         TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir = state.dataPowerInductionUnits->PIU(PIUNum).InducesPlenumAir;
-        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == iHCoilType::SimpleHeating) {
+        if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SimpleHeating) {
             SetCoilDesFlow(state,
                            HCoilNamesUC[static_cast<int>(state.dataPowerInductionUnits->PIU(PIUNum).HCoilType)],
                            state.dataPowerInductionUnits->PIU(PIUNum).HCoil,
@@ -1951,7 +1938,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
 
     switch (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType) {
 
-    case iHCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+    case HtgCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
         if (!HCoilOn) {
             // call the reheat coil with the NO FLOW condition
             mdot = 0.0;
@@ -1959,10 +1946,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                                  mdot,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
 
             SimulateWaterCoilComponents(
                 state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
@@ -1985,13 +1969,11 @@ void CalcSeriesPIU(EnergyPlusData &state,
                               _,
                               _,
                               _,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum);
+                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
         }
         break;
     }
-    case iHCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
+    case HtgCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
@@ -2006,7 +1988,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
 
         break;
     }
-    case iHCoilType::Electric: { // COIL:ELECTRIC:HEATING
+    case HtgCoilType::Electric: { // COIL:ELECTRIC:HEATING
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
@@ -2021,7 +2003,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
 
         break;
     }
-    case iHCoilType::Gas: { // COIL:GAS:HEATING
+    case HtgCoilType::Gas: { // COIL:GAS:HEATING
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
@@ -2275,7 +2257,7 @@ void CalcParallelPIU(EnergyPlusData &state,
     // fire the heating coil
     switch (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType) {
 
-    case iHCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+    case HtgCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
         if (!HCoilOn) {
             // call the reheat coil with the NO FLOW condition
             mdot = 0.0;
@@ -2283,10 +2265,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                                  mdot,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
             SimulateWaterCoilComponents(
                 state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
         } else {
@@ -2308,13 +2287,11 @@ void CalcParallelPIU(EnergyPlusData &state,
                               _,
                               _,
                               _,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum);
+                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
         }
         break;
     }
-    case iHCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
+    case HtgCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
@@ -2328,7 +2305,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                                     QCoilReq);
         break;
     }
-    case iHCoilType::Electric: { // COIL:ELECTRIC:HEATING
+    case HtgCoilType::Electric: { // COIL:ELECTRIC:HEATING
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
@@ -2343,7 +2320,7 @@ void CalcParallelPIU(EnergyPlusData &state,
 
         break;
     }
-    case iHCoilType::Gas: { // COIL:GAS:HEATING
+    case HtgCoilType::Gas: { // COIL:GAS:HEATING
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {

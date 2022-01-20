@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,12 +70,13 @@ namespace NodeInputManager {
     using DataLoopNode::NodeData;
 
     // For GetOnlySingleNode(), GetNodeNums(), etc
-    enum class compFluidStream
+    enum class CompFluidStream
     {
-        Unassigned = -1,
+        Invalid = -1,
         Primary = 1,
         Secondary = 2,
-        Tertiary = 3
+        Tertiary = 3,
+        Num
     };
 
     struct NodeListDef // Derived Type for Node Lists
@@ -101,10 +102,10 @@ namespace NodeInputManager {
                      std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
                      std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                      DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-                     compFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
+                     CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                      bool const ObjectIsParent,                                 // True/False
                      Optional_bool_const IncrementFluidStream = _,              // True/False
-                     Optional_string_const InputFieldName = _                   // Input Field Name
+                     std::string_view const InputFieldName = {}                 // Input Field Name
     );
 
     void SetupNodeVarsForReporting(EnergyPlusData &state);
@@ -123,20 +124,18 @@ namespace NodeInputManager {
                           std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                           DataLoopNode::NodeFluidType const NodeFluidType,           // Fluidtype for checking/setting node FluidType
                           DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-                          compFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
+                          CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                           bool const ObjectIsParent,                                 // True/False
-                          Optional_string_const InputFieldName = _                   // Input Field Name
+                          std::string_view const InputFieldName = {}                 // Input Field Name
     );
 
     void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
-    void CheckUniqueNodes(EnergyPlusData &state,
-                          std::string const &NodeTypes,
-                          std::string const &CheckType,
-                          bool &ErrorsFound,
-                          Optional_string_const CheckName = _,
-                          Optional_int_const CheckNumber = _,
-                          Optional_string_const ObjectName = _);
+    void CheckUniqueNodeNames(
+        EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, std::string const &CheckName, std::string const &ObjectName);
+
+    void CheckUniqueNodeNumbers(
+        EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, int const CheckNumber, std::string const ObjectName);
 
     void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 

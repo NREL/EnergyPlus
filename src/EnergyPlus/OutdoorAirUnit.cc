@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -81,7 +80,6 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -104,7 +102,7 @@ namespace OutdoorAirUnit {
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
-    // Simulate zone outdooor air unit.
+    // Simulate zone outdoor air unit.
 
     // METHODOLOGY EMPLOYED:
     // Systems are modeled as a collection of components:
@@ -404,8 +402,7 @@ namespace OutdoorAirUnit {
                     OutAirUnit(OAUnitNum).SFanAvailSchedPtr =
                         GetFanAvailSchPtr(state, cFanTypes(OutAirUnit(OAUnitNum).SFanType), OutAirUnit(OAUnitNum).SFanName, errFlag);
                     // get fan index
-                    GetFanIndex(
-                        state, OutAirUnit(OAUnitNum).SFanName, OutAirUnit(OAUnitNum).SFan_Index, ErrorsFound, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, OutAirUnit(OAUnitNum).SFanName, OutAirUnit(OAUnitNum).SFan_Index, ErrorsFound);
                 } else {
                     ErrorsFound = true;
                 }
@@ -459,11 +456,7 @@ namespace OutdoorAirUnit {
                         OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr =
                             GetFanAvailSchPtr(state, cFanTypes(OutAirUnit(OAUnitNum).ExtFanType), OutAirUnit(OAUnitNum).ExtFanName, errFlag);
                         // get fan index
-                        GetFanIndex(state,
-                                    OutAirUnit(OAUnitNum).ExtFanName,
-                                    OutAirUnit(OAUnitNum).ExtFan_Index,
-                                    ErrorsFound,
-                                    ObjexxFCL::Optional_string_const());
+                        GetFanIndex(state, OutAirUnit(OAUnitNum).ExtFanName, OutAirUnit(OAUnitNum).ExtFan_Index, ErrorsFound);
                     } else {
                         ErrorsFound = true;
                     }
@@ -521,9 +514,9 @@ namespace OutdoorAirUnit {
                 {
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
                     if (SELECT_CASE_var == "NEUTRALCONTROL") {
-                        OutAirUnit(OAUnitNum).ControlType = Control::Neutral;
+                        OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Neutral;
                     } else if (SELECT_CASE_var == "TEMPERATURECONTROL") {
-                        OutAirUnit(OAUnitNum).ControlType = Control::Temperature;
+                        OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Temperature;
                     }
                 }
             } else {
@@ -531,7 +524,7 @@ namespace OutdoorAirUnit {
                                 std::string{CurrentModuleObject} + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) +
                                     "=\"" + state.dataIPShortCut->cAlphaArgs(9) + "\".");
                 ShowContinueError(state, "Control reset to Unconditioned Control.");
-                OutAirUnit(OAUnitNum).ControlType = Control::Neutral;
+                OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Neutral;
             }
 
             // A10:High Control Temp :
@@ -567,7 +560,7 @@ namespace OutdoorAirUnit {
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                     ObjectIsParent);
             if (!lAlphaBlanks(14)) {
                 OutAirUnit(OAUnitNum).AirInletNode = GetOnlySingleNode(state,
@@ -577,7 +570,7 @@ namespace OutdoorAirUnit {
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Air,
                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                        ObjectIsParent);
             } else {
                 if (OutAirUnit(OAUnitNum).ExtFan) {
@@ -595,7 +588,7 @@ namespace OutdoorAirUnit {
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Internal,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 
             //  Set connection type to 'OutdoorAir', because this is hardwired to OA conditions
@@ -606,7 +599,7 @@ namespace OutdoorAirUnit {
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 
             if (!lAlphaBlanks(12)) {
@@ -1229,10 +1222,7 @@ namespace OutdoorAirUnit {
                     ScanPlantLoopsForObject(state,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilType,
-                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
-                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
-                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum,
+                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -1313,9 +1303,9 @@ namespace OutdoorAirUnit {
                                                                 OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
                                                                 errFlag);
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
                                                DataGlobalConstants::CWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
@@ -1323,11 +1313,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
 
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::WaterCoil_SimpleHeat) {
@@ -1337,9 +1323,9 @@ namespace OutdoorAirUnit {
                                                                 OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
                                                                 errFlag);
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
@@ -1347,32 +1333,25 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::SteamCoil_AirHeat) {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
                             GetCoilMaxSteamFlowRate(state, OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentIndex, errFlag);
-                        Real64 rho = GetSatDensityRefrig(state,
-                                                         state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
-                                                         DataGlobalConstants::SteamInitConvTemp,
-                                                         1.0,
-                                                         state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
-                                                         RoutineName);
+                        Real64 rho =
+                            GetSatDensityRefrig(state,
+                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
+                                                DataGlobalConstants::SteamInitConvTemp,
+                                                1.0,
+                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
+                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
                         InitComponentNodes(state,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::WaterCoil_CoolingHXAsst) {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
@@ -1381,9 +1360,9 @@ namespace OutdoorAirUnit {
                                                                 OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
                                                                 errFlag);
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
                                                DataGlobalConstants::CWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
@@ -1391,11 +1370,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
                 }
             }
@@ -1536,15 +1511,15 @@ namespace OutdoorAirUnit {
         auto &DataFanEnumType(state.dataSize->DataFanEnumType);
 
         if (OutAirUnit(OAUnitNum).SFanType == DataHVACGlobals::FanType_SystemModelObject) {
-            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
         if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {
-            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
         } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
-            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
         }
 
         if (OutAirUnit(OAUnitNum).OutAirVolFlow == AutoSize) {
@@ -1720,7 +1695,7 @@ namespace OutdoorAirUnit {
                     SimHXAssistedCoolingCoil(state,
                                              OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                              true,
-                                             1,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              0.0,
                                              OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex,
                                              ContFanCycCoil);
@@ -1820,7 +1795,7 @@ namespace OutdoorAirUnit {
         OutletNode = OutAirUnit(OAUnitNum).AirOutletNode;
         OutsideAirNode = OutAirUnit(OAUnitNum).OutsideAirNode;
         OperatingMode = OutAirUnit(OAUnitNum).OperatingMode;
-        Control UnitControlType = OutAirUnit(OAUnitNum).ControlType;
+        OAUnitCtrlType UnitControlType = OutAirUnit(OAUnitNum).controlType;
         AirOutletTemp = 0.0;
         OutAirUnit(OAUnitNum).CompOutSetTemp = 0.0;
         OutAirUnit(OAUnitNum).FanEffect = false;
@@ -1959,53 +1934,55 @@ namespace OutdoorAirUnit {
             }
 
             // Control type check
-            {
-                auto const SELECT_CASE_var(UnitControlType);
-                if (SELECT_CASE_var == Control::Neutral) {
-                    SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    // Neutral Control Condition
-                    if (DesOATemp == SetPointTemp) {
-                        OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
-                        AirOutletTemp = DesOATemp;
-                        OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+            switch (UnitControlType) {
+            case OAUnitCtrlType::Neutral: {
+                SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                // Neutral Control Condition
+                if (DesOATemp == SetPointTemp) {
+                    OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
+                    AirOutletTemp = DesOATemp;
+                    OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+                    SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                } else {
+                    if (DesOATemp < SetPointTemp) { // Heating MODE
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
+                        AirOutletTemp = SetPointTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
                         SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                    } else {
-                        if (DesOATemp < SetPointTemp) { // Heating MODE
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
-                            AirOutletTemp = SetPointTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        } else if (DesOATemp > SetPointTemp) { // Cooling Mode
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
-                            AirOutletTemp = SetPointTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        }
-                    }
-                    // SetPoint Temperature Condition
-                } else if (SELECT_CASE_var == Control::Temperature) {
-                    SetPointTemp = DesOATemp;
-                    HiCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr);
-                    LoCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr);
-                    if ((DesOATemp <= HiCtrlTemp) && (DesOATemp >= LoCtrlTemp)) {
-                        OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
-                        AirOutletTemp = DesOATemp;
-                        OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+                    } else if (DesOATemp > SetPointTemp) { // Cooling Mode
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
+                        AirOutletTemp = SetPointTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
                         SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                    } else {
-                        if (SetPointTemp < LoCtrlTemp) {
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
-                            AirOutletTemp = LoCtrlTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        } else if (SetPointTemp > HiCtrlTemp) {
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
-                            AirOutletTemp = HiCtrlTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        }
                     }
                 }
+                // SetPoint Temperature Condition
+            } break;
+            case OAUnitCtrlType::Temperature: {
+                SetPointTemp = DesOATemp;
+                HiCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr);
+                LoCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr);
+                if ((DesOATemp <= HiCtrlTemp) && (DesOATemp >= LoCtrlTemp)) {
+                    OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
+                    AirOutletTemp = DesOATemp;
+                    OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+                    SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                } else {
+                    if (SetPointTemp < LoCtrlTemp) {
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
+                        AirOutletTemp = LoCtrlTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
+                        SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                    } else if (SetPointTemp > HiCtrlTemp) {
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
+                        AirOutletTemp = HiCtrlTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
+                        SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                    }
+                }
+            } break;
+            default:
+                break;
             }
 
             // Fan positioning
@@ -2312,9 +2289,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       2,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::SteamCoil_AirHeat: { // 'Coil:Heating:Steam'
@@ -2377,9 +2352,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       1,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::WaterCoil_DetailedCool: { // 'Coil:Cooling:Water:DetailedGeometry'
@@ -2426,9 +2399,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       1,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::WaterCoil_CoolingHXAsst: { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
@@ -2471,9 +2442,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       1,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::DXSystem: { // CoilSystem:Cooling:DX  old 'CompType:UnitaryCoolOnly'
@@ -2489,7 +2458,7 @@ namespace OutdoorAirUnit {
                         UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(
                             state, OutAirUnit(OAUnitNum).OAEquip(SimCompNum).ComponentName, OAUnitNum);
                     }
-                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) ||
+                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) ||
                         (OpMode == Operation::HeatingMode)) {
                         Dxsystemouttemp = 100.0; // There is no cooling demand for the DX system.
                     } else {
@@ -2515,7 +2484,7 @@ namespace OutdoorAirUnit {
             } break;
             case CompType::DXHeatPumpSystem: {
                 if (Sim) {
-                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) ||
+                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) ||
                         (OpMode == Operation::CoolingMode)) {
                         Dxsystemouttemp = -20.0; // There is no heating demand for the DX system.
                     } else {
@@ -2528,10 +2497,10 @@ namespace OutdoorAirUnit {
             case CompType::UnitarySystemModel: { // 'CompType:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
-                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) &&
+                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) &&
                         (OpMode == Operation::HeatingMode)) {
                         Dxsystemouttemp = 100.0; // There is no cooling demand.
-                    } else if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) &&
+                    } else if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) &&
                                (OpMode == Operation::CoolingMode)) {
                         Dxsystemouttemp = -20.0; // There is no heating demand.
                     } else {
@@ -2715,8 +2684,13 @@ namespace OutdoorAirUnit {
 
             } break;
             case CompType::WaterCoil_CoolingHXAsst: {
-                SimHXAssistedCoolingCoil(
-                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, 1, 0.0, CoilIndex, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName,
+                                         FirstHVACIteration,
+                                         DataHVACGlobals::CompressorOperation::On,
+                                         0.0,
+                                         CoilIndex,
+                                         ContFanCycCoil);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;

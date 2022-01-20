@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1090,17 +1090,17 @@ namespace RoomAirModelManager {
 
             // Third Alpha is a string: JET or RECIRCULATION
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Jet")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Jet;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Jet;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Recirculation")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Recirculation;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Recirculation;
             } else {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Invalid;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Invalid;
             }
 
             for (Loop2 = 1; Loop2 <= state.dataHeatBal->TotPeople; ++Loop2) {
                 if (state.dataHeatBal->People(Loop2).ZonePtr != state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) continue;
                 if (state.dataHeatBal->People(Loop2).Fanger) {
-                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::VComfort_Invalid) {
+                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::Invalid) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
                                             "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1518,7 +1518,7 @@ namespace PlantPipingSystemsManager {
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1539,7 +1539,7 @@ namespace PlantPipingSystemsManager {
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
@@ -1656,7 +1656,7 @@ namespace PlantPipingSystemsManager {
                                                                            thisTrenchName,
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1669,7 +1669,7 @@ namespace PlantPipingSystemsManager {
                                                                             thisTrenchName,
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
@@ -2114,28 +2114,16 @@ namespace PlantPipingSystemsManager {
             }
 
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    thisCircuit->Name,
-                                                    TypeToLookFor,
-                                                    thisCircuit->LoopNum,
-                                                    thisCircuit->LoopSideNum,
-                                                    thisCircuit->BranchNum,
-                                                    thisCircuit->CompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(state, thisCircuit->Name, TypeToLookFor, thisCircuit->plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "PipingSystems:" + std::string{RoutineName} + ": Program terminated due to previous condition(s).");
             }
 
             // Once we find ourselves on the plant loop, we can do other things
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             thisCircuit->DesignMassFlowRate = thisCircuit->DesignVolumeFlowRate * rho;
             thisCircuit->NeedToFindOnPlantLoop = false;
@@ -2197,14 +2185,7 @@ namespace PlantPipingSystemsManager {
 
         // request design, set component flow will decide what to give us based on restrictions and flow lock status
         thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             thisCircuit->CurCircuitFlowRate,
-                                             InletNodeNum,
-                                             OutletNodeNum,
-                                             thisCircuit->LoopNum,
-                                             thisCircuit->LoopSideNum,
-                                             thisCircuit->BranchNum,
-                                             thisCircuit->CompNum);
+        PlantUtilities::SetComponentFlowRate(state, thisCircuit->CurCircuitFlowRate, InletNodeNum, OutletNodeNum, thisCircuit->plantLoc);
     }
 
     void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit *thisCircuit)
@@ -3384,7 +3365,7 @@ namespace PlantPipingSystemsManager {
                     RectangleF XYRectangle = RectangleF(CellXMinValue, CellYMinValue, CellWidth, CellHeight);
 
                     //'determine cell type
-                    CellType cellType = CellType::Unknown;
+                    CellType cellType = CellType::Invalid;
 
                     //'if this is a pipe node, some flags are needed
                     bool pipeCell = false;
@@ -3567,7 +3548,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         ++NumCutawayBasementCells;
                         break;
-                    case CellType::Unknown:
+                    case CellType::Invalid:
                         cellType = CellType::GeneralField;
                         // fallthrough
                     default:
@@ -3895,6 +3876,8 @@ namespace PlantPipingSystemsManager {
                     SegmentOutletCellY = segment->PipeCellCoordinates.Y;
                     SegmentOutletCellZ = 0;
                     break;
+                default:
+                    assert(false);
                 }
                 if (!CircuitInletCellSet) {
                     CircuitInletCellX = SegmentInletCellX;
@@ -4188,7 +4171,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         // it's ok to not simulate this one
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -4905,6 +4888,8 @@ namespace PlantPipingSystemsManager {
         case Direction::PositiveZ:
             distance = (cell.depth() / 2.0);
             break;
+        default:
+            assert(false);
         }
 
         resistance = (distance / 2.0) / (cell.Properties.Conductivity * cell.normalArea(direction));
@@ -5581,7 +5566,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -5689,7 +5674,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -5722,24 +5707,24 @@ namespace PlantPipingSystemsManager {
         // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
         // but need to verify the value of inlet temperature during warm up, etc.
         FluidCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                          thisCircuit->InletTemperature,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
         FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                          thisCircuit->InletTemperature,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
         FluidConductivity = FluidProperties::GetConductivityGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                                    thisCircuit->InletTemperature,
-                                                                   state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
         FluidViscosity = FluidProperties::GetViscosityGlycol(state,
-                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                              RoutineName);
 
         // Doesn't anyone care about poor Ludwig Prandtl?
