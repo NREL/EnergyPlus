@@ -293,7 +293,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 {
     bool success = true;
     auto &inputProcessor = state->dataInputProcessing->inputProcessor;
-    inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
+    inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema(), success);
 
     // Add common objects that will trigger a warning if not present
     if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {

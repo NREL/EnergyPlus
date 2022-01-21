@@ -320,7 +320,7 @@ private:
     std::unique_ptr<IdfParser> idf_parser;
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
-    json schema;
+    static const json &schema();
 
 public:
     json epJSON;
