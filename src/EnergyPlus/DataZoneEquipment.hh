@@ -501,12 +501,12 @@ namespace DataZoneEquipment {
         std::string Name;
         // int NumOfComponents; // not sure if this is necessary
 
-        int AvailSchNum;
+        int AvailScheduleNum;
         int InletNodeNum;
         int OutletNodeNum;
 
         Real64 DesignExhaustFlowRate;
-        int FlowControlType; // for now define 0 = Scheduled; 1 = Follow-supply
+        int FlowControlTypeNum; // for now define 0 = Scheduled; 1 = Follow-supply
         int ExhaustFlowFractionScheduleNum;
         int SupplyNodeOrNodelistNum;
         int MinZoneTempLimitScheduleNum;
@@ -516,7 +516,7 @@ namespace DataZoneEquipment {
         // default constructor
         // Question: why the constructor skipped the first element std::string Name?
         ZoneExhaustControl()
-            : AvailSchNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlType(0),
+            : AvailScheduleNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlTypeNum(0),
               ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0), MinExhFlowFracScheduleNum(0),
               BalancedExhFracScheduleNum(0)
         {
@@ -566,6 +566,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     int NumSupplyAirPaths = 0;
     int NumReturnAirPaths = 0;
     int NumExhaustAirSystems = 0;
+    int NumZoneExhaustControls = 0;
     bool ZoneEquipInputsFilled = false;
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
@@ -590,6 +591,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->NumSupplyAirPaths = 0;
         this->NumReturnAirPaths = 0;
         this->NumExhaustAirSystems = 0;
+        this->NumZoneExhaustControls = 0;
         this->ZoneEquipInputsFilled = false;
         this->ZoneEquipSimulatedOnce = false;
         this->NumOfZoneEquipLists = 0;
