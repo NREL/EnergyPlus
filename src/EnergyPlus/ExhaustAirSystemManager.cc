@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -264,24 +265,58 @@ namespace ExhaustAirSystemManager {
                 // 2022-01: also in general, should this processing may need to checked first that
                 // all the fan objects have already been processed already to be fail-safe.
                 // probably simialr to other like schedules etc, although schedules might have been processed early in most cases.
-                centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
-                if (centralFanIndex >= 0) {
-                // normal index
-                // 2022-01: to do: if some constant information need to be extracted, here might be a good place to do so:
-                    /* //e.g. an example in PIU processing: 
-                    if (HVACFan::checkIfFanNameIsAFanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)) {
-                        state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    state.dataHVACFan->fanObjs.emplace_back(
-                    new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
-                    } 
-                    */
+                if (centralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+                    centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
+                    if (centralFanIndex >= 0) {
+                        // normal index
+                        // 2022-01: to do: if some constant information need to be extracted, here might be a good place to do so:
+                        /* //e.g. an example in PIU processing:
+                        if (HVACFan::checkIfFanNameIsAFanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)) {
+                            state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
+                        state.dataHVACFan->fanObjs.emplace_back(
+                        new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
+                        }
+                        */
+                    } else {
+                        centralFanIndex = -1;
+                        // here a severe error message is needed
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                        ShowContinueError(state, "Fan Name =" + centralFanName + "not found.");
+                        ErrorsFound = true;
+                    }
+                } else if (centralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
+                    bool isNotOK(false);
+                    int fanType_Num_Check(0);
+                    EnergyPlus::Fans::GetFanType(state, centralFanName, fanType_Num_Check, isNotOK, cCurrentModuleObject, thisExhSys.Name);
+                    // 2022-01: to do: can do a check on fanType_Num_Check with centralFanTypeNum, if not feeling redudant.
+                    
+                    if (isNotOK) {
+                        ShowSevereError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
+                        ErrorsFound = true;
+                    } else {
+                        isNotOK = false;
+                        ValidateComponent(state, centralFanType, centralFanName, isNotOK, cCurrentModuleObject);
+                        if (isNotOK) {
+                            ShowSevereError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
+                            ErrorsFound = true;
+                        } else { // mine data from fan object
+                            // Get the fan index
+                            bool errFlag(false);
+                            EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                            if (errFlag) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
+                                ErrorsFound = true;
+                            }
+                        }
+                    }
                 } else {
-                    centralFanIndex = -1;
-                    // here a severe error message is needed
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "Fan Name =" + centralFanName + "not found.");
+                    ShowContinueError(state, "Fan Type =" + centralFanType + "not supported; ");
+                    ShowContinueError(state, "it needs to be either Fan:SystemModel or Fan:ComponentModel.");
                     ErrorsFound = true;
                 }
+
+
                 thisExhSys.CentralFanIndex = centralFanIndex;
             }
             state.dataZoneEquip->NumReturnAirPaths = numExhaustSystems;
