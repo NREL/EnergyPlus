@@ -168,7 +168,7 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
-                std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_manager_list_name");
+                std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
                 int availSchNum = ScheduleManager::GetScheduleIndex(state, availSchName);
                 if (availSchNum > 0) {
                     // normal conditions
@@ -179,7 +179,7 @@ namespace ExhaustAirSystemManager {
                     availSchNum = 0;
                     // a regular warning
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "Avaiability Manager Name =" + availSchName + "not found.");
+                    ShowContinueError(state, "Avaiability Schedule Name =" + availSchName + "not found.");
                     // ErrorsFound = true;
                 }
                 thisExhSys.AvailScheduleNum = availSchNum;
