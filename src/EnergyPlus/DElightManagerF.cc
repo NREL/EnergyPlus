@@ -708,10 +708,10 @@ namespace DElightManagerF {
 
         constexpr auto cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
-        state.dataDaylightingData->TotDElightCFS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingData->TotDElightCFS = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataDaylightingData->DElightComplexFene.allocate(state.dataDaylightingData->TotDElightCFS);
         for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      ++CFSNum,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -785,8 +785,8 @@ namespace DElightManagerF {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
                                                                      cAlphas,

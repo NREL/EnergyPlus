@@ -277,7 +277,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 {
-    int numSpeeds = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitSpeed::object_name);
+    int numSpeeds = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CoilCoolingDXCurveFitSpeed::object_name);
     if (numSpeeds <= 0) {
         // error
     }
@@ -286,7 +286,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CoilCoolingDXCurveFitSpeed::object_name,
                                                                  speedNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

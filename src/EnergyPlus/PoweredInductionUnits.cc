@@ -260,9 +260,9 @@ void GetPIUs(EnergyPlusData &state)
     // find the number of each type of fan coil unit
     SteamMessageNeeded = true;
     state.dataPowerInductionUnits->NumSeriesPIUs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:SeriesPIU:Reheat");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:SeriesPIU:Reheat");
     state.dataPowerInductionUnits->NumParallelPIUs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ParallelPIU:Reheat");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:ParallelPIU:Reheat");
     state.dataPowerInductionUnits->NumPIUs = state.dataPowerInductionUnits->NumSeriesPIUs + state.dataPowerInductionUnits->NumParallelPIUs;
     // allocate the data structures
     state.dataPowerInductionUnits->PIU.allocate(state.dataPowerInductionUnits->NumPIUs);
@@ -274,7 +274,7 @@ void GetPIUs(EnergyPlusData &state)
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:SeriesPIU:Reheat";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  PIUIndex,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -518,7 +518,7 @@ void GetPIUs(EnergyPlusData &state)
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:ParallelPIU:Reheat";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  PIUIndex,
                                                                  state.dataIPShortCut->cAlphaArgs,

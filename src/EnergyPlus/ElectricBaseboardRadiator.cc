@@ -211,7 +211,7 @@ namespace ElectricBaseboardRadiator {
 
         cCurrentModuleObject = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
 
-        state.dataElectBaseboardRad->NumElecBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataElectBaseboardRad->NumElecBaseboards = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         // object is extensible, no max args needed as IPShortCuts being used
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
@@ -226,7 +226,7 @@ namespace ElectricBaseboardRadiator {
 
         for (BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      BaseboardNum,
                                                                      state.dataIPShortCut->cAlphaArgs,

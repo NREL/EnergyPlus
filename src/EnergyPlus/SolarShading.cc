@@ -385,7 +385,7 @@ void GetShadowingInput(EnergyPlusData &state)
     state.dataIPShortCut->cAlphaArgs(1) = "";
     state.dataIPShortCut->cAlphaArgs(2) = "";
     cCurrentModuleObject = "ShadowCalculation";
-    NumItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumItems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
     NumAlphas = 0;
     NumNumbers = 0;
     if (NumItems > 1) {
@@ -393,7 +393,7 @@ void GetShadowingInput(EnergyPlusData &state)
     }
 
     if (NumItems != 0) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  1,
                                                                  state.dataIPShortCut->cAlphaArgs,

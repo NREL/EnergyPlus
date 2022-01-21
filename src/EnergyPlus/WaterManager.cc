@@ -190,23 +190,23 @@ namespace WaterManager {
         if ((state.dataWaterManager->MyOneTimeFlag) && (!(state.dataWaterData->WaterSystemGetInputCalled))) { // big block for entire subroutine
 
             cCurrentModuleObject = "WaterUse:Storage";
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = NumNumbers;
             MaxNumAlphas = NumAlphas;
             cCurrentModuleObject = "WaterUse:RainCollector";
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "WaterUse:Well";
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "Site:Precipitation";
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "RoofIrrigation";
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
             MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -219,14 +219,14 @@ namespace WaterManager {
 
             state.dataWaterManager->MyOneTimeFlag = false;
             cCurrentModuleObject = "WaterUse:Storage";
-            state.dataWaterData->NumWaterStorageTanks = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataWaterData->NumWaterStorageTanks = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
             if (state.dataWaterData->NumWaterStorageTanks > 0) {
                 state.dataWaterData->AnyWaterSystemsInModel = true;
                 if (!(allocated(state.dataWaterData->WaterStorage)))
                     state.dataWaterData->WaterStorage.allocate(state.dataWaterData->NumWaterStorageTanks);
 
                 for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              cCurrentModuleObject,
                                                                              Item,
                                                                              cAlphaArgs,
@@ -374,7 +374,7 @@ namespace WaterManager {
             } // num water storage tanks > 0
 
             cCurrentModuleObject = "WaterUse:RainCollector";
-            state.dataWaterData->NumRainCollectors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataWaterData->NumRainCollectors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
             if (state.dataWaterData->NumRainCollectors > 0) {
                 if (!(allocated(state.dataWaterData->RainCollector)))
                     state.dataWaterData->RainCollector.allocate(state.dataWaterData->NumRainCollectors);
@@ -382,7 +382,7 @@ namespace WaterManager {
                 state.dataWaterData->AnyWaterSystemsInModel = true;
 
                 for (Item = 1; Item <= state.dataWaterData->NumRainCollectors; ++Item) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              cCurrentModuleObject,
                                                                              Item,
                                                                              cAlphaArgs,
@@ -495,12 +495,12 @@ namespace WaterManager {
             } // (NumRainCollectors > 0)
 
             cCurrentModuleObject = "WaterUse:Well";
-            state.dataWaterData->NumGroundWaterWells = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataWaterData->NumGroundWaterWells = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
             if (state.dataWaterData->NumGroundWaterWells > 0) {
                 state.dataWaterData->AnyWaterSystemsInModel = true;
                 state.dataWaterData->GroundwaterWell.allocate(state.dataWaterData->NumGroundWaterWells);
                 for (Item = 1; Item <= state.dataWaterData->NumGroundWaterWells; ++Item) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              cCurrentModuleObject,
                                                                              Item,
                                                                              cAlphaArgs,
@@ -631,7 +631,7 @@ namespace WaterManager {
             }
 
             cCurrentModuleObject = "Site:Precipitation";
-            state.dataWaterData->NumSiteRainFall = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataWaterData->NumSiteRainFall = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
             if (state.dataWaterData->NumSiteRainFall > 1) { // throw error
                 ShowSevereError(state, "Only one " + cCurrentModuleObject + " object is allowed");
                 ErrorsFound = true;
@@ -639,7 +639,7 @@ namespace WaterManager {
 
             if (state.dataWaterData->NumSiteRainFall == 1) {
                 state.dataWaterData->AnyWaterSystemsInModel = true;
-                state.dataInputProcessing->inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor()->getObjectItem(
                     state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
 
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "ScheduleAndDesignLevel")) {
@@ -667,7 +667,7 @@ namespace WaterManager {
             }
 
             cCurrentModuleObject = "RoofIrrigation";
-            NumIrrigation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumIrrigation = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumIrrigation > 1) {
                 ShowSevereError(state, "Only one " + cCurrentModuleObject + " object is allowed");
                 ErrorsFound = true;
@@ -675,7 +675,7 @@ namespace WaterManager {
 
             if (NumIrrigation == 1) {
                 state.dataWaterData->AnyIrrigationInModel = true;
-                state.dataInputProcessing->inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor()->getObjectItem(
                     state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
                     state.dataWaterData->Irrigation.ModeID = DataWater::RainfallMode::IrrSchedDesign;

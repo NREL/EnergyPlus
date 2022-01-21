@@ -257,8 +257,8 @@ namespace SimulationManager {
         state.dataReportFlag->DisplayPerfSimulationFlag = false;
         state.dataReportFlag->DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
-            (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 ||
-             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
+            (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "RunPeriod") > 0 ||
+             state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
@@ -693,9 +693,9 @@ namespace SimulationManager {
         ErrorsFound = false;
 
         CurrentModuleObject = "Version";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
                                                                      Alphas,
@@ -726,10 +726,10 @@ namespace SimulationManager {
 
         // Do Mini Gets on HB Algorithm and by-surface overrides
         CurrentModuleObject = "HeatBalanceAlgorithm";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         CondFDAlgo = false;
         if (Num > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
                                                                      Alphas,
@@ -751,10 +751,10 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          Item,
                                                                          Alphas,
@@ -777,10 +777,10 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          1,
                                                                          Alphas,
@@ -802,10 +802,10 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          1,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -827,10 +827,10 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          1,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -853,9 +853,9 @@ namespace SimulationManager {
         }
 
         CurrentModuleObject = "Timestep";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
                                                                      Alphas,
@@ -894,7 +894,7 @@ namespace SimulationManager {
                 ShowContinueError(state, "..." + CurrentModuleObject + " is set to 20.");
                 state.dataGlobal->NumOfTimeStepInHour = 20;
             }
-            if (state.dataGlobal->NumOfTimeStepInHour < 4 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0) {
+            if (state.dataGlobal->NumOfTimeStepInHour < 4 && state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Zone") > 0) {
                 ShowWarningError(state,
                                  format("{}: Requested number ({}) is less than the suggested minimum of 4.",
                                         CurrentModuleObject,
@@ -902,12 +902,12 @@ namespace SimulationManager {
                 ShowContinueError(state,
                                   "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
             }
-        } else if (Num == 0 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0 && !CondFDAlgo) {
+        } else if (Num == 0 && state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Zone") > 0 && !CondFDAlgo) {
             ShowWarningError(state, "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4.");
             state.dataGlobal->NumOfTimeStepInHour = 4;
         } else if (Num == 0 && !CondFDAlgo) {
             state.dataGlobal->NumOfTimeStepInHour = 4;
-        } else if (Num == 0 && state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Zone") > 0 && CondFDAlgo) {
+        } else if (Num == 0 && state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Zone") > 0 && CondFDAlgo) {
             ShowWarningError(state, "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20.");
             ShowContinueError(state, "...Due to presence of Conduction Finite Difference Algorithm selection.");
             state.dataGlobal->NumOfTimeStepInHour = 20;
@@ -923,9 +923,9 @@ namespace SimulationManager {
         state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
         CurrentModuleObject = "ConvergenceLimits";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
                                                                      Alphas,
@@ -979,12 +979,12 @@ namespace SimulationManager {
         state.dataReportFlag->DebugOutput = false;
         state.dataReportFlag->EvenDuringWarmup = false;
         CurrentModuleObject = "Output:DebuggingData";
-        NumDebugOut = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDebugOut = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDebugOut > 1) {
             ShowWarningError(state, CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
         }
         if (NumDebugOut > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state, CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
             if (NumAlpha >= 1) {
                 state.dataReportFlag->DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
             }
@@ -995,20 +995,20 @@ namespace SimulationManager {
 
         {
             CurrentModuleObject = "Output:Diagnostics";
-            Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+            Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
             if (Num > 1) {
                 // Let it slide, but warn
                 // ErrorsFound = true;
                 ShowWarningError(state, CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
             }
-            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+            auto const instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
 
-            if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
                 auto &instancesValue = instances.value();
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                     auto const &fields = instance.value();
                     auto const &thisObjectName = instance.key();
-                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
+                    state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, thisObjectName);
 
                     auto diagnosticsExtensibles = fields.find("diagnostics");
                     if (diagnosticsExtensibles != fields.end()) {
@@ -1086,9 +1086,9 @@ namespace SimulationManager {
         }
 
         CurrentModuleObject = "OutputControl:ReportingTolerances";
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
                                                                      Alphas,
@@ -1120,10 +1120,10 @@ namespace SimulationManager {
         state.dataGlobal->DoHVACSizingSimulation = false;
         state.dataGlobal->HVACSizingSimMaxIterations = 0;
         CurrentModuleObject = "SimulationControl";
-        NumRunControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumRunControl = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRunControl > 0) {
             state.dataSimulationManager->RunControlInInput = true;
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
                                                                      Alphas,
@@ -1154,20 +1154,20 @@ namespace SimulationManager {
         }
 
         CurrentModuleObject = "PerformancePrecisionTradeoffs";
-        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
-        Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        auto const instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
+        Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 1) {
             ErrorsFound = true;
             ShowFatalError(state, "GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
         state.dataGlobal->createPerfLog = Num > 0;
         std::string overrideModeValue = "Normal";
-        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
+                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     state.dataGlobal->DoCoilDirectSolutions =
                         UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
@@ -1528,12 +1528,12 @@ namespace SimulationManager {
         bool ErrorsFound;
 
         ErrorsFound = false;
-        NumZoneSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Zone");
-        NumSystemSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:System");
-        NumPlantSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Plant");
-        NumDesignDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
-        NumRunPeriodDesign = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        NumZoneSizing = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Sizing:Zone");
+        NumSystemSizing = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Sizing:System");
+        NumPlantSizing = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Sizing:Plant");
+        NumDesignDays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:DesignDay");
+        NumRunPeriodDesign = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                             state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 
         WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
@@ -1644,20 +1644,20 @@ namespace SimulationManager {
         bool ReportingRequested;
 
         ReportingRequested = false;
-        SimPeriods = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
+        SimPeriods = (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
+                      state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
+                      state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
+                      state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "RunPeriod") > 0);
 
         if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
-            ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
+            ReportingRequested = (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
+                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
+                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
+                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Variable") > 0 ||
+                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter") > 0 ||
+                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
+                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
+                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
             // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
             if (!ReportingRequested) {
                 ShowWarningError(state, "No reporting elements have been requested. No simulation results produced.");
@@ -2944,14 +2944,14 @@ namespace SimulationManager {
 
         state.dataGlobal->DoingInputProcessing = false;
 
-        state.dataInputProcessing->inputProcessor->preProcessorCheck(
+        state.dataInputProcessing->inputProcessor()->preProcessorCheck(
             state, state.dataSimulationManager->PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
 
         if (state.dataSimulationManager->PreP_Fatal) {
             ShowFatalError(state, "Preprocessor condition(s) cause termination.");
         }
 
-        state.dataInputProcessing->inputProcessor->preScanReportingVariables(state);
+        state.dataInputProcessing->inputProcessor()->preScanReportingVariables(state);
     }
 
 } // namespace SimulationManager

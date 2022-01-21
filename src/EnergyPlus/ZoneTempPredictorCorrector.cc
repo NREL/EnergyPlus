@@ -348,7 +348,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &lAlphaFieldBlanks = state.dataIPShortCut->lAlphaFieldBlanks;
     auto &cAlphaFieldNames = state.dataIPShortCut->cAlphaFieldNames;
     auto &cNumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
-    auto &inputProcessor = state.dataInputProcessing->inputProcessor;
+    auto &inputProcessor = state.dataInputProcessing->inputProcessor();
     auto &SetPointDualHeatCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool;
 
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TStat));

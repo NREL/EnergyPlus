@@ -920,15 +920,15 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
 
     if (!state.dataMixedAir->GetOASysInputFlag) return;
 
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::OASystem)), TotalArgs, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::AirLoopEqList)), TotalArgs, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::ControllerList)), TotalArgs, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -941,7 +941,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     lNumericBlanks.dimension(MaxNums, true);
 
     CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::ControllerList));
-    state.dataMixedAir->NumControllerLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataMixedAir->NumControllerLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
     state.dataMixedAir->ControllerLists.allocate(state.dataMixedAir->NumControllerLists);
 
@@ -949,7 +949,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
 
         // create a reference for convenience
         auto &thisControllerList(state.dataMixedAir->ControllerLists(Item));
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  Item,
                                                                  AlphArray,
@@ -997,7 +997,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
 
     CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::OASystem));
 
-    state.dataAirLoop->NumOASystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataAirLoop->NumOASystems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
     state.dataAirLoop->OutsideAirSys.allocate(state.dataAirLoop->NumOASystems);
     state.dataSize->OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
@@ -1008,7 +1008,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
 
     for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  OASysNum,
                                                                  AlphArray,
@@ -1034,10 +1034,10 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         TestCompSet(state, CurrentModuleObject, AlphArray(1), "UNDEFINED", "UNDEFINED", "Air Nodes");
 
         if (!lAlphaBlanks(3)) {
-            ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
+            ListNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(
                 state, CurrentModuleObjects(static_cast<int>(CMO::AirLoopEqList)), ComponentListName);
             if (ListNum > 0) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor()->getObjectItem(
                     state, CurrentModuleObjects(static_cast<int>(CMO::AirLoopEqList)), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                 NumInList = (NumAlphas - 1) / 2;
                 state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents = NumInList;
@@ -1074,10 +1074,10 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         ListNum = 0;
         NumSimpControllers = 0;
         if (!lAlphaBlanks(2)) {
-            ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
+            ListNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(
                 state, CurrentModuleObjects(static_cast<int>(CMO::ControllerList)), ControllerListName);
             if (ListNum > 0) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(
+                state.dataInputProcessing->inputProcessor()->getObjectItem(
                     state, CurrentModuleObjects(static_cast<int>(CMO::ControllerList)), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                 NumInList = (NumAlphas - 1) / 2;
                 state.dataAirLoop->OutsideAirSys(OASysNum).NumControllers = NumInList;
@@ -1098,7 +1098,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else {
-            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") == 0) {
+            if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") == 0) {
                 ShowSevereError(state,
                                 CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(2) + " is blank and must be entered.");
                 ErrorsFound = true;
@@ -1322,15 +1322,15 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
     FaultsManager::CheckAndReadFaults(state);
 
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::OAController)), NumArg, NumAlphas, NumNums);
     MaxAlphas = NumAlphas;
     MaxNums = NumNums;
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::ERVController)), NumArg, NumAlphas, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNums = max(MaxNums, NumNums);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)), NumArg, NumAlphas, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNums = max(MaxNums, NumNums);
@@ -1351,7 +1351,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
         int currentOAControllerNum = 0;
         for (OutAirNum = state.dataMixedAir->NumERVControllers + 1; OutAirNum <= state.dataMixedAir->NumOAControllers; ++OutAirNum) {
             ++currentOAControllerNum;
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      currentOAControllerNum,
                                                                      AlphArray,
@@ -1417,12 +1417,12 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
     // Process Controller:MechanicalVentilation objects
     CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::MechVentilation));
-    state.dataMixedAir->NumVentMechControllers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataMixedAir->NumVentMechControllers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
     if (state.dataMixedAir->NumVentMechControllers > 0) {
         state.dataMixedAir->VentilationMechanical.allocate(state.dataMixedAir->NumVentMechControllers);
         for (VentMechNum = 1; VentMechNum <= state.dataMixedAir->NumVentMechControllers; ++VentMechNum) {
             auto &thisVentilationMechanical(state.dataMixedAir->VentilationMechanical(VentMechNum));
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      VentMechNum,
                                                                      AlphArray,
@@ -2060,9 +2060,9 @@ void AllocateOAControllers(EnergyPlusData &state)
 
     if (state.dataMixedAir->AllocateOAControllersFlag) {
         state.dataMixedAir->NumOAControllers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::OAController)));
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::OAController)));
         state.dataMixedAir->NumERVControllers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::ERVController)));
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObjects(static_cast<int>(CMO::ERVController)));
         state.dataMixedAir->NumOAControllers += state.dataMixedAir->NumERVControllers;
         state.dataMixedAir->OAController.allocate(state.dataMixedAir->NumOAControllers);
         state.dataMixedAir->OAControllerUniqueNames.reserve(static_cast<unsigned>(state.dataMixedAir->NumOAControllers));
@@ -2111,7 +2111,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
 
     if (!state.dataMixedAir->GetOAMixerInputFlag) return;
 
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
         state, CurrentModuleObjects(static_cast<int>(CMO::OAMixer)), NumArg, NumAlphas, NumNums);
 
     AlphArray.allocate(NumAlphas);
@@ -2123,14 +2123,14 @@ void GetOAMixerInputs(EnergyPlusData &state)
 
     CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::OAMixer));
 
-    state.dataMixedAir->NumOAMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataMixedAir->NumOAMixers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
     if (state.dataMixedAir->NumOAMixers > 0) {
 
         state.dataMixedAir->OAMixer.allocate(state.dataMixedAir->NumOAMixers);
 
         for (OutAirNum = 1; OutAirNum <= state.dataMixedAir->NumOAMixers; ++OutAirNum) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      OutAirNum,
                                                                      AlphArray,
@@ -6382,13 +6382,13 @@ void CheckControllerLists(EnergyPlusData &state, bool &ErrFound)
         state.dataMixedAir->GetOASysInputFlag = false;
     }
 
-    NumControllers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    NumAirLoop = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, AirLoopObject);
+    NumControllers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    NumAirLoop = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, AirLoopObject);
     AirLoopName = "";
 
     for (Item = 1; Item <= NumControllers; ++Item) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(
+        state.dataInputProcessing->inputProcessor()->getObjectItem(
             state, CurrentModuleObject, Item, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStat);
         ControllerListName = state.dataIPShortCut->cAlphaArgs(1);
         Count = 0;
@@ -6396,7 +6396,7 @@ void CheckControllerLists(EnergyPlusData &state, bool &ErrFound)
         // Check AirLoopHVAC -- brute force, get each AirLoopHVAC
 
         for (Loop = 1; Loop <= NumAirLoop; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(
+            state.dataInputProcessing->inputProcessor()->getObjectItem(
                 state, AirLoopObject, Loop, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNumbers, IOStat);
             if (state.dataIPShortCut->cAlphaArgs(2) != ControllerListName) continue;
             ++Count;

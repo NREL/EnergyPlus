@@ -175,8 +175,8 @@ void GetFluidCoolerInput(EnergyPlusData &state)
     Array1D_string AlphArray(5);  // Character string input data array
 
     // Get number of all Fluid Coolers specified in the input data file (idf)
-    int const NumSingleSpeedFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidCooler:SingleSpeed");
-    int const NumTwoSpeedFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidCooler:TwoSpeed");
+    int const NumSingleSpeedFluidCoolers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidCooler:SingleSpeed");
+    int const NumTwoSpeedFluidCoolers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidCooler:TwoSpeed");
     state.dataFluidCoolers->NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
     if (state.dataFluidCoolers->NumSimpleFluidCoolers <= 0)
@@ -199,7 +199,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
     cCurrentModuleObject = cFluidCooler_SingleSpeed;
     for (int SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber) {
         FluidCoolerNum = SingleSpeedFluidCoolerNumber;
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SingleSpeedFluidCoolerNumber,
                                                                  AlphArray,
@@ -297,7 +297,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
     cCurrentModuleObject = cFluidCooler_TwoSpeed;
     for (int TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber) {
         FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  TwoSpeedFluidCoolerNumber,
                                                                  AlphArray,

@@ -542,20 +542,20 @@ void GetPTUnit(EnergyPlusData &state)
 
     // find the number of each type of packaged terminal unit
     CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-    state.dataPTHP->NumPTHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+    state.dataPTHP->NumPTHP = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
 
     CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-    state.dataPTHP->NumPTAC = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+    state.dataPTHP->NumPTAC = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
 
     CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-    state.dataPTHP->NumPTWSHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+    state.dataPTHP->NumPTWSHP = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -592,7 +592,7 @@ void GetPTUnit(EnergyPlusData &state)
         OANodeNums = 0;
 
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  PTUnitIndex,
                                                                  Alphas,
@@ -1614,7 +1614,7 @@ void GetPTUnit(EnergyPlusData &state)
         OANodeNums = 0;
 
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  PTUnitIndex,
                                                                  Alphas,
@@ -2529,7 +2529,7 @@ void GetPTUnit(EnergyPlusData &state)
         OANodeNums = 0;
 
         CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  PTUnitIndex,
                                                                  Alphas,

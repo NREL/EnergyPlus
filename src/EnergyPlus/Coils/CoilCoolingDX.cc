@@ -93,7 +93,7 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
 
 void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state)
 {
-    int numCoolingCoilDXs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataCoilCooingDX->coilCoolingDXObjectName);
+    int numCoolingCoilDXs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataCoilCooingDX->coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(state, R"(No "Coil:Cooling:DX" objects in input file)");
     }
@@ -101,7 +101,7 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state)
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                  coilNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

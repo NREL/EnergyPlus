@@ -236,11 +236,11 @@ namespace DualDuct {
         Real64 DummyOAFlow(0.0);
 
         state.dataDualDuct->NumDualDuctConstVolDampers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
         state.dataDualDuct->NumDualDuctVarVolDampers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);
         state.dataDualDuct->NumDualDuctVarVolOA =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
         state.dataDualDuct->NumDDAirTerminal =
             state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
         state.dataDualDuct->dd_airterminal.allocate(state.dataDualDuct->NumDDAirTerminal);
@@ -253,7 +253,7 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDConstantVolume;
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          DamperIndex,
                                                                          AlphArray,
@@ -414,7 +414,7 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDVariableVolume;
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          DamperIndex,
                                                                          AlphArray,
@@ -597,7 +597,7 @@ namespace DualDuct {
                 // Load the info from the damper
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          DamperIndex,
                                                                          AlphArray,
@@ -2332,7 +2332,7 @@ namespace DualDuct {
 
         if (state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
             state.dataDualDuct->NumDualDuctVarVolOA =
-                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+                state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
             state.dataDualDuct->RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             state.dataDualDuct->DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
@@ -2346,7 +2346,7 @@ namespace DualDuct {
 
                     CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              DamperIndex,
                                                                              AlphArray,

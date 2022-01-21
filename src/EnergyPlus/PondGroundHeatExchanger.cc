@@ -184,7 +184,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
     // Initializations and allocations
     state.dataIPShortCut->cCurrentModuleObject = "GroundHeatExchanger:Pond";
     state.dataPondGHE->NumOfPondGHEs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
     // allocate data structures
     if (allocated(state.dataPondGHE->PondGHE)) state.dataPondGHE->PondGHE.deallocate();
 
@@ -194,7 +194,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
     for (Item = 1; Item <= state.dataPondGHE->NumOfPondGHEs; ++Item) {
 
         // get the input data
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  Item,
                                                                  state.dataIPShortCut->cAlphaArgs,

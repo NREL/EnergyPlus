@@ -306,9 +306,9 @@ namespace SteamBaseboardRadiator {
 
         SteamMessageNeeded = true;
         state.dataSteamBaseboardRadiator->NumSteamBaseboards =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
         state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design);
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design);
 
         // Count total number of baseboard units
 
@@ -326,7 +326,7 @@ namespace SteamBaseboardRadiator {
         // Get the data from the user input related to baseboard heater designobjects
         for (BaseboardDesignNum = 1; BaseboardDesignNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboardsDesign; ++BaseboardDesignNum) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design,
                                                                      BaseboardDesignNum,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -487,7 +487,7 @@ namespace SteamBaseboardRadiator {
         // Get the data from the user input related to baseboard heaters
         for (BaseboardNum = 1; BaseboardNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++BaseboardNum) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                                      BaseboardNum,
                                                                      state.dataIPShortCut->cAlphaArgs,

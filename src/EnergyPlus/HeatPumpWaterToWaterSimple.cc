@@ -245,8 +245,8 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
     bool ErrorsFound(false);
 
-    NumCoolCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
-    NumHeatCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
+    NumCoolCoil = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, HPEqFitCoolingUC);
+    NumHeatCoil = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, HPEqFitHeatingUC);
     state.dataHPWaterToWaterSimple->NumGSHPs = NumCoolCoil + NumHeatCoil;
 
     if (state.dataHPWaterToWaterSimple->NumGSHPs <= 0) {
@@ -264,7 +264,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
         GSHPNum = HPNum;
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  HPEqFitCoolingUC,
                                                                  HPNum,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -436,7 +436,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
         GSHPNum = NumCoolCoil + HPNum;
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  HPEqFitHeatingUC,
                                                                  HPNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

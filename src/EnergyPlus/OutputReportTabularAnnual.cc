@@ -105,7 +105,7 @@ void GetInputTabularAnnual(EnergyPlusData &state)
 
     auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
 
-    objCount = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, currentModuleObject);
+    objCount = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, currentModuleObject);
     if (objCount > 0) {
         // if not a run period using weather do not create reports
         if (!state.dataGlobal->DoWeathSim) {
@@ -115,11 +115,11 @@ void GetInputTabularAnnual(EnergyPlusData &state)
             return;
         }
     }
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, currentModuleObject, numParams, numAlphas, numNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, currentModuleObject, numParams, numAlphas, numNums);
     alphArray.allocate(numAlphas);
     numArray.dimension(numNums, 0.0);
     for (int tabNum = 1; tabNum <= objCount; ++tabNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state, currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat);
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state, currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat);
         if (numAlphas >= 5) {
             annualTables.push_back(AnnualTable(state, alphArray(1), alphArray(2), alphArray(3)));
             // the remaining fields are repeating in groups of three and need to be added to the data structure

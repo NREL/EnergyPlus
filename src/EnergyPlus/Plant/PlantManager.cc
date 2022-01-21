@@ -316,11 +316,11 @@ void GetPlantLoopData(EnergyPlusData &state)
 
     CurrentModuleObject = "PlantLoop";
     state.dataHVACGlobal->NumPlantLoops =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state,
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state,
                                                                       CurrentModuleObject); // Get the number of primary plant loops
     CurrentModuleObject = "CondenserLoop";
     state.dataHVACGlobal->NumCondLoops =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Get the number of Condenser loops
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Get the number of Condenser loops
     state.dataPlnt->TotNumLoops = state.dataHVACGlobal->NumPlantLoops + state.dataHVACGlobal->NumCondLoops;
 
     if (state.dataPlnt->TotNumLoops > 0) {
@@ -345,7 +345,7 @@ void GetPlantLoopData(EnergyPlusData &state)
             PlantLoopNum = LoopNum;
             this_loop.TypeOfLoop = LoopType::Plant;
             CurrentModuleObject = "PlantLoop";
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      PlantLoopNum,
                                                                      Alpha,
@@ -361,7 +361,7 @@ void GetPlantLoopData(EnergyPlusData &state)
             CondLoopNum = LoopNum - state.dataHVACGlobal->NumPlantLoops;
             this_loop.TypeOfLoop = LoopType::Condenser;
             CurrentModuleObject = "CondenserLoop";
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CondLoopNum,
                                                                      Alpha,
@@ -797,9 +797,9 @@ void GetPlantInput(EnergyPlusData &state)
     bool errFlag;
     int LoopNumInArray;
 
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Connector:Splitter", NumParams, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Connector:Splitter", NumParams, NumAlphas, NumNumbers);
     MaxNumAlphas = NumAlphas;
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Connector:Mixer", NumParams, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Connector:Mixer", NumParams, NumAlphas, NumNumbers);
     MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
     HalfLoopNum = 0;
 
@@ -4310,10 +4310,10 @@ void CheckIfAnyPlant(EnergyPlusData &state)
     int numCondenserLoopsCheck;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "PlantLoop";
-    numPlantLoopsCheck = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    numPlantLoopsCheck = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     cCurrentModuleObject = "CondenserLoop";
-    numCondenserLoopsCheck = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    numCondenserLoopsCheck = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if ((numPlantLoopsCheck + numCondenserLoopsCheck) > 0) {
         state.dataGlobal->AnyPlantInModel = true;

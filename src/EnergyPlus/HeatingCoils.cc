@@ -306,14 +306,14 @@ namespace HeatingCoils {
 
         auto &HeatingCoil(state.dataHeatingCoils->HeatingCoil);
 
-        state.dataHeatingCoils->NumElecCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric");
+        state.dataHeatingCoils->NumElecCoil = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:Electric");
         state.dataHeatingCoils->NumElecCoilMultiStage =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric:MultiStage");
-        state.dataHeatingCoils->NumFuelCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Fuel");
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:Electric:MultiStage");
+        state.dataHeatingCoils->NumFuelCoil = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:Fuel");
         state.dataHeatingCoils->NumGasCoilMultiStage =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Gas:MultiStage");
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:Gas:MultiStage");
         state.dataHeatingCoils->NumDesuperheaterCoil =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Desuperheater");
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:Desuperheater");
         state.dataHeatingCoils->NumHeatingCoils = state.dataHeatingCoils->NumElecCoil + state.dataHeatingCoils->NumElecCoilMultiStage +
                                                   state.dataHeatingCoils->NumFuelCoil + state.dataHeatingCoils->NumGasCoilMultiStage +
                                                   state.dataHeatingCoils->NumDesuperheaterCoil;
@@ -324,23 +324,23 @@ namespace HeatingCoils {
             state.dataHeatingCoils->CheckEquipName.dimension(state.dataHeatingCoils->NumHeatingCoils, true);
         }
 
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, "Coil:Heating:Electric", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, "Coil:Heating:Electric:MultiStage", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, "Coil:Heating:Fuel", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, "Coil:Heating:Gas:MultiStage", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, "Coil:Heating:Desuperheater", state.dataHeatingCoils->TotalArgs, NumAlphas, NumNums);
         state.dataHeatingCoils->MaxNums = max(state.dataHeatingCoils->MaxNums, NumNums);
         state.dataHeatingCoils->MaxAlphas = max(state.dataHeatingCoils->MaxAlphas, NumAlphas);
@@ -360,7 +360,7 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Electric";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      ElecCoilNum,
                                                                      Alphas,
@@ -489,7 +489,7 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      ElecCoilNum,
                                                                      Alphas,
@@ -625,7 +625,7 @@ namespace HeatingCoils {
 
             CurrentModuleObject = "Coil:Heating:Fuel";
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      FuelCoilNum,
                                                                      Alphas,
@@ -824,7 +824,7 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      FuelCoilNum,
                                                                      Alphas,
@@ -1017,7 +1017,7 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Desuperheater";
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      DesuperheaterCoilNum,
                                                                      Alphas,

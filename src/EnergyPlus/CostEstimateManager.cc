@@ -142,7 +142,7 @@ namespace CostEstimateManager {
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
-        state.dataCostEstimateManager->NumLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
+        state.dataCostEstimateManager->NumLineItems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ComponentCost:LineItem");
 
         if (state.dataCostEstimateManager->NumLineItems == 0) {
             state.dataCostEstimateManager->DoCostEstimate = false;
@@ -159,7 +159,7 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:LineItem";
 
         for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -183,9 +183,9 @@ namespace CostEstimateManager {
         // most input error checking to be performed later within Case construct in Calc routine.
 
         cCurrentModuleObject = "ComponentCost:Adjustments";
-        NumCostAdjust = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumCostAdjust = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumCostAdjust == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      1,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -207,9 +207,9 @@ namespace CostEstimateManager {
         }
 
         cCurrentModuleObject = "ComponentCost:Reference";
-        NumRefAdjust = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumRefAdjust = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumRefAdjust == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      1,
                                                                      state.dataIPShortCut->cAlphaArgs,

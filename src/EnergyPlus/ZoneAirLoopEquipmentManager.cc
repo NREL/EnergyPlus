@@ -196,7 +196,7 @@ namespace ZoneAirLoopEquipmentManager {
         Array1D_bool lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE.
         bool DualDuctRecircIsUsed;        // local temporary for deciding if recirc side used by dual duct terminal
 
-        state.dataDefineEquipment->NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataDefineEquipment->NumAirDistUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataDefineEquipment->AirDistUnit.allocate(state.dataDefineEquipment->NumAirDistUnits);
         state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(state.dataDefineEquipment->NumAirDistUnits);
@@ -205,7 +205,7 @@ namespace ZoneAirLoopEquipmentManager {
         if (state.dataDefineEquipment->NumAirDistUnits > 0) {
 
             for (AirDistUnitNum = 1; AirDistUnitNum <= state.dataDefineEquipment->NumAirDistUnits; ++AirDistUnitNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          AirDistUnitNum,
                                                                          AlphArray,

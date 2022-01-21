@@ -477,8 +477,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
     cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
-    state.dataHybridUnitaryAC->NumZoneHybridEvap = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+    state.dataHybridUnitaryAC->NumZoneHybridEvap = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
     int MaxNumbers = max(0, NumNumbers); // Maximum number of numeric fields in all objects
     int MaxAlphas = max(0, NumAlphas);   // Maximum number of alpha fields in all objects
     Alphas.allocate(MaxAlphas);
@@ -495,7 +495,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner.allocate(state.dataHybridUnitaryAC->NumZoneHybridEvap);
 
         for (UnitLoop = 1; UnitLoop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++UnitLoop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      UnitLoop,
                                                                      Alphas,

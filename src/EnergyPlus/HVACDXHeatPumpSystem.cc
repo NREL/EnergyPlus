@@ -284,12 +284,12 @@ namespace HVACDXHeatPumpSystem {
         auto &DXHeatPumpSystem(state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
 
         CurrentModuleObject = "CoilSystem:Heating:DX";
-        NumDXHeatPumpSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumDXHeatPumpSystems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
         DXHeatPumpSystem.allocate(NumDXHeatPumpSystems);
         state.dataHVACDXHeatPumpSys->CheckEquipName.dimension(NumDXHeatPumpSystems, true);
 
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, "CoilSystem:Heating:DX", state.dataHVACDXHeatPumpSys->TotalArgs, NumAlphas, NumNums);
 
         Alphas.allocate(NumAlphas);
@@ -302,7 +302,7 @@ namespace HVACDXHeatPumpSystem {
         // Get the data for the DX Cooling System
         for (DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      DXHeatSysNum,
                                                                      Alphas,

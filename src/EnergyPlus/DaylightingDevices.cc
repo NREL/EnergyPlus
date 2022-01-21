@@ -469,13 +469,13 @@ namespace DaylightingDevices {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "DaylightingDevice:Tubular";
-        state.dataDaylightingDevicesData->NumOfTDDPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingDevicesData->NumOfTDDPipes = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
             state.dataDaylightingDevicesData->TDDPipe.allocate(state.dataDaylightingDevicesData->NumOfTDDPipes);
 
             for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          PipeNum,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -806,13 +806,13 @@ namespace DaylightingDevices {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "DaylightingDevice:Shelf";
-        state.dataDaylightingDevicesData->NumOfShelf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingDevicesData->NumOfShelf = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataDaylightingDevicesData->NumOfShelf > 0) {
             state.dataDaylightingDevicesData->Shelf.allocate(state.dataDaylightingDevicesData->NumOfShelf);
 
             for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          ShelfNum,
                                                                          state.dataIPShortCut->cAlphaArgs,

@@ -192,13 +192,13 @@ namespace SplitterComponent {
         state.dataSplitterComponent->GetSplitterInputFlag = false;
 
         CurrentModuleObject = "AirLoopHVAC:ZoneSplitter";
-        state.dataSplitterComponent->NumSplitters = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataSplitterComponent->NumSplitters = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
         if (state.dataSplitterComponent->NumSplitters > 0)
             state.dataSplitterComponent->SplitterCond.allocate(state.dataSplitterComponent->NumSplitters);
         state.dataSplitterComponent->CheckEquipName.dimension(state.dataSplitterComponent->NumSplitters, true);
 
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         lAlphaBlanks.dimension(NumAlphas, true);
@@ -207,7 +207,7 @@ namespace SplitterComponent {
         NumArray.dimension(NumNums, 0.0);
 
         for (SplitterNum = 1; SplitterNum <= state.dataSplitterComponent->NumSplitters; ++SplitterNum) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      SplitterNum,
                                                                      AlphArray,

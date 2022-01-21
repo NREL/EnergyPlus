@@ -2321,10 +2321,10 @@ void GetOARequirements(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
     CurrentModuleObject = "DesignSpecification:OutdoorAir";
-    int numOARequirements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    int numOARequirements = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
     std::string cCurrentModuleObject2 = "DesignSpecification:OutdoorAir:SpaceList";
-    int numOARequirementsLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject2);
+    int numOARequirementsLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject2);
     state.dataSize->NumOARequirements = numOARequirements + numOARequirementsLists;
 
     Alphas.allocate(NumAlphas);
@@ -2340,7 +2340,7 @@ void GetOARequirements(EnergyPlusData &state)
         // Start Loading the System Input
         for (int OAIndex = 1; OAIndex <= numOARequirements; ++OAIndex) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      OAIndex,
                                                                      Alphas,
@@ -2368,7 +2368,7 @@ void GetOARequirements(EnergyPlusData &state)
         lNumericBlanks.deallocate();
 
         // DesignSpecification:OutdoorAir:SpaceList
-        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto &ip = state.dataInputProcessing->inputProcessor();
         auto const instances = ip->epJSON.find(cCurrentModuleObject2);
         if (instances != ip->epJSON.end()) {
             auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject2);
@@ -2637,8 +2637,8 @@ void GetZoneAirDistribution(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
     CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
-    state.dataSize->NumZoneAirDistribution = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    state.dataSize->NumZoneAirDistribution = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     Alphas.allocate(NumAlphas);
     cAlphaFields.allocate(NumAlphas);
@@ -2653,7 +2653,7 @@ void GetZoneAirDistribution(EnergyPlusData &state)
         // Start Loading the zone air distribution input
         for (ZADIndex = 1; ZADIndex <= state.dataSize->NumZoneAirDistribution; ++ZADIndex) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      ZADIndex,
                                                                      Alphas,
@@ -2764,10 +2764,10 @@ void GetSizingParams(EnergyPlusData &state)
     int Temp;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Sizing:Parameters";
-    NumSizParams = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumSizParams = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (NumSizParams == 1) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  1,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -2812,13 +2812,13 @@ void GetSizingParams(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "OutputControl:Sizing:Style";
-    Temp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    Temp = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (Temp == 0) {
         state.dataIPShortCut->cAlphaArgs(1) = "Comma";
         state.dataSize->SizingFileColSep = CharComma; // comma
     } else if (Temp == 1) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  1,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -2910,7 +2910,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
     Array1D<GlobalMiscObject> SizingZoneObjects;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Sizing:Zone";
-    NumSizingZoneStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumSizingZoneStatements = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
     SizingZoneObjects.allocate(NumSizingZoneStatements);
 
     if (NumSizingZoneStatements > 0) {
@@ -2922,7 +2922,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
     state.dataSize->NumZoneSizingInput = 0;
     errFlag = false;
     for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Item,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -2969,9 +2969,9 @@ void GetZoneSizingInput(EnergyPlusData &state)
     }
 
     if (state.dataSize->NumZoneSizingInput > 0) {
-        NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        NumDesDays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                     state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                     state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         if (NumDesDays == 0 && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
             ShowSevereError(state, "Zone Sizing calculations need SizingPeriod:* input. None found.");
             ErrorsFound = true;
@@ -2981,7 +2981,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
         ZoneSizIndex = 0;
         for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -3541,11 +3541,11 @@ void GetZoneAndZoneListNames(
     InErrFlag = ErrorsFound;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Zone";
-    NumZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumZones = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
     ZoneNames.allocate(NumZones);
 
     for (Item = 1; Item <= NumZones; ++Item) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Item,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -3567,11 +3567,11 @@ void GetZoneAndZoneListNames(
     }
 
     cCurrentModuleObject = "ZoneList";
-    NumZoneLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumZoneLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
     ZoneListNames.allocate(NumZoneLists);
 
     for (Item = 1; Item <= NumZoneLists; ++Item) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Item,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -3667,15 +3667,15 @@ void GetSystemSizingInput(EnergyPlusData &state)
 
     auto &SysSizInput(state.dataSize->SysSizInput);
 
-    state.dataSizingManager->NumAirLoops = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
+    state.dataSizingManager->NumAirLoops = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC");
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Sizing:System";
-    state.dataSize->NumSysSizInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataSize->NumSysSizInput = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataSize->NumSysSizInput > 0) {
-        NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        NumDesDays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                     state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                     state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         if (NumDesDays == 0 && (state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
             ShowSevereError(state, "System Sizing calculations need SizingPeriod:* input. None found.");
             ErrorsFound = true;
@@ -3684,7 +3684,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
     }
 
     for (SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SysSizIndex,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -4244,12 +4244,12 @@ void GetPlantSizingInput(EnergyPlusData &state)
     int NumDesDays;          // Number of design days in input
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Sizing:Plant";
-    state.dataSize->NumPltSizInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataSize->NumPltSizInput = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataSize->NumPltSizInput > 0) {
-        NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        NumDesDays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                     state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                     state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         if (NumDesDays == 0 && state.dataGlobal->DoPlantSizing) {
             ShowSevereError(state, "Plant Sizing calculations need SizingPeriod:* input");
             ErrorsFound = true;
@@ -4269,7 +4269,7 @@ void GetPlantSizingInput(EnergyPlusData &state)
     }
 
     for (PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  PltSizIndex,
                                                                  state.dataIPShortCut->cAlphaArgs,
@@ -4654,8 +4654,8 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
     CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
-    state.dataSize->NumZoneHVACSizing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    state.dataSize->NumZoneHVACSizing = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     Alphas.allocate(NumAlphas);
     cAlphaFields.allocate(NumAlphas);
@@ -4677,7 +4677,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
             lAlphaBlanks = true;
             lNumericBlanks = true;
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      zSIndex,
                                                                      Alphas,
@@ -5228,8 +5228,8 @@ void GetAirTerminalSizing(EnergyPlusData &state)
     bool ErrorsFound(false); // If errors detected in input
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
-    state.dataSize->NumAirTerminalSizingSpec = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    state.dataSize->NumAirTerminalSizingSpec = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     if (state.dataSize->NumAirTerminalSizingSpec > 0) {
         state.dataSize->AirTerminalSizingSpec.allocate(state.dataSize->NumAirTerminalSizingSpec);
@@ -5237,7 +5237,7 @@ void GetAirTerminalSizing(EnergyPlusData &state)
         // Start Loading the System Input
         for (int zSIndex = 1; zSIndex <= state.dataSize->NumAirTerminalSizingSpec; ++zSIndex) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      zSIndex,
                                                                      state.dataIPShortCut->cAlphaArgs,

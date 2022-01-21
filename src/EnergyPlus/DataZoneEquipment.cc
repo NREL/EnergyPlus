@@ -185,22 +185,22 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
     // Look in the input file for zones with air loop and zone equipment attached
 
-    NumOfControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:EquipmentConnections");
-    state.dataZoneEquip->NumOfZoneEquipLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
+    NumOfControlledZones = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneHVAC:EquipmentConnections");
+    state.dataZoneEquip->NumOfZoneEquipLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
         state, "ZoneHVAC:EquipmentList"); // Look for lists of equipment data - there should
     // be as many of these as there are controlled zones
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
     NodeNums.dimension(NumParams, 0);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums);
     MaxAlphas = NumAlphas;
     MaxNums = NumNums;
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNums = max(MaxNums, NumNums);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNums = max(MaxNums, NumNums);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNums = max(MaxNums, NumNums);
     AlphArray.allocate(MaxAlphas);
@@ -213,14 +213,14 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     if (!allocated(state.dataZoneEquip->SupplyAirPath)) {
         // Look for and read in the air supply path
         // component (splitters) information for each zone
-        state.dataZoneEquip->NumSupplyAirPaths = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPath");
+        state.dataZoneEquip->NumSupplyAirPaths = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC:SupplyPath");
         state.dataZoneEquip->SupplyAirPath.allocate(state.dataZoneEquip->NumSupplyAirPaths);
     }
 
     if (!allocated(state.dataZoneEquip->ReturnAirPath)) {
         // Look for and read in the air return path
         // component (mixers & plenums) information for each zone
-        state.dataZoneEquip->NumReturnAirPaths = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPath");
+        state.dataZoneEquip->NumReturnAirPaths = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC:ReturnPath");
         state.dataZoneEquip->ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
     }
 
@@ -262,7 +262,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
         CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  ControlledZoneLoop,
                                                                  AlphArray,
@@ -353,13 +353,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
         CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-        ZoneEquipListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
+        ZoneEquipListNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(
             state, CurrentModuleObject, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
         if (ZoneEquipListNum > 0) {
 
             EquipList &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(ControlledZoneNum);
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      ZoneEquipListNum,
                                                                      AlphArray,
@@ -899,7 +899,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     CurrentModuleObject = "AirLoopHVAC:SupplyPath";
     for (PathNum = 1; PathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++PathNum) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  PathNum,
                                                                  AlphArray,
@@ -969,7 +969,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     CurrentModuleObject = "AirLoopHVAC:ReturnPath";
     for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  PathNum,
                                                                  AlphArray,

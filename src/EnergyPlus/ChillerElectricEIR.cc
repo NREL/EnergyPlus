@@ -230,7 +230,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
 
     state.dataIPShortCut->cCurrentModuleObject = "Chiller:Electric:EIR";
     state.dataChillerElectricEIR->NumElectricEIRChillers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (state.dataChillerElectricEIR->NumElectricEIRChillers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -245,7 +245,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
         int NumAlphas = 0; // Number of elements in the alpha array
         int NumNums = 0;   // Number of elements in the numeric array
         int IOStat = 0;    // IO Status when calling get input subroutine
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  EIRChillerNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

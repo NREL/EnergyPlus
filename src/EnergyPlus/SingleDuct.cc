@@ -276,19 +276,19 @@ void GetSysInput(EnergyPlusData &state)
     std::string AirTermSysInletNodeName;  // air terminal single duct system inlet node name
     std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
-    state.dataSingleDuct->NumVAVSysGSI = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat");
+    state.dataSingleDuct->NumVAVSysGSI = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat");
     state.dataSingleDuct->NumNoRHVAVSysGSI =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:NoReheat");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:NoReheat");
     state.dataSingleDuct->NumConstVolSys =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:Reheat");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:Reheat");
     state.dataSingleDuct->NumCVNoReheatSysGSI =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:NoReheat");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:NoReheat");
     state.dataSingleDuct->NumVAVVSGSI =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan");
     state.dataSingleDuct->NumCBVAVSysGSI =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat");
     state.dataSingleDuct->NumNoRHCBVAVSysGSI =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat");
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat");
     state.dataSingleDuct->NumSDAirTerminal = state.dataSingleDuct->NumVAVSysGSI + state.dataSingleDuct->NumConstVolSys +
                                              state.dataSingleDuct->NumCVNoReheatSysGSI + state.dataSingleDuct->NumNoRHVAVSysGSI +
                                              state.dataSingleDuct->NumVAVVSGSI + state.dataSingleDuct->NumCBVAVSysGSI +
@@ -298,49 +298,49 @@ void GetSysInput(EnergyPlusData &state)
     state.dataSingleDuct->SysUniqueNames.reserve(static_cast<unsigned>(state.dataSingleDuct->NumSDAirTerminal));
     state.dataSingleDuct->CheckEquipName.dimension(state.dataSingleDuct->NumSDAirTerminal, true);
 
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state,
                                                                    "AirTerminal:SingleDuct:VAV:Reheat",
                                                                    state.dataSingleDuct->TotalArgsGSI,
                                                                    state.dataSingleDuct->NumAlphasGSI,
                                                                    state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state,
                                                                    "AirTerminal:SingleDuct:VAV:NoReheat",
                                                                    state.dataSingleDuct->TotalArgsGSI,
                                                                    state.dataSingleDuct->NumAlphasGSI,
                                                                    state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state,
                                                                    "AirTerminal:SingleDuct:ConstantVolume:Reheat",
                                                                    state.dataSingleDuct->TotalArgsGSI,
                                                                    state.dataSingleDuct->NumAlphasGSI,
                                                                    state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state,
                                                                    "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
                                                                    state.dataSingleDuct->TotalArgsGSI,
                                                                    state.dataSingleDuct->NumAlphasGSI,
                                                                    state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state,
                                                                    "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
                                                                    state.dataSingleDuct->TotalArgsGSI,
                                                                    state.dataSingleDuct->NumAlphasGSI,
                                                                    state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state,
                                                                    "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
                                                                    state.dataSingleDuct->TotalArgsGSI,
                                                                    state.dataSingleDuct->NumAlphasGSI,
                                                                    state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state,
                                                                    "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
                                                                    state.dataSingleDuct->TotalArgsGSI,
                                                                    state.dataSingleDuct->NumAlphasGSI,
@@ -361,7 +361,7 @@ void GetSysInput(EnergyPlusData &state)
 
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  state.dataSingleDuct->SysIndexGSI,
                                                                  Alphas,
@@ -769,7 +769,7 @@ void GetSysInput(EnergyPlusData &state)
 
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  state.dataSingleDuct->SysIndexGSI,
                                                                  Alphas,
@@ -1081,7 +1081,7 @@ void GetSysInput(EnergyPlusData &state)
     for (state.dataSingleDuct->SysIndexGSI = 1; state.dataSingleDuct->SysIndexGSI <= state.dataSingleDuct->NumConstVolSys;
          ++state.dataSingleDuct->SysIndexGSI) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  state.dataSingleDuct->SysIndexGSI,
                                                                  Alphas,
@@ -1349,7 +1349,7 @@ void GetSysInput(EnergyPlusData &state)
     for (state.dataSingleDuct->SysIndexGSI = 1; state.dataSingleDuct->SysIndexGSI <= state.dataSingleDuct->NumCVNoReheatSysGSI;
          ++state.dataSingleDuct->SysIndexGSI) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  state.dataSingleDuct->SysIndexGSI,
                                                                  Alphas,
@@ -1549,7 +1549,7 @@ void GetSysInput(EnergyPlusData &state)
 
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:NoReheat";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  state.dataSingleDuct->SysIndexGSI,
                                                                  Alphas,
@@ -1811,7 +1811,7 @@ void GetSysInput(EnergyPlusData &state)
 
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  state.dataSingleDuct->SysIndexGSI,
                                                                  Alphas,
@@ -2001,7 +2001,7 @@ void GetSysInput(EnergyPlusData &state)
 
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan";
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  state.dataSingleDuct->SysIndexGSI,
                                                                  Alphas,
@@ -2434,7 +2434,7 @@ void GetSysInput(EnergyPlusData &state)
     // Error check to see if a single duct air terminal is assigned to zone that has zone secondary recirculation
     // specified in the Sizing:Zone object
 
-    NumZoneSiz = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Sizing:Zone");
+    NumZoneSiz = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Sizing:Zone");
     if (NumZoneSiz > 0) {
         for (state.dataSingleDuct->SysIndexGSI = 1; state.dataSingleDuct->SysIndexGSI <= state.dataSingleDuct->NumSDAirTerminal;
              ++state.dataSingleDuct->SysIndexGSI) {
@@ -6038,7 +6038,7 @@ void GetATMixers(EnergyPlusData &state)
     state.dataSingleDuct->GetATMixerFlag = false;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
-    state.dataSingleDuct->NumATMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataSingleDuct->NumATMixers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataSingleDuct->SysATMixer.allocate(state.dataSingleDuct->NumATMixers);
 
     // make sure the input data is read in only once
@@ -6049,7 +6049,7 @@ void GetATMixers(EnergyPlusData &state)
     }
 
     for (ATMixerNum = 1; ATMixerNum <= state.dataSingleDuct->NumATMixers; ++ATMixerNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  ATMixerNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

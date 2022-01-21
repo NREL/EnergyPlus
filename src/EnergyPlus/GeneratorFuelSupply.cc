@@ -127,7 +127,7 @@ namespace GeneratorFuelSupply {
 
         if (state.dataGeneratorFuelSupply->MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
-            state.dataGenerator->NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataGenerator->NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (state.dataGenerator->NumGeneratorFuelSups <= 0) {
                 ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
@@ -137,7 +137,7 @@ namespace GeneratorFuelSupply {
             state.dataGenerator->FuelSupply.allocate(state.dataGenerator->NumGeneratorFuelSups);
 
             for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          FuelSupNum,
                                                                          AlphArray,

@@ -407,7 +407,7 @@ namespace SurfaceGeometry {
             s.extWindowArea = 0.0;
             s.totalSurfArea = 0.0;
         }
-        DetailedWWR = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
+        DetailedWWR = (state.dataInputProcessing->inputProcessor()->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
         if (DetailedWWR) {
             print(state.files.debug, "{}", "=======User Entered Classification =================");
             print(state.files.debug, "{}", "Surface,Class,Area,Tilt");
@@ -1267,36 +1267,36 @@ namespace SurfaceGeometry {
             }
         }
 
-        TotDetachedFixed = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Site:Detailed");
-        TotDetachedBldg = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Building:Detailed");
-        TotRectDetachedFixed = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Site");
-        TotRectDetachedBldg = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Building");
-        TotHTSurfs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "BuildingSurface:Detailed");
-        TotDetailedWalls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Wall:Detailed");
-        TotDetailedRoofs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RoofCeiling:Detailed");
-        TotDetailedFloors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Floor:Detailed");
-        TotHTSubs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FenestrationSurface:Detailed");
-        TotShdSubs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Zone:Detailed");
-        TotOverhangs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Overhang");
-        TotOverhangsProjection = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Overhang:Projection");
-        TotFins = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Fin");
-        TotFinsProjection = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Shading:Fin:Projection");
-        TotRectWindows = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Window");
-        TotRectDoors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Door");
-        TotRectGlazedDoors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GlazedDoor");
-        TotRectIZWindows = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Window:Interzone");
-        TotRectIZDoors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Door:Interzone");
-        TotRectIZGlazedDoors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GlazedDoor:Interzone");
-        TotRectExtWalls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Wall:Exterior");
-        TotRectIntWalls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Wall:Adiabatic");
-        TotRectIZWalls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Wall:Interzone");
-        TotRectUGWalls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Wall:Underground");
-        TotRectRoofs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Roof");
-        TotRectCeilings = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Ceiling:Adiabatic");
-        TotRectIZCeilings = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Ceiling:Interzone");
-        TotRectGCFloors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Floor:GroundContact");
-        TotRectIntFloors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Floor:Adiabatic");
-        TotRectIZFloors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Floor:Interzone");
+        TotDetachedFixed = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Site:Detailed");
+        TotDetachedBldg = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Building:Detailed");
+        TotRectDetachedFixed = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Site");
+        TotRectDetachedBldg = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Building");
+        TotHTSurfs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "BuildingSurface:Detailed");
+        TotDetailedWalls = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Wall:Detailed");
+        TotDetailedRoofs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "RoofCeiling:Detailed");
+        TotDetailedFloors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Floor:Detailed");
+        TotHTSubs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FenestrationSurface:Detailed");
+        TotShdSubs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Zone:Detailed");
+        TotOverhangs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Overhang");
+        TotOverhangsProjection = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Overhang:Projection");
+        TotFins = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Fin");
+        TotFinsProjection = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Shading:Fin:Projection");
+        TotRectWindows = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Window");
+        TotRectDoors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Door");
+        TotRectGlazedDoors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "GlazedDoor");
+        TotRectIZWindows = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Window:Interzone");
+        TotRectIZDoors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Door:Interzone");
+        TotRectIZGlazedDoors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "GlazedDoor:Interzone");
+        TotRectExtWalls = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Wall:Exterior");
+        TotRectIntWalls = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Wall:Adiabatic");
+        TotRectIZWalls = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Wall:Interzone");
+        TotRectUGWalls = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Wall:Underground");
+        TotRectRoofs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Roof");
+        TotRectCeilings = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Ceiling:Adiabatic");
+        TotRectIZCeilings = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Ceiling:Interzone");
+        TotRectGCFloors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Floor:GroundContact");
+        TotRectIntFloors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Floor:Adiabatic");
+        TotRectIZFloors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Floor:Interzone");
 
         state.dataSurface->TotOSC = 0;
 
@@ -2799,7 +2799,7 @@ namespace SurfaceGeometry {
 
         int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
                           TotOverhangsProjection + TotFins + TotFinsProjection;
-        int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
+        int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
         if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
             ShowWarningError(state,
                              std::string{RoutineName} + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
@@ -2813,7 +2813,7 @@ namespace SurfaceGeometry {
 
         // Representative surface calculations: Assign representative heat transfer surfaces
         if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
                 int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
@@ -3061,7 +3061,7 @@ namespace SurfaceGeometry {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "GlobalGeometryRules";
-        NumStmt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumStmt = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         OutMsg = " Surface Geometry,";
 
         {
@@ -3069,7 +3069,7 @@ namespace SurfaceGeometry {
 
             if (SELECT_CASE_var == 1) {
                 // This is the valid case
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          1,
                                                                          GAlphas,
@@ -3329,7 +3329,7 @@ namespace SurfaceGeometry {
                 ClassItem = SurfaceClass::Detached_B;
             }
 
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
             if (NumAlphas != 2) {
                 ShowSevereError(
                     state, format("{}: Object Definition indicates not = 2 Alpha Objects, Number Indicated={}", cCurrentModuleObject, NumAlphas));
@@ -3337,7 +3337,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -3506,7 +3506,7 @@ namespace SurfaceGeometry {
                 ClassItem = SurfaceClass::Detached_B;
             }
 
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
             if (NumAlphas != 1) {
                 ShowSevereError(
                     state, format("{}: Object Definition indicates not = 1 Alpha Objects, Number Indicated={}", cCurrentModuleObject, NumAlphas));
@@ -3514,7 +3514,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -3747,7 +3747,7 @@ namespace SurfaceGeometry {
                 ClassItem = 3;
             }
 
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
             if (Item == 1) {
                 if (SurfaceNumAlpha != 9) {
                     ShowSevereError(
@@ -3765,7 +3765,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -4381,7 +4381,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -4919,7 +4919,7 @@ namespace SurfaceGeometry {
         GetWindowShadingControlData(state, ErrorsFound);
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "FenestrationSurface:Detailed";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
 
         if (SurfaceNumAlpha != 6) {
             ShowSevereError(
@@ -4935,7 +4935,7 @@ namespace SurfaceGeometry {
         NeedToAddSurfaces = 0;
 
         for (Loop = 1; Loop <= TotHTSubs; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -5348,7 +5348,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -6341,7 +6341,7 @@ namespace SurfaceGeometry {
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Shading:Zone:Detailed";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
         if (NumAlphas != 3) {
             ShowSevereError(state,
                             format("{}: Object Definition indicates not = 3 Alpha Objects, Number Indicated={}", cCurrentModuleObject, NumAlphas));
@@ -6349,7 +6349,7 @@ namespace SurfaceGeometry {
         }
 
         for (Loop = 1; Loop <= TotShdSubs; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -6568,7 +6568,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -6995,7 +6995,7 @@ namespace SurfaceGeometry {
         bool errFlag;              //  local error flag
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "InternalMass";
-        int TotIntMass = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int TotIntMass = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotIntMass == 0) return;
 
         state.dataSurface->IntMassObjects.allocate(TotIntMass);
@@ -7004,7 +7004,7 @@ namespace SurfaceGeometry {
         errFlag = false;
         NumIntMassSurfaces = 0;
         for (int Item = 1; Item <= TotIntMass; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -7217,14 +7217,14 @@ namespace SurfaceGeometry {
         int NumIntMassSurf;  // total count of internal mass surfaces
 
         NumIntMassSurf = 0;
-        int TotIntMass = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "InternalMass");
+        int TotIntMass = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "InternalMass");
 
         if (TotIntMass == 0) return NumIntMassSurf;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "InternalMass";
         // scan for zones and zone lists in InternalMass objects
         for (int Item = 1; Item <= TotIntMass; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -7310,12 +7310,12 @@ namespace SurfaceGeometry {
         // Get the total number of Shading Surface Reflectance objects
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ShadingProperty:Reflectance";
-        TotShadingSurfaceReflectance = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        TotShadingSurfaceReflectance = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         //  IF(TotShadingSurfaceReflectance.EQ.0) RETURN
 
         for (Loop = 1; Loop <= TotShadingSurfaceReflectance; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -7469,7 +7469,7 @@ namespace SurfaceGeometry {
         bool ErrorInName;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:ExteriorNaturalVentedCavity";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
 
         if (MaxNumNumbers != 8) {
             ShowSevereError(
@@ -7477,12 +7477,12 @@ namespace SurfaceGeometry {
             ErrorsFound = true;
         }
 
-        state.dataSurface->TotExtVentCav = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotExtVentCav = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataSurface->ExtVentedCavity.allocate(state.dataSurface->TotExtVentCav);
 
         for (Item = 1; Item <= state.dataSurface->TotExtVentCav; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -7764,12 +7764,12 @@ namespace SurfaceGeometry {
         auto const tolerance = 1e-6;
 
         std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
-        int numObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int numObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (int obj = 1; obj <= numObjects; ++obj) {
             int alpF = 1;
             int numF = 1;
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      obj,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -7955,7 +7955,7 @@ namespace SurfaceGeometry {
         //-----------------------------------------------------------------------
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
-        state.dataSurface->TotSurfLocalEnv = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotSurfLocalEnv = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSurface->TotSurfLocalEnv > 0) {
 
@@ -7966,7 +7966,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -8112,7 +8112,7 @@ namespace SurfaceGeometry {
         //-----------------------------------------------------------------------
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
-        TotSrdSurfProperties = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        TotSrdSurfProperties = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotSrdSurfProperties > 0) {
 
@@ -8121,7 +8121,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= TotSrdSurfProperties; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -8235,10 +8235,10 @@ namespace SurfaceGeometry {
         bool msgneeded;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:HeatBalanceSourceTerm";
-        int CountAddHeatSourceSurf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int CountAddHeatSourceSurf = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Item = 1; Item <= CountAddHeatSourceSurf; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -8307,11 +8307,11 @@ namespace SurfaceGeometry {
             e.HeatTransferAlgorithm = state.dataHeatBal->OverallHeatTransferSolutionAlgo;
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-        CountHTAlgoObjectsSingleSurf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        CountHTAlgoObjectsSingleSurf = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         for (Item = 1; Item <= CountHTAlgoObjectsSingleSurf; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -8362,10 +8362,10 @@ namespace SurfaceGeometry {
         } // single surface heat transfer algorithm override
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-        CountHTAlgoObjectsMultiSurf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        CountHTAlgoObjectsMultiSurf = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Item = 1; Item <= CountHTAlgoObjectsMultiSurf; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -8519,9 +8519,9 @@ namespace SurfaceGeometry {
         } // multi surface heat transfer algo override
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-        CountHTAlgoObjectsSurfList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        CountHTAlgoObjectsSurfList = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -8577,9 +8577,9 @@ namespace SurfaceGeometry {
         }
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-        CountHTAlgoObjectsSurfList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        CountHTAlgoObjectsSurfList = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -8642,18 +8642,18 @@ namespace SurfaceGeometry {
         }
 
         // test for missing materials for algorithms selected
-        NumEMPDMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:MoisturePenetrationDepth:Settings");
-        NumPCMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange") +
-                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChangeHysteresis");
-        NumVTCMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
-        NumHAMTMat1 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Settings");
+        NumEMPDMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:MoisturePenetrationDepth:Settings");
+        NumPCMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:PhaseChange") +
+                   state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:PhaseChangeHysteresis");
+        NumVTCMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
+        NumHAMTMat1 = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Settings");
         NumHAMTMat2 =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm");
-        NumHAMTMat3 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Suction");
-        NumHAMTMat4 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Redistribution");
-        NumHAMTMat5 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Diffusion");
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm");
+        NumHAMTMat3 = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Suction");
+        NumHAMTMat4 = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Redistribution");
+        NumHAMTMat5 = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Diffusion");
         NumHAMTMat6 =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity");
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity");
         SumHAMTMat = NumHAMTMat1 + NumHAMTMat2 + NumHAMTMat3 + NumHAMTMat4 + NumHAMTMat5 + NumHAMTMat6;
         msgneeded = false;
 
@@ -9544,7 +9544,7 @@ namespace SurfaceGeometry {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Get the total number of window shading control blocks
         cCurrentModuleObject = "WindowShadingControl";
-        state.dataSurface->TotWinShadingControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotWinShadingControl = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotWinShadingControl == 0) return;
 
         state.dataSurface->WindowShadingControl.allocate(state.dataSurface->TotWinShadingControl);
@@ -9552,7 +9552,7 @@ namespace SurfaceGeometry {
         ControlNum = 0;
         for (Loop = 1; Loop <= state.dataSurface->TotWinShadingControl; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -10206,7 +10206,7 @@ namespace SurfaceGeometry {
 
         // Get the total number of storm window input objects
         cCurrentModuleObject = "WindowProperty:StormWindow";
-        state.dataSurface->TotStormWin = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotStormWin = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotStormWin == 0) return;
 
         state.dataSurface->StormWindow.allocate(state.dataSurface->TotStormWin);
@@ -10214,7 +10214,7 @@ namespace SurfaceGeometry {
         StormWinNum = 0;
         for (loop = 1; loop <= state.dataSurface->TotStormWin; ++loop) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -10430,12 +10430,12 @@ namespace SurfaceGeometry {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Get the total number of window airflow control statements
         cCurrentModuleObject = "WindowProperty:AirflowControl";
-        TotWinAirflowControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        TotWinAirflowControl = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotWinAirflowControl == 0) return;
 
         for (Loop = 1; Loop <= TotWinAirflowControl; ++Loop) { // Loop through all surfaces in the input...
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -10674,7 +10674,7 @@ namespace SurfaceGeometry {
 
         // Read Kiva Settings
         cCurrentModuleObject = "Foundation:Kiva:Settings";
-        int TotKivaStgs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int TotKivaStgs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaStgs > 1) {
             ErrorsFound = true;
@@ -10682,7 +10682,7 @@ namespace SurfaceGeometry {
         }
 
         if (TotKivaStgs == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      1,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -10772,7 +10772,7 @@ namespace SurfaceGeometry {
 
         // Read Foundation objects
         cCurrentModuleObject = "Foundation:Kiva";
-        int TotKivaFnds = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int TotKivaFnds = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaFnds > 0) {
             state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
@@ -10782,7 +10782,7 @@ namespace SurfaceGeometry {
             fndNames(1) = "<Default Foundation>";
 
             for (int Loop = 1; Loop <= TotKivaFnds; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -11297,12 +11297,12 @@ namespace SurfaceGeometry {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "SurfaceProperty:OtherSideCoefficients";
-        state.dataSurface->TotOSC = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotOSC = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataSurface->OSC.allocate(state.dataSurface->TotOSC);
 
         OSCNum = 0;
         for (Loop = 1; Loop <= state.dataSurface->TotOSC; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -11499,13 +11499,13 @@ namespace SurfaceGeometry {
         bool IsBlank;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:OtherSideConditionsModel";
-        state.dataSurface->TotOSCM = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotOSCM = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataSurface->OSCM.allocate(state.dataSurface->TotOSCM);
         // OSCM is already initialized in derived type defn.
 
         OSCMNum = 0;
         for (Loop = 1; Loop <= state.dataSurface->TotOSCM; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(
+            state.dataInputProcessing->inputProcessor()->getObjectItem(
                 state, cCurrentModuleObject, Loop, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumProps, IOStat);
             ErrorInName = false;
             IsBlank = false;
@@ -11644,9 +11644,9 @@ namespace SurfaceGeometry {
         int InslType;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceControl:MovableInsulation";
-        NMatInsul = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NMatInsul = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= NMatInsul; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -11878,7 +11878,7 @@ namespace SurfaceGeometry {
         Polyhedron ZoneStruct;
 
         initmsg = true;
-        bool ShowZoneSurfaces = (state.dataInputProcessing->inputProcessor->getNumSectionsFound("SHOWZONESURFACES_DEBUG") > 0);
+        bool ShowZoneSurfaces = (state.dataInputProcessing->inputProcessor()->getNumSectionsFound("SHOWZONESURFACES_DEBUG") > 0);
 
         enum class ZoneVolumeCalcMethod
         {
@@ -14370,8 +14370,8 @@ namespace SurfaceGeometry {
         // get user input...
 
         if (state.dataSurfaceGeometry->firstTime) {
-            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          1,
                                                                          cAlphas,
@@ -14630,13 +14630,13 @@ namespace SurfaceGeometry {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // First collect names of surfaces referenced by active solar components
         cCurrentModuleObject = "SolarCollector:FlatPlate:Water";
-        NumOfFlatPlateUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfFlatPlateUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-        NumPVTs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumPVTs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Generator:Photovoltaic";
-        NumPVs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumPVs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-        NumOfICSUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfICSUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         NumCandidateNames = NumOfFlatPlateUnits + NumPVTs + NumPVs + NumOfICSUnits;
         NumOfCollectors = NumOfFlatPlateUnits + NumOfICSUnits;
@@ -14649,7 +14649,7 @@ namespace SurfaceGeometry {
             cCurrentModuleObject = "SolarCollector:FlatPlate:Water";
             for (CollectorNum = 1; CollectorNum <= NumOfFlatPlateUnits; ++CollectorNum) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          CollectorNum,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -14667,7 +14667,7 @@ namespace SurfaceGeometry {
             cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
             for (PVTnum = 1; PVTnum <= NumPVTs; ++PVTnum) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          PVTnum,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -14683,7 +14683,7 @@ namespace SurfaceGeometry {
         if (NumPVs > 0) {
             cCurrentModuleObject = "Generator:Photovoltaic";
             for (PVnum = 1; PVnum <= NumPVs; ++PVnum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          PVnum,
                                                                          state.dataIPShortCut->cAlphaArgs,
@@ -14698,7 +14698,7 @@ namespace SurfaceGeometry {
         if (NumOfICSUnits > 0) {
             cCurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
             for (CollectorNum = 1; CollectorNum <= NumOfICSUnits; ++CollectorNum) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          CollectorNum,
                                                                          state.dataIPShortCut->cAlphaArgs,

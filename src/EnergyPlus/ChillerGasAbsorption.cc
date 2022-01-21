@@ -301,7 +301,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     state.dataIPShortCut->cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
-    NumGasAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumGasAbsorbers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (NumGasAbsorbers <= 0) {
         ShowSevereError(state, "No " + cCurrentModuleObject + " equipment found in input file");
@@ -316,7 +316,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
     // LOAD ARRAYS
 
     for (AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  AbsorberNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

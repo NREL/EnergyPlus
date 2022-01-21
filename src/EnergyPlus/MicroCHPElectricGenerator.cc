@@ -150,7 +150,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
         // First get the Micro CHP Parameters so they can be nested in structure later
         state.dataIPShortCut->cCurrentModuleObject = "Generator:MicroCHP:NonNormalizedParameters";
         state.dataCHPElectGen->NumMicroCHPParams =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataCHPElectGen->NumMicroCHPParams <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -160,7 +160,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
         state.dataCHPElectGen->MicroCHPParamInput.allocate(state.dataCHPElectGen->NumMicroCHPParams);
 
         for (int CHPParamNum = 1; CHPParamNum <= state.dataCHPElectGen->NumMicroCHPParams; ++CHPParamNum) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      CHPParamNum,
                                                                      AlphArray,
@@ -259,7 +259,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:MicroCHP";
         state.dataCHPElectGen->NumMicroCHPs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataCHPElectGen->NumMicroCHPs <= 0) {
             // shouldn't ever come here?
@@ -273,7 +273,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
 
         // load in Micro CHPs
         for (int GeneratorNum = 1; GeneratorNum <= state.dataCHPElectGen->NumMicroCHPs; ++GeneratorNum) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      GeneratorNum,
                                                                      AlphArray,

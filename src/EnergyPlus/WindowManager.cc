@@ -9107,7 +9107,7 @@ namespace WindowManager {
 
         // Step 1 - check whether there is custom solar or visible spectrum
         cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-        NumSiteSpectrum = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumSiteSpectrum = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         // no custom spectrum data, done!
         if (NumSiteSpectrum == 0) {
@@ -9121,12 +9121,12 @@ namespace WindowManager {
             ErrorsFound = true;
         }
 
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
         cAlphaArgs.allocate(NumAlphas);
         rNumericArgs.dimension(NumNumbers, 0.0);
 
         if (NumSiteSpectrum == 1) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      1,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -9146,7 +9146,7 @@ namespace WindowManager {
             cVisibleSpectrum = state.dataIPShortCut->cAlphaArgs(4);
 
             cCurrentModuleObject = "Site:SpectrumData";
-            NumSiteSpectrum = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            NumSiteSpectrum = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumSiteSpectrum == 0) { // throw error
                 ShowSevereError(state, "No " + cCurrentModuleObject + " object is found");
                 ErrorsFound = true;
@@ -9155,7 +9155,7 @@ namespace WindowManager {
             cAlphaArgs.deallocate();
             rNumericArgs.deallocate();
 
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
             cAlphaArgs.allocate(NumAlphas);
             rNumericArgs.dimension(NumNumbers, 0.0);
 
@@ -9163,7 +9163,7 @@ namespace WindowManager {
             iVisibleSpectrum = 0;
             for (Loop = 1; Loop <= NumSiteSpectrum; ++Loop) {
                 // Step 2 - read user-defined spectrum data
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,

@@ -1928,7 +1928,7 @@ namespace ThermalComfort {
         int WhichAFList;           // Used in validating AngleFactorList
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ComfortViewFactorAngles";
-        NumOfAngleFactorLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfAngleFactorLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataThermalComforts->AngleFactorList.allocate(NumOfAngleFactorLists);
         for (auto &e : state.dataThermalComforts->AngleFactorList) {
             e.Name.clear();
@@ -1941,7 +1941,7 @@ namespace ThermalComfort {
             AllAngleFacSummed = 0.0;
             auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(Item));
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
                                                                      state.dataIPShortCut->cAlphaArgs,

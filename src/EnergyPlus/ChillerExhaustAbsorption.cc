@@ -305,7 +305,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
     auto cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
-    int NumExhaustAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int NumExhaustAbsorbers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (NumExhaustAbsorbers <= 0) {
         ShowSevereError(state, "No " + cCurrentModuleObject + " equipment found in input file");
@@ -320,7 +320,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
     // LOAD ARRAYS
 
     for (AbsorberNum = 1; AbsorberNum <= NumExhaustAbsorbers; ++AbsorberNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  AbsorberNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

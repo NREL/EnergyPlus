@@ -552,10 +552,10 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
     Array1D<Real64> rNumbers;
 
     bool localErrorsFound(false);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
     cAlphas.allocate(NumAlphas);
     rNumbers.allocate(NumNumbers);
-    state.dataNodeInputMgr->NumOfNodeLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataNodeInputMgr->NumOfNodeLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
     state.dataNodeInputMgr->NodeLists.allocate(state.dataNodeInputMgr->NumOfNodeLists);
     for (int i = 1; i <= state.dataNodeInputMgr->NumOfNodeLists; ++i) {
         state.dataNodeInputMgr->NodeLists(i).Name.clear();
@@ -564,7 +564,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
 
     NCount = 0;
     for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(
+        state.dataInputProcessing->inputProcessor()->getObjectItem(
             state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
         if (UtilityRoutines::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
 
@@ -783,7 +783,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
     int NumNums;
 
     if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         state.dataNodeInputMgr->GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
         state.dataNodeInputMgr->GetOnlySingleNodeFirstTime = false;
     }

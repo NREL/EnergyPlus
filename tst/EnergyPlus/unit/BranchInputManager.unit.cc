@@ -86,7 +86,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 
     static constexpr std::string_view RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
-    int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
+    int NumOfBranches = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -105,9 +105,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         state->dataBranchInputManager->Branch.allocate(NumOfBranches);
         for (auto &e : state->dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+            state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
                                                                       CurrentModuleObject,
                                                                       Count,
                                                                       Alphas,
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 
     static constexpr std::string_view RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
-    int NumOfBranches = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
+    int NumOfBranches = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -271,9 +271,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         state->dataBranchInputManager->Branch.allocate(NumOfBranches);
         for (auto &e : state->dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(*state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        state->dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(*state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            state->dataInputProcessing->inputProcessor->getObjectItem(*state,
+            state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
                                                                       CurrentModuleObject,
                                                                       Count,
                                                                       Alphas,

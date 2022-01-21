@@ -659,38 +659,38 @@ namespace FluidProperties {
 
         MaxAlphas = 0;
         MaxNumbers = 0;
-        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Name") > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Name", Status, NumAlphas, NumNumbers);
+        if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidProperties:Name") > 0) {
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "FluidProperties:Name", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:GlycolConcentration") > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidProperties:GlycolConcentration") > 0) {
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
                 state, "FluidProperties:GlycolConcentration", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfFluidTempArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Temperatures");
+        NumOfFluidTempArrays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidProperties:Temperatures");
         if (NumOfFluidTempArrays > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Temperatures", Status, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "FluidProperties:Temperatures", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfSatFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Saturated");
+        NumOfSatFluidPropArrays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidProperties:Saturated");
         if (NumOfSatFluidPropArrays > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Saturated", Status, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "FluidProperties:Saturated", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfSHFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Superheated");
+        NumOfSHFluidPropArrays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidProperties:Superheated");
         if (NumOfSHFluidPropArrays > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Superheated", Status, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "FluidProperties:Superheated", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfGlyFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Concentration");
+        NumOfGlyFluidPropArrays = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "FluidProperties:Concentration");
         if (NumOfGlyFluidPropArrays > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Concentration", Status, NumAlphas, NumNumbers);
+            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "FluidProperties:Concentration", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
@@ -717,7 +717,7 @@ namespace FluidProperties {
         // long as the user only desires to simulate loops with water.  More than
         // one FluidName input is not allowed.
         CurrentModuleObject = "FluidProperties:Name";
-        NumOfOptionalInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumOfOptionalInput = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
         FluidNames.allocate(NumOfOptionalInput);
 
@@ -725,7 +725,7 @@ namespace FluidProperties {
         // so that the main derived types can be allocated
         FluidNum = 0;
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      Loop,
                                                                      Alphas,
@@ -834,7 +834,7 @@ namespace FluidProperties {
 
         for (Loop = 1; Loop <= NumOfFluidTempArrays; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      Loop,
                                                                      Alphas,
@@ -886,7 +886,7 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -966,7 +966,7 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1044,7 +1044,7 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1128,7 +1128,7 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1206,7 +1206,7 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1289,7 +1289,7 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1367,7 +1367,7 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1474,7 +1474,7 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1543,7 +1543,7 @@ namespace FluidProperties {
             FirstSHMatch = true;
             NumOfPressPts = 0;
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1607,7 +1607,7 @@ namespace FluidProperties {
             NumOfPressPts = 0;
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1651,7 +1651,7 @@ namespace FluidProperties {
             }
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          PressurePtr(InData).InPtr,
                                                                          Alphas,
@@ -1702,7 +1702,7 @@ namespace FluidProperties {
             NumOfPressPts = 0;
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1745,7 +1745,7 @@ namespace FluidProperties {
             }
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          PressurePtr(InData).InPtr,
                                                                          Alphas,
@@ -1784,7 +1784,7 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Superheated";
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
 
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1841,7 +1841,7 @@ namespace FluidProperties {
             NumOfConcPts = 0;
             state.dataFluidProps->GlyRawData(Loop).CpDataPresent = false;
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for specific heat are consistant
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -1899,7 +1899,7 @@ namespace FluidProperties {
                 CurrentModuleObject = "FluidProperties:Concentration";
                 NumOfConcPts = 0;
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              InData,
                                                                              Alphas,
@@ -1953,7 +1953,7 @@ namespace FluidProperties {
             state.dataFluidProps->GlyRawData(Loop).RhoDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for density are consistant
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -2011,7 +2011,7 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              InData,
                                                                              Alphas,
@@ -2065,7 +2065,7 @@ namespace FluidProperties {
             state.dataFluidProps->GlyRawData(Loop).CondDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for conductivity are consistant
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -2123,7 +2123,7 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              InData,
                                                                              Alphas,
@@ -2177,7 +2177,7 @@ namespace FluidProperties {
             state.dataFluidProps->GlyRawData(Loop).ViscDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for viscosity are consistant
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          InData,
                                                                          Alphas,
@@ -2235,7 +2235,7 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              InData,
                                                                              Alphas,
@@ -2311,7 +2311,7 @@ namespace FluidProperties {
         // More than one GlycolConcentrations input is not allowed.
 
         CurrentModuleObject = "FluidProperties:GlycolConcentration";
-        NumOfOptionalInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumOfOptionalInput = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
         NumOfGlyConcs = NumOfOptionalInput + 1;
         state.dataFluidProps->GlycolData.allocate(NumOfGlyConcs);
@@ -2352,7 +2352,7 @@ namespace FluidProperties {
         NumOfGlyConcs = 1; // Water is always available, everything else must be specified
 
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      Loop,
                                                                      Alphas,
@@ -2606,12 +2606,12 @@ namespace FluidProperties {
             ShowFatalError(state, std::string{RoutineName} + "Previous errors in input cause program termination.");
         }
 
-        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("REPORTGLYCOLS") > 0) state.dataFluidProps->DebugReportGlycols = true;
-        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("REPORTREFRIGERANTS") > 0)
+        if (state.dataInputProcessing->inputProcessor()->getNumSectionsFound("REPORTGLYCOLS") > 0) state.dataFluidProps->DebugReportGlycols = true;
+        if (state.dataInputProcessing->inputProcessor()->getNumSectionsFound("REPORTREFRIGERANTS") > 0)
             state.dataFluidProps->DebugReportRefrigerants = true;
-        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("INCREASEGLYCOLERRORLIMIT") > 0)
+        if (state.dataInputProcessing->inputProcessor()->getNumSectionsFound("INCREASEGLYCOLERRORLIMIT") > 0)
             state.dataFluidProps->GlycolErrorLimitTest += 10;
-        if (state.dataInputProcessing->inputProcessor->getNumSectionsFound("INCREASEREFRIGERANTERRORLIMIT") > 0)
+        if (state.dataInputProcessing->inputProcessor()->getNumSectionsFound("INCREASEREFRIGERANTERRORLIMIT") > 0)
             state.dataFluidProps->RefrigerantErrorLimitTest += 10;
 
         if (state.dataFluidProps->DebugReportGlycols) ReportAndTestGlycols(state);

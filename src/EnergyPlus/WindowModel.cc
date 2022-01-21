@@ -83,9 +83,9 @@ namespace WindowManager {
         int IOStat;
 
         auto aModel = std::make_unique<CWindowModel>();
-        int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objectName);
+        int numCurrModels = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, objectName);
         if (numCurrModels > 0) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(
+            state.dataInputProcessing->inputProcessor()->getObjectItem(
                 state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
             EnumParser<WindowsModel> aParser;
             aModel->m_Model = aParser.StringToEnum(state, state.dataIPShortCut->cAlphaArgs(1));
@@ -117,7 +117,7 @@ namespace WindowManager {
         // Process input data and counts if number of complex fenestration objects is greater
         // than zero in which case it will use BSDF window model
         auto aModel = std::make_unique<CWindowOpticalModel>();
-        int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
+        int numCurrModels = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
 
         if (numCurrModels > 0) {
             aModel->m_Model = WindowsOpticalModel::BSDF;

@@ -284,11 +284,11 @@ namespace OutdoorAirUnit {
 
         if (!state.dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag) return;
 
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, CurrentModuleObjects(CurrentObject::OAUnit), TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
             state, CurrentModuleObjects(CurrentObject::EqList), TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -302,7 +302,7 @@ namespace OutdoorAirUnit {
         cAlphaArgs.allocate(NumAlphas);
 
         CurrentModuleObject = CurrentModuleObjects(CurrentObject::OAUnit);
-        state.dataOutdoorAirUnit->NumOfOAUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataOutdoorAirUnit->NumOfOAUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataOutdoorAirUnit->OutAirUnit.allocate(state.dataOutdoorAirUnit->NumOfOAUnits);
         state.dataOutdoorAirUnit->SupplyFanUniqueNames.reserve(static_cast<unsigned>(state.dataOutdoorAirUnit->NumOfOAUnits));
@@ -315,7 +315,7 @@ namespace OutdoorAirUnit {
 
         for (OAUnitNum = 1; OAUnitNum <= state.dataOutdoorAirUnit->NumOfOAUnits; ++OAUnitNum) {
 
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      OAUnitNum,
                                                                      state.dataIPShortCut->cAlphaArgs,
@@ -634,10 +634,10 @@ namespace OutdoorAirUnit {
             ComponentListName = state.dataIPShortCut->cAlphaArgs(16);
             OutAirUnit(OAUnitNum).ComponentListName = ComponentListName;
             if (!lAlphaBlanks(16)) {
-                ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
+                ListNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(
                     state, CurrentModuleObjects(CurrentObject::EqList), ComponentListName);
                 if (ListNum > 0) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(
+                    state.dataInputProcessing->inputProcessor()->getObjectItem(
                         state, CurrentModuleObjects(CurrentObject::EqList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                     NumInList = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
                     if (mod(NumAlphas - 1, 2) != 0) ++NumInList;

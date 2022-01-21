@@ -168,7 +168,7 @@ void GetBoilerInput(EnergyPlusData &state)
 
     // GET NUMBER OF ALL EQUIPMENT
     state.dataIPShortCut->cCurrentModuleObject = "Boiler:HotWater";
-    state.dataBoilers->numBoilers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    state.dataBoilers->numBoilers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (state.dataBoilers->numBoilers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " Equipment specified in input file");
@@ -186,7 +186,7 @@ void GetBoilerInput(EnergyPlusData &state)
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  BoilerNum,
                                                                  state.dataIPShortCut->cAlphaArgs,

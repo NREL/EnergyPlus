@@ -207,7 +207,7 @@ namespace FaultsManager {
         state.dataFaultsMgr->NumFaults = 0;
         state.dataFaultsMgr->NumFaultyEconomizer = 0;
         for (int NumFaultsTemp = 0, i = 0; i <= 15; ++i) {
-            NumFaultsTemp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cFaults(i));
+            NumFaultsTemp = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cFaults(i));
             state.dataFaultsMgr->NumFaults += NumFaultsTemp;
 
             if (i <= 4) {
@@ -289,7 +289,7 @@ namespace FaultsManager {
              ++jFault_EvapCoolerFouling) {
 
             cFaultCurrentObject = cFaults(15); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_EvapCoolerFouling,
                                                                      cAlphaArgs,
@@ -391,7 +391,7 @@ namespace FaultsManager {
         for (int jFault_ChillerFouling = 1; jFault_ChillerFouling <= state.dataFaultsMgr->NumFaultyChillerFouling; ++jFault_ChillerFouling) {
 
             cFaultCurrentObject = cFaults(14); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_ChillerFouling,
                                                                      cAlphaArgs,
@@ -658,7 +658,7 @@ namespace FaultsManager {
         for (int jFault_BoilerFouling = 1; jFault_BoilerFouling <= state.dataFaultsMgr->NumFaultyBoilerFouling; ++jFault_BoilerFouling) {
 
             cFaultCurrentObject = cFaults(13); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_BoilerFouling,
                                                                      cAlphaArgs,
@@ -750,7 +750,7 @@ namespace FaultsManager {
         for (int jFault_CoilSAT = 1; jFault_CoilSAT <= state.dataFaultsMgr->NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
 
             cFaultCurrentObject = cFaults(12); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_CoilSAT,
                                                                      cAlphaArgs,
@@ -979,7 +979,7 @@ namespace FaultsManager {
         for (int jFault_TowerFouling = 1; jFault_TowerFouling <= state.dataFaultsMgr->NumFaultyTowerFouling; ++jFault_TowerFouling) {
 
             cFaultCurrentObject = cFaults(11); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_TowerFouling,
                                                                      cAlphaArgs,
@@ -1095,7 +1095,7 @@ namespace FaultsManager {
         for (int jFault_CondenserSWT = 1; jFault_CondenserSWT <= state.dataFaultsMgr->NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT) {
 
             cFaultCurrentObject = cFaults(10); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_CondenserSWT,
                                                                      cAlphaArgs,
@@ -1199,7 +1199,7 @@ namespace FaultsManager {
         for (int jFault_ChillerSWT = 1; jFault_ChillerSWT <= state.dataFaultsMgr->NumFaultyChillerSWTSensor; ++jFault_ChillerSWT) {
 
             cFaultCurrentObject = cFaults(9); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_ChillerSWT,
                                                                      cAlphaArgs,
@@ -1444,7 +1444,7 @@ namespace FaultsManager {
             }
 
             cFaultCurrentObject = cFaults(8); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_AirFilter,
                                                                      cAlphaArgs,
@@ -1530,7 +1530,7 @@ namespace FaultsManager {
         for (int jFault_Humidistat = 1; jFault_Humidistat <= state.dataFaultsMgr->NumFaultyHumidistat; ++jFault_Humidistat) {
 
             cFaultCurrentObject = cFaults(7); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_Humidistat,
                                                                      cAlphaArgs,
@@ -1610,7 +1610,7 @@ namespace FaultsManager {
         for (int jFault_Thermostat = 1; jFault_Thermostat <= state.dataFaultsMgr->NumFaultyThermostat; ++jFault_Thermostat) {
 
             cFaultCurrentObject = cFaults(6); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_Thermostat,
                                                                      cAlphaArgs,
@@ -1669,7 +1669,7 @@ namespace FaultsManager {
         for (int jFault_FoulingCoil = 1; jFault_FoulingCoil <= state.dataFaultsMgr->NumFouledCoil; ++jFault_FoulingCoil) {
 
             cFaultCurrentObject = cFaults(5); // fault object string
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                      cFaultCurrentObject,
                                                                      jFault_FoulingCoil,
                                                                      cAlphaArgs,
@@ -1844,10 +1844,10 @@ namespace FaultsManager {
         // read faults input: Fault_type 0 to 4, which are related with economizer sensors
         for (int j = 0, i = 0; i <= 4; ++i) {
             cFaultCurrentObject = cFaults(i); // fault object string
-            int NumFaultsTemp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cFaultCurrentObject);
+            int NumFaultsTemp = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cFaultCurrentObject);
 
             for (int jj = 1; jj <= NumFaultsTemp; ++jj) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                          cFaultCurrentObject,
                                                                          jj,
                                                                          cAlphaArgs,

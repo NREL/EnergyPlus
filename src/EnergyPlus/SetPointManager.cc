@@ -285,205 +285,205 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     cCurrentModuleObject = "SetpointManager:Scheduled";
     state.dataSetPointManager->NumSchSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
 
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = NumNums;
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = NumAlphas;
 
     cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
     state.dataSetPointManager->NumDualSchSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled:DualSetpoint'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled:DualSetpoint'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
     state.dataSetPointManager->NumOutAirSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirReset'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirReset'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
     state.dataSetPointManager->NumSZRhSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Reheat'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Reheat'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
     state.dataSetPointManager->NumSZHtSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Heating'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Heating'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
     state.dataSetPointManager->NumSZClSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Cooling'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Cooling'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
     state.dataSetPointManager->NumSZMinHumSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Minimum'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Minimum'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
     state.dataSetPointManager->NumSZMaxHumSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Maximum'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Maximum'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:MixedAir";
     state.dataSetPointManager->NumMixedAirSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MixedAir'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MixedAir'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
     state.dataSetPointManager->NumOAPretreatSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirPretreat'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirPretreat'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:Warmest";
     state.dataSetPointManager->NumWarmestSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Warmest'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Warmest'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:Coldest";
     state.dataSetPointManager->NumColdestSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Coldest'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Coldest'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
     state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:WarmestTemperatureFlow'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:WarmestTemperatureFlow'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
     state.dataSetPointManager->NumRABFlowSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:ReturnAirBypassFlow'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:ReturnAirBypassFlow'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
     state.dataSetPointManager->NumMZClgAverageSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Cooling:Average'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Cooling:Average'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
     state.dataSetPointManager->NumMZHtgAverageSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Heating:Average'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Heating:Average'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
-    state.dataSetPointManager->NumMZAverageMinHumSetPtMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
+    state.dataSetPointManager->NumMZAverageMinHumSetPtMgrs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
         state, cCurrentModuleObject); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
-    state.dataSetPointManager->NumMZAverageMaxHumSetPtMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
+    state.dataSetPointManager->NumMZAverageMaxHumSetPtMgrs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
         state, cCurrentModuleObject); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
     state.dataSetPointManager->NumMZMinHumSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Minimum'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Minimum'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
     state.dataSetPointManager->NumMZMaxHumSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Maximum'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Maximum'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
     state.dataSetPointManager->NumFollowOATempSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowOutdoorAirTemperature'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowOutdoorAirTemperature'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
     state.dataSetPointManager->NumFollowSysNodeTempSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowSystemNodeTemperature'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowSystemNodeTemperature'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
     state.dataSetPointManager->NumGroundTempSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowGroundTemperature'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowGroundTemperature'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
     state.dataSetPointManager->NumCondEntSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
     state.dataSetPointManager->NumIdealCondEntSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset:Ideal'
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset:Ideal'
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
     state.dataSetPointManager->NumSZOneStageCoolingSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
     state.dataSetPointManager->NumSZOneStageHeatingSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
     state.dataSetPointManager->NumReturnWaterResetChWSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
     state.dataSetPointManager->NumReturnWaterResetHWSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
@@ -510,7 +510,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     rNumericArgs.dimension(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, 0.0);
     lNumericFieldBlanks.dimension(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, false);
 
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
     NodeNums.dimension(NumParams, 0);
 
     if (state.dataSetPointManager->NumAllSetPtMgrs > 0)
@@ -527,7 +527,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:Scheduled";
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSchSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -638,7 +638,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumDualSchSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -743,7 +743,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumOutAirSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -865,7 +865,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZRhSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -985,7 +985,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZHtSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1104,7 +1104,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1223,7 +1223,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1333,7 +1333,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1445,7 +1445,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:MixedAir";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMixedAirSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1592,7 +1592,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumOAPretreatSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1774,7 +1774,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:Warmest";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1880,7 +1880,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:Coldest";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumColdestSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -1987,7 +1987,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2108,7 +2108,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2179,7 +2179,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each setpoint manager
     cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2271,7 +2271,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each setpoint manager
     cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2364,7 +2364,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each setpoint manager
     cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2457,7 +2457,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each setpoint manager
     cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2551,7 +2551,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each setpoint manager
     cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2641,7 +2641,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each setpoint manager
     cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2733,7 +2733,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumFollowOATempSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2849,7 +2849,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumFollowSysNodeTempSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -2977,7 +2977,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumGroundTempSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -3160,7 +3160,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumCondEntSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -3266,7 +3266,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumIdealCondEntSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -3352,7 +3352,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -3463,7 +3463,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -3576,7 +3576,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum) {
 
         // get the object inputs
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -3673,7 +3673,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum) {
 
         // get the object inputs
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SetPtMgrNum,
                                                                  cAlphaArgs,
@@ -9048,7 +9048,7 @@ void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state)
     std::string cCurrentModuleObject;
 
     cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-    state.dataSetPointManager->NumIdealCondEntSetPtMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataSetPointManager->NumIdealCondEntSetPtMgrs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataSetPointManager->NumIdealCondEntSetPtMgrs > 0) {
         state.dataGlobal->AnyIdealCondEntSetPointInModel = true;

@@ -335,11 +335,19 @@ private:
 
 struct DataInputProcessing : BaseGlobalStruct
 {
-    std::unique_ptr<InputProcessor> inputProcessor = InputProcessor::factory();
+    std::unique_ptr<InputProcessor> m_inputProcessor;
+
+    std::unique_ptr<InputProcessor> &inputProcessor() {
+      if (!m_inputProcessor) {
+        clear_state();
+      }
+      return m_inputProcessor;
+    }
+
     void clear_state() override
     {
-        inputProcessor.reset();
-        inputProcessor = EnergyPlus::InputProcessor::factory();
+        m_inputProcessor.reset();
+        m_inputProcessor = EnergyPlus::InputProcessor::factory();
     }
 };
 
