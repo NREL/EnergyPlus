@@ -765,7 +765,7 @@ namespace OutputProcessor {
                                            TimeStepType timeStepType,
                                            OutputProcessor::Unit unitsForVar, // The variables units
                                            Optional_string_const customUnitName = _,
-                                           Optional_string_const ScheduleName = _);
+                                           std::string_view const ScheduleName = {});
 
     void WriteMeterDictionaryItem(EnergyPlusData &state,
                                   ReportingFrequency reportingInterval, // The reporting interval (e.g., hourly, daily)

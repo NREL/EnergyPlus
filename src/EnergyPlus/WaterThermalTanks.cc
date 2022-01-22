@@ -955,8 +955,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                                     state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
                                     state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum,
                                     errFlag,
-                                    state.dataIPShortCut->cCurrentModuleObject,
-                                    ObjexxFCL::Optional_bool_const());
+                                    state.dataIPShortCut->cCurrentModuleObject);
             if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(
                     state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);

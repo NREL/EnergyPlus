@@ -768,8 +768,8 @@ namespace OutputReportTabular {
                     const Array1D_string &rowLabels,
                     const Array1D_string &columnLabels,
                     Array1D_int &widthColumn,
-                    Optional_bool_const transposeXML = _,
-                    Optional_string_const footnoteText = _);
+                    bool transposeXML = false,
+                    std::string_view const footnoteText = {});
 
     bool produceDualUnitsFlags(int iUnit_Sys,
                                EnergyPlus::OutputReportTabular::UnitsStyle unitsStyle_Tab,

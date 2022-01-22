@@ -355,8 +355,7 @@ namespace HVACHXAssistedCoolingCoil {
                                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
                                CoolingCoilErrFlag,
-                               state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                               ObjexxFCL::Optional_bool_const());
+                               state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError(state,
                                       "...occurs in " + CurrentModuleObject + "=\"" +
@@ -1081,7 +1080,7 @@ namespace HVACHXAssistedCoolingCoil {
     // *****************************************************************************
 
     void GetHXDXCoilIndex(
-        EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+        EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, std::string_view const CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1109,8 +1108,8 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (HXDXCoilIndex == 0) {
-            if (present(CurrentModuleObject)) {
-                ShowSevereError(state, CurrentModuleObject() + ", GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + HXDXCoilName);
+            if (!CurrentModuleObject.empty()) {
+                ShowSevereError(state, fmt::format("{}, GetHXDXCoilIndex: HX Assisted Cooling Coil not found={}", CurrentModuleObject, HXDXCoilName));
             } else {
                 ShowSevereError(state, "GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + HXDXCoilName);
             }
