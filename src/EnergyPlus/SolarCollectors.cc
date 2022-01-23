@@ -380,20 +380,20 @@ namespace SolarCollectors {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(4),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlateWater,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(5),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlateWater,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -672,20 +672,20 @@ namespace SolarCollectors {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(6),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorIntegralCollectorStorage,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(7),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorIntegralCollectorStorage,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 

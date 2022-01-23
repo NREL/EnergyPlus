@@ -293,12 +293,12 @@ namespace MundtSimMgr {
                         }
 
                         // count air nodes connected to walls in each zone
-                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::MundtRoomAirNode) {
+                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::MundtRoomAir) {
                             ++RoomNodesCount;
                         }
 
                         // count floors in each zone
-                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::FloorAirNode) {
+                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::FloorAir) {
                             FloorSurfCount += count(state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).SurfMask);
                         }
                     }
@@ -497,23 +497,23 @@ namespace MundtSimMgr {
         state.dataMundtSimMgr->NumRoomNodes = 0;
         for (NodeNum = 1; NodeNum <= state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneNum); ++NodeNum) {
             switch (state.dataMundtSimMgr->LineNode(NodeNum, state.dataMundtSimMgr->MundtZoneNum).ClassType) {
-            case AirNodeType::InletAirNode: { // inlet
+            case AirNodeType::InletAir: { // inlet
                 state.dataMundtSimMgr->SupplyNodeID = NodeNum;
             } break;
-            case AirNodeType::FloorAirNode: { // floor
+            case AirNodeType::FloorAir: { // floor
                 state.dataMundtSimMgr->MundtFootAirID = NodeNum;
             } break;
-            case AirNodeType::ControlAirNode: { // thermostat
+            case AirNodeType::ControlAir: { // thermostat
                 state.dataMundtSimMgr->TstatNodeID = NodeNum;
             } break;
-            case AirNodeType::CeilingAirNode: { // ceiling
+            case AirNodeType::CeilingAir: { // ceiling
                 state.dataMundtSimMgr->MundtCeilAirID = NodeNum;
             } break;
-            case AirNodeType::MundtRoomAirNode: { // wall
+            case AirNodeType::MundtRoomAir: { // wall
                 ++state.dataMundtSimMgr->NumRoomNodes;
                 state.dataMundtSimMgr->RoomNodeIDs(state.dataMundtSimMgr->NumRoomNodes) = NodeNum;
             } break;
-            case AirNodeType::ReturnAirNode: { // return
+            case AirNodeType::ReturnAir: { // return
                 state.dataMundtSimMgr->ReturnNodeID = NodeNum;
             } break;
             default: {

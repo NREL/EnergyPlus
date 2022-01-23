@@ -546,10 +546,10 @@ namespace SteamBaseboardRadiator {
                 GetOnlySingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(4),
                                   ErrorsFound,
-                                  state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveSteam,
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
-                                  DataLoopNode::NodeConnectionType::Inlet,
+                                  DataLoopNode::ConnectionType::Inlet,
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
@@ -558,10 +558,10 @@ namespace SteamBaseboardRadiator {
                 GetOnlySingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(5),
                                   ErrorsFound,
-                                  state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveSteam,
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
-                                  DataLoopNode::NodeConnectionType::Outlet,
+                                  DataLoopNode::ConnectionType::Outlet,
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state,

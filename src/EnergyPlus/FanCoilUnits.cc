@@ -392,20 +392,20 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).AirInNode = GetOnlySingleNode(state,
                                                               Alphas(5),
                                                               ErrorsFound,
-                                                              FanCoil(FanCoilNum).UnitType,
+                                                              DataLoopNode::ConnectionObjectType::ZoneHVACFourPipeFanCoil,
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
-                                                              DataLoopNode::NodeConnectionType::Inlet,
+                                                              DataLoopNode::ConnectionType::Inlet,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsParent); // air input node
 
             FanCoil(FanCoilNum).AirOutNode = GetOnlySingleNode(state,
                                                                Alphas(6),
                                                                ErrorsFound,
-                                                               FanCoil(FanCoilNum).UnitType,
+                                                               DataLoopNode::ConnectionObjectType::ZoneHVACFourPipeFanCoil,
                                                                Alphas(1),
                                                                DataLoopNode::NodeFluidType::Air,
-                                                               DataLoopNode::NodeConnectionType::Outlet,
+                                                               DataLoopNode::ConnectionType::Outlet,
                                                                NodeInputManager::CompFluidStream::Primary,
                                                                ObjectIsParent); // air outlet node
 
