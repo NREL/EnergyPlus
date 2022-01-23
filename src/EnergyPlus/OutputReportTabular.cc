@@ -16103,8 +16103,8 @@ void WriteTable(EnergyPlusData &state,
                 const Array1D_string &rowLabels,
                 const Array1D_string &columnLabels,
                 Array1D_int &widthColumn,
-                Optional_bool_const transposeXML,
-                Optional_string_const footnoteText)
+                bool transposeXML,
+                std::string_view const footnoteText)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
@@ -16170,16 +16170,10 @@ void WriteTable(EnergyPlusData &state,
     std::string curDel;
     std::string tagWithAttrib;
     std::string::size_type col1start;
-    bool doTransposeXML;
     bool isTableBlank;
     bool isRecordBlank;
     auto &ort(state.dataOutRptTab);
 
-    if (present(transposeXML)) {
-        doTransposeXML = transposeXML;
-    } else {
-        doTransposeXML = false; // if not present assume that the XML table should not be transposed
-    }
     // create blank string
     spaces = blank; // REPEAT(' ',1000)
     // get sizes of arrays
@@ -16276,10 +16270,8 @@ void WriteTable(EnergyPlusData &state,
                 }
                 tbl_stream << InsertCurrencySymbol(state, outputLine, false) << '\n';
             }
-            if (present(footnoteText)) {
-                if (!footnoteText().empty()) {
-                    tbl_stream << footnoteText() << '\n';
-                }
+            if (!footnoteText.empty()) {
+                tbl_stream << fmt::format("{}\n", footnoteText);
             }
             tbl_stream << "\n\n";
 
@@ -16310,10 +16302,8 @@ void WriteTable(EnergyPlusData &state,
                 }
                 tbl_stream << InsertCurrencySymbol(state, outputLine, false) << '\n';
             }
-            if (present(footnoteText)) {
-                if (!footnoteText().empty()) {
-                    tbl_stream << footnoteText() << '\n';
-                }
+            if (!footnoteText.empty()) {
+                tbl_stream << fmt::format("{}\n", footnoteText);
             }
             tbl_stream << "\n\n";
 
@@ -16354,10 +16344,8 @@ void WriteTable(EnergyPlusData &state,
             }
             // end the table
             tbl_stream << "</table>\n";
-            if (present(footnoteText)) {
-                if (!footnoteText().empty()) {
-                    tbl_stream << "<i>" << footnoteText() << "</i>\n";
-                }
+            if (!footnoteText.empty()) {
+                tbl_stream << fmt::format("<i>{}</i>\n", footnoteText);
             }
             tbl_stream << "<br><br>\n";
         } else if (style == TableStyle::XML) {
@@ -16386,7 +16374,7 @@ void WriteTable(EnergyPlusData &state,
                 }
                 // if a single column table, transpose it automatically
                 if ((colsBody == 1) && (rowsBody > 1)) {
-                    doTransposeXML = true;
+                    transposeXML = true;
                 }
                 // first convert all row and column headers into tags compatible with XML strings
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {
@@ -16415,7 +16403,7 @@ void WriteTable(EnergyPlusData &state,
                         bodyEsc(iCol, jRow) = ConvertToEscaped(body(iCol, jRow));
                     }
                 }
-                if (!doTransposeXML) {
+                if (!transposeXML) {
                     // body with row headers
                     for (jRow = 1; jRow <= rowsBody; ++jRow) {
                         // check if record is blank and it if is skip generating anything
@@ -16484,10 +16472,8 @@ void WriteTable(EnergyPlusData &state,
                         }
                     }
                 }
-                if (present(footnoteText)) {
-                    if (!footnoteText().empty()) {
-                        tbl_stream << "  <footnote>" << footnoteText() << "</footnote>\n";
-                    }
+                if (!footnoteText.empty()) {
+                    tbl_stream << fmt::format("  <footnote>{}</footnote>\n", footnoteText);
                 }
             }
         } else {

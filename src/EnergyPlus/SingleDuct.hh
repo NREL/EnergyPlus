@@ -73,9 +73,9 @@ namespace SingleDuct {
     {
         Invalid = -1,
         Normal,
-        ReverseAction,
-        ReverseActionWithLimits,
-        HeatingActionNotUsed,
+        Reverse,
+        ReverseWithLimits,
+        HeatingNotUsed,
         Num
     };
     enum class SysType
@@ -232,7 +232,7 @@ namespace SingleDuct {
               DesignFixedMinAir(0.0), InletNodeNum(0), OutletNodeNum(0), ReheatControlNode(0), ReheatCoilOutletNode(0), ReheatCoilMaxCapacity(0.0),
               ReheatAirOutletNode(0), MaxReheatWaterVolFlow(0.0), MaxReheatSteamVolFlow(0.0), MaxReheatWaterFlow(0.0), MaxReheatSteamFlow(0.0),
               MinReheatWaterVolFlow(0.0), MinReheatSteamVolFlow(0.0), MinReheatWaterFlow(0.0), MinReheatSteamFlow(0.0), ControllerOffset(0.0),
-              MaxReheatTemp(0.0), MaxReheatTempSetByUser(false), DamperHeatingAction(Action::HeatingActionNotUsed), DamperPosition(0.0), ADUNum(0),
+              MaxReheatTemp(0.0), MaxReheatTempSetByUser(false), DamperHeatingAction(Action::HeatingNotUsed), DamperPosition(0.0), ADUNum(0),
               FluidIndex(0), ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0),
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWplantLoc{}, SecInNode(0),
@@ -347,7 +347,7 @@ namespace SingleDuct {
                                    std::string const &SDSName,
                                    int &SDSIndex,
                                    bool &ErrorsFound,
-                                   Optional_string_const ThisObjectType = _,
+                                   std::string_view const ThisObjectType = {},
                                    Optional_int DamperInletNode = _, // Damper inlet node number
                                    Optional_int DamperOutletNode = _ // Damper outlet node number
     );

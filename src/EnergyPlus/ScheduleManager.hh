@@ -284,19 +284,17 @@ namespace ScheduleManager {
     );
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,            // Which Day Schedule being tested
-                                     Real64 const Minimum,               // Minimum desired value
-                                     std::string const &MinString,       // Minimum indicator ('>', '>=')
-                                     Optional<Real64 const> Maximum = _, // Maximum desired value
-                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin, // Minimum indicator ('>', '>=')
+                                     Real64 const Maximum,    // Maximum desired value
+                                     bool const exclusiveMax  // Maximum indicator ('<', ',=')
     );
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,            // Which Day Schedule being tested
-                                     Real32 const Minimum,               // Minimum desired value
-                                     std::string const &MinString,       // Minimum indicator ('>', '>=')
-                                     Optional<Real32 const> Maximum = _, // Maximum desired value
-                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin  // Minimum indicator ('>', '>=')
     );
 
     bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested

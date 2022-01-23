@@ -708,11 +708,11 @@ namespace DXCoils {
                         std::string const &DXCoilName,
                         int &DXCoilIndex,
                         bool &ErrorsFound,
-                        Optional_string_const ThisObjectType,
-                        Optional_bool_const SuppressWarning);
+                        std::string_view const ThisObjectType = {},
+                        bool const SuppressWarning = false);
 
     std::string GetDXCoilName(
-        EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning);
+        EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, std::string_view const ThisObjectType = {}, bool const SuppressWarning = false);
 
     Real64 GetCoilCapacity(EnergyPlusData &state,
                            std::string const &CoilType, // must match coil types in this module

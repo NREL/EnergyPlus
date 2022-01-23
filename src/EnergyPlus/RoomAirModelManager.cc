@@ -402,7 +402,7 @@ namespace RoomAirModelManager {
 
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::ConstGradTemp;
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTstat = state.dataIPShortCut->rNumericArgs(2);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTleaving = state.dataIPShortCut->rNumericArgs(3);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTexhaust = state.dataIPShortCut->rNumericArgs(4);
@@ -424,7 +424,7 @@ namespace RoomAirModelManager {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterp;
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.TstatHeight = state.dataIPShortCut->rNumericArgs(2);
@@ -435,19 +435,19 @@ namespace RoomAirModelManager {
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "OutdoorDryBulbTemperature")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode;
+                    DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulb;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneDryBulbTemperature")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode;
+                    DataRoomAirModel::UserDefinedPatternMode::ZoneAirTemp;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneAndOutdoorTemperatureDifference")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleCoolingLoad")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode;
+                    DataRoomAirModel::UserDefinedPatternMode::SensibleCooling;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleHeatingLoad")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode;
+                    DataRoomAirModel::UserDefinedPatternMode::SensibleHeating;
             } else {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
@@ -469,9 +469,9 @@ namespace RoomAirModelManager {
             if ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.UpperBoundTempScale ==
                  state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.LowerBoundTempScale) &&
                 ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) ||
+                  DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulb) ||
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode) ||
+                  DataRoomAirModel::UserDefinedPatternMode::ZoneAirTemp) ||
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
                   DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone))) {
                 // throw error, will cause divide by zero when used for scaling
@@ -481,9 +481,9 @@ namespace RoomAirModelManager {
             if ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient ==
                  state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient) &&
                 ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) ||
+                  DataRoomAirModel::UserDefinedPatternMode::SensibleCooling) ||
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode))) {
+                  DataRoomAirModel::UserDefinedPatternMode::SensibleHeating))) {
                 // throw error, will cause divide by zero when used for scaling
                 ShowSevereError(state, "Error in load scale in " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -493,7 +493,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternNDHeightObject;
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumNonDimensionalHeight; ++ObjNum) {
             thisPattern = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp + ObjNum;
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeight;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -545,7 +545,7 @@ namespace RoomAirModelManager {
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumSurfaceMapping; ++ObjNum) {
             thisPattern = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp +
                           state.dataRoomAirMod->NumNonDimensionalHeight + ObjNum;
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTemp;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -727,17 +727,17 @@ namespace RoomAirModelManager {
             {
                 auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
                 if (nodeType == "INLET") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAir;
                 } else if (nodeType == "FLOOR") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::FloorAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::FloorAir;
                 } else if (nodeType == "CONTROL") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ControlAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ControlAir;
                 } else if (nodeType == "CEILING") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::CeilingAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::CeilingAir;
                 } else if (nodeType == "MUNDTROOM") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::MundtRoomAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::MundtRoomAir;
                 } else if (nodeType == "RETURN") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAir;
                 } else {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));

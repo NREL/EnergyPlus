@@ -147,23 +147,28 @@ int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 enum class OutConvClass
 {
     Invalid = -1,
-    WindwardVertWall = 101,
-    LeewardVertWall = 102,
-    RoofStable = 103,
-    RoofUnstable = 104,
+    WindwardVertWall,
+    LeewardVertWall,
+    RoofStable,
+    RoofUnstable,
     Num
 };
 
-enum class ConvSurfDeltaT : int
+// Report Values for "Surface Outside Face Convection Classification Index"
+// note that Invalid (-1) is also reported but not included here
+// where used, that should be handled with a static_cast<int>(OutConvClass::Invalid)
+constexpr static std::array<int, static_cast<int>(OutConvClass::Num)> OutConvClassReportVals = {101, 102, 103, 104};
+
+enum class ConvSurfDeltaT
 {
     Invalid = -1,
     Positive,
     Zero,
     Negative,
-    Num // count, always the last element
+    Num
 };
 
-enum class SurfConvOrientation : int
+enum class SurfConvOrientation
 {
     Invalid = -1,
     HorizontalDown,
@@ -171,20 +176,19 @@ enum class SurfConvOrientation : int
     Vertical,
     TiltedUpward,
     HorizontalUp,
-    Num // count, always the last element
+    Num
 };
 
 // Parameters for fenestration relative location in zone
 enum class InConvWinLoc
 {
-    // TODO: enum check
     Invalid = -1,
-    NotSet = 0,
-    LowerPartOfExteriorWall = 1, // this is a window in the lower part of wall
-    UpperPartOfExteriorWall = 2, // this is a window in the upper part of wall
-    WindowAboveThis = 3,         // this is a wall with window above it
-    WindowBelowThis = 4,         // this is a wall with window below it
-    LargePartOfExteriorWall = 5, // this is a big window taking up most of wall
+    NotSet,
+    LowerPartOfExteriorWall, // this is a window in the lower part of wall
+    UpperPartOfExteriorWall, // this is a window in the upper part of wall
+    WindowAboveThis,         // this is a wall with window above it
+    WindowBelowThis,         // this is a wall with window below it
+    LargePartOfExteriorWall, // this is a big window taking up most of wall
     Num
 };
 
@@ -192,56 +196,63 @@ enum class InConvWinLoc
 enum class InConvClass
 {
     Invalid = -1,
-    A1_VertWalls = 1,           // flow regime A1, vertical walls
-    A1_StableHoriz = 2,         // flow regime A1
-    A1_UnstableHoriz = 3,       // flow regime A1
-    A1_HeatedFloor = 4,         // flow regime A1
-    A1_ChilledCeil = 5,         // flow regime A1
-    A1_StableTilted = 6,        // flow regime A1
-    A1_UnstableTilted = 7,      // flow regime A1
-    A1_Windows = 8,             // flow regime A1
-    A2_VertWallsNonHeated = 9,  // flow regime A2
-    A2_HeatedVerticalWall = 10, // flow regime A2
-    A2_StableHoriz = 11,        // flow regime A2
-    A2_UnstableHoriz = 12,      // flow regime A2
-    A2_StableTilted = 13,       // flow regime A2
-    A2_UnstableTilted = 14,     // flow regime A2
-    A2_Windows = 15,            // flow regime A2
-    A3_VertWalls = 16,          // flow regime A3
-    A3_StableHoriz = 17,        // flow regime A3
-    A3_UnstableHoriz = 18,      // flow regime A3
-    A3_StableTilted = 19,       // flow regime A3
-    A3_UnstableTilted = 20,     // flow regime A3
-    A3_Windows = 21,            // flow regime A3
-    B_VertWalls = 22,           // flow regime B
-    B_VertWallsNearHeat = 23,   // flow regime B
-    B_StableHoriz = 24,         // flow regime B
-    B_UnstableHoriz = 25,       // flow regime B
-    B_StableTilted = 26,        // flow regime B
-    B_UnstableTilted = 27,      // flow regime B
-    B_Windows = 28,             // flow regime B
-    C_Walls = 29,               // flow regime C
-    C_Ceiling = 30,             // flow regime C
-    C_Floor = 31,               // flow regime C
-    C_Windows = 32,             // flow regime C
-    D_Walls = 33,               // flow regime D
-    D_StableHoriz = 34,         // flow regime D
-    D_UnstableHoriz = 35,       // flow regime D
-    D_StableTilted = 36,        // flow regime D
-    D_UnstableTilted = 37,      // flow regime D
-    D_Windows = 38,             // flow regime D
-    E_AssistFlowWalls = 39,     // flow regime E
-    E_OpposFlowWalls = 40,      // flow regime E
-    E_StableFloor = 41,         // flow regime E
-    E_UnstableFloor = 42,       // flow regime E
-    E_StableCeiling = 43,       // flow regime E
-    E_UnstableCeiling = 44,     // flow regime E
-    E_Windows = 45,             // flow regime E
+    A1_VertWalls,          // flow regime A1, vertical walls
+    A1_StableHoriz,        // flow regime A1
+    A1_UnstableHoriz,      // flow regime A1
+    A1_HeatedFloor,        // flow regime A1
+    A1_ChilledCeil,        // flow regime A1
+    A1_StableTilted,       // flow regime A1
+    A1_UnstableTilted,     // flow regime A1
+    A1_Windows,            // flow regime A1
+    A2_VertWallsNonHeated, // flow regime A2
+    A2_HeatedVerticalWall, // flow regime A2
+    A2_StableHoriz,        // flow regime A2
+    A2_UnstableHoriz,      // flow regime A2
+    A2_StableTilted,       // flow regime A2
+    A2_UnstableTilted,     // flow regime A2
+    A2_Windows,            // flow regime A2
+    A3_VertWalls,          // flow regime A3
+    A3_StableHoriz,        // flow regime A3
+    A3_UnstableHoriz,      // flow regime A3
+    A3_StableTilted,       // flow regime A3
+    A3_UnstableTilted,     // flow regime A3
+    A3_Windows,            // flow regime A3
+    B_VertWalls,           // flow regime B
+    B_VertWallsNearHeat,   // flow regime B
+    B_StableHoriz,         // flow regime B
+    B_UnstableHoriz,       // flow regime B
+    B_StableTilted,        // flow regime B
+    B_UnstableTilted,      // flow regime B
+    B_Windows,             // flow regime B
+    C_Walls,               // flow regime C
+    C_Ceiling,             // flow regime C
+    C_Floor,               // flow regime C
+    C_Windows,             // flow regime C
+    D_Walls,               // flow regime D
+    D_StableHoriz,         // flow regime D
+    D_UnstableHoriz,       // flow regime D
+    D_StableTilted,        // flow regime D
+    D_UnstableTilted,      // flow regime D
+    D_Windows,             // flow regime D
+    E_AssistFlowWalls,     // flow regime E
+    E_OpposFlowWalls,      // flow regime E
+    E_StableFloor,         // flow regime E
+    E_UnstableFloor,       // flow regime E
+    E_StableCeiling,       // flow regime E
+    E_UnstableCeiling,     // flow regime E
+    E_Windows,             // flow regime E
     Num
 };
 
+// Report values for "Surface Inside Face Convection Classification Index"
+// note that Invalid (-1) is also reported but not included here
+// where used, that should be handled with a static_cast<int>(InConvClass::Invalid)
+constexpr static std::array<int, static_cast<int>(InConvClass::Num)> InConvClassReportVals = {
+    1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45};
+
 // Parameters to indicate user specified convection coefficients (for surface)
-enum class ConvCoefOverrideType : int
+enum class ConvCoefOverrideType
 {
     Invalid = -1,
     Value,          // User specified "value" as the override type

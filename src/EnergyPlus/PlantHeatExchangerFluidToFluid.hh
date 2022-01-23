@@ -231,7 +231,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void control(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration);
 
-        void controlSteamToWaterHX(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
+        void controlSteamToWaterHX(EnergyPlusData &state, Real64 MyLoad);
 
         void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
 

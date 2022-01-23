@@ -2,10 +2,8 @@
 // Created by jackcook on 8/17/21.
 //
 
-#include <LU-Decomposition/lu.h>
+#include <include/cpgfunction/lu.h>
 #include <algorithm>
-#include <numeric>
-#include <thread>
 
 double jcc::dot(int &n, std::vector<double> &A, int &begin_x, int &incx,
                 int &begin_y, int &incy, int &n_threads) {
@@ -99,7 +97,7 @@ void jcc::CroutDecomposition(std::vector<double > &A, int &n,
                 i_piv = i;
             }
         } // next i
-      
+
         // if the pivot term changed from the diagonal, swap rows
         if ( i_piv != j) {
             // swap row i_piv with row j
