@@ -140,7 +140,7 @@ void HeatExchangerStruct::simulate(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2012
-    //       MODIFIED       na
+    //       MODIFIED       Jan 2022, Dareum Nam, Add steam to water heat exchanger
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -157,11 +157,13 @@ void HeatExchangerStruct::simulate(EnergyPlusData &state,
         } else {
             this->control(state, CurLoad, FirstHVACIteration);
         }
+
         this->calculate(state,
                         state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate,
                         state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate);
+
     } else if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
-        this->controlSteamToWaterHX(state, calledFromLocation.loopNum, CurLoad);
+        this->controlSteamToWaterHX(state, CurLoad);
         this->calculateSteamToWaterHX(state, CurLoad, state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate);
     }
 }
@@ -817,17 +819,18 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineNameNoColon("InitFluidHeatExchanger");
     static constexpr std::string_view RoutineNameSTWNoColon("InitSteamToWaterHeatExchanger");
+    Real64 rho;
 
     this->oneTimeInit(state); // plant setup
 
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
         if (this->Type == DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg) {
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                           RoutineNameNoColon);
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                    DataGlobalConstants::InitConvTemp,
+                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                    RoutineNameNoColon);
             this->DemandSideLoop.MassFlowRateMax = rho * this->DemandSideLoop.DesignVolumeFlowRate;
             PlantUtilities::InitComponentNodes(state,
                                                this->DemandSideLoop.MassFlowRateMin,
@@ -864,11 +867,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
             this->DemandSideLoop.InletSteamPress = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press;
         }
 
-        Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
-                                                       RoutineNameNoColon);
+        rho = FluidProperties::GetDensityGlycol(state,
+                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
+                                                DataGlobalConstants::InitConvTemp,
+                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
+                                                RoutineNameNoColon);
         this->SupplySideLoop.MassFlowRateMax = rho * this->SupplySideLoop.DesignVolumeFlowRate;
         PlantUtilities::InitComponentNodes(state,
                                            this->SupplySideLoop.MassFlowRateMin,
@@ -916,6 +919,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     // the capacity uses the full HX model
 
     if (this->Type == DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg) {
+
         static constexpr std::string_view RoutineName("SizeFluidHeatExchanger");
 
         // first deal with Loop Supply Side
@@ -1807,7 +1811,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
     }
 }
 
-void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, [[maybe_unused]] int const LoopNum, Real64 MyLoad)
+void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 MyLoad)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2718,16 +2722,8 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
     if (this->MyFlag) {
         // locate the main two connections to the plant loops
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
-                                                this->DemandSideLoop,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->DemandSideLoop.inletNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, this->Type, this->DemandSideLoop, errFlag, _, _, _, this->DemandSideLoop.inletNodeNum, _);
 
         if (this->DemandSideLoop.loopSideNum != DataPlant::LoopSideLocation::Demand) { // throw error
             ShowSevereError(state,
@@ -2739,16 +2735,8 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             errFlag = true;
         }
 
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
-                                                this->SupplySideLoop,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->SupplySideLoop.inletNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, this->Type, this->SupplySideLoop, errFlag, _, _, _, this->SupplySideLoop.inletNodeNum, _);
 
         if (this->SupplySideLoop.loopSideNum != DataPlant::LoopSideLocation::Supply) { // throw error
             ShowSevereError(state,
@@ -2771,8 +2759,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             errFlag = true;
         } else {
 
-            PlantUtilities::InterConnectTwoPlantLoopSides(
-                state, this->SupplySideLoop, this->DemandSideLoop, DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg, true);
+            PlantUtilities::InterConnectTwoPlantLoopSides(state, this->SupplySideLoop, this->DemandSideLoop, this->Type, true);
         }
 
         // find remote component if control mode is of that type.
