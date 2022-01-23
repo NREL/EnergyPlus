@@ -1514,10 +1514,10 @@ namespace PlantPipingSystemsManager {
             thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(2),
                                                                            ErrorsFound,
-                                                                           ObjName_Circuit,
+                                                                           DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
@@ -1535,10 +1535,10 @@ namespace PlantPipingSystemsManager {
             thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(3),
                                                                             ErrorsFound,
-                                                                            ObjName_Circuit,
+                                                                            DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
@@ -1652,10 +1652,10 @@ namespace PlantPipingSystemsManager {
             thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                            thisCircuit.InletNodeName,
                                                                            ErrorsFound,
-                                                                           ObjName_HorizTrench,
+                                                                           DataLoopNode::ConnectionObjectType::GroundHeatExchangerHorizontalTrench,
                                                                            thisTrenchName,
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
@@ -1665,10 +1665,10 @@ namespace PlantPipingSystemsManager {
             thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             thisCircuit.OutletNodeName,
                                                                             ErrorsFound,
-                                                                            ObjName_HorizTrench,
+                                                                            DataLoopNode::ConnectionObjectType::GroundHeatExchangerHorizontalTrench,
                                                                             thisTrenchName,
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
