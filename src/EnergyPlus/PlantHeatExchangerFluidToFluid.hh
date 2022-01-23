@@ -75,6 +75,7 @@ namespace PlantHeatExchangerFluidToFluid {
         CounterFlow,
         ParallelFlow,
         Ideal,
+        PhaseChangeProcess, // one of the fluids in a HX undergoes a phase-change process, like steam to water HX
         Num
     };
 
@@ -93,8 +94,6 @@ namespace PlantHeatExchangerFluidToFluid {
         CoolingDifferentialOnOff,
         CoolingSetPointOnOffWithComponentOverride,
         TrackComponentOnOff,
-        LoadControl,                // for steam to water HX
-        TemperatureSetpointControl, // for steam to water HX
         Num
     };
 
@@ -185,8 +184,6 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 HeatTransferEnergy;
         Real64 Effectiveness;
         Real64 OperationStatus;
-        Real64 DegOfSubCool;
-        Real64 DegOfLoopSubCool;
         int DmdSideModulatSolvNoConvergeErrorCount;
         int DmdSideModulatSolvNoConvergeErrorIndex;
         int DmdSideModulatSolvFailErrorCount;
@@ -200,9 +197,9 @@ namespace PlantHeatExchangerFluidToFluid {
             : AvailSchedNum(0), HeatExchangeModelType(FluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), controlMode(ControlType::Invalid),
               SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(CtrlTempType::Invalid), MinOperationTemp(-99999.0),
               MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
-              HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DegOfSubCool(0.0), DegOfLoopSubCool(0.0),
-              DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0),
-              DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+              HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
+              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 
