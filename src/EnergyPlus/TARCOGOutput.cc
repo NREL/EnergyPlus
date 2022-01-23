@@ -349,25 +349,29 @@ void WriteInputArguments(EnergyPlusData &state,
 
     print(InArgumentsFile, Format_1089);
     for (i = 1; i <= nlayer; ++i) {
-        {
-            auto const SELECT_CASE_var(LayerType(i));
-            if (SELECT_CASE_var == TARCOGLayerType::DIFFSHADE) { // Diffuse Shade
-                print(InArgumentsFile, Format_10806, i, LayerType(i));
-            } else if (SELECT_CASE_var == TARCOGLayerType::WOVSHADE) { // Woven Shade
-                print(InArgumentsFile, Format_10805, i, LayerType(i));
-            } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_HORIZ) { // Horizontal venetian blind
-                print(InArgumentsFile, Format_10804, i, LayerType(i));
-            } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_VERT) { // Vertical venetian blind
-                print(InArgumentsFile, Format_10810, i, LayerType(i));
-            } else if (SELECT_CASE_var == TARCOGLayerType::SPECULAR) { // Specular layer
-                if (nslice(i) <= 1) {
-                    print(InArgumentsFile, Format_10802, i, LayerType(i)); // Monolithic glass
-                } else {
-                    print(InArgumentsFile, Format_10803, i, LayerType(i)); // Laminated layer
-                }
+        switch (LayerType(i)) {
+        case TARCOGLayerType::DIFFSHADE: { // Diffuse Shade
+            print(InArgumentsFile, Format_10806, i, LayerType(i));
+        } break;
+        case TARCOGLayerType::WOVSHADE: { // Woven Shade
+            print(InArgumentsFile, Format_10805, i, LayerType(i));
+        } break;
+        case TARCOGLayerType::VENETBLIND_HORIZ: { // Horizontal venetian blind
+            print(InArgumentsFile, Format_10804, i, LayerType(i));
+        } break;
+        case TARCOGLayerType::VENETBLIND_VERT: { // Vertical venetian blind
+            print(InArgumentsFile, Format_10810, i, LayerType(i));
+        } break;
+        case TARCOGLayerType::SPECULAR: { // Specular layer
+            if (nslice(i) <= 1) {
+                print(InArgumentsFile, Format_10802, i, LayerType(i)); // Monolithic glass
             } else {
-                print(InArgumentsFile, Format_10809, i, LayerType(i));
+                print(InArgumentsFile, Format_10803, i, LayerType(i)); // Laminated layer
             }
+        } break;
+        default: {
+            print(InArgumentsFile, Format_10809, i, LayerType(i));
+        } break;
         }
 
         print(InArgumentsFile, Format_1090, thick(i));
@@ -679,30 +683,33 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
 
     // bi  Write out layer properties:
     for (i = 1; i <= nlayer; ++i) {
-        {
-            TARCOGLayerType const SELECT_CASE_var((LayerType(i)));
-            if ((SELECT_CASE_var) == TARCOGLayerType::SPECULAR) { // Specular layer
-                print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
-                print(OutArgumentsFile, Format_2190, i, q(2 * i));
-                print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-            } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_HORIZ ||
-                       SELECT_CASE_var == TARCOGLayerType::VENETBLIND_VERT) { // Venetian blind
-                print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
-                print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-                print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-            } else if (SELECT_CASE_var == TARCOGLayerType::WOVSHADE) { // Venetian blind
-                print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
-                print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-                print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-            } else if (SELECT_CASE_var == TARCOGLayerType::DIFFSHADE) { // Venetian blind
-                print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
-                print(OutArgumentsFile, Format_2190, i, q(2 * i));
-                print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-            } else {
-                print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
-                print(OutArgumentsFile, Format_2199, i, q(2 * i));
-                print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
-            }
+        switch (LayerType(i)) {
+        case TARCOGLayerType::SPECULAR: { // Specular layer
+            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2190, i, q(2 * i));
+            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+        } break;
+        case TARCOGLayerType::VENETBLIND_HORIZ:
+        case TARCOGLayerType::VENETBLIND_VERT: { // Venetian blind
+            print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
+            print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+        } break;
+        case TARCOGLayerType::WOVSHADE: { // Venetian blind
+            print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
+            print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+        } break;
+        case TARCOGLayerType::DIFFSHADE: { // Venetian blind
+            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2190, i, q(2 * i));
+            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+        } break;
+        default: {
+            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2199, i, q(2 * i));
+            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+        } break;
         }
 
         // bi  Write out gap properties:
@@ -734,40 +741,43 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
     print(OutArgumentsFile, "\n");
 
     for (i = 1; i <= nlayer; ++i) {
-        {
-            auto const SELECT_CASE_var(LayerType(i));
-            if (SELECT_CASE_var == TARCOGLayerType::SPECULAR) { // Specular layer
-                print(OutArgumentsFile, Format_4110, i, Ebf(i), i, Rf(i));
-                print(OutArgumentsFile, Format_4111);
-                print(OutArgumentsFile, Format_4190);
-                print(OutArgumentsFile, Format_4121);
-                print(OutArgumentsFile, Format_4120, i, Ebb(i), i, Rb(i));
-            } else if (SELECT_CASE_var == TARCOGLayerType::VENETBLIND_HORIZ ||
-                       SELECT_CASE_var == TARCOGLayerType::VENETBLIND_VERT) { // Venetian blind
-                print(OutArgumentsFile, Format_4112, i, Ebf(i), i, Rf(i));
-                print(OutArgumentsFile, Format_4113);
-                print(OutArgumentsFile, Format_4190);
-                print(OutArgumentsFile, Format_4123);
-                print(OutArgumentsFile, Format_4122, i, Ebb(i), i, Rb(i));
-            } else if (SELECT_CASE_var == TARCOGLayerType::WOVSHADE) { // Venetian blind
-                print(OutArgumentsFile, Format_4114, i, Ebf(i), i, Rf(i));
-                print(OutArgumentsFile, Format_4115);
-                print(OutArgumentsFile, Format_4190);
-                print(OutArgumentsFile, Format_4125);
-                print(OutArgumentsFile, Format_4124, i, Ebb(i), i, Rb(i));
-            } else if (SELECT_CASE_var == TARCOGLayerType::DIFFSHADE) {
-                print(OutArgumentsFile, Format_4116, i, Ebf(i), i, Rf(i));
-                print(OutArgumentsFile, Format_4117);
-                print(OutArgumentsFile, Format_4190);
-                print(OutArgumentsFile, Format_4127);
-                print(OutArgumentsFile, Format_4126, i, Ebb(i), i, Rb(i));
-            } else {
-                print(OutArgumentsFile, Format_4110, i, Ebf(i), i, Rf(i));
-                print(OutArgumentsFile, Format_4111);
-                print(OutArgumentsFile, Format_4190);
-                print(OutArgumentsFile, Format_4121);
-                print(OutArgumentsFile, Format_4120, i, Ebb(i), i, Rb(i));
-            }
+        switch (LayerType(i)) {
+        case TARCOGLayerType::SPECULAR: { // Specular layer
+            print(OutArgumentsFile, Format_4110, i, Ebf(i), i, Rf(i));
+            print(OutArgumentsFile, Format_4111);
+            print(OutArgumentsFile, Format_4190);
+            print(OutArgumentsFile, Format_4121);
+            print(OutArgumentsFile, Format_4120, i, Ebb(i), i, Rb(i));
+        } break;
+        case TARCOGLayerType::VENETBLIND_HORIZ:
+        case TARCOGLayerType::VENETBLIND_VERT: { // Venetian blind
+            print(OutArgumentsFile, Format_4112, i, Ebf(i), i, Rf(i));
+            print(OutArgumentsFile, Format_4113);
+            print(OutArgumentsFile, Format_4190);
+            print(OutArgumentsFile, Format_4123);
+            print(OutArgumentsFile, Format_4122, i, Ebb(i), i, Rb(i));
+        } break;
+        case TARCOGLayerType::WOVSHADE: { // Venetian blind
+            print(OutArgumentsFile, Format_4114, i, Ebf(i), i, Rf(i));
+            print(OutArgumentsFile, Format_4115);
+            print(OutArgumentsFile, Format_4190);
+            print(OutArgumentsFile, Format_4125);
+            print(OutArgumentsFile, Format_4124, i, Ebb(i), i, Rb(i));
+        } break;
+        case TARCOGLayerType::DIFFSHADE: {
+            print(OutArgumentsFile, Format_4116, i, Ebf(i), i, Rf(i));
+            print(OutArgumentsFile, Format_4117);
+            print(OutArgumentsFile, Format_4190);
+            print(OutArgumentsFile, Format_4127);
+            print(OutArgumentsFile, Format_4126, i, Ebb(i), i, Rb(i));
+        } break;
+        default: {
+            print(OutArgumentsFile, Format_4110, i, Ebf(i), i, Rf(i));
+            print(OutArgumentsFile, Format_4111);
+            print(OutArgumentsFile, Format_4190);
+            print(OutArgumentsFile, Format_4121);
+            print(OutArgumentsFile, Format_4120, i, Ebb(i), i, Rb(i));
+        } break;
         }
         print(OutArgumentsFile, "\n");
     }

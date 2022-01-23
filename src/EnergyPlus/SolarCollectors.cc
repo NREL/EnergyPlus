@@ -887,16 +887,17 @@ namespace SolarCollectors {
     {
         this->initialize(state);
 
-        {
-            auto const SELECT_CASE_var(this->Type);
+        switch (this->Type) {
             // Select and CALL models based on collector type
-            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
-                this->CalcSolarCollector(state);
-            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorICS) {
-                this->CalcICSSolarCollector(state);
-            } else {
-                assert(false); // LCOV_EXCL_LINE
-            }
+        case DataPlant::PlantEquipmentType::SolarCollectorFlatPlate: {
+            this->CalcSolarCollector(state);
+        } break;
+        case DataPlant::PlantEquipmentType::SolarCollectorICS: {
+            this->CalcICSSolarCollector(state);
+        } break;
+        default: {
+            assert(false); // LCOV_EXCL_LINE
+        } break;
         }
 
         this->update(state);
@@ -1148,24 +1149,25 @@ namespace SolarCollectors {
             Real64 FRULpTest = 0.0;
 
             // Modify coefficients depending on test correlation type
-            {
-                auto const SELECT_CASE_var(state.dataSolarCollectors->Parameters(ParamNum).TestType);
-                if (SELECT_CASE_var == TestTypeEnum::INLET) {
-                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
-                    TestTypeMod = 1.0;
-
-                } else if (SELECT_CASE_var == TestTypeEnum::AVERAGE) {
-                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                                state.dataSolarCollectors->Parameters(ParamNum).eff2 *
-                                    ((inletTemp + outletTemp) * 0.5 - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
-                    TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
-
-                } else if (SELECT_CASE_var == TestTypeEnum::OUTLET) {
-                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
-                    TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
-                }
+            switch (state.dataSolarCollectors->Parameters(ParamNum).TestType) {
+            case TestTypeEnum::INLET: {
+                FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                            state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                TestTypeMod = 1.0;
+            } break;
+            case TestTypeEnum::AVERAGE: {
+                FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                            state.dataSolarCollectors->Parameters(ParamNum).eff2 *
+                                ((inletTemp + outletTemp) * 0.5 - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
+            } break;
+            case TestTypeEnum::OUTLET: {
+                FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                            state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
+            } break;
+            default:
+                break;
             }
 
             // FR * tau * alpha at normal incidence = Y-intercept of collector efficiency
