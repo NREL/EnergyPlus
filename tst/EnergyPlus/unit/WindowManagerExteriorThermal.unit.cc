@@ -256,3 +256,45 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     typeOfShade = aFactory.getShadeType(*state, betweenCons);
     EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::BGBlind);
 }
+
+TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)
+{
+    // set up for using CWCEHeatTransferFactory
+    int numSurf = 1;
+    state->dataSurface->Surface.allocate(numSurf);
+    state->dataSurface->SurfaceWindow.allocate(numSurf);
+    state->dataSurface->SurfWinShadingFlag.allocate(numSurf);
+    state->dataSurface->SurfWinActiveShadedConstruction.allocate(numSurf);
+
+    int numCons = 2;
+    state->dataConstruction->Construct.allocate(numCons);
+    state->dataSurface->Surface(numSurf).Construction = numCons;
+    int numLayers = 2;
+    state->dataConstruction->Construct(numCons).LayerPoint.allocate(numLayers);
+    int materialOutside = 1;
+    int materialInside = 2;
+    state->dataConstruction->Construct(numCons).TotLayers = numLayers;
+    state->dataConstruction->Construct(numCons).LayerPoint(1) = materialOutside;
+    state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
+    state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
+    int numMaterials = materialInside;
+    state->dataMaterial->Material.allocate(numMaterials);
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+
+    auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
+
+    auto &surface(state->dataSurface->Surface(numSurf));
+    state->dataSurface->SurfWinShadingFlag(numSurf) = DataSurfaces::WinShadingType::ExtBlind;
+    state->dataSurface->SurfWinActiveShadedConstruction(numSurf) = 7;
+
+    int consSelected = aFactory.getActiveConstructionNumber(*state, surface, numSurf);
+    EXPECT_EQ(consSelected, 7);
+
+    state->dataSurface->SurfWinShadingFlag(numSurf) = DataSurfaces::WinShadingType::NoShade;
+
+    consSelected = aFactory.getActiveConstructionNumber(*state, surface, numSurf);
+    EXPECT_EQ(consSelected, numCons);
+}
+
+
