@@ -297,4 +297,38 @@ TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)
     EXPECT_EQ(consSelected, numCons);
 }
 
+TEST_F(EnergyPlusFixture, test_getIGU)
+{
+    // set up for using CWCEHeatTransferFactory
+    int numSurf = 1;
+    state->dataSurface->Surface.allocate(numSurf);
+    state->dataSurface->SurfaceWindow.allocate(numSurf);
+    int numCons = 1;
+    state->dataConstruction->Construct.allocate(numCons);
+    state->dataSurface->Surface(numSurf).Construction = numCons;
+    int numLayers = 2;
+    state->dataConstruction->Construct(numCons).LayerPoint.allocate(numLayers);
+    int materialOutside = 1;
+    int materialInside = 2;
+    state->dataConstruction->Construct(numCons).TotLayers = numLayers;
+    state->dataConstruction->Construct(numCons).LayerPoint(1) = materialOutside;
+    state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
+    state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
+    int numMaterials = materialInside;
+    state->dataMaterial->Material.allocate(numMaterials);
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
+
+    double width = 10.;
+    double height = 15.;
+    double tilt = 90.;
+
+    auto igu = aFactory.getIGU(width, height, tilt);
+    EXPECT_NEAR(igu.getTilt(), 90., 0.01);
+    EXPECT_NEAR(igu.getHeight(), 15., 0.01);
+    EXPECT_NEAR(igu.getWidth(), 10., 0.01);
+}
+
+
 
