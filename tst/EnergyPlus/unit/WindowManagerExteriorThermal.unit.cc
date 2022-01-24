@@ -180,3 +180,79 @@ TEST_F(EnergyPlusFixture, test_getIndoorNfrc)
     indoor = aFactory.getIndoorNfrc(false);
     EXPECT_NEAR(indoor->getAirTemperature(), 294.15, 0.01);
 }
+
+TEST_F(EnergyPlusFixture, test_getShadeType)
+{
+    // set up for using CWCEHeatTransferFactory
+    int numSurf = 1;
+    state->dataSurface->Surface.allocate(numSurf);
+    state->dataSurface->SurfaceWindow.allocate(numSurf);
+    int numCons = 2;
+    int simpleCons = 1;
+    state->dataConstruction->Construct.allocate(numCons);
+    state->dataSurface->Surface(numSurf).Construction = simpleCons;
+    int numLayers = 3;
+    state->dataConstruction->Construct(simpleCons).LayerPoint.allocate(numLayers);
+    int materialOutside = 1;
+    int materialInside = 2;
+    state->dataConstruction->Construct(simpleCons).TotLayers = numLayers;
+    state->dataConstruction->Construct(simpleCons).TotGlassLayers = numLayers - 1;
+    state->dataConstruction->Construct(simpleCons).LayerPoint(1) = materialOutside;
+    state->dataConstruction->Construct(simpleCons).LayerPoint(numLayers) = materialInside;
+    state->dataConstruction->Construct(simpleCons).AbsDiff.allocate(2);
+    int numMaterials = materialInside + 1;
+    state->dataMaterial->Material.allocate(numMaterials);
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, simpleCons);
+
+    //outside
+    auto typeOfShade = aFactory.getShadeType(*state, simpleCons);
+    EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::NoShade);
+
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::Shade;
+    typeOfShade = aFactory.getShadeType(*state, simpleCons);
+    EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtShade);
+
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowBlind;
+    typeOfShade = aFactory.getShadeType(*state, simpleCons);
+    EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtBlind);
+
+    //reset the outside to glass
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+
+    //inside
+    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::Shade;
+    typeOfShade = aFactory.getShadeType(*state, simpleCons);
+    EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::IntShade);
+    
+    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowBlind;
+    typeOfShade = aFactory.getShadeType(*state, simpleCons);
+    EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::IntBlind);
+
+    // reset the outside to glass
+    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+
+    // between glass - double pane
+    int betweenCons = 2;
+    state->dataSurface->Surface(numSurf).Construction = betweenCons;
+    numLayers = 4;
+    int shadeLayer = 3;
+    state->dataConstruction->Construct(betweenCons).LayerPoint.allocate(numLayers);
+    int materialShade = 3;
+    state->dataConstruction->Construct(betweenCons).TotLayers = numLayers;
+    state->dataConstruction->Construct(betweenCons).TotGlassLayers = 2;
+    state->dataConstruction->Construct(betweenCons).LayerPoint(1) = materialOutside;
+    state->dataConstruction->Construct(betweenCons).LayerPoint(shadeLayer) = materialShade;
+    state->dataConstruction->Construct(betweenCons).LayerPoint(numLayers) = materialInside;
+    state->dataConstruction->Construct(betweenCons).AbsDiff.allocate(2);
+
+    state->dataMaterial->Material(materialShade).Group = DataHeatBalance::MaterialGroup::Shade;
+    typeOfShade = aFactory.getShadeType(*state, betweenCons);
+    EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::BGShade);
+
+    state->dataMaterial->Material(materialShade).Group = DataHeatBalance::MaterialGroup::WindowBlind;
+    typeOfShade = aFactory.getShadeType(*state, betweenCons);
+    EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::BGBlind);
+}
