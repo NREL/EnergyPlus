@@ -224,9 +224,9 @@ namespace OutAirNodeManager {
                                 NodeNums,
                                 ErrInList,
                                 DataLoopNode::NodeFluidType::Air,
+                                DataLoopNode::ConnectionObjectType::OutdoorAirNodeList,
                                 CurrentModuleObject,
-                                CurrentModuleObject,
-                                DataLoopNode::NodeConnectionType::OutsideAir,
+                                DataLoopNode::ConnectionType::OutsideAir,
                                 static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
                                 ObjectIsNotParent,
                                 IncrementFluidStreamYes,
@@ -281,9 +281,9 @@ namespace OutAirNodeManager {
                             NodeNums,
                             ErrInList,
                             DataLoopNode::NodeFluidType::Air,
+                            DataLoopNode::ConnectionObjectType::OutdoorAirNode,
                             CurrentModuleObject,
-                            CurrentModuleObject,
-                            DataLoopNode::NodeConnectionType::OutsideAir,
+                            DataLoopNode::ConnectionType::OutsideAir,
                             static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes,
@@ -413,7 +413,7 @@ namespace OutAirNodeManager {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Provide a entry into the OutAirNode List for checking from other routines.
+        // Provide an entry into the OutAirNode List for checking from other routines.
 
         // METHODOLOGY EMPLOYED:
         // na
@@ -530,9 +530,9 @@ namespace OutAirNodeManager {
                             TmpNums,
                             errFlag,
                             DataLoopNode::NodeFluidType::Air,
+                            DataLoopNode::ConnectionObjectType::OutdoorAirNode,
                             "OutdoorAir:Node",
-                            "OutdoorAir:Node",
-                            DataLoopNode::NodeConnectionType::OutsideAir,
+                            DataLoopNode::ConnectionType::OutsideAir,
                             static_cast<NodeInputManager::CompFluidStream>(state.dataOutAirNodeMgr->NumOutsideAirNodes),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes);
