@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -189,9 +189,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
     GetPIUs(*state);
 
     ASSERT_EQ(1, state->dataPowerInductionUnits->NumSeriesPIUs);
-    EXPECT_EQ("SPACE1-1 ZONE COIL", state->dataPowerInductionUnits->PIU(1).HCoil);     // heating coil name
-    EXPECT_EQ("COIL:HEATING:WATER", state->dataPowerInductionUnits->PIU(1).HCoilType); // hot water heating coil
-    EXPECT_GT(state->dataPowerInductionUnits->PIU(1).HotControlNode, 0);               // none zero integer node index is expected
+    EXPECT_EQ("SPACE1-1 ZONE COIL", state->dataPowerInductionUnits->PIU(1).HCoil); // heating coil name
+    EXPECT_EQ("COIL:HEATING:WATER",
+              HCoilNamesUC[static_cast<int>(state->dataPowerInductionUnits->PIU(1).HCoilType)]); // hot water heating coil
+    EXPECT_GT(state->dataPowerInductionUnits->PIU(1).HotControlNode, 0);                         // none zero integer node index is expected
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
@@ -297,8 +298,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     GetPIUs(*state);
 
-    int const PIUNum = 1;
-    int const ADUNum = 1;
+    int constexpr PIUNum = 1;
+    int constexpr ADUNum = 1;
 
     ASSERT_EQ(1, state->dataPowerInductionUnits->NumSeriesPIUs);
     EXPECT_EQ("SPACE1-1 ATU", state->dataDefineEquipment->AirDistUnit(ADUNum).Name);    // ADU name
@@ -1477,8 +1478,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
-    int const PIUNum = 1;
-    int const ADUNum = 1;
+    int constexpr PIUNum = 1;
+    int constexpr ADUNum = 1;
 
     ASSERT_EQ(1, state->dataPowerInductionUnits->NumSeriesPIUs);
     EXPECT_EQ("SERIES PIU ELEC RHT AIR DISTRIBUTION UNIT", state->dataDefineEquipment->AirDistUnit(ADUNum).Name); // ADU name

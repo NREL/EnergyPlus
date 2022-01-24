@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -195,15 +195,19 @@ namespace HighTempRadiantSystem {
 
         InitHighTempRadiantSystem(state, FirstHVACIteration, RadSysNum);
 
-        {
-            auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-            if ((SELECT_CASE_var == RadControlType::MATControl) || (SELECT_CASE_var == RadControlType::MRTControl) ||
-                (SELECT_CASE_var == RadControlType::OperativeControl)) {
-                CalcHighTempRadiantSystem(state, RadSysNum);
-            } else if ((SELECT_CASE_var == RadControlType::MATSPControl) || (SELECT_CASE_var == RadControlType::MRTSPControl) ||
-                       (SELECT_CASE_var == RadControlType::OperativeSPControl)) {
-                CalcHighTempRadiantSystemSP(state, FirstHVACIteration, RadSysNum);
-            }
+        switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
+        case RadControlType::MATControl:
+        case RadControlType::MRTControl:
+        case RadControlType::OperativeControl: {
+            CalcHighTempRadiantSystem(state, RadSysNum);
+        } break;
+        case RadControlType::MATSPControl:
+        case RadControlType::MRTSPControl:
+        case RadControlType::OperativeSPControl: {
+            CalcHighTempRadiantSystemSP(state, FirstHVACIteration, RadSysNum);
+        } break;
+        default:
+            break;
         }
 
         UpdateHighTempRadiantSystem(state, RadSysNum, LoadMet);
@@ -238,16 +242,17 @@ namespace HighTempRadiantSystem {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MaxCombustionEffic(1.00); // Limit the combustion efficiency to perfection
-        Real64 const MaxFraction(1.0);         // Limit the highest allowed fraction for heat transfer parts
-        Real64 const MinCombustionEffic(0.01); // Limit the minimum combustion efficiency
-        Real64 const MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
-        Real64 const MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
+        Real64 constexpr MaxCombustionEffic(1.00); // Limit the combustion efficiency to perfection
+        Real64 constexpr MaxFraction(1.0);         // Limit the highest allowed fraction for heat transfer parts
+        Real64 constexpr MinCombustionEffic(0.01); // Limit the minimum combustion efficiency
+        Real64 constexpr MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
+        Real64 constexpr MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
         //  INTEGER,          PARAMETER :: MaxDistribSurfaces = 20    ! Maximum number of surfaces that a radiant heater can radiate to
-        int const iHeatCAPMAlphaNum(4);                   // get input index to High Temperature Radiant system heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1);       // get input index to High Temperature Radiant system heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatCAPMAlphaNum(4);             // get input index to High Temperature Radiant system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to High Temperature Radiant system heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
+            2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -948,16 +953,19 @@ namespace HighTempRadiantSystem {
             OpTemp = (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
-            {
-                auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-                if (SELECT_CASE_var == RadControlType::MATControl) {
-                    HeatFrac = (OffTemp - state.dataHeatBalFanSys->MAT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-                } else if (SELECT_CASE_var == RadControlType::MRTControl) {
-                    HeatFrac = (OffTemp - state.dataHeatBal->ZoneMRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-                } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
-                    OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-                    HeatFrac = (OffTemp - OpTemp) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-                }
+            switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
+            case RadControlType::MATControl: {
+                HeatFrac = (OffTemp - state.dataHeatBalFanSys->MAT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
+            } break;
+            case RadControlType::MRTControl: {
+                HeatFrac = (OffTemp - state.dataHeatBal->ZoneMRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
+            } break;
+            case RadControlType::OperativeControl: {
+                OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                HeatFrac = (OffTemp - OpTemp) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
+            } break;
+            default:
+                break;
             }
             if (HeatFrac < 0.0) HeatFrac = 0.0;
             if (HeatFrac > 1.0) HeatFrac = 1.0;
@@ -1008,7 +1016,7 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         float const TempConvToler(0.1f); // Temperature controller tries to converge to within 0.1C
-        int const MaxIterations(10);     // Maximum number of iterations to achieve temperature control
+        int constexpr MaxIterations(10); // Maximum number of iterations to achieve temperature control
         // (10 interval halvings achieves control to 0.1% of capacity)
         // These two parameters are intended to achieve reasonable control
         // without excessive run times.
@@ -1052,17 +1060,19 @@ namespace HighTempRadiantSystem {
 
             // First determine whether or not the unit should be on
             // Determine the proper temperature on which to control
-            {
-                auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-                if (SELECT_CASE_var == RadControlType::MATSPControl) {
-                    ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                } else if (SELECT_CASE_var == RadControlType::MRTSPControl) {
-                    ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
-                } else if (SELECT_CASE_var == RadControlType::OperativeSPControl) {
-                    ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-                } else {
-                    assert(false);
-                }
+            switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
+            case RadControlType::MATSPControl: {
+                ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+            } break;
+            case RadControlType::MRTSPControl: {
+                ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+            } break;
+            case RadControlType::OperativeSPControl: {
+                ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+            } break;
+            default: {
+                assert(false);
+            } break;
             }
 
             if (ZoneTemp < (SetPtTemp - TempConvToler)) {
@@ -1094,15 +1104,18 @@ namespace HighTempRadiantSystem {
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
-                    {
-                        auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-                        if (SELECT_CASE_var == RadControlType::MATControl) {
-                            ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                        } else if (SELECT_CASE_var == RadControlType::MRTControl) {
-                            ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
-                        } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
-                            ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-                        }
+                    switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
+                    case RadControlType::MATControl: {
+                        ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                    } break;
+                    case RadControlType::MRTControl: {
+                        ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+                    } break;
+                    case RadControlType::OperativeControl: {
+                        ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    } break;
+                    default:
+                        break;
                     }
 
                     if ((std::abs(ZoneTemp - SetPtTemp)) <= TempConvToler) {
@@ -1200,20 +1213,22 @@ namespace HighTempRadiantSystem {
         state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) = SysTimeElapsed;
         state.dataHighTempRadSys->LastTimeStepSys(RadSysNum) = TimeStepSys;
 
-        {
-            auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-            if ((SELECT_CASE_var == RadControlType::MATControl) || (SELECT_CASE_var == RadControlType::MRTControl) ||
-                (SELECT_CASE_var == RadControlType::OperativeControl)) {
-                // Only need to do this for the non-SP controls (SP has already done this enough)
-                // Now, distribute the radiant energy of all systems to the appropriate
-                // surfaces, to people, and the air; determine the latent portion
-                DistributeHTRadGains(state);
+        switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
+        case RadControlType::MATControl:
+        case RadControlType::MRTControl:
+        case RadControlType::OperativeControl: {
+            // Only need to do this for the non-SP controls (SP has already done this enough)
+            // Now, distribute the radiant energy of all systems to the appropriate
+            // surfaces, to people, and the air; determine the latent portion
+            DistributeHTRadGains(state);
 
-                // Now "simulate" the system by recalculating the heat balances
-                ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-            }
+            // Now "simulate" the system by recalculating the heat balances
+            ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
+        } break;
+        default:
+            break;
         }
 
         if (state.dataHighTempRadSys->QHTRadSource(RadSysNum) <= 0.0) {
@@ -1312,7 +1327,7 @@ namespace HighTempRadiantSystem {
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
