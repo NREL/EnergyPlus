@@ -316,7 +316,9 @@ namespace DualDuct {
                                                                                                   cAlphaFields(5));
 
                 state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
-                state.dataDualDuct->dd_airterminal(DDNum).ZoneMinAirFracDes = 1.0;
+                // constant volume dual duct systems cannot set ZoneMinAirFracDes = 1 since there are 2 ducts and it is the
+                // system flow rate (sum of hot and cold) that is constant, not the individual flow through the hot and cold ducts
+                state.dataDualDuct->dd_airterminal(DDNum).ZoneMinAirFracDes = 0.0;
 
                 // Register component set data - one for heat and one for cool
                 TestCompSet(
