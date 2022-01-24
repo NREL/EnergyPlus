@@ -348,55 +348,55 @@ namespace ExhaustAirSystemManager {
 
     void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum)
     {
-        //// SUBROUTINE INFORMATION:
-        ////       AUTHOR:
-        ////       DATE WRITTEN:    Jan 2022
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR:
+        //       DATE WRITTEN:    Jan 2022
 
-        //// PURPOSE OF THIS SUBROUTINE: This subroutine
+        // PURPOSE OF THIS SUBROUTINE: This subroutine
 
-        //// METHODOLOGY EMPLOYED:
+        // METHODOLOGY EMPLOYED:
 
-        //// REFERENCES:
+        // REFERENCES:
 
-        //// USE STATEMENTS:
+        // USE STATEMENTS:
 
-        //// Using/Aliasing
-        // using MixerComponent::SimAirMixer;
-        // using ZonePlenum::SimAirZonePlenum;
+        // Using/Aliasing
+        using MixerComponent::SimAirMixer;
 
-        //// Locals
-        // int ComponentNum;
+        // For DataZoneEquipment::AirLoopHVACZone::Mixer: // 'AirLoopHVAC:ZoneMixer'
+        // 2022-01: Simulate Zone Air Mixer
+        if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
+              state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+            SimAirMixer(state,
+                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
+                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+        }
 
-        // for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
-        //    switch (state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentTypeEnum(ComponentNum)) {
-        //    case DataZoneEquipment::AirLoopHVACZone::Mixer: // 'AirLoopHVAC:ZoneMixer'
+        // 2022-01: Simulate the fan
+        // Step 1: need to know the fan type
+        if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+            // 2022-01: The system model, look in HVACFan name space
+            // Simulation procedure
+            // 1. Determine the incoming flow rate;
+            // 2. Calculate fan related parameters;
+            // 3. May need to reconcile the sum of the incoming flows and the fan model's calculation
+            // --maybe based on fan types: e.g. constant flow vs. variable flow?
+        } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
+            // 2022-01: Component model, look in Fan name space
+            // Simulation procedure
+            // 1. Determine the incoming flow rate;
+            // 2. Calculate fan related parameters;
+            // 3. May need to reconcile the sum of the incoming flows and the fan model's calculation
+            // --maybe based on fan types: e.g. constant flow vs. variable flow?
+        }
 
-        //        if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-        //              state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-        //            SimAirMixer(state,
-        //                        state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-        //                        state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-        //        }
+        // 2022-01: Errors and warning messages:
+        //ShowSevereError(state,
+        //                "Problems found in simulating AirLoopHVAC:ExhaustSystem =" +
+        //                state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).Name));
+        //// ShowContinueError(state, "Occurs in AirLoopHVAC:ExhaustSystem =" + state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).Name);
+        //ShowFatalError(state, "Preceding condition causes termination.");
 
-        //        break;
-
-        //    case DataZoneEquipment::AirLoopHVACZone::ReturnPlenum: // 'AirLoopHVAC:ReturnPlenum'
-
-        //        SimAirZonePlenum(state,
-        //                         state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-        //                         DataZoneEquipment::AirLoopHVACZone::ReturnPlenum,
-        //                         state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-        //        break;
-
-        //    default:
-        //        ShowSevereError(state,
-        //                        "Invalid AirLoopHVAC:ReturnPath Component=" +
-        //                            state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
-        //        ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
-        //        ShowFatalError(state, "Preceding condition causes termination.");
-        //        break;
-        //    }
-        //}
     }
 
     void ReportExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
