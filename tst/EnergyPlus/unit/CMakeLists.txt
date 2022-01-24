@@ -243,6 +243,8 @@ set(test_src
     WindowAC.unit.cc
     WindowEquivalentLayer.unit.cc
     WindowLayerEffectiveMultipliers.unit.cc
+    WindowManagerExteriorOptical.unit.cc
+    WindowManagerExteriorThermal.unit.cc
     WindowManager.unit.cc
     XingGroundTemperatureModel.unit.cc
     ZoneContaminantPredictorCorrector.unit.cc
