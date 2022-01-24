@@ -140,6 +140,13 @@ namespace WindowManager {
         bool isInteriorShade() const;
         double overallUfactorFromFilmsAndCond(double conductance, double insideFilm, double outsideFilm);
 
+        // methods specifically for helping in NFRC assembly calculations
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorNfrc(bool const useSummerConditions);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorNfrc(bool const useSummerConditions);
+
+        // Method to determine current construction shade type
+        static EnergyPlus::DataSurfaces::WinShadingType getShadeType(EnergyPlusData &state, int ConstrNum);
+
     private:
         DataSurfaces::SurfaceData m_Surface;
         DataSurfaces::SurfaceWindowCalc m_Window;
@@ -173,12 +180,6 @@ namespace WindowManager {
         static Gases::CGas getAir();
         Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
 
-        // methods specifically for helping in NFRC assembly calculations
-        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorNfrc(bool const useSummerConditions);
-        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorNfrc(bool const useSummerConditions);
-
-        // Method to determine current construction shade type
-        static EnergyPlus::DataSurfaces::WinShadingType getShadeType(EnergyPlusData &state, int ConstrNum);
     };
 } // namespace WindowManager
 
