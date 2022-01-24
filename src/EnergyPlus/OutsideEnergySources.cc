@@ -161,20 +161,20 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
 
     for (int EnergySourceNum = 1; EnergySourceNum <= state.dataOutsideEnergySrcs->NumDistrictUnits; ++EnergySourceNum) {
 
-        std::string reportVarPrefix;
         std::string nodeNames;
         DataPlant::PlantEquipmentType EnergyType;
+        DataLoopNode::ConnectionObjectType objType;
         int thisIndex;
         if (EnergySourceNum <= NumDistrictUnitsHeat) {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating";
-            reportVarPrefix = "District Heating ";
+            objType = DataLoopNode::ConnectionObjectType::DistrictHeating;
             nodeNames = "Hot Water Nodes";
             EnergyType = DataPlant::PlantEquipmentType::PurchHotWater;
             heatIndex++;
             thisIndex = heatIndex;
         } else {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictCooling";
-            reportVarPrefix = "District Cooling ";
+            objType = DataLoopNode::ConnectionObjectType::DistrictCooling;
             nodeNames = "Chilled Water Nodes";
             EnergyType = DataPlant::PlantEquipmentType::PurchChilledWater;
             coolIndex++;
@@ -207,20 +207,20 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
             NodeInputManager::GetOnlySingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(2),
                                                 ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                objType,
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                DataLoopNode::ConnectionType::Inlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                 ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                objType,
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                DataLoopNode::ConnectionType::Outlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
