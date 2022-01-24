@@ -151,4 +151,32 @@ TEST_F(EnergyPlusFixture, test_getOutdoorNfrc)
     EXPECT_NEAR(indoor->getDirectSolarRadiation(), 0.0, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, test_getIndoorNfrc)
+{
+    // set up for using CWCEHeatTransferFactory
+    int numSurf = 1;
+    state->dataSurface->Surface.allocate(numSurf);
+    state->dataSurface->SurfaceWindow.allocate(numSurf);
+    int numCons = 1;
+    state->dataConstruction->Construct.allocate(numCons);
+    state->dataSurface->Surface(numSurf).Construction = numCons;
+    int numLayers = 2;
+    state->dataConstruction->Construct(numCons).LayerPoint.allocate(numLayers);
+    int materialOutside = 1;
+    int materialInside = 2;
+    state->dataConstruction->Construct(numCons).TotLayers = numLayers;
+    state->dataConstruction->Construct(numCons).LayerPoint(1) = materialOutside;
+    state->dataConstruction->Construct(numCons).LayerPoint(numLayers) = materialInside;
+    state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
+    int numMaterials = materialInside;
+    state->dataMaterial->Material.allocate(numMaterials);
+    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, numCons);
 
+    auto indoor = aFactory.getIndoorNfrc(true);
+    EXPECT_NEAR(indoor->getAirTemperature(), 297.15, 0.01);
+
+    indoor = aFactory.getIndoorNfrc(false);
+    EXPECT_NEAR(indoor->getAirTemperature(), 294.15, 0.01);
+}
