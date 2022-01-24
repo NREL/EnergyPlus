@@ -66,6 +66,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -4326,4 +4327,82 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     SizeHeatRecovery(*state, ExchNum);
     // check autosized nominal supply flow
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 1.0);
+}
+
+TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
+{
+    // 2022-01: For now, place the unit test here; may move to a new place with other tests later.
+    std::string const idf_objects = delimited_string({
+
+        "AirLoopHVAC:ExhaustSystem,",
+        "    Central Exhaust 1,     !-Name Exhaust Avail List",
+        "    Omni_Sched,                      !-Availability Manager List Name",
+        "    AirLoopExhaustMixer1,  !-AirLoopHVAC:ZoneMixer Name",
+        "    Fan:SystemModel,     !-Fan Object Type,"
+        "    CentralExhaustFan1;    !-Fan Name",
+
+        "ZoneHVAC:ExhaustControl,",
+        "    Zone1 Exhaust Control,           !-Name",
+        "    HVACOperationSchd,              !- Availability Schedule Name",
+        "    Zone2 Exhaust Node,             !- Inlet Node Name",
+        "    Zone2 ExhaustSystem Node,       !- Outlet Node Name",
+        "    0.1,                            !- Design Flow Rate {m3/s}",
+        "    Scheduled,                      !- Flow Control Type (Scheduled, FollowSupply, Other?)",
+        "    Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name",
+        "    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)",
+        "    ,                               !- Minimum Zone Temperature Limit Schedule Name",
+        "    Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name",
+        "    FlowBalancedSched;        !-Balanced Exhaust Fraction Schedule Name",
+
+        "    Schedule:Compact,",
+        "      Omni_Sched,             !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+        "    Schedule:Compact,",
+        "      HVACOperationSchd,             !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+        "    Schedule:Compact,",
+        "      Zone2 Exhaust Flow Sched,             !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+        "    Schedule:Compact,",
+        "      Zone2 Min Exhaust Flow Sched,             !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00, 0.2;        !- Field 3",
+
+        "    Schedule:Compact,",
+        "      FlowBalancedSched,             !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00, 0.2;        !- Field 3",
+
+        "    ScheduleTypeLimits,",
+        "      Fraction,                !- Name",
+        "      0.0,                     !- Lower Limit Value",
+        "      1.0,                     !- Upper Limit Value",
+        "      CONTINUOUS;              !- Numeric Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    ScheduleManager::ProcessScheduleInput(*state);
+
+    // Call the processing codes
+    ExhaustAirSystemManager::GetExhaustAirSystemInput(*state);
+    ExhaustAirSystemManager::GetZoneExhaustControlInput(*state);
+
+    // Expected values:
+    EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(1).DesignExhaustFlowRate, 0.1, 1e-5);
 }
