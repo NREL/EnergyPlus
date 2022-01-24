@@ -962,11 +962,11 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                 state.dataSize->VpzHtgByZone(termUnitSizingIndex) =
                                     sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate; // store std 62.1 values
                             } else {
-                                if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseAction) {
+                                if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::Reverse) {
                                     airLoopHeatingMaximumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
                                     state.dataSize->VpzHtgByZone(termUnitSizingIndex) =
                                         sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                                } else if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseActionWithLimits) {
+                                } else if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseWithLimits) {
                                     airLoopHeatingMaximumFlowRateSum +=
                                         max(sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
                                             (sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate * sd_airterminal(singleDuctATUNum).ZoneMinAirFrac));

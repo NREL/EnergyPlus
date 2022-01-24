@@ -320,10 +320,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         ThisCP.WaterInletNode = GetOnlySingleNode(state,
                                                   state.dataIPShortCut->cAlphaArgs(3),
                                                   ErrorsFound,
-                                                  cCMO_CoolingPanel_Simple,
+                                                  DataLoopNode::ConnectionObjectType::ZoneHVACCoolingPanelRadiantConvectiveWater,
                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                   DataLoopNode::NodeFluidType::Water,
-                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                  DataLoopNode::ConnectionType::Inlet,
                                                   NodeInputManager::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
@@ -331,10 +331,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         ThisCP.WaterOutletNode = GetOnlySingleNode(state,
                                                    state.dataIPShortCut->cAlphaArgs(4),
                                                    ErrorsFound,
-                                                   cCMO_CoolingPanel_Simple,
+                                                   DataLoopNode::ConnectionObjectType::ZoneHVACCoolingPanelRadiantConvectiveWater,
                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::NodeConnectionType::Outlet,
+                                                   DataLoopNode::ConnectionType::Outlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state,

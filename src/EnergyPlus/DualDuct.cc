@@ -284,36 +284,39 @@ namespace DualDuct {
                         ErrorsFound = true;
                     }
                 }
-                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                                                            AlphArray(3),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            AlphArray(1),
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsNotParent,
-                                                                                            cAlphaFields(3));
-                state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                 AlphArray(4),
-                                                                                                 ErrorsFound,
-                                                                                                 CurrentModuleObject,
-                                                                                                 AlphArray(1),
-                                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::CompFluidStream::Primary,
-                                                                                                 ObjectIsNotParent,
-                                                                                                 cAlphaFields(4));
-                state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                  AlphArray(5),
-                                                                                                  ErrorsFound,
-                                                                                                  CurrentModuleObject,
-                                                                                                  AlphArray(1),
-                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                  NodeInputManager::CompFluidStream::Primary,
-                                                                                                  ObjectIsNotParent,
-                                                                                                  cAlphaFields(5));
+                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(3),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctConstantVolume,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(3));
+                state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(4),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctConstantVolume,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Inlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(4));
+                state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(5),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctConstantVolume,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Inlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(5));
 
                 state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
                 // constant volume dual duct systems cannot set ZoneMinAirFracDes = 1 since there are 2 ducts and it is the
@@ -447,36 +450,39 @@ namespace DualDuct {
                         ErrorsFound = true;
                     }
                 }
-                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                                                            AlphArray(3),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            AlphArray(1),
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsNotParent,
-                                                                                            cAlphaFields(3));
-                state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                 AlphArray(4),
-                                                                                                 ErrorsFound,
-                                                                                                 CurrentModuleObject,
-                                                                                                 AlphArray(1),
-                                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::CompFluidStream::Primary,
-                                                                                                 ObjectIsNotParent,
-                                                                                                 cAlphaFields(4));
-                state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                  AlphArray(5),
-                                                                                                  ErrorsFound,
-                                                                                                  CurrentModuleObject,
-                                                                                                  AlphArray(1),
-                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                  NodeInputManager::CompFluidStream::Primary,
-                                                                                                  ObjectIsNotParent,
-                                                                                                  cAlphaFields(5));
+                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(3),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctVAV,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(3));
+                state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(4),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctVAV,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Inlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(4));
+                state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(5),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctVAV,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Inlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(5));
 
                 state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
                 state.dataDualDuct->dd_airterminal(DDNum).ZoneMinAirFracDes = NumArray(2);
@@ -630,38 +636,41 @@ namespace DualDuct {
                         ErrorsFound = true;
                     }
                 }
-                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                                                            AlphArray(3),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            AlphArray(1),
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsNotParent,
-                                                                                            cAlphaFields(3));
-                state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum = GetOnlySingleNode(state,
-                                                                                             AlphArray(4),
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             AlphArray(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsNotParent,
-                                                                                             cAlphaFields(4));
+                state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(3),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctVAVOutdoorAir,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(3));
+                state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(4),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirTerminalDualDuctVAVOutdoorAir,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Inlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent,
+                                      cAlphaFields(4));
 
                 if (!lAlphaBlanks(5)) {
-                    state.dataDualDuct->dd_airterminal(DDNum).RecircAirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                        AlphArray(5),
-                                                                                                        ErrorsFound,
-                                                                                                        CurrentModuleObject,
-                                                                                                        AlphArray(1),
-                                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                                        ObjectIsNotParent,
-                                                                                                        cAlphaFields(5));
+                    state.dataDualDuct->dd_airterminal(DDNum).RecircAirInletNodeNum =
+                        GetOnlySingleNode(state,
+                                          AlphArray(5),
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::AirTerminalDualDuctVAVOutdoorAir,
+                                          AlphArray(1),
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Inlet,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent,
+                                          cAlphaFields(5));
                 } else {
                     // for this model, we intentionally allow not using the recirc side
                     state.dataDualDuct->dd_airterminal(DDNum).RecircIsUsed = false;

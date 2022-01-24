@@ -5,41 +5,39 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 if (MSVC)
     add_compile_definitions(_USE_MATH_DEFINES)
-endif()
+endif ()
 
 # Everything will need to access this
 include_directories(include)
-# Third party includes
-add_subdirectory(third_party/LU-Decomposition-0.2)
-include_directories(third_party/LU-Decomposition-0.2/include)
 
 # Create a DLL with an API
-add_library(cpgfunctionEP  src/boreholes.cpp
+add_library(cpgfunctionEP
+        src/blas.cpp
+        src/boreholes.cpp
+        src/coordinates.cpp
         src/gfunction.cpp
         src/heat_transfer.cpp
         src/interpolation.cpp
-        src/utilities.cpp
-        src/coordinates.cpp
-        src/statistics.cpp
+        src/lu.cpp
         src/segments.cpp
-        src/blas.cpp)
-
-target_link_libraries(cpgfunctionEP INTERFACE LU-Decomposition)
+        src/statistics.cpp
+        src/utilities.cpp
+        )
 
 # It depends on threads
 find_package(Threads REQUIRED)
 target_link_libraries(cpgfunctionEP INTERFACE Threads::Threads)
 
-option (USE_OpenMP "Use OpenMP" ON)
-if(USE_OpenMP)
+option(USE_OpenMP "Use OpenMP" ON)
+if (USE_OpenMP)
     find_package(OpenMP)
-    if(OpenMP_CXX_FOUND)
+    if (OpenMP_CXX_FOUND)
         target_link_libraries(cpgfunctionEP PRIVATE OpenMP::OpenMP_CXX)
-    endif()
-endif()
+    endif ()
+endif ()
 
-# if we are only building cpgfnctionEP
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+# if we are only building cpgfunctionEP
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # local eigen if not in EnergyPlus third_party/
     include_directories(third_party/eigen-3.3.9)  # Eigen for LU decomposition
     include_directories(third_party/nlohmann-3.9.1)
@@ -89,4 +87,4 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_test(NAME RunTest8 COMMAND ${CMAKE_BINARY_DIR}/gFunction_adaptive)
     add_test(NAME RunTest9 COMMAND ${CMAKE_BINARY_DIR}/gFunctionTiming)
     add_test(NAME RunTest10 COMMAND ${CMAKE_BINARY_DIR}/ComputeFLS)
-endif()
+endif ()

@@ -329,10 +329,10 @@ namespace FuelCellElectricGenerator {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(7),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelCellPowerModule,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.DilutionExhaustNodeName = AlphArray(8);
@@ -340,10 +340,10 @@ namespace FuelCellElectricGenerator {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(8),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelCellPowerModule,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -417,10 +417,10 @@ namespace FuelCellElectricGenerator {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(2),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelCellAirSupply,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -644,10 +644,10 @@ namespace FuelCellElectricGenerator {
                         NodeInputManager::GetOnlySingleNode(state,
                                                             AlphArray(5),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::GeneratorFuelCellWaterSupply,
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Sensor,
+                                                            DataLoopNode::ConnectionType::Sensor,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -660,10 +660,10 @@ namespace FuelCellElectricGenerator {
                         NodeInputManager::GetOnlySingleNode(state,
                                                             AlphArray(5),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::GeneratorFuelCellWaterSupply,
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Sensor,
+                                                            DataLoopNode::ConnectionType::Sensor,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -817,20 +817,20 @@ namespace FuelCellElectricGenerator {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(2),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelCellExhaustGasToWaterHeatExchanger,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterOutNode =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(3),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelCellExhaustGasToWaterHeatExchanger,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(
@@ -841,10 +841,10 @@ namespace FuelCellElectricGenerator {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(4),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelCellExhaustGasToWaterHeatExchanger,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Secondary,
                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -1049,20 +1049,20 @@ namespace FuelCellElectricGenerator {
                         NodeInputManager::GetOnlySingleNode(state,
                                                             AlphArray(2),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::GeneratorFuelCellStackCooler,
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                            DataLoopNode::ConnectionType::Inlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).StackCooler.WaterOutNode =
                         NodeInputManager::GetOnlySingleNode(state,
                                                             AlphArray(3),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::GeneratorFuelCellStackCooler,
                                                             AlphArray(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                            DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     BranchNodeConnections::TestCompSet(
