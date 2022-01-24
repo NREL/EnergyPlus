@@ -1394,7 +1394,7 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
                                                 std::string const &units,
                                                 int const reportingFreq,
                                                 bool isMeter,
-                                                Optional_string_const scheduleName)
+                                                std::string_view const scheduleName)
 {
     if (m_writeOutputToSQLite) {
         sqliteBindInteger(m_reportDictionaryInsertStmt, 1, reportVariableReportID);
@@ -1406,8 +1406,8 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
         sqliteBindText(m_reportDictionaryInsertStmt, 7, variableName);
         sqliteBindText(m_reportDictionaryInsertStmt, 8, reportingFreqName(reportingFreq));
 
-        if (scheduleName.present()) {
-            sqliteBindText(m_reportDictionaryInsertStmt, 9, scheduleName());
+        if (!scheduleName.empty()) {
+            sqliteBindText(m_reportDictionaryInsertStmt, 9, scheduleName);
         } else {
             sqliteBindNULL(m_reportDictionaryInsertStmt, 9);
         }

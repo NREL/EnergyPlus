@@ -439,19 +439,19 @@ namespace HVACFan {
         inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                            alphaArgs(3),
                                                            errorsFound,
-                                                           locCurrentModuleObject,
+                                                           DataLoopNode::ConnectionObjectType::FanSystemModel,
                                                            alphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                           DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                             alphaArgs(4),
                                                             errorsFound,
-                                                            locCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::FanSystemModel,
                                                             alphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                            DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -680,8 +680,7 @@ namespace HVACFan {
         }
 
         if (m_heatLossesDestination == ThermalLossDestination::ZoneGains) {
-            SetupZoneInternalGain(
-                state, m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainType::FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
+            SetupZoneInternalGain(state, m_zoneNum, name, DataHeatBalance::IntGainType::FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
         }
 
         alphaArgs.deallocate();

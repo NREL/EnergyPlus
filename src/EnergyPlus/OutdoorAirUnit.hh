@@ -66,8 +66,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace OutdoorAirUnit {
-    // component types addressed by this module
-    extern std::string const cMO_OutdoorAirUnit;
 
     enum class CompType : int
     {
@@ -139,26 +137,6 @@ namespace OutdoorAirUnit {
         Num
     };
 
-    enum class CurrentObject
-    {
-        Invalid = -1,
-        OAUnit,
-        EqList,
-        Num
-    };
-
-    constexpr const char *CurrentModuleObjects(CurrentObject const co)
-    {
-        switch (co) {
-        case CurrentObject::OAUnit:
-            return "ZoneHVAC:OutdoorAirUnit";
-        case CurrentObject::EqList:
-            return "ZoneHVAC:OutdoorAirUnit:EquipmentList";
-        default:
-            return "";
-        }
-    }
-
     struct OAEquipList
     {
         // Members
@@ -172,10 +150,7 @@ namespace OutdoorAirUnit {
         int CoilWaterInletNode;
         int CoilWaterOutletNode;
         DataPlant::PlantEquipmentType CoilType;
-        int LoopNum;
-        int LoopSideNum;
-        int BranchNum;
-        int CompNum;
+        PlantLocation plantLoc;
         int FluidIndex; // used in Steam...
         Real64 MaxVolWaterFlow;
         Real64 MaxWaterMassFlow;
@@ -187,8 +162,8 @@ namespace OutdoorAirUnit {
         // Default Constructor
         OAEquipList()
             : Type(CompType::Invalid), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
-              CoilType(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
-              MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
+              CoilType(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, FluidIndex(0), MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0),
+              MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }
     };

@@ -144,13 +144,13 @@ void PipeHTData::simulate(EnergyPlusData &state,
     this->InitPipesHeatTransfer(state, FirstHVACIteration);
     // make the calculations
     for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= state.dataPipeHT->nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
-        {
-            auto const SELECT_CASE_var(this->EnvironmentPtr);
-            if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-                this->CalcBuriedPipeSoil(state);
-            } else {
-                this->CalcPipesHeatTransfer(state);
-            }
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::GroundEnv: {
+            this->CalcBuriedPipeSoil(state);
+        } break;
+        default: {
+            this->CalcPipesHeatTransfer(state);
+        } break;
         }
         this->PushInnerTimeStepArrays();
     }
@@ -168,7 +168,8 @@ void PipeHTData::PushInnerTimeStepArrays()
                 for (int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     // This will store the old 'current' values as the new 'previous values'  This allows
                     // us to use the previous time array as history terms in the equations
-                    this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex);
+                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous) =
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
                 }
             }
         }
@@ -276,10 +277,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                                         ErrorsFound,
-                                                                        cCurrentModuleObject,
+                                                                        DataLoopNode::ConnectionObjectType::PipeIndoor,
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
@@ -293,10 +294,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,
-                                                                         cCurrentModuleObject,
+                                                                         DataLoopNode::ConnectionObjectType::PipeIndoor,
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
@@ -431,10 +432,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                                         ErrorsFound,
-                                                                        cCurrentModuleObject,
+                                                                        DataLoopNode::ConnectionObjectType::PipeOutdoor,
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
@@ -448,10 +449,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,
-                                                                         cCurrentModuleObject,
+                                                                         DataLoopNode::ConnectionObjectType::PipeOutdoor,
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
@@ -475,10 +476,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).EnvrAirNodeNum = GetOnlySingleNode(state,
                                                                           state.dataIPShortCut->cAlphaArgs(5),
                                                                           ErrorsFound,
-                                                                          cCurrentModuleObject,
+                                                                          DataLoopNode::ConnectionObjectType::PipeOutdoor,
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                          DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                          DataLoopNode::ConnectionType::OutsideAirReference,
                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
         if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
@@ -568,10 +569,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                                         ErrorsFound,
-                                                                        cCurrentModuleObject,
+                                                                        DataLoopNode::ConnectionObjectType::PipeUnderground,
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
@@ -585,10 +586,10 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,
-                                                                         cCurrentModuleObject,
+                                                                         DataLoopNode::ConnectionObjectType::PipeUnderground,
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
@@ -692,7 +693,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).T.allocate(state.dataPipeHT->PipeHT(Item).PipeNodeWidth,
                                                   state.dataPipeHT->PipeHT(Item).NumDepthNodes,
                                                   state.dataPipeHT->PipeHT(Item).NumSections,
-                                                  TentativeTimeIndex);
+                                                  TimeIndex::Tentative);
         state.dataPipeHT->PipeHT(Item).T = 0.0;
 
     } // PipeUG input loop
@@ -774,7 +775,6 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
             SetupZoneInternalGain(state,
                                   state.dataPipeHT->PipeHT(Item).EnvrZonePtr,
-                                  "Pipe:Indoor",
                                   state.dataPipeHT->PipeHT(Item).Name,
                                   DataHeatBalance::IntGainType::PipeIndoor,
                                   &state.dataPipeHT->PipeHT(Item).ZoneHeatGainRate);
@@ -909,8 +909,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
 void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
     }
@@ -968,7 +967,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && this->BeginSimEnvrn)) {
 
         if (this->EnvironmentPtr == EnvrnPtr::GroundEnv) {
-            for (TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex) {
+            for (TimeIndex = TimeIndex::Previous; TimeIndex <= TimeIndex::Tentative; ++TimeIndex) {
                 // Loop through all length, depth, and width of pipe to init soil temperature
                 for (LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex) {
                     for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
@@ -1014,7 +1013,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
         if (this->EnvironmentPtr == EnvrnPtr::GroundEnv) {
 
             // And then update Ground Boundary Conditions
-            for (TimeIndex = 1; TimeIndex <= TentativeTimeIndex; ++TimeIndex) {
+            for (TimeIndex = 1; TimeIndex <= TimeIndex::Tentative; ++TimeIndex) {
                 for (LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex) {
                     for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                         // Farfield boundary
@@ -1033,19 +1032,24 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
         }
 
         // should next choose environment temperature according to coupled with air or ground
-        {
-            auto const SELECT_CASE_var(this->EnvironmentPtr);
-            if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-                // EnvironmentTemp = GroundTemp
-            } else if (SELECT_CASE_var == EnvrnPtr::OutsideAirEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
-            } else if (SELECT_CASE_var == EnvrnPtr::ZoneEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
-            } else if (SELECT_CASE_var == EnvrnPtr::ScheduleEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
-            } else if (SELECT_CASE_var == EnvrnPtr::None) { // default to outside temp
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
-            }
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::GroundEnv: {
+            // EnvironmentTemp = GroundTemp
+        } break;
+        case EnvrnPtr::OutsideAirEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
+        } break;
+        case EnvrnPtr::ZoneEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+        } break;
+        case EnvrnPtr::ScheduleEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+        } break;
+        case EnvrnPtr::None: { // default to outside temp
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
+        } break;
+        default:
+            break;
         }
 
         this->BeginEnvrnupdateFlag = false;
@@ -1076,8 +1080,8 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
                     for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                         // This will essentially 'accept' the tentative values that were calculated last iteration
                         // as the new officially 'current' values
-                        this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex) =
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex);
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
                     }
                 }
             }
@@ -1096,7 +1100,8 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     // This will essentially erase the past iterations and revert back to the correct values
-                    this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex);
+                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
                 }
             }
         }
@@ -1111,14 +1116,14 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     // Thus, this is called at the beginning of every time step once.
 
     this->FluidSpecHeat = GetSpecificHeatGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                 state.dataPipeHT->nsvInletTemp,
-                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                 RoutineName);
     this->FluidDensity = GetDensityGlycol(state,
-                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                           state.dataPipeHT->nsvInletTemp,
-                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                           RoutineName);
 
     // At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
@@ -1209,23 +1214,27 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const
     FluidConvCoef = this->CalcPipeHeatTransCoef(state, state.dataPipeHT->nsvInletTemp, state.dataPipeHT->nsvMassFlowRate, this->PipeID);
 
     // heat transfer to air or ground
-    {
-        auto const SELECT_CASE_var(this->EnvironmentPtr);
-        if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-            // Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
-            // between pipe wall and next closest node.
-            EnvHeatTransCoef = this->SoilConductivity / (this->dSregular - (this->PipeID / 2.0));
-        } else if (SELECT_CASE_var == EnvrnPtr::OutsideAirEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::ZoneEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::ScheduleEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::None) {
-            EnvHeatTransCoef = 0.0;
-        } else {
-            EnvHeatTransCoef = 0.0;
-        }
+    switch (this->EnvironmentPtr) {
+    case EnvrnPtr::GroundEnv: {
+        // Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
+        // between pipe wall and next closest node.
+        EnvHeatTransCoef = this->SoilConductivity / (this->dSregular - (this->PipeID / 2.0));
+    } break;
+    case EnvrnPtr::OutsideAirEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::ZoneEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::ScheduleEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::None: {
+        EnvHeatTransCoef = 0.0;
+    } break;
+    default: {
+        EnvHeatTransCoef = 0.0;
+    } break;
     }
 
     // work out the coefficients
@@ -1260,9 +1269,9 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const
 
         PipeDepth = this->PipeNodeDepth;
         PipeWidth = this->PipeNodeWidth;
-        TempBelow = this->T(PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex);
-        TempBeside = this->T(PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex);
-        TempAbove = this->T(PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex);
+        TempBelow = this->T(PipeWidth, PipeDepth + 1, LengthIndex, TimeIndex::Current);
+        TempBeside = this->T(PipeWidth - 1, PipeDepth, LengthIndex, TimeIndex::Current);
+        TempAbove = this->T(PipeWidth, PipeDepth - 1, LengthIndex, TimeIndex::Current);
         state.dataPipeHT->nsvEnvironmentTemp = (TempBelow + TempBeside + TempAbove) / 3.0;
 
         this->TentativeFluidTemp(LengthIndex) = (A2 * this->TentativeFluidTemp(LengthIndex - 1) +
@@ -1381,7 +1390,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
         for (LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
-                    T_O(WidthIndex, DepthIndex, LengthIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex);
+                    T_O(WidthIndex, DepthIndex, LengthIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
                 }
             }
         }
@@ -1394,7 +1403,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                     if (DepthIndex == 1) { // Soil Surface Boundary
 
                         // If on soil boundary, load up local variables and perform calculations
-                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex);
+                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous);
                         PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv;
                         SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv;
                         TopRoughness = this->SoilRoughness;
@@ -1429,11 +1438,11 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         if (WidthIndex == this->PipeNodeWidth) { // Symmetric centerline boundary
 
                             //-Coefficients and Temperatures
-                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
+                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
 
                             //-Update Equation, basically a detailed energy balance at the surface
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                                 (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                  (kSoil / dS) * (NodeBelow + 2 * NodeLeft) + (rho * Cp / state.dataPipeHT->nsvDeltaTime) * NodePast) /
                                 (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / state.dataPipeHT->nsvDeltaTime));
@@ -1441,12 +1450,12 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         } else { // Soil surface, but not on centerline
 
                             //-Coefficients and Temperatures
-                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                            NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex);
+                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                            NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, TimeIndex::Current);
 
                             //-Update Equation
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                                 (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                  (kSoil / dS) * (NodeBelow + NodeLeft + NodeRight) + (rho * Cp / state.dataPipeHT->nsvDeltaTime) * NodePast) /
                                 (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / state.dataPipeHT->nsvDeltaTime));
@@ -1461,20 +1470,20 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                             this->CalcPipesHeatTransfer(state, LengthIndex);
 
                             //-Update node for cartesian system
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) = this->PipeTemp(LengthIndex);
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) = this->PipeTemp(LengthIndex);
 
                         } else if (DepthIndex != 1) { // Not surface node
 
                             //-Coefficients and Temperatures
-                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                            NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex);
-                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                            NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1);
+                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                            NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, TimeIndex::Current);
+                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                            NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current - 1);
                             A1 = this->CoefA1;
                             A2 = this->CoefA2;
 
                             //-Update Equation
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                                 A1 * (NodeBelow + NodeAbove + 2 * NodeLeft) + A2 * NodePast;
 
                         } // Symmetric centerline node structure
@@ -1484,14 +1493,14 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         //-Coefficients and Temperatures
                         A1 = this->CoefA1;
                         A2 = this->CoefA2;
-                        NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                        NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex);
-                        NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                        NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1);
+                        NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                        NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, TimeIndex::Current);
+                        NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                        NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current - 1);
 
                         //-Update Equation
-                        this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                             A1 * (NodeBelow + NodeAbove + NodeRight + NodeLeft) + A2 * NodePast; // Eq. D1
                     }
                 }
@@ -1502,7 +1511,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
         for (LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
-                    Ttemp = this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex);
+                    Ttemp = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
                     if (std::abs(T_O(WidthIndex, DepthIndex, LengthIndex) - Ttemp) > ConvCrit) goto IterationLoop_loop;
                 }
             }
@@ -1568,7 +1577,7 @@ void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
         state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMaxAvail;
     state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Quality = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Quality;
     // Only pass pressure if we aren't doing a pressure simulation
-    switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
+    switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PressureSimType) {
     case DataPlant::PressSimType::NoPressure:
         state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Press = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Press;
         break;
@@ -1726,7 +1735,7 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     int LoopNum;
 
     // retrieve loop index for this component so we can look up fluid properties
-    LoopNum = this->LoopNum;
+    LoopNum = this->plantLoc.loopNum;
 
     // since the fluid properties routine doesn't have Prandtl, we'll just use water values
     idx = 0;
@@ -1839,33 +1848,33 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     bool CoefSet;
 
     // Set environmental variables
-    {
-        auto const SELECT_CASE_var(this->Type);
-
-        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) {
-
-            {
-                auto const SELECT_CASE_var1(this->EnvironmentPtr);
-                if (SELECT_CASE_var1 == EnvrnPtr::ScheduleEnv) {
-                    AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
-                    AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
-
-                } else if (SELECT_CASE_var1 == EnvrnPtr::ZoneEnv) {
-                    AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
-                    AirVel = RoomAirVel;
-                }
-            }
-
-        } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) {
-
-            {
-                auto const SELECT_CASE_var1(this->EnvironmentPtr);
-                if (SELECT_CASE_var1 == EnvrnPtr::OutsideAirEnv) {
-                    AirTemp = state.dataLoopNodes->Node(this->EnvrAirNodeNum).Temp;
-                    AirVel = state.dataEnvrn->WindSpeed;
-                }
-            }
+    switch (this->Type) {
+    case DataPlant::PlantEquipmentType::PipeInterior: {
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::ScheduleEnv: {
+            AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+            AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
+        } break;
+        case EnvrnPtr::ZoneEnv: {
+            AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+            AirVel = RoomAirVel;
+        } break;
+        default:
+            break;
         }
+    } break;
+    case DataPlant::PlantEquipmentType::PipeExterior: {
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::OutsideAirEnv: {
+            AirTemp = state.dataLoopNodes->Node(this->EnvrAirNodeNum).Temp;
+            AirVel = state.dataEnvrn->WindSpeed;
+        } break;
+        default:
+            break;
+        }
+    } break;
+    default:
+        break;
     }
 
     PipeOD = this->InsulationOD;

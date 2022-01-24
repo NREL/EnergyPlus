@@ -113,7 +113,7 @@ namespace WaterToAirHeatPump {
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         int const CompOp,
+                         DataHVACGlobals::CompressorOperation const CompressorOp,
                          Real64 const PartLoadRatio)
     {
 
@@ -174,14 +174,14 @@ namespace WaterToAirHeatPump {
         if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
+            CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
         } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
+            CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
@@ -306,42 +306,46 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressCutoff = NumArray(5);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressCutoff = NumArray(6);
 
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(state,
-                                                                                                    AlphArray(4),
-                                                                                                    ErrorsFound,
-                                                                                                    CurrentModuleObject,
-                                                                                                    AlphArray(1),
-                                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                    NodeInputManager::CompFluidStream::Secondary,
-                                                                                                    ObjectIsNotParent);
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(state,
-                                                                                                     AlphArray(5),
-                                                                                                     ErrorsFound,
-                                                                                                     CurrentModuleObject,
-                                                                                                     AlphArray(1),
-                                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                     NodeInputManager::CompFluidStream::Secondary,
-                                                                                                     ObjectIsNotParent);
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                  AlphArray(6),
-                                                                                                  ErrorsFound,
-                                                                                                  CurrentModuleObject,
-                                                                                                  AlphArray(1),
-                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                  NodeInputManager::CompFluidStream::Primary,
-                                                                                                  ObjectIsNotParent);
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(state,
-                                                                                                   AlphArray(7),
-                                                                                                   ErrorsFound,
-                                                                                                   CurrentModuleObject,
-                                                                                                   AlphArray(1),
-                                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                                   ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(5),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(6),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(7),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
 
             // 2010-01-13 ESL: Jason Glazer noted that these were out of order previously, but they are good now
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(7);
@@ -497,42 +501,46 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressCutoff = NumArray(3);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressCutoff = NumArray(4);
 
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(state,
-                                                                                                    AlphArray(4),
-                                                                                                    ErrorsFound,
-                                                                                                    CurrentModuleObject,
-                                                                                                    AlphArray(1),
-                                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                    NodeInputManager::CompFluidStream::Secondary,
-                                                                                                    ObjectIsNotParent);
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum = GetOnlySingleNode(state,
-                                                                                                     AlphArray(5),
-                                                                                                     ErrorsFound,
-                                                                                                     CurrentModuleObject,
-                                                                                                     AlphArray(1),
-                                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                     NodeInputManager::CompFluidStream::Secondary,
-                                                                                                     ObjectIsNotParent);
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                  AlphArray(6),
-                                                                                                  ErrorsFound,
-                                                                                                  CurrentModuleObject,
-                                                                                                  AlphArray(1),
-                                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                  NodeInputManager::CompFluidStream::Primary,
-                                                                                                  ObjectIsNotParent);
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirOutletNodeNum = GetOnlySingleNode(state,
-                                                                                                   AlphArray(7),
-                                                                                                   ErrorsFound,
-                                                                                                   CurrentModuleObject,
-                                                                                                   AlphArray(1),
-                                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                                   ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(5),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(6),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  AlphArray(7),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpParameterEstimation,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(5);
             if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue) {
@@ -940,10 +948,7 @@ namespace WaterToAirHeatPump {
             ScanPlantLoopsForObject(state,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum,
+                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc,
                                     errFlag,
                                     _,
                                     _,
@@ -951,7 +956,7 @@ namespace WaterToAirHeatPump {
                                     _,
                                     _);
 
-            if (state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
+            if (state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName == "WATER") {
                 if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
                     ShowSevereError(state,
                                     "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
@@ -1013,14 +1018,14 @@ namespace WaterToAirHeatPump {
 
             // The rest of the one time initializations
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName,
                                    DataGlobalConstants::InitConvTemp,
-                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex,
                                    RoutineName);
             Cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName,
                                        DataGlobalConstants::InitConvTemp,
-                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate =
@@ -1029,20 +1034,9 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HPTimeConstant = HPTimeConstant;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).FanDelayTime = FanDelayTime;
 
-            PlantOutletNode = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum)
-                                  .LoopSide(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide)
-                                  .Branch(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum)
-                                  .Comp(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum)
-                                  .NodeNumOut;
-            InitComponentNodes(state,
-                               0.0,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate,
-                               WaterInletNode,
-                               PlantOutletNode,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
+            PlantOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc).NodeNumOut;
+            InitComponentNodes(
+                state, 0.0, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate, WaterInletNode, PlantOutletNode);
 
             state.dataLoopNodes->Node(WaterInletNode).Temp = 5.0;
             state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
@@ -1114,10 +1108,7 @@ namespace WaterToAirHeatPump {
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
+                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc);
 
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         //  IF (WatertoAirHP(HPNum)%InletWaterTemp < 0.0) THEN  ! Debug trap
@@ -1154,7 +1145,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
-                                 int const CompOp,
+                                 DataHVACGlobals::CompressorOperation const CompressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1325,8 +1316,8 @@ namespace WaterToAirHeatPump {
 
         SourceSideInletTemp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy;
-        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName;
-        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex;
+        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName;
+        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex;
         SourceSideMassFlowRate = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate;
         SourceSideVolFlowRate =
             SourceSideMassFlowRate /
@@ -1345,7 +1336,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }
@@ -1796,7 +1787,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
-                                 int const CompOp,
+                                 DataHVACGlobals::CompressorOperation const CompressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1947,8 +1938,8 @@ namespace WaterToAirHeatPump {
 
         SourceSideInletTemp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy;
-        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName;
-        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex;
+        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName;
+        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex;
         SourceSideMassFlowRate = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate;
         SourceSideVolFlowRate =
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate /
@@ -1965,7 +1956,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }

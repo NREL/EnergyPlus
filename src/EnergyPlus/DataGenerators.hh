@@ -163,11 +163,11 @@ namespace DataGenerators {
     enum class OperatingMode
     {
         Invalid = -1,
-        OpModeOff,      // CHP operating mode OFF
-        OpModeStandby,  // CHP operating mode Stand By
-        OpModeWarmUp,   // CHP operating mode Warm Up or start up
-        OpModeNormal,   // CHP operating mode Normal
-        OpModeCoolDown, // CHP operating mode Cool down or shut down
+        Off,      // CHP operating mode OFF
+        Standby,  // CHP operating mode Stand By
+        WarmUp,   // CHP operating mode Warm Up or start up
+        Normal,   // CHP operating mode Normal
+        CoolDown, // CHP operating mode Cool down or shut down
         Num
     };
 
@@ -330,10 +330,10 @@ namespace DataGenerators {
               WarmUpByEngineTemp(true), StartUpTimeDelay(0.0), WarmUpDelay(0.0), StartUpFuel(0.0), StartUpElectConsum(0.0), StartUpElectProd(0.0),
               ShutDownFuel(0.0), ShutDownElectConsum(0.0), PcoolDown(0.0), CoolDownDelay(0.0), NumCyclesInit(0), NumRunHoursInit(0.0), Pstandby(0.0),
               MCeng(0.0), MCcw(0.0), kf(0.0), TnomEngOp(0.0), kp(0.0), MandatoryFullCoolDown(false), WarmRestartOkay(true), AvailabilitySchedID(0),
-              CurrentOpMode(DataGenerators::OperatingMode::OpModeOff), LastOpMode(DataGenerators::OperatingMode::OpModeOff),
-              FractionalDayofLastShutDown(0.0), FractionalDayofLastStartUp(0.0), HasBeenOn(false), DuringStartUp(false), DuringShutDown(false),
-              FuelMdotLastTimestep(0.0), PelLastTimeStep(0.0), NumCycles(0), PLRforSubtimestepStartUp(0.0), PLRforSubtimestepShutDown(0.0),
-              ElectEffNom(0.0), ThermEffNom(0.0), QdotHXMax(0.0), QdotHXMin(0.0), QdotHXOpt(0.0)
+              CurrentOpMode(DataGenerators::OperatingMode::Off), LastOpMode(DataGenerators::OperatingMode::Off), FractionalDayofLastShutDown(0.0),
+              FractionalDayofLastStartUp(0.0), HasBeenOn(false), DuringStartUp(false), DuringShutDown(false), FuelMdotLastTimestep(0.0),
+              PelLastTimeStep(0.0), NumCycles(0), PLRforSubtimestepStartUp(0.0), PLRforSubtimestepShutDown(0.0), ElectEffNom(0.0), ThermEffNom(0.0),
+              QdotHXMax(0.0), QdotHXMin(0.0), QdotHXOpt(0.0)
         {
         }
     };

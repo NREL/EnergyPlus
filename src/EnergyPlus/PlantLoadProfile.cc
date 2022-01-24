@@ -146,9 +146,9 @@ void PlantProfileData::simulate(EnergyPlusData &state,
 
     if (this->MassFlowRate > 0.0) {
         Real64 Cp = GetSpecificHeatGlycol(state,
-                                          state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                           this->InletTemp,
-                                          state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                           RoutineName);
         DeltaTemp = this->Power / (this->MassFlowRate * Cp);
     } else {
@@ -201,22 +201,14 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
         state.dataLoopNodes->Node(OutletNode).Temp = 0.0;
 
         FluidDensityInit = GetDensityGlycol(state,
-                                            state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                             DataGlobalConstants::InitConvTemp,
-                                            state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                             RoutineName);
 
         Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
-        InitComponentNodes(state,
-                           0.0,
-                           this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
-                           this->InletNode,
-                           this->OutletNode,
-                           this->WLoopNum,
-                           this->WLoopSideNum,
-                           this->WLoopBranchNum,
-                           this->WLoopCompNum);
+        InitComponentNodes(state, 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InletNode, this->OutletNode);
 
         this->EMSOverrideMassFlow = false;
         this->EMSMassFlowValue = 0.0;
@@ -233,9 +225,9 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
 
     FluidDensityInit = GetDensityGlycol(state,
-                                        state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                         this->InletTemp,
-                                        state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                         RoutineName);
 
     // Get the scheduled mass flow rate
@@ -246,8 +238,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     if (this->EMSOverrideMassFlow) this->MassFlowRate = this->EMSMassFlowValue;
 
     // Request the mass flow rate from the plant component flow utility routine
-    SetComponentFlowRate(
-        state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+    SetComponentFlowRate(state, this->MassFlowRate, InletNode, OutletNode, this->plantLoc);
 
     this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
 
@@ -300,8 +291,7 @@ void PlantProfileData::oneTimeInit_new(EnergyPlusData &state)
 
     if (allocated(state.dataPlnt->PlantLoop)) {
         errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->Name, this->Type, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
+        ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
         }
@@ -366,19 +356,19 @@ void GetPlantProfileInput(EnergyPlusData &state)
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
                                                                                                state.dataIPShortCut->cAlphaArgs(2),
                                                                                                ErrorsFound,
-                                                                                               cCurrentModuleObject,
+                                                                                               DataLoopNode::ConnectionObjectType::LoadProfilePlant,
                                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
                                                                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                                                                 ErrorsFound,
-                                                                                                cCurrentModuleObject,
+                                                                                                DataLoopNode::ConnectionObjectType::LoadProfilePlant,
                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                 ObjectIsNotParent);
 

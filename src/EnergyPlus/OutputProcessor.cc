@@ -3943,7 +3943,7 @@ namespace OutputProcessor {
                                            TimeStepType const timeStepType,
                                            OutputProcessor::Unit const unitsForVar, // The variables units
                                            Optional_string_const customUnitName,
-                                           Optional_string_const ScheduleName)
+                                           std::string_view const ScheduleName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3981,8 +3981,8 @@ namespace OutputProcessor {
 
         FreqString = frequencyNotice(storeType, reportingInterval);
 
-        if (present(ScheduleName)) {
-            FreqString += "," + ScheduleName;
+        if (!ScheduleName.empty()) {
+            FreqString = fmt::format("{},{}", FreqString, ScheduleName);
         }
 
         std::string UnitsString;

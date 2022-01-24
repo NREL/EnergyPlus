@@ -586,8 +586,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
 
     // test sensible control
-    int CompOn = 1;
-    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+    DataHVACGlobals::CompressorOperation CompressorOn = DataHVACGlobals::CompressorOperation::On;
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     // system meets temperature set point
     EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
     // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
@@ -597,7 +597,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
 
     // test latent control
     thisSys->m_DesiredOutletHumRat = RHControlHumRat;
-    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
 
     // system over cools past temperature set point
     EXPECT_GT(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp);
@@ -761,8 +761,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
 
     // test sensible control
-    int CompOn = 1;
-    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+    DataHVACGlobals::CompressorOperation CompressorOn = DataHVACGlobals::CompressorOperation::On;
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     Real64 SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.49605, 0.0001);
     EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
@@ -771,7 +771,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     // add latent degradation model
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 1000.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
-    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 1.0, 0.0001);                                                           // more sensible capacity so PLR should be lower
     EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
@@ -787,7 +787,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 0.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 0.0;
 
-    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.7624, 0.0001);
     EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed
@@ -796,7 +796,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     // add latent degradation model
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 1000.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
-    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 1.0, 0.0001);                                                           // more sensible capacity so PLR should be lower
     EXPECT_EQ(1, state->dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport);             // latent degradation only works at low speed

@@ -99,15 +99,9 @@ namespace HeatPumpWaterToWaterHEATING {
         bool IsOn;
         bool MustRun;
         // loop topology variables
-        int SourceLoopNum;     // source side plant loop index number
-        int SourceLoopSideNum; // source side plant loop side index
-        int SourceBranchNum;   // source side plant loop branch index
-        int SourceCompNum;     // source side plant loop component index
-        int LoadLoopNum;       // load side plant loop index number
-        int LoadLoopSideNum;   // load side plant loop side index
-        int LoadBranchNum;     // load side plant loop branch index
-        int LoadCompNum;       // load side plant loop component index
-        int CondMassFlowIndex; // index for criteria in PullCompInterconnectTrigger
+        PlantLocation SourcePlantLoc; // source side plant loop component location
+        PlantLocation LoadPlantLoc;   // load side plant loop component location
+        int CondMassFlowIndex;        // index for criteria in PullCompInterconnectTrigger
 
         // Members
         Real64 Power;                       // Power Consumption Watts
@@ -132,11 +126,10 @@ namespace HeatPumpWaterToWaterHEATING {
               MaxPartLoadRat(0.0), OptPartLoadRat(0.0), LoadSideVolFlowRate(0.0), LoadSideDesignMassFlow(0.0), SourceSideVolFlowRate(0.0),
               SourceSideDesignMassFlow(0.0), SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0),
               SourceSideUACoeff(0.0), LoadSideUACoeff(0.0), CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0),
-              PowerLosses(0.0), LossFactor(0.0), HighPressCutoff(0.0), LowPressCutoff(0.0), IsOn(false), MustRun(false), SourceLoopNum(0),
-              SourceLoopSideNum(0), SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0), LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0),
-              CondMassFlowIndex(0), Power(0.0), Energy(0.0), QLoad(0.0), QLoadEnergy(0.0), QSource(0.0), QSourceEnergy(0.0),
-              LoadSideWaterInletTemp(0.0), SourceSideWaterInletTemp(0.0), LoadSideWaterOutletTemp(0.0), SourceSideWaterOutletTemp(0.0),
-              LoadSideWaterMassFlowRate(0.0), SourceSideWaterMassFlowRate(0.0), Running(0), plantScanFlag(true), beginEnvironFlag(true)
+              PowerLosses(0.0), LossFactor(0.0), HighPressCutoff(0.0), LowPressCutoff(0.0), IsOn(false), MustRun(false), CondMassFlowIndex(0),
+              Power(0.0), Energy(0.0), QLoad(0.0), QLoadEnergy(0.0), QSource(0.0), QSourceEnergy(0.0), LoadSideWaterInletTemp(0.0),
+              SourceSideWaterInletTemp(0.0), LoadSideWaterOutletTemp(0.0), SourceSideWaterOutletTemp(0.0), LoadSideWaterMassFlowRate(0.0),
+              SourceSideWaterMassFlowRate(0.0), Running(0), plantScanFlag(true), beginEnvironFlag(true)
         {
         }
 

@@ -591,9 +591,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerScheduled,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -609,9 +609,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(4))//'="'//TRIM(cAlphaArgs(4))//'".')
             ErrorsFound = true;
         }
 
@@ -695,9 +692,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerScheduledDualSetpoint,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -714,9 +711,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->DualSchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else { // check getnodenums/nodelist
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(5))//'="'//TRIM(cAlphaArgs(5))//'".')
             ErrorsFound = true;
         }
 
@@ -819,9 +813,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerOutdoorAirReset,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -836,9 +830,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(3))//'="'//TRIM(cAlphaArgs(3))//'".')
             ErrorsFound = true;
         }
 
@@ -903,24 +894,26 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      cNumericFieldNames(1),
                                      state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
-        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
-                                                                                                   cAlphaArgs(4),
-                                                                                                   ErrorsFound,
-                                                                                                   cCurrentModuleObject,
-                                                                                                   cAlphaArgs(1),
-                                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                                   DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                                   ObjectIsNotParent);
-        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
-                                                                                                        cAlphaArgs(5),
-                                                                                                        ErrorsFound,
-                                                                                                        cCurrentModuleObject,
-                                                                                                        cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                                        DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                                        ObjectIsNotParent);
+        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneReheat,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneReheat,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
                     cAlphaArgs(6),
@@ -928,9 +921,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneReheat,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -945,9 +938,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(6))//'="'//TRIM(cAlphaArgs(6))//'".')
             ErrorsFound = true;
         }
 
@@ -1023,24 +1013,26 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      cNumericFieldNames(1),
                                      state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
-        state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
-                                                                                                   cAlphaArgs(4),
-                                                                                                   ErrorsFound,
-                                                                                                   cCurrentModuleObject,
-                                                                                                   cAlphaArgs(1),
-                                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                                   DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                                   ObjectIsNotParent);
-        state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
-                                                                                                        cAlphaArgs(5),
-                                                                                                        ErrorsFound,
-                                                                                                        cCurrentModuleObject,
-                                                                                                        cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                                        DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                                        ObjectIsNotParent);
+        state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHeating,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHeating,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
                     cAlphaArgs(6),
@@ -1048,9 +1040,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHeating,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1065,9 +1057,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(4))//'="'//TRIM(cAlphaArgs(4))//'".')
             ErrorsFound = true;
         }
 
@@ -1142,24 +1131,26 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      cNumericFieldNames(1),
                                      state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
-        state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
-                                                                                                   cAlphaArgs(4),
-                                                                                                   ErrorsFound,
-                                                                                                   cCurrentModuleObject,
-                                                                                                   cAlphaArgs(1),
-                                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                                   DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                                   ObjectIsNotParent);
-        state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
-                                                                                                        cAlphaArgs(5),
-                                                                                                        ErrorsFound,
-                                                                                                        cCurrentModuleObject,
-                                                                                                        cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                                        DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                                        ObjectIsNotParent);
+        state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneCooling,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneCooling,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
                     cAlphaArgs(6),
@@ -1167,9 +1158,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneCooling,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1184,9 +1175,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(6))//'="'//TRIM(cAlphaArgs(6))//'".')
             ErrorsFound = true;
         }
 
@@ -1248,9 +1236,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHumidityMinimum,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1265,9 +1253,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(4))//'="'//TRIM(cAlphaArgs(4))//'".')
             ErrorsFound = true;
         }
 
@@ -1278,17 +1263,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHumidityMinimum,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::Sensor,
+                    DataLoopNode::ConnectionType::Sensor,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
                     cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
         if (ErrInList) {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(5))//'="'//TRIM(cAlphaArgs(5))//'".')
             ErrorsFound = true;
         }
         NumZones = NumNodes;
@@ -1358,9 +1340,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHumidityMaximum,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1375,9 +1357,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(4))//'="'//TRIM(cAlphaArgs(4))//'".')
             ErrorsFound = true;
         }
 
@@ -1388,17 +1367,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHumidityMaximum,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::Sensor,
+                    DataLoopNode::ConnectionType::Sensor,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
                     cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
         if (ErrInList) {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(5))//'="'//TRIM(cAlphaArgs(5))//'".')
             ErrorsFound = true;
         }
         NumZones = NumNodes;
@@ -1470,33 +1446,36 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ShowContinueError(state, "..Valid value is \"Temperature\".");
             ErrorsFound = true;
         }
-        state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(state,
-                                                                                             cAlphaArgs(3),
-                                                                                             ErrorsFound,
-                                                                                             cCurrentModuleObject,
-                                                                                             cAlphaArgs(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Sensor,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsNotParent);
-        state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode = GetOnlySingleNode(state,
-                                                                                               cAlphaArgs(4),
-                                                                                               ErrorsFound,
-                                                                                               cCurrentModuleObject,
-                                                                                               cAlphaArgs(1),
-                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType::Sensor,
-                                                                                               NodeInputManager::CompFluidStream::Primary,
-                                                                                               ObjectIsNotParent);
-        state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode = GetOnlySingleNode(state,
-                                                                                                cAlphaArgs(5),
-                                                                                                ErrorsFound,
-                                                                                                cCurrentModuleObject,
-                                                                                                cAlphaArgs(1),
-                                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                                DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                NodeInputManager::CompFluidStream::Primary,
-                                                                                                ObjectIsNotParent);
+        state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerMixedAir,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerMixedAir,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerMixedAir,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
                     cAlphaArgs(6),
@@ -1504,9 +1483,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerMixedAir,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1521,9 +1500,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(6))//'="'//TRIM(cAlphaArgs(6))//'".')
             ErrorsFound = true;
         }
 
@@ -1549,24 +1525,26 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                          state.dataSetPointManager->NumSZMinHumSetPtMgrs + state.dataSetPointManager->NumSZMaxHumSetPtMgrs;
 
         if (NumAlphas > 7) {
-            state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilInNode = GetOnlySingleNode(state,
-                                                                                                        cAlphaArgs(7),
-                                                                                                        ErrorsFound,
-                                                                                                        cCurrentModuleObject,
-                                                                                                        cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                                        DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                                        ObjectIsNotParent);
-            state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilOutNode = GetOnlySingleNode(state,
-                                                                                                         cAlphaArgs(8),
-                                                                                                         ErrorsFound,
-                                                                                                         cCurrentModuleObject,
-                                                                                                         cAlphaArgs(1),
-                                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                         NodeInputManager::CompFluidStream::Primary,
-                                                                                                         ObjectIsNotParent);
+            state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilInNode =
+                GetOnlySingleNode(state,
+                                  cAlphaArgs(7),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::SetpointManagerMixedAir,
+                                  cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Sensor,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilOutNode =
+                GetOnlySingleNode(state,
+                                  cAlphaArgs(8),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::SetpointManagerMixedAir,
+                                  cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Sensor,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
             if (NumNums == 1) {
                 state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).MinCoolCoilOutTemp = rNumericArgs(1);
             }
@@ -1667,42 +1645,46 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat = 0.00001;
         }
 
-        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(state,
-                                                                                               cAlphaArgs(3),
-                                                                                               ErrorsFound,
-                                                                                               cCurrentModuleObject,
-                                                                                               cAlphaArgs(1),
-                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType::Sensor,
-                                                                                               NodeInputManager::CompFluidStream::Primary,
-                                                                                               ObjectIsNotParent);
-        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode = GetOnlySingleNode(state,
-                                                                                                    cAlphaArgs(4),
-                                                                                                    ErrorsFound,
-                                                                                                    cCurrentModuleObject,
-                                                                                                    cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                                    DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                                    ObjectIsNotParent);
-        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode = GetOnlySingleNode(state,
-                                                                                                cAlphaArgs(5),
-                                                                                                ErrorsFound,
-                                                                                                cCurrentModuleObject,
-                                                                                                cAlphaArgs(1),
-                                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                                DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                NodeInputManager::CompFluidStream::Primary,
-                                                                                                ObjectIsNotParent);
-        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode = GetOnlySingleNode(state,
-                                                                                                    cAlphaArgs(6),
-                                                                                                    ErrorsFound,
-                                                                                                    cCurrentModuleObject,
-                                                                                                    cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                                    DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                                    ObjectIsNotParent);
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerOutdoorAirPretreat,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerOutdoorAirPretreat,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerOutdoorAirPretreat,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(6),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerOutdoorAirPretreat,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
                     cAlphaArgs(7),
@@ -1710,9 +1692,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerOutdoorAirPretreat,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1727,9 +1709,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(7))//'="'//TRIM(cAlphaArgs(7))//'".')
             ErrorsFound = true;
         }
 
@@ -1832,9 +1811,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerWarmest,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1849,9 +1828,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(5))//'="'//TRIM(cAlphaArgs(5))//'".')
             ErrorsFound = true;
         }
 
@@ -1938,9 +1914,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerColdest,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -1955,9 +1931,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(5))//'="'//TRIM(cAlphaArgs(5))//'".')
             ErrorsFound = true;
         }
 
@@ -2056,9 +2029,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerWarmestTemperatureFlow,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2073,9 +2046,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(5))//'="'//TRIM(cAlphaArgs(5))//'".')
             ErrorsFound = true;
         }
 
@@ -2219,9 +2189,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneCoolingAverage,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2236,9 +2206,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(3))//'="'//TRIM(cAlphaArgs(3))//'".')
             ErrorsFound = true;
         }
 
@@ -2311,9 +2278,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneHeatingAverage,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2328,9 +2295,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(3))//'="'//TRIM(cAlphaArgs(3))//'".')
             ErrorsFound = true;
         }
 
@@ -2404,9 +2368,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneMinimumHumidityAverage,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2421,9 +2385,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(3))//'="'//TRIM(cAlphaArgs(3))//'".')
             ErrorsFound = true;
         }
 
@@ -2497,9 +2458,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneMaximumHumidityAverage,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2514,9 +2475,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(3))//'="'//TRIM(cAlphaArgs(3))//'".')
             ErrorsFound = true;
         }
 
@@ -2590,9 +2548,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneHumidityMinimum,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2607,9 +2565,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(3))//'="'//TRIM(cAlphaArgs(3))//'".')
             ErrorsFound = true;
         }
 
@@ -2680,9 +2635,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneHumidityMaximum,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2697,9 +2652,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(3))//'="'//TRIM(cAlphaArgs(3))//'".')
             ErrorsFound = true;
         }
 
@@ -2794,9 +2746,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerFollowOutdoorAirTemperature,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2811,9 +2763,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(4))//'="'//TRIM(cAlphaArgs(4))//'".')
             ErrorsFound = true;
         }
 
@@ -2878,15 +2827,16 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ShowContinueError(state, R"(..Valid values are "Temperature","MaximumTemperature" or "MinimumTemperature".)");
             ErrorsFound = true;
         }
-        state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum = GetOnlySingleNode(state,
-                                                                                                         cAlphaArgs(3),
-                                                                                                         ErrorsFound,
-                                                                                                         cCurrentModuleObject,
-                                                                                                         cAlphaArgs(1),
-                                                                                                         DataLoopNode::NodeFluidType::Blank,
-                                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                         NodeInputManager::CompFluidStream::Primary,
-                                                                                                         ObjectIsNotParent);
+        state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerFollowSystemNodeTemperature,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Blank,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(4);
         if (UtilityRoutines::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeWetBulb")) {
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::WetBulb;
@@ -2920,9 +2870,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerFollowSystemNodeTemperature,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -2937,9 +2887,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(4))//'="'//TRIM(cAlphaArgs(4))//'".')
             ErrorsFound = true;
         }
 
@@ -3087,9 +3034,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerFollowGroundTemperature,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -3104,9 +3051,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowSevereError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
-            //       '", invalid field.')
-            //    Call ShowContinueError(state, '..invalid '//TRIM(cAlphaFieldNames(4))//'="'//TRIM(cAlphaArgs(4))//'".')
             ErrorsFound = true;
         }
 
@@ -3210,9 +3154,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerCondenserEnteringReset,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -3227,8 +3171,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowContinueError(state, 'Invalid '//TRIM(cAlphaFieldNames(3))//' in '//TRIM(cCurrentModuleObject)//' = '// &
-            //                           TRIM(CondEntSetPtMgr(SetPtMgrNum)%Name))
             ErrorsFound = true;
         }
 
@@ -3299,9 +3241,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerCondenserEnteringResetIdeal,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -3316,8 +3258,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
-            //    CALL ShowContinueError(state, 'Invalid '//TRIM(cAlphaFieldNames(3))//' in '//TRIM(cCurrentModuleObject)//' = '// &
-            //                           TRIM(IdealCondEntSetPtMgr(SetPtMgrNum)%Name))
             ErrorsFound = true;
         }
 
@@ -3411,9 +3351,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneOneStageCooling,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -3522,9 +3462,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    cCurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneOneStageHeating,
                     cAlphaArgs(1),
-                    DataLoopNode::NodeConnectionType::SetPoint,
+                    DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -3598,10 +3538,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             GetOnlySingleNode(state,
                               cAlphaArgs(2),
                               errFlag,
-                              cCurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerReturnTemperatureChilledWater,
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::Blank,
-                              DataLoopNode::NodeConnectionType::SetPoint,
+                              DataLoopNode::ConnectionType::SetPoint,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(2)); // setpoint nodes
@@ -3609,10 +3549,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             GetOnlySingleNode(state,
                               cAlphaArgs(3),
                               errFlag,
-                              cCurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerReturnTemperatureChilledWater,
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::Blank,
-                              DataLoopNode::NodeConnectionType::Sensor,
+                              DataLoopNode::ConnectionType::Sensor,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(3)); // setpoint nodes
@@ -3695,10 +3635,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             GetOnlySingleNode(state,
                               cAlphaArgs(2),
                               errFlag,
-                              cCurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerReturnTemperatureHotWater,
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::Blank,
-                              DataLoopNode::NodeConnectionType::SetPoint,
+                              DataLoopNode::ConnectionType::SetPoint,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(2)); // setpoint nodes
@@ -3706,10 +3646,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             GetOnlySingleNode(state,
                               cAlphaArgs(3),
                               errFlag,
-                              cCurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerReturnTemperatureHotWater,
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::Blank,
-                              DataLoopNode::NodeConnectionType::Sensor,
+                              DataLoopNode::ConnectionType::Sensor,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(3)); // setpoint nodes
@@ -4757,33 +4697,39 @@ void InitSetPointManagers(EnergyPlusData &state)
                     for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                         if (state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum ==
                             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex)) {
-                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).TotalBranches;
+                                 ++BranchNum) {
                                 for (CompNum = 1;
-                                     CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
+                                     CompNum <=
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).TotalComponents;
                                      ++CompNum) {
                                     // Check if cooling tower is single speed and generate and error
                                     state.dataSetPointManager->InitType =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Type;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).Comp(CompNum).Type;
                                     if (state.dataSetPointManager->InitType == PlantEquipmentType::CoolingTower_SingleSpd) {
                                         ShowSevereError(state,
                                                         cSetPointManagerType + "=\"" + state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).Name +
                                                             "\", invalid tower found");
-                                        ShowContinueError(
-                                            state,
-                                            "Found SingleSpeed Cooling Tower, Cooling Tower=" +
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Name);
+                                        ShowContinueError(state,
+                                                          "Found SingleSpeed Cooling Tower, Cooling Tower=" + state.dataPlnt->PlantLoop(LoopNum)
+                                                                                                                  .LoopSide(LoopSideLocation::Supply)
+                                                                                                                  .Branch(BranchNum)
+                                                                                                                  .Comp(CompNum)
+                                                                                                                  .Name);
                                         ShowContinueError(state, "SingleSpeed cooling towers cannot be used with this setpoint manager.");
                                         ErrorsFound = true;
                                     }
                                 }
                             }
                             // Scan all attached chillers in the condenser loop index found to find the chiller index
-                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
+                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).TotalBranches;
+                                 ++BranchNum) {
                                 for (CompNum = 1;
-                                     CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
+                                     CompNum <=
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).Branch(BranchNum).TotalComponents;
                                      ++CompNum) {
                                     state.dataSetPointManager->InitType =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).Branch(BranchNum).Comp(CompNum).Type;
                                     switch (state.dataSetPointManager->InitType) {
 
                                     case PlantEquipmentType::Chiller_Absorption:
@@ -4796,20 +4742,24 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     case PlantEquipmentType::Chiller_ElectricReformEIR:
                                     case PlantEquipmentType::Chiller_EngineDriven: {
                                         // Scan the supply side to find the chiller index and branch index on plantloop
-                                        state.dataSetPointManager->ChillerType =
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
+                                        state.dataSetPointManager->ChillerType = state.dataPlnt->PlantLoop(LoopNum)
+                                                                                     .LoopSide(LoopSideLocation::Demand)
+                                                                                     .Branch(BranchNum)
+                                                                                     .Comp(CompNum)
+                                                                                     .Type;
                                         for (LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops;
                                              ++LoopNum2) {
                                             for (BranchNumPlantSide = 1;
-                                                 BranchNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
+                                                 BranchNumPlantSide <=
+                                                 state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideLocation::Supply).TotalBranches;
                                                  ++BranchNumPlantSide) {
                                                 for (CompNumPlantSide = 1; CompNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2)
-                                                                                                   .LoopSide(SupplySide)
+                                                                                                   .LoopSide(LoopSideLocation::Supply)
                                                                                                    .Branch(BranchNumPlantSide)
                                                                                                    .TotalComponents;
                                                      ++CompNumPlantSide) {
                                                     if (state.dataPlnt->PlantLoop(LoopNum2)
-                                                            .LoopSide(SupplySide)
+                                                            .LoopSide(LoopSideLocation::Supply)
                                                             .Branch(BranchNumPlantSide)
                                                             .Comp(CompNumPlantSide)
                                                             .Type == state.dataSetPointManager->ChillerType) {
@@ -4849,22 +4799,26 @@ void InitSetPointManagers(EnergyPlusData &state)
                          ++CtrlNodeIndex) {
                         if (state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum ==
                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex)) {
-                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).TotalBranches;
+                                 ++BranchNum) {
                                 for (CompNum = 1;
-                                     CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
+                                     CompNum <=
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).TotalComponents;
                                      ++CompNum) {
                                     // Check if cooling tower is single speed and generate and error
                                     state.dataSetPointManager->InitType =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Type;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).Comp(CompNum).Type;
                                     if (state.dataSetPointManager->InitType == PlantEquipmentType::CoolingTower_SingleSpd) {
                                         ShowSevereError(state,
                                                         cSetPointManagerType + "=\"" +
                                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name +
                                                             "\", invalid cooling tower found");
-                                        ShowContinueError(
-                                            state,
-                                            "Found Single Speed Cooling Tower, Cooling Tower=" +
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Name);
+                                        ShowContinueError(state,
+                                                          "Found Single Speed Cooling Tower, Cooling Tower=" + state.dataPlnt->PlantLoop(LoopNum)
+                                                                                                                   .LoopSide(LoopSideLocation::Supply)
+                                                                                                                   .Branch(BranchNum)
+                                                                                                                   .Comp(CompNum)
+                                                                                                                   .Name);
                                         ShowContinueError(state, "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop");
                                         ErrorsFound = true;
                                     } else if (state.dataSetPointManager->InitType == PlantEquipmentType::CoolingTower_TwoSpd ||
@@ -4882,12 +4836,14 @@ void InitSetPointManagers(EnergyPlusData &state)
                                 }
                             }
                             // Scan all attached chillers in the condenser loop index found to find the chiller index
-                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
+                            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).TotalBranches;
+                                 ++BranchNum) {
                                 for (CompNum = 1;
-                                     CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
+                                     CompNum <=
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).Branch(BranchNum).TotalComponents;
                                      ++CompNum) {
                                     state.dataSetPointManager->InitType =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).Branch(BranchNum).Comp(CompNum).Type;
 
                                     switch (state.dataSetPointManager->InitType) {
 
@@ -4901,20 +4857,24 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     case PlantEquipmentType::Chiller_ElectricReformEIR:
                                     case PlantEquipmentType::Chiller_EngineDriven: {
                                         // Scan the supply side to find the chiller index and branch index on plantloop
-                                        state.dataSetPointManager->ChillerType =
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
+                                        state.dataSetPointManager->ChillerType = state.dataPlnt->PlantLoop(LoopNum)
+                                                                                     .LoopSide(LoopSideLocation::Demand)
+                                                                                     .Branch(BranchNum)
+                                                                                     .Comp(CompNum)
+                                                                                     .Type;
                                         for (LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops;
                                              ++LoopNum2) {
                                             for (BranchNumPlantSide = 1;
-                                                 BranchNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
+                                                 BranchNumPlantSide <=
+                                                 state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideLocation::Supply).TotalBranches;
                                                  ++BranchNumPlantSide) {
                                                 for (CompNumPlantSide = 1; CompNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2)
-                                                                                                   .LoopSide(SupplySide)
+                                                                                                   .LoopSide(LoopSideLocation::Supply)
                                                                                                    .Branch(BranchNumPlantSide)
                                                                                                    .TotalComponents;
                                                      ++CompNumPlantSide) {
                                                     state.dataSetPointManager->InitType = state.dataPlnt->PlantLoop(LoopNum2)
-                                                                                              .LoopSide(SupplySide)
+                                                                                              .LoopSide(LoopSideLocation::Supply)
                                                                                               .Branch(BranchNumPlantSide)
                                                                                               .Comp(CompNumPlantSide)
                                                                                               .Type;
@@ -4927,15 +4887,16 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                             BranchNumPlantSide;
                                                         // Scan the pump on the chilled water loop
                                                         for (BranchNum2 = 1;
-                                                             BranchNum2 <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
+                                                             BranchNum2 <=
+                                                             state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideLocation::Supply).TotalBranches;
                                                              ++BranchNum2) {
                                                             for (CompNum2 = 1; CompNum2 <= state.dataPlnt->PlantLoop(LoopNum2)
-                                                                                               .LoopSide(SupplySide)
+                                                                                               .LoopSide(LoopSideLocation::Supply)
                                                                                                .Branch(BranchNum2)
                                                                                                .TotalComponents;
                                                                  ++CompNum2) {
                                                                 state.dataSetPointManager->InitType = state.dataPlnt->PlantLoop(LoopNum2)
-                                                                                                          .LoopSide(SupplySide)
+                                                                                                          .LoopSide(LoopSideLocation::Supply)
                                                                                                           .Branch(BranchNum2)
                                                                                                           .Comp(CompNum2)
                                                                                                           .Type;
@@ -4958,10 +4919,12 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                                 state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name +
                                                                 "\", too many chillers found");
                                             ShowContinueError(state, "only one chiller can be used with this setpoint manager on each loop");
-                                            ShowContinueError(
-                                                state,
-                                                "Found more than one chiller, chiller =" +
-                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Name);
+                                            ShowContinueError(state,
+                                                              "Found more than one chiller, chiller =" + state.dataPlnt->PlantLoop(LoopNum)
+                                                                                                             .LoopSide(LoopSideLocation::Demand)
+                                                                                                             .Branch(BranchNum)
+                                                                                                             .Comp(CompNum)
+                                                                                                             .Name);
                                             ErrorsFound = true;
                                         }
                                         state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Type = state.dataSetPointManager->ChillerType;
@@ -4998,36 +4961,45 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                 // Initialize scheduled setpoints
-                {
-                    auto const SELECT_CASE_var(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode);
-                    if (SELECT_CASE_var == CtrlVarType::Temp) {
-                        state.dataLoopNodes->Node(NodeNum).TempSetPoint =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxTemp) {
-                        state.dataLoopNodes->Node(NodeNum).TempSetPointHi =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinTemp) {
-                        state.dataLoopNodes->Node(NodeNum).TempSetPointLo =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::HumRat) {
-                        state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) {
-                        state.dataLoopNodes->Node(NodeNum).HumRatMax =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) {
-                        state.dataLoopNodes->Node(NodeNum).HumRatMin =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MassFlow) {
-                        state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxMassFlow) {
-                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMax =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinMassFlow) {
-                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMin =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    }
+                switch (state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+                case CtrlVarType::Temp: {
+                    state.dataLoopNodes->Node(NodeNum).TempSetPoint =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MaxTemp: {
+                    state.dataLoopNodes->Node(NodeNum).TempSetPointHi =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MinTemp: {
+                    state.dataLoopNodes->Node(NodeNum).TempSetPointLo =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::HumRat: {
+                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MaxHumRat: {
+                    state.dataLoopNodes->Node(NodeNum).HumRatMax =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MinHumRat: {
+                    state.dataLoopNodes->Node(NodeNum).HumRatMin =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MassFlow: {
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MaxMassFlow: {
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMax =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MinMassFlow: {
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMin =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                default:
+                    break;
                 }
             }
         }
@@ -6338,32 +6310,36 @@ void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
     ReturnInNode = this->ReturnInNode;
     HumiditySetPoint = false;
 
-    {
-        auto const SELECT_CASE_var(this->CtrlTypeMode);
-        if (SELECT_CASE_var == CtrlVarType::Temp) { // 'Temperature'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).TempSetPoint;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).Temp;
-            MinSetPoint = this->MinSetTemp;
-            MaxSetPoint = this->MaxSetTemp;
-        } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) { // 'HUMRATMAX'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMax;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
-            MinSetPoint = this->MinSetHumRat;
-            MaxSetPoint = this->MaxSetHumRat;
-            HumiditySetPoint = true;
-        } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) { // 'HUMRATMIN'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMin;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
-            MinSetPoint = this->MinSetHumRat;
-            MaxSetPoint = this->MaxSetHumRat;
-            HumiditySetPoint = true;
-        } else if (SELECT_CASE_var == CtrlVarType::HumRat) { // 'HumidityRatio'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatSetPoint;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
-            MinSetPoint = this->MinSetHumRat;
-            MaxSetPoint = this->MaxSetHumRat;
-            HumiditySetPoint = true;
-        }
+    switch (this->CtrlTypeMode) {
+    case CtrlVarType::Temp: { // 'Temperature'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).TempSetPoint;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).Temp;
+        MinSetPoint = this->MinSetTemp;
+        MaxSetPoint = this->MaxSetTemp;
+    } break;
+    case CtrlVarType::MaxHumRat: { // 'HUMRATMAX'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMax;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
+        MinSetPoint = this->MinSetHumRat;
+        MaxSetPoint = this->MaxSetHumRat;
+        HumiditySetPoint = true;
+    } break;
+    case CtrlVarType::MinHumRat: { // 'HUMRATMIN'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMin;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
+        MinSetPoint = this->MinSetHumRat;
+        MaxSetPoint = this->MaxSetHumRat;
+        HumiditySetPoint = true;
+    } break;
+    case CtrlVarType::HumRat: { // 'HumidityRatio'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatSetPoint;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
+        MinSetPoint = this->MinSetHumRat;
+        MaxSetPoint = this->MaxSetHumRat;
+        HumiditySetPoint = true;
+    } break;
+    default:
+        break;
     }
 
     if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
@@ -6376,19 +6352,21 @@ void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
                 ShowFatalError(state, "Missing reference setpoint.");
             } else {
                 bool LocalSetPointCheckFailed = false;
-                {
-                    auto const SELECT_CASE_var(this->CtrlTypeMode);
-                    if (SELECT_CASE_var == CtrlVarType::Temp) { // 'Temperature'
-                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::TemperatureSetPoint, LocalSetPointCheckFailed);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) { // 'HUMRATMAX'
-                        CheckIfNodeSetPointManagedByEMS(
-                            state, RefNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) { // 'HUMRATMIN'
-                        CheckIfNodeSetPointManagedByEMS(
-                            state, RefNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, LocalSetPointCheckFailed);
-                    } else if (SELECT_CASE_var == CtrlVarType::HumRat) { // 'HumidityRatio'
-                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioSetPoint, LocalSetPointCheckFailed);
-                    }
+                switch (this->CtrlTypeMode) {
+                case CtrlVarType::Temp: { // 'Temperature'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::TemperatureSetPoint, LocalSetPointCheckFailed);
+                } break;
+                case CtrlVarType::MaxHumRat: { // 'HUMRATMAX'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
+                } break;
+                case CtrlVarType::MinHumRat: { // 'HUMRATMIN'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, LocalSetPointCheckFailed);
+                } break;
+                case CtrlVarType::HumRat: { // 'HumidityRatio'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioSetPoint, LocalSetPointCheckFailed);
+                } break;
+                default:
+                    break;
                 }
                 if (LocalSetPointCheckFailed) {
                     ShowSevereError(state,
@@ -7228,13 +7206,15 @@ void DefineFollowOATempSetPointManager::calculate(EnergyPlusData &state)
     MaxSetPoint = this->MaxSetTemp;
     MinSetPoint = this->MinSetTemp;
 
-    {
-        auto const SELECT_CASE_var(this->RefTypeMode);
-        if (SELECT_CASE_var == ReferenceTempType::WetBulb) {
-            this->SetPt = state.dataEnvrn->OutWetBulbTemp + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceTempType::DryBulb) {
-            this->SetPt = state.dataEnvrn->OutDryBulbTemp + this->Offset;
-        }
+    switch (this->RefTypeMode) {
+    case ReferenceTempType::WetBulb: {
+        this->SetPt = state.dataEnvrn->OutWetBulbTemp + this->Offset;
+    } break;
+    case ReferenceTempType::DryBulb: {
+        this->SetPt = state.dataEnvrn->OutDryBulbTemp + this->Offset;
+    } break;
+    default:
+        break;
     }
 
     // Apply maximum and minimum values
@@ -7295,15 +7275,17 @@ void DefineFollowSysNodeTempSetPointManager::calculate(EnergyPlusData &state)
 
     RefNode = this->RefNodeNum;
 
-    {
-        auto const SELECT_CASE_var(this->RefTypeMode);
-        if (SELECT_CASE_var == ReferenceTempType::WetBulb) {
-            if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
-                RefNodeTemp = state.dataLoopNodes->MoreNodeInfo(RefNode).WetBulbTemp;
-            }
-        } else if (SELECT_CASE_var == ReferenceTempType::DryBulb) {
-            RefNodeTemp = state.dataLoopNodes->Node(RefNode).Temp;
+    switch (this->RefTypeMode) {
+    case ReferenceTempType::WetBulb: {
+        if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
+            RefNodeTemp = state.dataLoopNodes->MoreNodeInfo(RefNode).WetBulbTemp;
         }
+    } break;
+    case ReferenceTempType::DryBulb: {
+        RefNodeTemp = state.dataLoopNodes->Node(RefNode).Temp;
+    } break;
+    default:
+        break;
     }
 
     this->SetPt = RefNodeTemp + this->Offset;
@@ -7338,17 +7320,21 @@ void DefineGroundTempSetPointManager::calculate(EnergyPlusData &state)
     MaxSetPoint = this->MaxSetTemp;
     MinSetPoint = this->MinSetTemp;
 
-    {
-        auto const SELECT_CASE_var(this->RefTypeMode);
-        if (SELECT_CASE_var == ReferenceGroundTempObjectType::BuildingSurface) {
-            this->SetPt = state.dataEnvrn->GroundTemp + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Shallow) {
-            this->SetPt = state.dataEnvrn->GroundTemp_Surface + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Deep) {
-            this->SetPt = state.dataEnvrn->GroundTemp_Deep + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::FCFactorMethod) {
-            this->SetPt = state.dataEnvrn->GroundTempFC + this->Offset;
-        }
+    switch (this->RefTypeMode) {
+    case ReferenceGroundTempObjectType::BuildingSurface: {
+        this->SetPt = state.dataEnvrn->GroundTemp + this->Offset;
+    } break;
+    case ReferenceGroundTempObjectType::Shallow: {
+        this->SetPt = state.dataEnvrn->GroundTemp_Surface + this->Offset;
+    } break;
+    case ReferenceGroundTempObjectType::Deep: {
+        this->SetPt = state.dataEnvrn->GroundTemp_Deep + this->Offset;
+    } break;
+    case ReferenceGroundTempObjectType::FCFactorMethod: {
+        this->SetPt = state.dataEnvrn->GroundTempFC + this->Offset;
+    } break;
+    default:
+        break;
     }
 
     // Apply maximum and minimum values
@@ -7447,42 +7433,48 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     BranchIndexDemandSide = this->BranchIndexDemandSide;
 
     // If chiller is on
-    CurLoad =
-        std::abs(state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MyLoad);
+    CurLoad = std::abs(state.dataPlnt->PlantLoop(LoopIndexPlantSide)
+                           .LoopSide(LoopSideLocation::Supply)
+                           .Branch(BranchIndexPlantSide)
+                           .Comp(ChillerIndexPlantSide)
+                           .MyLoad);
     if (CurLoad > 0) {
         if (Type == PlantEquipmentType::Chiller_Absorption || Type == PlantEquipmentType::Chiller_CombTurbine ||
             Type == PlantEquipmentType::Chiller_Electric || Type == PlantEquipmentType::Chiller_ElectricReformEIR ||
             Type == PlantEquipmentType::Chiller_EngineDriven) {
             TempDesCondIn = state.dataPlnt->PlantLoop(LoopIndexPlantSide)
-                                .LoopSide(SupplySide)
+                                .LoopSide(LoopSideLocation::Supply)
                                 .Branch(BranchIndexPlantSide)
                                 .Comp(ChillerIndexPlantSide)
                                 .TempDesCondIn;
             state.dataSetPointManager->DCESPMCondInletTemp = state.dataLoopNodes
                                                                  ->Node(state.dataPlnt->PlantLoop(LoopIndexDemandSide)
-                                                                            .LoopSide(DemandSide)
+                                                                            .LoopSide(LoopSideLocation::Demand)
                                                                             .Branch(BranchIndexDemandSide)
                                                                             .Comp(ChillerIndexDemandSide)
                                                                             .NodeNumIn)
                                                                  .Temp;
             state.dataSetPointManager->DCESPMEvapOutletTemp = state.dataLoopNodes
                                                                   ->Node(state.dataPlnt->PlantLoop(LoopIndexPlantSide)
-                                                                             .LoopSide(SupplySide)
+                                                                             .LoopSide(LoopSideLocation::Supply)
                                                                              .Branch(BranchIndexPlantSide)
                                                                              .Comp(ChillerIndexPlantSide)
                                                                              .NodeNumOut)
                                                                   .Temp;
             TempEvapOutDesign = state.dataPlnt->PlantLoop(LoopIndexPlantSide)
-                                    .LoopSide(SupplySide)
+                                    .LoopSide(LoopSideLocation::Supply)
                                     .Branch(BranchIndexPlantSide)
                                     .Comp(ChillerIndexPlantSide)
                                     .TempDesEvapOut;
-            state.dataSetPointManager->DCESPMDesignClgCapacity_Watts =
-                state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MaxLoad;
+            state.dataSetPointManager->DCESPMDesignClgCapacity_Watts = state.dataPlnt->PlantLoop(LoopIndexPlantSide)
+                                                                           .LoopSide(LoopSideLocation::Supply)
+                                                                           .Branch(BranchIndexPlantSide)
+                                                                           .Comp(ChillerIndexPlantSide)
+                                                                           .MaxLoad;
             state.dataSetPointManager->DCESPMCurrentLoad_Watts = state.dataPlnt->PlantLoop(LoopIndexPlantSide).CoolingDemand;
         } else if (Type == PlantEquipmentType::Chiller_Indirect_Absorption || Type == PlantEquipmentType::Chiller_DFAbsorption) {
             TempDesCondIn = state.dataPlnt->PlantLoop(LoopIndexPlantSide)
-                                .LoopSide(SupplySide)
+                                .LoopSide(LoopSideLocation::Supply)
                                 .Branch(BranchIndexPlantSide)
                                 .Comp(ChillerIndexPlantSide)
                                 .TempDesCondIn;
@@ -7642,7 +7634,7 @@ void DefineIdealCondEntSetPointManager::calculate(EnergyPlusData &state)
 
         // If chiller is on
         CurLoad = std::abs(state.dataPlnt->PlantLoop(this->LoopIndexPlantSide)
-                               .LoopSide(SupplySide)
+                               .LoopSide(LoopSideLocation::Supply)
                                .Branch(this->BranchIndexPlantSide)
                                .Comp(this->ChillerIndexPlantSide)
                                .MyLoad);
@@ -7655,7 +7647,7 @@ void DefineIdealCondEntSetPointManager::calculate(EnergyPlusData &state)
                 this->Type == PlantEquipmentType::Chiller_EngineDriven) {
                 EvapOutletTemp = state.dataLoopNodes
                                      ->Node(state.dataPlnt->PlantLoop(this->LoopIndexPlantSide)
-                                                .LoopSide(SupplySide)
+                                                .LoopSide(LoopSideLocation::Supply)
                                                 .Branch(this->BranchIndexPlantSide)
                                                 .Comp(this->ChillerIndexPlantSide)
                                                 .NodeNumOut)
@@ -7808,7 +7800,7 @@ void DefineReturnWaterChWSetPointManager::calculate(EnergyPlusData &state, DataL
     int fluidIndex = 1;
     if (this->plantLoopIndex == 0) {
         for (int plantIndex = 1; plantIndex <= state.dataPlnt->TotNumLoops; plantIndex++) {
-            if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
+            if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut) {
                 this->plantLoopIndex = plantIndex;
                 this->plantSetpointNodeIndex = state.dataPlnt->PlantLoop(plantIndex).TempSetPointNodeNum;
                 fluidIndex = state.dataPlnt->PlantLoop(plantIndex).FluidIndex;
@@ -7914,7 +7906,7 @@ void DefineReturnWaterHWSetPointManager::calculate(EnergyPlusData &state, DataLo
     int fluidIndex = 1;
     if (this->plantLoopIndex == 0) {
         for (int plantIndex = 1; plantIndex <= state.dataPlnt->TotNumLoops; plantIndex++) {
-            if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
+            if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut) {
                 this->plantLoopIndex = plantIndex;
                 this->plantSetpointNodeIndex = state.dataPlnt->PlantLoop(plantIndex).TempSetPointNodeNum;
                 fluidIndex = state.dataPlnt->PlantLoop(plantIndex).FluidIndex;
@@ -8020,8 +8012,8 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     int CondPumpBranchNum(this->CondPumpBranchNum); // Condenser water pump branch number
     int CondPumpNum(this->CondPumpNum);             // Condenser pump number
 
-    TypeOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).TypeOf;
-    NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).Name;
+    TypeOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChillerBranchNum).Comp(ChillerNum).TypeOf;
+    NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChillerBranchNum).Comp(ChillerNum).Name;
     NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
     VarIndexes.allocate(NumVariables);
     VarTypes.allocate(NumVariables);
@@ -8041,8 +8033,9 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     this->ChllrVarType = VarTypes(1);
     this->ChllrVarIndex = VarIndexes(1);
 
-    TypeOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).TypeOf;
-    NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).Name;
+    TypeOfComp =
+        state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).TypeOf;
+    NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).Name;
     NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
     VarIndexes.allocate(NumVariables);
     VarTypes.allocate(NumVariables);
@@ -8064,8 +8057,16 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     this->ChlPumpVarIndex = VarIndexes(1);
 
     for (int i = 1; i <= this->numTowers; i++) {
-        TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).TypeOf;
-        NameOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).Name;
+        TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum)
+                         .LoopSide(LoopSideLocation::Supply)
+                         .Branch(this->CondTowerBranchNum(i))
+                         .Comp(this->TowerNum(i))
+                         .TypeOf;
+        NameOfComp = state.dataPlnt->PlantLoop(TowerLoopNum)
+                         .LoopSide(LoopSideLocation::Supply)
+                         .Branch(this->CondTowerBranchNum(i))
+                         .Comp(this->TowerNum(i))
+                         .Name;
         NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
@@ -8087,8 +8088,8 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
         this->ClTowerVarIndex.push_back(VarIndexes(1));
     }
 
-    TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).TypeOf;
-    NameOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).Name;
+    TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(CondPumpBranchNum).Comp(CondPumpNum).TypeOf;
+    NameOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(CondPumpBranchNum).Comp(CondPumpNum).Name;
     NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
     VarIndexes.allocate(NumVariables);
     VarTypes.allocate(NumVariables);
@@ -8183,28 +8184,37 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             // setpoints from this setpoint manager
             NodeNum = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-            {
-                auto const SELECT_CASE_var(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode);
+            switch (state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
                 // set the setpoint depending on the type of variable being controlled
-                if (SELECT_CASE_var == CtrlVarType::Temp) {
-                    state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MaxTemp) {
-                    state.dataLoopNodes->Node(NodeNum).TempSetPointHi = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MinTemp) {
-                    state.dataLoopNodes->Node(NodeNum).TempSetPointLo = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::HumRat) {
-                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) {
-                    state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) {
-                    state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MassFlow) {
-                    state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MaxMassFlow) {
-                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MinMassFlow) {
-                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                }
+            case CtrlVarType::Temp: {
+                state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MaxTemp: {
+                state.dataLoopNodes->Node(NodeNum).TempSetPointHi = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MinTemp: {
+                state.dataLoopNodes->Node(NodeNum).TempSetPointLo = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::HumRat: {
+                state.dataLoopNodes->Node(NodeNum).HumRatSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MaxHumRat: {
+                state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MinHumRat: {
+                state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MassFlow: {
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MaxMassFlow: {
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MinMassFlow: {
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            default:
+                break;
             }
 
         } // nodes in list
@@ -8702,21 +8712,23 @@ void UpdateOAPretreatSetPoints(EnergyPlusData &state)
             // setpoints from this setpoint manager
             NodeNum = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-            {
-                auto const SELECT_CASE_var(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode);
-                if (SELECT_CASE_var == CtrlVarType::Temp) { // 'Temperature'
-                    state.dataLoopNodes->Node(NodeNum).TempSetPoint =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) {                   // 'MaximumHumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatMax =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) {                   // 'MinimumHumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatMin =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == CtrlVarType::HumRat) {                      // 'HumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                }
+            switch (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+            case CtrlVarType::Temp: { // 'Temperature'
+                state.dataLoopNodes->Node(NodeNum).TempSetPoint =
+                    state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            case CtrlVarType::MaxHumRat: { // 'MaximumHumidityRatio'
+                state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            case CtrlVarType::MinHumRat: { // 'MinimumHumidityRatio'
+                state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            case CtrlVarType::HumRat: { // 'HumidityRatio'
+                state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
+                    state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            default:
+                break;
             }
         }
     }

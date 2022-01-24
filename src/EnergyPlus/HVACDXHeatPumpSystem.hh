@@ -67,10 +67,6 @@ namespace HVACDXHeatPumpSystem {
     // MODULE PARAMETER DEFINITIONS
     constexpr Real64 MinAirMassFlow(0.001);
 
-    // Compressor operation
-    constexpr int On(1);  // normal compressor operation
-    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
-
     // Types
     struct DXHeatPumpSystemStruct
     {

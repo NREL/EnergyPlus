@@ -303,37 +303,37 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = GetOnlySingleNode(state,
                                                                                            AlphArray(3),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                            AlphArray(1),
                                                                                            DataLoopNode::NodeFluidType::Steam,
-                                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                                            NodeInputManager::CompFluidStream::Secondary,
                                                                                            ObjectIsNotParent);
             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = GetOnlySingleNode(state,
                                                                                             AlphArray(4),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject,
+                                                                                            DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Steam,
-                                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                                             NodeInputManager::CompFluidStream::Secondary,
                                                                                             ObjectIsNotParent);
             state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                          AlphArray(5),
                                                                                          ErrorsFound,
-                                                                                         CurrentModuleObject,
+                                                                                         DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                          AlphArray(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType::Inlet,
+                                                                                         DataLoopNode::ConnectionType::Inlet,
                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                          ObjectIsNotParent);
             state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                           AlphArray(6),
                                                                                           ErrorsFound,
-                                                                                          CurrentModuleObject,
+                                                                                          DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                           AlphArray(1),
                                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                                                          DataLoopNode::ConnectionType::Outlet,
                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
@@ -342,15 +342,16 @@ namespace SteamCoils {
                 // TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
                 if (SELECT_CASE_var == "TEMPERATURESETPOINTCONTROL") {
                     state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = TemperatureSetPointControl;
-                    state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
-                                                                                                     AlphArray(8),
-                                                                                                     ErrorsFound,
-                                                                                                     CurrentModuleObject,
-                                                                                                     AlphArray(1),
-                                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                                     DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                     NodeInputManager::CompFluidStream::Primary,
-                                                                                                     ObjectIsNotParent);
+                    state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum =
+                        GetOnlySingleNode(state,
+                                          AlphArray(8),
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
+                                          AlphArray(1),
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Sensor,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
                     if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
@@ -522,10 +523,7 @@ namespace SteamCoils {
             ScanPlantLoopsForObject(state,
                                     state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                     state.dataSteamCoils->SteamCoil(CoilNum).CoilType,
-                                    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
-                                    state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
-                                    state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
-                                    state.dataSteamCoils->SteamCoil(CoilNum).CompNum,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).plantLoc,
                                     errFlag,
                                     _,
                                     _,
@@ -610,11 +608,7 @@ namespace SteamCoils {
                                0.0,
                                state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate,
                                state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
-                               state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
+                               state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum);
             MyEnvrnFlag(CoilNum) = false;
         } // End If for the Begin Environment initializations
 
@@ -997,7 +991,7 @@ namespace SteamCoils {
                                                                                      coilWasAutosized,
                                                                                      state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                                                                      state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                                                                     state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
+                                                                                     state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum);
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(
             state,
             state.dataSteamCoils->SteamCoil(CoilNum).Name,
@@ -1006,7 +1000,7 @@ namespace SteamCoils {
             coilWasAutosized,
             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-            state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
+            state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum);
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(
             state, state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", TempSteamIn); // coil  report
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(
@@ -1195,10 +1189,7 @@ namespace SteamCoils {
                                          SteamMassFlowRate,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
+                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
 
                     // recalculate if mass flow rate changed in previous call.
                     QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1311,10 +1302,7 @@ namespace SteamCoils {
                                              SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
                         // Inlet equal to outlet when not required to run.
                         TempWaterOut = TempSteamIn;
 
@@ -1349,10 +1337,7 @@ namespace SteamCoils {
                                              SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1385,10 +1370,7 @@ namespace SteamCoils {
                                              SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1452,10 +1434,7 @@ namespace SteamCoils {
                                          SteamMassFlowRate,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
+                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
                     TempAirOut = TempAirIn;
                     TempWaterOut = TempSteamIn;
                     HeatingCoilLoad = 0.0;
