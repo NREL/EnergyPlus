@@ -1041,12 +1041,12 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataLoopNodes->Node(ControlNode).HumRat = 0.008;
 
     // test sensible control
-    int CompOn = 1;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->CurSysNum = 1;
     state->dataSize->UnitarySysEqSizing.allocate(1);
     // run init to size system
     thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0, 0.0);
+    DataHVACGlobals::CompressorOperation CompOn = DataHVACGlobals::CompressorOperation::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
     // system meets temperature set point
     Real64 outTemp1 = state->dataLoopNodes->Node(ControlNode).Temp;
