@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -981,7 +981,6 @@ namespace InternalHeatGains {
                     SetupSpaceInternalGain(state,
                                            state.dataHeatBal->People(peopleNum).spaceIndex,
                                            1.0,
-                                           "People",
                                            state.dataHeatBal->People(peopleNum).Name,
                                            DataHeatBalance::IntGainType::People,
                                            &state.dataHeatBal->People(peopleNum).ConGainRate,
@@ -1317,11 +1316,11 @@ namespace InternalHeatGains {
                             thisLights.ZoneExhaustNodeNum = GetOnlySingleNode(state,
                                                                               AlphaName(8),
                                                                               exhaustNodeError,
-                                                                              lightsModuleObject,
+                                                                              DataLoopNode::ConnectionObjectType::Lights,
                                                                               thisLights.Name,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::ZoneExhaust,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              DataLoopNode::ConnectionType::ZoneExhaust,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
                             if (!exhaustNodeError) { // GetOnlySingleNode will throw error messages if this is a NodeList Name and for other issues
                                 exhaustNodeError =
@@ -1382,7 +1381,6 @@ namespace InternalHeatGains {
                     SetupSpaceInternalGain(state,
                                            state.dataHeatBal->Lights(lightsNum).spaceIndex,
                                            1.0,
-                                           "Lights",
                                            state.dataHeatBal->Lights(lightsNum).Name,
                                            DataHeatBalance::IntGainType::Lights,
                                            &state.dataHeatBal->Lights(lightsNum).ConGainRate,
@@ -1665,7 +1663,6 @@ namespace InternalHeatGains {
                         SetupSpaceInternalGain(state,
                                                thisZoneElectric.spaceIndex,
                                                1.0,
-                                               "ElectricEquipment",
                                                thisZoneElectric.Name,
                                                DataHeatBalance::IntGainType::ElectricEquipment,
                                                &thisZoneElectric.ConGainRate,
@@ -1911,7 +1908,6 @@ namespace InternalHeatGains {
                         SetupSpaceInternalGain(state,
                                                thisZoneGas.spaceIndex,
                                                1.0,
-                                               "GasEquipment",
                                                thisZoneGas.Name,
                                                DataHeatBalance::IntGainType::GasEquipment,
                                                &thisZoneGas.ConGainRate,
@@ -2128,7 +2124,6 @@ namespace InternalHeatGains {
                         SetupSpaceInternalGain(state,
                                                thisZoneHWEq.spaceIndex,
                                                1.0,
-                                               "HotWaterEquipment",
                                                thisZoneHWEq.Name,
                                                DataHeatBalance::IntGainType::HotWaterEquipment,
                                                &thisZoneHWEq.ConGainRate,
@@ -2344,7 +2339,6 @@ namespace InternalHeatGains {
                         SetupSpaceInternalGain(state,
                                                thisZoneStmEq.spaceIndex,
                                                1.0,
-                                               "SteamEquipment",
                                                thisZoneStmEq.Name,
                                                DataHeatBalance::IntGainType::SteamEquipment,
                                                &thisZoneStmEq.ConGainRate,
@@ -2393,7 +2387,7 @@ namespace InternalHeatGains {
 
                     std::string FuelTypeString("");
                     if (AlphaName(2) == "NONE") {
-                        thisZoneOthEq.OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
+                        thisZoneOthEq.OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Invalid;
                         FuelTypeString = AlphaName(2);
                     } else {
                         ExteriorEnergyUse::ValidateFuelType(state,
@@ -2403,7 +2397,7 @@ namespace InternalHeatGains {
                                                             othEqModuleObject,
                                                             state.dataIPShortCut->cAlphaFieldNames(2),
                                                             AlphaName(2));
-                        if (thisZoneOthEq.OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown ||
+                        if (thisZoneOthEq.OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Invalid ||
                             thisZoneOthEq.OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + othEqModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
@@ -2532,7 +2526,7 @@ namespace InternalHeatGains {
                     }
 
                     // Throw an error if the design level is negative and we have a fuel type
-                    if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
+                    if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", " +
                                             state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative");
@@ -2603,7 +2597,6 @@ namespace InternalHeatGains {
                         SetupSpaceInternalGain(state,
                                                thisZoneOthEq.spaceIndex,
                                                1.0,
-                                               "OtherEquipment",
                                                thisZoneOthEq.Name,
                                                DataHeatBalance::IntGainType::OtherEquipment,
                                                &thisZoneOthEq.ConGainRate,
@@ -2935,11 +2928,11 @@ namespace InternalHeatGains {
                             thisZoneITEq.SupplyAirNodeNum = GetOnlySingleNode(state,
                                                                               AlphaName(14),
                                                                               ErrorsFound,
-                                                                              itEqModuleObject,
+                                                                              DataLoopNode::ConnectionObjectType::ElectricEquipmentITEAirCooled,
                                                                               AlphaName(1),
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::Sensor,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              DataLoopNode::ConnectionType::Sensor,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
                         }
 
@@ -3058,7 +3051,6 @@ namespace InternalHeatGains {
                             SetupSpaceInternalGain(state,
                                                    thisZoneITEq.spaceIndex,
                                                    1.0,
-                                                   "ElectricEquipment:ITE:AirCooled",
                                                    thisZoneITEq.Name,
                                                    DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
                                                    &thisZoneITEq.ConGainRateToZone);
@@ -3189,7 +3181,6 @@ namespace InternalHeatGains {
                     SetupSpaceInternalGain(state,
                                            thisZoneBBHeat.spaceIndex,
                                            1.0,
-                                           "ZoneBaseboard:OutdoorTemperatureControlled",
                                            thisZoneBBHeat.Name,
                                            DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
                                            &thisZoneBBHeat.ConGainRate,
@@ -3290,7 +3281,6 @@ namespace InternalHeatGains {
 
             SetupZoneInternalGain(state,
                                   state.dataHeatBal->ZoneCO2Gen(Loop).ZonePtr,
-                                  "ZoneContaminantSourceAndSink:CarbonDioxide",
                                   state.dataHeatBal->ZoneCO2Gen(Loop).Name,
                                   DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
                                   nullptr,
@@ -5820,7 +5810,7 @@ namespace InternalHeatGains {
             // Set flags for zone and space total report variables
             addZoneOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex) = true;
-            if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
+            if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
                 std::string fuelTypeString = state.dataHeatBal->ZoneOtherEq(othEqNum).otherEquipFuelTypeString;
                 SetupOutputVariable(state,
                                     "Other Equipment " + fuelTypeString + " Rate",

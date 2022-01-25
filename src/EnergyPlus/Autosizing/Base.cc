@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -188,7 +188,7 @@ std::string BaseSizer::getLastErrorMessages()
 
 void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 {
-    if (this->sizingType == AutoSizingType::Unknown) {
+    if (this->sizingType == AutoSizingType::Invalid) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
         ShowSevereError(state, msg);
@@ -788,7 +788,7 @@ void BaseSizer::clearState()
     dataAirFlowUsedForSizing = 0.0;
     dataDesInletAirTemp = 0.0;
     dataDesAccountForFanHeat = false;
-    dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
     dataDesicRegCoil = false;
     dataHeatSizeRatio = 0.0;
     dataZoneUsedForSizing = 0;

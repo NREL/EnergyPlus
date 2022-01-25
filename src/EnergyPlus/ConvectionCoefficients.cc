@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -5747,7 +5747,8 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
     }
 
     // Set report var after surface has been classified
-    state.dataSurface->SurfOutConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum));
+    state.dataSurface->SurfOutConvClassificationRpt(SurfNum) =
+        ConvectionConstants::OutConvClassReportVals[static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum))];
 }
 
 void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNum) // surface number
@@ -6450,7 +6451,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     }
 
     // Set report var after surface has been classified
-    state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum));
+    state.dataSurface->SurfIntConvClassificationRpt(SurfNum) =
+        ConvectionConstants::InConvClassReportVals[static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum))];
 }
 
 void MapIntConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum) // surface pointer index

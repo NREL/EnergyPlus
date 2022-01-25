@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,25 +83,25 @@ struct OpSchemePtrData
 struct EquipListCompData
 {
     // Members
-    std::string Name;                      // The name of each item in the list
-    std::string TypeOf;                    // The name of each item in the list
-    DataPlant::CtrlType CtrlType;          // CoolingOp, HeatingOp, DualOp
-    int LoopNumPtr;                        // pointer to the comp location in the data structure
-    int LoopSideNumPtr;                    // pointer to the comp location in the data structure
-    int BranchNumPtr;                      // pointer to the comp location in the data structure
-    int CompNumPtr;                        // pointer to the comp location in the data structure
-    Real64 SetPointFlowRate;               // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
-    std::string DemandNodeName;            // COMP SETPOINT CTRL ONLY--The name of each item in the list
-    int DemandNodeNum;                     // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-    std::string SetPointNodeName;          // COMP SETPOINT CTRL ONLY--The name of each item in the list
-    int SetPointNodeNum;                   // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-    Real64 EMSIntVarRemainingLoadValue;    // EMS internal variable remaining load, neg cooling [W]
-    Real64 EMSActuatorDispatchedLoadValue; // EMS actuator for dispatched load, neg= cooling [W]
+    std::string Name;                           // The name of each item in the list
+    std::string TypeOf;                         // The name of each item in the list
+    DataPlant::CtrlType CtrlType;               // CoolingOp, HeatingOp, DualOp
+    int LoopNumPtr;                             // pointer to the comp location in the data structure
+    DataPlant::LoopSideLocation LoopSideNumPtr; // pointer to the comp location in the data structure
+    int BranchNumPtr;                           // pointer to the comp location in the data structure
+    int CompNumPtr;                             // pointer to the comp location in the data structure
+    Real64 SetPointFlowRate;                    // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
+    std::string DemandNodeName;                 // COMP SETPOINT CTRL ONLY--The name of each item in the list
+    int DemandNodeNum;                          // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
+    std::string SetPointNodeName;               // COMP SETPOINT CTRL ONLY--The name of each item in the list
+    int SetPointNodeNum;                        // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
+    Real64 EMSIntVarRemainingLoadValue;         // EMS internal variable remaining load, neg cooling [W]
+    Real64 EMSActuatorDispatchedLoadValue;      // EMS actuator for dispatched load, neg= cooling [W]
 
     // Default Constructor
     EquipListCompData()
-        : CtrlType(DataPlant::CtrlType::Unassigned), LoopNumPtr(0), LoopSideNumPtr(0), BranchNumPtr(0), CompNumPtr(0), SetPointFlowRate(0.0),
-          DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
+        : CtrlType(DataPlant::CtrlType::Invalid), LoopNumPtr(0), LoopSideNumPtr(DataPlant::LoopSideLocation::Invalid), BranchNumPtr(0), CompNumPtr(0),
+          SetPointFlowRate(0.0), DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
     {
     }
 };
@@ -145,7 +145,7 @@ struct OperationData
 
     // Default Constructor
     OperationData()
-        : Type(DataPlant::OpScheme::Unassigned), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0),
+        : Type(DataPlant::OpScheme::Invalid), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0),
           ReferenceNodeNumber(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1),
           EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
     {

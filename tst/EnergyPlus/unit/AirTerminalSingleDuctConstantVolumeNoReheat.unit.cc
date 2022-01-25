@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
     GetSysInput(*state);
 
     EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-              state->dataSingleDuct->sd_airterminal(1).SysType);                    // AT SD constant volume no reheat object type
+              state->dataSingleDuct->sd_airterminal(1).sysType);                    // AT SD constant volume no reheat object type
     EXPECT_EQ("SDCVNOREHEATAT1", state->dataSingleDuct->sd_airterminal(1).SysName); // AT SD constant volume no reheat name
     EXPECT_EQ("AVAILSCHEDULE", state->dataSingleDuct->sd_airterminal(1).Schedule);  // AT SD constant volume no reheat availability schedule name
     EXPECT_EQ(0.50, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);    // maximum volume flow Rate

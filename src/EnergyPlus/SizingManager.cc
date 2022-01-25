@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -962,11 +962,11 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                 state.dataSize->VpzHtgByZone(termUnitSizingIndex) =
                                     sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate; // store std 62.1 values
                             } else {
-                                if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseAction) {
+                                if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::Reverse) {
                                     airLoopHeatingMaximumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
                                     state.dataSize->VpzHtgByZone(termUnitSizingIndex) =
                                         sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                                } else if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseActionWithLimits) {
+                                } else if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseWithLimits) {
                                     airLoopHeatingMaximumFlowRateSum +=
                                         max(sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
                                             (sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate * sd_airterminal(singleDuctATUNum).ZoneMinAirFrac));
@@ -1069,7 +1069,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                         int termUnitSizingIndex = AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
                         airLoopMaxFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                         if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
-                            DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
+                            DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                             airLoopHeatingMaximumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
                                                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                             airLoopHeatingMinimumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
@@ -1104,7 +1104,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                 state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
 
                         } else if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
-                                   DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
+                                   DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                             airLoopHeatingMaximumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
                                                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                             airLoopHeatingMinimumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *

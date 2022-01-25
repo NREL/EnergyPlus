@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,6 +65,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -87,19 +88,24 @@ namespace PlantPipingSystemsManager {
 
     enum class SegmentFlow
     {
+        Invalid = -1,
         IncreasingZ,
-        DecreasingZ
+        DecreasingZ,
+        Num
     };
 
     enum class MeshDistribution
     {
+        Invalid = -1,
         Uniform,
         SymmetricGeometric,
-        Geometric
+        Geometric,
+        Num
     };
 
     enum class RegionType
     {
+        Invalid = -1,
         Pipe,
         BasementWall,
         BasementFloor,
@@ -114,21 +120,25 @@ namespace PlantPipingSystemsManager {
         UnderFloor,
         HorizInsXSide,
         HorizInsZSide,
-        VertInsLowerEdge
+        VertInsLowerEdge,
+        Num
     };
 
     enum class Direction
     {
+        Invalid = -1,
         PositiveY,
         NegativeY,
         PositiveX,
         NegativeX,
         PositiveZ,
-        NegativeZ
+        NegativeZ,
+        Num
     };
 
     enum class PartitionType
     {
+        Invalid = -1,
         BasementWall,
         BasementFloor,
         Pipe,
@@ -141,12 +151,13 @@ namespace PlantPipingSystemsManager {
         UnderFloor,
         HorizInsXSide,
         VertInsLowerEdge,
-        HorizInsZSide
+        HorizInsZSide,
+        Num
     };
 
     enum class CellType
     {
-        Unknown,
+        Invalid = -1,
         Pipe,
         GeneralField,
         GroundSurface,
@@ -158,7 +169,8 @@ namespace PlantPipingSystemsManager {
         Slab,
         HorizInsulation,
         VertInsulation,
-        ZoneGroundInterface
+        ZoneGroundInterface,
+        Num
     };
 
     struct BaseThermalPropertySet
@@ -434,7 +446,7 @@ namespace PlantPipingSystemsManager {
         Real64 Z_min = 0.0;
         Real64 Z_max = 0.0;
         Point3DReal Centroid;
-        CellType cellType = CellType::Unknown;
+        CellType cellType = CellType::Invalid;
         std::map<Direction, NeighborInformation> NeighborInfo;
         CartesianPipeCellInformation PipeCellData;
 
@@ -672,10 +684,7 @@ namespace PlantPipingSystemsManager {
         bool NeedToFindOnPlantLoop = true;
         bool IsActuallyPartOfAHorizontalTrench = false;
         // Location of this pipe circuit in the PlantLoop topology
-        int LoopNum = 0;
-        int LoopSideNum = 0;
-        int BranchNum = 0;
-        int CompNum = 0;
+        PlantLocation plantLoc{};
         ExtendedFluidProperties CurFluidPropertySet; // is_used
         // Variables used to pass information from INIT-type routines to CALC-type routines
         Real64 CurCircuitInletTemp = 23.0;

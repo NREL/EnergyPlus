@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -117,7 +117,7 @@ public:
 
     int getNumSectionsFound(std::string const &SectionWord);
 
-    int getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord);
+    int getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord);
 
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
@@ -138,7 +138,7 @@ public:
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
     void getObjectItem(EnergyPlusData &state,
-                       std::string const &Object,
+                       std::string_view Object,
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
@@ -155,8 +155,8 @@ public:
     int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
     int getObjectItemNum(EnergyPlusData &state,
-                         std::string const &ObjType, // Object Type (ref: IDD Objects)
-                         std::string const &ObjName  // Name of the object type
+                         std::string_view ObjType, // Object Type (ref: IDD Objects)
+                         std::string_view ObjName  // Name of the object type
     );
 
     int getObjectItemNum(EnergyPlusData &state,
@@ -165,26 +165,37 @@ public:
                          std::string const &ObjName      // Name of the object type
     );
 
+    void lowerRangeCheck(EnergyPlusData &state,
+                         bool &ErrorsFound,                         // Set to true if error detected
+                         std::string const &WhatFieldString,        // Descriptive field for string
+                         std::string const &WhatObjectString,       // Descriptive field for object, Zone Name, etc.
+                         std::string const &ErrorLevel,             // 'Warning','Severe','Fatal')
+                         std::string const &LowerBoundString,       // String for error message, if applicable
+                         bool const LowerBoundCondition,            // Condition for error condition, if applicable
+                         std::string_view const ValueString = {},   // Value with digits if to be displayed with error
+                         std::string_view const WhatObjectName = {} // ObjectName -- used for error messages
+    );
+
     void rangeCheck(EnergyPlusData &state,
-                    bool &ErrorsFound,                           // Set to true if error detected
-                    std::string const &WhatFieldString,          // Descriptive field for string
-                    std::string const &WhatObjectString,         // Descriptive field for object, Zone Name, etc.
-                    std::string const &ErrorLevel,               // 'Warning','Severe','Fatal')
-                    Optional_string_const LowerBoundString = _,  // String for error message, if applicable
-                    Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
-                    Optional_string_const UpperBoundString = _,  // String for error message, if applicable
-                    Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
-                    Optional_string_const ValueString = _,       // Value with digits if to be displayed with error
-                    Optional_string_const WhatObjectName = _     // ObjectName -- used for error messages
+                    bool &ErrorsFound,                         // Set to true if error detected
+                    std::string const &WhatFieldString,        // Descriptive field for string
+                    std::string const &WhatObjectString,       // Descriptive field for object, Zone Name, etc.
+                    std::string const &ErrorLevel,             // 'Warning','Severe','Fatal')
+                    std::string const &LowerBoundString,       // String for error message, if applicable
+                    bool const LowerBoundCondition,            // Condition for error condition, if applicable
+                    std::string const &UpperBoundString,       // String for error message, if applicable
+                    bool const UpperBoundCondition,            // Condition for error condition, if applicable
+                    std::string_view const ValueString = {},   // Value with digits if to be displayed with error
+                    std::string_view const WhatObjectName = {} // ObjectName -- used for error messages
     );
 
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
     void getObjectDefMaxArgs(EnergyPlusData &state,
-                             std::string const &ObjectWord, // Object for definition
-                             int &NumArgs,                  // How many arguments (max) this Object can have
-                             int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
-                             int &NumNumeric                // How many Numeric arguments (max) this Object can have
+                             std::string_view const &ObjectWord, // Object for definition
+                             int &NumArgs,                       // How many arguments (max) this Object can have
+                             int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
+                             int &NumNumeric                     // How many Numeric arguments (max) this Object can have
     );
 
     void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error

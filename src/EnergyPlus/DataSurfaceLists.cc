@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -180,9 +180,10 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                 SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
                 SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), state.dataSurface->Surface);
                 if (SurfList(Item).SurfPtr(SurfNum) == 0) {
-                    ShowSevereError(state,
-                                    cAlphaFields(SurfNum + 1) + " in " + CurrentModuleObject1 +
-                                        " statement not found = " + SurfList(Item).SurfName(SurfNum));
+                    ShowSevereError(
+                        state,
+                        fmt::format(
+                            "{} in {} statement not found = {}", cAlphaFields(SurfNum + 1), CurrentModuleObject1, SurfList(Item).SurfName(SurfNum)));
                     ErrorsFound = true;
                 } else { // Make sure that all of the surfaces are located in the same zone
                     state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfList(Item).SurfPtr(SurfNum)) = true;
@@ -290,9 +291,10 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                 SlabList(Item).ZoneName(SurfNum) = Alphas(AlphaArray);
                 SlabList(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(AlphaArray), state.dataHeatBal->Zone);
                 if (SlabList(Item).ZonePtr(SurfNum) == 0) {
-                    ShowSevereError(state,
-                                    cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
-                                        " Zone not found = " + SlabList(Item).SurfName(SurfNum));
+                    ShowSevereError(
+                        state,
+                        fmt::format(
+                            "{} in {} Zone not found = {}", cAlphaFields(AlphaArray + 1), CurrentModuleObject2, SlabList(Item).SurfName(SurfNum)));
                     ErrorsFound = true;
                 }
 
@@ -300,8 +302,10 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                 SlabList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(AlphaArray + 1), state.dataSurface->Surface);
                 if (SlabList(Item).SurfPtr(SurfNum) == 0) {
                     ShowSevereError(state,
-                                    cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
-                                        " statement not found = " + SlabList(Item).SurfName(SurfNum));
+                                    fmt::format("{} in {} statement not found = {}",
+                                                cAlphaFields(AlphaArray + 1),
+                                                CurrentModuleObject2,
+                                                SlabList(Item).SurfName(SurfNum)));
                     ErrorsFound = true;
                 }
                 for (SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList) {

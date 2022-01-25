@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,7 +66,7 @@ namespace UnitHeater {
 
     enum class HCoilType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Electric,
         Gas,
         WaterHeatingCoil,
@@ -121,10 +121,7 @@ namespace UnitHeater {
         int HotControlNode;        // hot water control node, inlet of coil
         Real64 HotControlOffset;   // control tolerance
         int HotCoilOutNodeNum;     // outlet of coil
-        int HWLoopNum;             // index for plant loop with hot plant coil
-        int HWLoopSide;            // index for plant loop side for hot plant coil
-        int HWBranchNum;           // index for plant branch for hot plant coil
-        int HWCompNum;             // index for plant component for hot plant coil
+        PlantLocation HWplantLoc;  // Location of plant component for hot plant coil
         Real64 PartLoadFrac;       // part load fraction for the unit
         // Report data
         Real64 HeatPower;  // unit heating output in watts
@@ -145,9 +142,9 @@ namespace UnitHeater {
               CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), FanOutletNode(0), OpMode(0), HCoil_Index(0),
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0),
               MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0),
-              MinHotSteamFlow(0.0), HotControlNode(0), HotControlOffset(0.0), HotCoilOutNodeNum(0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0),
-              HWCompNum(0), PartLoadFrac(0.0), HeatPower(0.0), HeatEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0),
-              FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0), HVACSizingIndex(0), FirstPass(true)
+              MinHotSteamFlow(0.0), HotControlNode(0), HotControlOffset(0.0), HotCoilOutNodeNum(0), HWplantLoc{}, PartLoadFrac(0.0), HeatPower(0.0),
+              HeatEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0),
+              HVACSizingIndex(0), FirstPass(true)
         {
         }
     };

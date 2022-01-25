@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,11 +61,23 @@ namespace DataPlant {
     // "Both" is used as a special flag and is never assigned to the loop's TypeOfLoop member
     enum class LoopType
     {
-        Unassigned,
+        Invalid = -1,
         Plant,
         Condenser,
-        Both
+        Both,
+        Num
     };
+
+    struct HalfLoopContainer : std::array<HalfLoopData, static_cast<int>(DataPlant::LoopSideLocation::Num)>
+    {
+        HalfLoopData &operator()(LoopSideLocation ls)
+        {
+            return this->at(static_cast<int>(ls));
+        }
+    };
+
+    constexpr std::array<DataPlant::LoopSideLocation, static_cast<int>(DataPlant::LoopSideLocation::Num)> LoopSideKeys = {
+        DataPlant::LoopSideLocation::Demand, DataPlant::LoopSideLocation::Supply};
 
     struct PlantLoopData
     {
@@ -97,7 +109,7 @@ namespace DataPlant {
         bool EMSCtrl;
         Real64 EMSValue;
         // Loop Inlet and Outlet Nodes
-        Array1D<HalfLoopData> LoopSide;                       // Half loop data (Demand side or Supply Side)
+        HalfLoopContainer LoopSide;                           // Half loop data (Demand side or Supply Side)
         std::string OperationScheme;                          // Operation scheme name for the loop
         int NumOpSchemes;                                     // Number of items in list identified by "OpScheme"
         Array1D<OperationData> OpScheme;                      // Operation scheme data
@@ -133,14 +145,14 @@ namespace DataPlant {
 
         // Default Constructor
         PlantLoopData()
-            : FluidType(DataLoopNode::NodeFluidType::blank), FluidIndex(1), // default to water
+            : FluidType(DataLoopNode::NodeFluidType::Blank), FluidIndex(1), // default to water
               MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), TempSetPointNodeNum(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
               MaxTempErrIndex(0), MinVolFlowRate(0.0), MaxVolFlowRate(0.0), MaxVolFlowRateWasAutoSized(false), MinMassFlowRate(0.0),
               MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0),
-              NumOpSchemes(0), LoadDistribution(DataPlant::LoadingScheme::Unassigned), PlantSizNum(0),
-              LoopDemandCalcScheme(DataPlant::LoopDemandCalcScheme::Unassigned), CommonPipeType(DataPlant::CommonPipeType::No),
+              NumOpSchemes(0), LoadDistribution(DataPlant::LoadingScheme::Invalid), PlantSizNum(0),
+              LoopDemandCalcScheme(DataPlant::LoopDemandCalcScheme::Invalid), CommonPipeType(DataPlant::CommonPipeType::No),
               EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0),
-              LoopHasConnectionComp(false), TypeOfLoop(LoopType::Unassigned), PressureSimType(DataPlant::PressSimType::NoPressure),
+              LoopHasConnectionComp(false), TypeOfLoop(LoopType::Invalid), PressureSimType(DataPlant::PressSimType::NoPressure),
               HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0), CoolingDemand(0.0),
               HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0), InletNodeFlowrate(0.0), InletNodeTemperature(0.0),
               OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)

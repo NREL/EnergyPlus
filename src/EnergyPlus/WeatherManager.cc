@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2634,29 +2634,25 @@ namespace WeatherManager {
                                                                               format("{:.0R}", AtmPress),
                                                                               state.dataEnvrn->WeatherFileLocationTitle);
                     if (DirectRad < 9999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Direct Radiation",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">= 0",
-                                                                              (DirectRad >= 0.0),
-                                                                              _,
-                                                                              _,
-                                                                              _,
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
+                        state.dataInputProcessing->inputProcessor->lowerRangeCheck(state,
+                                                                                   ErrorsFound,
+                                                                                   "Direct Radiation",
+                                                                                   "WeatherFile",
+                                                                                   "Severe",
+                                                                                   ">= 0",
+                                                                                   (DirectRad >= 0.0),
+                                                                                   {},
+                                                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (DiffuseRad < 9999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Diffuse Radiation",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">= 0",
-                                                                              (DiffuseRad >= 0.0),
-                                                                              _,
-                                                                              _,
-                                                                              _,
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
+                        state.dataInputProcessing->inputProcessor->lowerRangeCheck(state,
+                                                                                   ErrorsFound,
+                                                                                   "Diffuse Radiation",
+                                                                                   "WeatherFile",
+                                                                                   "Severe",
+                                                                                   ">= 0",
+                                                                                   (DiffuseRad >= 0.0),
+                                                                                   {},
+                                                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (WindDir < 999.0)
                         state.dataInputProcessing->inputProcessor->rangeCheck(state,
                                                                               ErrorsFound,
@@ -3651,7 +3647,7 @@ namespace WeatherManager {
                         }
                     } else {
                         bool error = false;
-                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line, error);
+                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                         if (error) {
                             ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                         }
@@ -3660,7 +3656,7 @@ namespace WeatherManager {
                     }
                 } else {
                     bool error = false;
-                    SnowDepth = UtilityRoutines::ProcessNumber(Line, error);
+                    SnowDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                     if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
@@ -3670,7 +3666,7 @@ namespace WeatherManager {
                 }
             } else {
                 bool error = false;
-                AerosolOptDepth = UtilityRoutines::ProcessNumber(Line, error);
+                AerosolOptDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                 if (error) {
                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                 }
@@ -3681,7 +3677,7 @@ namespace WeatherManager {
             }
         } else {
             bool error = false;
-            PrecipWater = UtilityRoutines::ProcessNumber(Line, error);
+            PrecipWater = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
             if (error) {
                 ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
             }
@@ -6140,14 +6136,14 @@ namespace WeatherManager {
                 state.dataWeatherManager->SpecialDays(Count).WeekDay = 0;
                 state.dataWeatherManager->SpecialDays(Count).CompDate = PMonth * 32 + PDay;
                 state.dataWeatherManager->SpecialDays(Count).WthrFile = false;
-            } else if (dateType != DateType::InvalidDate) {
+            } else if (dateType != DateType::Invalid) {
                 state.dataWeatherManager->SpecialDays(Count).DateType = dateType;
                 state.dataWeatherManager->SpecialDays(Count).Month = PMonth;
                 state.dataWeatherManager->SpecialDays(Count).Day = PDay;
                 state.dataWeatherManager->SpecialDays(Count).WeekDay = PWeekDay;
                 state.dataWeatherManager->SpecialDays(Count).CompDate = 0;
                 state.dataWeatherManager->SpecialDays(Count).WthrFile = false;
-            } else if (dateType == DateType::InvalidDate) {
+            } else if (dateType == DateType::Invalid) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + ": " + AlphArray(1) + " Invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
@@ -6291,7 +6287,7 @@ namespace WeatherManager {
                                            state.dataWeatherManager->IDFDST.StWeekDay,
                                            state.dataWeatherManager->IDFDST.StDateType,
                                            ErrorsFound);
-                if (state.dataWeatherManager->IDFDST.StDateType == DateType::InvalidDate) {
+                if (state.dataWeatherManager->IDFDST.StDateType == DateType::Invalid) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                         state.dataIPShortCut->cAlphaArgs(1));
@@ -6304,7 +6300,7 @@ namespace WeatherManager {
                                            state.dataWeatherManager->IDFDST.EnWeekDay,
                                            state.dataWeatherManager->IDFDST.EnDateType,
                                            ErrorsFound);
-                if (state.dataWeatherManager->IDFDST.EnDateType == DateType::InvalidDate) {
+                if (state.dataWeatherManager->IDFDST.EnDateType == DateType::Invalid) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' +
                                         state.dataIPShortCut->cAlphaArgs(2));
@@ -6595,7 +6591,7 @@ namespace WeatherManager {
                                                                       (testval >= -90.0),
                                                                       "<= 70",
                                                                       (testval <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6637,7 +6633,7 @@ namespace WeatherManager {
                         }
                         if (state.dataIPShortCut->cAlphaArgs(3) == "MultiplierSchedule") {
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, ">=", 1.0, "<=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, false, 1.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6649,7 +6645,7 @@ namespace WeatherManager {
                             }
                         } else if (state.dataIPShortCut->cAlphaArgs(3) == "DifferenceSchedule") { // delta, must be > 0.0
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, ">=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6688,7 +6684,7 @@ namespace WeatherManager {
                                                                               (testval >= -90.0),
                                                                               "<= 70",
                                                                               (testval <= 70.0),
-                                                                              _,
+                                                                              {},
                                                                               state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                         if (errFlag) {
                             ErrorsFound = true;
@@ -6743,7 +6739,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= -90.0),
                                                                       "<= 70",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     //        CALL ShowContinueError(state, TRIM(state.dataIPShortCut->cCurrentModuleObject)//': Occured in
@@ -6776,7 +6772,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= -90.0),
                                                                       "<= 70",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6808,7 +6804,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= 0.0),
                                                                       "<= .03",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 0.03),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6840,7 +6836,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= 0.0),
                                                                       "<= 130000",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 130000.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6966,7 +6962,7 @@ namespace WeatherManager {
                         switch (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType) {
                         case DDHumIndType::RelHumSch:
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 100.0, "<=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, false, 100.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6980,7 +6976,7 @@ namespace WeatherManager {
                         case DDHumIndType::WBProfMul:
                             // multiplier: use schedule value, check 0 <= v <= 1
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 1.0, "<=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, false, 1.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6993,7 +6989,7 @@ namespace WeatherManager {
                             break;
                         case DDHumIndType::WBProfDif:
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -7106,7 +7102,7 @@ namespace WeatherManager {
                                                 state.dataIPShortCut->cAlphaArgs(11));
                         }
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr, 0.0, ">=")) {
+                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr, 0.0, false)) {
                             ShowSevereError(state,
                                             state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                 state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -7160,7 +7156,7 @@ namespace WeatherManager {
                                                 state.dataIPShortCut->cAlphaArgs(12));
                         }
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr, 0.0, ">=")) {
+                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr, 0.0, false)) {
                             ShowSevereError(state,
                                             state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                 state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -8409,7 +8405,7 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartDay = PDay;
@@ -8425,7 +8421,7 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
@@ -8439,7 +8435,7 @@ namespace WeatherManager {
                         Line.erase(0, Pos + 1);
                     } else { // Pos=0, probably last one
                         General::ProcessDateString(state, Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
@@ -8619,7 +8615,7 @@ namespace WeatherManager {
                         // call ProcessDateString with local bool (unused)
                         bool errflag1;
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             // ErrorsFound is still false after ProcessDateString
                             if (PMonth == 0 && PDay == 0) {
                                 state.dataWeatherManager->EPWDaylightSaving = false;
@@ -8642,7 +8638,7 @@ namespace WeatherManager {
                     } else if (i == 3) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (state.dataWeatherManager->EPWDaylightSaving) {
-                            if (dateType != DateType::InvalidDate) {
+                            if (dateType != DateType::Invalid) {
                                 state.dataWeatherManager->EPWDST.EnDateType = dateType;
                                 state.dataWeatherManager->EPWDST.EnMon = PMonth;
                                 state.dataWeatherManager->EPWDST.EnDay = PDay;
@@ -8686,7 +8682,7 @@ namespace WeatherManager {
                                     state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType != DateType::InvalidDate) {
+                                } else if (dateType != DateType::Invalid) {
                                     state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
                                     state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
                                     state.dataWeatherManager->SpecialDays(CurCount).Day = PDay;
@@ -8695,7 +8691,7 @@ namespace WeatherManager {
                                     state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType == DateType::InvalidDate) {
+                                } else if (dateType == DateType::Invalid) {
                                     ShowSevereError(state, "Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
                                     ErrorsFound = true;
                                 }

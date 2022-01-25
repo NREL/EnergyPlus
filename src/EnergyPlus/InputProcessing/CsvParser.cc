@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -267,7 +267,7 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
 //        case Token::STRING: {
 //            return parse_string(csv, index);
 //        }
-//        case Token::NUMBER: {
+//        case Token::Num: {
 //            return parse_number(csv, index);
 //        }
 //        case Token::FILE_END:
