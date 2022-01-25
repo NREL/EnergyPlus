@@ -104,7 +104,6 @@ void SimIHP(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int DXCoilNum(0); // The IHP No that you are currently dealing with
-    Real64 waterMassFlowRate(0);
     Real64 airMassFlowRate(0);
 
     // Obtains and Allocates ASIHP related parameters from input file
@@ -143,7 +142,6 @@ void SimIHP(EnergyPlusData &state,
     InitializeIHP(state, DXCoilNum);
 
     airMassFlowRate = state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
-    waterMassFlowRate = state.dataLoopNodes->Node(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
     state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate = airMassFlowRate;
 
     switch (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -1161,19 +1159,15 @@ void GetIHPInput(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("GetIHPInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int DXCoilNum; // No of IHP DX system
-    int NumASIHPs; // Counter for air-source integrated heat pumps
-
-    int NumAlphas;           // Number of variables in String format
-    int NumNums;             // Number of variables in Numeric format
-    int NumParams;           // Total number of input fields
-    int MaxNums(0);          // Maximum number of numeric input fields
-    int MaxAlphas(0);        // Maximum number of alpha input fields
-    std::string CoilName;    // Name of the  Coil
-    std::string Coiltype;    // type of coil
-    std::string InNodeName;  // Name of coil inlet node
-    std::string OutNodeName; // Name of coil outlet node
-
+    int NumAlphas;                   // Number of variables in String format
+    int NumNums;                     // Number of variables in Numeric format
+    int NumParams;                   // Total number of input fields
+    int MaxNums(0);                  // Maximum number of numeric input fields
+    int MaxAlphas(0);                // Maximum number of alpha input fields
+    std::string CoilName;            // Name of the  Coil
+    std::string Coiltype;            // type of coil
+    std::string InNodeName;          // Name of coil inlet node
+    std::string OutNodeName;         // Name of coil outlet node
     std::string CurrentModuleObject; // for ease in getting objects
     std::string sIHPType;            // specify IHP type
     Array1D_string AlphArray;        // Alpha input items for object
@@ -1183,20 +1177,14 @@ void GetIHPInput(EnergyPlusData &state)
     Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-    bool ErrorsFound(false); // If errors detected in input
-    int CoilCounter;         // Counter
-
-    int IOStat;
-    int AlfaFieldIncre; // increment number of Alfa field
-
     bool IsNotOK; // Flag to verify name
     bool errFlag;
+    int IOStat;
     int InNode(0);         // inlet air or water node
     int OutNode(0);        // outlet air or water node
     int ChildCoilIndex(0); // refer to a child coil
 
-    NumASIHPs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
-    DXCoilNum = 0;
+    int NumASIHPs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
 
     if (NumASIHPs <= 0) return;
 
@@ -1219,10 +1207,9 @@ void GetIHPInput(EnergyPlusData &state)
     CurrentModuleObject = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE"; // for reporting
     sIHPType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";            // for checking
 
-    for (CoilCounter = 1; CoilCounter <= NumASIHPs; ++CoilCounter) {
+    for (int CoilCounter = 1; CoilCounter <= NumASIHPs; ++CoilCounter) {
 
-        ++DXCoilNum;
-        AlfaFieldIncre = 1;
+        bool ErrorsFound(false); // If errors detected in input
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
@@ -1240,15 +1227,15 @@ void GetIHPInput(EnergyPlusData &state)
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
         VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name = AlphArray(1);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).IHPtype = "AIRSOURCE_IHP";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name = AlphArray(1);
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).IHPtype = "AIRSOURCE_IHP";
 
         // AlphArray( 2 ) is the water sensor node
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilType = "COIL:COOLING:DX:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilName = AlphArray(3);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilName;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilType = "COIL:COOLING:DX:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilName = AlphArray(3);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilName;
 
         ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1256,17 +1243,17 @@ void GetIHPInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
             if (errFlag) {
                 ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
             }
         }
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilType = "COIL:HEATING:DX:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilName = AlphArray(4);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilName;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilType = "COIL:HEATING:DX:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilName = AlphArray(4);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilName;
 
         ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1274,17 +1261,17 @@ void GetIHPInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
             if (errFlag) {
                 ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
             }
         }
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName = AlphArray(5);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName = AlphArray(5);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName;
 
         ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1292,17 +1279,17 @@ void GetIHPInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
             if (errFlag) {
                 ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
             }
         }
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName = AlphArray(6);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName = AlphArray(6);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName;
 
         ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1310,17 +1297,17 @@ void GetIHPInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
             if (errFlag) {
                 ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
             }
         }
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType = "COIL:COOLING:DX:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName = AlphArray(7);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilType = "COIL:COOLING:DX:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilName = AlphArray(7);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilName;
 
         ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1328,17 +1315,18 @@ void GetIHPInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilIndex =
+                GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
             if (errFlag) {
                 ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
             }
         }
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName = AlphArray(8);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName = AlphArray(8);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName;
 
         ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1346,65 +1334,66 @@ void GetIHPInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
             errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                ErrorsFound = true;
-            } else {
-                state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).bIsDesuperheater =
-                    true;
-            }
-        }
-
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType = "COIL:HEATING:DX:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName = AlphArray(9);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName;
-
-        ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
-        if (IsNotOK) {
-            ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-            ErrorsFound = true;
-        } else {
-            errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                ErrorsFound = true;
-            }
-        }
-
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName = AlphArray(10);
-        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType;
-        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName;
-
-        ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
-        if (IsNotOK) {
-            ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-            ErrorsFound = true;
-        } else {
-            errFlag = false;
-            state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
             if (errFlag) {
                 ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
             } else {
-                state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).bIsDesuperheater =
-                    true;
+                state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilIndex)
+                    .bIsDesuperheater = true;
             }
         }
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow = NumArray(1);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow = NumArray(2);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TindoorWHHighPriority = NumArray(3);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TambientWHHighPriority = NumArray(4);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).ModeMatchSCWH = int(NumArray(5));
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).MinSpedSCWH = int(NumArray(6));
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterVolSCDWH = NumArray(7);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).MinSpedSCDWH = int(NumArray(8));
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TimeLimitSHDWH = NumArray(9);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).MinSpedSHDWH = int(NumArray(10));
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilType = "COIL:HEATING:DX:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilName = AlphArray(9);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilName;
+
+        ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+        if (IsNotOK) {
+            ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+            ErrorsFound = true;
+        } else {
+            errFlag = false;
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilIndex =
+                GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            if (errFlag) {
+                ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                ErrorsFound = true;
+            }
+        }
+
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName = AlphArray(10);
+        Coiltype = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType;
+        CoilName = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName;
+
+        ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+        if (IsNotOK) {
+            ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+            ErrorsFound = true;
+        } else {
+            errFlag = false;
+            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+            if (errFlag) {
+                ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                ErrorsFound = true;
+            } else {
+                state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex)
+                    .bIsDesuperheater = true;
+            }
+        }
+
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TindoorOverCoolAllow = NumArray(1);
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TambientOverCoolAllow = NumArray(2);
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TindoorWHHighPriority = NumArray(3);
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TambientWHHighPriority = NumArray(4);
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).ModeMatchSCWH = int(NumArray(5));
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MinSpedSCWH = int(NumArray(6));
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).WaterVolSCDWH = NumArray(7);
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MinSpedSCDWH = int(NumArray(8));
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TimeLimitSHDWH = NumArray(9);
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MinSpedSHDWH = int(NumArray(10));
 
         // Due to the overlapping coil objects, compsets and node registrations are handled as follows:
         //  1. The ASIHP coil object is registered as four different coils, Name+" Cooling Coil", Name+" Heating Coil",
@@ -1419,18 +1408,18 @@ void GetIHPInput(EnergyPlusData &state)
         //     using OverrideNodeConnectionType
 
         // cooling coil air node connections
-        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
+        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilIndex;
         InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
         OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
         InNodeName = state.dataLoopNodes->NodeID(InNode);
         OutNodeName = state.dataLoopNodes->NodeID(OutNode);
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = InNode;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = OutNode;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).AirCoolInletNodeNum = InNode;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).AirHeatInletNodeNum = OutNode;
 
         TestCompSet(state,
                     CurrentModuleObject,
-                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
+                    state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Cooling Coil",
                     InNodeName,
                     OutNodeName,
                     "Cooling Air Nodes");
@@ -1438,7 +1427,7 @@ void GetIHPInput(EnergyPlusData &state)
                                InNode,
                                state.dataLoopNodes->NodeID(InNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Cooling Coil",
                                DataLoopNode::ConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1447,7 +1436,7 @@ void GetIHPInput(EnergyPlusData &state)
                                OutNode,
                                state.dataLoopNodes->NodeID(OutNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Cooling Coil",
                                DataLoopNode::ConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1455,16 +1444,16 @@ void GetIHPInput(EnergyPlusData &state)
 
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Cooling Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1472,34 +1461,34 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirInletNodeNum !=
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilIndex).AirInletNodeNum !=
              InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirOutletNodeNum !=
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilIndex).AirOutletNodeNum !=
              OutNode)) {
             ShowContinueError(state,
                               "Mistaken air node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Cooling Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1507,34 +1496,34 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirInletNodeNum !=
-             InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex).AirOutletNodeNum !=
-             OutNode)) {
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilIndex)
+                 .AirInletNodeNum != InNode) ||
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilIndex)
+                 .AirOutletNodeNum != OutNode)) {
             ShowContinueError(state,
                               "Mistaken air node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Cooling Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1542,19 +1531,19 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHCoolCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
         // heating coil air node connections
-        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
+        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilIndex;
 
-        InNode = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum;
+        InNode = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).AirHeatInletNodeNum;
         OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirOutletNodeNum = OutNode;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).AirOutletNodeNum = OutNode;
         InNodeName = state.dataLoopNodes->NodeID(InNode);
         OutNodeName = state.dataLoopNodes->NodeID(OutNode);
         if (state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum != InNode) {
@@ -1564,7 +1553,7 @@ void GetIHPInput(EnergyPlusData &state)
         }
         TestCompSet(state,
                     CurrentModuleObject,
-                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
+                    state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Heating Coil",
                     InNodeName,
                     OutNodeName,
                     "Heating Air Nodes");
@@ -1572,7 +1561,7 @@ void GetIHPInput(EnergyPlusData &state)
                                InNode,
                                state.dataLoopNodes->NodeID(InNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Heating Coil",
                                DataLoopNode::ConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1581,7 +1570,7 @@ void GetIHPInput(EnergyPlusData &state)
                                OutNode,
                                state.dataLoopNodes->NodeID(OutNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Heating Coil",
                                DataLoopNode::ConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1589,16 +1578,16 @@ void GetIHPInput(EnergyPlusData &state)
 
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Heating Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1606,34 +1595,34 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirInletNodeNum !=
-             InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirOutletNodeNum !=
-             OutNode)) {
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilIndex)
+                 .AirInletNodeNum != InNode) ||
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilIndex)
+                 .AirOutletNodeNum != OutNode)) {
             ShowContinueError(state,
                               "Mistaken air node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Heating Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1641,35 +1630,35 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHHeatCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
         // water node connections
-        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
+        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilIndex;
 
         InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).WaterInletNodeNum;
         OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).WaterOutletNodeNum;
         InNodeName = state.dataLoopNodes->NodeID(InNode);
         OutNodeName = state.dataLoopNodes->NodeID(OutNode);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum = InNode;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum = OutNode;
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterInletNodeNum !=
-             InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterOutletNodeNum !=
-             OutNode)) {
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).WaterInletNodeNum = InNode;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).WaterOutletNodeNum = OutNode;
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilIndex)
+                 .WaterInletNodeNum != InNode) ||
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilIndex)
+                 .WaterOutletNodeNum != OutNode)) {
             ShowContinueError(state,
                               "Mistaken water node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
 
         TestCompSet(state,
                     CurrentModuleObject,
-                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
+                    state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Water Coil",
                     InNodeName,
                     OutNodeName,
                     "Water Nodes");
@@ -1677,7 +1666,7 @@ void GetIHPInput(EnergyPlusData &state)
                                InNode,
                                state.dataLoopNodes->NodeID(InNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Water Coil",
                                DataLoopNode::ConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1686,7 +1675,7 @@ void GetIHPInput(EnergyPlusData &state)
                                OutNode,
                                state.dataLoopNodes->NodeID(InNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Water Coil",
                                DataLoopNode::ConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1694,16 +1683,16 @@ void GetIHPInput(EnergyPlusData &state)
 
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Water Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
@@ -1711,8 +1700,8 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
@@ -1720,16 +1709,16 @@ void GetIHPInput(EnergyPlusData &state)
 
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Water Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
@@ -1737,34 +1726,34 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterInletNodeNum !=
-             InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).WaterOutletNodeNum !=
-             OutNode)) {
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex)
+                 .WaterInletNodeNum != InNode) ||
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex)
+                 .WaterOutletNodeNum != OutNode)) {
             ShowContinueError(state,
                               "Mistaken water node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Water Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
@@ -1772,34 +1761,34 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterInletNodeNum !=
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilIndex).WaterInletNodeNum !=
              InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterOutletNodeNum !=
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilIndex).WaterOutletNodeNum !=
              OutNode)) {
             ShowContinueError(state,
                               "Mistaken water node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Water Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
@@ -1807,14 +1796,14 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterTankoutNod =
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).WaterTankoutNod =
             GetOnlySingleNode(state,
                               AlphArray(2),
                               ErrorsFound,
@@ -1827,26 +1816,26 @@ void GetIHPInput(EnergyPlusData &state)
 
         // outdoor air node connections for water heating coils
         // DWH, SCDWH, SHDWH coils have the same outdoor air nodes
-        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilIndex;
+        ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilIndex;
         InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
         OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
         InNodeName = state.dataLoopNodes->NodeID(InNode);
         OutNodeName = state.dataLoopNodes->NodeID(OutNode);
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).ODAirInletNodeNum = InNode;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).ODAirOutletNodeNum = OutNode;
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirInletNodeNum !=
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).ODAirInletNodeNum = InNode;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).ODAirOutletNodeNum = OutNode;
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilIndex).AirInletNodeNum !=
              InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).AirOutletNodeNum !=
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilIndex).AirOutletNodeNum !=
              OutNode)) {
             ShowContinueError(state,
                               "Mistaken air node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
 
         TestCompSet(state,
                     CurrentModuleObject,
-                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
+                    state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Outdoor Coil",
                     InNodeName,
                     OutNodeName,
                     "Outdoor Air Nodes");
@@ -1854,7 +1843,7 @@ void GetIHPInput(EnergyPlusData &state)
                                InNode,
                                state.dataLoopNodes->NodeID(InNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Outdoor Coil",
                                DataLoopNode::ConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1863,7 +1852,7 @@ void GetIHPInput(EnergyPlusData &state)
                                OutNode,
                                state.dataLoopNodes->NodeID(InNode),
                                DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
-                               state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
+                               state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Outdoor Coil",
                                DataLoopNode::ConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
@@ -1871,16 +1860,16 @@ void GetIHPInput(EnergyPlusData &state)
 
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Outdoor Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1888,8 +1877,8 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1897,16 +1886,16 @@ void GetIHPInput(EnergyPlusData &state)
 
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Outdoor Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1914,37 +1903,38 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirInletNodeNum = InNode;
-        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirOutletNodeNum =
+        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex).AirInletNodeNum =
+            InNode;
+        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex).AirOutletNodeNum =
             OutNode;
-        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirInletNodeNum !=
+        if ((state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex).AirInletNodeNum !=
              InNode) ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).AirOutletNodeNum !=
+            (state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilIndex).AirOutletNodeNum !=
              OutNode)) {
             ShowContinueError(state,
                               "Mistaken air node connection: " + CurrentModuleObject +
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName + "-wrong coil node names.");
+                                  state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName + "-wrong coil node names.");
             ErrorsFound = true;
         }
         SetUpCompSets(state,
                       CurrentModuleObject,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
-                      state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name + " Outdoor Coil",
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType,
+                      state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName,
                       InNodeName,
                       OutNodeName);
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
@@ -1952,21 +1942,21 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
-                                   state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilType,
+                                   state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = false;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale = 1.0; // scale coil flow rates to match the parent fan object
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).HeatVolFlowScale = 1.0; // scale coil flow rates to match the parent fan object
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::IdleMode;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).MaxHeatAirMassFlow = 1e10;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).MaxHeatAirVolFlow = 1e10;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).MaxCoolAirMassFlow = 1e10;
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).MaxCoolAirVolFlow = 1e10;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).IHPCoilsSized = false;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).CoolVolFlowScale = 1.0; // scale coil flow rates to match the parent fan object
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).HeatVolFlowScale = 1.0; // scale coil flow rates to match the parent fan object
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).CurMode = IHPOperationMode::IdleMode;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MaxHeatAirMassFlow = 1e10;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MaxHeatAirVolFlow = 1e10;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MaxCoolAirMassFlow = 1e10;
+        state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MaxCoolAirVolFlow = 1e10;
 
         if (ErrorsFound) {
             ShowFatalError(state,
@@ -1977,108 +1967,108 @@ void GetIHPInput(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Air Loop Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).AirLoopFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Condenser Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TankSourceWaterMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Air Total Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCoolingRate,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Air Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalSpaceHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Water Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalWaterHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalPower,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Air Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalLatentLoad,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalLatentLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Source Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Qsource,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Qsource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump COP",
                                 OutputProcessor::Unit::None,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).TotalCOP,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalCOP,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Energy,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Air Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalCooling,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalCooling,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Air Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalHeating,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalHeating,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Water Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalWaterHeating,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalWaterHeating,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Air Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergyLatent,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLatent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
             SetupOutputVariable(state,
                                 "Integrated Heat Pump Source Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EnergySource,
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name);
+                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
         }
     }
 }
@@ -2572,7 +2562,6 @@ void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
     // Obtains and Allocates WatertoAirHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
         GetIHPInput(state);
-        //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
@@ -2696,8 +2685,6 @@ void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
                           0.0,
                           0.0,
                           1.0);
-
-    return;
 }
 
 IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum)
@@ -2705,7 +2692,6 @@ IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum)
     // Obtains and Allocates WatertoAirHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
         GetIHPInput(state);
-        //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
@@ -3038,14 +3024,8 @@ int GetLowSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum)
 
     switch (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
     case IHPOperationMode::IdleMode:
-        SpeedNum = 1;
-        break;
     case IHPOperationMode::SCMode:
-        SpeedNum = 1;
-        break;
     case IHPOperationMode::SHMode:
-        SpeedNum = 1;
-        break;
     case IHPOperationMode::DWHMode:
         SpeedNum = 1;
         break;
@@ -3088,8 +3068,6 @@ int GetMaxSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum)
 
     switch (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
     case IHPOperationMode::IdleMode:
-        SpeedNum = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NumOfSpeeds;
-        break;
     case IHPOperationMode::SCMode:
         SpeedNum = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NumOfSpeeds;
         break;
@@ -3259,11 +3237,7 @@ Real64 GetWaterVolFlowRateIHP(
 
     switch (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).CurMode) {
     case IHPOperationMode::IdleMode:
-        WaterVolFlowRate = 0.0;
-        break;
     case IHPOperationMode::SCMode:
-        WaterVolFlowRate = 0.0;
-        break;
     case IHPOperationMode::SHMode:
         WaterVolFlowRate = 0.0;
         break;
