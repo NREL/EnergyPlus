@@ -61,8 +61,8 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
-#include <nlohmann/json_literals.hpp>
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <nlohmann/json_literals.hpp>
 
 using namespace EnergyPlus;
 
