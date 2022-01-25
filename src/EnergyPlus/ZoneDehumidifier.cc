@@ -274,26 +274,28 @@ namespace ZoneDehumidifier {
             }
 
             // A3 , \field Air Inlet Node Name
-            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(state,
-                                                                                                          Alphas(3),
-                                                                                                          ErrorsFound,
-                                                                                                          CurrentModuleObject,
-                                                                                                          Alphas(1),
-                                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                          NodeInputManager::CompFluidStream::Primary,
-                                                                                                          ObjectIsNotParent);
+            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACDehumidifierDX,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
-            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(state,
-                                                                                                           Alphas(4),
-                                                                                                           ErrorsFound,
-                                                                                                           CurrentModuleObject,
-                                                                                                           Alphas(1),
-                                                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                                                           ObjectIsNotParent);
+            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACDehumidifierDX,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedWaterRemoval = Numbers(1);

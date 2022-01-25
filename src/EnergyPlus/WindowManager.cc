@@ -7554,223 +7554,225 @@ namespace WindowManager {
 
                     for (i = 1; i <= state.dataConstruction->Construct(ThisNum).TotLayers; ++i) {
                         Layer = state.dataConstruction->Construct(ThisNum).LayerPoint(i);
-                        {
-                            auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
-                            if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowGas) {
-                                static constexpr std::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
-                                print(state.files.eio,
-                                      Format_702,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      GasTypeName(state.dataMaterial->Material(Layer).GasType(1)),
-                                      state.dataMaterial->Material(Layer).Thickness);
-
-                                //! fw CASE(WindowGasMixture)
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Shade) {
-                                static constexpr std::string_view Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                                print(state.files.eio,
-                                      Format_703,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      state.dataMaterial->Material(Layer).Thickness,
-                                      state.dataMaterial->Material(Layer).Conductivity,
-                                      state.dataMaterial->Material(Layer).AbsorpThermal,
-                                      state.dataMaterial->Material(Layer).Trans,
-                                      state.dataMaterial->Material(Layer).TransVis,
-                                      state.dataMaterial->Material(Layer).ReflectShade);
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowBlind) {
-                                BlNum = state.dataMaterial->Material(Layer).BlindDataPtr;
-                                static constexpr std::string_view Format_704(
-                                    " WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                                print(state.files.eio,
-                                      Format_704,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      state.dataHeatBal->Blind(BlNum).SlatWidth,
-                                      state.dataHeatBal->Blind(BlNum).SlatSeparation,
-                                      state.dataHeatBal->Blind(BlNum).SlatThickness,
-                                      state.dataHeatBal->Blind(BlNum).SlatAngle,
-                                      state.dataHeatBal->Blind(BlNum).SlatTransSolBeamDiff,
-                                      state.dataHeatBal->Blind(BlNum).SlatFrontReflSolBeamDiff,
-                                      state.dataHeatBal->Blind(BlNum).BlindToGlassDist);
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Screen) {
-                                if (state.dataMaterial->Material(Layer).ScreenDataPtr > 0) {
-                                    static constexpr std::string_view Format_706(
-                                        " WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                                    print(state.files.eio,
-                                          Format_706,
-                                          state.dataMaterial->Material(Layer).Name,
-                                          state.dataMaterial->Material(Layer).Thickness,
-                                          state.dataMaterial->Material(Layer).Conductivity,
-                                          state.dataMaterial->Material(Layer).AbsorpThermal,
-                                          state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).BmBmTrans,
-                                          state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).ReflectSolBeamFront,
-                                          state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).ReflectVisBeamFront,
-                                          state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).DifReflect,
-                                          state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).DifReflectVis,
-                                          state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr)
-                                              .ScreenDiameterToSpacingRatio,
-                                          state.dataMaterial->Material(Layer).WinShadeToGlassDist);
-                                }
-                            } else if ((SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowGlass) ||
-                                       (SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
-                                SolarDiffusing = "No";
-                                if (state.dataMaterial->Material(Layer).SolarDiffusing) SolarDiffusing = "Yes";
-                                OpticalDataType = "SpectralAverage";
-                                SpectralDataName = "";
-                                if (state.dataMaterial->Material(Layer).GlassSpectralDataPtr > 0) {
-                                    OpticalDataType = "Spectral";
-                                    SpectralDataName = state.dataHeatBal->SpectralData(state.dataMaterial->Material(Layer).GlassSpectralDataPtr).Name;
-                                }
-                                if (state.dataMaterial->Material(Layer).GlassSpectralAndAngle) {
-                                    OpticalDataType = "SpectralAndAngle";
-                                    SpectralDataName =
-                                        state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
-                                        state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
-                                        state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngBRefleDataPtr).Name;
-                                }
-                                static constexpr std::string_view Format_707(
-                                    " WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
-                                    ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
-                                print(state.files.eio,
-                                      Format_707,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      OpticalDataType,
-                                      SpectralDataName,
-                                      state.dataMaterial->Material(Layer).Thickness,
-                                      state.dataMaterial->Material(Layer).Trans,
-                                      state.dataMaterial->Material(Layer).ReflectSolBeamFront,
-                                      state.dataMaterial->Material(Layer).ReflectSolBeamBack,
-                                      state.dataMaterial->Material(Layer).TransVis,
-                                      state.dataMaterial->Material(Layer).ReflectVisBeamFront,
-                                      state.dataMaterial->Material(Layer).ReflectVisBeamBack,
-                                      state.dataMaterial->Material(Layer).TransThermal,
-                                      state.dataMaterial->Material(Layer).AbsorpThermalFront,
-                                      state.dataMaterial->Material(Layer).AbsorpThermalBack,
-                                      state.dataMaterial->Material(Layer).Conductivity,
-                                      state.dataMaterial->Material(Layer).GlassTransDirtFactor,
-                                      SolarDiffusing);
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
-                                OpticalDataType = "SpectralAverage";
-                                SpectralDataName = "";
-                                static constexpr std::string_view Format_708(
-                                    " WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
-                                    ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
-                                print(state.files.eio,
-                                      Format_708,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      OpticalDataType,
-                                      SpectralDataName,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamBeam,
-                                      state.dataMaterial->Material(Layer).TausBackBeamBeam,
-                                      state.dataMaterial->Material(Layer).ReflFrontBeamBeam,
-                                      state.dataMaterial->Material(Layer).ReflBackBeamBeam,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausDiffDiff,
-                                      state.dataMaterial->Material(Layer).ReflFrontDiffDiff,
-                                      state.dataMaterial->Material(Layer).ReflBackDiffDiff,
-                                      state.dataMaterial->Material(Layer).TausThermal,
-                                      state.dataMaterial->Material(Layer).EmissThermalFront,
-                                      state.dataMaterial->Material(Layer).EmissThermalBack);
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) {
-                                static constexpr std::string_view Format_709(
-                                    " WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
-                                print(state.files.eio,
-                                      Format_709,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamBeam,
-                                      state.dataMaterial->Material(Layer).TausBackBeamBeam,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausThermal,
-                                      state.dataMaterial->Material(Layer).EmissThermalFront,
-                                      state.dataMaterial->Material(Layer).EmissThermalBack);
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) {
-                                static constexpr std::string_view Format_710(
-                                    " WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},"
-                                    "{:.4R},{:.4R},{:.5R},{:.5R}\n");
-                                print(state.files.eio,
-                                      Format_710,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamBeam,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausThermal,
-                                      state.dataMaterial->Material(Layer).EmissThermalFront,
-                                      state.dataMaterial->Material(Layer).EmissThermalBack,
-                                      state.dataMaterial->Material(Layer).PleatedDrapeWidth,
-                                      state.dataMaterial->Material(Layer).PleatedDrapeLength);
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) {
-                                static constexpr std::string_view Format_711(
-                                    " WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}"
-                                    ",{:.4R},{:.4R},{:.5R},{:.5R}\n");
-                                print(state.files.eio,
-                                      Format_711,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamBeam,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausThermal,
-                                      state.dataMaterial->Material(Layer).EmissThermalFront,
-                                      state.dataMaterial->Material(Layer).EmissThermalBack,
-                                      state.dataMaterial->Material(Layer).ScreenWireSpacing,
-                                      state.dataMaterial->Material(Layer).ScreenWireDiameter);
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
-                                SlateOrientation = "Horizontal";
-                                if (state.dataMaterial->Material(Layer).SlatOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
-                                    SlateOrientation = "Vertical";
-                                }
-                                // Formats
-                                static constexpr std::string_view Format_712(
-                                    " WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:."
-                                    "5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
-                                print(state.files.eio,
-                                      Format_712,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      SlateOrientation,
-                                      state.dataMaterial->Material(Layer).SlatWidth,
-                                      state.dataMaterial->Material(Layer).SlatSeparation,
-                                      state.dataMaterial->Material(Layer).SlatCrown,
-                                      state.dataMaterial->Material(Layer).SlatAngle,
-                                      state.dataMaterial->Material(Layer).TausFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
-                                      state.dataMaterial->Material(Layer).ReflBackBeamDiff,
-                                      state.dataMaterial->Material(Layer).TausDiffDiff,
-                                      state.dataMaterial->Material(Layer).ReflFrontDiffDiff,
-                                      state.dataMaterial->Material(Layer).ReflBackDiffDiff,
-                                      state.dataMaterial->Material(Layer).TausThermal,
-                                      state.dataMaterial->Material(Layer).EmissThermalFront,
-                                      state.dataMaterial->Material(Layer).EmissThermalBack);
-
-                            } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {
-                                GapVentType = "Sealed";
-                                if (state.dataMaterial->Material(Layer).GapVentType == 2) {
-                                    GapVentType = "VentedIndoor";
-                                } else if (state.dataMaterial->Material(Layer).GapVentType == 3) {
-                                    GapVentType = "VentedOutdoor";
-                                }
-                                static constexpr std::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
-                                print(state.files.eio,
-                                      Format_713,
-                                      state.dataMaterial->Material(Layer).Name,
-                                      GasTypeName(state.dataMaterial->Material(Layer).GasType(1)),
-                                      state.dataMaterial->Material(Layer).Thickness,
-                                      GapVentType);
+                        switch (state.dataMaterial->Material(Layer).Group) {
+                        case DataHeatBalance::MaterialGroup::WindowGas: {
+                            static constexpr std::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
+                            print(state.files.eio,
+                                  Format_702,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  GasTypeName(state.dataMaterial->Material(Layer).GasType(1)),
+                                  state.dataMaterial->Material(Layer).Thickness);
+                            //! fw CASE(WindowGasMixture)
+                        } break;
+                        case DataHeatBalance::MaterialGroup::Shade: {
+                            static constexpr std::string_view Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                            print(state.files.eio,
+                                  Format_703,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  state.dataMaterial->Material(Layer).Thickness,
+                                  state.dataMaterial->Material(Layer).Conductivity,
+                                  state.dataMaterial->Material(Layer).AbsorpThermal,
+                                  state.dataMaterial->Material(Layer).Trans,
+                                  state.dataMaterial->Material(Layer).TransVis,
+                                  state.dataMaterial->Material(Layer).ReflectShade);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::WindowBlind: {
+                            BlNum = state.dataMaterial->Material(Layer).BlindDataPtr;
+                            static constexpr std::string_view Format_704(
+                                " WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                            print(state.files.eio,
+                                  Format_704,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  state.dataHeatBal->Blind(BlNum).SlatWidth,
+                                  state.dataHeatBal->Blind(BlNum).SlatSeparation,
+                                  state.dataHeatBal->Blind(BlNum).SlatThickness,
+                                  state.dataHeatBal->Blind(BlNum).SlatAngle,
+                                  state.dataHeatBal->Blind(BlNum).SlatTransSolBeamDiff,
+                                  state.dataHeatBal->Blind(BlNum).SlatFrontReflSolBeamDiff,
+                                  state.dataHeatBal->Blind(BlNum).BlindToGlassDist);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::Screen: {
+                            if (state.dataMaterial->Material(Layer).ScreenDataPtr > 0) {
+                                static constexpr std::string_view Format_706(
+                                    " WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                print(
+                                    state.files.eio,
+                                    Format_706,
+                                    state.dataMaterial->Material(Layer).Name,
+                                    state.dataMaterial->Material(Layer).Thickness,
+                                    state.dataMaterial->Material(Layer).Conductivity,
+                                    state.dataMaterial->Material(Layer).AbsorpThermal,
+                                    state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).BmBmTrans,
+                                    state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).ReflectSolBeamFront,
+                                    state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).ReflectVisBeamFront,
+                                    state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).DifReflect,
+                                    state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).DifReflectVis,
+                                    state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(Layer).ScreenDataPtr).ScreenDiameterToSpacingRatio,
+                                    state.dataMaterial->Material(Layer).WinShadeToGlassDist);
                             }
+                        } break;
+                        case DataHeatBalance::MaterialGroup::WindowGlass:
+                        case DataHeatBalance::MaterialGroup::WindowSimpleGlazing: {
+                            SolarDiffusing = "No";
+                            if (state.dataMaterial->Material(Layer).SolarDiffusing) SolarDiffusing = "Yes";
+                            OpticalDataType = "SpectralAverage";
+                            SpectralDataName = "";
+                            if (state.dataMaterial->Material(Layer).GlassSpectralDataPtr > 0) {
+                                OpticalDataType = "Spectral";
+                                SpectralDataName = state.dataHeatBal->SpectralData(state.dataMaterial->Material(Layer).GlassSpectralDataPtr).Name;
+                            }
+                            if (state.dataMaterial->Material(Layer).GlassSpectralAndAngle) {
+                                OpticalDataType = "SpectralAndAngle";
+                                SpectralDataName =
+                                    state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
+                                    state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
+                                    state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngBRefleDataPtr).Name;
+                            }
+                            static constexpr std::string_view Format_707(
+                                " WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
+                                ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
+                            print(state.files.eio,
+                                  Format_707,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  OpticalDataType,
+                                  SpectralDataName,
+                                  state.dataMaterial->Material(Layer).Thickness,
+                                  state.dataMaterial->Material(Layer).Trans,
+                                  state.dataMaterial->Material(Layer).ReflectSolBeamFront,
+                                  state.dataMaterial->Material(Layer).ReflectSolBeamBack,
+                                  state.dataMaterial->Material(Layer).TransVis,
+                                  state.dataMaterial->Material(Layer).ReflectVisBeamFront,
+                                  state.dataMaterial->Material(Layer).ReflectVisBeamBack,
+                                  state.dataMaterial->Material(Layer).TransThermal,
+                                  state.dataMaterial->Material(Layer).AbsorpThermalFront,
+                                  state.dataMaterial->Material(Layer).AbsorpThermalBack,
+                                  state.dataMaterial->Material(Layer).Conductivity,
+                                  state.dataMaterial->Material(Layer).GlassTransDirtFactor,
+                                  SolarDiffusing);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::GlassEquivalentLayer: {
+                            OpticalDataType = "SpectralAverage";
+                            SpectralDataName = "";
+                            static constexpr std::string_view Format_708(
+                                " WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
+                                ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
+                            print(state.files.eio,
+                                  Format_708,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  OpticalDataType,
+                                  SpectralDataName,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamBeam,
+                                  state.dataMaterial->Material(Layer).TausBackBeamBeam,
+                                  state.dataMaterial->Material(Layer).ReflFrontBeamBeam,
+                                  state.dataMaterial->Material(Layer).ReflBackBeamBeam,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausDiffDiff,
+                                  state.dataMaterial->Material(Layer).ReflFrontDiffDiff,
+                                  state.dataMaterial->Material(Layer).ReflBackDiffDiff,
+                                  state.dataMaterial->Material(Layer).TausThermal,
+                                  state.dataMaterial->Material(Layer).EmissThermalFront,
+                                  state.dataMaterial->Material(Layer).EmissThermalBack);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::ShadeEquivalentLayer: {
+                            static constexpr std::string_view Format_709(
+                                " WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
+                            print(state.files.eio,
+                                  Format_709,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamBeam,
+                                  state.dataMaterial->Material(Layer).TausBackBeamBeam,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausThermal,
+                                  state.dataMaterial->Material(Layer).EmissThermalFront,
+                                  state.dataMaterial->Material(Layer).EmissThermalBack);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::DrapeEquivalentLayer: {
+                            static constexpr std::string_view Format_710(
+                                " WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},"
+                                "{:.4R},{:.4R},{:.5R},{:.5R}\n");
+                            print(state.files.eio,
+                                  Format_710,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamBeam,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausThermal,
+                                  state.dataMaterial->Material(Layer).EmissThermalFront,
+                                  state.dataMaterial->Material(Layer).EmissThermalBack,
+                                  state.dataMaterial->Material(Layer).PleatedDrapeWidth,
+                                  state.dataMaterial->Material(Layer).PleatedDrapeLength);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::ScreenEquivalentLayer: {
+                            static constexpr std::string_view Format_711(
+                                " WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}"
+                                ",{:.4R},{:.4R},{:.5R},{:.5R}\n");
+                            print(state.files.eio,
+                                  Format_711,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamBeam,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausThermal,
+                                  state.dataMaterial->Material(Layer).EmissThermalFront,
+                                  state.dataMaterial->Material(Layer).EmissThermalBack,
+                                  state.dataMaterial->Material(Layer).ScreenWireSpacing,
+                                  state.dataMaterial->Material(Layer).ScreenWireDiameter);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::BlindEquivalentLayer: {
+                            SlateOrientation = "Horizontal";
+                            if (state.dataMaterial->Material(Layer).SlatOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
+                                SlateOrientation = "Vertical";
+                            }
+                            // Formats
+                            static constexpr std::string_view Format_712(
+                                " WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:."
+                                "5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
+                            print(state.files.eio,
+                                  Format_712,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  SlateOrientation,
+                                  state.dataMaterial->Material(Layer).SlatWidth,
+                                  state.dataMaterial->Material(Layer).SlatSeparation,
+                                  state.dataMaterial->Material(Layer).SlatCrown,
+                                  state.dataMaterial->Material(Layer).SlatAngle,
+                                  state.dataMaterial->Material(Layer).TausFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflFrontBeamDiff,
+                                  state.dataMaterial->Material(Layer).ReflBackBeamDiff,
+                                  state.dataMaterial->Material(Layer).TausDiffDiff,
+                                  state.dataMaterial->Material(Layer).ReflFrontDiffDiff,
+                                  state.dataMaterial->Material(Layer).ReflBackDiffDiff,
+                                  state.dataMaterial->Material(Layer).TausThermal,
+                                  state.dataMaterial->Material(Layer).EmissThermalFront,
+                                  state.dataMaterial->Material(Layer).EmissThermalBack);
+                        } break;
+                        case DataHeatBalance::MaterialGroup::GapEquivalentLayer: {
+                            GapVentType = "Sealed";
+                            if (state.dataMaterial->Material(Layer).GapVentType == 2) {
+                                GapVentType = "VentedIndoor";
+                            } else if (state.dataMaterial->Material(Layer).GapVentType == 3) {
+                                GapVentType = "VentedOutdoor";
+                            }
+                            static constexpr std::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
+                            print(state.files.eio,
+                                  Format_713,
+                                  state.dataMaterial->Material(Layer).Name,
+                                  GasTypeName(state.dataMaterial->Material(Layer).GasType(1)),
+                                  state.dataMaterial->Material(Layer).Thickness,
+                                  GapVentType);
+                        } break;
+                        default:
+                            break;
                         }
                     }
                 }

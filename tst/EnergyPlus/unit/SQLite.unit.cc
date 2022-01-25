@@ -238,12 +238,12 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
 {
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+        1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _);
+        2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        3, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 3, true, _);
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(4, 1, "HVAC", "", "AHU-1", 2, "", 1, false, _);
+        3, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 3, true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(4, 1, "HVAC", "", "AHU-1", 2, "", 1, false);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(5, 1, "HVAC", "", "AHU-1", 2, "", 1, false, "test schedule");
     auto result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
@@ -262,12 +262,12 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        6, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+        6, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        7, 2, "Facility:Electricity", "", "Facility:Electricity", 3, "J", 1, true, _);
+        7, 2, "Facility:Electricity", "", "Facility:Electricity", 3, "J", 1, true);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        8, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 7, true, _);
-    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(9, 1, "HVAC", "", "AHU-1", 2, "", -2, false, _);
+        8, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 7, true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(9, 1, "HVAC", "", "AHU-1", 2, "", -2, false);
     result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -285,7 +285,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // This should fail to insert due to duplicate primary key
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+        9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
     result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
     EXPECT_EQ(9ul, result.size());
@@ -356,7 +356,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
-        1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
+        1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(1, 999.9);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(1, 999.9, 2, 0, 1310459, 100, 7031530, 15);
     state->dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(1, 999.9, 0, 0, 1310459, 100, 7031530, 15);

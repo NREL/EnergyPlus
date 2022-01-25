@@ -593,7 +593,7 @@ void GetControllerInput(EnergyPlusData &state)
             if (UtilityRoutines::SameString(AlphArray(3), "Normal")) {
                 ControllerProps(Num).Action = ControllerAction::NormalAction;
             } else if (UtilityRoutines::SameString(AlphArray(3), "Reverse")) {
-                ControllerProps(Num).Action = ControllerAction::ReverseAction;
+                ControllerProps(Num).Action = ControllerAction::Reverse;
             } else if (lAlphaBlanks(3)) {
                 ControllerProps(Num).Action = ControllerAction::NoAction;
             } else {
@@ -611,19 +611,19 @@ void GetControllerInput(EnergyPlusData &state)
             ControllerProps(Num).SensedNode = GetOnlySingleNode(state,
                                                                 AlphArray(5),
                                                                 ErrorsFound,
-                                                                CurrentModuleObject,
+                                                                DataLoopNode::ConnectionObjectType::ControllerWaterCoil,
                                                                 AlphArray(1),
                                                                 DataLoopNode::NodeFluidType::Blank,
-                                                                DataLoopNode::NodeConnectionType::Sensor,
+                                                                DataLoopNode::ConnectionType::Sensor,
                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                 ObjectIsNotParent);
             ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state,
                                                                   AlphArray(6),
                                                                   ErrorsFound,
-                                                                  CurrentModuleObject,
+                                                                  DataLoopNode::ConnectionObjectType::ControllerWaterCoil,
                                                                   AlphArray(1),
                                                                   DataLoopNode::NodeFluidType::Blank,
-                                                                  DataLoopNode::NodeConnectionType::Actuator,
+                                                                  DataLoopNode::ConnectionType::Actuator,
                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                   ObjectIsNotParent);
             ControllerProps(Num).Offset = NumArray(1);
@@ -725,17 +725,17 @@ void GetControllerInput(EnergyPlusData &state)
         } else { // Node found, check type and action
             if (WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                 if (ControllerProps(Num).Action == ControllerAction::NoAction) {
-                    ControllerProps(Num).Action = ControllerAction::ReverseAction;
+                    ControllerProps(Num).Action = ControllerAction::Reverse;
                 } else if (ControllerProps(Num).Action == ControllerAction::NormalAction) {
                     ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                     ShowContinueError(state, "...Normal action has been specified for a cooling coil - should be Reverse.");
                     ShowContinueError(state, "...overriding user input action with Reverse Action.");
-                    ControllerProps(Num).Action = ControllerAction::ReverseAction;
+                    ControllerProps(Num).Action = ControllerAction::Reverse;
                 }
             } else if (WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
                 if (ControllerProps(Num).Action == ControllerAction::NoAction) {
                     ControllerProps(Num).Action = ControllerAction::NormalAction;
-                } else if (ControllerProps(Num).Action == ControllerAction::ReverseAction) {
+                } else if (ControllerProps(Num).Action == ControllerAction::Reverse) {
                     ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                     ShowContinueError(state, "...Reverse action has been specified for a heating coil - should be Normal.");
                     ShowContinueError(state, "...overriding user input action with Normal Action.");
@@ -941,9 +941,9 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         }
                     }
                 } else {
-                    //           Warn if humidity setpoint is detected (only for cooling coils) and control varible is TEMP.
+                    //           Warn if humidity setpoint is detected (only for cooling coils) and control variable is TEMP.
                     if (state.dataLoopNodes->Node(SensedNode).HumRatMax != SensedNodeFlagValue &&
-                        ControllerProps(ControllerIndex).Action == ControllerAction::ReverseAction) {
+                        ControllerProps(ControllerIndex).Action == ControllerAction::Reverse) {
                         ShowWarningError(state,
                                          "HVACControllers: controller type=" + ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                              ControllerProps(ControllerIndex).ControllerName +
@@ -1133,7 +1133,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                                                                  // Y variables
 
         } break;
-        case ControllerAction::ReverseAction: {
+        case ControllerAction::Reverse: {
             SetupRootFinder(state,
                             RootFinders(ControlNum),
                             DataRootFinder::Slope::Decreasing,
@@ -1886,7 +1886,7 @@ bool CheckMinActiveController(EnergyPlusData &state, int const ControlNum)
             return CheckMinActiveController;
         }
     } break;
-    case ControllerAction::ReverseAction: { // "REVERSE"
+    case ControllerAction::Reverse: { // "REVERSE"
         // Check for min constrained convergence
         if (ControllerProps(ControlNum).SetPointValue >= ControllerProps(ControlNum).SensedValue) {
             CheckMinActiveController = true;
@@ -1937,7 +1937,7 @@ bool CheckMaxActiveController(EnergyPlusData &state, int const ControlNum)
             return CheckMaxActiveController;
         }
     } break;
-    case ControllerAction::ReverseAction: { // "REVERSE"
+    case ControllerAction::Reverse: { // "REVERSE"
         // Check for max constrained convergence
         if (ControllerProps(ControlNum).SetPointValue <= ControllerProps(ControlNum).SensedValue) {
             CheckMaxActiveController = true;
@@ -2049,8 +2049,8 @@ void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &I
                         // Turn on humidity control and restart controller
                         IsConvergedFlag = false;
                         thisController.HumRatCtrlOverride = true;
-                        if (thisController.Action == ControllerAction::ReverseAction) {
-                            // Cooling coil controller should always be ReverseAction, but skip this if not
+                        if (thisController.Action == ControllerAction::Reverse) {
+                            // Cooling coil controller should always be Reverse, but skip this if not
                             RootFinder::SetupRootFinder(state,
                                                         state.dataHVACControllers->RootFinders(ControlNum),
                                                         DataRootFinder::Slope::Decreasing,

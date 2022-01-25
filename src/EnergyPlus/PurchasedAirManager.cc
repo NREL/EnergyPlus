@@ -205,7 +205,7 @@ void GetPurchasedAir(EnergyPlusData &state)
     // Set up output variables.
 
     // Using/Aliasing
-    using NodeInputManager::CheckUniqueNodes;
+    using NodeInputManager::CheckUniqueNodeNames;
     using NodeInputManager::EndUniqueNodeCheck;
     using NodeInputManager::GetOnlySingleNode;
     using NodeInputManager::InitUniqueNodeCheck;
@@ -279,20 +279,18 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).ZoneSupplyAirNodeNum = GetOnlySingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(3),
                                                                            ErrorsFound,
-                                                                           cCurrentModuleObject,
+                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                           DataLoopNode::NodeConnectionType::Outlet,
+                                                                           DataLoopNode::ConnectionType::Outlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
             UniqueNodeError = false;
-            CheckUniqueNodes(state,
-                             state.dataIPShortCut->cAlphaFieldNames(3),
-                             "NodeName",
-                             UniqueNodeError,
-                             state.dataIPShortCut->cAlphaArgs(3),
-                             _,
-                             state.dataIPShortCut->cAlphaArgs(1));
+            CheckUniqueNodeNames(state,
+                                 state.dataIPShortCut->cAlphaFieldNames(3),
+                                 UniqueNodeError,
+                                 state.dataIPShortCut->cAlphaArgs(3),
+                                 state.dataIPShortCut->cAlphaArgs(1));
             if (UniqueNodeError) ErrorsFound = true;
             // If new (optional) exhaust air node name is present, then register it as inlet
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
@@ -300,41 +298,39 @@ void GetPurchasedAir(EnergyPlusData &state)
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(4),
                                                                                     ErrorsFound,
-                                                                                    cCurrentModuleObject,
+                                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 } else {
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(4),
                                                                                     ErrorsFound,
-                                                                                    cCurrentModuleObject,
+                                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 state.dataIPShortCut->cAlphaFieldNames(4),
-                                 "NodeName",
-                                 UniqueNodeError,
-                                 state.dataIPShortCut->cAlphaArgs(4),
-                                 _,
-                                 state.dataIPShortCut->cAlphaArgs(1));
+                CheckUniqueNodeNames(state,
+                                     state.dataIPShortCut->cAlphaFieldNames(4),
+                                     UniqueNodeError,
+                                     state.dataIPShortCut->cAlphaArgs(4),
+                                     state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 PurchAir(PurchAirNum).PlenumExhaustAirNodeNum = GetOnlySingleNode(state,
                                                                                   state.dataIPShortCut->cAlphaArgs(5),
                                                                                   ErrorsFound,
-                                                                                  cCurrentModuleObject,
+                                                                                  DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                                                  DataLoopNode::ConnectionType::Inlet,
                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsNotParent);
             }
@@ -516,10 +512,10 @@ void GetPurchasedAir(EnergyPlusData &state)
                 PurchAir(PurchAirNum).OutdoorAirNodeNum = GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(13),
                                                                             ErrorsFound,
-                                                                            cCurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
                 // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
@@ -532,13 +528,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ShowContinueError(state, "Adding OutdoorAir:Node=" + state.dataIPShortCut->cAlphaArgs(13));
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 state.dataIPShortCut->cAlphaFieldNames(13),
-                                 "NodeName",
-                                 UniqueNodeError,
-                                 state.dataIPShortCut->cAlphaArgs(13),
-                                 _,
-                                 state.dataIPShortCut->cAlphaArgs(1));
+                CheckUniqueNodeNames(state,
+                                     state.dataIPShortCut->cAlphaFieldNames(13),
+                                     UniqueNodeError,
+                                     state.dataIPShortCut->cAlphaArgs(13),
+                                     state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
 
                 // get Demand controlled ventilation type

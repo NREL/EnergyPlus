@@ -163,10 +163,10 @@ namespace AirLoopHVACDOAS {
                 thisMixer.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                               thisMixer.OutletNodeName,
                                                                               errorsFound,
-                                                                              cCurrentModuleObject,
+                                                                              DataLoopNode::ConnectionObjectType::AirLoopHVACMixer,
                                                                               thisObjectName,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                                              DataLoopNode::ConnectionType::Outlet,
                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                               DataLoopNode::ObjectIsParent);
 
@@ -460,7 +460,7 @@ namespace AirLoopHVACDOAS {
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         thisDOAS.m_FanTypeNum = SimAirServingZones::CompType::Fan_ComponentModel;
-                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound, ObjexxFCL::Optional_string_const());
+                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound);
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;

@@ -484,20 +484,20 @@ void GetAirPathData(EnergyPlusData &state)
         AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(1) = GetOnlySingleNode(state,
                                                                                  Alphas(6),
                                                                                  ErrorsFound,
-                                                                                 CurrentModuleObject,
+                                                                                 DataLoopNode::ConnectionObjectType::AirLoopHVAC,
                                                                                  Alphas(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
         if (!lAlphaBlanks(7)) {
             AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
                                                                                        Alphas(7),
                                                                                        ErrorsFound,
-                                                                                       CurrentModuleObject,
+                                                                                       DataLoopNode::ConnectionObjectType::AirLoopHVAC,
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                                                       DataLoopNode::ConnectionType::Outlet,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
         } else {
@@ -604,16 +604,14 @@ void GetAirPathData(EnergyPlusData &state)
                     NodeNums,
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
-                    CurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::AirLoopHVAC,
                     PrimaryAirSystems(AirSysNum).Name,
-                    DataLoopNode::NodeConnectionType::Inlet,
+                    DataLoopNode::ConnectionType::Inlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(8));
         if (ErrInList) {
-            //      CALL ShowContinueError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
-            //                         '", invalid '//TRIM(cAlphaFields(8))//'.')
             ErrorsFound = true;
         }
         // Allow at most 3 supply nodes (for a 3 deck system)
@@ -645,16 +643,14 @@ void GetAirPathData(EnergyPlusData &state)
                     NodeNums,
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
-                    CurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::AirLoopHVAC,
                     PrimaryAirSystems(AirSysNum).Name,
-                    DataLoopNode::NodeConnectionType::Outlet,
+                    DataLoopNode::ConnectionType::Outlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(9));
         if (ErrInList) {
-            //      CALL ShowContinueError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
-            //                         '", invalid '//TRIM(cAlphaFields(9))//'.')
             ErrorsFound = true;
         }
         if (NumNodes != AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) {
@@ -2035,28 +2031,16 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         if (PrimaryAirSystems(AirLoopNum).OASysExists && !PrimaryAirSystems(AirLoopNum).isAllOA) {
                             if (FoundOASys) {
                                 if (PrimaryAirSystems(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-                                    GetFanIndex(state,
-                                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                SupFanIndex,
-                                                ErrorsFound,
-                                                ObjexxFCL::Optional_string_const());
+                                    GetFanIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                                     supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
                                 }
                             } else {
-                                GetFanIndex(state,
-                                            PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                            RetFanIndex,
-                                            ErrorsFound,
-                                            ObjexxFCL::Optional_string_const());
+                                GetFanIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
                                 retFanModelType = StructArrayLegacyFanModels;
                             }
                         } else {
-                            GetFanIndex(state,
-                                        PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                        SupFanIndex,
-                                        ErrorsFound,
-                                        ObjexxFCL::Optional_string_const());
+                            GetFanIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                             supFanModelType = StructArrayLegacyFanModels;
                             goto EndOfAirLoop;
                         }
