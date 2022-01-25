@@ -354,6 +354,7 @@ namespace DataLoopNode {
         SetpointManagerSingleZoneOneStageCooling,
         SetpointManagerSingleZoneOneStageHeating,
         SetpointManagerSingleZoneReheat,
+        SetpointManagerSystemNodeReset,
         SetpointManagerWarmest,
         SetpointManagerWarmestTemperatureFlow,
         SolarCollectorFlatPlatePhotovoltaicThermal,
