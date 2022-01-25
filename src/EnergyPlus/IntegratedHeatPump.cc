@@ -1177,7 +1177,8 @@ void GetIHPInput(EnergyPlusData &state)
     Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-    bool IsNotOK; // Flag to verify name
+    bool ErrorsFound(false); // If errors detected in input
+    bool IsNotOK;            // Flag to verify name
     bool errFlag;
     int IOStat;
     int InNode(0);         // inlet air or water node
@@ -1208,8 +1209,6 @@ void GetIHPInput(EnergyPlusData &state)
     sIHPType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";            // for checking
 
     for (int CoilCounter = 1; CoilCounter <= NumASIHPs; ++CoilCounter) {
-
-        bool ErrorsFound(false); // If errors detected in input
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
@@ -1957,119 +1956,121 @@ void GetIHPInput(EnergyPlusData &state)
         state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MaxHeatAirVolFlow = 1e10;
         state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MaxCoolAirMassFlow = 1e10;
         state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).MaxCoolAirVolFlow = 1e10;
+    }
 
-        if (ErrorsFound) {
-            ShowFatalError(state,
-                           std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
-                               " input.  Preceding condition(s) causes termination.");
-        } else {
-            // set up output variables, not reported in the individual coil models
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Air Loop Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).AirLoopFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Condenser Water Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TankSourceWaterMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Air Total Cooling Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalCoolingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Air Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalSpaceHeatingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Water Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalWaterHeatingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Electricity Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Air Latent Cooling Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalLatentLoad,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Source Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Qsource,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump COP",
-                                OutputProcessor::Unit::None,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalCOP,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Electricity Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Air Total Cooling Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalCooling,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Air Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalHeating,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Water Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalWaterHeating,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Air Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLatent,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-            SetupOutputVariable(state,
-                                "Integrated Heat Pump Source Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergySource,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
-        }
+    if (ErrorsFound) {
+        ShowFatalError(state,
+                       std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
+                           " input.  Preceding condition(s) causes termination.");
+    }
+
+    for (int CoilCounter = 1; CoilCounter <= NumASIHPs; ++CoilCounter) {
+        // set up output variables, not reported in the individual coil models
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Air Loop Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).AirLoopFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Condenser Water Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TankSourceWaterMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Air Total Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalCoolingRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Air Heating Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalSpaceHeatingRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Water Heating Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalWaterHeatingRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalPower,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Air Latent Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalLatentLoad,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Source Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Qsource,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump COP",
+                            OutputProcessor::Unit::None,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).TotalCOP,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Energy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Air Total Cooling Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalCooling,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Air Heating Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalHeating,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Water Heating Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLoadTotalWaterHeating,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Air Latent Cooling Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergyLatent,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
+        SetupOutputVariable(state,
+                            "Integrated Heat Pump Source Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).EnergySource,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            state.dataIntegratedHP->IntegratedHeatPumps(CoilCounter).Name);
     }
 }
 
