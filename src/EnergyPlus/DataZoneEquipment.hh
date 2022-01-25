@@ -488,10 +488,11 @@ namespace DataZoneEquipment {
         std::string ZoneMixerName;
         int ZoneMixerIndex;
         int CentralFanTypeNum;
+        std::string CentralFanName; // 2022-01: adding this seems to make the sim call easier
         int CentralFanIndex;
 
         // Default Constructor
-        ExhaustAir() : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanIndex(0)
+        ExhaustAir() : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanName(""), CentralFanIndex(0)
         {
         }
     };
