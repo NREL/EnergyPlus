@@ -1636,8 +1636,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetTempTest)
 
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlVarType, "TEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::Temp));
+    EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).ctrlVarType, "TEMPERATURE");
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::Temp));
     EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeReset));
     EXPECT_EQ(20.0, state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtLowRefTemp);
     EXPECT_EQ(16.7, state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtHighRefTemp);
@@ -1664,7 +1664,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetTempTest)
     SetPointManager::UpdateSetPointManagers(*state);
     // check the new reset value is set
     EXPECT_EQ(14.0, state->dataLoopNodes->Node(2).TempSetPoint);
-
     // set the reference temperature in the middle of two reference points
     state->dataLoopNodes->Node(1).Temp = 18.0;
     // check Reset Set Point Manager run
@@ -1701,8 +1700,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetHumRatTest)
 
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlVarType, "HUMIDITYRATIO");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::HumRat));
+    EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).ctrlVarType, "HUMIDITYRATIO");
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::HumRat));
     EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeReset));
     EXPECT_EQ(0.008, state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtLowRefHumRat);
     EXPECT_EQ(0.004, state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtHighRefHumRat);
@@ -1729,7 +1728,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetHumRatTest)
     SetPointManager::UpdateSetPointManagers(*state); 
     // check the new reset value is set
     EXPECT_EQ(0.003, state->dataLoopNodes->Node(2).HumRatSetPoint);
-
     // set the reference humidity ratio in the middle of two reference points 
     state->dataLoopNodes->Node(1).HumRat = 0.005;
     // check Reset Set Point Manager run

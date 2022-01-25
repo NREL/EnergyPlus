@@ -3736,20 +3736,20 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         auto &setpointManager = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum);
 
         setpointManager.Name = cAlphaArgs(1);
-        setpointManager.CtrlVarType = cAlphaArgs(2);
+        setpointManager.ctrlVarType = cAlphaArgs(2);
 
-        if (UtilityRoutines::SameString(setpointManager.CtrlVarType, "Temperature")) {
-            setpointManager.CtrlTypeMode = iCtrlVarType::Temp;
-        } else if (UtilityRoutines::SameString(setpointManager.CtrlVarType, "MaximumTemperature")) {
-            setpointManager.CtrlTypeMode = iCtrlVarType::MaxTemp;
-        } else if (UtilityRoutines::SameString(setpointManager.CtrlVarType, "MinimumTemperature")) {
-            setpointManager.CtrlTypeMode = iCtrlVarType::MinTemp;
-        } else if (UtilityRoutines::SameString(setpointManager.CtrlVarType, "HumidityRatio")) {
-            setpointManager.CtrlTypeMode = iCtrlVarType::HumRat;
-        } else if (UtilityRoutines::SameString(setpointManager.CtrlVarType, "MaximumHumidityRatio")) {
-            setpointManager.CtrlTypeMode = iCtrlVarType::MaxHumRat;
-        } else if (UtilityRoutines::SameString(setpointManager.CtrlVarType, "MinimumHumidityRatio")) {
-            setpointManager.CtrlTypeMode = iCtrlVarType::MinHumRat;
+        if (UtilityRoutines::SameString(setpointManager.ctrlVarType, "Temperature")) {
+            setpointManager.CtrlTypeMode = CtrlVarType::Temp;
+        } else if (UtilityRoutines::SameString(setpointManager.ctrlVarType, "MaximumTemperature")) {
+            setpointManager.CtrlTypeMode = CtrlVarType::MaxTemp;
+        } else if (UtilityRoutines::SameString(setpointManager.ctrlVarType, "MinimumTemperature")) {
+            setpointManager.CtrlTypeMode = CtrlVarType::MinTemp;
+        } else if (UtilityRoutines::SameString(setpointManager.ctrlVarType, "HumidityRatio")) {
+            setpointManager.CtrlTypeMode = CtrlVarType::HumRat;
+        } else if (UtilityRoutines::SameString(setpointManager.ctrlVarType, "MaximumHumidityRatio")) {
+            setpointManager.CtrlTypeMode = CtrlVarType::MaxHumRat;
+        } else if (UtilityRoutines::SameString(setpointManager.ctrlVarType, "MinimumHumidityRatio")) {
+            setpointManager.CtrlTypeMode = CtrlVarType::MinHumRat;
         } else {
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -3771,7 +3771,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         setpointManager.RefNodeNum = GetOnlySingleNode(state,
                                                        cAlphaArgs(3),
                                                        ErrorsFound,
-                                                       cCurrentModuleObject,
+                                                       DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeReset,
                                                        cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::blank,
                                                        DataLoopNode::NodeConnectionType::Sensor,
@@ -5579,21 +5579,22 @@ void InitSetPointManagers(EnergyPlusData &state)
                 state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).calculate(state);
                 NodeNum = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                 switch (state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
-                case iCtrlVarType::Temp:
+                case CtrlVarType::Temp:
                     state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
-                case iCtrlVarType::MaxTemp:
+                case CtrlVarType::MaxTemp:
                     state.dataLoopNodes->Node(NodeNum).TempSetPointHi = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
-                case iCtrlVarType::MinTemp:
+                case CtrlVarType::MinTemp:
                     state.dataLoopNodes->Node(NodeNum).TempSetPointLo = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
-                case iCtrlVarType::HumRat:
+                case CtrlVarType::HumRat:
                     state.dataLoopNodes->Node(NodeNum).HumRatSetPoint = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
-                case iCtrlVarType::MaxHumRat:
+                case CtrlVarType::MaxHumRat:
                     state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
-                case iCtrlVarType::MinHumRat:
+                case CtrlVarType::MinHumRat:
                     state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
                 }
             }
         }
+
 
         state.dataSetPointManager->InitSetPointManagersMyEnvrnFlag = false;
         if (!state.dataSetPointManager->InitSetPointManagersOneTimeFlag) state.dataSetPointManager->InitSetPointManagersOneTimeFlag2 = false;
@@ -8820,22 +8821,22 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             // setpoints from this setpoint manager
             NodeNum = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
             switch (state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
-            case iCtrlVarType::Temp:
+            case CtrlVarType::Temp:
                 state.dataLoopNodes->Node(NodeNum).TempSetPoint =
                     state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
-            case iCtrlVarType::MaxTemp:
+            case CtrlVarType::MaxTemp:
                 state.dataLoopNodes->Node(NodeNum).TempSetPointHi =
                     state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the maximum temperature setpoint
-            case iCtrlVarType::MinTemp:
+            case CtrlVarType::MinTemp:
                 state.dataLoopNodes->Node(NodeNum).TempSetPointLo =
                     state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the minimum temperature setpoint
-            case iCtrlVarType::HumRat:
+            case CtrlVarType::HumRat:
                 state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
                     state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the humidity ratio setpoint
-            case iCtrlVarType::MaxHumRat:
+            case CtrlVarType::MaxHumRat:
                 state.dataLoopNodes->Node(NodeNum).HumRatMax =
                     state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the maximum humidity ratio setpoint
-            case iCtrlVarType::MinHumRat:
+            case CtrlVarType::MinHumRat:
                 state.dataLoopNodes->Node(NodeNum).HumRatMin =
                     state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the minimum humidity ratio setpoint
             }
