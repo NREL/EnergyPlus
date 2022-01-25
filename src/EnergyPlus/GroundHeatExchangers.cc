@@ -148,10 +148,10 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
-                                                             this->moduleName,
+                                                             DataLoopNode::ConnectionObjectType::GroundHeatExchangerSlinky,
                                                              this->name,
                                                              DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                             DataLoopNode::ConnectionType::Inlet,
                                                              NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
@@ -159,10 +159,10 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
-                                                              this->moduleName,
+                                                              DataLoopNode::ConnectionObjectType::GroundHeatExchangerSlinky,
                                                               this->name,
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                              DataLoopNode::ConnectionType::Outlet,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
 
@@ -286,10 +286,10 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
-                                                             this->moduleName,
+                                                             DataLoopNode::ConnectionObjectType::GroundHeatExchangerSystem,
                                                              objName,
                                                              DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                             DataLoopNode::ConnectionType::Inlet,
                                                              NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
@@ -298,10 +298,10 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
-                                                              this->moduleName,
+                                                              DataLoopNode::ConnectionObjectType::GroundHeatExchangerSystem,
                                                               objName,
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                              DataLoopNode::ConnectionType::Outlet,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
     this->available = true;

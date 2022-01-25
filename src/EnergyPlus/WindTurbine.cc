@@ -688,46 +688,48 @@ namespace WindTurbine {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-            {
-                auto const SELECT_CASE_var(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType);
-                if (SELECT_CASE_var == RotorType::HAWT) {
-                    SetupOutputVariable(state,
-                                        "Generator Turbine Power Coefficient",
-                                        OutputProcessor::Unit::None,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                } else if (SELECT_CASE_var == RotorType::VAWT) {
-                    SetupOutputVariable(state,
-                                        "Generator Turbine Chordal Component Velocity",
-                                        OutputProcessor::Unit::m_s,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable(state,
-                                        "Generator Turbine Normal Component Velocity",
-                                        OutputProcessor::Unit::m_s,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable(state,
-                                        "Generator Turbine Relative Flow Velocity",
-                                        OutputProcessor::Unit::m_s,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable(state,
-                                        "Generator Turbine Attack Angle",
-                                        OutputProcessor::Unit::deg,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AngOfAttack,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                }
+            switch (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType) {
+            case RotorType::HAWT: {
+                SetupOutputVariable(state,
+                                    "Generator Turbine Power Coefficient",
+                                    OutputProcessor::Unit::None,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
+            } break;
+            case RotorType::VAWT: {
+                SetupOutputVariable(state,
+                                    "Generator Turbine Chordal Component Velocity",
+                                    OutputProcessor::Unit::m_s,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
+                SetupOutputVariable(state,
+                                    "Generator Turbine Normal Component Velocity",
+                                    OutputProcessor::Unit::m_s,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
+                SetupOutputVariable(state,
+                                    "Generator Turbine Relative Flow Velocity",
+                                    OutputProcessor::Unit::m_s,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
+                SetupOutputVariable(state,
+                                    "Generator Turbine Attack Angle",
+                                    OutputProcessor::Unit::deg,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AngOfAttack,
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
+            } break;
+            default:
+                break;
             }
         }
     }
@@ -956,116 +958,114 @@ namespace WindTurbine {
                 TipSpeedRatio = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio;
             }
 
-            {
-                auto const SELECT_CASE_var(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType);
-                if (SELECT_CASE_var == RotorType::HAWT) { // Horizontal axis wind turbine
+            switch (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType) {
+            case RotorType::HAWT: { // Horizontal axis wind turbine
+                MaxPowerCoeff = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff;
+                // Check if empirical constants are available
+                C1 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC1;
+                C2 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC2;
+                C3 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC3;
+                C4 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC4;
+                C5 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC5;
+                C6 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC6;
 
-                    MaxPowerCoeff = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff;
-                    // Check if empirical constants are available
-                    C1 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC1;
-                    C2 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC2;
-                    C3 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC3;
-                    C4 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC4;
-                    C5 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC5;
-                    C6 = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeffC6;
-
-                    Real64 const LocalWindSpeed_3(pow_3(LocalWindSpeed));
-                    if (C1 > 0.0 && C2 > 0.0 && C3 > 0.0 && C4 >= 0.0 && C5 > 0.0 && C6 > 0.0) {
-                        // Analytical approximation
-                        // Maximum power, i.e., rotor speed is at maximum, and pitch angle is zero
-                        // TipSpeedRatioAtI = 1.0 / ( ( 1.0 / ( TipSpeedRatio + 0.08 * PitchAngle ) ) - ( 0.035 / ( pow_3( PitchAngle ) + 1.0 ) ) );
-                        // //Tuned PitchAngle is zero
-                        TipSpeedRatioAtI = TipSpeedRatio / (1.0 - (TipSpeedRatio * 0.035));
-                        // PowerCoeff = C1 * ( ( C2 / TipSpeedRatioAtI ) - ( C3 * PitchAngle ) - ( C4 * std::pow( PitchAngle, 1.5 ) ) - C5 ) * (
-                        // std::exp( -( C6 / TipSpeedRatioAtI ) ) ); //Tuned PitchAngle is zero
-                        PowerCoeff = C1 * ((C2 / TipSpeedRatioAtI) - C5) * std::exp(-(C6 / TipSpeedRatioAtI));
-                        if (PowerCoeff > MaxPowerCoeff) {
-                            PowerCoeff = MaxPowerCoeff;
-                        }
-                        WTPower = 0.5 * LocalAirDensity * PowerCoeff * SweptArea * LocalWindSpeed_3;
-                    } else { // Simple approximation
-                        WTPower = 0.5 * LocalAirDensity * SweptArea * LocalWindSpeed_3 * MaxPowerCoeff;
+                Real64 const LocalWindSpeed_3(pow_3(LocalWindSpeed));
+                if (C1 > 0.0 && C2 > 0.0 && C3 > 0.0 && C4 >= 0.0 && C5 > 0.0 && C6 > 0.0) {
+                    // Analytical approximation
+                    // Maximum power, i.e., rotor speed is at maximum, and pitch angle is zero
+                    // TipSpeedRatioAtI = 1.0 / ( ( 1.0 / ( TipSpeedRatio + 0.08 * PitchAngle ) ) - ( 0.035 / ( pow_3( PitchAngle ) + 1.0 ) ) );
+                    // //Tuned PitchAngle is zero
+                    TipSpeedRatioAtI = TipSpeedRatio / (1.0 - (TipSpeedRatio * 0.035));
+                    // PowerCoeff = C1 * ( ( C2 / TipSpeedRatioAtI ) - ( C3 * PitchAngle ) - ( C4 * std::pow( PitchAngle, 1.5 ) ) - C5 ) * (
+                    // std::exp( -( C6 / TipSpeedRatioAtI ) ) ); //Tuned PitchAngle is zero
+                    PowerCoeff = C1 * ((C2 / TipSpeedRatioAtI) - C5) * std::exp(-(C6 / TipSpeedRatioAtI));
+                    if (PowerCoeff > MaxPowerCoeff) {
                         PowerCoeff = MaxPowerCoeff;
                     }
-                    // Maximum of rated power
-                    if (LocalWindSpeed >= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedWindSpeed ||
-                        WTPower > state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower) {
-                        WTPower = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower;
-                        PowerCoeff = WTPower / (0.5 * LocalAirDensity * SweptArea * LocalWindSpeed_3);
-                    }
-                    // Recalculated Cp at the rated power
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff = PowerCoeff;
+                    WTPower = 0.5 * LocalAirDensity * PowerCoeff * SweptArea * LocalWindSpeed_3;
+                } else { // Simple approximation
+                    WTPower = 0.5 * LocalAirDensity * SweptArea * LocalWindSpeed_3 * MaxPowerCoeff;
+                    PowerCoeff = MaxPowerCoeff;
+                }
+                // Maximum of rated power
+                if (LocalWindSpeed >= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedWindSpeed ||
+                    WTPower > state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower) {
+                    WTPower = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower;
+                    PowerCoeff = WTPower / (0.5 * LocalAirDensity * SweptArea * LocalWindSpeed_3);
+                }
+                // Recalculated Cp at the rated power
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff = PowerCoeff;
+            } break;
+            case RotorType::VAWT: { // Vertical axis wind turbine
+                RotorVel = Omega * (RotorD / 2.0);
+                // Recalculated omega, if TSR is greater than the maximum
+                if (TipSpeedRatio >= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio) {
+                    RotorVel = LocalWindSpeed * state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio;
+                    Omega = RotorVel / (RotorD / 2.0);
+                }
 
-                } else if (SELECT_CASE_var == RotorType::VAWT) { // Vertical axis wind turbine
-                    RotorVel = Omega * (RotorD / 2.0);
-                    // Recalculated omega, if TSR is greater than the maximum
-                    if (TipSpeedRatio >= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio) {
-                        RotorVel = LocalWindSpeed * state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio;
-                        Omega = RotorVel / (RotorD / 2.0);
-                    }
-
-                    AzimuthAng = MaxDegree / state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade;
-                    // Azimuth angle between zero and 90 degree
-                    if (AzimuthAng > MaxTheta) { // Number of blades is 2 or 3
-                        AzimuthAng -= MaxTheta;
-                        if (AzimuthAng == MaxTheta) { // 2 blades
-                            AzimuthAng = 0.0;
-                        }
-                    } else if (AzimuthAng == MaxTheta) { // 4 blades
+                AzimuthAng = MaxDegree / state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade;
+                // Azimuth angle between zero and 90 degree
+                if (AzimuthAng > MaxTheta) { // Number of blades is 2 or 3
+                    AzimuthAng -= MaxTheta;
+                    if (AzimuthAng == MaxTheta) { // 2 blades
                         AzimuthAng = 0.0;
                     }
-
-                    InducedVel = LocalWindSpeed * 2.0 / 3.0;
-                    // Velocity components
-                    Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DataGlobalConstants::DegToRadians));
-                    Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DataGlobalConstants::DegToRadians));
-                    ChordalVel = RotorVel + InducedVel * cos_AzimuthAng;
-                    NormalVel = InducedVel * sin_AzimuthAng;
-                    RelFlowVel = std::sqrt(pow_2(ChordalVel) + pow_2(NormalVel));
-
-                    // Angle of attack
-                    AngOfAttack = std::atan((sin_AzimuthAng / ((RotorVel / LocalWindSpeed) / (InducedVel / LocalWindSpeed) + cos_AzimuthAng)));
-
-                    // Force coefficients
-                    Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians));
-                    Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians));
-                    TanForceCoeff = std::abs(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff * sin_AngOfAttack -
-                                             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff * cos_AngOfAttack);
-                    NorForceCoeff = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff * cos_AngOfAttack +
-                                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff * sin_AngOfAttack;
-
-                    // Net tangential and normal forces
-                    Real64 const RelFlowVel_2(pow_2(RelFlowVel));
-                    Real64 const density_fac(0.5 * LocalAirDensity * state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordArea * RelFlowVel_2);
-                    TanForce = TanForceCoeff * density_fac;
-                    NorForce = NorForceCoeff * density_fac;
-                    Constant = (1.0 / Period) * (TanForce / RelFlowVel_2);
-
-                    // Relative flow velocity is the only function of theta in net tangential force
-                    // Integral of cos(theta) on zero to 2pi goes to zero
-                    // Integrate constants only
-                    IntRelFlowVel = pow_2(RotorVel) * Period + pow_2(InducedVel) * Period;
-
-                    // Average tangential force on a single blade
-                    AvgTanForce = Constant * IntRelFlowVel;
-                    TotTorque = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade * AvgTanForce * (RotorD / 2.0);
-                    WTPower = TotTorque * Omega;
-
-                    // Check if power produced is greater than maximum or rated power
-                    if (WTPower > state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower) {
-                        WTPower = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower;
-                    }
-
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel = ChordalVel;
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel = NormalVel;
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel = RelFlowVel;
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TanForce = TanForce;
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NorForce = NorForce;
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TotTorque = TotTorque;
-
-                } else {
-                    assert(false);
+                } else if (AzimuthAng == MaxTheta) { // 4 blades
+                    AzimuthAng = 0.0;
                 }
+
+                InducedVel = LocalWindSpeed * 2.0 / 3.0;
+                // Velocity components
+                Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DataGlobalConstants::DegToRadians));
+                Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DataGlobalConstants::DegToRadians));
+                ChordalVel = RotorVel + InducedVel * cos_AzimuthAng;
+                NormalVel = InducedVel * sin_AzimuthAng;
+                RelFlowVel = std::sqrt(pow_2(ChordalVel) + pow_2(NormalVel));
+
+                // Angle of attack
+                AngOfAttack = std::atan((sin_AzimuthAng / ((RotorVel / LocalWindSpeed) / (InducedVel / LocalWindSpeed) + cos_AzimuthAng)));
+
+                // Force coefficients
+                Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians));
+                Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians));
+                TanForceCoeff = std::abs(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff * sin_AngOfAttack -
+                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff * cos_AngOfAttack);
+                NorForceCoeff = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff * cos_AngOfAttack +
+                                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff * sin_AngOfAttack;
+
+                // Net tangential and normal forces
+                Real64 const RelFlowVel_2(pow_2(RelFlowVel));
+                Real64 const density_fac(0.5 * LocalAirDensity * state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordArea * RelFlowVel_2);
+                TanForce = TanForceCoeff * density_fac;
+                NorForce = NorForceCoeff * density_fac;
+                Constant = (1.0 / Period) * (TanForce / RelFlowVel_2);
+
+                // Relative flow velocity is the only function of theta in net tangential force
+                // Integral of cos(theta) on zero to 2pi goes to zero
+                // Integrate constants only
+                IntRelFlowVel = pow_2(RotorVel) * Period + pow_2(InducedVel) * Period;
+
+                // Average tangential force on a single blade
+                AvgTanForce = Constant * IntRelFlowVel;
+                TotTorque = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade * AvgTanForce * (RotorD / 2.0);
+                WTPower = TotTorque * Omega;
+
+                // Check if power produced is greater than maximum or rated power
+                if (WTPower > state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower) {
+                    WTPower = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower;
+                }
+
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel = ChordalVel;
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel = NormalVel;
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel = RelFlowVel;
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TanForce = TanForce;
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NorForce = NorForce;
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TotTorque = TotTorque;
+            } break;
+            default: {
+                assert(false);
+            } break;
             }
 
             if (WTPower > state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedPower) {

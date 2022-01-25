@@ -481,40 +481,40 @@ void GetStandAloneERV(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode),
                               ErrorsFound,
-                              CurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::ZoneHVACEnergyRecoveryVentilator,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode =
             GetOnlySingleNode(state,
                               state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode),
                               ErrorsFound,
-                              CurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::ZoneHVACEnergyRecoveryVentilator,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode =
             GetOnlySingleNode(state,
                               state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode),
                               ErrorsFound,
-                              CurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::ZoneHVACEnergyRecoveryVentilator,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode =
             GetOnlySingleNode(state,
                               state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode),
                               ErrorsFound,
-                              CurrentModuleObject,
+                              DataLoopNode::ConnectionObjectType::ZoneHVACEnergyRecoveryVentilator,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::ReliefAir,
+                              DataLoopNode::ConnectionType::ReliefAir,
                               NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
 

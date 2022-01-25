@@ -444,10 +444,10 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(7),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
@@ -457,10 +457,10 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(8),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
@@ -722,10 +722,10 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(15),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
@@ -745,10 +745,10 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(16),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }

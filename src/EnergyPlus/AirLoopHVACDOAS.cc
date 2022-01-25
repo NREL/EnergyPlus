@@ -163,10 +163,10 @@ namespace AirLoopHVACDOAS {
                 thisMixer.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                               thisMixer.OutletNodeName,
                                                                               errorsFound,
-                                                                              cCurrentModuleObject,
+                                                                              DataLoopNode::ConnectionObjectType::AirLoopHVACMixer,
                                                                               thisObjectName,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                                              DataLoopNode::ConnectionType::Outlet,
                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                               DataLoopNode::ObjectIsParent);
 

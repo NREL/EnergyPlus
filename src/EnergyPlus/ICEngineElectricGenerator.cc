@@ -171,10 +171,10 @@ namespace ICEngineElectricGenerator {
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(2),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorInternalCombustionEngine,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Electric,
-                                                    DataLoopNode::NodeConnectionType::Electric,
+                                                    DataLoopNode::ConnectionType::Electric,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -244,10 +244,10 @@ namespace ICEngineElectricGenerator {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(8),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorInternalCombustionEngine,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
@@ -259,10 +259,10 @@ namespace ICEngineElectricGenerator {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(9),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorInternalCombustionEngine,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {

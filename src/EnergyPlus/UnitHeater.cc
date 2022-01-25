@@ -317,20 +317,20 @@ namespace UnitHeater {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode = GetOnlySingleNode(state,
                                                                                        Alphas(3),
                                                                                        ErrorsFound,
-                                                                                       CurrentModuleObject,
+                                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACUnitHeater,
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode = GetOnlySingleNode(state,
                                                                                         Alphas(4),
                                                                                         ErrorsFound,
-                                                                                        CurrentModuleObject,
+                                                                                        DataLoopNode::ConnectionObjectType::ZoneHVACUnitHeater,
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                         ObjectIsParent);
 

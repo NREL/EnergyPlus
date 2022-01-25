@@ -194,27 +194,27 @@ void ManageZoneAirUpdates(EnergyPlusData &state,
 
     InitZoneAirSetPoints(state);
 
-    {
-        auto const SELECT_CASE_var(UpdateType);
-
-        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
-            CalcZoneAirTempSetPoints(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
-            PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
-            CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
-            RevertZoneTimestepHistories(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
-            PushZoneTimestepHistories(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
-            PushSystemTimestepHistories(state);
-        }
+    switch (UpdateType) {
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints: {
+        CalcZoneAirTempSetPoints(state);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep: {
+        PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep: {
+        CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories: {
+        RevertZoneTimestepHistories(state);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories: {
+        PushZoneTimestepHistories(state);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories: {
+        PushSystemTimestepHistories(state);
+    } break;
+    default:
+        break;
     }
 }
 
@@ -5285,24 +5285,27 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             //    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
             //    TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
             // Solve for zone air temperature
-            {
-                auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
+            switch (ZoneAirSolutionAlgo) {
+            case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+                ZT(ZoneNum) =
+                    (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
+                                             (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
+                    ((11.0 / 6.0) * AirCap + TempDepCoef);
+                // Exact solution
+            } break;
+            case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+                if (TempDepCoef == 0.0) { // B=0
+                    ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                } else {
                     ZT(ZoneNum) =
-                        (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
-                                                 (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
-                        ((11.0 / 6.0) * AirCap + TempDepCoef);
-                    // Exact solution
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-                    if (TempDepCoef == 0.0) { // B=0
-                        ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
-                    } else {
-                        ZT(ZoneNum) =
-                            (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
-                    }
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-                    ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
+            } break;
+            case DataHeatBalance::SolutionAlgo::EulerMethod: {
+                ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+            } break;
+            default:
+                break;
             }
             // Update zone node temperature and thermostat temperature unless already updated in Room Air Model,
             // calculate load correction factor
@@ -5382,24 +5385,27 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             //      TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
 
             // Solve for zone air temperature
-            {
-                auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
+            switch (ZoneAirSolutionAlgo) {
+            case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+                ZT(ZoneNum) =
+                    (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
+                                             (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
+                    ((11.0 / 6.0) * AirCap + TempDepCoef);
+                // Exact solution
+            } break;
+            case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+                if (TempDepCoef == 0.0) { // B=0
+                    ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                } else {
                     ZT(ZoneNum) =
-                        (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
-                                                 (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
-                        ((11.0 / 6.0) * AirCap + TempDepCoef);
-                    // Exact solution
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-                    if (TempDepCoef == 0.0) { // B=0
-                        ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
-                    } else {
-                        ZT(ZoneNum) =
-                            (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
-                    }
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-                    ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
+            } break;
+            case DataHeatBalance::SolutionAlgo::EulerMethod: {
+                ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+            } break;
+            default:
+                break;
             }
 
             if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
@@ -5435,50 +5441,52 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, RoutineName);
 
         // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
-        {
-            auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
-            if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
-                if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
-                    if (state.dataRoomAirMod->ZoneDVMixedFlag(ZoneNum) == 0) {
-                        ZoneTempChange = max(ZoneTempChange,
-                                             max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->ZTM1OC(ZoneNum)),
-                                                 std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->ZTM1MX(ZoneNum))));
-                    } else {
-                        ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
-                    }
-                } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
-                    if (state.dataRoomAirMod->ZoneUFMixedFlag(ZoneNum) == 0) {
-                        ZoneTempChange = max(ZoneTempChange,
-                                             max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->ZTM1OC(ZoneNum)),
-                                                 std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->ZTM1MX(ZoneNum))));
-                    } else {
-                        ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
-                    }
+        switch (ZoneAirSolutionAlgo) {
+        case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+            if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
+                if (state.dataRoomAirMod->ZoneDVMixedFlag(ZoneNum) == 0) {
+                    ZoneTempChange = max(ZoneTempChange,
+                                         max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->ZTM1OC(ZoneNum)),
+                                             std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->ZTM1MX(ZoneNum))));
                 } else {
                     ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
                 }
-            } else if ((SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) ||
-                       (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod)) {
-                if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
-                    if (state.dataRoomAirMod->ZoneDVMixedFlag(ZoneNum) == 0) {
-                        ZoneTempChange = max(ZoneTempChange,
-                                             max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->Zone1OC(ZoneNum)),
-                                                 std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->Zone1MX(ZoneNum))));
-                    } else {
-                        ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
-                    }
-                } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
-                    if (state.dataRoomAirMod->ZoneUFMixedFlag(ZoneNum) == 0) {
-                        ZoneTempChange = max(ZoneTempChange,
-                                             max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->Zone1OC(ZoneNum)),
-                                                 std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->Zone1MX(ZoneNum))));
-                    } else {
-                        ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
-                    }
+            } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
+                if (state.dataRoomAirMod->ZoneUFMixedFlag(ZoneNum) == 0) {
+                    ZoneTempChange = max(ZoneTempChange,
+                                         max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->ZTM1OC(ZoneNum)),
+                                             std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->ZTM1MX(ZoneNum))));
+                } else {
+                    ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
+                }
+            } else {
+                ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
+            }
+        } break;
+        case DataHeatBalance::SolutionAlgo::AnalyticalSolution:
+        case DataHeatBalance::SolutionAlgo::EulerMethod: {
+            if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
+                if (state.dataRoomAirMod->ZoneDVMixedFlag(ZoneNum) == 0) {
+                    ZoneTempChange = max(ZoneTempChange,
+                                         max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->Zone1OC(ZoneNum)),
+                                             std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->Zone1MX(ZoneNum))));
                 } else {
                     ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
                 }
+            } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
+                if (state.dataRoomAirMod->ZoneUFMixedFlag(ZoneNum) == 0) {
+                    ZoneTempChange = max(ZoneTempChange,
+                                         max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->Zone1OC(ZoneNum)),
+                                             std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->Zone1MX(ZoneNum))));
+                } else {
+                    ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
+                }
+            } else {
+                ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
             }
+        } break;
+        default:
+            break;
         }
 
         CalcZoneComponentLoadSums(state,
@@ -5946,24 +5954,27 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
 
     // Use a 3rd order derivative to predict final zone humidity ratio and
     // smooth the changes using the zone air capacitance.
-    {
-        auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-        if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
-            state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
-                                                                            (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
-                                                                            (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum))) /
-                                                                  ((11.0 / 6.0) * C + A);
-            // Exact solution
-        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-            if (A == 0.0) { // B=0
-                state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B / C;
-            } else {
-                state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) =
-                    (state.dataHeatBalFanSys->ZoneW1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
-            }
-        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (C * state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B) / (C + A);
+    switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
+    case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+        state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
+                                                                        (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
+                                                                        (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum))) /
+                                                              ((11.0 / 6.0) * C + A);
+        // Exact solution
+    } break;
+    case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+        if (A == 0.0) { // B=0
+            state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B / C;
+        } else {
+            state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) =
+                (state.dataHeatBalFanSys->ZoneW1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
         }
+    } break;
+    case DataHeatBalance::SolutionAlgo::EulerMethod: {
+        state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (C * state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B) / (C + A);
+    } break;
+    default:
+        break;
     }
 
     // Set the humidity ratio to zero if the zone has been dried out
@@ -7091,17 +7102,20 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
     RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
 
-    {
-        auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-        if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
-            CzdTdt = RhoAir * CpAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
-                     (MAT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)) / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-            // Exact solution
-        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-            CzdTdt = TempIndCoef - TempDepCoef * MAT(ZoneNum);
-        } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            CzdTdt = AIRRAT(ZoneNum) * (MAT(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum));
-        }
+    switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
+    case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+        CzdTdt = RhoAir * CpAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens * (MAT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)) /
+                 (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        // Exact solution
+    } break;
+    case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+        CzdTdt = TempIndCoef - TempDepCoef * MAT(ZoneNum);
+    } break;
+    case DataHeatBalance::SolutionAlgo::EulerMethod: {
+        CzdTdt = AIRRAT(ZoneNum) * (MAT(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum));
+    } break;
+    default:
+        break;
     }
 
     if (state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance) {

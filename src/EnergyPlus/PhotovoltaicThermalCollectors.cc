@@ -343,20 +343,20 @@ namespace PhotovoltaicThermalCollectors {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(6),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).PlantOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(7),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -375,20 +375,20 @@ namespace PhotovoltaicThermalCollectors {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(8),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).HVACOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(9),
                                                         ErrorsFound,
-                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 

@@ -413,42 +413,46 @@ namespace HeatRecovery {
             state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirVolFlow = state.dataIPShortCut->rNumericArgs(5);
             state.dataHeatRecovery->ExchCond(ExchNum).NomSecAirInTemp = state.dataIPShortCut->rNumericArgs(6);
             state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = state.dataIPShortCut->rNumericArgs(7);
-            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                                                                                       state.dataIPShortCut->cAlphaArgs(5),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::CompFluidStream::Primary,
-                                                                                       ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                                                                                        state.dataIPShortCut->cAlphaArgs(6),
-                                                                                        ErrorsFound,
-                                                                                        cCurrentModuleObject,
-                                                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                        ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                                                                                       state.dataIPShortCut->cAlphaArgs(7),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::CompFluidStream::Secondary,
-                                                                                       ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                                                                                        state.dataIPShortCut->cAlphaArgs(8),
-                                                                                        ErrorsFound,
-                                                                                        cCurrentModuleObject,
-                                                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::CompFluidStream::Secondary,
-                                                                                        ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(5),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(6),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(7),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(8),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
 
             TestCompSet(state,
                         cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum),
@@ -534,42 +538,46 @@ namespace HeatRecovery {
                                      "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError(state, "Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                                                                                       state.dataIPShortCut->cAlphaArgs(3),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::CompFluidStream::Primary,
-                                                                                       ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                                                                                        state.dataIPShortCut->cAlphaArgs(4),
-                                                                                        ErrorsFound,
-                                                                                        cCurrentModuleObject,
-                                                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                        ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                                                                                       state.dataIPShortCut->cAlphaArgs(5),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::CompFluidStream::Secondary,
-                                                                                       ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                                                                                        state.dataIPShortCut->cAlphaArgs(6),
-                                                                                        ErrorsFound,
-                                                                                        cCurrentModuleObject,
-                                                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::CompFluidStream::Secondary,
-                                                                                        ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(5),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(6),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
 
             state.dataHeatRecovery->ExchCond(ExchNum).NomElecPower = state.dataIPShortCut->rNumericArgs(10);
 
@@ -683,43 +691,47 @@ namespace HeatRecovery {
             // desiccant HX's usually refer to process and regeneration air streams
             // In this module, Sup = Regeneration nodes and Sec = Process nodes
             // regeneration air inlet and outlet nodes
-            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
-                                                                                       state.dataIPShortCut->cAlphaArgs(3),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::CompFluidStream::Primary,
-                                                                                       ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
-                                                                                        state.dataIPShortCut->cAlphaArgs(4),
-                                                                                        ErrorsFound,
-                                                                                        cCurrentModuleObject,
-                                                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                        ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupInletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SupOutletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
             // process air inlet and outlet nodes
-            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
-                                                                                       state.dataIPShortCut->cAlphaArgs(5),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::CompFluidStream::Secondary,
-                                                                                       ObjectIsNotParent);
-            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
-                                                                                        state.dataIPShortCut->cAlphaArgs(6),
-                                                                                        ErrorsFound,
-                                                                                        cCurrentModuleObject,
-                                                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::CompFluidStream::Secondary,
-                                                                                        ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecInletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(5),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
+            state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(6),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
 
             // Set up the component set for the process side of the HX (Sec = Process)
             TestCompSet(state,

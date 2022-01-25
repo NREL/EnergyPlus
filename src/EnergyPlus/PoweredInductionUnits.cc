@@ -345,49 +345,53 @@ void GetPIUs(EnergyPlusData &state)
         }
         }
 
-        state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode = GetOnlySingleNode(state,
-                                                                                    state.dataIPShortCut->cAlphaArgs(3),
-                                                                                    ErrorsFound,
-                                                                                    state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                    ObjectIsParent,
-                                                                                    state.dataIPShortCut->cAlphaFieldNames(3));
+        state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(3));
 
-        state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode = GetOnlySingleNode(state,
-                                                                                    state.dataIPShortCut->cAlphaArgs(4),
-                                                                                    ErrorsFound,
-                                                                                    state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                    ObjectIsParent,
-                                                                                    state.dataIPShortCut->cAlphaFieldNames(4));
+        state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(4));
 
-        state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode = GetOnlySingleNode(state,
-                                                                                  state.dataIPShortCut->cAlphaArgs(5),
-                                                                                  ErrorsFound,
-                                                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType::Outlet,
-                                                                                  NodeInputManager::CompFluidStream::Primary,
-                                                                                  ObjectIsParent,
-                                                                                  state.dataIPShortCut->cAlphaFieldNames(5));
+        state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(5));
 
-        state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode = GetOnlySingleNode(state,
-                                                                                      state.dataIPShortCut->cAlphaArgs(6),
-                                                                                      ErrorsFound,
-                                                                                      state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
-                                                                                      state.dataIPShortCut->cAlphaArgs(1),
-                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Internal,
-                                                                                      NodeInputManager::CompFluidStream::Primary,
-                                                                                      ObjectIsParent,
-                                                                                      state.dataIPShortCut->cAlphaFieldNames(6));
+        state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(6),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Internal,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(6));
         // The reheat coil control node is necessary for hot water reheat, but not necessary for
         // electric or gas reheat.
         if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SimpleHeating) {
@@ -582,67 +586,53 @@ void GetPIUs(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode = GetOnlySingleNode(state,
-                                                                                    state.dataIPShortCut->cAlphaArgs(3),
-                                                                                    ErrorsFound,
-                                                                                    cCurrentModuleObject,
-                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                    ObjectIsParent,
-                                                                                    state.dataIPShortCut->cAlphaFieldNames(3));
+        state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(3));
 
-        state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode = GetOnlySingleNode(state,
-                                                                                    state.dataIPShortCut->cAlphaArgs(4),
-                                                                                    ErrorsFound,
-                                                                                    cCurrentModuleObject,
-                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                    ObjectIsParent,
-                                                                                    state.dataIPShortCut->cAlphaFieldNames(4));
+        state.dataPowerInductionUnits->PIU(PIUNum).SecAirInNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(4));
 
-        state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode = GetOnlySingleNode(state,
-                                                                                  state.dataIPShortCut->cAlphaArgs(5),
-                                                                                  ErrorsFound,
-                                                                                  cCurrentModuleObject,
-                                                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType::Outlet,
-                                                                                  NodeInputManager::CompFluidStream::Primary,
-                                                                                  ObjectIsParent,
-                                                                                  state.dataIPShortCut->cAlphaFieldNames(5));
+        state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(5));
 
-        state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode = GetOnlySingleNode(state,
-                                                                                      state.dataIPShortCut->cAlphaArgs(6),
-                                                                                      ErrorsFound,
-                                                                                      cCurrentModuleObject,
-                                                                                      state.dataIPShortCut->cAlphaArgs(1),
-                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Internal,
-                                                                                      NodeInputManager::CompFluidStream::Primary,
-                                                                                      ObjectIsParent,
-                                                                                      state.dataIPShortCut->cAlphaFieldNames(6));
-        // The reheat coil control node is necessary for hot water reheat, but not necessary for
-        // electric or gas reheat.
-        //  IF (PIU(PIUNum)%HCoilType .EQ. HCoilType_Gas .OR. PIU(PIUNum)%HCoilType .EQ. HCoilType_Electric) THEN
-        //    IF(state.dataIPShortCut->cAlphaArgs(11) /= '') THEN
-        //      CALL ShowWarningError(state, 'In '//TRIM(cCurrentModuleObject)//' = ' // TRIM(PIU(PIUNum)%Name) &
-        //                             // ' the '//TRIM(cAlphaFieldNames(11))//' is not needed and will be ignored.')
-        //      CALL ShowContinueError(state, '  It is used for hot water reheat coils only.')
-        //    END IF
-        //  ELSE
-        //    IF(state.dataIPShortCut->cAlphaArgs(11) == '') THEN
-        //      CALL ShowSevereError(state, 'In '//TRIM(cCurrentModuleObject)//' = ' // TRIM(PIU(PIUNum)%Name) &
-        //                           // ' the '//TRIM(cAlphaFieldNames(11))//' is undefined.')
-        //      ErrorsFound=.TRUE.
-        //    END IF
-        //    PIU(PIUNum)%HotControlNode  = &
-        //      GetOnlySingleNode(state, state.dataIPShortCut->cAlphaArgs(11),ErrorsFound,TRIM(cCurrentModuleObject),cAlphaArgs(1), &
-        //                        DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
-        //  END IF
+        state.dataPowerInductionUnits->PIU(PIUNum).HCoilInAirNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(6),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Internal,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent,
+                              state.dataIPShortCut->cAlphaFieldNames(6));
         if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType == HtgCoilType::SimpleHeating) {
             state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode =
                 GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);

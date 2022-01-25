@@ -439,19 +439,19 @@ namespace HVACFan {
         inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                            alphaArgs(3),
                                                            errorsFound,
-                                                           locCurrentModuleObject,
+                                                           DataLoopNode::ConnectionObjectType::FanSystemModel,
                                                            alphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                           DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                             alphaArgs(4),
                                                             errorsFound,
-                                                            locCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::FanSystemModel,
                                                             alphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                            DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 

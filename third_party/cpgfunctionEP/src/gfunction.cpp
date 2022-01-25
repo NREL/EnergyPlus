@@ -5,12 +5,13 @@
 //
 
 #include <chrono>
-#include <LU-Decomposition/lu.h>
+
 #include <blas/blas.h>
 #include <cpgfunction/gfunction.h>
-#include <cpgfunction/interpolation.h>
-#include <cpgfunction/segments.h>
 #include <cpgfunction/heat_transfer.h>
+#include <cpgfunction/interpolation.h>
+#include <cpgfunction/lu.h>
+#include <cpgfunction/segments.h>
 
 
 using namespace std;  // lots of vectors, only namespace to be used

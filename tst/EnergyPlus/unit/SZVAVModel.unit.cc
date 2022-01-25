@@ -284,10 +284,10 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     NodeInputManager::GetOnlySingleNode(*state,
                                         "ZoneNode",
                                         ErrorsFound,
-                                        "PTUnit",
+                                        DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed,
                                         "PTUnit",
                                         DataLoopNode::NodeFluidType::Air,
-                                        DataLoopNode::NodeConnectionType::Inlet,
+                                        DataLoopNode::ConnectionType::Inlet,
                                         NodeInputManager::CompFluidStream::Primary,
                                         DataLoopNode::ObjectIsNotParent);
 

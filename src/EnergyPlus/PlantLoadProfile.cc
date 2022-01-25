@@ -356,19 +356,19 @@ void GetPlantProfileInput(EnergyPlusData &state)
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
                                                                                                state.dataIPShortCut->cAlphaArgs(2),
                                                                                                ErrorsFound,
-                                                                                               cCurrentModuleObject,
+                                                                                               DataLoopNode::ConnectionObjectType::LoadProfilePlant,
                                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
                                                                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                                                                 ErrorsFound,
-                                                                                                cCurrentModuleObject,
+                                                                                                DataLoopNode::ConnectionObjectType::LoadProfilePlant,
                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                 ObjectIsNotParent);
 

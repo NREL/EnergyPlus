@@ -439,20 +439,20 @@ namespace WaterUse {
                         NodeInputManager::GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(2),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::WaterUseConnections,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                            DataLoopNode::ConnectionType::Inlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode =
                         NodeInputManager::GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(3),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::WaterUseConnections,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                            DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -1496,42 +1496,45 @@ namespace WaterUse {
 
         } else { // WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
 
-            {
-                auto const SELECT_CASE_var(this->HeatRecoveryConfig);
-                if (SELECT_CASE_var == HeatRecoveryConfigEnum::Plant) {
-                    this->RecoveryMassFlowRate = this->HotMassFlowRate;
-                } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::Equipment) {
-                    this->RecoveryMassFlowRate = this->ColdMassFlowRate;
-                } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::PlantAndEquip) {
-                    this->RecoveryMassFlowRate = this->TotalMassFlowRate;
-                }
+            switch (this->HeatRecoveryConfig) {
+            case HeatRecoveryConfigEnum::Plant: {
+                this->RecoveryMassFlowRate = this->HotMassFlowRate;
+            } break;
+            case HeatRecoveryConfigEnum::Equipment: {
+                this->RecoveryMassFlowRate = this->ColdMassFlowRate;
+            } break;
+            case HeatRecoveryConfigEnum::PlantAndEquip: {
+                this->RecoveryMassFlowRate = this->TotalMassFlowRate;
+            } break;
+            default:
+                break;
             }
 
             Real64 HXCapacityRate = Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * this->RecoveryMassFlowRate;
             Real64 DrainCapacityRate = Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * this->DrainMassFlowRate;
             Real64 MinCapacityRate = min(DrainCapacityRate, HXCapacityRate);
 
-            {
-                auto const SELECT_CASE_var(this->HeatRecoveryHX);
-                if (SELECT_CASE_var == HeatRecoveryHXEnum::Ideal) {
-                    this->Effectiveness = 1.0;
-
-                } else if (SELECT_CASE_var == HeatRecoveryHXEnum::CounterFlow) { // Unmixed
-                    Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
-                    Real64 NTU = this->HXUA / MinCapacityRate;
-                    if (CapacityRatio == 1.0) {
-                        this->Effectiveness = NTU / (1.0 + NTU);
-                    } else {
-                        Real64 ExpVal = std::exp(-NTU * (1.0 - CapacityRatio));
-                        this->Effectiveness = (1.0 - ExpVal) / (1.0 - CapacityRatio * ExpVal);
-                    }
-
-                } else if (SELECT_CASE_var == HeatRecoveryHXEnum::CrossFlow) { // Unmixed
-                    Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
-                    Real64 NTU = this->HXUA / MinCapacityRate;
-                    this->Effectiveness =
-                        1.0 - std::exp((std::pow(NTU, 0.22) / CapacityRatio) * (std::exp(-CapacityRatio * std::pow(NTU, 0.78)) - 1.0));
+            switch (this->HeatRecoveryHX) {
+            case HeatRecoveryHXEnum::Ideal: {
+                this->Effectiveness = 1.0;
+            } break;
+            case HeatRecoveryHXEnum::CounterFlow: { // Unmixed
+                Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
+                Real64 NTU = this->HXUA / MinCapacityRate;
+                if (CapacityRatio == 1.0) {
+                    this->Effectiveness = NTU / (1.0 + NTU);
+                } else {
+                    Real64 ExpVal = std::exp(-NTU * (1.0 - CapacityRatio));
+                    this->Effectiveness = (1.0 - ExpVal) / (1.0 - CapacityRatio * ExpVal);
                 }
+            } break;
+            case HeatRecoveryHXEnum::CrossFlow: { // Unmixed
+                Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
+                Real64 NTU = this->HXUA / MinCapacityRate;
+                this->Effectiveness = 1.0 - std::exp((std::pow(NTU, 0.22) / CapacityRatio) * (std::exp(-CapacityRatio * std::pow(NTU, 0.78)) - 1.0));
+            } break;
+            default:
+                break;
             }
 
             this->RecoveryRate = this->Effectiveness * MinCapacityRate * (this->DrainTemp - this->ColdSupplyTemp);
@@ -1545,24 +1548,25 @@ namespace WaterUse {
                 state.dataWaterData->WaterStorage(this->RecoveryTankNum).TwaterSupply(this->TankSupplyID) = this->WasteTemp;
             }
 
-            {
-                auto const SELECT_CASE_var(this->HeatRecoveryConfig);
-                if (SELECT_CASE_var == HeatRecoveryConfigEnum::Plant) {
-                    this->TempError = 0.0; // No feedback back to the cold supply
-                    this->ReturnTemp = this->RecoveryTemp;
+            switch (this->HeatRecoveryConfig) {
+            case HeatRecoveryConfigEnum::Plant: {
+                this->TempError = 0.0; // No feedback back to the cold supply
+                this->ReturnTemp = this->RecoveryTemp;
+            } break;
+            case HeatRecoveryConfigEnum::Equipment: {
+                this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
-                } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::Equipment) {
-                    this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
+                this->ColdTemp = this->RecoveryTemp;
+                this->ReturnTemp = this->ColdSupplyTemp;
+            } break;
+            case HeatRecoveryConfigEnum::PlantAndEquip: {
+                this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
-                    this->ColdTemp = this->RecoveryTemp;
-                    this->ReturnTemp = this->ColdSupplyTemp;
-
-                } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::PlantAndEquip) {
-                    this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
-
-                    this->ColdTemp = this->RecoveryTemp;
-                    this->ReturnTemp = this->RecoveryTemp;
-                }
+                this->ColdTemp = this->RecoveryTemp;
+                this->ReturnTemp = this->RecoveryTemp;
+            } break;
+            default:
+                break;
             }
         }
     }

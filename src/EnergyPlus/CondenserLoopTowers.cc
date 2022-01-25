@@ -290,20 +290,20 @@ namespace CondenserLoopTowers {
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(2),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCondenserLoopTowers->towers(TowerNum).WaterOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(3),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -487,10 +487,10 @@ namespace CondenserLoopTowers {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(10),
                                                         ErrorsFound,
-                                                        cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
                                                         state.dataCondenserLoopTowers->towers(TowerNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                        DataLoopNode::ConnectionType::OutsideAirReference,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum)) {
@@ -699,20 +699,20 @@ namespace CondenserLoopTowers {
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(2),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCondenserLoopTowers->towers(TowerNum).WaterOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(3),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -956,10 +956,10 @@ namespace CondenserLoopTowers {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(10),
                                                         ErrorsFound,
-                                                        cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
                                                         state.dataCondenserLoopTowers->towers(TowerNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                        DataLoopNode::ConnectionType::OutsideAirReference,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum)) {
@@ -1152,20 +1152,20 @@ namespace CondenserLoopTowers {
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(2),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeed,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCondenserLoopTowers->towers(TowerNum).WaterOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(3),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeed,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -1692,10 +1692,10 @@ namespace CondenserLoopTowers {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(12),
                                                         ErrorsFound,
-                                                        cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeed,
                                                         state.dataCondenserLoopTowers->towers(TowerNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                        DataLoopNode::ConnectionType::OutsideAirReference,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum)) {
@@ -1742,20 +1742,20 @@ namespace CondenserLoopTowers {
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(2),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeedMerkel,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCondenserLoopTowers->towers(TowerNum).WaterOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(3),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeedMerkel,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -2014,10 +2014,10 @@ namespace CondenserLoopTowers {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         AlphArray(14),
                                                         ErrorsFound,
-                                                        cCurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeedMerkel,
                                                         state.dataCondenserLoopTowers->towers(TowerNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                        DataLoopNode::ConnectionType::OutsideAirReference,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCondenserLoopTowers->towers(TowerNum).OutdoorAirInletNodeNum)) {

@@ -516,10 +516,10 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).WaterInletNode = GetOnlySingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,
-                                                                         cCMO_BBRadiator_Water,
+                                                                         DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveWater,
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType::Inlet,
+                                                                         DataLoopNode::ConnectionType::Inlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
@@ -527,10 +527,10 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
                                                                           state.dataIPShortCut->cAlphaArgs(5),
                                                                           ErrorsFound,
-                                                                          cCMO_BBRadiator_Water,
+                                                                          DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveWater,
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                                          DataLoopNode::ConnectionType::Outlet,
                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
             TestCompSet(state,

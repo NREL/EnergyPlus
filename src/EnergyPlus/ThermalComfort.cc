@@ -2236,19 +2236,21 @@ namespace ThermalComfort {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneRadTemp;
 
-        {
-            auto const SELECT_CASE_var(state.dataHeatBal->People(PeopleListNum).MRTCalcType);
-
-            if (SELECT_CASE_var == DataHeatBalance::CalcMRT::ZoneAveraged) {
-                state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::SurfaceWeighted) {
-                ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-                SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
-                state.dataThermalComforts->RadTemp =
-                    CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
-            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::AngleFactor) {
-                state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
-            }
+        switch (state.dataHeatBal->People(PeopleListNum).MRTCalcType) {
+        case DataHeatBalance::CalcMRT::ZoneAveraged: {
+            state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
+        } break;
+        case DataHeatBalance::CalcMRT::SurfaceWeighted: {
+            ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
+            SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
+            state.dataThermalComforts->RadTemp =
+                CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
+        } break;
+        case DataHeatBalance::CalcMRT::AngleFactor: {
+            state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
+        } break;
+        default:
+            break;
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
@@ -2457,15 +2459,18 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
             state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
             // report how the aggregation is conducted
-            {
-                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
-                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
-                }
+            switch (state.dataGlobal->KindOfSim) {
+            case DataGlobalConstants::KindOfSim::DesignDay: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the Design Days");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodDesign: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodWeather: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
+            } break;
+            default:
+                break;
             }
             // report number of occupied hours per week for LEED report
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
@@ -2655,15 +2660,18 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied = 0.0;
             state.dataThermalComforts->TotalAnyZoneNotMetOccupied = 0.0;
             // report how the aggregation is conducted
-            {
-                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
-                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
-                }
+            switch (state.dataGlobal->KindOfSim) {
+            case DataGlobalConstants::KindOfSim::DesignDay: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the Design Days");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodDesign: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodWeather: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
+            } break;
+            default:
+                break;
             }
         }
     }
