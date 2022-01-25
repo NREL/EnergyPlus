@@ -215,7 +215,6 @@ namespace DataSurfaces {
         "OnIfHighZoneAirTempAndHighSolarOnWindow",
         "OnIfHighZoneAirTempAndHighHorizontalSolar"};
 
-
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface

@@ -179,7 +179,6 @@ namespace WindowManager {
         Gases::CGas getGas(Material::MaterialProperties const &material) const;
         static Gases::CGas getAir();
         Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
-
     };
 } // namespace WindowManager
 

@@ -213,7 +213,7 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
     auto aFactory = CWCEHeatTransferFactory(*state, state->dataSurface->Surface(numSurf), numSurf, simpleCons);
 
-    //outside
+    // outside
     auto typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::NoShade);
 
@@ -225,14 +225,14 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtBlind);
 
-    //reset the outside to glass
+    // reset the outside to glass
     state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
 
-    //inside
+    // inside
     state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::Shade;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::IntShade);
-    
+
     state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowBlind;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
     EXPECT_EQ(typeOfShade, DataSurfaces::WinShadingType::IntBlind);
@@ -418,7 +418,6 @@ TEST_F(EnergyPlusFixture, DISABLED_GetWindowAssemblyNfrcForReport)
 
     GetWindowAssemblyNfrcForReport(*state, numSurf, numCons, 3.0, 1.5, DataSurfaces::NfrcVisionType::DualVertical, uValueRep, shgcRep, vtRep);
 }
-
 
 TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
 {
@@ -808,7 +807,6 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     EXPECT_TRUE(windowSurfNum > 0);
     int constructNum = UtilityRoutines::FindItemInList("DOUBLE PANE HW WINDOW", state->dataConstruction->Construct);
     EXPECT_TRUE(constructNum > 0);
-
 
     GetWindowAssemblyNfrcForReport(
         *state, windowSurfNum, constructNum, 1.0, 0.5, DataSurfaces::NfrcVisionType::DualVertical, uValueRep, shgcRep, vtRep);
