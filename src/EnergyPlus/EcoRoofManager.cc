@@ -961,7 +961,7 @@ namespace EcoRoofManager {
             // Smart schedule only irrigates when scheduled AND the soil is less than 40% saturated
             state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
             state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
-        } else {
+        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::Invalid) {
             // no schedule, irrigation is just the rain amount
             state.dataEcoRoofMgr->CurrentIrrigation = state.dataEcoRoofMgr->CurrentPrecipitation; // units of m
             state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
