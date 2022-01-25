@@ -581,7 +581,7 @@ namespace ExhaustAirSystemManager {
                             DataLoopNode::NodeFluidType::Air,
                             "ZoneHVAC:ExhaustControl",
                             thisExhCtrl.Name,
-                            DataLoopNode::NodeConnectionType::ZoneInlet,
+                            DataLoopNode::NodeConnectionType::Sensor,
                             NodeInputManager::CompFluidStream::Primary,
                             ObjectIsNotParent,
                             _,
