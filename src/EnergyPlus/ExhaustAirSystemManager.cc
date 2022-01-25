@@ -373,22 +373,41 @@ namespace ExhaustAirSystemManager {
         }
 
         // 2022-01: Simulate the fan
-        // Step 1: need to know the fan type
+        // capacity control method is VariableFanVariableFlow, VariableFanConstantFlow, or ASHRAE90.1
+
+        // calculate fan speed ratio for Fan:OnOff or Fan:SystemModel (not used for other fan types). Only used in fan:OnOff model if performance
+        // curves are present.
+        Real64 FanAirVolFlow = 1.0; // 2022-01: this should be something like a design or rate fan flow rate
+        Real64 FanSpeedRatio = 1.0; //  Node(InletNode).MassFlowRate / (FanAirVolFlow * state.dataEnvrn->StdRhoAir);
+
+        // Constant fan and variable flow calculation AND variable fan
+        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
+
+        bool FirstHVACIteration = false; // 2022-01: This was passed in as a calling parameter in Fan::SimulateFanComponents()'s parent call 
+        // 2022-01: may still need find another way to pass this in or deal with the first HVAC iteration scenario
+
         if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             // 2022-01: The system model, look in HVACFan name space
-            // Simulation procedure
-            // 1. Determine the incoming flow rate;
-            // 2. Calculate fan related parameters;
-            // 3. May need to reconcile the sum of the incoming flows and the fan model's calculation
-            // --maybe based on fan types: e.g. constant flow vs. variable flow?
+            state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(
+                state, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
         } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             // 2022-01: Component model, look in Fan name space
-            // Simulation procedure
-            // 1. Determine the incoming flow rate;
-            // 2. Calculate fan related parameters;
-            // 3. May need to reconcile the sum of the incoming flows and the fan model's calculation
-            // --maybe based on fan types: e.g. constant flow vs. variable flow?
+            // if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
+                                        FirstHVACIteration,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex,
+                                        FanSpeedRatio,
+                                        ZoneCompTurnFansOn,
+                                        ZoneCompTurnFansOff);
         }
+
+        // 2022-01: Determine if there are some "iteration" or revisit step for the zone mixer and fan simulation
+        // depending on which should determine the flow based on control types:
+        /* // if (control type == follow-supply) { //then sum up the flow and assign to fan};
+        // else if(controltype == scheduled) { //then sum up based on schedule} */
+
 
         // 2022-01: Errors and warning messages:
         //ShowSevereError(state,
@@ -548,7 +567,26 @@ namespace ExhaustAirSystemManager {
                    // and also need make sure it is a valid node or nodelist
                 */
                 // Also to do: convert text to interger node values (or node list values?)
-                /* */
+                
+                // InducedNodeListName = AlphArray(5);
+                bool NodeListError = false;
+                int NumNodes = 0;
+
+                Array1D_int supplyNodeOrNodelistArray; // 2022-01: this needs some extra allocation and initialization
+                GetNodeNums(state,
+                            supplyNodeOrNodelistName,
+                            NumNodes,
+                            supplyNodeOrNodelistArray,
+                            NodeListError,
+                            DataLoopNode::NodeFluidType::Air,
+                            "ZoneHVAC:ExhaustControl",
+                            thisExhCtrl.Name,
+                            DataLoopNode::NodeConnectionType::ZoneInlet,
+                            NodeInputManager::CompFluidStream::Primary,
+                            ObjectIsNotParent,
+                            _,
+                            supplyNodeOrNodelistName);
+
                 thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
 
                 std::string minZoneTempLimitScheduleName =
