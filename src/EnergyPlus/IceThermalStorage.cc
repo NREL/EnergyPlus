@@ -698,17 +698,17 @@ namespace IceThermalStorage {
             int NumNums;
             int IOStat;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     iceNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       iceNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             ++state.dataIceThermalStorage->TotalNumIceStorage;
@@ -802,17 +802,17 @@ namespace IceThermalStorage {
             int NumNums;
             int IOStat;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     iceNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       iceNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             ++state.dataIceThermalStorage->TotalNumIceStorage;

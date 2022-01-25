@@ -292,17 +292,17 @@ namespace InternalHeatGains {
             int peopleNum = 0;
             for (int peopleInputNum = 1; peopleInputNum <= state.dataHeatBal->NumPeopleStatements; ++peopleInputNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         peopleModuleObject,
-                                                                         peopleInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           peopleModuleObject,
+                                                                           peopleInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 // Create one People instance for every space associated with this People input object
                 auto &thisPeopleInput = state.dataHeatBal->PeopleObjects(peopleInputNum);
@@ -1069,17 +1069,17 @@ namespace InternalHeatGains {
             for (int lightsInputNum = 1; lightsInputNum <= state.dataHeatBal->NumLightsStatements; ++lightsInputNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         lightsModuleObject,
-                                                                         lightsInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           lightsModuleObject,
+                                                                           lightsInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisLightsInput = state.dataHeatBal->LightsObjects(lightsInputNum);
                 // Create one Lights instance for every space associated with this Lights input object
@@ -1473,17 +1473,17 @@ namespace InternalHeatGains {
             for (int elecEqInputNum = 1; elecEqInputNum <= state.dataHeatBal->NumZoneElectricStatements; ++elecEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         elecEqModuleObject,
-                                                                         elecEqInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           elecEqModuleObject,
+                                                                           elecEqInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisElecEqInput = state.dataHeatBal->ZoneElectricObjects(elecEqInputNum);
                 for (int Item1 = 1; Item1 <= thisElecEqInput.numOfSpaces; ++Item1) {
@@ -1687,17 +1687,17 @@ namespace InternalHeatGains {
             for (int gasEqInputNum = 1; gasEqInputNum <= state.dataHeatBal->NumZoneGasStatements; ++gasEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         gasEqModuleObject,
-                                                                         gasEqInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           gasEqModuleObject,
+                                                                           gasEqInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisGasEqInput = state.dataHeatBal->ZoneGasObjects(gasEqInputNum);
                 for (int Item1 = 1; Item1 <= thisGasEqInput.numOfSpaces; ++Item1) {
@@ -1934,17 +1934,17 @@ namespace InternalHeatGains {
             for (int hwEqInputNum = 1; hwEqInputNum <= state.dataHeatBal->NumHotWaterEqStatements; ++hwEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         hwEqModuleObject,
-                                                                         hwEqInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           hwEqModuleObject,
+                                                                           hwEqInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisHWEqInput = state.dataHeatBal->HotWaterEqObjects(hwEqInputNum);
                 for (int Item1 = 1; Item1 <= thisHWEqInput.numOfSpaces; ++Item1) {
@@ -2147,17 +2147,17 @@ namespace InternalHeatGains {
             int stmEqNum = 0;
             for (int stmEqInputNum = 1; stmEqInputNum <= state.dataHeatBal->NumSteamEqStatements; ++stmEqInputNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         stmEqModuleObject,
-                                                                         stmEqInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           stmEqModuleObject,
+                                                                           stmEqInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisStmEqInput = state.dataHeatBal->SteamEqObjects(stmEqInputNum);
                 for (int Item1 = 1; Item1 <= thisStmEqInput.numOfSpaces; ++Item1) {
@@ -2363,17 +2363,17 @@ namespace InternalHeatGains {
             for (int othEqInputNum = 1; othEqInputNum <= state.dataHeatBal->NumOtherEqStatements; ++othEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         othEqModuleObject,
-                                                                         othEqInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           othEqModuleObject,
+                                                                           othEqInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisOthEqInput = state.dataHeatBal->OtherEqObjects(othEqInputNum);
                 for (int Item1 = 1; Item1 <= thisOthEqInput.numOfSpaces; ++Item1) {
@@ -2624,17 +2624,17 @@ namespace InternalHeatGains {
             for (int itEqInputNum = 1; itEqInputNum <= state.dataHeatBal->NumZoneITEqStatements; ++itEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         itEqModuleObject,
-                                                                         itEqInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           itEqModuleObject,
+                                                                           itEqInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisITEqInput = state.dataHeatBal->ITEqObjects(itEqInputNum);
                 for (int Item1 = 1; Item1 <= thisITEqInput.numOfSpaces; ++Item1) {
@@ -3081,17 +3081,17 @@ namespace InternalHeatGains {
             int bbHeatNum = 0;
             for (int bbHeatInputNum = 1; bbHeatInputNum <= state.dataHeatBal->NumZoneBBHeatStatements; ++bbHeatInputNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         bbModuleObject,
-                                                                         bbHeatInputNum,
-                                                                         AlphaName,
-                                                                         NumAlpha,
-                                                                         IHGNumbers,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           bbModuleObject,
+                                                                           bbHeatInputNum,
+                                                                           AlphaName,
+                                                                           NumAlpha,
+                                                                           IHGNumbers,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 auto &thisBBHeatInput = state.dataHeatBal->ZoneBBHeatObjects(bbHeatInputNum);
                 for (int Item1 = 1; Item1 <= thisBBHeatInput.numOfSpaces; ++Item1) {
@@ -3197,17 +3197,17 @@ namespace InternalHeatGains {
             AlphaName = "";
             IHGNumbers = 0.0;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     contamSSModuleObject,
-                                                                     Loop,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       contamSSModuleObject,
+                                                                       Loop,
+                                                                       AlphaName,
+                                                                       NumAlpha,
+                                                                       IHGNumbers,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphaName(1), contamSSModuleObject, ErrorsFound);
 
             state.dataHeatBal->ZoneCO2Gen(Loop).Name = AlphaName(1);

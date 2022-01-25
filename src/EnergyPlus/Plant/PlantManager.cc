@@ -317,7 +317,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     CurrentModuleObject = "PlantLoop";
     state.dataHVACGlobal->NumPlantLoops =
         state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state,
-                                                                      CurrentModuleObject); // Get the number of primary plant loops
+                                                                        CurrentModuleObject); // Get the number of primary plant loops
     CurrentModuleObject = "CondenserLoop";
     state.dataHVACGlobal->NumCondLoops =
         state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Get the number of Condenser loops
@@ -348,34 +348,34 @@ void GetPlantLoopData(EnergyPlusData &state)
             CurrentModuleObject = "PlantLoop";
             objType = DataLoopNode::ConnectionObjectType::PlantLoop;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     PlantLoopNum,
-                                                                     Alpha,
-                                                                     NumAlphas,
-                                                                     Num,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       PlantLoopNum,
+                                                                       Alpha,
+                                                                       NumAlphas,
+                                                                       Num,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
         } else {
             CondLoopNum = LoopNum - state.dataHVACGlobal->NumPlantLoops;
             this_loop.TypeOfLoop = LoopType::Condenser;
             CurrentModuleObject = "CondenserLoop";
             objType = DataLoopNode::ConnectionObjectType::CondenserLoop;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     CondLoopNum,
-                                                                     Alpha,
-                                                                     NumAlphas,
-                                                                     Num,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       CondLoopNum,
+                                                                       Alpha,
+                                                                       NumAlphas,
+                                                                       Num,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
         }
         UtilityRoutines::IsNameEmpty(state, Alpha(1), CurrentModuleObject, ErrorsFound);
         this_loop.Name = Alpha(1); // Load the Plant Loop Name

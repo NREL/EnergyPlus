@@ -291,17 +291,17 @@ namespace RoomAirModelManager {
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->numTempDistContrldZones; ++ObjNum) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ObjNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       ObjNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       Status,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             // first get zone ID
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneNum == 0) { // throw error
@@ -388,17 +388,17 @@ namespace RoomAirModelManager {
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumConstantGradient; ++ObjNum) {
             thisPattern = ObjNum;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ObjNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       ObjNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       Status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
 
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
@@ -413,17 +413,17 @@ namespace RoomAirModelManager {
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumTwoGradientInterp; ++ObjNum) {
             thisPattern = state.dataRoomAirMod->NumConstantGradient + ObjNum;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ObjNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       ObjNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       Status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterp;
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
@@ -496,17 +496,17 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeight;
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ObjNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       ObjNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       Status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTstat = state.dataIPShortCut->rNumericArgs(2);
@@ -548,17 +548,17 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTemp;
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ObjNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       ObjNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       Status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTstat = state.dataIPShortCut->rNumericArgs(2);
@@ -696,17 +696,17 @@ namespace RoomAirModelManager {
 
             // get air node objects
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     AirNodeNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       AirNodeNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       Status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataRoomAirMod->AirNode(AirNodeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -897,17 +897,17 @@ namespace RoomAirModelManager {
         // loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
         for (ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ControlNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       ControlNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       Status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (ZoneNum == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " = " + state.dataIPShortCut->cAlphaArgs(1));
@@ -964,17 +964,17 @@ namespace RoomAirModelManager {
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDDV; ++Loop) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDDV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr =
@@ -1048,17 +1048,17 @@ namespace RoomAirModelManager {
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDCV; ++Loop) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDCV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr =
@@ -1210,17 +1210,17 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDUI; ++Loop) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDUI(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDUI(Loop).ZonePtr =
@@ -1281,17 +1281,17 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionExterior";
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDUE; ++Loop) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDUE(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDUE(Loop).ZonePtr =
@@ -1403,7 +1403,8 @@ namespace RoomAirModelManager {
         int RAFNNum;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "RoomAirSettings:AirflowNetwork";
-        state.dataRoomAirMod->NumOfRoomAirflowNetControl = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRoomAirMod->NumOfRoomAirflowNetControl =
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRoomAirMod->NumOfRoomAirflowNetControl == 0) return;
         if (state.dataRoomAirMod->NumOfRoomAirflowNetControl > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
@@ -1417,17 +1418,17 @@ namespace RoomAirModelManager {
 
         for (Loop = 1; Loop <= state.dataRoomAirMod->NumOfRoomAirflowNetControl; ++Loop) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     status,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       status,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state,
@@ -1493,17 +1494,17 @@ namespace RoomAirModelManager {
         state.dataRoomAirMod->TotNumOfRoomAFNNodes = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotNumOfRoomAFNNodes; ++Loop) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     status,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       status,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state,
@@ -1553,17 +1554,17 @@ namespace RoomAirModelManager {
         for (Loop = 1; Loop <= TotNumOfRAFNNodeSurfLists; ++Loop) {
             foundList = false;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // find surface list
                 if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
@@ -1632,17 +1633,17 @@ namespace RoomAirModelManager {
         for (Loop = 1; Loop <= TotNumOfRAFNNodeGainsLists; ++Loop) {
             foundList = false;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 3) != 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state,
@@ -1739,17 +1740,17 @@ namespace RoomAirModelManager {
         TotNumOfRAFNNodeHVACLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= TotNumOfRAFNNodeHVACLists; ++Loop) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     status,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       status,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 4) != 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state,

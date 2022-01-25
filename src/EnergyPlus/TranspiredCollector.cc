@@ -302,17 +302,17 @@ namespace TranspiredCollector {
 
         for (Item = 1; Item <= state.dataTranspiredCollector->NumUTSC; ++Item) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Item,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       Item,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
 
             // first handle alphas
             state.dataTranspiredCollector->UTSC(Item).Name = Alphas(1);

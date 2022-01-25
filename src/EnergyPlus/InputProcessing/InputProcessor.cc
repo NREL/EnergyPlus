@@ -105,9 +105,10 @@ static std::string const BlankString;
 
 using json = nlohmann::json;
 
-const json &InputProcessor::schema() {
-  static const auto json_schema = json::from_cbor(EmbeddedEpJSONSchema::embeddedEpJSONSchema());
-  return json_schema;
+const json &InputProcessor::schema()
+{
+    static const auto json_schema = json::from_cbor(EmbeddedEpJSONSchema::embeddedEpJSONSchema());
+    return json_schema;
 }
 
 InputProcessor::InputProcessor() : idf_parser(std::make_unique<IdfParser>()), data(std::make_unique<DataStorage>())

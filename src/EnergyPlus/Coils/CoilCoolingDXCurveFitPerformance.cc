@@ -143,15 +143,15 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CoilCoolingDXCurveFitPerformance::object_name,
-                                                                 perfNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 _,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks);
+                                                                   CoilCoolingDXCurveFitPerformance::object_name,
+                                                                   perfNum,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNumbers,
+                                                                   IOStatus,
+                                                                   _,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks);
         if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }

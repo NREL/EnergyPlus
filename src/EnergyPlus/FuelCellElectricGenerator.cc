@@ -195,17 +195,17 @@ namespace FuelCellElectricGenerator {
         // first load in FuelCell names
         for (int GeneratorNum = 1; GeneratorNum <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++GeneratorNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     GeneratorNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       GeneratorNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             state.dataFuelCellElectGen->FuelCell(GeneratorNum).Name = AlphArray(1);
@@ -232,17 +232,17 @@ namespace FuelCellElectricGenerator {
 
         for (int FCPMNum = 1; FCPMNum <= NumFuelCellPMs; ++FCPMNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     FCPMNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     lAlphaBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       FCPMNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       lAlphaBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCPM);
@@ -392,17 +392,17 @@ namespace FuelCellElectricGenerator {
 
         for (int FCAirSupNum = 1; FCAirSupNum <= NumFuelCellAirSups; ++FCAirSupNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     FCAirSupNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       FCAirSupNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCAirSup);
@@ -601,17 +601,17 @@ namespace FuelCellElectricGenerator {
 
         for (int FCWaterSupNum = 1; FCWaterSupNum <= NumFCWaterSups; ++FCWaterSupNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     FCWaterSupNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       FCWaterSupNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCWaterSup);
@@ -715,17 +715,17 @@ namespace FuelCellElectricGenerator {
 
         for (int FCAuxHeatNum = 1; FCAuxHeatNum <= NumFuelCellAuxilHeaters; ++FCAuxHeatNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     FCAuxHeatNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       FCAuxHeatNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCAuxilHeat);
@@ -792,17 +792,17 @@ namespace FuelCellElectricGenerator {
 
         for (int FCHXNum = 1; FCHXNum <= NumFCExhaustGasHXs; ++FCHXNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     FCHXNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       FCHXNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameExhaustHX);
@@ -893,7 +893,8 @@ namespace FuelCellElectricGenerator {
         }
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:FuelCell:ElectricalStorage";
-        int NumFCElecStorageUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        int NumFCElecStorageUnits =
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (NumFCElecStorageUnits <= 0) {
             ShowWarningError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -903,17 +904,17 @@ namespace FuelCellElectricGenerator {
 
         for (int StorageNum = 1; StorageNum <= NumFCElecStorageUnits; ++StorageNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     StorageNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       StorageNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameElecStorage);
@@ -963,17 +964,17 @@ namespace FuelCellElectricGenerator {
 
         for (int FCPCUNum = 1; FCPCUNum <= NumFCPowerCondUnits; ++FCPCUNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     FCPCUNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       FCPCUNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameInverter);
@@ -1022,17 +1023,17 @@ namespace FuelCellElectricGenerator {
         if (NumFCStackCoolers > 0) { // get stack cooler input data
             for (int FCScoolNum = 1; FCScoolNum <= NumFCStackCoolers; ++FCScoolNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         state.dataIPShortCut->cCurrentModuleObject,
-                                                                         FCScoolNum,
-                                                                         AlphArray,
-                                                                         NumAlphas,
-                                                                         NumArray,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         _,
-                                                                         _,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                           FCScoolNum,
+                                                                           AlphArray,
+                                                                           NumAlphas,
+                                                                           NumArray,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           _,
+                                                                           _,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
                 int thisFuelCell =

@@ -378,17 +378,17 @@ namespace UnitarySystems {
                 Array1D_string cAlphaFields(NumAlphas);
                 Array1D_string cNumericFields(NumNumbers);
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         ++designSpecNum,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           cCurrentModuleObject,
+                                                                           ++designSpecNum,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 // **********************************************************************************************************
 
                 auto const &fields = instance.value();

@@ -240,17 +240,17 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 PipeItem,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   PipeItem,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNumbers,
+                                                                   IOStatus,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPipeHT->PipeHTUniqueNames,
@@ -395,17 +395,17 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 PipeItem,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   PipeItem,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNumbers,
+                                                                   IOStatus,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPipeHT->PipeHTUniqueNames,
@@ -532,17 +532,17 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         ++Item;
         // get the object name
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 PipeItem,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   PipeItem,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNumbers,
+                                                                   IOStatus,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPipeHT->PipeHTUniqueNames,

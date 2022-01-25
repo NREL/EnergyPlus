@@ -144,7 +144,7 @@ namespace EnergyPlus {
 // 	{
 // 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,  "SurfaceConvectionAlgorithm:Inside" );
 // 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,  "RoomAir:Node:AirflowNetwork:InternalGains" );
-// 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpening"
+// 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "AirflowNetwork:MultiZone:Component:DetailedOpening"
 // ); 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,
 // "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" ); 		total +=
 // state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "HeatPump:WaterToWater:ParameterEstimation:Cooling"
@@ -170,7 +170,8 @@ namespace EnergyPlus {
 // 	{
 // 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,  "SurfaceConvectionAlgorithm:Insides" );
 // 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,  "RoomAir:Node:AirflowNetwork:InternalGainss" );
-// 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,  "AirflowNetwork:MultiZone:Component:DetailedOpenings"
+// 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,
+// "AirflowNetwork:MultiZone:Component:DetailedOpenings"
 // ); 		total += state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state,
 // "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" ); 		total +=
 // state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "HeatPump:WaterToWater:ParameterEstimation:Coolings"
@@ -2065,17 +2066,17 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              NumSQLite,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                NumSQLite,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR", ""}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type", "Unit Conversion for Tabular Data"}), cAlphaFields));
@@ -2124,17 +2125,17 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              NumGasSteamHums,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                NumGasSteamHums,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", ""}),
@@ -2200,17 +2201,17 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              numBuildingSurfaceDetailed,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                numBuildingSurfaceDetailed,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED"}), Alphas));
@@ -2263,17 +2264,17 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_curve_biquadratic_objects,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_curve_biquadratic_objects,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "", ""}), Alphas));
@@ -2328,17 +2329,17 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_curve_biquadratic_objects,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_curve_biquadratic_objects,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "", ""}), Alphas));
@@ -2401,17 +2402,17 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_curve_biquadratic_objects,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_curve_biquadratic_objects,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({
@@ -2508,17 +2509,17 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_curve_biquadratic_objects,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_curve_biquadratic_objects,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLEIRFT SPEED", "", "", ""}), Alphas));
@@ -2611,17 +2612,17 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              NumSizingSystem,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                NumSizingSystem,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(11, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"WEST ZONE AIR SYSTEM",
@@ -2697,17 +2698,17 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              NumGasSteamHums,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                NumGasSteamHums,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER",
@@ -2772,17 +2773,17 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              NumGasSteamHums,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                NumGasSteamHums,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(2, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "", "", "", "", ""}), Alphas));
@@ -2872,17 +2873,17 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_unitary_systems,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_unitary_systems,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(22, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"GASHEAT DXAC FURNACE 1",
@@ -2961,17 +2962,17 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_eq_connections,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_eq_connections,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3021,17 +3022,17 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_zones,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_zones,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "", "", ""}), Alphas));
@@ -3088,17 +3089,17 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_equipment_connections,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_equipment_connections,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(6, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3130,17 +3131,17 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cNumericFields2(NumNumbers2);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_equipment_lists,
-                                                              Alphas2,
-                                                              NumAlphas2,
-                                                              Numbers2,
-                                                              NumNumbers2,
-                                                              IOStatus,
-                                                              lNumericBlanks2,
-                                                              lAlphaBlanks2,
-                                                              cAlphaFields2,
-                                                              cNumericFields2);
+                                                                CurrentModuleObject,
+                                                                num_equipment_lists,
+                                                                Alphas2,
+                                                                NumAlphas2,
+                                                                Numbers2,
+                                                                NumNumbers2,
+                                                                IOStatus,
+                                                                lNumericBlanks2,
+                                                                lAlphaBlanks2,
+                                                                cAlphaFields2,
+                                                                cNumericFields2);
 
     EXPECT_EQ(6, NumAlphas2);
     EXPECT_TRUE(compare_containers(
@@ -3232,17 +3233,17 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     Array1D_string cNumericFields2(NumNumbers2);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              2,
-                                                              Alphas2,
-                                                              NumAlphas2,
-                                                              Numbers2,
-                                                              NumNumbers2,
-                                                              IOStatus,
-                                                              lNumericBlanks2,
-                                                              lAlphaBlanks2,
-                                                              cAlphaFields2,
-                                                              cNumericFields2);
+                                                                CurrentModuleObject,
+                                                                2,
+                                                                Alphas2,
+                                                                NumAlphas2,
+                                                                Numbers2,
+                                                                NumNumbers2,
+                                                                IOStatus,
+                                                                lNumericBlanks2,
+                                                                lAlphaBlanks2,
+                                                                cAlphaFields2,
+                                                                cNumericFields2);
 
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3301,17 +3302,17 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_schedule_type_limits,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_schedule_type_limits,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"ANY NUMBER", "", ""}), Alphas));
@@ -3340,17 +3341,17 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cNumericFields2(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              2,
-                                                              Alphas2,
-                                                              NumAlphas,
-                                                              Numbers2,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks2,
-                                                              lAlphaBlanks2,
-                                                              cAlphaFields2,
-                                                              cNumericFields2);
+                                                                CurrentModuleObject,
+                                                                2,
+                                                                Alphas2,
+                                                                NumAlphas,
+                                                                Numbers2,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks2,
+                                                                lAlphaBlanks2,
+                                                                cAlphaFields2,
+                                                                cNumericFields2);
 
     // Container size is 4500 here!
     EXPECT_EQ(6, NumAlphas);
@@ -3403,17 +3404,17 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_fans,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_fans,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(
@@ -3501,17 +3502,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cNumericFields2(NumNumbers2);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              2,
-                                                              Alphas2,
-                                                              NumAlphas2,
-                                                              Numbers2,
-                                                              NumNumbers2,
-                                                              IOStatus,
-                                                              lNumericBlanks2,
-                                                              lAlphaBlanks2,
-                                                              cAlphaFields2,
-                                                              cNumericFields2);
+                                                                CurrentModuleObject,
+                                                                2,
+                                                                Alphas2,
+                                                                NumAlphas2,
+                                                                Numbers2,
+                                                                NumNumbers2,
+                                                                IOStatus,
+                                                                lNumericBlanks2,
+                                                                lAlphaBlanks2,
+                                                                cAlphaFields2,
+                                                                cNumericFields2);
 
     EXPECT_EQ(1, NumAlphas2);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFFF", "", ""}), Alphas2));
@@ -3535,17 +3536,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cNumericFields3(NumNumbers3);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              3,
-                                                              Alphas3,
-                                                              NumAlphas3,
-                                                              Numbers3,
-                                                              NumNumbers3,
-                                                              IOStatus,
-                                                              lNumericBlanks3,
-                                                              lAlphaBlanks3,
-                                                              cAlphaFields3,
-                                                              cNumericFields3);
+                                                                CurrentModuleObject,
+                                                                3,
+                                                                Alphas3,
+                                                                NumAlphas3,
+                                                                Numbers3,
+                                                                NumNumbers3,
+                                                                IOStatus,
+                                                                lNumericBlanks3,
+                                                                lAlphaBlanks3,
+                                                                cAlphaFields3,
+                                                                cNumericFields3);
 
     EXPECT_EQ(1, NumAlphas3);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"PLFFPLR", "", ""}), Alphas3));
@@ -3706,17 +3707,17 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_coils,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_coils,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(49, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"FURNACE ACDXCOIL 1",
@@ -3911,17 +3912,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     Array1D_string cNumericFields2(NumNumbers2);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              2,
-                                                              Alphas2,
-                                                              NumAlphas2,
-                                                              Numbers2,
-                                                              NumNumbers2,
-                                                              IOStatus,
-                                                              lNumericBlanks2,
-                                                              lAlphaBlanks2,
-                                                              cAlphaFields2,
-                                                              cNumericFields2);
+                                                                CurrentModuleObject,
+                                                                2,
+                                                                Alphas2,
+                                                                NumAlphas2,
+                                                                Numbers2,
+                                                                NumNumbers2,
+                                                                IOStatus,
+                                                                lNumericBlanks2,
+                                                                lAlphaBlanks2,
+                                                                cAlphaFields2,
+                                                                cNumericFields2);
 
     EXPECT_EQ(4, NumAlphas2);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFT", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas2));
@@ -3982,17 +3983,17 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     Array1D_string cNumericFields(NumNumbers);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              num_curve_biquad,
-                                                              Alphas,
-                                                              NumAlphas,
-                                                              Numbers,
-                                                              NumNumbers,
-                                                              IOStatus,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                num_curve_biquad,
+                                                                Alphas,
+                                                                NumAlphas,
+                                                                Numbers,
+                                                                NumNumbers,
+                                                                IOStatus,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLCAPFT SPEED 1", "TEMPERATURE", "TEMPERATURE", "DIMENSIONLESS"}), Alphas));
@@ -4369,17 +4370,17 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     state->dataIPShortCut->rNumericArgs = 0.0;
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              obj_name1,
-                                                              1,
-                                                              state->dataIPShortCut->cAlphaArgs,
-                                                              numAlphas,
-                                                              state->dataIPShortCut->rNumericArgs,
-                                                              numNumbers,
-                                                              ioStat,
-                                                              state->dataIPShortCut->lNumericFieldBlanks,
-                                                              state->dataIPShortCut->lAlphaFieldBlanks,
-                                                              state->dataIPShortCut->cAlphaFieldNames,
-                                                              state->dataIPShortCut->cNumericFieldNames);
+                                                                obj_name1,
+                                                                1,
+                                                                state->dataIPShortCut->cAlphaArgs,
+                                                                numAlphas,
+                                                                state->dataIPShortCut->rNumericArgs,
+                                                                numNumbers,
+                                                                ioStat,
+                                                                state->dataIPShortCut->lNumericFieldBlanks,
+                                                                state->dataIPShortCut->lAlphaFieldBlanks,
+                                                                state->dataIPShortCut->cAlphaFieldNames,
+                                                                state->dataIPShortCut->cNumericFieldNames);
 
     // For Building, min-fields is 8, which is the entire object, regardless of the number of input object fields
     EXPECT_EQ(numAlphas, 3);
@@ -4398,17 +4399,17 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(5), 1.0, 0.0001);
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              obj_name2,
-                                                              1,
-                                                              state->dataIPShortCut->cAlphaArgs,
-                                                              numAlphas,
-                                                              state->dataIPShortCut->rNumericArgs,
-                                                              numNumbers,
-                                                              ioStat,
-                                                              state->dataIPShortCut->lNumericFieldBlanks,
-                                                              state->dataIPShortCut->lAlphaFieldBlanks,
-                                                              state->dataIPShortCut->cAlphaFieldNames,
-                                                              state->dataIPShortCut->cNumericFieldNames);
+                                                                obj_name2,
+                                                                1,
+                                                                state->dataIPShortCut->cAlphaArgs,
+                                                                numAlphas,
+                                                                state->dataIPShortCut->rNumericArgs,
+                                                                numNumbers,
+                                                                ioStat,
+                                                                state->dataIPShortCut->lNumericFieldBlanks,
+                                                                state->dataIPShortCut->lAlphaFieldBlanks,
+                                                                state->dataIPShortCut->cAlphaFieldNames,
+                                                                state->dataIPShortCut->cNumericFieldNames);
 
     // For Material:NoMass, min-fields is 3, but the input object above takes it to A2 and N3
     EXPECT_EQ(numAlphas, 2);

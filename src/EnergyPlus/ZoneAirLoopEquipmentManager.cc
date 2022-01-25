@@ -206,17 +206,17 @@ namespace ZoneAirLoopEquipmentManager {
 
             for (AirDistUnitNum = 1; AirDistUnitNum <= state.dataDefineEquipment->NumAirDistUnits; ++AirDistUnitNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         AirDistUnitNum,
-                                                                         AlphArray,
-                                                                         NumAlphas,
-                                                                         NumArray,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields); //  data for one zone
+                                                                           CurrentModuleObject,
+                                                                           AirDistUnitNum,
+                                                                           AlphArray,
+                                                                           NumAlphas,
+                                                                           NumArray,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields); //  data for one zone
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name = AlphArray(1);

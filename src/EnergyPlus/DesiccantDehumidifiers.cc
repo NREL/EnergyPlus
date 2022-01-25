@@ -352,17 +352,17 @@ namespace DesiccantDehumidifiers {
             RegenCoilAirInletNode = 0;
             RegenCoilAirOutletNode = 0;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     DesicDehumIndex,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       DesicDehumIndex,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             DesicDehumNum = DesicDehumIndex;
 
             GlobalNames::VerifyUniqueInterObjectName(
@@ -744,17 +744,17 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).DehumType = CurrentModuleObject;
             DesicDehum(DesicDehumNum).DehumTypeCode = DesicDehumType::Generic;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     DesicDehum(DesicDehumNum).DehumType,
-                                                                     DesicDehumIndex,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       DesicDehum(DesicDehumNum).DehumType,
+                                                                       DesicDehumIndex,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataDesiccantDehumidifiers->UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFoundGeneric);
             DesicDehum(DesicDehumNum).Name = Alphas(1);

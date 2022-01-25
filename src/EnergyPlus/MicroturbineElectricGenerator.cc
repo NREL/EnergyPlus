@@ -146,17 +146,17 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         Array1D<Real64> NumArray(19);
         Array1D_string AlphArray(20);
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
-                                                                 GeneratorNum,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                                   GeneratorNum,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name = AlphArray(1);
 

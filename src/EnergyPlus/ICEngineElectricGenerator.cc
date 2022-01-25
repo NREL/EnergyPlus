@@ -144,17 +144,17 @@ namespace ICEngineElectricGenerator {
         // LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
         for (genNum = 1; genNum <= state.dataICEngElectGen->NumICEngineGenerators; ++genNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     genNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       genNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).Name = AlphArray(1);

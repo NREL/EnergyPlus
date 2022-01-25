@@ -1069,17 +1069,17 @@ namespace BranchInputManager {
                 BCount = 0;
                 for (int Count = 1; Count <= state.dataBranchInputManager->NumOfBranches; ++Count) {
                     state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                             CurrentModuleObject,
-                                                                             Count,
-                                                                             Alphas,
-                                                                             NumAlphas,
-                                                                             Numbers,
-                                                                             NumNumbers,
-                                                                             IOStat,
-                                                                             lNumericBlanks,
-                                                                             lAlphaBlanks,
-                                                                             cAlphaFields,
-                                                                             cNumericFields);
+                                                                               CurrentModuleObject,
+                                                                               Count,
+                                                                               Alphas,
+                                                                               NumAlphas,
+                                                                               Numbers,
+                                                                               NumNumbers,
+                                                                               IOStat,
+                                                                               lNumericBlanks,
+                                                                               lAlphaBlanks,
+                                                                               cAlphaFields,
+                                                                               cNumericFields);
                     if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrFound)) continue;
                     ++BCount;
                     GetSingleBranchInput(state, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
@@ -1345,17 +1345,17 @@ namespace BranchInputManager {
         for (Count = 1; Count <= state.dataBranchInputManager->NumOfBranchLists; ++Count) {
             CurrentModuleObject = "BranchList";
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Count,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       Count,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrFound)) continue;
 
             ++BCount;
@@ -1500,7 +1500,8 @@ namespace BranchInputManager {
         if (!state.dataBranchInputManager->GetConnectorListInputFlag) return;
         ErrorsFound = false;
         std::string CurrentModuleObject = "ConnectorList";
-        state.dataBranchInputManager->NumOfConnectorLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataBranchInputManager->NumOfConnectorLists =
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         state.dataBranchInputManager->ConnectorLists.allocate(state.dataBranchInputManager->NumOfConnectorLists);
         state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         if (NumAlphas != 5 || NumNumbers != 0) {
@@ -1516,17 +1517,17 @@ namespace BranchInputManager {
         lNumericBlanks.dimension(NumNumbers, true);
         for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Count,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       Count,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             state.dataBranchInputManager->ConnectorLists(Count).Name = Alphas(1);
             NumConnectors = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
             if (mod(NumAlphas - 1, 2) != 0) ++NumConnectors;
@@ -1766,17 +1767,17 @@ namespace BranchInputManager {
         lNumericBlanks.dimension(NumNumbers, true);
         for (Count = 1; Count <= state.dataBranchInputManager->NumSplitters; ++Count) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Count,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       Count,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             state.dataBranchInputManager->Splitters(Count).Name = Alphas(1);
             state.dataBranchInputManager->Splitters(Count).InletBranchName = Alphas(2);
             state.dataBranchInputManager->Splitters(Count).NumOutletBranches = NumAlphas - 2;
@@ -2013,17 +2014,17 @@ namespace BranchInputManager {
         lNumericBlanks.dimension(NumNumbers, true);
         for (Count = 1; Count <= state.dataBranchInputManager->NumMixers; ++Count) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Count,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       Count,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             state.dataBranchInputManager->Mixers(Count).Name = Alphas(1);
             state.dataBranchInputManager->Mixers(Count).OutletBranchName = Alphas(2);
             state.dataBranchInputManager->Mixers(Count).NumInletBranches = NumAlphas - 2;
@@ -2225,7 +2226,8 @@ namespace BranchInputManager {
         Numbers.allocate(NumNumbers);
 
         for (Num = 1; Num <= NumPlantLoops; ++Num) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            state.dataInputProcessing->inputProcessor()->getObjectItem(
+                state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // Only looking for BranchList here.
             if (Alphas(8) == BranchListName) {
                 FoundPlantLoopName = Alphas(1);
@@ -2285,7 +2287,8 @@ namespace BranchInputManager {
         Numbers.allocate(NumNumbers);
 
         for (Num = 1; Num <= NumCondLoops; ++Num) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            state.dataInputProcessing->inputProcessor()->getObjectItem(
+                state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // Only looking for BranchList here.
             if (Alphas(8) == BranchListName) {
                 FoundCondLoopName = Alphas(1);
@@ -2347,7 +2350,8 @@ namespace BranchInputManager {
         Numbers.allocate(NumNumbers);
 
         for (Num = 1; Num <= NumAirLoops; ++Num) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            state.dataInputProcessing->inputProcessor()->getObjectItem(
+                state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // Only looking for BranchList here.
             if (Alphas(4) == BranchListName) {
                 FoundAirLoopName = Alphas(1);

@@ -458,17 +458,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumSchedSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_Scheduled;
@@ -502,17 +502,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumSchedOnSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_ScheduledOn;
@@ -546,17 +546,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumSchedOffSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_ScheduledOff;
@@ -591,17 +591,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_NightCycle;
@@ -806,17 +806,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_OptimumStart;
@@ -959,17 +959,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumDiffTSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_DiffThermo;
@@ -1042,17 +1042,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumHiTurnOffSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_HiTempTOff;
@@ -1097,17 +1097,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumHiTurnOnSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_HiTempTOn;
@@ -1152,17 +1152,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumLoTurnOffSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_LoTempTOff;
@@ -1218,17 +1218,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumLoTurnOnSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_LoTempTOn;
@@ -1273,17 +1273,17 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs; ++SysAvailNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SysAvailNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SysAvailNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_NightVent;
@@ -4012,17 +4012,17 @@ namespace SystemAvailabilityManager {
         for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     SysAvailNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       SysAvailNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_HybridVent;

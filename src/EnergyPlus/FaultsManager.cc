@@ -290,17 +290,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(15); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_EvapCoolerFouling,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_EvapCoolerFouling,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).FaultTypeEnum = Fault::Fouling_EvapCooler;
@@ -392,17 +392,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(14); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_ChillerFouling,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_ChillerFouling,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).FaultTypeEnum = Fault::Fouling_Chiller;
@@ -659,17 +659,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(13); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_BoilerFouling,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_BoilerFouling,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsBoilerFouling(jFault_BoilerFouling).FaultTypeEnum = Fault::Fouling_Boiler;
@@ -751,17 +751,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(12); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_CoilSAT,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_CoilSAT,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).FaultTypeEnum = Fault::TemperatureSensorOffset_CoilSupplyAir;
@@ -980,17 +980,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(11); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_TowerFouling,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_TowerFouling,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).FaultTypeEnum = Fault::Fouling_Tower;
@@ -1096,17 +1096,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(10); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_CondenserSWT,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_CondenserSWT,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).FaultTypeEnum = Fault::TemperatureSensorOffset_CondenserSupplyWater;
@@ -1200,17 +1200,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(9); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_ChillerSWT,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_ChillerSWT,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).FaultTypeEnum = Fault::TemperatureSensorOffset_ChillerSupplyWater;
@@ -1445,17 +1445,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(8); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_AirFilter,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_AirFilter,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultTypeEnum = Fault::Fouling_AirFilter;
@@ -1531,17 +1531,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(7); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_Humidistat,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_Humidistat,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsHumidistatOffset(jFault_Humidistat).FaultTypeEnum = Fault::HumidistatOffset;
@@ -1611,17 +1611,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(6); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_Thermostat,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_Thermostat,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FaultsThermostatOffset(jFault_Thermostat).FaultTypeEnum = Fault::ThermostatOffset;
@@ -1670,17 +1670,17 @@ namespace FaultsManager {
 
             cFaultCurrentObject = cFaults(5); // fault object string
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cFaultCurrentObject,
-                                                                     jFault_FoulingCoil,
-                                                                     cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cFaultCurrentObject,
+                                                                       jFault_FoulingCoil,
+                                                                       cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FaultType = cFaultCurrentObject;
             state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FaultTypeEnum = Fault::Fouling_Coil;
@@ -1848,17 +1848,17 @@ namespace FaultsManager {
 
             for (int jj = 1; jj <= NumFaultsTemp; ++jj) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cFaultCurrentObject,
-                                                                         jj,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cFaultCurrentObject,
+                                                                           jj,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
 
                 ++j;
                 state.dataFaultsMgr->FaultsEconomizer(j).FaultType = cFaultCurrentObject;

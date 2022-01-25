@@ -441,17 +441,17 @@ void GetAirPathData(EnergyPlusData &state)
         CurrentModuleObject = "AirLoopHVAC";
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 AirSysNum,
-                                                                 Alphas,
-                                                                 NumAlphas,
-                                                                 Numbers,
-                                                                 NumNumbers,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields); // get all the input data for the air system
+                                                                   CurrentModuleObject,
+                                                                   AirSysNum,
+                                                                   Alphas,
+                                                                   NumAlphas,
+                                                                   Numbers,
+                                                                   NumNumbers,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields); // get all the input data for the air system
 
         // Assign the air system data to the simulation variables.
         // Data needed to simulate the system goes into PrimaryAirSystem.
@@ -1031,7 +1031,8 @@ void GetAirPathData(EnergyPlusData &state)
         NumControllers = 0;
         if (ControllerListName != std::string()) { // If not blank, then must be there and valid
             // Loop through the controller lists until you find the one attached to this primary air system
-            ControllerListNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(state, "AirLoopHVAC:ControllerList", ControllerListName);
+            ControllerListNum =
+                state.dataInputProcessing->inputProcessor()->getObjectItemNum(state, "AirLoopHVAC:ControllerList", ControllerListName);
             if (ControllerListNum > 0) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(
                     state, "AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);

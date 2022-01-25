@@ -712,17 +712,17 @@ namespace DElightManagerF {
         state.dataDaylightingData->DElightComplexFene.allocate(state.dataDaylightingData->TotDElightCFS);
         for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     ++CFSNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       ++CFSNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             cfs.Name = state.dataIPShortCut->cAlphaArgs(1);
             cfs.ComplexFeneType = state.dataIPShortCut->cAlphaArgs(2);
             cfs.surfName = state.dataIPShortCut->cAlphaArgs(3);
@@ -787,17 +787,17 @@ namespace DElightManagerF {
 
         if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject) == 1) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     1,
-                                                                     cAlphas,
-                                                                     NAlphas,
-                                                                     rNumerics,
-                                                                     NNum,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       1,
+                                                                       cAlphas,
+                                                                       NAlphas,
+                                                                       rNumerics,
+                                                                       NNum,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             if (cAlphas(1) != "XY") {

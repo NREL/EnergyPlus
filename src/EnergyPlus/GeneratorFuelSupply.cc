@@ -138,17 +138,17 @@ namespace GeneratorFuelSupply {
 
             for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         FuelSupNum,
-                                                                         AlphArray,
-                                                                         NumAlphas,
-                                                                         NumArray,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         _,
-                                                                         _,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           FuelSupNum,
+                                                                           AlphArray,
+                                                                           NumAlphas,
+                                                                           NumArray,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           _,
+                                                                           _,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).Name = AlphArray(1);

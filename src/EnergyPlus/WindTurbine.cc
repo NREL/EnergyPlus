@@ -235,17 +235,17 @@ namespace WindTurbine {
         for (WindTurbineNum = 1; WindTurbineNum <= state.dataWindTurbine->NumWindTurbines; ++WindTurbineNum) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     WindTurbineNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       WindTurbineNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name = state.dataIPShortCut->cAlphaArgs(1); // Name of wind turbine

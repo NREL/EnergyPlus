@@ -141,17 +141,17 @@ namespace MatrixDataManager {
         MatNum = 0;
         for (MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     MatIndex,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     _,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       MatIndex,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       _,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             ++MatNum;
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 

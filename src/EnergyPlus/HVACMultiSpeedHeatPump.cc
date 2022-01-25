@@ -616,17 +616,17 @@ namespace HVACMultiSpeedHeatPump {
             SuppHeatCoilOutletNode = 0;
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                                                     MSHPNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                                       MSHPNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), state.dataHVACMultiSpdHP->CurrentModuleObject, ErrorsFound);
 
             MSHeatPump(MSHPNum).Name = Alphas(1);

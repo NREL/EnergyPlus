@@ -207,17 +207,17 @@ void GetSwimmingPool(EnergyPlusData &state)
     for (int Item = 1; Item <= state.dataSwimmingPools->NumSwimmingPools; ++Item) {
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 Item,
-                                                                 Alphas,
-                                                                 NumAlphas,
-                                                                 Numbers,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   Item,
+                                                                   Alphas,
+                                                                   NumAlphas,
+                                                                   Numbers,
+                                                                   NumNumbers,
+                                                                   IOStatus,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
         UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
         state.dataSwimmingPools->Pool(Item).Name = Alphas(1);
 

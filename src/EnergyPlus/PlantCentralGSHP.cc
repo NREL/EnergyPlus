@@ -572,17 +572,17 @@ void GetWrapperInput(EnergyPlusData &state)
     // Load arrays with electric EIR chiller data
     for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
-                                                                 WrapperNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 _,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                                   WrapperNum,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   _,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -1198,17 +1198,17 @@ void GetChillerHeaterInput(EnergyPlusData &state)
     // Load arrays with electric EIR chiller data
     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= state.dataPlantCentralGSHP->numChillerHeaters; ++ChillerHeaterNum) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
-                                                                 ChillerHeaterNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 _,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                                   ChillerHeaterNum,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   _,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);

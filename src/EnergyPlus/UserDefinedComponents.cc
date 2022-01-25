@@ -558,17 +558,17 @@ namespace UserDefinedComponents {
             state.dataUserDefinedComponents->CheckUserPlantCompName.dimension(state.dataUserDefinedComponents->NumUserPlantComps, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserPlantComps; ++CompLoop) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         CompLoop,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         _,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         _);
+                                                                           cCurrentModuleObject,
+                                                                           CompLoop,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           _,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name = cAlphaArgs(1);
@@ -1003,17 +1003,17 @@ namespace UserDefinedComponents {
             state.dataUserDefinedComponents->CheckUserCoilName.dimension(state.dataUserDefinedComponents->NumUserCoils, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserCoils; ++CompLoop) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         CompLoop,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         _,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         _);
+                                                                           cCurrentModuleObject,
+                                                                           CompLoop,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           _,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -1395,23 +1395,24 @@ namespace UserDefinedComponents {
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserZoneAir = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserZoneAir =
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserZoneAir > 0) {
             state.dataUserDefinedComponents->UserZoneAirHVAC.allocate(state.dataUserDefinedComponents->NumUserZoneAir);
             state.dataUserDefinedComponents->CheckUserZoneAirName.dimension(state.dataUserDefinedComponents->NumUserZoneAir, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserZoneAir; ++CompLoop) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         CompLoop,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         _,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         _);
+                                                                           cCurrentModuleObject,
+                                                                           CompLoop,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           _,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name = cAlphaArgs(1);
 
@@ -1849,17 +1850,17 @@ namespace UserDefinedComponents {
             state.dataUserDefinedComponents->CheckUserAirTerminal.dimension(state.dataUserDefinedComponents->NumUserAirTerminals, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserAirTerminals; ++CompLoop) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         CompLoop,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         _,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         _);
+                                                                           cCurrentModuleObject,
+                                                                           CompLoop,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           _,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           _);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name = cAlphaArgs(1);
 

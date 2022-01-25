@@ -189,17 +189,17 @@ namespace SolarCollectors {
 
                 int ParametersNum = FlatPlateParamNum;
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleParamObject,
-                                                                         ParametersNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         _,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           CurrentModuleParamObject,
+                                                                           ParametersNum,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           state.dataIPShortCut->rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           _,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 // Collector module parameters name
                 GlobalNames::VerifyUniqueInterObjectName(state,
@@ -292,13 +292,13 @@ namespace SolarCollectors {
                 int CollectorNum = FlatPlateUnitsNum;
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         CollectorNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus);
+                                                                           CurrentModuleObject,
+                                                                           CollectorNum,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           state.dataIPShortCut->rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus);
 
                 // Collector name
                 GlobalNames::VerifyUniqueInterObjectName(
@@ -424,17 +424,17 @@ namespace SolarCollectors {
                 int ParametersNum = ICSParamNum + NumOfFlatPlateParam;
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleParamObject,
-                                                                         ICSParamNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         _,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           CurrentModuleParamObject,
+                                                                           ICSParamNum,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           state.dataIPShortCut->rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           _,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 // Collector module parameters name
                 GlobalNames::VerifyUniqueInterObjectName(state,
@@ -527,17 +527,17 @@ namespace SolarCollectors {
                 int CollectorNum = ICSUnitsNum + NumFlatPlateUnits;
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         ICSUnitsNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         lAlphaBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           ICSUnitsNum,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           state.dataIPShortCut->rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           lAlphaBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
 
                 // Collector name
                 GlobalNames::VerifyUniqueInterObjectName(state,

@@ -292,17 +292,17 @@ void GetStandAloneERV(EnergyPlusData &state)
     for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 StandAloneERVIndex,
-                                                                 Alphas,
-                                                                 NumAlphas,
-                                                                 Numbers,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   StandAloneERVIndex,
+                                                                   Alphas,
+                                                                   NumAlphas,
+                                                                   Numbers,
+                                                                   NumNumbers,
+                                                                   IOStatus,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
         StandAloneERVNum = StandAloneERVIndex; // separate variables in case other objects read by this module at some point later
         UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name = Alphas(1);
@@ -837,17 +837,17 @@ void GetStandAloneERV(EnergyPlusData &state)
 
     for (ERVControllerNum = 1; ERVControllerNum <= NumERVCtrlrs; ++ERVControllerNum) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 ERVControllerNum,
-                                                                 Alphas,
-                                                                 NumAlphas,
-                                                                 Numbers,
-                                                                 NumNumbers,
-                                                                 IOStatus,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   ERVControllerNum,
+                                                                   Alphas,
+                                                                   NumAlphas,
+                                                                   Numbers,
+                                                                   NumNumbers,
+                                                                   IOStatus,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
         MixedAir::CheckOAControllerName(state, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         ++OutAirNum;
         auto &thisOAController(state.dataMixedAir->OAController(OutAirNum));

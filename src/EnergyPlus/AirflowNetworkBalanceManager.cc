@@ -372,7 +372,7 @@ namespace AirflowNetworkBalanceManager {
             // Check that there is more than one
             if (referenceConditions.size() == 1) {
                 state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
-                                                                            referenceConditions.begin()->second.name);
+                                                                              referenceConditions.begin()->second.name);
                 defaultReferenceConditions = referenceConditions.begin()->second;
 
             } else {
@@ -423,7 +423,7 @@ namespace AirflowNetworkBalanceManager {
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
-                                                                                        result->second.name);
+                                                                                          result->second.name);
                         }
                     }
                 }
@@ -511,7 +511,7 @@ namespace AirflowNetworkBalanceManager {
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
-                                                                                        result->second.name);
+                                                                                          result->second.name);
                         }
                     }
                 }
@@ -588,7 +588,7 @@ namespace AirflowNetworkBalanceManager {
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
-                                                                                        result->second.name);
+                                                                                          result->second.name);
                         }
                     }
                 }
@@ -664,7 +664,7 @@ namespace AirflowNetworkBalanceManager {
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
-                                                                                        result->second.name);
+                                                                                          result->second.name);
                         }
                     }
                 }
@@ -1772,17 +1772,17 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name = Alphas(1); // Name of object
                 state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime = Numbers(1);
@@ -1988,17 +1988,17 @@ namespace AirflowNetworkBalanceManager {
         SimObjectError = false;
         if (!state.dataAirflowNetwork->AFNDefaultControlFlag) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     state.dataAirflowNetworkBalanceManager->NumAirflowNetwork,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       state.dataAirflowNetworkBalanceManager->NumAirflowNetwork,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
 
             state.dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName = Alphas(1);
             state.dataAirflowNetwork->AirflowNetworkSimu.Control = Alphas(2);
@@ -2245,17 +2245,17 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetwork->AirflowNetworkZoneFlag.dimension(state.dataGlobal->NumOfZones, false); // AirflowNetwork zone flag
             for (int i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfZones; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName = Alphas(1); // Name of Associated EnergyPlus Thermal Zone
                 if (!lAlphaBlanks(2))
@@ -2507,17 +2507,17 @@ namespace AirflowNetworkBalanceManager {
                                          state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode;
                      ++i) {
                     state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                             CurrentModuleObject,
-                                                                             i,
-                                                                             Alphas,
-                                                                             NumAlphas,
-                                                                             Numbers,
-                                                                             NumNumbers,
-                                                                             IOStatus,
-                                                                             lNumericBlanks,
-                                                                             lAlphaBlanks,
-                                                                             cAlphaFields,
-                                                                             cNumericFields);
+                                                                               CurrentModuleObject,
+                                                                               i,
+                                                                               Alphas,
+                                                                               NumAlphas,
+                                                                               Numbers,
+                                                                               NumNumbers,
+                                                                               IOStatus,
+                                                                               lNumericBlanks,
+                                                                               lAlphaBlanks,
+                                                                               cAlphaFields,
+                                                                               cNumericFields);
                     UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                     state.dataAirflowNetwork->MultizoneExternalNodeData(i).Name = Alphas(1);    // Name of external node
                     state.dataAirflowNetwork->MultizoneExternalNodeData(i).height = Numbers(1); // Nodal height
@@ -2645,17 +2645,17 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetwork->MultizoneSurfaceData.allocate(state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces);
             for (int i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName = Alphas(1);    // Name of Associated EnergyPlus surface
                 state.dataAirflowNetwork->MultizoneSurfaceData(i).OpeningName = Alphas(2); // Name of crack or opening component,
@@ -3666,17 +3666,17 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetwork->IntraZoneNodeData.allocate(state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetwork->IntraZoneNodeData(i).Name = Alphas(1);         // Name of node
                 state.dataAirflowNetwork->IntraZoneNodeData(i).RAFNNodeName = Alphas(2); // Name of RoomAir node
@@ -3750,17 +3750,17 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetwork->IntraZoneLinkageData(i).Name = Alphas(1); // Name of linkage
                 state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNames[0] = Alphas(2);
@@ -4063,17 +4063,17 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetwork->DisSysNodeData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetwork->DisSysNodeData(i).Name = Alphas(1);      // Name of node
                 state.dataAirflowNetwork->DisSysNodeData(i).EPlusName = Alphas(2); // Name of associated EnergyPlus node
@@ -4132,17 +4132,17 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
                 auto &this_VF_object(state.dataAirflowNetwork->AirflowNetworkLinkageViewFactorData(i));
@@ -4246,17 +4246,17 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetwork->PressureControllerData.allocate(state.dataAirflowNetworkBalanceManager->NumOfPressureControllers);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->NumOfPressureControllers; ++i) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         i,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           i,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetwork->PressureControllerData(i).Name = Alphas(1);     // Object Name
                 state.dataAirflowNetwork->PressureControllerData(i).ZoneName = Alphas(2); // Zone name
@@ -5107,17 +5107,17 @@ namespace AirflowNetworkBalanceManager {
                  ++count) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         count - state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFields,
-                                                                         cNumericFields);
+                                                                           CurrentModuleObject,
+                                                                           count - state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFields,
+                                                                           cNumericFields);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 state.dataAirflowNetwork->AirflowNetworkLinkageData(count).Name = Alphas(1);
                 state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeNames[0] = Alphas(2);

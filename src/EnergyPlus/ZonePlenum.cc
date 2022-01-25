@@ -291,17 +291,17 @@ void GetZonePlenumInput(EnergyPlusData &state)
         CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 ZonePlenumNum,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   ZonePlenumNum,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
         state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName = AlphArray(1);
 
@@ -494,17 +494,17 @@ void GetZonePlenumInput(EnergyPlusData &state)
         CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 ZonePlenumNum,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   ZonePlenumNum,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
         state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName = AlphArray(1);
 

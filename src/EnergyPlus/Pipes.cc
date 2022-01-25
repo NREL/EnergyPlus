@@ -167,13 +167,13 @@ void GetPipeInput(EnergyPlusData &state)
     for (int PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {
         ++PipeNum;
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 PipeWaterNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat);
+                                                                   cCurrentModuleObject,
+                                                                   PipeWaterNum,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataPipes->LocalPipeUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataPipes->LocalPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -211,13 +211,13 @@ void GetPipeInput(EnergyPlusData &state)
     for (int PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum) {
         ++PipeNum;
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 PipeSteamNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat);
+                                                                   cCurrentModuleObject,
+                                                                   PipeSteamNum,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataPipes->LocalPipeUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataPipes->LocalPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);

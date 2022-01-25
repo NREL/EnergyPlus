@@ -161,17 +161,17 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
 
         for (int CHPParamNum = 1; CHPParamNum <= state.dataCHPElectGen->NumMicroCHPParams; ++CHPParamNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     CHPParamNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       CHPParamNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
 
             std::string ObjMSGName = state.dataIPShortCut->cCurrentModuleObject + " Named " + AlphArray(1);
 
@@ -274,17 +274,17 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
         // load in Micro CHPs
         for (int GeneratorNum = 1; GeneratorNum <= state.dataCHPElectGen->NumMicroCHPs; ++GeneratorNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     GeneratorNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       GeneratorNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       _,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // GENERATOR:MICRO CHP,

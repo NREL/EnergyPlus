@@ -176,7 +176,8 @@ namespace EMSManager {
             state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-        state.dataRuntimeLang->NumEMSConstructionIndices = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSConstructionIndices =
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "Output:EnergyManagementSystem";
         int NumOutputEMSs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
@@ -608,17 +609,17 @@ namespace EMSManager {
 
             for (SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         SensorNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           SensorNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
@@ -687,49 +688,49 @@ namespace EMSManager {
                 // name of the module object, and shift the ActuatorNum in GetObjectItem
                 if (ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed) {
                     state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                             cCurrentModuleObject,
-                                                                             ActuatorNum,
-                                                                             cAlphaArgs,
-                                                                             NumAlphas,
-                                                                             rNumericArgs,
-                                                                             NumNums,
-                                                                             IOStat,
-                                                                             lNumericFieldBlanks,
-                                                                             lAlphaFieldBlanks,
-                                                                             cAlphaFieldNames,
-                                                                             cNumericFieldNames);
+                                                                               cCurrentModuleObject,
+                                                                               ActuatorNum,
+                                                                               cAlphaArgs,
+                                                                               NumAlphas,
+                                                                               rNumericArgs,
+                                                                               NumNums,
+                                                                               IOStat,
+                                                                               lNumericFieldBlanks,
+                                                                               lAlphaFieldBlanks,
+                                                                               cAlphaFieldNames,
+                                                                               cNumericFieldNames);
                 } else if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed &&
                            ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:Actuator";
                     state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                             cCurrentModuleObject,
-                                                                             ActuatorNum - state.dataRuntimeLang->numActuatorsUsed,
-                                                                             cAlphaArgs,
-                                                                             NumAlphas,
-                                                                             rNumericArgs,
-                                                                             NumNums,
-                                                                             IOStat,
-                                                                             lNumericFieldBlanks,
-                                                                             lAlphaFieldBlanks,
-                                                                             cAlphaFieldNames,
-                                                                             cNumericFieldNames);
+                                                                               cCurrentModuleObject,
+                                                                               ActuatorNum - state.dataRuntimeLang->numActuatorsUsed,
+                                                                               cAlphaArgs,
+                                                                               NumAlphas,
+                                                                               rNumericArgs,
+                                                                               NumNums,
+                                                                               IOStat,
+                                                                               lNumericFieldBlanks,
+                                                                               lAlphaFieldBlanks,
+                                                                               cAlphaFieldNames,
+                                                                               cNumericFieldNames);
                 } else if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed &&
                            ActuatorNum <= (state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
                                            state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed)) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
                     state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                             cCurrentModuleObject,
-                                                                             ActuatorNum - state.dataRuntimeLang->numActuatorsUsed -
-                                                                                 state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed,
-                                                                             cAlphaArgs,
-                                                                             NumAlphas,
-                                                                             rNumericArgs,
-                                                                             NumNums,
-                                                                             IOStat,
-                                                                             lNumericFieldBlanks,
-                                                                             lAlphaFieldBlanks,
-                                                                             cAlphaFieldNames,
-                                                                             cNumericFieldNames);
+                                                                               cCurrentModuleObject,
+                                                                               ActuatorNum - state.dataRuntimeLang->numActuatorsUsed -
+                                                                                   state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed,
+                                                                               cAlphaArgs,
+                                                                               NumAlphas,
+                                                                               rNumericArgs,
+                                                                               NumNums,
+                                                                               IOStat,
+                                                                               lNumericFieldBlanks,
+                                                                               lAlphaFieldBlanks,
+                                                                               cAlphaFieldNames,
+                                                                               cNumericFieldNames);
                 } else if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
                                              state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed &&
                            ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
@@ -823,23 +824,24 @@ namespace EMSManager {
         }
 
         cCurrentModuleObject = "EnergyManagementSystem:InternalVariable";
-        state.dataRuntimeLang->NumInternalVariablesUsed = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumInternalVariablesUsed =
+            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumInternalVariablesUsed > 0) {
             state.dataRuntimeLang->EMSInternalVarsUsed.allocate(state.dataRuntimeLang->NumInternalVariablesUsed);
 
             for (InternVarNum = 1; InternVarNum <= state.dataRuntimeLang->NumInternalVariablesUsed; ++InternVarNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         InternVarNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           InternVarNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
 
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -890,17 +892,17 @@ namespace EMSManager {
             for (CallManagerNum = 1; CallManagerNum <= state.dataRuntimeLang->NumProgramCallManagers; ++CallManagerNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         CallManagerNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           cCurrentModuleObject,
+                                                                           CallManagerNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
 
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).Name = cAlphaArgs(1);

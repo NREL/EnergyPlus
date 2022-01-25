@@ -156,17 +156,17 @@ void SetupPollutionCalculations(EnergyPlusData &state)
     for (Loop = 1; Loop <= NumPolluteRpt; ++Loop) {
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         // Call this routine in the Output Processor to setup the correct Facility energy meters that are
         //  necessary to make sure that the Meter file is opened and written to by the OP so that time stamps
@@ -211,17 +211,17 @@ void GetPollutionFactorInput(EnergyPlusData &state)
     if (state.dataPollutionModule->NumEnvImpactFactors > 0) {
         // Now find and load all of the user inputs and factors.
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 1,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   1,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
     } else {
         if (state.dataPollutionModule->PollutionReportSetup)
             ShowWarningError(state, cCurrentModuleObject + ": not entered.  Values will be defaulted.");
@@ -263,17 +263,17 @@ void GetPollutionFactorInput(EnergyPlusData &state)
     for (Loop = 1; Loop <= state.dataPollutionModule->NumFuelFactors; ++Loop) {
         // Now find and load all of the user inputs and factors.
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         FuelType.FuelTypeNames(Loop) = state.dataIPShortCut->cAlphaArgs(1);
 

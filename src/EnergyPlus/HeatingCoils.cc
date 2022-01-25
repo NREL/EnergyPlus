@@ -361,17 +361,17 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     ElecCoilNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       ElecCoilNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -490,17 +490,17 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     ElecCoilNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       ElecCoilNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -626,17 +626,17 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Fuel";
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     FuelCoilNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       FuelCoilNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -825,17 +825,17 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     FuelCoilNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       FuelCoilNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";
@@ -1018,17 +1018,17 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     DesuperheaterCoilNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       DesuperheaterCoilNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
 
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames.allocate(state.dataHeatingCoils->MaxNums);
             state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames = "";

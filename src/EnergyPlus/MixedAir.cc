@@ -950,17 +950,17 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         // create a reference for convenience
         auto &thisControllerList(state.dataMixedAir->ControllerLists(Item));
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 Item,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   Item,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
         thisControllerList.Name = AlphArray(1);
         thisControllerList.NumControllers = (NumAlphas - 1) / 2;
@@ -1009,17 +1009,17 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 OASysNum,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   OASysNum,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
         state.dataAirLoop->OutsideAirSys(OASysNum).Name = AlphArray(1);
         if (!AlphArray(2).empty()) {
@@ -1350,17 +1350,17 @@ void GetOAControllerInputs(EnergyPlusData &state)
         for (OutAirNum = state.dataMixedAir->NumERVControllers + 1; OutAirNum <= state.dataMixedAir->NumOAControllers; ++OutAirNum) {
             ++currentOAControllerNum;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     currentOAControllerNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       currentOAControllerNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataMixedAir->OAControllerUniqueNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
@@ -1421,17 +1421,17 @@ void GetOAControllerInputs(EnergyPlusData &state)
         for (VentMechNum = 1; VentMechNum <= state.dataMixedAir->NumVentMechControllers; ++VentMechNum) {
             auto &thisVentilationMechanical(state.dataMixedAir->VentilationMechanical(VentMechNum));
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     VentMechNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       VentMechNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
 
             MechVentZoneCount = 0;
 
@@ -2129,17 +2129,17 @@ void GetOAMixerInputs(EnergyPlusData &state)
 
         for (OutAirNum = 1; OutAirNum <= state.dataMixedAir->NumOAMixers; ++OutAirNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     OutAirNum,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
+                                                                       CurrentModuleObject,
+                                                                       OutAirNum,
+                                                                       AlphArray,
+                                                                       NumAlphas,
+                                                                       NumArray,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             state.dataMixedAir->OAMixer(OutAirNum).Name = AlphArray(1);

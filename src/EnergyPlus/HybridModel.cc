@@ -135,17 +135,17 @@ namespace HybridModel {
             for (int HybridModelNum = 1; HybridModelNum <= state.dataHybridModel->NumOfHybridModelZones; ++HybridModelNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         HybridModelNum,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           HybridModelNum,
+                                                                           cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericFieldBlanks,
+                                                                           lAlphaFieldBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
 
                 ZoneListPtr = 0;
                 ZonePtr =

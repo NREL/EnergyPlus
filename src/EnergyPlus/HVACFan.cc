@@ -410,17 +410,17 @@ namespace HVACFan {
         }
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 locCurrentModuleObject,
-                                                                 objectNum,
-                                                                 alphaArgs,
-                                                                 numAlphas,
-                                                                 numericArgs,
-                                                                 numNums,
-                                                                 IOStat,
-                                                                 isNumericFieldBlank,
-                                                                 isAlphaFieldBlank,
-                                                                 alphaFieldNames,
-                                                                 numericFieldNames);
+                                                                   locCurrentModuleObject,
+                                                                   objectNum,
+                                                                   alphaArgs,
+                                                                   numAlphas,
+                                                                   numericArgs,
+                                                                   numNums,
+                                                                   IOStat,
+                                                                   isNumericFieldBlank,
+                                                                   isAlphaFieldBlank,
+                                                                   alphaFieldNames,
+                                                                   numericFieldNames);
 
         name = alphaArgs(1);
         // TODO how to check for unique names across objects during get input?

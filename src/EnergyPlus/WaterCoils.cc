@@ -322,17 +322,17 @@ void GetWaterCoilInput(EnergyPlusData &state)
         CoilNum = SimpHeatNum;
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 SimpHeatNum,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   SimpHeatNum,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
 
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
@@ -500,17 +500,17 @@ void GetWaterCoilInput(EnergyPlusData &state)
         CoilNum = NumSimpHeat + FlatFinNum;
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 FlatFinNum,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   FlatFinNum,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
 
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
@@ -729,17 +729,17 @@ void GetWaterCoilInput(EnergyPlusData &state)
         CoilNum = NumSimpHeat + NumFlatFin + CoolingNum;
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 CoolingNum,
-                                                                 AlphArray,
-                                                                 NumAlphas,
-                                                                 NumArray,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericBlanks,
-                                                                 lAlphaBlanks,
-                                                                 cAlphaFields,
-                                                                 cNumericFields);
+                                                                   CurrentModuleObject,
+                                                                   CoolingNum,
+                                                                   AlphArray,
+                                                                   NumAlphas,
+                                                                   NumArray,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericBlanks,
+                                                                   lAlphaBlanks,
+                                                                   cAlphaFields,
+                                                                   cNumericFields);
 
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";

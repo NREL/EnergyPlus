@@ -1397,17 +1397,17 @@ void ScanForReports(EnergyPlusData &state,
 
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     RepNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumNames,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       RepNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumNames,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
 
             try {
                 int value = localMap[state.dataIPShortCut->cAlphaArgs(1)];
@@ -1456,17 +1456,17 @@ void ScanForReports(EnergyPlusData &state,
         NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     RepNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumNames,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       RepNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumNames,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
 
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
@@ -1511,17 +1511,17 @@ void ScanForReports(EnergyPlusData &state,
         NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     RepNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumNames,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       RepNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumNames,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             state.dataGeneral->VarDict = true;
             VarDictOption1 = state.dataIPShortCut->cAlphaArgs(1);
             VarDictOption2 = state.dataIPShortCut->cAlphaArgs(2);
@@ -1531,17 +1531,17 @@ void ScanForReports(EnergyPlusData &state,
         NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     RepNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumNames,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       RepNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumNames,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "CONSTRUCTIONS")) {
                 state.dataGeneral->Constructions = true;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "MATERIALS")) {
@@ -1560,17 +1560,17 @@ void ScanForReports(EnergyPlusData &state,
         NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     RepNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumNames,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNumbers,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       RepNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumNames,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNumbers,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
 
             state.dataGeneral->EMSoutput = true;
 

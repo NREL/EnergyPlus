@@ -157,17 +157,17 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
 
     for (Loop = 1; Loop <= state.dataEarthTube->TotEarthTube; ++Loop) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         // First Alpha is Zone Name
         state.dataEarthTube->EarthTubeSys(Loop).ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), Zone);

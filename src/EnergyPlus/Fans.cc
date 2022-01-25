@@ -329,17 +329,17 @@ void GetFanInput(EnergyPlusData &state)
         FanNum = SimpFanNum;
         cCurrentModuleObject = "Fan:ConstantVolume";
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 SimpFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   SimpFanNum,
+                                                                   cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
 
         FanNumericFields(FanNum).FieldNames.allocate(MaxNumbers);
         FanNumericFields(FanNum).FieldNames = "";
@@ -408,17 +408,17 @@ void GetFanInput(EnergyPlusData &state)
         FanNum = NumSimpFan + VarVolFanNum;
         cCurrentModuleObject = "Fan:VariableVolume";
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 VarVolFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   VarVolFanNum,
+                                                                   cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
 
         FanNumericFields(FanNum).FieldNames.allocate(MaxNumbers);
         FanNumericFields(FanNum).FieldNames = "";
@@ -507,17 +507,17 @@ void GetFanInput(EnergyPlusData &state)
         FanNum = NumSimpFan + NumVarVolFan + ExhFanNum;
         cCurrentModuleObject = "Fan:ZoneExhaust";
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 ExhFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   ExhFanNum,
+                                                                   cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
 
         FanNumericFields(FanNum).FieldNames.allocate(MaxNumbers);
         FanNumericFields(FanNum).FieldNames = "";
@@ -676,17 +676,17 @@ void GetFanInput(EnergyPlusData &state)
         FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
         cCurrentModuleObject = "Fan:OnOff";
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 OnOffFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   OnOffFanNum,
+                                                                   cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
 
         FanNumericFields(FanNum).FieldNames.allocate(MaxNumbers);
         FanNumericFields(FanNum).FieldNames = "";
@@ -782,17 +782,17 @@ void GetFanInput(EnergyPlusData &state)
     // input the night ventilation performance objects
     for (NVPerfNum = 1; NVPerfNum <= state.dataFans->NumNightVentPerf; ++NVPerfNum) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 NVPerfNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   NVPerfNum,
+                                                                   cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         NightVentPerf(NVPerfNum).FanName = cAlphaArgs(1);
         NightVentPerf(NVPerfNum).FanEff = rNumericArgs(1);
@@ -820,17 +820,17 @@ void GetFanInput(EnergyPlusData &state)
 
         cCurrentModuleObject = "Fan:ComponentModel";
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 CompModelFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   CompModelFanNum,
+                                                                   cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   rNumericArgs,
+                                                                   NumNums,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
 
         FanNumericFields(FanNum).FieldNames.allocate(MaxNumbers);
         FanNumericFields(FanNum).FieldNames = "";

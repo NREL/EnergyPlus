@@ -139,13 +139,13 @@ namespace ReturnAirPathManager {
             for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         PathNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNums,
-                                                                         IOStat);
+                                                                           cCurrentModuleObject,
+                                                                           PathNum,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           state.dataIPShortCut->rNumericArgs,
+                                                                           NumNums,
+                                                                           IOStat);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).Name = state.dataIPShortCut->cAlphaArgs(1);

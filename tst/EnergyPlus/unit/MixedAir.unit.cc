@@ -161,17 +161,17 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     ControllerNum = 1;
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              ControllerNum,
-                                                              AlphArray,
-                                                              NumAlphas,
-                                                              NumArray,
-                                                              NumNums,
-                                                              IOStat,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                ControllerNum,
+                                                                AlphArray,
+                                                                NumAlphas,
+                                                                NumArray,
+                                                                NumNums,
+                                                                IOStat,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     ProcessOAControllerInputs(*state,
                               CurrentModuleObject,
@@ -192,17 +192,17 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
 
     ControllerNum = 2;
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              ControllerNum,
-                                                              AlphArray,
-                                                              NumAlphas,
-                                                              NumArray,
-                                                              NumNums,
-                                                              IOStat,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                ControllerNum,
+                                                                AlphArray,
+                                                                NumAlphas,
+                                                                NumArray,
+                                                                NumNums,
+                                                                IOStat,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     ErrorsFound = false;
     ProcessOAControllerInputs(*state,
@@ -1537,17 +1537,17 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     state->dataZoneCtrls->NumHumidityControlZones = 1;
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              ControllerNum,
-                                                              AlphArray,
-                                                              NumAlphas,
-                                                              NumArray,
-                                                              NumNums,
-                                                              IOStat,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                ControllerNum,
+                                                                AlphArray,
+                                                                NumAlphas,
+                                                                NumArray,
+                                                                NumNums,
+                                                                IOStat,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     ProcessOAControllerInputs(*state,
                               CurrentModuleObject,
@@ -1672,17 +1672,17 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     state->dataZoneCtrls->NumHumidityControlZones = 1;
 
     state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
-                                                              CurrentModuleObject,
-                                                              ControllerNum,
-                                                              AlphArray,
-                                                              NumAlphas,
-                                                              NumArray,
-                                                              NumNums,
-                                                              IOStat,
-                                                              lNumericBlanks,
-                                                              lAlphaBlanks,
-                                                              cAlphaFields,
-                                                              cNumericFields);
+                                                                CurrentModuleObject,
+                                                                ControllerNum,
+                                                                AlphArray,
+                                                                NumAlphas,
+                                                                NumArray,
+                                                                NumNums,
+                                                                IOStat,
+                                                                lNumericBlanks,
+                                                                lAlphaBlanks,
+                                                                cAlphaFields,
+                                                                cNumericFields);
 
     ProcessOAControllerInputs(*state,
                               CurrentModuleObject,

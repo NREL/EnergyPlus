@@ -184,17 +184,17 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 
         // Call Input Get routine to retrieve material data
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 MaterialNames,
-                                                                 MaterialNumAlpha,
-                                                                 MaterialProps,
-                                                                 MaterialNumProp,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   MaterialNames,
+                                                                   MaterialNumAlpha,
+                                                                   MaterialProps,
+                                                                   MaterialNumProp,
+                                                                   IOStat,
+                                                                   state.dataIPShortCut->lNumericFieldBlanks,
+                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
 
         // Load the material derived type from the input data.
         MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);

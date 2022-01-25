@@ -394,17 +394,17 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
         OpNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(state, CurrentModuleObject, PlantOpSchemeName);
         if (OpNum > 0) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     OpNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       OpNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes = (NumAlphas - 1) / 3;
             if (state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes > 0) {
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme.allocate(state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes);
@@ -548,7 +548,8 @@ void GetOperationSchemeInput(EnergyPlusData &state)
     WBRBO = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulb");
     DPRBO = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpoint");
     RHRBO = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorRelativeHumidity");
-    CSPBO = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
+    CSPBO =
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
     NumUserDefOpSchemes = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:UserDefined");
     DBTDBO = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulbDifference");
     WBTDBO = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulbDifference");
@@ -1137,17 +1138,17 @@ void LoadEquipList(EnergyPlusData &state,
                 for (Num = 1; Num <= PELists; ++Num) {
                     iIndex = Num;
                     state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                             CurrentModuleObject,
-                                                                             Num,
-                                                                             state.dataIPShortCut->cAlphaArgs,
-                                                                             NumAlphas,
-                                                                             state.dataIPShortCut->rNumericArgs,
-                                                                             NumNums,
-                                                                             IOStat,
-                                                                             state.dataIPShortCut->lNumericFieldBlanks,
-                                                                             state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                             state.dataIPShortCut->cAlphaFieldNames,
-                                                                             state.dataIPShortCut->cNumericFieldNames);
+                                                                               CurrentModuleObject,
+                                                                               Num,
+                                                                               state.dataIPShortCut->cAlphaArgs,
+                                                                               NumAlphas,
+                                                                               state.dataIPShortCut->rNumericArgs,
+                                                                               NumNums,
+                                                                               IOStat,
+                                                                               state.dataIPShortCut->lNumericFieldBlanks,
+                                                                               state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                               state.dataIPShortCut->cAlphaFieldNames,
+                                                                               state.dataIPShortCut->cNumericFieldNames);
                     state.dataPlantCondLoopOp->EquipListsNameList(iIndex) = state.dataIPShortCut->cAlphaArgs(1);
                     state.dataPlantCondLoopOp->EquipListsTypeList(iIndex) = LoopType::Plant;
                     state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
@@ -1192,17 +1193,17 @@ void LoadEquipList(EnergyPlusData &state,
                 for (Num = 1; Num <= CELists; ++Num) {
                     iIndex = Num + PELists;
                     state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                             CurrentModuleObject,
-                                                                             Num,
-                                                                             state.dataIPShortCut->cAlphaArgs,
-                                                                             NumAlphas,
-                                                                             state.dataIPShortCut->rNumericArgs,
-                                                                             NumNums,
-                                                                             IOStat,
-                                                                             state.dataIPShortCut->lNumericFieldBlanks,
-                                                                             state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                             state.dataIPShortCut->cAlphaFieldNames,
-                                                                             state.dataIPShortCut->cNumericFieldNames);
+                                                                               CurrentModuleObject,
+                                                                               Num,
+                                                                               state.dataIPShortCut->cAlphaArgs,
+                                                                               NumAlphas,
+                                                                               state.dataIPShortCut->rNumericArgs,
+                                                                               NumNums,
+                                                                               IOStat,
+                                                                               state.dataIPShortCut->lNumericFieldBlanks,
+                                                                               state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                               state.dataIPShortCut->cAlphaFieldNames,
+                                                                               state.dataIPShortCut->cNumericFieldNames);
                     state.dataPlantCondLoopOp->EquipListsNameList(iIndex) = state.dataIPShortCut->cAlphaArgs(1);
                     state.dataPlantCondLoopOp->EquipListsTypeList(iIndex) = LoopType::Condenser;
                     state.dataPlantCondLoopOp->EquipListsIndexList(iIndex) = Num;
@@ -1264,17 +1265,17 @@ void LoadEquipList(EnergyPlusData &state,
                 }
             }
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     state.dataPlantCondLoopOp->EquipListsIndexList(Num),
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       state.dataPlantCondLoopOp->EquipListsIndexList(Num),
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).NumComps = (NumAlphas - 1) / 2;
             if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).NumComps > 0) {
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Comp.allocate(
@@ -1809,17 +1810,17 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
 
         for (Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     Num,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       Num,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       NumAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       NumNums,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1)))
                 break;               // found the correct one
             if (Num == NumSchemes) { // did not find it

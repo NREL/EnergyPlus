@@ -417,7 +417,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
     state.dataRefrigCase->NumSimulationCases = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:Case");
     state.dataRefrigCase->NumSimulationCaseAndWalkInLists =
         state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:CaseAndWalkInList");
-    state.dataRefrigCase->NumRefrigeratedRacks = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:CompressorRack");
+    state.dataRefrigCase->NumRefrigeratedRacks =
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:CompressorRack");
     state.dataRefrigCase->NumSimulationSecondarySystems =
         state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:SecondarySystem");
     state.dataRefrigCase->NumSimulationTransferLoadLists =
@@ -436,7 +437,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
         state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:GasCooler:AirCooled");
     state.dataRefrigCase->NumRefrigCondensers = state.dataRefrigCase->NumSimulationCondAir + state.dataRefrigCase->NumSimulationCondEvap +
                                                 state.dataRefrigCase->NumSimulationCondWater + state.dataRefrigCase->NumSimulationCascadeCondensers;
-    state.dataRefrigCase->NumSimulationCompressors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:Compressor");
+    state.dataRefrigCase->NumSimulationCompressors =
+        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:Compressor");
     state.dataRefrigCase->NumSimulationSubcoolers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:Subcooler");
     int NumCompressorLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Refrigeration:CompressorList");
     state.dataRefrigCase->NumRefrigChillerSets =
@@ -578,17 +580,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         CurrentModuleObject = "Refrigeration:Case";
         for (int CaseNum = 1; CaseNum <= state.dataRefrigCase->NumSimulationCases; ++CaseNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     CaseNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       CaseNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             ++NumDisplayCases;
 
@@ -1255,17 +1257,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         CurrentModuleObject = "Refrigeration:WalkIn";
         for (int WalkInID = 1; WalkInID <= state.dataRefrigCase->NumSimulationWalkIns; ++WalkInID) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     WalkInID,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       WalkInID,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             WalkIn(WalkInID).Name = Alphas(1);
@@ -1732,17 +1734,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             // A1
             AlphaNum = 1;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     CoilID,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       CoilID,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             WarehouseCoil(CoilID).Name = Alphas(AlphaNum);
@@ -2364,17 +2366,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         CurrentModuleObject = "ZoneHVAC:RefrigerationChillerSet";
         for (int SetID = 1; SetID <= state.dataRefrigCase->NumRefrigChillerSets; ++SetID) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     SetID,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       SetID,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             AlphaNum = 1;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
@@ -2477,17 +2479,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         CurrentModuleObject = "Refrigeration:CaseAndWalkInList";
         for (int ListNum = 1; ListNum <= state.dataRefrigCase->NumSimulationCaseAndWalkInLists; ++ListNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     ListNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       ListNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             CaseAndWalkInList(ListNum).Name = Alphas(1);
 
@@ -2558,17 +2560,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         for (int RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     RackNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       RackNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             RefrigRack(RackNum).Name = Alphas(1);
@@ -3032,17 +3034,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
             for (int CondNum = 1; CondNum <= state.dataRefrigCase->NumSimulationCondAir; ++CondNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         CondNum,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           CondNum,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 Condenser(CondNum).Name = Alphas(1);
@@ -3165,17 +3167,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             for (int CondIndex = 1; CondIndex <= state.dataRefrigCase->NumSimulationCondEvap; ++CondIndex) {
                 int CondNum = CondIndex + state.dataRefrigCase->NumSimulationCondAir;
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         CondIndex,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           CondIndex,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
 
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -3407,17 +3409,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             for (int CondIndex = 1; CondIndex <= state.dataRefrigCase->NumSimulationCondWater; ++CondIndex) {
                 int CondNum = CondIndex + state.dataRefrigCase->NumSimulationCondAir + state.dataRefrigCase->NumSimulationCondEvap;
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         CondIndex,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           CondIndex,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
 
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -3583,17 +3585,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 int CondNum = CondIndex + state.dataRefrigCase->NumSimulationCondAir + state.dataRefrigCase->NumSimulationCondEvap +
                               state.dataRefrigCase->NumSimulationCondWater;
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         CondIndex,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           CondIndex,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
 
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -3676,17 +3678,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             CurrentModuleObject = "Refrigeration:GasCooler:AirCooled";
             for (int GCNum = 1; GCNum <= state.dataRefrigCase->NumSimulationGasCooler; ++GCNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         GCNum,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           GCNum,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 GasCooler(GCNum).Name = Alphas(1);
 
@@ -3855,17 +3857,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             CurrentModuleObject = "Refrigeration:SecondarySystem";
             for (int SecondaryNum = 1; SecondaryNum <= state.dataRefrigCase->NumSimulationSecondarySystems; ++SecondaryNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         SecondaryNum,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           SecondaryNum,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
                 Secondary(SecondaryNum).Name = Alphas(1);
@@ -4496,17 +4498,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         CurrentModuleObject = "Refrigeration:Compressor";
         for (int CompNum = 1; CompNum <= state.dataRefrigCase->NumSimulationCompressors; ++CompNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     CompNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       CompNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             Compressor(CompNum).Name = Alphas(1);
@@ -4604,17 +4606,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             state.dataRefrigCase->NumSimulationMechSubcoolers = 0;
             for (int SubcoolerNum = 1; SubcoolerNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolerNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         SubcoolerNum,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           SubcoolerNum,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
                 Subcooler(SubcoolerNum).Name = Alphas(1);
@@ -4695,17 +4697,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
             CurrentModuleObject = "Refrigeration:TransferLoadList";
             for (int ListNum = 1; ListNum <= state.dataRefrigCase->NumSimulationTransferLoadLists; ++ListNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         ListNum,
-                                                                         Alphas,
-                                                                         NumAlphas,
-                                                                         Numbers,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericBlanks,
-                                                                         lAlphaBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           ListNum,
+                                                                           Alphas,
+                                                                           NumAlphas,
+                                                                           Numbers,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           lNumericBlanks,
+                                                                           lAlphaBlanks,
+                                                                           cAlphaFieldNames,
+                                                                           cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
                 TransferLoadList(ListNum).Name = Alphas(1);
@@ -4764,17 +4766,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         CurrentModuleObject = "Refrigeration:CompressorList";
         for (int ListNum = 1; ListNum <= NumCompressorLists; ++ListNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     ListNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       ListNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             CompressorLists(ListNum).NumCompressors = NumAlphas - 1;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
@@ -4803,17 +4805,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         for (RefrigSysNum = 1; RefrigSysNum <= state.dataRefrigCase->NumRefrigSystems; ++RefrigSysNum) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     RefrigSysNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       RefrigSysNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             System(RefrigSysNum).Name = Alphas(1);
@@ -5667,17 +5669,17 @@ void GetRefrigerationInput(EnergyPlusData &state)
         CurrentModuleObject = "Refrigeration:TranscriticalSystem";
         for (int TransRefrigSysNum = 1; TransRefrigSysNum <= state.dataRefrigCase->NumTransRefrigSystems; ++TransRefrigSysNum) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     TransRefrigSysNum,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     IOStatus,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       TransRefrigSysNum,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             TransSystem(TransRefrigSysNum).Name = Alphas(1);

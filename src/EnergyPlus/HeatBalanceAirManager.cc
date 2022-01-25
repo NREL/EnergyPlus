@@ -541,17 +541,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     for (Loop = 1; Loop <= state.dataHeatBal->TotZoneAirBalance; ++Loop) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
         IsNotOK = false;
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataHeatBal->ZoneAirBalance(Loop).Name = cAlphaArgs(1);
@@ -752,17 +752,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     errFlag = false;
     for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Item,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Item,
+                                                                   cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataHeatBal->InfiltrationObjects(Item).Name = cAlphaArgs(1);
@@ -807,17 +807,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Item,
-                                                                     cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Item,
+                                                                       cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             for (Item1 = 1; Item1 <= state.dataHeatBal->InfiltrationObjects(Item).NumOfZones; ++Item1) {
                 ++Loop;
@@ -1049,17 +1049,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     InfiltCount = state.dataHeatBal->TotDesignFlowInfiltration;
     for (Loop = 1; Loop <= state.dataHeatBal->TotShermGrimsInfiltration; ++Loop) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
         ++InfiltCount;
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -1117,17 +1117,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
     for (Loop = 1; Loop <= state.dataHeatBal->TotAIM2Infiltration; ++Loop) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
         ++InfiltCount;
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
@@ -1403,17 +1403,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
     for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Item,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Item,
+                                                                   cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         errFlag = ErrorsFound;
 
@@ -1457,17 +1457,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Item,
-                                                                     cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Item,
+                                                                       cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
 
             for (Item1 = 1; Item1 <= state.dataHeatBal->VentilationObjects(Item).NumOfZones; ++Item1) {
                 ++Loop;
@@ -2154,17 +2154,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     for (Loop = 1; Loop <= state.dataHeatBal->TotWindAndStackVentilation; ++Loop) {
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
 
         VentiCount = state.dataHeatBal->TotDesignFlowVentilation + Loop;
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
@@ -2635,17 +2635,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
 
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   Loop,
+                                                                   cAlphaArgs,
+                                                                   NumAlpha,
+                                                                   rNumericArgs,
+                                                                   NumNumber,
+                                                                   IOStat,
+                                                                   lNumericFieldBlanks,
+                                                                   lAlphaFieldBlanks,
+                                                                   cAlphaFieldNames,
+                                                                   cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataHeatBal->Mixing(Loop).Name = cAlphaArgs(1);
@@ -3151,17 +3151,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             state.dataHeatBal->CrossMixing(Loop).FromZone = zone2;
         } else {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->CrossMixing(Loop).Name = cAlphaArgs(1);
@@ -3657,17 +3657,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         for (Loop = 1; Loop <= state.dataHeatBal->TotRefDoorMixing; ++Loop) {
 
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     Loop,
-                                                                     cAlphaArgs,
-                                                                     NumAlpha,
-                                                                     rNumericArgs,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
+                                                                       cCurrentModuleObject,
+                                                                       Loop,
+                                                                       cAlphaArgs,
+                                                                       NumAlpha,
+                                                                       rNumericArgs,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       lNumericFieldBlanks,
+                                                                       lAlphaFieldBlanks,
+                                                                       cAlphaFieldNames,
+                                                                       cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             NameThisObject = cAlphaArgs(1);
@@ -4409,17 +4409,17 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
 
     for (AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum) {
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 AirModelNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 Status,
-                                                                 _,
-                                                                 _,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                   cCurrentModuleObject,
+                                                                   AirModelNum,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNumbers,
+                                                                   Status,
+                                                                   _,
+                                                                   _,
+                                                                   state.dataIPShortCut->cAlphaFieldNames,
+                                                                   state.dataIPShortCut->cNumericFieldNames);
         ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (ZoneNum != 0) {
             if (!state.dataRoomAirMod->AirModel(ZoneNum).AirModelName.empty()) {

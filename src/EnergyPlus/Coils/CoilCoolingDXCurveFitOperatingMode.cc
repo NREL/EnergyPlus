@@ -131,13 +131,13 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                 CoilCoolingDXCurveFitOperatingMode::object_name,
-                                                                 modeNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 IOStatus);
+                                                                   CoilCoolingDXCurveFitOperatingMode::object_name,
+                                                                   modeNum,
+                                                                   state.dataIPShortCut->cAlphaArgs,
+                                                                   NumAlphas,
+                                                                   state.dataIPShortCut->rNumericArgs,
+                                                                   NumNumbers,
+                                                                   IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }

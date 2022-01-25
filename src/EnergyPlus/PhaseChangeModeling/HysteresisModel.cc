@@ -332,17 +332,17 @@ namespace HysteresisPhaseChange {
 
             // get the input data and store it in the Shortcuts structures
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     state.dataIPShortCut->cCurrentModuleObject,
-                                                                     hmNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     numAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     numNumbers,
-                                                                     ioStatus,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       state.dataIPShortCut->cCurrentModuleObject,
+                                                                       hmNum,
+                                                                       state.dataIPShortCut->cAlphaArgs,
+                                                                       numAlphas,
+                                                                       state.dataIPShortCut->rNumericArgs,
+                                                                       numNumbers,
+                                                                       ioStatus,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
 
             // the input processor validates the numeric inputs based on the IDD definition
             // still validate the name to make sure there aren't any duplicates or blanks

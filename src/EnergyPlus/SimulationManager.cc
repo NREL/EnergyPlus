@@ -696,17 +696,17 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     1,
-                                                                     Alphas,
-                                                                     NumAlpha,
-                                                                     Number,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       1,
+                                                                       Alphas,
+                                                                       NumAlpha,
+                                                                       Number,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             std::string::size_type const lenVer(len(MatchVersion));
             if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
                 Which = static_cast<int>(index(Alphas(1).substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
@@ -730,17 +730,17 @@ namespace SimulationManager {
         CondFDAlgo = false;
         if (Num > 0) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     1,
-                                                                     Alphas,
-                                                                     NumAlpha,
-                                                                     Number,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       1,
+                                                                       Alphas,
+                                                                       NumAlpha,
+                                                                       Number,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(Alphas(1));
                 if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
@@ -755,17 +755,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         Item,
-                                                                         Alphas,
-                                                                         NumAlpha,
-                                                                         Number,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           Item,
+                                                                           Alphas,
+                                                                           NumAlpha,
+                                                                           Number,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -781,17 +781,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         1,
-                                                                         Alphas,
-                                                                         NumAlpha,
-                                                                         Number,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           1,
+                                                                           Alphas,
+                                                                           NumAlpha,
+                                                                           Number,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(Alphas(3));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -806,17 +806,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         1,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlpha,
-                                                                         Number,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           1,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlpha,
+                                                                           Number,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -831,17 +831,17 @@ namespace SimulationManager {
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         CurrentModuleObject,
-                                                                         1,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlpha,
-                                                                         Number,
-                                                                         NumNumber,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           CurrentModuleObject,
+                                                                           1,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlpha,
+                                                                           Number,
+                                                                           NumNumber,
+                                                                           IOStat,
+                                                                           state.dataIPShortCut->lNumericFieldBlanks,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 {
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                     if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
@@ -856,17 +856,17 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     1,
-                                                                     Alphas,
-                                                                     NumAlpha,
-                                                                     Number,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       1,
+                                                                       Alphas,
+                                                                       NumAlpha,
+                                                                       Number,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             state.dataGlobal->NumOfTimeStepInHour = Number(1);
             if (state.dataGlobal->NumOfTimeStepInHour <= 0 || state.dataGlobal->NumOfTimeStepInHour > 60) {
                 Alphas(1) = fmt::to_string(state.dataGlobal->NumOfTimeStepInHour);
@@ -926,17 +926,17 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     1,
-                                                                     Alphas,
-                                                                     NumAlpha,
-                                                                     Number,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       1,
+                                                                       Alphas,
+                                                                       NumAlpha,
+                                                                       Number,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             MinInt = int(Number(1));
             if (MinInt > state.dataGlobal->MinutesPerTimeStep) {
                 MinInt = state.dataGlobal->MinutesPerTimeStep;
@@ -1089,17 +1089,17 @@ namespace SimulationManager {
         Num = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     1,
-                                                                     Alphas,
-                                                                     NumAlpha,
-                                                                     Number,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       1,
+                                                                       Alphas,
+                                                                       NumAlpha,
+                                                                       Number,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
                 deviationFromSetPtThresholdHtg = -Number(1);
             } else {
@@ -1124,17 +1124,17 @@ namespace SimulationManager {
         if (NumRunControl > 0) {
             state.dataSimulationManager->RunControlInInput = true;
             state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     1,
-                                                                     Alphas,
-                                                                     NumAlpha,
-                                                                     Number,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                                                                       CurrentModuleObject,
+                                                                       1,
+                                                                       Alphas,
+                                                                       NumAlpha,
+                                                                       Number,
+                                                                       NumNumber,
+                                                                       IOStat,
+                                                                       state.dataIPShortCut->lNumericFieldBlanks,
+                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                       state.dataIPShortCut->cAlphaFieldNames,
+                                                                       state.dataIPShortCut->cNumericFieldNames);
             if (Alphas(1) == "YES") state.dataGlobal->DoZoneSizing = true;
             if (Alphas(2) == "YES") state.dataGlobal->DoSystemSizing = true;
             if (Alphas(3) == "YES") state.dataGlobal->DoPlantSizing = true;
@@ -1650,14 +1650,15 @@ namespace SimulationManager {
                       state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "RunPeriod") > 0);
 
         if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
-            ReportingRequested = (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
-                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
-                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Variable") > 0 ||
-                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter") > 0 ||
-                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
-                                  state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
+            ReportingRequested =
+                (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
+                 state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
+                 state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
+                 state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Variable") > 0 ||
+                 state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter") > 0 ||
+                 state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
+                 state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
+                 state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
             // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
             if (!ReportingRequested) {
                 ShowWarningError(state, "No reporting elements have been requested. No simulation results produced.");

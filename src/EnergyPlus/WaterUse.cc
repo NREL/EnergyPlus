@@ -300,17 +300,17 @@ namespace WaterUse {
 
             for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         state.dataIPShortCut->cCurrentModuleObject,
-                                                                         WaterEquipNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         _,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                           WaterEquipNum,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           state.dataIPShortCut->rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           _,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
                 state.dataWaterUse->WaterEquipment(WaterEquipNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -420,17 +420,17 @@ namespace WaterUse {
 
             for (int WaterConnNum = 1; WaterConnNum <= state.dataWaterUse->numWaterConnections; ++WaterConnNum) {
                 state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                         state.dataIPShortCut->cCurrentModuleObject,
-                                                                         WaterConnNum,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         _,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
+                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                           WaterConnNum,
+                                                                           state.dataIPShortCut->cAlphaArgs,
+                                                                           NumAlphas,
+                                                                           state.dataIPShortCut->rNumericArgs,
+                                                                           NumNumbers,
+                                                                           IOStatus,
+                                                                           _,
+                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                           state.dataIPShortCut->cAlphaFieldNames,
+                                                                           state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
                 state.dataWaterUse->WaterConnections(WaterConnNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
