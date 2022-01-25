@@ -321,20 +321,20 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(4),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(5),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
@@ -346,10 +346,10 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(6),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -358,10 +358,10 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(7),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -786,8 +786,8 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
         this->A42Model.QdotSkin = 0.0;
         this->A42Model.QdotConvZone = 0.0;
         this->A42Model.QdotRadZone = 0.0;
-        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::OperatingMode::OpModeOff;
-        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CurrentOpMode = DataGenerators::OperatingMode::OpModeOff;
+        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::OperatingMode::Off;
+        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CurrentOpMode = DataGenerators::OperatingMode::Off;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown = 0.0;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp = 0.0;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).HasBeenOn = false;
@@ -899,7 +899,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     Real64 ThermEff = 0.0;
 
     switch (CurrentOpMode) {
-    case DataGenerators::OperatingMode::OpModeOff: { // same as standby in model spec but no Pnet standby electicity losses.
+    case DataGenerators::OperatingMode::Off: { // same as standby in model spec but no Pnet standby electicity losses.
 
         Qgenss = 0.0;
         MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
@@ -918,7 +918,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
         PlantUtilities::SetComponentFlowRate(state, MdotCW, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
         this->PlantMassFlowRate = MdotCW;
     } break;
-    case DataGenerators::OperatingMode::OpModeStandby: {
+    case DataGenerators::OperatingMode::Standby: {
         Qgenss = 0.0;
         MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
         TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
@@ -936,7 +936,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
         PlantUtilities::SetComponentFlowRate(state, MdotCW, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
         this->PlantMassFlowRate = MdotCW;
     } break;
-    case DataGenerators::OperatingMode::OpModeWarmUp: {
+    case DataGenerators::OperatingMode::WarmUp: {
         if (this->A42Model.WarmUpByTimeDelay) {
             // Internal combustion engine.  This is just like normal  operation but no net power yet.
             Pnetss = MyElectricLoad; // W
@@ -1048,7 +1048,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
         }
         NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
     } break;
-    case DataGenerators::OperatingMode::OpModeNormal: {
+    case DataGenerators::OperatingMode::Normal: {
         if (PLRforSubtimestepStartUp < 1.0) {
             if (RunFlagElectCenter) Pnetss = MyElectricLoad; // W
             if (RunFlagPlant) Pnetss = AllowedLoad;
@@ -1119,7 +1119,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             Pnetss = AllowedLoad;
         }
     } break;
-    case DataGenerators::OperatingMode::OpModeCoolDown: {
+    case DataGenerators::OperatingMode::CoolDown: {
         Pnetss = 0.0;
         Pstandby = 0.0;
         Pcooler = this->A42Model.PcoolDown;
@@ -1143,7 +1143,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     for (int i = 1; i <= 20; ++i) { // sequential search with exit criteria
         // calculate new value for engine temperature
         // for Stirling in warmup, need to include dependency of Qgness on Teng
-        if ((this->A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OperatingMode::OpModeWarmUp)) {
+        if ((this->A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OperatingMode::WarmUp)) {
 
             Real64 Pmax = this->A42Model.MaxElecPower;
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C

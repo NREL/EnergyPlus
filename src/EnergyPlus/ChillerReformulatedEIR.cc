@@ -339,19 +339,19 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(6),
                                                                            ErrorsFound,
-                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                           DataLoopNode::ConnectionObjectType::ChillerElectricReformulatedEIR,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(7),
                                                                             ErrorsFound,
-                                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ChillerElectricReformulatedEIR,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
@@ -380,19 +380,19 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(8),
                                                                            ErrorsFound,
-                                                                           state.dataIPShortCut->cCurrentModuleObject,
+                                                                           DataLoopNode::ConnectionObjectType::ChillerElectricReformulatedEIR,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Secondary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(9),
                                                                             ErrorsFound,
-                                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ChillerElectricReformulatedEIR,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Secondary,
                                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -534,10 +534,10 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
             thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                   state.dataIPShortCut->cAlphaArgs(11),
                                                                                   ErrorsFound,
-                                                                                  state.dataIPShortCut->cCurrentModuleObject,
+                                                                                  DataLoopNode::ConnectionObjectType::ChillerElectricReformulatedEIR,
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Water,
-                                                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                                                  DataLoopNode::ConnectionType::Inlet,
                                                                                   NodeInputManager::CompFluidStream::Tertiary,
                                                                                   DataLoopNode::ObjectIsNotParent);
             if (thisChiller.HeatRecInletNodeNum == 0) {
@@ -550,10 +550,10 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
             thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                    state.dataIPShortCut->cAlphaArgs(12),
                                                                                    ErrorsFound,
-                                                                                   state.dataIPShortCut->cCurrentModuleObject,
+                                                                                   DataLoopNode::ConnectionObjectType::ChillerElectricReformulatedEIR,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                   DataLoopNode::NodeConnectionType::Outlet,
+                                                                                   DataLoopNode::ConnectionType::Outlet,
                                                                                    NodeInputManager::CompFluidStream::Tertiary,
                                                                                    DataLoopNode::ObjectIsNotParent);
             if (thisChiller.HeatRecOutletNodeNum == 0) {
@@ -611,15 +611,16 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
 
             if (NumAlphas > 13) {
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    thisChiller.HeatRecSetPointNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                                             state.dataIPShortCut->cAlphaArgs(14),
-                                                                                             ErrorsFound,
-                                                                                             state.dataIPShortCut->cCurrentModuleObject,
-                                                                                             state.dataIPShortCut->cAlphaArgs(1),
-                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                             DataLoopNode::NodeConnectionType::Sensor,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             DataLoopNode::ObjectIsNotParent);
+                    thisChiller.HeatRecSetPointNodeNum =
+                        NodeInputManager::GetOnlySingleNode(state,
+                                                            state.dataIPShortCut->cAlphaArgs(14),
+                                                            ErrorsFound,
+                                                            DataLoopNode::ConnectionObjectType::ChillerElectricReformulatedEIR,
+                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            DataLoopNode::NodeFluidType::Water,
+                                                            DataLoopNode::ConnectionType::Sensor,
+                                                            NodeInputManager::CompFluidStream::Primary,
+                                                            DataLoopNode::ObjectIsNotParent);
                 } else {
                     thisChiller.HeatRecSetPointNodeNum = 0;
                 }

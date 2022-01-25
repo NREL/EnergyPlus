@@ -285,7 +285,7 @@ namespace BranchInputManager {
     void GetBranchInput(EnergyPlusData &state);
 
     void GetSingleBranchInput(EnergyPlusData &state,
-                              std::string_view const RoutineName,
+                              std::string_view RoutineName,
                               int BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,

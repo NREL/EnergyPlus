@@ -1265,11 +1265,9 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataDefineEquip;
-    using CurveManager::GetCurveIndex;
-
-    using NodeInputManager::GetOnlySingleNode;
     using namespace OutputReportPredefined;
 
+    using CurveManager::GetCurveIndex;
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2148,10 +2146,10 @@ void GetOAMixerInputs(EnergyPlusData &state)
             state.dataMixedAir->OAMixer(OutAirNum).MixNode = GetOnlySingleNode(state,
                                                                                AlphArray(2),
                                                                                ErrorsFound,
-                                                                               CurrentModuleObject,
+                                                                               DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType::Outlet,
+                                                                               DataLoopNode::ConnectionType::Outlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                ObjectIsNotParent);
             //  Set connection type to 'Inlet', because this is not necessarily directly from
@@ -2159,28 +2157,28 @@ void GetOAMixerInputs(EnergyPlusData &state)
             state.dataMixedAir->OAMixer(OutAirNum).InletNode = GetOnlySingleNode(state,
                                                                                  AlphArray(3),
                                                                                  ErrorsFound,
-                                                                                 CurrentModuleObject,
+                                                                                 DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                  AlphArray(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsNotParent);
             state.dataMixedAir->OAMixer(OutAirNum).RelNode = GetOnlySingleNode(state,
                                                                                AlphArray(4),
                                                                                ErrorsFound,
-                                                                               CurrentModuleObject,
+                                                                               DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType::ReliefAir,
+                                                                               DataLoopNode::ConnectionType::ReliefAir,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                ObjectIsNotParent);
             state.dataMixedAir->OAMixer(OutAirNum).RetNode = GetOnlySingleNode(state,
                                                                                AlphArray(5),
                                                                                ErrorsFound,
-                                                                               CurrentModuleObject,
+                                                                               DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                ObjectIsNotParent);
             // Check for dupes in the four nodes.
@@ -2301,19 +2299,19 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     state.dataMixedAir->OAController(OutAirNum).MixNode = GetOnlySingleNode(state,
                                                                             AlphArray(4),
                                                                             ErrorsFound,
-                                                                            CurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Sensor,
+                                                                            DataLoopNode::ConnectionType::Sensor,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
     state.dataMixedAir->OAController(OutAirNum).OANode = GetOnlySingleNode(state,
                                                                            AlphArray(5),
                                                                            ErrorsFound,
-                                                                           CurrentModuleObject,
+                                                                           DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                            AlphArray(1),
                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                           DataLoopNode::NodeConnectionType::Actuator,
+                                                                           DataLoopNode::ConnectionType::Actuator,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
     if (!CheckOutAirNodeNumber(state, state.dataMixedAir->OAController(OutAirNum).OANode)) {
@@ -2410,19 +2408,19 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     state.dataMixedAir->OAController(OutAirNum).RelNode = GetOnlySingleNode(state,
                                                                             AlphArray(2),
                                                                             ErrorsFound,
-                                                                            CurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Actuator,
+                                                                            DataLoopNode::ConnectionType::Actuator,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
     state.dataMixedAir->OAController(OutAirNum).RetNode = GetOnlySingleNode(state,
                                                                             AlphArray(3),
                                                                             ErrorsFound,
-                                                                            CurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Sensor,
+                                                                            DataLoopNode::ConnectionType::Sensor,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
     state.dataMixedAir->OAController(OutAirNum).MinOASch = AlphArray(11);

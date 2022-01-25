@@ -80,11 +80,11 @@ namespace PlantCondLoopOperation {
     );
 
     void FindDeltaTempRangeInput(EnergyPlusData &state,
-                                 std::string &CurrentModuleObject, // for ease in renaming
-                                 int const NumSchemes,             // May be set here and passed on
-                                 int const LoopNum,                // May be set here and passed on
-                                 int const SchemeNum,              // May be set here and passed on
-                                 bool &ErrorsFound                 // May be set here and passed on
+                                 DataLoopNode::ConnectionObjectType const CurrentModuleObject, // for ease in renaming
+                                 int const NumSchemes,                                         // May be set here and passed on
+                                 int const LoopNum,                                            // May be set here and passed on
+                                 int const SchemeNum,                                          // May be set here and passed on
+                                 bool &ErrorsFound                                             // May be set here and passed on
     );
 
     void LoadEquipList(EnergyPlusData &state,

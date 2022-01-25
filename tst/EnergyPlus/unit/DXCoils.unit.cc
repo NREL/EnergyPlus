@@ -1089,7 +1089,6 @@ TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
     // Test whether the coil is placed indoor or outdoor, by checking the air inlet node location
 
     using namespace DXCoils;
-    using NodeInputManager::GetOnlySingleNode;
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // Common Inputs
