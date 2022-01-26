@@ -103,7 +103,7 @@ namespace WindowManager {
         // Tarcog thermal system for solving heat transfer through the window
         const auto activeConstrNum{CWCEHeatTransferFactory::getActiveConstructionNumber(state, surface, SurfNum)};
         auto aFactory = CWCEHeatTransferFactory(state, surface, SurfNum, activeConstrNum);
-        auto aSystem = aFactory.getTarcogSystem(state, SurfNum, HextConvCoeff);
+        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);
         aSystem->setTolerance(solutionTolerance);
 
         // get previous timestep temperatures solution for faster iterations
@@ -429,7 +429,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CSingleSystem>
-    CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, int const SurfNum, Real64 const t_HextConvCoeff)
+    CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
     {
         auto Indoor = getIndoor(state);
         auto Outdoor = getOutdoor(state, t_HextConvCoeff);
@@ -516,7 +516,7 @@ namespace WindowManager {
                               BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
                               BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade))) {
             ++m_SolidLayerIndex;
-            aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex);
+            aLayer = getSolidLayer(state,  *material, m_SolidLayerIndex);
         } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
             aLayer = getGapLayer(*material);
         } else if (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
@@ -534,7 +534,6 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state,
-                                                                                            SurfaceData const &surface,
                                                                                             Material::MaterialProperties const &material,
                                                                                             int const t_Index)
     {
@@ -937,13 +936,10 @@ namespace WindowManager {
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
         } else if (state.dataMaterial->Material(MatOutside).Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Exterior blind present
-            const auto MatShade = MatOutside;
             ShadeFlag = WinShadingType::ExtBlind;
         } else if (state.dataMaterial->Material(MatInside).Group == DataHeatBalance::MaterialGroup::Shade) { // Interior shade present
-            const auto MatShade = MatInside;
             ShadeFlag = WinShadingType::IntShade;
         } else if (state.dataMaterial->Material(MatInside).Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Interior blind present
-            const auto MatShade = MatInside;
             ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group ==

@@ -120,7 +120,7 @@ namespace WindowManager {
     public:
         CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int t_SurfNum, int t_ConstrNum);
 
-        std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, int const SurfNum, Real64 const t_HextConvCoeff);
+        std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getIGULayer(EnergyPlusData &state, int const t_Index);
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoor(EnergyPlusData &state) const;
@@ -165,7 +165,6 @@ namespace WindowManager {
         int getNumOfLayers(EnergyPlusData &state) const;
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
-                                                                       DataSurfaces::SurfaceData const &surface,
                                                                        Material::MaterialProperties const &material,
                                                                        int const t_Index);
 

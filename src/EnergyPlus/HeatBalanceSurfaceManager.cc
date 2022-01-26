@@ -826,7 +826,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                 // Report table for every shading control state
                 const auto totalStates{Surface(iSurf).windowShadingControlList.size()};
-                for (int i = 0; i < totalStates; ++i) {
+                for (unsigned int i = 0; i < totalStates; ++i) {
                     const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
