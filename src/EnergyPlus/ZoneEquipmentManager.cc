@@ -101,6 +101,7 @@
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
@@ -3625,6 +3626,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         }
 
     } // end of the Supply Air Path DO Loop
+
+    EnergyPlus::ExhaustAirSystemManager::SimZoneHVACExhaustControls(state, FirstHVACIteration);
+
+    EnergyPlus::ExhaustAirSystemManager::SimExhaustAirSystem(state, FirstHVACIteration);
 
     CalcZoneMassBalance(state, FirstHVACIteration);
 
