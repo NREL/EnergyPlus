@@ -71,12 +71,9 @@ namespace DataBranchNodeConnections {
         std::string InletNodeName;  // Inlet Node ID
         std::string OutletNodeName; // Outlet Node ID
         std::string Description;    // Description of Component List Type
-        bool InfoFilled;            // true when all information has been filled
 
         // Default Constructor
-        ComponentListData() : InfoFilled(false)
-        {
-        }
+        ComponentListData() = default;
     };
 
     struct NodeConnectionDef
@@ -84,14 +81,16 @@ namespace DataBranchNodeConnections {
         // Members
         int NodeNumber;                                // Node number of this node connection
         std::string NodeName;                          // Node Name of this node connection
-        std::string ObjectType;                        // Object/Component Type of this node connection
+        DataLoopNode::ConnectionObjectType ObjectType; // Object/Component Type of this node connection
         std::string ObjectName;                        // Name of the Object/Component Type of this node connection
-        std::string ConnectionType;                    // Connection Type (must be valid) for this node connection
+        DataLoopNode::ConnectionType ConnectionType;   // Connection Type (must be valid) for this node connection
         NodeInputManager::CompFluidStream FluidStream; // Fluid Stream for this node connection
         bool ObjectIsParent;                           // Indicator whether the object is a parent or not
 
         // Default Constructor
-        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::CompFluidStream::Invalid), ObjectIsParent(false)
+        NodeConnectionDef()
+            : NodeNumber(0), ObjectType(DataLoopNode::ConnectionObjectType::Invalid), ConnectionType(DataLoopNode::ConnectionType::Invalid),
+              FluidStream(NodeInputManager::CompFluidStream::Invalid), ObjectIsParent(false)
         {
         }
     };
@@ -99,15 +98,14 @@ namespace DataBranchNodeConnections {
     struct ParentListData
     {
         // Members
-        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
-        std::string CName;          // Component Name
-        std::string InletNodeName;  // Inlet Node ID
-        std::string OutletNodeName; // Outlet Node ID
-        std::string Description;    // Description of Component List Type
-        bool InfoFilled;            // true when all information has been filled
+        DataLoopNode::ConnectionObjectType ComponentType; // Component Type (Cannot be SPLITTER or MIXER)
+        std::string ComponentName;                        // Component Name
+        std::string InletNodeName;                        // Inlet Node ID
+        std::string OutletNodeName;                       // Outlet Node ID
+        std::string Description;                          // Description of Component List Type
 
         // Default Constructor
-        ParentListData() : InfoFilled(false)
+        ParentListData() : ComponentType(DataLoopNode::ConnectionObjectType::Invalid)
         {
         }
     };
@@ -115,14 +113,16 @@ namespace DataBranchNodeConnections {
     struct EqNodeConnectionDef
     {
         // Members
-        std::string NodeName;       // Node Name of this node connection
-        std::string ObjectType;     // Object/Component Type of this node connection
-        std::string ObjectName;     // Name of the Object/Component Type of this node connection
-        std::string InputFieldName; // Input Field Name for this connection
-        std::string ConnectionType; // Connection Type (must be valid) for this node connection
+        std::string NodeName;                          // Node Name of this node connection
+        DataLoopNode::ConnectionObjectType ObjectType; // Object/Component Type of this node connection
+        std::string ObjectName;                        // Name of the Object/Component Type of this node connection
+        std::string InputFieldName;                    // Input Field Name for this connection
+        DataLoopNode::ConnectionType ConnectionType;   // Connection Type (must be valid) for this node connection
 
         // Default Constructor
-        EqNodeConnectionDef() = default;
+        EqNodeConnectionDef() : ObjectType(DataLoopNode::ConnectionObjectType::Invalid), ConnectionType(DataLoopNode::ConnectionType::Invalid)
+        {
+        }
     };
 
 } // namespace DataBranchNodeConnections

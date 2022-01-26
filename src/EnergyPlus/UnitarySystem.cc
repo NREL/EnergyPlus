@@ -255,25 +255,28 @@ namespace UnitarySystems {
 
         if (this->m_OKToPrintSizing) {
             bool HXUnitOn = false;
-            {
-                auto const SELECT_CASE_var(this->m_ControlType);
-                if (SELECT_CASE_var == UnitarySysCtrlType::Setpoint) {
-                    if (ZoneEquipment) {
-                        this->controlUnitarySystemtoSP(
-                            state, 0, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
-                    } else {
-                        this->controlUnitarySystemtoSP(
-                            state, AirLoopNum, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
-                    }
-                } else if (SELECT_CASE_var == UnitarySysCtrlType::Load || SELECT_CASE_var == UnitarySysCtrlType::CCMASHRAE) {
-                    if (ZoneEquipment) {
-                        this->controlUnitarySystemtoLoad(
-                            state, 0, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
-                    } else {
-                        this->controlUnitarySystemtoLoad(
-                            state, AirLoopNum, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
-                    }
+            switch (this->m_ControlType) {
+            case UnitarySysCtrlType::Setpoint: {
+                if (ZoneEquipment) {
+                    this->controlUnitarySystemtoSP(
+                        state, 0, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
+                } else {
+                    this->controlUnitarySystemtoSP(
+                        state, AirLoopNum, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                 }
+            } break;
+            case UnitarySysCtrlType::Load:
+            case UnitarySysCtrlType::CCMASHRAE: {
+                if (ZoneEquipment) {
+                    this->controlUnitarySystemtoLoad(
+                        state, 0, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
+                } else {
+                    this->controlUnitarySystemtoLoad(
+                        state, AirLoopNum, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
+                }
+            } break;
+            default:
+                break;
             }
         }
 
@@ -2910,6 +2913,8 @@ namespace UnitarySystems {
         static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string cCurrentModuleObject = input_data.system_type;
+        auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC,
+                                                                               UtilityRoutines::MakeUPPERCase(input_data.system_type));
         std::string thisObjectName = input_data.name;
         this->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
         sysNum = getUnitarySystemIndex(state, thisObjectName);
@@ -2920,10 +2925,10 @@ namespace UnitarySystems {
             this->AirInNode = NodeInputManager::GetOnlySingleNode(state,
                                                                   loc_AirInNodeName,
                                                                   errorsFound,
-                                                                  cCurrentModuleObject,
+                                                                  objType,
                                                                   thisObjectName,
                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                                  DataLoopNode::ConnectionType::Inlet,
                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                   DataLoopNode::ObjectIsParent);
         } else {
@@ -2935,10 +2940,10 @@ namespace UnitarySystems {
             this->AirOutNode = NodeInputManager::GetOnlySingleNode(state,
                                                                    loc_AirOutNodeName,
                                                                    errorsFound,
-                                                                   cCurrentModuleObject,
+                                                                   objType,
                                                                    thisObjectName,
                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::NodeConnectionType::Outlet,
+                                                                   DataLoopNode::ConnectionType::Outlet,
                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsParent);
         } else {
@@ -5275,10 +5280,10 @@ namespace UnitarySystems {
                 this->m_SystemCoolControlNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                        loc_m_SystemCoolControlNodeName,
                                                                                        errFlag,
-                                                                                       cCurrentModuleObject,
+                                                                                       objType,
                                                                                        thisObjectName,
                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Sensor,
+                                                                                       DataLoopNode::ConnectionType::Sensor,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        DataLoopNode::ObjectIsParent);
             } else {
@@ -6596,10 +6601,10 @@ namespace UnitarySystems {
                 this->m_CondenserNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                loc_condenserInletNodeName,
                                                                                errFlag,
-                                                                               cCurrentModuleObject,
+                                                                               objType,
                                                                                thisObjectName,
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsParent);
             } else {
@@ -6635,19 +6640,19 @@ namespace UnitarySystems {
                 this->m_HeatRecoveryInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                        loc_heatRecoveryInletNodeName,
                                                                                        errFlag,
-                                                                                       cCurrentModuleObject,
+                                                                                       objType,
                                                                                        thisObjectName,
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 this->m_HeatRecoveryOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                         loc_heatRecoveryOutletNodeName,
                                                                                         errFlag,
-                                                                                        cCurrentModuleObject,
+                                                                                        objType,
                                                                                         thisObjectName,
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                                         NodeInputManager::CompFluidStream::Tertiary,
                                                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -7826,8 +7831,9 @@ namespace UnitarySystems {
             state.dataUnitarySystems->MoistureLoad = 0.0;
             this->LoadSHR = 0.0;
             this->CoilSHR = 0.0;
-            auto const SELECT_CASE_var(this->m_ControlType);
-            if (SELECT_CASE_var == UnitarySysCtrlType::Load || SELECT_CASE_var == UnitarySysCtrlType::CCMASHRAE) {
+            switch (this->m_ControlType) {
+            case UnitarySysCtrlType::Load:
+            case UnitarySysCtrlType::CCMASHRAE: {
                 if (AirLoopNum == -1) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAirUnit
                     ShowWarningError(state, this->UnitType + " \"" + this->Name + "\"");
                     ShowFatalError(state, "...Load based control is not allowed when used with ZoneHVAC:OutdoorAirUnit");
@@ -7912,8 +7918,8 @@ namespace UnitarySystems {
                         if (this->m_ValidASHRAEHeatCoil) this->m_SimASHRAEModel = true;
                     }
                 }
-
-            } else if (SELECT_CASE_var == UnitarySysCtrlType::Setpoint) {
+            } break;
+            case UnitarySysCtrlType::Setpoint: {
                 if (AirLoopNum == -1) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAIRUNIT
 
                     if (ControlNode == 0) {
@@ -7992,9 +7998,10 @@ namespace UnitarySystems {
                     }
                 }
                 this->m_DesiredOutletTemp = min(this->m_DesiredOutletTemp, MaxOutletTemp);
-
-            } else {
+            } break;
+            default: {
                 // should never get here, only 3 control types
+            } break;
             }
         }
     }
@@ -8240,36 +8247,38 @@ namespace UnitarySystems {
         }
 
         // determine if PLR=0 meets the load
-        {
-            auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum));
-            if (SELECT_CASE_var == DataHVACGlobals::SingleHeatingSetPoint) {
-                if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
-                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                    return;
-                if (!state.dataUnitarySystems->HeatingLoad &&
-                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                    return;
-            } else if (SELECT_CASE_var == DataHVACGlobals::SingleCoolingSetPoint) {
-                if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
-                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                    return;
-                if (!state.dataUnitarySystems->CoolingLoad &&
-                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                    return;
-            } else if ((SELECT_CASE_var == DataHVACGlobals::SingleHeatCoolSetPoint) ||
-                       (SELECT_CASE_var == DataHVACGlobals::DualSetPointWithDeadBand)) {
-                if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
-                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                    return;
-                if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
-                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                    return;
-                if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad &&
-                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                    return;
-            } else {
-                // should never get here
-            }
+        switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
+        case DataHVACGlobals::SingleHeatingSetPoint: {
+            if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
+                (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                return;
+            if (!state.dataUnitarySystems->HeatingLoad &&
+                (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                return;
+        } break;
+        case DataHVACGlobals::SingleCoolingSetPoint: {
+            if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
+                (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                return;
+            if (!state.dataUnitarySystems->CoolingLoad &&
+                (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                return;
+        } break;
+        case DataHVACGlobals::SingleHeatCoolSetPoint:
+        case DataHVACGlobals::DualSetPointWithDeadBand: {
+            if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
+                (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                return;
+            if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
+                (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                return;
+            if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad &&
+                (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                return;
+        } break;
+        default: {
+            // should never get here
+        } break;
         }
 
         // if a variable speed unit, the SensOutputOff at SpeedNum=1 must be checked to see if it exceeds the ZoneLoad
@@ -8304,42 +8313,42 @@ namespace UnitarySystems {
                                           CompressorONFlag);
             FullSensibleOutput = SensOutputOff;
 
-            {
-                auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum));
-                if (SELECT_CASE_var == DataHVACGlobals::SingleHeatingSetPoint) {
-                    if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                        return;
-                    if (!state.dataUnitarySystems->HeatingLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                        return;
-                } else if (SELECT_CASE_var == DataHVACGlobals::SingleCoolingSetPoint) {
-                    if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
-                        this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat)
-                        return;
-                    if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                        return;
-                    if (!state.dataUnitarySystems->CoolingLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                        return;
-                } else if ((SELECT_CASE_var == DataHVACGlobals::SingleHeatCoolSetPoint) ||
-                           (SELECT_CASE_var == DataHVACGlobals::DualSetPointWithDeadBand)) {
-                    if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                        return;
-                    if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
-                        this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat)
-                        return;
-                    if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                        return;
-                    if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
-                        return;
-                } else {
-                    // should never get here
-                }
+            switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
+            case DataHVACGlobals::SingleHeatingSetPoint: {
+                if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                    return;
+                if (!state.dataUnitarySystems->HeatingLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                    return;
+            } break;
+            case DataHVACGlobals::SingleCoolingSetPoint: {
+                if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad && this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat)
+                    return;
+                if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                    return;
+                if (!state.dataUnitarySystems->CoolingLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                    return;
+            } break;
+            case DataHVACGlobals::SingleHeatCoolSetPoint:
+            case DataHVACGlobals::DualSetPointWithDeadBand: {
+                if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                    return;
+                if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad && this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat)
+                    return;
+                if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                    return;
+                if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
+                    return;
+            } break;
+            default: {
+                // should never get here
+            } break;
             }
         }
 
@@ -8457,45 +8466,47 @@ namespace UnitarySystems {
         // test to see if full capacity is less than load, if so set to PLR=1 and RETURN if no moisture load
         if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating <= 1) ||
             (state.dataUnitarySystems->CoolingLoad && this->m_NumOfSpeedCooling <= 1)) {
-            {
-                auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum));
-                if (SELECT_CASE_var == DataHVACGlobals::SingleHeatingSetPoint) {
-                    if (state.dataUnitarySystems->HeatingLoad && SensOutputOn < ZoneLoad) {
-                        this->m_HeatingPartLoadFrac = 1.0;
-                        this->m_WSHPRuntimeFrac = 1.0;
-                        if (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn) return;
-                    }
-                    if (!state.dataUnitarySystems->HeatingLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn))
-                        return;
-                } else if (SELECT_CASE_var == DataHVACGlobals::SingleCoolingSetPoint) {
-                    if (state.dataUnitarySystems->CoolingLoad && SensOutputOn > ZoneLoad) {
-                        this->m_CoolingPartLoadFrac = 1.0;
-                        this->m_WSHPRuntimeFrac = 1.0;
-                        if (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn) return;
-                    }
-                    if (!state.dataUnitarySystems->CoolingLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn))
-                        return;
-                } else if ((SELECT_CASE_var == DataHVACGlobals::SingleHeatCoolSetPoint) ||
-                           (SELECT_CASE_var == DataHVACGlobals::DualSetPointWithDeadBand)) {
-                    if (state.dataUnitarySystems->HeatingLoad && SensOutputOn < ZoneLoad) {
-                        this->m_HeatingPartLoadFrac = 1.0;
-                        this->m_WSHPRuntimeFrac = 1.0;
-                        if (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOn) return;
-                    }
-                    if (state.dataUnitarySystems->CoolingLoad && SensOutputOn > ZoneLoad) {
-                        this->m_CoolingPartLoadFrac = 1.0;
-                        this->m_WSHPRuntimeFrac = 1.0;
-                        return;
-                    }
-                    if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad &&
-                        (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn)) {
-                        return;
-                    }
-                } else {
-                    // no other choices for thermostat control
+            switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
+            case DataHVACGlobals::SingleHeatingSetPoint: {
+                if (state.dataUnitarySystems->HeatingLoad && SensOutputOn < ZoneLoad) {
+                    this->m_HeatingPartLoadFrac = 1.0;
+                    this->m_WSHPRuntimeFrac = 1.0;
+                    if (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn) return;
                 }
+                if (!state.dataUnitarySystems->HeatingLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn))
+                    return;
+            } break;
+            case DataHVACGlobals::SingleCoolingSetPoint: {
+                if (state.dataUnitarySystems->CoolingLoad && SensOutputOn > ZoneLoad) {
+                    this->m_CoolingPartLoadFrac = 1.0;
+                    this->m_WSHPRuntimeFrac = 1.0;
+                    if (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn) return;
+                }
+                if (!state.dataUnitarySystems->CoolingLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn))
+                    return;
+            } break;
+            case DataHVACGlobals::SingleHeatCoolSetPoint:
+            case DataHVACGlobals::DualSetPointWithDeadBand: {
+                if (state.dataUnitarySystems->HeatingLoad && SensOutputOn < ZoneLoad) {
+                    this->m_HeatingPartLoadFrac = 1.0;
+                    this->m_WSHPRuntimeFrac = 1.0;
+                    if (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOn) return;
+                }
+                if (state.dataUnitarySystems->CoolingLoad && SensOutputOn > ZoneLoad) {
+                    this->m_CoolingPartLoadFrac = 1.0;
+                    this->m_WSHPRuntimeFrac = 1.0;
+                    return;
+                }
+                if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad &&
+                    (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn)) {
+                    return;
+                }
+            } break;
+            default: {
+                // no other choices for thermostat control
+            } break;
             }
         }
         // will find speed for multispeed coils here and then RegulaFalsi on PLR at a fixed speed
@@ -11531,22 +11542,15 @@ namespace UnitarySystems {
             auto const SELECT_CASE_var(this->m_SuppHeatCoilType_Num);
 
             if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-                {
-                    auto const SELECT_CASE_var1(this->m_ControlType);
-                    if (SELECT_CASE_var1 == UnitarySysCtrlType::Setpoint) {
-                        HeatingCoils::SimulateHeatingCoilComponents(
-                            state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
-                    } else {
-                        HeatingCoils::SimulateHeatingCoilComponents(state,
-                                                                    CompName,
-                                                                    FirstHVACIteration,
-                                                                    SuppHeatCoilLoad,
-                                                                    this->m_SuppHeatCoilIndex,
-                                                                    _,
-                                                                    true,
-                                                                    this->m_FanOpMode,
-                                                                    PartLoadRatio);
-                    }
+                switch (this->m_ControlType) {
+                case UnitarySysCtrlType::Setpoint: {
+                    HeatingCoils::SimulateHeatingCoilComponents(
+                        state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
+                } break;
+                default: {
+                    HeatingCoils::SimulateHeatingCoilComponents(
+                        state, CompName, FirstHVACIteration, SuppHeatCoilLoad, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
+                } break;
                 }
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
                 HeatingCoils::SimulateHeatingCoilComponents(
@@ -14748,10 +14752,10 @@ namespace UnitarySystems {
         int OutletNode = this->AirOutNode;
 
         Real64 AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-        auto const SELECT_CASE_var(this->m_ControlType);
-        // Noticed that these are calculated differently.
-        // That doesn't make sense except that NodeNumOfControlledZone = 0 for set point control because the control zone name is not required.
-        if (SELECT_CASE_var == UnitarySysCtrlType::Setpoint) {
+        switch (this->m_ControlType) {
+            // Noticed that these are calculated differently.
+            // That doesn't make sense except that NodeNumOfControlledZone = 0 for set point control because the control zone name is not required.
+        case UnitarySysCtrlType::Setpoint: {
             if (OutletNode > 0) {
                 int InletNode = this->AirInNode;
                 CalcComponentSensibleLatentOutput(AirMassFlow,
@@ -14765,7 +14769,8 @@ namespace UnitarySystems {
                 QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
                 QTotUnitOut = TotalOutput;
             }
-        } else {
+        } break;
+        default: {
             if (OutletNode > 0 && this->NodeNumOfControlledZone > 0) {
                 CalcZoneSensibleLatentOutput(AirMassFlow,
                                              state.dataLoopNodes->Node(OutletNode).Temp,
@@ -14778,6 +14783,7 @@ namespace UnitarySystems {
                 QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
                 QTotUnitOut = TotalOutput;
             }
+        } break;
         }
 
         // set the system part-load ratio report variable

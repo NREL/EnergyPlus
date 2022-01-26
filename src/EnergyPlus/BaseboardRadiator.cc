@@ -324,25 +324,27 @@ namespace BaseboardRadiator {
                     }
                 }
                 // get inlet node number
-                baseboard->Baseboard(BaseboardNum).WaterInletNode = GetOnlySingleNode(state,
-                                                                                      state.dataIPShortCut->cAlphaArgs(3),
-                                                                                      ErrorsFound,
-                                                                                      cCurrentModuleObject,
-                                                                                      state.dataIPShortCut->cAlphaArgs(1),
-                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      NodeInputManager::CompFluidStream::Primary,
-                                                                                      ObjectIsNotParent);
+                baseboard->Baseboard(BaseboardNum).WaterInletNode =
+                    GetOnlySingleNode(state,
+                                      state.dataIPShortCut->cAlphaArgs(3),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardConvectiveWater,
+                                      state.dataIPShortCut->cAlphaArgs(1),
+                                      DataLoopNode::NodeFluidType::Water,
+                                      DataLoopNode::ConnectionType::Inlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
                 // get outlet node number
-                baseboard->Baseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
-                                                                                       state.dataIPShortCut->cAlphaArgs(4),
-                                                                                       ErrorsFound,
-                                                                                       cCurrentModuleObject,
-                                                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::CompFluidStream::Primary,
-                                                                                       ObjectIsNotParent);
+                baseboard->Baseboard(BaseboardNum).WaterOutletNode =
+                    GetOnlySingleNode(state,
+                                      state.dataIPShortCut->cAlphaArgs(4),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardConvectiveWater,
+                                      state.dataIPShortCut->cAlphaArgs(1),
+                                      DataLoopNode::NodeFluidType::Water,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
 
                 TestCompSet(state,
                             cCMO_BBRadiator_Water,
