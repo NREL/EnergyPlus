@@ -389,18 +389,30 @@ namespace ExhaustAirSystemManager {
 
         if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             // 2022-01: The system model, look in HVACFan name space
+            // state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(
+            //    state, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+            // 2022-01: use a simpler call instead (checkout SimAirServingZones.cc)
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
             state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(
-                state, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state, _, _, _, _);
         } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             // 2022-01: Component model, look in Fan name space
             // if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state,
+            /*Fans::SimulateFanComponents(state,
                                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
                                         FirstHVACIteration,
                                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex,
                                         FanSpeedRatio,
                                         ZoneCompTurnFansOn,
-                                        ZoneCompTurnFansOff);
+                                        ZoneCompTurnFansOff);*/
+            // 2022-01: use a simpler call instead (checkout SimAirServingZones.cc)
+            Fans::SimulateFanComponents(state,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
+                                        FirstHVACIteration,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex); //,
+                                        // FanSpeedRatio,
+                                        // ZoneCompTurnFansOn,
+                                        // ZoneCompTurnFansOff);
         }
 
         // 2022-01: Determine if there are some "iteration" or revisit step for the zone mixer and fan simulation
