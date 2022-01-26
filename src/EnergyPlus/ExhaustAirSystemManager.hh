@@ -71,6 +71,10 @@ namespace ExhaustAirSystemManager {
 
     void GetZoneExhaustControlInput(EnergyPlusData &state);
 
+    void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration);
+ 
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration);
+
 } // namespace ExhaustAirSystemManager
 
 struct ExhaustAirSystemMgr : BaseGlobalStruct

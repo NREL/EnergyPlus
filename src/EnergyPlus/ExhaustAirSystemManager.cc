@@ -187,7 +187,7 @@ namespace ExhaustAirSystemManager {
 
                 std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "airloophvac_zonemixer_name");
                 int zoneMixerNum = 0;
-                int zoneMixerIndex = 0; 
+                int zoneMixerIndex = 0;
 
                 // Obtains and Allocates Mixer related parameters from input file
                 if (state.dataMixerComponent->SimAirMixerInputFlag) { // First time subroutine has been entered
@@ -197,7 +197,8 @@ namespace ExhaustAirSystemManager {
 
                 // Find the correct MixerNumber
                 if (zoneMixerNum == 0) {
-                    zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state.dataMixerComponent->MixerCond, &EnergyPlus::MixerComponent::MixerConditions::MixerName);
+                    zoneMixerNum = UtilityRoutines::FindItemInList(
+                        zoneMixerName, state.dataMixerComponent->MixerCond, &EnergyPlus::MixerComponent::MixerConditions::MixerName);
                     if (zoneMixerNum == 0) {
                         // 2022-01-19: May need to change the message a little bit to get rid of "SimAirLoopMixer:"
                         ShowFatalError(state, "GetExhaustAirSystemInput: Mixer not found=" + std::string{zoneMixerName});
@@ -216,11 +217,13 @@ namespace ExhaustAirSystemManager {
                     if (state.dataMixerComponent->CheckEquipName(zoneMixerNum)) {
                         if (zoneMixerName != state.dataMixerComponent->MixerCond(zoneMixerNum).MixerName) {
                             // 2022-01-19: May need to change the warning mesage a little bit
-                            ShowFatalError(state,
-                                           format("GetExhaustAirSystemInput: Invalid zoneMixerIndex passed={}, Mixer name={}, stored Mixer Name for that index={}",
-                                                  zoneMixerNum,
-                                                  zoneMixerName,
-                                                  state.dataMixerComponent->MixerCond(zoneMixerNum).MixerName));
+                            ShowFatalError(
+                                state,
+                                format(
+                                    "GetExhaustAirSystemInput: Invalid zoneMixerIndex passed={}, Mixer name={}, stored Mixer Name for that index={}",
+                                    zoneMixerNum,
+                                    zoneMixerName,
+                                    state.dataMixerComponent->MixerCond(zoneMixerNum).MixerName));
                         }
                         state.dataMixerComponent->CheckEquipName(zoneMixerNum) = false;
                     }
@@ -230,8 +233,8 @@ namespace ExhaustAirSystemManager {
                 EnergyPlus::MixerComponent::InitAirMixer(state, zoneMixerNum); // Initialize all Mixer related parameters
                 // 2022-01-19: Till this point are the code revised from example
 
-                // 2022-01-19: Originally put the following lines to check componets a few days ago. But now it seems 
-                // redudant with the zone mixer's CheckEquipName() function. 
+                // 2022-01-19: Originally put the following lines to check componets a few days ago. But now it seems
+                // redudant with the zone mixer's CheckEquipName() function.
                 ValidateComponent(state, "AirLoopHVAC:ZoneMixer", zoneMixerName, IsNotOK, "AirLoopHVAC:ExhaustSystem");
                 if (IsNotOK) {
                     // zoneMixerNum = 0;
@@ -246,7 +249,7 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.ZoneMixerIndex = zoneMixerIndex;
 
                 std::string centralFanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
-                int centralFanTypeNum = 0; 
+                int centralFanTypeNum = 0;
                 // 2022-01: Check fan types and gives warnings
                 if (UtilityRoutines::SameString(centralFanType, "Fan:SystemModel")) {
                     centralFanTypeNum = DataHVACGlobals::FanType_SystemModelObject;
@@ -261,7 +264,7 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.CentralFanTypeNum = centralFanTypeNum;
 
                 std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
-                int centralFanIndex = 0; // zero based 
+                int centralFanIndex = 0; // zero based
                 // 2022-01: also in general, should this processing may need to checked first that
                 // all the fan objects have already been processed already to be fail-safe.
                 // probably simialr to other like schedules etc, although schedules might have been processed early in most cases.
@@ -289,7 +292,7 @@ namespace ExhaustAirSystemManager {
                     int fanType_Num_Check(0);
                     EnergyPlus::Fans::GetFanType(state, centralFanName, fanType_Num_Check, isNotOK, cCurrentModuleObject, thisExhSys.Name);
                     // 2022-01: to do: can do a check on fanType_Num_Check with centralFanTypeNum, if not feeling redudant.
-                    
+
                     if (isNotOK) {
                         ShowSevereError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
                         ErrorsFound = true;
@@ -315,7 +318,6 @@ namespace ExhaustAirSystemManager {
                     ShowContinueError(state, "it needs to be either Fan:SystemModel or Fan:ComponentModel.");
                     ErrorsFound = true;
                 }
-
 
                 thisExhSys.CentralFanIndex = centralFanIndex;
             }
@@ -384,7 +386,7 @@ namespace ExhaustAirSystemManager {
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
-        bool FirstHVACIteration = false; // 2022-01: This was passed in as a calling parameter in Fan::SimulateFanComponents()'s parent call 
+        bool FirstHVACIteration = false; // 2022-01: This was passed in as a calling parameter in Fan::SimulateFanComponents()'s parent call
         // 2022-01: may still need find another way to pass this in or deal with the first HVAC iteration scenario
 
         if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
@@ -393,8 +395,7 @@ namespace ExhaustAirSystemManager {
             //    state, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             // 2022-01: use a simpler call instead (checkout SimAirServingZones.cc)
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(
-                state, _, _, _, _);
+            state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(state, _, _, _, _);
         } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             // 2022-01: Component model, look in Fan name space
             // if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -410,9 +411,9 @@ namespace ExhaustAirSystemManager {
                                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
                                         FirstHVACIteration,
                                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex); //,
-                                        // FanSpeedRatio,
-                                        // ZoneCompTurnFansOn,
-                                        // ZoneCompTurnFansOff);
+                                                                                                                     // FanSpeedRatio,
+                                                                                                                     // ZoneCompTurnFansOn,
+                                                                                                                     // ZoneCompTurnFansOff);
         }
 
         // 2022-01: Determine if there are some "iteration" or revisit step for the zone mixer and fan simulation
@@ -420,14 +421,12 @@ namespace ExhaustAirSystemManager {
         /* // if (control type == follow-supply) { //then sum up the flow and assign to fan};
         // else if(controltype == scheduled) { //then sum up based on schedule} */
 
-
         // 2022-01: Errors and warning messages:
-        //ShowSevereError(state,
+        // ShowSevereError(state,
         //                "Problems found in simulating AirLoopHVAC:ExhaustSystem =" +
         //                state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).Name));
         //// ShowContinueError(state, "Occurs in AirLoopHVAC:ExhaustSystem =" + state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).Name);
-        //ShowFatalError(state, "Preceding condition causes termination.");
-
+        // ShowFatalError(state, "Preceding condition causes termination.");
     }
 
     void ReportExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
@@ -450,7 +449,7 @@ namespace ExhaustAirSystemManager {
         // This function is for the ZoneExhaust Control input processing;
         // It might not be finally belongs to here; but started here to code the processing part
         //
-        // 
+        //
         // Using/Aliasing
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
@@ -500,7 +499,7 @@ namespace ExhaustAirSystemManager {
                     // normal conditions
                 } else if (availSchNum == 0) {
                     // blank or anything like that, treat as always avaialabe
-                    /* //may not need to process the detailed schedule value here, but if yes, use this example: 
+                    /* //may not need to process the detailed schedule value here, but if yes, use this example:
                     GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr)
                     */
                 } else {
@@ -512,31 +511,31 @@ namespace ExhaustAirSystemManager {
                 }
                 thisExhCtrl.AvailScheduleNum = availSchNum;
 
-                // These two nodes are required inputs: 
+                // These two nodes are required inputs:
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
                 // 2022-01: What about nodelist, can GetOnlySingleNode() still used for that?
                 int inletNodeNum = GetOnlySingleNode(state,
-                                                  inletNodeName,
-                                                  ErrorsFound,
-                                                  cCurrentModuleObject,
-                                                  thisExhCtrl.Name,
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsParent);
+                                                     inletNodeName,
+                                                     ErrorsFound,
+                                                     cCurrentModuleObject,
+                                                     thisExhCtrl.Name,
+                                                     DataLoopNode::NodeFluidType::Air,
+                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     NodeInputManager::CompFluidStream::Primary,
+                                                     ObjectIsParent);
                 thisExhCtrl.InletNodeNum = inletNodeNum;
 
                 std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
 
                 int outletNodeNum = GetOnlySingleNode(state,
-                                                     outletNodeName,
-                                                     ErrorsFound,
-                                                     cCurrentModuleObject,
-                                                     thisExhCtrl.Name,
-                                                     DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                     NodeInputManager::CompFluidStream::Primary,
-                                                     ObjectIsParent);
+                                                      outletNodeName,
+                                                      ErrorsFound,
+                                                      cCurrentModuleObject,
+                                                      thisExhCtrl.Name,
+                                                      DataLoopNode::NodeFluidType::Air,
+                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      NodeInputManager::CompFluidStream::Primary,
+                                                      ObjectIsParent);
                 thisExhCtrl.OutletNodeNum = outletNodeNum;
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
@@ -573,13 +572,13 @@ namespace ExhaustAirSystemManager {
                 std::string supplyNodeOrNodelistName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "supply_node_or_nodelist_name");
                 int supplyNodeOrNodelistNum = 0;
                 // to do: check the requirement dependent on the control type:
-                /* // Logic: if (control is scheduled) then do not process this or  
+                /* // Logic: if (control is scheduled) then do not process this or
                    // set a number out of range
-                   // if (control is follow-supply) then need to make sure this is not blank 
+                   // if (control is follow-supply) then need to make sure this is not blank
                    // and also need make sure it is a valid node or nodelist
                 */
                 // Also to do: convert text to interger node values (or node list values?)
-                
+
                 // InducedNodeListName = AlphArray(5);
                 bool NodeListError = false;
                 int NumNodes = 0;
@@ -596,8 +595,8 @@ namespace ExhaustAirSystemManager {
                             DataLoopNode::NodeConnectionType::Sensor,
                             NodeInputManager::CompFluidStream::Primary,
                             ObjectIsNotParent); // ,
-                            // _,
-                            // supplyNodeOrNodelistName);
+                                                // _,
+                                                // supplyNodeOrNodelistName);
 
                 thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
 
@@ -665,7 +664,7 @@ namespace ExhaustAirSystemManager {
             // 2022-01: Need an equivalent of the zone exhaust numbers
             // However, probably need one for all numbers (sum of all zones);
             // and also need to create a map that contains a table of for each zone how many of these exhasut controls
-            state.dataZoneEquip->NumZoneExhaustControls =  numZoneExhaustControls; // or exhCtrlNum? */
+            state.dataZoneEquip->NumZoneExhaustControls = numZoneExhaustControls; // or exhCtrlNum? */
 
         } else {
             // If no exhaust systems are defined, then do something <or nothing>:
@@ -677,6 +676,18 @@ namespace ExhaustAirSystemManager {
         }
     }
 
+    void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration)
+    {
+    }
+
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration)
+    {
+        // 2022-01: Calculate a zonehvac exhaust control system
+        // basically, based on the incoming node information, as well as the input parameters
+        // determine the outlet node values and possible other state variable (if any)
+
+
+    }
 } // namespace ExhaustAirSystemManager
 
 } // namespace EnergyPlus
