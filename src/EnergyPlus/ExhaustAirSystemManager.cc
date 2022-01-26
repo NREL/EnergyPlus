@@ -684,11 +684,11 @@ namespace ExhaustAirSystemManager {
         // third, sizing
         // fourth, run calc for all exhaust controls
         // fifth, report variables. (so need to set up variables as well somehwere before the actual simulation
-        
+
         // Locals
         int ExhaustControlNum;
 
-        // 2022-01: Step 1: 
+        // 2022-01: Step 1:
         if (state.dataExhCtrlSystemMrg->GetInputFlag) { // First time subroutine has been entered
             GetZoneExhaustControlInput(state);
             state.dataExhCtrlSystemMrg->GetInputFlag = false;
@@ -702,7 +702,6 @@ namespace ExhaustAirSystemManager {
         }
 
         // 2022-01: Step 5: report results
-
     }
 
     void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration)
@@ -711,8 +710,42 @@ namespace ExhaustAirSystemManager {
         // basically, based on the incoming node information, as well as the input parameters
         // determine the outlet node values and possible other state variable (if any)
 
+        // just for posted here for temp reference, will remove later:
+        //std::string const idf_objects = delimited_string({
+        //    "ZoneHVAC:ExhaustControl,",
+        //    "    Zone1 Exhaust Control,           !-Name",
+        //    "    HVACOperationSchd,              !- Availability Schedule Name",
+        //    "    Zone2 Exhaust Node,             !- Inlet Node Name",
+        //    "    Zone2 ExhaustSystem Node,       !- Outlet Node Name",
+        //    "    0.1,                            !- Design Flow Rate {m3/s}",
+        //    "    Scheduled,                      !- Flow Control Type (Scheduled, FollowSupply, Other?)",
+        //    "    Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name",
+        //    "    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)",
+        //    "    ,                               !- Minimum Zone Temperature Limit Schedule Name",
+        //    "    Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name",
+        //    "    FlowBalancedSched;        !-Balanced Exhaust Fraction Schedule Name",
+        //});
+
+        // Availability schedule: 
+        // if (available) {//then proceed to Steps 0-4 below;}
+        // else {// set inlet and outlet flows to zero}
+
+        // Basic relations: 
+        // 0. Outlet node flow = inlet flow (this might should be the last step instead, after everything is calculated).
+        // 1. outlet node flow rate = Design flow rate * flow fraction schedule name for schedule flow control;
+        // 1a. outlet node flow rate is proportional (maybe by 1.0) to supply flow rate for follow-supply;
+        // 2. outlet node flow rate need to be >= than the min flow fraction * Design flow rate if scheduled flow;
+        // 2a?. outlet node flow rate >= min fraction *(design flow rate still, or design supply flow, or something else?)
+        // 2b. if 2 or 2a are not true, then set the flow rate to min 
+        // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
+        // 4. How to use balanced exhaust fraction? 
 
     }
+
+    void SizeExhaustSystem(EnergyPlusData &state)
+    {
+    }
+
 } // namespace ExhaustAirSystemManager
 
 } // namespace EnergyPlus
