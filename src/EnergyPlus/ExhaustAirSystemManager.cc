@@ -583,9 +583,9 @@ namespace ExhaustAirSystemManager {
                             thisExhCtrl.Name,
                             DataLoopNode::NodeConnectionType::Sensor,
                             NodeInputManager::CompFluidStream::Primary,
-                            ObjectIsNotParent,
-                            _,
-                            supplyNodeOrNodelistName);
+                            ObjectIsNotParent); // ,
+                            // _,
+                            // supplyNodeOrNodelistName);
 
                 thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
 
