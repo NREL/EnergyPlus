@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -117,15 +117,15 @@ void GshpPeCoolingSpecs::simulate(
     EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
 {
     // Simulate the model for the Demand "MyLoad"
-    if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
+    if (calledFromLocation.loopNum == this->LoadPlantLoc.loopNum) { // chilled water loop
         this->initialize(state);
         this->calculate(state, CurLoad);
         this->update(state);
-    } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
+    } else if (calledFromLocation.loopNum == this->SourcePlantLoc.loopNum) { // condenser loop
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
-                                                            this->SourceLoopNum,
-                                                            this->SourceLoopSideNum,
-                                                            DataPlant::TypeOf_HPWaterEFCooling,
+                                                            this->SourcePlantLoc.loopNum,
+                                                            this->SourcePlantLoc.loopSideNum,
+                                                            DataPlant::PlantEquipmentType::HPWaterEFCooling,
                                                             this->SourceSideInletNodeNum,
                                                             this->SourceSideOutletNodeNum,
                                                             this->QSource,
@@ -156,36 +156,21 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_HPWaterPECooling,
-                                                this->SourceLoopNum,
-                                                this->SourceLoopSideNum,
-                                                this->SourceBranchNum,
-                                                this->SourceCompNum,
+                                                DataPlant::PlantEquipmentType::HPWaterPECooling,
+                                                this->SourcePlantLoc,
                                                 errFlag,
                                                 _,
                                                 _,
                                                 _,
                                                 this->SourceSideInletNodeNum,
                                                 _);
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::TypeOf_HPWaterPECooling,
-                                                this->LoadLoopNum,
-                                                this->LoadLoopSideNum,
-                                                this->LoadBranchNum,
-                                                this->LoadCompNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->LoadSideInletNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::HPWaterPECooling, this->LoadPlantLoc, errFlag, _, _, _, this->LoadSideInletNodeNum, _);
         if (errFlag) {
             ShowFatalError(state, "InitGshp: Program terminated due to previous condition(s).");
         }
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantTypeOfNum, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state, this->LoadPlantLoc, this->SourcePlantLoc, this->WWHPPlantTypeOfNum, true);
         this->plantScanFlag = false;
     }
 }
@@ -206,7 +191,6 @@ void GetGshpInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using DataPlant::TypeOf_HPWaterPECooling;
     using FluidProperties::FindRefrigerant;
     using NodeInputManager::GetOnlySingleNode;
     using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -238,7 +222,7 @@ void GetGshpInput(EnergyPlusData &state)
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name = AlphArray(1);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).WWHPPlantTypeOfNum = TypeOf_HPWaterPECooling;
+        state.dataHPWaterToWaterClg->GSHP(GSHPNum).WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterPECooling;
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).COP = NumArray(1);
         if (NumArray(1) == 0.0) {
@@ -325,45 +309,49 @@ void GetGshpInput(EnergyPlusData &state)
             state.dataHPWaterToWaterClg->GSHP(GSHPNum).LowPressCutoff = 0.0;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum = GetOnlySingleNode(state,
-                                                                                              AlphArray(2),
-                                                                                              ErrorsFound,
-                                                                                              "HeatPump:WaterToWater Cooling",
-                                                                                              AlphArray(1),
-                                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                                              NodeInputManager::compFluidStream::Primary,
-                                                                                              ObjectIsNotParent);
+        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum =
+            GetOnlySingleNode(state,
+                              AlphArray(2),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                              AlphArray(1),
+                              DataLoopNode::NodeFluidType::Water,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(state,
-                                                                                               AlphArray(3),
-                                                                                               ErrorsFound,
-                                                                                               "HeatPump:WaterToWater Cooling",
-                                                                                               AlphArray(1),
-                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                                               NodeInputManager::compFluidStream::Primary,
-                                                                                               ObjectIsNotParent);
+        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideOutletNodeNum =
+            GetOnlySingleNode(state,
+                              AlphArray(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                              AlphArray(1),
+                              DataLoopNode::NodeFluidType::Water,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(state,
-                                                                                            AlphArray(4),
-                                                                                            ErrorsFound,
-                                                                                            "HeatPump:WaterToWater Cooling",
-                                                                                            AlphArray(1),
-                                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Secondary,
-                                                                                            ObjectIsNotParent);
+        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideInletNodeNum =
+            GetOnlySingleNode(state,
+                              AlphArray(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                              AlphArray(1),
+                              DataLoopNode::NodeFluidType::Water,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Secondary,
+                              ObjectIsNotParent);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(state,
-                                                                                             AlphArray(5),
-                                                                                             ErrorsFound,
-                                                                                             "HeatPump:WaterToWater Cooling",
-                                                                                             AlphArray(1),
-                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Secondary,
-                                                                                             ObjectIsNotParent);
+        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideOutletNodeNum =
+            GetOnlySingleNode(state,
+                              AlphArray(5),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                              AlphArray(1),
+                              DataLoopNode::NodeFluidType::Water,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Secondary,
+                              ObjectIsNotParent);
 
         // Test node sets
         TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(2), AlphArray(3), "Condenser Water Nodes");
@@ -393,7 +381,7 @@ void GetGshpInput(EnergyPlusData &state)
 
     state.dataHPWaterToWaterClg->GSHPRefrigIndex = FindRefrigerant(state, GSHPRefrigerant);
     if (state.dataHPWaterToWaterClg->GSHPRefrigIndex == 0) {
-        ShowFatalError(state, "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant);
+        ShowFatalError(state, "Refrigerant for " + ModuleCompName + " not found, should have been=" + GSHPRefrigerant);
         ShowFatalError(state, "FluidProperties:* objects for " + GSHPRefrigerant + " must be included in the idf file.");
     }
 
@@ -526,38 +514,22 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
 
         this->beginEnvironFlag = false;
         Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::CWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
         this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->LoadSideDesignMassFlow,
-                                           this->LoadSideInletNodeNum,
-                                           this->LoadSideOutletNodeNum,
-                                           this->LoadLoopNum,
-                                           this->LoadLoopSideNum,
-                                           this->LoadBranchNum,
-                                           this->LoadCompNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->LoadSideDesignMassFlow, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum);
 
         rho = FluidProperties::GetDensityGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
+                                                state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
                                                 DataGlobalConstants::CWInitConvTemp,
-                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                 RoutineName);
         this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->SourceSideDesignMassFlow,
-                                           this->SourceSideInletNodeNum,
-                                           this->SourceSideOutletNodeNum,
-                                           this->SourceLoopNum,
-                                           this->SourceLoopSideNum,
-                                           this->SourceBranchNum,
-                                           this->SourceCompNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->SourceSideDesignMassFlow, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum);
 
         state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp = 35.0;
     }
@@ -588,11 +560,11 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     //       RE-ENGINEERED  Mar2000
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const gamma(1.114); // Expnasion Coefficient
-    Real64 const HeatBalTol(0.0005);
-    Real64 const RelaxParam(0.6);
-    Real64 const SmallNum(1.0e-20);
-    int const IterationLimit(500);
+    Real64 constexpr gamma(1.114); // Expnasion Coefficient
+    Real64 constexpr HeatBalTol(0.0005);
+    Real64 constexpr RelaxParam(0.6);
+    Real64 constexpr SmallNum(1.0e-20);
+    int constexpr IterationLimit(500);
     static constexpr std::string_view RoutineName("CalcGshpModel");
     static constexpr std::string_view RoutineNameLoadSideRefridgTemp("CalcGSHPModel:LoadSideRefridgTemp");
     static constexpr std::string_view RoutineNameSourceSideRefridgTemp("CalcGSHPModel:SourceSideRefridgTemp");
@@ -653,32 +625,16 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     // Set flows if the heat pump is not running
     if (!this->MustRun) {
         this->LoadSideWaterMassFlowRate = 0.0;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->LoadSideWaterMassFlowRate,
-                                             this->LoadSideInletNodeNum,
-                                             this->LoadSideOutletNodeNum,
-                                             this->LoadLoopNum,
-                                             this->LoadLoopSideNum,
-                                             this->LoadBranchNum,
-                                             this->LoadCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->LoadSideWaterMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
         this->SourceSideWaterMassFlowRate = 0.0;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->SourceSideWaterMassFlowRate,
-                                             this->SourceSideInletNodeNum,
-                                             this->SourceSideOutletNodeNum,
-                                             this->SourceLoopNum,
-                                             this->SourceLoopSideNum,
-                                             this->SourceBranchNum,
-                                             this->SourceCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->SourceSideWaterMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->LoadLoopNum,
-                                                    this->LoadLoopSideNum,
-                                                    this->LoadBranchNum,
-                                                    this->LoadCompNum,
+                                                    this->LoadPlantLoc,
                                                     this->CondMassFlowIndex,
-                                                    this->SourceLoopNum,
-                                                    this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    this->SourcePlantLoc,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
         // now initialize simulation variables for "heat pump off"
         this->QLoad = 0.0;
@@ -693,24 +649,12 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
         // Set flows if the heat pump is running
     } else { // the heat pump must run
         this->LoadSideWaterMassFlowRate = this->LoadSideDesignMassFlow;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->LoadSideWaterMassFlowRate,
-                                             this->LoadSideInletNodeNum,
-                                             this->LoadSideOutletNodeNum,
-                                             this->LoadLoopNum,
-                                             this->LoadLoopSideNum,
-                                             this->LoadBranchNum,
-                                             this->LoadCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->LoadSideWaterMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
 
         this->SourceSideWaterMassFlowRate = this->SourceSideDesignMassFlow;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->SourceSideWaterMassFlowRate,
-                                             this->SourceSideInletNodeNum,
-                                             this->SourceSideOutletNodeNum,
-                                             this->SourceLoopNum,
-                                             this->SourceLoopSideNum,
-                                             this->SourceBranchNum,
-                                             this->SourceCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->SourceSideWaterMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
         // get inlet temps
         this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
         this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
@@ -718,32 +662,16 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
         if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance ||
             this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
             this->LoadSideWaterMassFlowRate = 0.0;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->LoadSideWaterMassFlowRate,
-                                                 this->LoadSideInletNodeNum,
-                                                 this->LoadSideOutletNodeNum,
-                                                 this->LoadLoopNum,
-                                                 this->LoadLoopSideNum,
-                                                 this->LoadBranchNum,
-                                                 this->LoadCompNum);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->LoadSideWaterMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
             this->SourceSideWaterMassFlowRate = 0.0;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->SourceSideWaterMassFlowRate,
-                                                 this->SourceSideInletNodeNum,
-                                                 this->SourceSideOutletNodeNum,
-                                                 this->SourceLoopNum,
-                                                 this->SourceLoopSideNum,
-                                                 this->SourceBranchNum,
-                                                 this->SourceCompNum);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->SourceSideWaterMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
-                                                        this->LoadLoopNum,
-                                                        this->LoadLoopSideNum,
-                                                        this->LoadBranchNum,
-                                                        this->LoadCompNum,
+                                                        this->LoadPlantLoc,
                                                         this->CondMassFlowIndex,
-                                                        this->SourceLoopNum,
-                                                        this->LoadLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        this->SourcePlantLoc,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             this->QLoad = 0.0;
             this->QSource = 0.0;
@@ -755,14 +683,10 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
             return;
         }
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->LoadLoopNum,
-                                                    this->LoadLoopSideNum,
-                                                    this->LoadBranchNum,
-                                                    this->LoadCompNum,
+                                                    this->LoadPlantLoc,
                                                     this->CondMassFlowIndex,
-                                                    this->SourceLoopNum,
-                                                    this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    this->SourcePlantLoc,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
     }
 
@@ -774,15 +698,15 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     IterationCount = 0;
 
     CpSourceSide = FluidProperties::GetSpecificHeatGlycol(state,
-                                                          state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
+                                                          state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
                                                           this->SourceSideWaterInletTemp,
-                                                          state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                          state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                           RoutineName);
 
     CpLoadSide = FluidProperties::GetSpecificHeatGlycol(state,
-                                                        state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidName,
+                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
                                                         this->LoadSideWaterInletTemp,
-                                                        state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
     // Determine effectiveness of Load Side

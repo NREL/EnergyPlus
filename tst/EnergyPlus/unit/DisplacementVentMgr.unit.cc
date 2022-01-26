@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -273,15 +273,15 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
 TEST_F(EnergyPlusFixture, DVThirdOrderFloorTempCalculation)
 {
-    Real64 const tempHistoryTerm = 0; // no history
-    Real64 const HAT_floor = 20;
-    Real64 const HA_floor = 1;
-    Real64 const MCpT_Total = 40;
-    Real64 const MCp_Total = 2;
-    Real64 const occupiedTemp = 25;
-    Real64 const nonAirSystemResponse = 0;
-    Real64 const zoneMultiplier = 1;
-    Real64 const airCap = 100;
+    Real64 constexpr tempHistoryTerm = 0; // no history
+    Real64 constexpr HAT_floor = 20;
+    Real64 constexpr HA_floor = 1;
+    Real64 constexpr MCpT_Total = 40;
+    Real64 constexpr MCp_Total = 2;
+    Real64 constexpr occupiedTemp = 25;
+    Real64 constexpr nonAirSystemResponse = 0;
+    Real64 constexpr zoneMultiplier = 1;
+    Real64 constexpr airCap = 100;
 
     Real64 temp = calculateThirdOrderFloorTemperature(
         tempHistoryTerm, HAT_floor, HA_floor, MCpT_Total, MCp_Total, occupiedTemp, nonAirSystemResponse, zoneMultiplier, airCap);

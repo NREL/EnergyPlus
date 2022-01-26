@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -687,10 +687,10 @@ namespace BranchInputManager {
                 RegisterNodeConnection(state,
                                        OutletNodeNum,
                                        state.dataLoopNodes->NodeID(OutletNodeNum),
-                                       "Connector:Mixer",
+                                       DataLoopNode::ConnectionObjectType::ConnectorMixer,
                                        MixerName,
-                                       DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
-                                       NodeInputManager::compFluidStream::Primary,
+                                       DataLoopNode::ConnectionType::Outlet,
+                                       NodeInputManager::CompFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
 
@@ -719,10 +719,10 @@ namespace BranchInputManager {
                         RegisterNodeConnection(state,
                                                InletNodeNums(Loop),
                                                state.dataLoopNodes->NodeID(InletNodeNums(Loop)),
-                                               "Connector:Mixer",
+                                               DataLoopNode::ConnectionObjectType::ConnectorMixer,
                                                MixerName,
-                                               DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
-                                               NodeInputManager::compFluidStream::Primary,
+                                               DataLoopNode::ConnectionType::Inlet,
+                                               NodeInputManager::CompFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
                     }
@@ -845,10 +845,10 @@ namespace BranchInputManager {
                 RegisterNodeConnection(state,
                                        InletNodeNum,
                                        state.dataLoopNodes->NodeID(InletNodeNum),
-                                       "Connector:Splitter",
+                                       DataLoopNode::ConnectionObjectType::ConnectorSplitter,
                                        SplitterName,
-                                       DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
-                                       NodeInputManager::compFluidStream::Primary,
+                                       DataLoopNode::ConnectionType::Inlet,
+                                       NodeInputManager::CompFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
 
@@ -878,10 +878,10 @@ namespace BranchInputManager {
                         RegisterNodeConnection(state,
                                                OutletNodeNums(Loop),
                                                state.dataLoopNodes->NodeID(OutletNodeNums(Loop)),
-                                               "Connector:Splitter",
+                                               DataLoopNode::ConnectionObjectType::ConnectorSplitter,
                                                SplitterName,
-                                               DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
-                                               NodeInputManager::compFluidStream::Primary,
+                                               DataLoopNode::ConnectionType::Outlet,
+                                               NodeInputManager::CompFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
                     }
@@ -1120,18 +1120,18 @@ namespace BranchInputManager {
         // Locals
         PressureCurveType pressureCurveType;
         int PressureCurveIndex;
-        bool ErrFound;                                   // Flag for error detection
-        int Comp;                                        // Loop Counter
-        bool IsNotOK;                                    // Flag to verify name
-        int NumInComps;                                  // Number of components actually verified (no SPLITTER or MIXER allowed)
-        DataLoopNode::NodeConnectionType ConnectionType; // Used to pass variable node connection type to GetNodeNums
-        int NumNodes;                                    // Number of Nodes from NodeInputManager
+        bool ErrFound;                               // Flag for error detection
+        int Comp;                                    // Loop Counter
+        bool IsNotOK;                                // Flag to verify name
+        int NumInComps;                              // Number of components actually verified (no SPLITTER or MIXER allowed)
+        DataLoopNode::ConnectionType ConnectionType; // Used to pass variable node connection type to GetNodeNums
+        int NumNodes;                                // Number of Nodes from NodeInputManager
 
         std::string CurrentModuleObject = "Branch";
 
         state.dataBranchInputManager->Branch(BCount).Name = Alphas(1);
         GetPressureCurveTypeAndIndex(state, Alphas(2), pressureCurveType, PressureCurveIndex);
-        if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Error) {
+        if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Invalid) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
             ShowContinueError(state, "..Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
             ShowContinueError(state, "This curve could not be found in the input deck.  Ensure that this curve has been entered");
@@ -1170,9 +1170,9 @@ namespace BranchInputManager {
             state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName = Alphas(Loop + 2);
             // If first component on branch, then inlet node is inlet to branch, otherwise node is internal
             if (Loop == 3) {
-                ConnectionType = DataLoopNode::NodeConnectionType::Inlet;
+                ConnectionType = DataLoopNode::ConnectionType::Inlet;
             } else {
-                ConnectionType = DataLoopNode::NodeConnectionType::Internal;
+                ConnectionType = DataLoopNode::ConnectionType::Internal;
             }
             if (!lAlphaBlanks(Loop + 2)) {
                 GetNodeNums(state,
@@ -1180,11 +1180,11 @@ namespace BranchInputManager {
                             NumNodes,
                             NodeNums,
                             ErrFound,
-                            DataLoopNode::NodeFluidType::blank,
-                            CurrentModuleObject,
+                            DataLoopNode::NodeFluidType::Blank,
+                            DataLoopNode::ConnectionObjectType::Branch,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
-                            NodeInputManager::compFluidStream::Primary,
+                            NodeInputManager::CompFluidStream::Primary,
                             ObjectIsParent,
                             _,
                             cAlphaFields(Loop + 2));
@@ -1212,9 +1212,9 @@ namespace BranchInputManager {
             state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNodeName = Alphas(Loop + 3);
             // If last component on branch, then outlet node is outlet from branch, otherwise node is internal
             if (Loop == NumAlphas - 3) {
-                ConnectionType = DataLoopNode::NodeConnectionType::Outlet;
+                ConnectionType = DataLoopNode::ConnectionType::Outlet;
             } else {
-                ConnectionType = DataLoopNode::NodeConnectionType::Internal;
+                ConnectionType = DataLoopNode::ConnectionType::Internal;
             }
             if (!lAlphaBlanks(Loop + 3)) {
                 GetNodeNums(state,
@@ -1222,11 +1222,11 @@ namespace BranchInputManager {
                             NumNodes,
                             NodeNums,
                             ErrFound,
-                            DataLoopNode::NodeFluidType::blank,
-                            CurrentModuleObject,
+                            DataLoopNode::NodeFluidType::Blank,
+                            DataLoopNode::ConnectionObjectType::Branch,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
-                            NodeInputManager::compFluidStream::Primary,
+                            NodeInputManager::CompFluidStream::Primary,
                             ObjectIsParent,
                             _,
                             cAlphaFields(Loop + 3));
@@ -2588,7 +2588,7 @@ namespace BranchInputManager {
                   state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
 
             IsAirBranch = false;
-            BranchFluidType = NodeFluidType::blank;
+            BranchFluidType = NodeFluidType::Blank;
             MixedFluidTypesOnBranchList = false;
             NumNodesOnBranchList = 0;
             FoundBranches.allocate(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
@@ -2638,16 +2638,16 @@ namespace BranchInputManager {
                     if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType ==
                         DataLoopNode::NodeFluidType::Air)
                         IsAirBranch = true;
-                    if (BranchFluidType == DataLoopNode::NodeFluidType::blank) {
+                    if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         BranchFluidType = state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType;
                         InitialBranchFluidNode = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
-                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes(DataLoopNode::NodeFluidType::blank);
+                        OriginalBranchFluidType = DataLoopNode::NodeFluidTypeNames[static_cast<int>(DataLoopNode::NodeFluidType::Blank)];
                     } else if (BranchFluidType !=
                                    state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType &&
                                state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType !=
-                                   DataLoopNode::NodeFluidType::blank) {
+                                   DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         MixedFluidTypesOnBranchList = true;
@@ -2658,16 +2658,16 @@ namespace BranchInputManager {
                     if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType ==
                         DataLoopNode::NodeFluidType::Air)
                         IsAirBranch = true;
-                    if (BranchFluidType == DataLoopNode::NodeFluidType::blank) {
+                    if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         BranchFluidType = state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType;
                         InitialBranchFluidNode = state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode;
-                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes(BranchFluidType);
+                        OriginalBranchFluidType = DataLoopNode::NodeFluidTypeNames[static_cast<int>(BranchFluidType)];
                     } else if (BranchFluidType !=
                                    state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType &&
                                state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType !=
-                                   DataLoopNode::NodeFluidType::blank) {
+                                   DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode;
                         MixedFluidTypesOnBranchList = true;
@@ -2727,7 +2727,8 @@ namespace BranchInputManager {
                         continue;
                     }
                     for (Loop2 = Ptr; Loop2 <= EndPtr; ++Loop2) {
-                        cBranchFluidType = DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(BranchFluidNodes(Loop2)).FluidType);
+                        cBranchFluidType =
+                            DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(BranchFluidNodes(Loop2)).FluidType)];
                         if (cBranchFluidType.empty()) cBranchFluidType = "**Unknown**";
                         ShowContinueError(state,
                                           "....Node=" + state.dataLoopNodes->NodeID(BranchFluidNodes(Loop2)) + ", Fluid Type=" + cBranchFluidType);

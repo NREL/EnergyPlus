@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -183,9 +183,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(CoilInHumRat);
                             // adjust coil inlet/outlet temp with fan temperature rise
                             if (this->dataDesAccountForFanHeat) {
-                                if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                                if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
                                     CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
-                                } else if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
+                                } else if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::DrawThru) {
                                     CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 }
                             }
@@ -372,31 +372,31 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         if (this->curOASysNum > 0) { // coil is in the OA stream
                             // need to find fan type in OA system
                         } else {
-                            switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            switch (this->primaryAirSystem(this->curSysNum).supFanModelType) {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
                             } // end switch
 
-                            switch (this->primaryAirSystem(this->curSysNum).retFanModelTypeEnum) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            switch (this->primaryAirSystem(this->curSysNum).retFanModelType) {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad += (1.0 - OutAirFrac) * this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad += (1.0 - OutAirFrac) * this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
@@ -409,12 +409,12 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         // adjust coil inlet/outlet temp with fan temperature rise
                         if (this->dataDesAccountForFanHeat) {
                             PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
-                            if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                            if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::BlowThru) {
                                 CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 // include change in inlet condition in TotCapTempModFac
                                 CoilInWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                                     state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
-                            } else if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                            } else if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::DrawThru) {
                                 CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                             }
                         }
