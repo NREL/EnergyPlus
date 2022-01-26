@@ -82,7 +82,7 @@ namespace ExhaustAirSystemManager {
     // PURPOSE OF THIS MODULE:
     // To manage the exhaust air system.
 
-    void SimExhaustAirSystem(EnergyPlusData &state)
+    void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -100,7 +100,7 @@ namespace ExhaustAirSystemManager {
         }
 
         for (ExhaustAirSystemNum = 1; ExhaustAirSystemNum <= state.dataZoneEquip->NumExhaustAirSystems; ++ExhaustAirSystemNum) {
-            CalcExhaustAirSystem(state, ExhaustAirSystemNum);
+            CalcExhaustAirSystem(state, ExhaustAirSystemNum, FirstHVACIteration);
         }
     }
 
@@ -348,7 +348,7 @@ namespace ExhaustAirSystemManager {
         // USE STATEMENTS:
     }
 
-    void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum)
+    void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum, bool FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:
@@ -386,7 +386,7 @@ namespace ExhaustAirSystemManager {
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
-        bool FirstHVACIteration = false; // 2022-01: This was passed in as a calling parameter in Fan::SimulateFanComponents()'s parent call
+        // bool FirstHVACIteration = false; // 2022-01: This was passed in as a calling parameter in Fan::SimulateFanComponents()'s parent call
         // 2022-01: may still need find another way to pass this in or deal with the first HVAC iteration scenario
 
         if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
@@ -678,6 +678,12 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration)
     {
+        // calling steps:
+
+        // first, call the input processing and set the first time input flag
+
+        // second, run calc for all Exhaust controls
+
     }
 
     void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration)

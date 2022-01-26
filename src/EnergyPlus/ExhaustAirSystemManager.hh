@@ -59,13 +59,13 @@ struct EnergyPlusData;
 
 namespace ExhaustAirSystemManager {
 
-    void SimExhaustAirSystem(EnergyPlusData &state);
+    void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration);
 
     void GetExhaustAirSystemInput(EnergyPlusData &state);
 
     void InitExhaustAirSystem(int &ExhaustAirSystemNum); // maybe unused
 
-    void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum);
+    void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum, bool FirstHVACIteration);
 
     void ReportExhaustAirSystem(int &ExhaustAirSystemNum); // may condiser reactivate this for the exhaust system
 
