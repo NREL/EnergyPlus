@@ -1819,7 +1819,7 @@ Site:Precipitation,
 
 \subsection{RoofIrrigation}\label{roofirrigation}
 
-The RoofIrrigation object is used to describe the amount of irrigation on the ecoroof surface over the course of the simulation runperiod. This object is used to provide irrigation data using Schedule objects that define rates of irrigation in meters per hour. These schedules can be one of two types: Schedule, or SmartSchedule.
+The RoofIrrigation object is used to describe the amount of irrigation on the ecoroof surface over the course of the simulation runperiod. This object is used to provide irrigation data using Schedule objects that define rates of irrigation in meters per hour. These schedules can be one of two types: Schedule, or SmartSchedule. Up till version 9.6, the schedule objects are necessary to describe the rates of rainfall. For newer versions, if the schedule is not defined, precipitation depth in the weather input .epw will be used instead. When this is the case, please make sure the precipitation in the .epw is accurate. This \hyperref[table by the State Climate Extreme Committee]{https://www.ncdc.noaa.gov/extremes/scec/records/all/maxp} could be a reference for sanity check of extreme values in the precipitation data. The tabular report "Monthly Precipitation Summary" provides a monthly summary of rainfall in the weather file and the amount used in the roof irrigation. This could be handing in debugging the precipitation data in the weather file.
 
 \subsubsection{Inputs}\label{inputs-23-002}
 

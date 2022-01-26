@@ -690,7 +690,7 @@ This the temperature of overflow water leaving the tank.
 
 \subsection{WaterUse:RainCollector}\label{wateruseraincollector}
 
-The WaterUse:RainCollector object is used for harvesting rainwater falling on building surfaces. The rainwater is sent to a \hyperref[waterusestorage]{WaterUse:Storage} object. In order to use this object it is necessary to also include a \hyperref[siteprecipitation]{Site:Precipitation} object to describe the rates of rainfall.
+The WaterUse:RainCollector object is used for harvesting rainwater falling on building surfaces. The rainwater is sent to a \hyperref[waterusestorage]{WaterUse:Storage} object. Up till version 9.6, in order to use this object it is necessary to also include a \hyperref[siteprecipitation]{Site:Precipitation} object to describe the rates of rainfall. For newer versions, if the \hyperref[siteprecipitation]{Site:Precipitation} object is not defined, precipitation depth in the weather input .epw will be used instead. When this is the case, please make sure the precipitation in the .epw is accurate. This \hyperref[table by the State Climate Extreme Committee]{https://www.ncdc.noaa.gov/extremes/scec/records/all/maxp} could be a reference for sanity check of extreme values in the precipitation data. The tabular report "Monthly Precipitation Summary" provides a monthly summary of rainfall in the weather file and the amount used in the roof irrigation. This could be handing in debugging the precipitation data in the weather file.
 
 \subsubsection{Inputs}\label{inputs-3-041}
 
