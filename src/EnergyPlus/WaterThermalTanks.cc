@@ -779,24 +779,24 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         }
 
         DesupHtr.WaterInletNode = NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(5),
-                                                ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CoilWaterHeatingDesuperheater,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsParent);
+                                                                      state.dataIPShortCut->cAlphaArgs(5),
+                                                                      ErrorsFound,
+                                                                      DataLoopNode::ConnectionObjectType::CoilWaterHeatingDesuperheater,
+                                                                      state.dataIPShortCut->cAlphaArgs(1),
+                                                                      DataLoopNode::NodeFluidType::Water,
+                                                                      DataLoopNode::ConnectionType::Inlet,
+                                                                      NodeInputManager::CompFluidStream::Primary,
+                                                                      DataLoopNode::ObjectIsParent);
 
         DesupHtr.WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(6),
-                                                ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CoilWaterHeatingDesuperheater,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Outlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsParent);
+                                                                       state.dataIPShortCut->cAlphaArgs(6),
+                                                                       ErrorsFound,
+                                                                       DataLoopNode::ConnectionObjectType::CoilWaterHeatingDesuperheater,
+                                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                                       DataLoopNode::NodeFluidType::Water,
+                                                                       DataLoopNode::ConnectionType::Outlet,
+                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                       DataLoopNode::ObjectIsParent);
 
         DesupHtr.InletNodeName1 = cAlphaArgs(5);
         DesupHtr.OutletNodeName1 = cAlphaArgs(6);
@@ -858,7 +858,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         DesupHtr.HeatingSourceType = heatSourceObjType;
         DesupHtr.HeatingSourceName = cAlphaArgs(10);
         if (UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:CompressorRack")) {
-            DesupHtr.ReclaimHeatingSource = CoilObjEnum::CompressorRackRefrigeratedCase;
+            DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::CompressorRackRefrigeratedCase;
             for (int RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
                 if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).Name, cAlphaArgs(10))) continue;
                 DesupHtr.ReclaimHeatingSourceIndexNum = RackNum;
@@ -923,11 +923,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             } else {
                 DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::DXMultiSpeed;
             }
-            DXCoils::GetDXCoilIndex(state,
-                                    DesupHtr.HeatingSourceName,
-                                    DesupHtr.ReclaimHeatingSourceIndexNum,
-                                    errFlag,
-                                    state.dataIPShortCut->cCurrentModuleObject);
+            DXCoils::GetDXCoilIndex(
+                state, DesupHtr.HeatingSourceName, DesupHtr.ReclaimHeatingSourceIndexNum, errFlag, state.dataIPShortCut->cCurrentModuleObject);
             if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(DesupHtr.ReclaimHeatingSourceIndexNum);
                 if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
@@ -947,8 +944,9 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 }
             }
         } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:VariableSpeed")) {
-            DesupHtr.ReclaimHeatingSource = CoilObjEnum::DXVariableCooling;
-            DesupHtr.ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(state, heatSourceObjType, state.dataIPShortCut->cAlphaArgs(10), errFlag);
+            DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::DXVariableCooling;
+            DesupHtr.ReclaimHeatingSourceIndexNum =
+                VariableSpeedCoils::GetCoilIndexVariableSpeed(state, heatSourceObjType, state.dataIPShortCut->cAlphaArgs(10), errFlag);
             if (allocated(state.dataHeatBal->HeatReclaimVS_DXCoil)) {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimVS_DXCoil(DesupHtr.ReclaimHeatingSourceIndexNum);
                 if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
@@ -968,8 +966,9 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 }
             }
         } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
-            DesupHtr.ReclaimHeatingSource = CoilObjEnum::AirWaterHeatPumpEQ;
-            DesupHtr.ReclaimHeatingSourceIndexNum = WaterToAirHeatPumpSimple::GetCoilIndex(state, heatSourceObjType, state.dataIPShortCut->cAlphaArgs(10), errFlag);
+            DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::AirWaterHeatPumpEQ;
+            DesupHtr.ReclaimHeatingSourceIndexNum =
+                WaterToAirHeatPumpSimple::GetCoilIndex(state, heatSourceObjType, state.dataIPShortCut->cAlphaArgs(10), errFlag);
             if (allocated(state.dataHeatBal->HeatReclaimSimple_WAHPCoil)) {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                     state.dataHeatBal->HeatReclaimSimple_WAHPCoil(DesupHtr.ReclaimHeatingSourceIndexNum);
@@ -990,7 +989,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                 }
             }
         } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX")) {
-            DesupHtr.ReclaimHeatingSource = CoilObjEnum::CoilCoolingDX;
+            DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::CoilCoolingDX;
             DesupHtr.ReclaimHeatingSourceIndexNum = CoilCoolingDX::factory(state, cAlphaArgs(10));
             if (DesupHtr.ReclaimHeatingSourceIndexNum < 0) {
                 ShowSevereError(
@@ -1032,7 +1031,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (DesupHtr.ReclaimHeatingSourceIndexNum == 0 && DesupHtr.ReclaimHeatingSource != CoilObjEnum::CoilCoolingDX) {
+        if (DesupHtr.ReclaimHeatingSourceIndexNum == 0 && DesupHtr.ReclaimHeatingSource != ReclaimHeatObjectType::CoilCoolingDX) {
             ShowSevereError(state,
                             cCurrentModuleObject + ", \"" + DesupHtr.Name + "\" desuperheater heat source object not found: " + heatSourceObjType +
                                 " \"" + cAlphaArgs(10) + "\"");
@@ -8507,7 +8506,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             AverageWasteHeat = state.dataHeatBal->HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -
                                state.dataHeatBal->HeatReclaimSimple_WAHPCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
             DesupHtr.DXSysPLR = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(SourceID).PartLoadRatio;
-        } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::CoilCoolingDX) {
+        } else if (DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::CoilCoolingDX) {
             AverageWasteHeat =
                 state.dataCoilCooingDX->coilCoolingDXs[DesupHtr.ReclaimHeatingSourceIndexNum].reclaimHeat.AvailCapacity -
                 state.dataCoilCooingDX->coilCoolingDXs[DesupHtr.ReclaimHeatingSourceIndexNum].reclaimHeat.HVACDesuperheaterReclaimedHeatTotal;
@@ -8852,7 +8851,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
             for (auto &num : state.dataHeatBal->HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat)
                 state.dataHeatBal->HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal += num;
-        } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::CoilCoolingDX) {
+        } else if (DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::CoilCoolingDX) {
             state.dataCoilCooingDX->coilCoolingDXs[DesupHtr.ReclaimHeatingSourceIndexNum].reclaimHeat.WaterHeatingDesuperheaterReclaimedHeat(
                 DesuperheaterNum) = DesupHtr.HeaterRate;
             state.dataCoilCooingDX->coilCoolingDXs[DesupHtr.ReclaimHeatingSourceIndexNum].reclaimHeat.WaterHeatingDesuperheaterReclaimedHeatTotal =

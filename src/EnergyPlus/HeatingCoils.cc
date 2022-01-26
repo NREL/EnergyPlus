@@ -2813,9 +2813,6 @@ namespace HeatingCoils {
                         thisCoolingCoil.reclaimHeat.AvailCapacity * Effic - thisCoolingCoil.reclaimHeat.WaterHeatingDesuperheaterReclaimedHeatTotal;
                 }
                 break;
-            case HeatObjTypes::Unassigned:
-                ShowFatalError(state, "Developer error: Heating coil ReclaimHeatingSource was not assigned properly");
-                break;
             }
 
         } else {

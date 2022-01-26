@@ -76,7 +76,7 @@ namespace HeatingCoils {
         COIL_DX_MULTIMODE,
         CONDENSER_REFRIGERATION,
         COIL_DX_VARIABLE_COOLING,
-        COIL_COOLING_DX_NEW // Coil:Cooling:DX main one-for-all coil
+        COIL_COOLING_DX_NEW, // Coil:Cooling:DX main one-for-all coil
         Num
     };
 
@@ -121,19 +121,19 @@ namespace HeatingCoils {
         // (standing pilot light) [J]
         Real64 ParasiticFuelRate = 0.0; // avg. parasitic fuel consumption rate with the gas heating coil
         // (standing pilot light) [J]
-        Real64 ParasiticFuelCapacity = 0.0;                           // capacity of parasitic fuel consumption rate, input by user [W]
-        Real64 RTF = 0.0;                                             // Heater runtime fraction, including PLF curve impacts
-        int RTFErrorIndex = 0;                                        // used in recurring error warnings
-        int RTFErrorCount = 0;                                        // used in recurring error warnings
-        int PLFErrorIndex = 0;                                        // used in recurring error warnings
-        int PLFErrorCount = 0;                                        // used in recurring error warnings
-        std::string ReclaimHeatingCoilName;                           // Name of reclaim heating coil
-        int ReclaimHeatingSourceIndexNum = 0;                         // Index to reclaim heating source (condenser) of a specific type
-        HeatObjTypes ReclaimHeatingSource = HeatObjTypes::Unassigned; // The source for the Reclaim Heating Coil
-        int NumOfStages = 0;                                          // Number of speeds
-        Array1D<Real64> MSNominalCapacity;                            // Nominal Capacity MS AC Furnace [W]
-        Array1D<Real64> MSEfficiency;                                 // Efficiency for MS AC Furnace [dimensionless]
-        Array1D<Real64> MSParasiticElecLoad;                          // Parasitic elec load MS AC Furnace (gas only) [W]
+        Real64 ParasiticFuelCapacity = 0.0;                        // capacity of parasitic fuel consumption rate, input by user [W]
+        Real64 RTF = 0.0;                                          // Heater runtime fraction, including PLF curve impacts
+        int RTFErrorIndex = 0;                                     // used in recurring error warnings
+        int RTFErrorCount = 0;                                     // used in recurring error warnings
+        int PLFErrorIndex = 0;                                     // used in recurring error warnings
+        int PLFErrorCount = 0;                                     // used in recurring error warnings
+        std::string ReclaimHeatingCoilName;                        // Name of reclaim heating coil
+        int ReclaimHeatingSourceIndexNum = 0;                      // Index to reclaim heating source (condenser) of a specific type
+        HeatObjTypes ReclaimHeatingSource = HeatObjTypes::Invalid; // The source for the Reclaim Heating Coil
+        int NumOfStages = 0;                                       // Number of speeds
+        Array1D<Real64> MSNominalCapacity;                         // Nominal Capacity MS AC Furnace [W]
+        Array1D<Real64> MSEfficiency;                              // Efficiency for MS AC Furnace [dimensionless]
+        Array1D<Real64> MSParasiticElecLoad;                       // Parasitic elec load MS AC Furnace (gas only) [W]
         bool DesiccantRegenerationCoil = false; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
         int DesiccantDehumNum = 0;              // index to desiccant dehumidifier object
         bool FaultyCoilSATFlag = false;         // True if the coil has SAT sensor fault
