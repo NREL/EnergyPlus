@@ -374,7 +374,11 @@ namespace ExhaustAirSystemManager {
                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
         }
 
-        // 2022-01: Simulate the fan
+        // 2022-01-26: One additional step here might be to consider the avaiability schedule of the exhasut system
+        // or the central exhaust fan's own avaiability schedule. 
+        // Need to prodeed differently for the cases when the exhasut system (fan) is available or not available. 
+
+        // 2022-01: Simulate the fan (need some clean up 2022-01-26)
         // capacity control method is VariableFanVariableFlow, VariableFanConstantFlow, or ASHRAE90.1
 
         // calculate fan speed ratio for Fan:OnOff or Fan:SystemModel (not used for other fan types). Only used in fan:OnOff model if performance
@@ -731,7 +735,7 @@ namespace ExhaustAirSystemManager {
         // else {// set inlet and outlet flows to zero}
 
         // Basic relations: 
-        // 0. Outlet node flow = inlet flow (this might should be the last step instead, after everything is calculated).
+        // 0. Outlet node flow rate and conditions= inlet flow rate and conditions (this might should be the last step instead, after everything is calculated).
         // 1. outlet node flow rate = Design flow rate * flow fraction schedule name for schedule flow control;
         // 1a. outlet node flow rate is proportional (maybe by 1.0) to supply flow rate for follow-supply;
         // 2. outlet node flow rate need to be >= than the min flow fraction * Design flow rate if scheduled flow;
@@ -739,6 +743,10 @@ namespace ExhaustAirSystemManager {
         // 2b. if 2 or 2a are not true, then set the flow rate to min 
         // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
         // 4. How to use balanced exhaust fraction? 
+
+        // finer details: 
+        // In step 3, use the zone temperature, or the the exhaust node temperature for comparision? 
+        // since there is an exhasut node temperature calculation in EnergyPlus considering the radiation details.  
 
     }
 
