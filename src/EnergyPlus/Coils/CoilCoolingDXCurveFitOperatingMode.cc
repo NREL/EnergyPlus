@@ -287,6 +287,18 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
 {
 
     static constexpr std::string_view RoutineName = "CoilCoolingDXCurveFitOperatingMode::calcOperatingMode";
+
+    if (((speedNum == 1) && (PLR == 0.0)) || (inletNode.MassFlowRate == 0.0)) {
+        outletNode.Temp = inletNode.Temp;
+        outletNode.HumRat = inletNode.HumRat;
+        outletNode.Enthalpy = inletNode.Enthalpy;
+        outletNode.Press = inletNode.Press;
+        OpModeRTF = 0.0;
+        OpModePower = 0.0;
+        OpModeWasteHeat = 0.0;
+        return;
+    }
+
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
