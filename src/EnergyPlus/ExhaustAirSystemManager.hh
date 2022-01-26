@@ -88,6 +88,17 @@ struct ExhaustAirSystemMgr : BaseGlobalStruct
     }
 };
 
+struct ExhaustControlSystemMgr : BaseGlobalStruct
+{
+
+    bool GetInputFlag = true;
+
+    void clear_state() override
+    {
+        this->GetInputFlag = true;
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

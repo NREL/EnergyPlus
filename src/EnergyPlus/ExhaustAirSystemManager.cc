@@ -678,11 +678,30 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration)
     {
-        // calling steps:
-
+        // 2022-01: calling steps:
         // first, call the input processing and set the first time input flag
+        // second, initialize if needed?, or sizing first (step3)
+        // third, sizing
+        // fourth, run calc for all exhaust controls
+        // fifth, report variables. (so need to set up variables as well somehwere before the actual simulation
+        
+        // Locals
+        int ExhaustControlNum;
 
-        // second, run calc for all Exhaust controls
+        // 2022-01: Step 1: 
+        if (state.dataExhCtrlSystemMrg->GetInputFlag) { // First time subroutine has been entered
+            GetZoneExhaustControlInput(state);
+            state.dataExhCtrlSystemMrg->GetInputFlag = false;
+        }
+
+        // 2022-01: Step 2 and/or 3: initialize or sizing if needed:
+
+        // 2022-01: Step 4: run calc for all exhaust controls;
+        for (ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
+            CalcZoneHVACExhaustControl(state, ExhaustControlNum, FirstHVACIteration);
+        }
+
+        // 2022-01: Step 5: report results
 
     }
 
