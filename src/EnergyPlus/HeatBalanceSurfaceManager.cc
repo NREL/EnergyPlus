@@ -826,36 +826,45 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                 // Report table for every shading control state
                 const auto totalStates{Surface(iSurf).windowShadingControlList.size()};
-                for (unsigned int i = 0; i < totalStates; ++i) {
-                    const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                    const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                    const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                if (frameDivNum != 0) {
+                    for (unsigned int i = 0; i < totalStates; ++i) {
+                        const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
-                    int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
-                    const auto stateUValue{GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
-                    const auto stateSHGC{GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
-                    const auto windowName{state.dataConstruction->Construct(stateConstrNum).Name};
+                        int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
+                        const auto stateUValue{GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
+                        const auto stateSHGC{GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
+                        const auto windowName{state.dataConstruction->Construct(stateConstrNum).Name};
 
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdUfact, windowName, stateUValue, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, windowName, stateSHGC, 3);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchFenShdVisTr,
-                                     windowName,
-                                     state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
-                                     3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdUfact, windowName, stateUValue, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, windowName, stateSHGC, 3);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchFenShdVisTr,
+                                         windowName,
+                                         state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                         3);
 
-                    frameDivNum = Surface(iSurf).FrameDivider;
-                    if (frameDivNum != 0) {
-                        double stateAssemblyUValue{0.1};
-                        double stateAssemblySHGC{0.1};
-                        double stateAssemblyVT{0.1};
+                        frameDivNum = Surface(iSurf).FrameDivider;
+                        if (frameDivNum != 0) {
+                            double stateAssemblyUValue{0.1};
+                            double stateAssemblySHGC{0.1};
+                            double stateAssemblyVT{0.1};
 
-                        GetWindowAssemblyNfrcForReport(
-                            state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
+                            GetWindowAssemblyNfrcForReport(state,
+                                                           iSurf,
+                                                           stateConstrNum,
+                                                           windowWidth,
+                                                           windowHeight,
+                                                           vision,
+                                                           stateAssemblyUValue,
+                                                           stateAssemblySHGC,
+                                                           stateAssemblyVT);
 
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, windowName, stateAssemblyUValue, 3);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, windowName, stateAssemblySHGC, 3);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, windowName, stateAssemblyVT, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, windowName, stateAssemblyUValue, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, windowName, stateAssemblySHGC, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, windowName, stateAssemblyVT, 3);
+                        }
                     }
                 }
 
