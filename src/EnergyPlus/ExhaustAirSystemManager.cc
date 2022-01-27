@@ -767,9 +767,10 @@ namespace ExhaustAirSystemManager {
         // Basic relations:
         // 0. Outlet node flow rate and conditions= inlet flow rate and conditions (this might should be the last step instead, after everything is
         // calculated).
-        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
-        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+        //2022-01-07: moved this Step 0 to the very end:
+        // state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        // state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+        // state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
 
         // 1. outlet node flow rate = Design flow rate * flow fraction schedule name for schedule flow control;
         // 1a. outlet node flow rate is proportional (maybe by 1.0) to supply flow rate for follow-supply;
@@ -788,16 +789,10 @@ namespace ExhaustAirSystemManager {
             } else {
                 //
             }
-            MassFlow = DesignFlowRate * FlowFrac;
+            // MassFlow = DesignFlowRate * FlowFrac;
         } else { // follow-supply
             // 2022-01: Deal with the node or nodelist flow sum etc.
         }
-
-        // 2022-01-27: This might be the Step 0 moved to the end
-        state.dataLoopNodes->Node(OutletNode).MassFlowRate = MassFlow;
-        state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
-        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
 
         // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
         // 2022-01: try to adapt from SimZoneExhaustFan() in Fan.cc, probably need to use actual flow rate determinations,
@@ -820,46 +815,40 @@ namespace ExhaustAirSystemManager {
             FlowFrac = 0.0; // or directly set flow rate to zero.
         }
         // 2022-01-27: still need some logic to blend availabiltiy, frac, min fract, and flow rate together to get a single final flow number.
+        MassFlow = DesignFlowRate * FlowFrac;
 
         // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
-        /* // from UpdateFan() in Fan.cc
-    auto &Fan(state.dataFans->Fan);
-
-    OutletNode = Fan(FanNum).OutletNodeNum;
-    InletNode = Fan(FanNum).InletNodeNum;
-
-    // Set the outlet air nodes of the fan
-    state.dataLoopNodes->Node(OutletNode).MassFlowRate = Fan(FanNum).OutletAirMassFlowRate;
-    state.dataLoopNodes->Node(OutletNode).Temp = Fan(FanNum).OutletAirTemp;
-    state.dataLoopNodes->Node(OutletNode).HumRat = Fan(FanNum).OutletAirHumRat;
-    state.dataLoopNodes->Node(OutletNode).Enthalpy = Fan(FanNum).OutletAirEnthalpy;
-    // Set the outlet nodes for properties that just pass through & not used
-    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
-    state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
-
-    // Set the Node Flow Control Variables from the Fan Control Variables
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
-
-    if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
-        state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-        if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
-            state.dataHVACGlobal->UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
-            if (Fan(FanNum).BalancedFractSchedNum > 0) {
-                state.dataHVACGlobal->BalancedExhMassFlow =
-                    state.dataHVACGlobal->UnbalExhMassFlow * GetCurrentScheduleValue(state, Fan(FanNum).BalancedFractSchedNum);
-                state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
-            } else {
-                state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
-            }
+        // from UpdateFan() in Fan.cc
+        state.dataHVACGlobal->UnbalExhMassFlow = MassFlow; // Fan(FanNum).InletAirMassFlowRate;
+        if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
+            state.dataHVACGlobal->BalancedExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow * EnergyPlus::ScheduleManager::GetCurrentScheduleValue(
+                                                                                                     state, thisExhCtrl.BalancedExhFracScheduleNum);
+            state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
         } else {
-            state.dataHVACGlobal->UnbalExhMassFlow = 0.0;
             state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
         }
-        Fan(FanNum).UnbalancedOutletMassFlowRate = state.dataHVACGlobal->UnbalExhMassFlow;
-        Fan(FanNum).BalancedOutletMassFlowRate = state.dataHVACGlobal->BalancedExhMassFlow;
-    }
-        */
+
+        // Set the outlet conditions of the exhaust control (A good summary Step 0)
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate = MassFlow;
+        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+        state.dataLoopNodes->Node(OutletNode).Enthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
+        // Set the outlet nodes for properties that just pass through & not used
+        state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+        state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+
+        // Set the Node Flow Control Variables from the Fan Control Variables? No need
+        // state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
+        // state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
+
+        //// these might also be useful to pass through (founnd in UpdateFan() in Fan.cc)
+        // if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        //    state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+        //}
+
+        // if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        //    state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+        //}
 
         // finer details:
         // In step 3, use the zone temperature, or the the exhaust node temperature for comparision?
