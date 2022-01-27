@@ -107,6 +107,8 @@ using json = nlohmann::json;
 
 const json &InputProcessor::schema()
 {
+    // avoid re-parsing embedded JSON schema by making this into a static const singleton
+    // because it is const, we don't have to worry about threading issues for creation or access
     static const auto json_schema = json::from_cbor(EmbeddedEpJSONSchema::embeddedEpJSONSchema());
     return json_schema;
 }
