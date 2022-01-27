@@ -762,6 +762,7 @@ namespace ExhaustAirSystemManager {
         // Availability schedule: 
         if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
             // state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
+            MassFlow = 0.0;
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
         } else {
             // set inlet and outlet flows to zero}
@@ -777,7 +778,29 @@ namespace ExhaustAirSystemManager {
         // 2. outlet node flow rate need to be >= than the min flow fraction * Design flow rate if scheduled flow;
         // 2a?. outlet node flow rate >= min fraction *(design flow rate still, or design supply flow, or something else?)
         // 2b. if 2 or 2a are not true, then set the flow rate to min 
+
+        Real64 DesignFlowRate = thisExhCtrl.DesignExhaustFlowRate;
+        Real64 FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
+        Real64 MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
         
+        if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
+            if (FlowFrac < MinFlowFrac) {
+                FlowFrac = MinFlowFrac;
+            } else {
+                //
+            }
+            MassFlow = DesignFlowRate * FlowFrac;
+        } else { // follow-supply
+            // 2022-01: Deal with the node or nodelist flow sum etc.
+        
+        }
+
+        // 2022-01-27: This might be the Step 0 moved to the end
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate = MassFlow;
+        state.dataLoopNodes->Node(InletNode).MassFlowRate; 
+        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+       
         // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
         // 2022-01: try to adapt from SimZoneExhaustFan() in Fan.cc, probably need to use actual flow rate determinations,
         // rather than FanIsRunning status flag:
