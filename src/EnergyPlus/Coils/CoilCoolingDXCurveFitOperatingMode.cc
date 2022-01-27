@@ -290,7 +290,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
-    if ((inletNode.MassFlowRate == 0.0) || ((PLR == 0.0) & (speedNum == 1)) || ((speedNum == 0) && (speedRatio == 0))) {
+    if (((speedNum == 1) && (PLR == 0.0)) || (inletNode.MassFlowRate == 0.0)) {
         outletNode.Temp = inletNode.Temp;
         outletNode.HumRat = inletNode.HumRat;
         outletNode.Enthalpy = inletNode.Enthalpy;
