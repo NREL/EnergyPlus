@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     extLitUse = 1.01;
 
     // UpdateDataandReport( 1 ); not sure if this is needed
-    GatherAnnualResultsForTimeStep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherAnnualResultsForTimeStep(*state, OutputProcessor::TimeStepType::Zone);
 
     // STOPPPED HERE. NOT SEEING THE POWER VARIABLE SHOWING UP
 
@@ -314,7 +314,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     state->dataOutputProcessor->EnergyMeters(1).CurTSValue = -10.;
     state->dataOutputProcessor->EnergyMeters(2).CurTSValue = 50.;
-    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     std::vector<std::string> fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead
@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     state->dataOutputProcessor->EnergyMeters(1).CurTSValue = 15.;
     state->dataOutputProcessor->EnergyMeters(2).CurTSValue = 55.;
-    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -123,9 +123,12 @@ namespace HVACFan {
 
         enum class SpeedControlMethod : int
         {
+            // TODO: enum check
+            Invalid = -1,
             NotSet = 0,
             Discrete,
-            Continuous
+            Continuous,
+            Num
         };
 
         // data
@@ -169,18 +172,20 @@ namespace HVACFan {
 
         // data
 
-        enum class PowerSizingMethod : int
+        enum class PowerSizingMethod
         {
-            powerSizingMethodNotSet = 0,
-            powerPerFlow,
-            powerPerFlowPerPressure,
-            totalEfficiencyAndPressure
+            Invalid = -1,
+            PowerPerFlow,
+            PowerPerFlowPerPressure,
+            TotalEfficiencyAndPressure,
+            Num
         };
-        enum class ThermalLossDestination : int
+        enum class ThermalLossDestination
         {
-            heatLossNotDetermined = 0,
-            zoneGains,
-            lostToOutside
+            Invalid = -1,
+            ZoneGains,
+            LostToOutside,
+            Num
         };
 
         std::string m_fanType;                   // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
@@ -191,8 +196,8 @@ namespace HVACFan {
         Real64 m_motorInAirFrac;                 // Fraction of motor heat entering air stream
         bool m_designElecPowerWasAutosized;
         PowerSizingMethod m_powerSizingMethod;          // sizing method for design electric power, three options
-        Real64 m_elecPowerPerFlowRate;                  // scaling factor for powerPerFlow method
-        Real64 m_elecPowerPerFlowRatePerPressure;       // scaling factor for powerPerFlowPerPressure
+        Real64 m_elecPowerPerFlowRate;                  // scaling factor for PowerPerFlow method
+        Real64 m_elecPowerPerFlowRatePerPressure;       // scaling factor for PowerPerFlowPerPressure
         Real64 m_fanTotalEff;                           // Fan total system efficiency (fan*belt*motor*VFD)
         Real64 m_nightVentPressureDelta;                // fan pressure rise during night ventilation mode
         Real64 m_nightVentFlowFraction;                 // fan's flow fraction during night ventilation mode, not used

@@ -968,7 +968,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ENDIF
 
           ! Now we write the first few fields
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,NVertFieldNum,OutArgs,FieldNames,FieldUnits)
 
           VArg=NVertFieldNum + 1
           DO Arg=1,NVert

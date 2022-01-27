@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
 // SSC Headers
@@ -68,16 +69,9 @@
 
 namespace EnergyPlus {
 
-enum class ThermalLossDestination : int
-{
-    heatLossNotDetermined = 0,
-    zoneGains,    // device thermal losses are added to a zone as internal gains
-    lostToOutside // device thermal losses have no destination
-};
-
 enum class GeneratorType
 {
-    Unassigned,
+    Invalid = -1,
     ICEngine,
     CombTurbine,
     PV,
@@ -85,7 +79,34 @@ enum class GeneratorType
     MicroCHP,
     Microturbine,
     WindTurbine,
-    PVWatts
+    PVWatts,
+    Num
+};
+
+static constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypeNames{"Generator:InternalCombustionEngine",
+                                                                                                       "Generator:CombustionTurbine",
+                                                                                                       "Generator:Photovoltaic",
+                                                                                                       "Generator:FuelCell",
+                                                                                                       "Generator:MicroCHP",
+                                                                                                       "Generator:MicroTurbine",
+                                                                                                       "Generator:WindTurbine",
+                                                                                                       "Generator:PVWatts"};
+
+static constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Num)> GeneratorTypeNamesUC{"GENERATOR:INTERNALCOMBUSTIONENGINE",
+                                                                                                         "GENERATOR:COMBUSTIONTURBINE",
+                                                                                                         "GENERATOR:PHOTOVOLTAIC",
+                                                                                                         "GENERATOR:FUELCELL",
+                                                                                                         "GENERATOR:MICROCHP",
+                                                                                                         "GENERATOR:MICROTURBINE",
+                                                                                                         "GENERATOR:WINDTURBINE",
+                                                                                                         "GENERATOR:PVWATTS"};
+
+enum class ThermalLossDestination
+{
+    Invalid = -1,
+    ZoneGains,     // device thermal losses are added to a zone as internal gains
+    LostToOutside, // device thermal losses have no destination
+    Num
 };
 
 void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
@@ -96,13 +117,14 @@ class DCtoACInverter
 {
 
 public: // Methods
-    enum class InverterModelType : int
+    enum class InverterModelType
     {
-        notYetSet,
-        cECLookUpTableModel,
-        curveFuncOfPower,
-        simpleConstantEff,
-        pvWatts,
+        Invalid = -1,
+        CECLookUpTableModel,
+        CurveFuncOfPower,
+        SimpleConstantEff,
+        PVWatts,
+        Num
     };
 
     // Constructor
@@ -203,11 +225,12 @@ private: // methods
     void calcEfficiency(EnergyPlusData &state);
 
 private: // data
-    enum class ConverterModelType : int
+    enum class ConverterModelType
     {
-        notYetSet,
-        curveFuncOfPower,
-        simpleConstantEff
+        Invalid = -1,
+        CurveFuncOfPower,
+        SimpleConstantEff,
+        Num
     };
 
     std::string name_; // user identifier
@@ -332,19 +355,21 @@ private:                            // methods
     );
 
 private: // data
-    enum class StorageModelType : int
+    enum class StorageModelType
     {
-        storageTypeNotSet = 0,
-        simpleBucketStorage,
-        kiBaMBattery,
-        liIonNmcBattery,
+        Invalid = -1,
+        SimpleBucketStorage,
+        KIBaMBattery,
+        LiIonNmcBattery,
+        Num
     };
 
-    enum class BatteryDegradationModelType : int
+    enum class BatteryDegradationModelType
     {
-        degredationNotSet = 0,
-        lifeCalculationYes,
-        lifeCalculationNo
+        Invalid = -1,
+        LifeCalculationYes,
+        LifeCalculationNo,
+        Num
     };
 
     std::string name_;               // name of this electrical storage module
@@ -354,7 +379,6 @@ private: // data
     Real64 drawnEnergy_;             // [J]
     Real64 decrementedEnergyStored_; // [J] this is the negative of StoredEnergy
     int maxRainflowArrayBounds_;
-    int const maxRainflowArrayInc_ = 100;
     bool myWarmUpFlag_;
     StorageModelType storageModelMode_;            // type of model parameter, SimpleBucketStorage
     int availSchedPtr_;                            // availability schedule index.
@@ -460,18 +484,21 @@ public: // methods
     std::string const &name() const;
 
 private: // data
-    enum class TransformerUse : int
+    enum class TransformerUse
     {
-        usenotYetSet = 0,
-        powerInFromGrid,              // condition power from grid going into building buss
-        powerOutFromBldgToGrid,       // condition power from building buss going out to grid
-        powerBetweenLoadCenterAndBldg // condition power from a load center going into building buss, or from building buss into load center for draws
+        Invalid = -1,
+        PowerInFromGrid,               // condition power from grid going into building buss
+        PowerOutFromBldgToGrid,        // condition power from building buss going out to grid
+        PowerBetweenLoadCenterAndBldg, // condition power from a load center going into building buss, or from building buss into load center for
+                                       // draws
+        Num
     };
-    enum class TransformerPerformanceInput : int
+    enum class TransformerPerformanceInput
     {
-        perfInputMethodNotSet = 0,
-        lossesMethod,
-        efficiencyMethod
+        Invalid = -1,
+        LossesMethod,
+        EfficiencyMethod,
+        Num
     };
 
     std::string name_; // user identifier
@@ -546,21 +573,19 @@ public: // Method
 
     void reinitAtBeginEnvironment();
 
-public:                              // data // might make this class a friend of ElectPowerLoadCenter?
-    std::string name;                // user identifier
-    std::string typeOfName;          // equipment type
-    GeneratorType compGenTypeOf_Num; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
-    int compPlantTypeOf_Num;         // numeric designator for plant component, in DataPlant
-    std::string compPlantName;       // name of plant component if heat recovery
-    GeneratorType generatorType;
-    int generatorIndex;              // index in generator model data struct
-    Real64 maxPowerOut;              // Maximum Power Output (W)
-    std::string availSched;          // Operation Schedule.
-    int availSchedPtr;               // pointer to operation schedule
-    Real64 powerRequestThisTimestep; // Current Demand on Equipment (W)
-    bool onThisTimestep;             // Indicator whether Generator on
-    Real64 eMSPowerRequest;          // EMS actuator for current demand on equipment (W)
-    bool eMSRequestOn;               // EMS actuating On if true.
+public:                          // data // might make this class a friend of ElectPowerLoadCenter?
+    std::string name;            // user identifier
+    GeneratorType generatorType; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+    DataPlant::PlantEquipmentType compPlantType{DataPlant::PlantEquipmentType::Invalid}; // numeric designator for plant component, in DataPlant
+    std::string compPlantName;                                                           // name of plant component if heat recovery
+    int generatorIndex;                                                                  // index in generator model data struct
+    Real64 maxPowerOut;                                                                  // Maximum Power Output (W)
+    std::string availSched;                                                              // Operation Schedule.
+    int availSchedPtr;                                                                   // pointer to operation schedule
+    Real64 powerRequestThisTimestep;                                                     // Current Demand on Equipment (W)
+    bool onThisTimestep;                                                                 // Indicator whether Generator on
+    Real64 eMSPowerRequest;                                                              // EMS actuator for current demand on equipment (W)
+    bool eMSRequestOn;                                                                   // EMS actuating On if true.
     bool plantInfoFound;
     PlantLocation cogenLocation;
     Real64 nominalThermElectRatio; // Cogen: nominal ratio of thermal to elect production
@@ -611,14 +636,15 @@ private: // Methods
     Real64 calcLoadCenterThermalLoad(EnergyPlusData &state); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
-    enum class ElectricBussType : int
+    enum class ElectricBussType
     {
-        notYetSet = 0,
-        aCBuss,
-        dCBussInverter,
-        aCBussStorage,
-        dCBussInverterDCStorage,
-        dCBussInverterACStorage
+        Invalid = -1,
+        ACBuss,
+        DCBussInverter,
+        ACBussStorage,
+        DCBussInverterDCStorage,
+        DCBussInverterACStorage,
+        Num
     };
 
     std::unique_ptr<ElectricStorage> storageObj;
@@ -650,23 +676,25 @@ public: // data public for unit test
 private: // data
     enum class GeneratorOpScheme : int
     {
-        notYetSet = 0,
-        baseLoad,
-        demandLimit,
-        trackElectrical,
-        trackSchedule,
-        trackMeter,
-        thermalFollow,
-        thermalFollowLimitElectrical
+        Invalid = -1,
+        BaseLoad,
+        DemandLimit,
+        TrackElectrical,
+        TrackSchedule,
+        TrackMeter,
+        ThermalFollow,
+        ThermalFollowLimitElectrical,
+        Num
     };
 
     enum class StorageOpScheme : int
     {
-        notYetSet = 0,
-        facilityDemandStoreExcessOnSite, // legacy control behavior
-        meterDemandStoreExcessOnSite,
-        chargeDischargeSchedules,
-        facilityDemandLeveling
+        Invalid = -1,
+        FacilityDemandStoreExcessOnSite, // legacy control behavior
+        MeterDemandStoreExcessOnSite,
+        ChargeDischargeSchedules,
+        FacilityDemandLeveling,
+        Num
     };
 
     std::string name_;                     // user identifier

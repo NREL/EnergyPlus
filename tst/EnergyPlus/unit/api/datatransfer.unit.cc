@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -148,8 +148,8 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         Real64 timeStep = 1.0;
         OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
-        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
         state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(*state);
     }
 
@@ -272,7 +272,7 @@ public:
     void simulateTimeStepAndReport()
     {
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     }
 };
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -132,14 +132,14 @@ namespace WindowManager {
     //***********************************************************************************
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
-    //    void updateQdotRadOutRepHeatEmi(EnergyPlusData &state,
+    //    void updateSurfQdotRadOutRepHeatEmi(EnergyPlusData &state,
     //                                    int const SurfNum,                // Surface number
     //                                    Real64 const Tsout,               // temporary for result of outside surface temp in Kelvin
     //                                    Real64 const rad_out_per_area,    // Total radiation emission rate per area
     //                                    Real64 const rad_out_air_per_area // Radiation emission to air rate per area
     //    );
     //
-    //    void updateQdotConvOutRep(EnergyPlusData &state,
+    //    void updateSurfQdotConvOutRep(EnergyPlusData &state,
     //                              int const SurfNum, // Surface number
     //                              Real64 const Tsout // temporary for result of outside surface temp in Kelvin
     //    );
