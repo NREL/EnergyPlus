@@ -409,9 +409,10 @@ void HeatPumpWaterHeaterData::simulate(
         state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).WHtankID = this->WaterHeaterTankNum;
         IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(state, this->DXCoilNum);
 
-        if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
-            (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
-            (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
+        if ((IntegratedHeatPump::IHPOperationMode::DedicatedWaterHtg == IHPMode) ||
+            (IntegratedHeatPump::IHPOperationMode::SpaceClgDedicatedWaterHtg == IHPMode) ||
+            (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOff == IHPMode) ||
+            (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOn == IHPMode)) { // default is to specify the air nodes for SCWH mode
             bool bDWHCoilReading = false;
             this->HeatPumpAirInletNode =
                 VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state,
@@ -1729,11 +1730,11 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         } else if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
 
             if (HPWH.bIsIHP) {
-                HPWH.Capacity = GetDWHCoilCapacityIHP(
-                    state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
+                HPWH.Capacity =
+                    GetDWHCoilCapacityIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWH, DXCoilErrFlag);
                 HPWH.DXCoilAirInletNode = IntegratedHeatPump::GetCoilInletNodeIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                HPWH.DXCoilPLFFPLR = GetIHPDWHCoilPLFFPLR(
-                    state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
+                HPWH.DXCoilPLFFPLR =
+                    GetIHPDWHCoilPLFFPLR(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWH, DXCoilErrFlag);
             } else {
                 HPWH.Capacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                 HPWH.DXCoilAirInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
@@ -8897,8 +8898,8 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     Real64 constexpr Acc(0.001); // Accuracy of result from RegulaFalsi
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 MdotWater;                                                                             // mass flow rate of condenser water, kg/s
-    IntegratedHeatPump::IHPOperationMode IHPMode(IntegratedHeatPump::IHPOperationMode::IdleMode); // IHP working mode
+    Real64 MdotWater;                                                                         // mass flow rate of condenser water, kg/s
+    IntegratedHeatPump::IHPOperationMode IHPMode(IntegratedHeatPump::IHPOperationMode::Idle); // IHP working mode
     Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0);
 
     // References to objects used in this function
@@ -9357,13 +9358,13 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
                 if (state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).CheckWHCall) {
                     int VSCoilNum;
-                    if (IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) {
+                    if (IntegratedHeatPump::IHPOperationMode::DedicatedWaterHtg == IHPMode) {
                         VSCoilNum = state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).DWHCoilIndex;
-                        state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).CurMode = IntegratedHeatPump::IHPOperationMode::DWHMode;
+                        state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).CurMode =
+                            IntegratedHeatPump::IHPOperationMode::DedicatedWaterHtg;
                     } else {
                         VSCoilNum = state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).SCWHCoilIndex;
-                        state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).CurMode =
-                            IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode;
+                        state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).CurMode = IntegratedHeatPump::IHPOperationMode::SCWHMatchWH;
                     }
 
                     this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
@@ -9406,15 +9407,15 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                false,
                                                1.0);
 
-                    if ((IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode == IHPMode) ||
-                        (IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode)) {
+                    if ((IntegratedHeatPump::IHPOperationMode::SCWHMatchWH == IHPMode) ||
+                        (IntegratedHeatPump::IHPOperationMode::DedicatedWaterHtg == IHPMode)) {
                         bIterSpeed = true;
                     } else {
                         this->SourceMassFlowRate = state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).TankSourceWaterMassFlowRate;
                         MdotWater = this->SourceMassFlowRate;
                     }
 
-                    if (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) // turn off heater element
+                    if (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOff == IHPMode) // turn off heater element
                     {
                         this->MaxCapacity = 0.0;
                         this->MinCapacity = 0.0;
