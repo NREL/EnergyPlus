@@ -899,7 +899,6 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     VIEWVC(3) = 0.0;
 
     thisDaylightControl.DaylIllumAtRefPt = 0.0;  // Daylight illuminance at reference points (lux)
-    thisDaylightControl.DaylLumAtRefPt = 0.0; // Daylight illuminance at reference points (lux)
     thisDaylightControl.GlareIndexAtRefPt = 0.0; // Glare index at reference points
     thisDaylightControl.SolidAngAtRefPt = 0.0;
     thisDaylightControl.SolidAngAtRefPtWtd = 0.0;
@@ -5099,7 +5098,6 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         daylightControl.FracZoneDaylit.allocate(curTotalDaylRefPts);
         daylightControl.IllumSetPoint.allocate(curTotalDaylRefPts);
         daylightControl.DaylIllumAtRefPt.allocate(curTotalDaylRefPts);
-        daylightControl.DaylLumAtRefPt.allocate(curTotalDaylRefPts);
         daylightControl.GlareIndexAtRefPt.allocate(curTotalDaylRefPts);
         daylightControl.DaylRefPtAbsCoord.allocate(3, curTotalDaylRefPts);
         daylightControl.DaylRefPtInBounds.allocate(curTotalDaylRefPts);
@@ -5113,7 +5111,6 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.FracZoneDaylit(refPt) = 0.0;
             daylightControl.IllumSetPoint(refPt) = 0.0;
             daylightControl.DaylIllumAtRefPt(refPt) = 0.0;
-            daylightControl.DaylLumAtRefPt(refPt) = 0.0;
             daylightControl.GlareIndexAtRefPt(refPt) = 0.0;
             daylightControl.DaylRefPtInBounds(refPt) = true;
             daylightControl.RefPtPowerReductionFactor(refPt) = 1.0;
@@ -5173,13 +5170,6 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                     daylightControl.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    daylightControl.Name);
-                SetupOutputVariable(state,
-                                    format("Daylighting Reference Point {} Luminance", refPtNum),
-                                    OutputProcessor::Unit::cd_m2,
-                                    daylightControl.DaylLumAtRefPt(refPtNum),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
                                     daylightControl.Name);
             }
         }
@@ -7142,7 +7132,6 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
                             thisControl.IllumFromWinAtRefPt(loop, IS, refPtNum);
                         state.dataSurface->SurfaceWindow(IWin).LumWinFromRefPtRep(refPtCount) =
                             thisControl.SourceLumFromWinAtRefPt(loop, IS, refPtNum);
-                        thisDaylightControl.DaylLumAtRefPt(refPtNum) += thisControl.SourceLumFromWinAtRefPt(loop, IS, refPtNum);
                     }
                 }
             }

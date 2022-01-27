@@ -171,7 +171,6 @@ namespace DataDaylighting {
         Array1D<Real64> RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
         // due to daylighting
         Array1D<Real64> DaylIllumAtRefPt;        // =0.0 ! Daylight illuminance at reference points (lux)
-        Array1D<Real64> DaylLumAtRefPt;          // =0.0 ! Daylight luminance at reference points (cd/m2)
         Array1D<Real64> GlareIndexAtRefPt;       // =0.0 ! Glare index at reference points
         Array1D<Real64> BacLum;                  // =0.0 ! Background luminance at each reference point (cd/m2)
         Array2D<Real64> SolidAngAtRefPt;         // (Number of Zones, Total Daylighting Reference Points)

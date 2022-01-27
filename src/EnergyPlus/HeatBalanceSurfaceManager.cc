@@ -477,7 +477,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(thisDaylightControl.enclIndex);
         thisDaylightControl.DaylIllumAtRefPt = 0.0;
-        thisDaylightControl.DaylLumAtRefPt = 0.0;
         thisDaylightControl.GlareIndexAtRefPt = 0.0;
         thisDaylightControl.PowerReductionFactor = 1.0;
         thisEnclDaylight.InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
