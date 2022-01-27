@@ -2,10 +2,10 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneReturnFan.idf
+! 5ZoneSystemNodeReset.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              illustrates use of a return fan
+! Highlights:              illustrates use of SetpointManager:SystemNodeReset objects.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -2869,17 +2869,23 @@
     CW Loop Temp Schedule,   !- Schedule Name
     Chilled Water Loop Setpoint Node List;  !- Setpoint Node or NodeList Name
 
-  SetpointManager:SystemNodeReset,
+  SetpointManager:SystemNodeReset:Temperature,
     Reset Air Temp Manager 1,         !- Name
     Temperature,                      !- Control Variable
     20.0,                             !- Setpoint at Low Reference Temperature {C}
     16.7,                             !- Setpoint at High Reference Temperature {C}
     12.8,                             !- Low Reference Temperature {C}
     23.9,                             !- High Reference Temperature {C}
-    ,                                 !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
-    ,                                 !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
-    ,                                 !- Low Reference Humidity Ratio {kgWater/kgDryAir}
-    ,                                 !- High Reference Humidity Ratio {kgWater/kgDryAir}
+    VAV Sys 1 Outlet Node,            !- Reference Node Name
+    Main Branch SetPoint Node List;   !- Setpoint Node or NodeList Name
+
+  SetpointManager:SystemNodeReset:Humidity,
+    Reset Air Hum Manager 1,          !- Name
+    HumidityRatio,                    !- Control Variable
+    0.008,                            !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
+    0.004,                            !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
+    0.003,                            !- Low Reference Humidity Ratio {kgWater/kgDryAir}
+    0.010,                            !- High Reference Humidity Ratio {kgWater/kgDryAir}
     VAV Sys 1 Outlet Node,            !- Reference Node Name
     Main Branch SetPoint Node List;   !- Setpoint Node or NodeList Name
 
@@ -3267,17 +3273,13 @@
     100.,                    !- Water Outlet Upper Temperature Limit {C}
     LeavingSetpointModulated;!- Boiler Flow Mode
 
-SetpointManager:SystemNodeReset,
+SetpointManager:SystemNodeReset:Temperature,
   Central Boiler Setpoint Manager,  !- Name
   Temperature,                      !- Control Variable
   80.0,                             !- Setpoint at Low Reference Temperature {C}
   40.0,                             !- Setpoint at High Reference Temperature {C}
   50,                               !- Low Reference Temperature {C}
   70,                               !- High Reference Temperature {C}
-  ,                                 !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
-  ,                                 !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
-  ,                                 !- Low Reference Humidity Ratio {kgWater/kgDryAir}
-  ,                                 !- High Reference Humidity Ratio {kgWater/kgDryAir}
   Central Boiler Inlet Node,        !- Reference Node Name
   Central Boiler Outlet Node;       !- Setpoint Node or NodeList Name
 
@@ -3578,6 +3580,10 @@ SetpointManager:SystemNodeReset,
   Output:Variable,Main Cooling Coil 1 Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,Main Cooling Coil 1 Outlet Node,System Node Setpoint Temperature,hourly;
+
+  Output:Variable,Main Cooling Coil 1 Outlet Node,System Node Humidity Ratio, hourly;
+
+  Output:Variable,Main Cooling Coil 1 Outlet Node,System Node Setpoint Humidity Ratio, hourly;
 
   Output:Variable,Main Heating Coil 1 Outlet Node,System Node Temperature,hourly;
 

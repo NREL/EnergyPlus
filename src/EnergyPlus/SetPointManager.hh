@@ -164,7 +164,8 @@ namespace SetPointManager {
         ReturnWaterResetChW,
         ReturnWaterResetHW,
         TESScheduled,
-        SystemNodeReset,
+        SystemNodeResetTemp,
+        SystemNodeResetHum,
         Num
     };
 
@@ -199,7 +200,8 @@ namespace SetPointManager {
         "SetpointManager:ReturnTemperature:ChilledWater",
         "SetpointManager:ReturnTemperature:HotWater",
         "SetpointManager:ScheduledTES",
-        "SetpointManager:SystemNodeReset"};
+        "SetpointManager:SystemNodeReset:Temperature",
+        "SetpointManager:SystemNodeReset:Humidity"};
 
     struct SPBase
     {
@@ -947,13 +949,31 @@ namespace SetPointManager {
         void calculate(EnergyPlusData &state);
     };
 
-    struct DefineSysNodeResetSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
+    struct DefineSysNodeResetTempSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
     {
         // Members
-        Real64 SpAtLowRefTemp;    // Setpoint at Low Reference Temperature (i.e., Maximum Temperature Setpoint)
-        Real64 SpAtHighRefTemp;   // Setpoint at High Reference Temperature (i.e., Minimum Temperature Setpoint)
-        Real64 LowRefTemp;        // Low Reference Temperature
-        Real64 HighRefTemp;       // High Reference Temperature
+        Real64 SpAtLowRefTemp;  // Setpoint at Low Reference Temperature (i.e., Maximum Temperature Setpoint)
+        Real64 SpAtHighRefTemp; // Setpoint at High Reference Temperature (i.e., Minimum Temperature Setpoint)
+        Real64 LowRefTemp;      // Low Reference Temperature
+        Real64 HighRefTemp;     // High Reference Temperature
+        int RefNodeNum;         // Reference Node Number
+        int NumCtrlNodes;
+        std::string CtrlNodeListName;
+        Array1D_int CtrlNodes;
+        Real64 SetPt; // current setpoint value
+
+        // Default Constructor
+        DefineSysNodeResetTempSetPointManager()
+            : SpAtLowRefTemp(0.0), SpAtHighRefTemp(0.0), LowRefTemp(0.0), HighRefTemp(0.0), RefNodeNum(0), NumCtrlNodes(0), SetPt(0.0)
+        {
+        }
+
+        void calculate(EnergyPlusData &state);
+    };
+
+    struct DefineSysNodeResetHumSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
+    {
+        // Members
         Real64 SpAtLowRefHumRat;  // Setpoint at Low Reference Humidity Ratio (i.e., Maximum Humidity Ratio Setpoint)
         Real64 SpAtHighRefHumRat; // Setpoint at High Reference Humidity Ratio (i.e., Maximum Humidity Ratio Setpoint)
         Real64 LowRefHumRat;      // Low Reference Humidity Ratio
@@ -965,9 +985,8 @@ namespace SetPointManager {
         Real64 SetPt; // current setpoint value
 
         // Default Constructor
-        DefineSysNodeResetSetPointManager()
-            : SpAtLowRefTemp(0.0), SpAtHighRefTemp(0.0), LowRefTemp(0.0), HighRefTemp(0.0), SpAtLowRefHumRat(0.0), SpAtHighRefHumRat(0.0),
-              LowRefHumRat(0.0), HighRefHumRat(0.0), RefNodeNum(0), NumCtrlNodes(0), SetPt(0.0)
+        DefineSysNodeResetHumSetPointManager()
+            : SpAtLowRefHumRat(0.0), SpAtHighRefHumRat(0.0), LowRefHumRat(0.0), HighRefHumRat(0.0), RefNodeNum(0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -1054,7 +1073,8 @@ struct SetPointManagerData : BaseGlobalStruct
     int NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
     int NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
     int NumSchTESSetPtMgrs = 0;              // number of TES scheduled setpoint managers (created internally, not by user input)
-    int NumSystemNodeResetPtMgrs = 0;        // Number of System Node Reset Setpoint Managers found in input
+    int NumSystemNodeResetTempSetPtMgrs = 0; // Number of SystemNodeReset:Temperature setpoint managers
+    int NumSystemNodeResetHumSetPtMgrs = 0;  // Number of SystemNodeReset:Humidity setpoint managers
 
     Real64 TSupNoHC = 0.0;     // supply temperature with no heating or cooling
     Real64 ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
@@ -1129,7 +1149,8 @@ struct SetPointManagerData : BaseGlobalStruct
     Array1D<SetPointManager::DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
     Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
     Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
-    Array1D<SetPointManager::DefineSysNodeResetSetPointManager> SystemNodeResetSetPtMgr;          // Array for System Node Reset Setpoint Manager data
+    Array1D<SetPointManager::DefineSysNodeResetTempSetPointManager> SystemNodeResetTempSetPtMgr;  // Array for System Node Reset Setpoint Manager data
+    Array1D<SetPointManager::DefineSysNodeResetHumSetPointManager> SystemNodeResetHumSetPtMgr;    // Array for System Node Reset Setpoint Manager data
 
     Real64 CondWaterSetPoint = 0; // Condenser entering water temperature setpoint this timestep, C
     Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
@@ -1172,7 +1193,9 @@ struct SetPointManagerData : BaseGlobalStruct
         NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
         NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
         NumSchTESSetPtMgrs = 0;              // number of TES Scheduled setpoint Managers
-        NumSystemNodeResetPtMgrs = 0;        // Number of System Node Reset Setpoint Managers found in input
+        NumSystemNodeResetTempSetPtMgrs = 0; // Number of SystemNodeReset:Temperature setpoint managers
+        NumSystemNodeResetHumSetPtMgrs = 0;  // Number of SystemNodeReset:Humidity setpoint managers
+
 
         DCESPMDsn_EntCondTemp = 0.0;
         DCESPMDsn_MinCondSetpt = 0.0;
@@ -1235,7 +1258,8 @@ struct SetPointManagerData : BaseGlobalStruct
         ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
         ReturnWaterResetHWSetPtMgr.deallocate();  // hot-water return water reset
         SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
-        SystemNodeResetSetPtMgr.deallocate();     // Array for System Node Reset Setpoint Manager data
+        SystemNodeResetTempSetPtMgr.deallocate(); // Array for System Node Reset Temperature Set Pt Mgr
+        SystemNodeResetHumSetPtMgr.deallocate();  // Array for System Node Reset Humidity Set Pt Mgr
 
         NoSurfaceGroundTempObjWarning = true;
         NoShallowGroundTempObjWarning = true;
