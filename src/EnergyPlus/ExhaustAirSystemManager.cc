@@ -680,6 +680,11 @@ namespace ExhaustAirSystemManager {
                     ShowContinueError(state, "Schedule Name =" + balancedExhFracScheduleName + "not found.");
                     // ErrorsFound = true;
                 }
+
+                // 2022-01-27: Need an additional check per IORef:
+                // This input field must be blank when the zone air flow balance is enforced.If user specifies a schedule and zone air flow balance is
+                //     enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.
+
                 thisExhCtrl.BalancedExhFracScheduleNum = balancedExhFracScheduleNum;
             }
 
