@@ -165,11 +165,12 @@ namespace ScheduleManager {
         Real64 CurrentValue;                    // For Reporting
         bool EMSActuatedOn;                     // indicates if EMS computed
         Real64 EMSValue;
+        bool UseDaylightSaving;                 // Toggles between daylight saving ON and OFF (default)
 
         // Default Constructor
         ScheduleData()
             : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
-              EMSActuatedOn(false), EMSValue(0.0)
+              EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(false)
         {
         }
     };
