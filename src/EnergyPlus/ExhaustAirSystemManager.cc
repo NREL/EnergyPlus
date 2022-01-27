@@ -328,9 +328,30 @@ namespace ExhaustAirSystemManager {
             /* */
         }
 
+        // 2022-01-26: Either here or at the end, or blended in the code above, set up the output variables: 
+        /* // some example code to set up outpput variables: 
+            SetupOutputVariable(state,
+                                "Fan Unbalanced Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                Fan(FanNum).UnbalancedOutletMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                Fan(FanNum).FanName);
+            SetupOutputVariable(state,
+                                "Fan Balanced Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                Fan(FanNum).BalancedOutletMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                Fan(FanNum).FanName);
+        */
+
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
         }
+
+
+
     }
 
     void InitExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
