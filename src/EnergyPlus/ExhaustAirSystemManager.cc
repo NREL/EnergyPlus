@@ -328,8 +328,12 @@ namespace ExhaustAirSystemManager {
             /* */
         }
 
-        // 2022-01-26: Either here or at the end, or blended in the code above, set up the output variables: 
-        /* // some example code to set up outpput variables: 
+        if (ErrorsFound) {
+            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
+        }
+
+        // 2022-01-26: Either here or at the end, or blended in the code above, set up the output variables:
+        /* // some example code to set up outpput variables:
             SetupOutputVariable(state,
                                 "Fan Unbalanced Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
@@ -345,13 +349,6 @@ namespace ExhaustAirSystemManager {
                                 OutputProcessor::SOVStoreType::Average,
                                 Fan(FanNum).FanName);
         */
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
-        }
-
-
-
     }
 
     void InitExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
@@ -396,8 +393,8 @@ namespace ExhaustAirSystemManager {
         }
 
         // 2022-01-26: One additional step here might be to consider the avaiability schedule of the exhasut system
-        // or the central exhaust fan's own avaiability schedule. 
-        // Need to prodeed differently for the cases when the exhasut system (fan) is available or not available. 
+        // or the central exhaust fan's own avaiability schedule.
+        // Need to prodeed differently for the cases when the exhasut system (fan) is available or not available.
 
         // 2022-01: Simulate the fan (need some clean up 2022-01-26)
         // capacity control method is VariableFanVariableFlow, VariableFanConstantFlow, or ASHRAE90.1
@@ -736,7 +733,7 @@ namespace ExhaustAirSystemManager {
         // determine the outlet node values and possible other state variable (if any)
 
         // just for posted here for temp reference, will remove later:
-        //std::string const idf_objects = delimited_string({
+        // std::string const idf_objects = delimited_string({
         //    "ZoneHVAC:ExhaustControl,",
         //    "    Zone1 Exhaust Control,           !-Name",
         //    "    HVACOperationSchd,              !- Availability Schedule Name",
@@ -757,9 +754,9 @@ namespace ExhaustAirSystemManager {
         Real64 MassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         Real64 Tin = state.dataLoopNodes->Node(InletNode).Temp;
         Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
-        // RhoAir = RhoAirStdInit;        
+        // RhoAir = RhoAirStdInit;
 
-        // Availability schedule: 
+        // Availability schedule:
         if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
             // state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
             MassFlow = 0.0;
@@ -767,22 +764,24 @@ namespace ExhaustAirSystemManager {
         } else {
             // set inlet and outlet flows to zero}
         }
-        // Basic relations: 
-        // 0. Outlet node flow rate and conditions= inlet flow rate and conditions (this might should be the last step instead, after everything is calculated).
+        // Basic relations:
+        // 0. Outlet node flow rate and conditions= inlet flow rate and conditions (this might should be the last step instead, after everything is
+        // calculated).
         state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
         state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-        
+
         // 1. outlet node flow rate = Design flow rate * flow fraction schedule name for schedule flow control;
         // 1a. outlet node flow rate is proportional (maybe by 1.0) to supply flow rate for follow-supply;
         // 2. outlet node flow rate need to be >= than the min flow fraction * Design flow rate if scheduled flow;
         // 2a?. outlet node flow rate >= min fraction *(design flow rate still, or design supply flow, or something else?)
-        // 2b. if 2 or 2a are not true, then set the flow rate to min 
+        // 2b. if 2 or 2a are not true, then set the flow rate to min
 
         Real64 DesignFlowRate = thisExhCtrl.DesignExhaustFlowRate;
         Real64 FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
         Real64 MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
-        
+
+        // 2022-01-27: Need to be refined more based on the schedule availability as well
         if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
             if (FlowFrac < MinFlowFrac) {
                 FlowFrac = MinFlowFrac;
@@ -792,55 +791,37 @@ namespace ExhaustAirSystemManager {
             MassFlow = DesignFlowRate * FlowFrac;
         } else { // follow-supply
             // 2022-01: Deal with the node or nodelist flow sum etc.
-        
         }
 
         // 2022-01-27: This might be the Step 0 moved to the end
         state.dataLoopNodes->Node(OutletNode).MassFlowRate = MassFlow;
-        state.dataLoopNodes->Node(InletNode).MassFlowRate; 
+        state.dataLoopNodes->Node(InletNode).MassFlowRate;
         state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
         state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-       
+
         // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
         // 2022-01: try to adapt from SimZoneExhaustFan() in Fan.cc, probably need to use actual flow rate determinations,
-        // rather than FanIsRunning status flag:
-        /*
-            // apply controls to determine if operating
-    if (Fan(FanNum).AvailManagerMode == ExhaustFanCoupledToAvailManagers) {
-        if (((GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
-            !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) { // available
-            if (Fan(FanNum).MinTempLimitSchedNum > 0) {
-                if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
-                    FanIsRunning = true;
+
+        bool runExhaust = true;
+        if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) > 0.0) { // available
+            if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
+                if (Tin >= EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
+                    runExhaust = true;
                 } else {
-                    FanIsRunning = false;
+                    runExhaust = false;
+                    FlowFrac = MinFlowFrac;
                 }
             } else {
-                FanIsRunning = true;
+                runExhaust = true;
+                // flow not changed
             }
         } else {
-            FanIsRunning = false;
+            runExhaust = false;
+            FlowFrac = 0.0; // or directly set flow rate to zero.
         }
+        // 2022-01-27: still need some logic to blend availabiltiy, frac, min fract, and flow rate together to get a single final flow number.
 
-    } else if (Fan(FanNum).AvailManagerMode == ExhaustFanDecoupledFromAvailManagers) {
-        if (GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
-            if (Fan(FanNum).MinTempLimitSchedNum > 0) {
-                if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
-                    FanIsRunning = true;
-                } else {
-                    FanIsRunning = false;
-                }
-            } else {
-                FanIsRunning = true;
-            }
-        } else {
-            FanIsRunning = false;
-        }
-    }
-        */
-
-
-        // 4. How to use balanced exhaust fraction? // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
+        // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
         /* // from UpdateFan() in Fan.cc
     auto &Fan(state.dataFans->Fan);
 
@@ -880,10 +861,10 @@ namespace ExhaustAirSystemManager {
     }
         */
 
-        // finer details: 
-        // In step 3, use the zone temperature, or the the exhaust node temperature for comparision? 
-        // since there is an exhasut node temperature calculation in EnergyPlus considering the radiation details.  
-
+        // finer details:
+        // In step 3, use the zone temperature, or the the exhaust node temperature for comparision?
+        // since there is an exhasut node temperature calculation in EnergyPlus considering the radiation details.
+        // 2022-01-27: fan coil module used the fan inlet temperature as the comparision value.
     }
 
     void SizeExhaustSystem(EnergyPlusData &state)
