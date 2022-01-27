@@ -84,7 +84,9 @@ Simulation order for setpoint managers:
 \item
   \hyperref[setpointmanagerreturntemperaturehotwater]{SetpointManager:ReturnTemperature:HotWater}
 \item
-  \hyperref[setpointmanagersystemnodereset]{SetpointManager:SystemNodeReset}
+  \hyperref[setpointmanagersystemnoderesettemperature]{SetpointManager:SystemNodeReset:Temperature}
+\item
+  \hyperref[setpointmanagersystemnoderesethumidity]{SetpointManager:SystemNodeReset:Humidity}
 \end{itemize}
 
 \subsection{SetpointManager:Scheduled}\label{setpointmanagerscheduled}
@@ -1731,100 +1733,4 @@ SetpointManager:ReturnTemperature:HotWater,
   UNTIL: 12:00, 55,        !- Field 3
   UNTIL: 17:00, 53,        !- Field 3
   UNTIL: 24:00, 55;        !- Field 3
-\end{lstlisting}
-
-\subsection{SetpointManager:SystemNodeReset}\label{setpointmanagersystemnodereset}
-
-The System Node Reset Setpoint Manager is used to place a temperature or humidity ratio setpoint on a system node according to the reference (e.g., return) temperature or humidity ratio of a system node using a reset rule. The reset rule is determined by two points: setpoints at low and high reference temperature or humidity ratio (SpAtLowRefTemp and SpAtHighRefTemp or SpAtLowRefHumRat and SpAtHighRefHumRat). In general, the higher the reference temperature or humidity ratio, the lower the setpoint. Specifically, the temperature or humidity ratio setpoints at low reference temperature or humidity ratio start decreasing linearly to the temperature or humidity ratio setpoints at high reference temperature or humidity ratio when the temperature or humidity ratio becomes higher than the low reference temperature or humidity ratio (LowRefTemp or LowRefHumRat) until the high reference temperature or humidity ratio (HighRefTemp or HighRefHumRat). The reference temperature or humidity ratio is obtained from the user-specified system node during the simulation. This SPM can be used to place a temperature or humidity ratio setpoint on HVAC system nodes.
-
-The input consists of the setpoint manager name, the control variable, the name of the node or node list affected by the setpoint, the name of the reference node name, and the data for the reset rule: setpoints at low and high reference temperatures, low and high reference temperatures, setpoints at low and high reference humidity ratios, low and high reference humidity ratios. Depending on the selected control variable, this setpoint manager uses the temperature inputs or humidity ratio inputs.
-
-\subsubsection{Inputs}
-
-\paragraph{Field: Name}
-
-A unique, user-assigned name for an instance of a system node reset setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
-
-\paragraph{Field: Control Variable}
-
-The type of variable that will be controlled. There are six key choices for this type of set point manager:
-\begin{itemize}
-  \item Temperature
-  \item MaximumTemperature
-  \item MinimumTemperature
-  \item HumidityRatio
-  \item MaximumHumidityRatio
-  \item MinimumHumidityRatio
-
-  \paragraph{Field: Setpoint at Low Reference Temperature}\label{field-setpoint-at-low-reference-temperature}
-
-  The temperature setpoint in \(^{o}\)C at the low reference temperature for the reset rule. This input is required when Temperature, MaximumTemperature or MinimumTemperature is selected as the control variable.
-
-  \paragraph{Field: Setpoint at High Reference Temperature}\label{field-setpoint-at-high-reference-temperature}
-
-  The temperature setpoint in \(^{o}\)C at the high reference temperature for the reset rule. This input is required when Temperature, MaximumTemperature or MinimumTemperature is selected as the control variable.
-
-  \paragraph{Field: Low Reference Temperature}\label{field-low-reference-temperature}
-
-  The low reference temperature in \(^{o}\)C for the reset rule. In other words, when the reference temperature is lower than this value, the temperature setpoint is at its maximum.
-
-  \paragraph{Field: High Reference Temperature}\label{field-high-reference-temperature}
-
-  The high reference temperature in \(^{o}\)C for the reset rule. In other words, when the reference temperature is higher than this value, the temperature setpoint is at its minimum.
-
-  \paragraph{Field: Setpoint at Low Reference Humidity Ratio}\label{field-setpoint-at-low-reference-humidity-ratio}
-
-  The humidity ratio setpoint in kgWater/kgDryAir at the low reference humidity ratio for the reset rule. This input is required when HumidityRatio, MaximumHumidityRatio or MinimumHumidityRatio is selected as the control variable.
-
-  \paragraph{Field: Setpoint at High Reference Humidity Ratio}\label{field-setpoint-at-high-reference-humidity-ratio}
-
-  The humidity ratio setpoint in kgWater/kgDryAir at the high reference humidity ratio for the reset rule. This input is required when HumidityRatio, MaximumHumidityRatio or MinimumHumidityRatio is selected as the control variable.
-
-  \paragraph{Field: Low Reference Humidity Ratio}\label{field-low-reference-humidity-ratio}
-
-  The low reference humidity ratio in kgWater/kgDryAir for the reset rule. In other words, when the reference humidity ratio is lower than this value, the humidity ratio setpoint is at its maximum.
-
-  \paragraph{Field: High Reference Humidity Ratio}\label{field-high-reference-humidity-ratio}
-
-  The high reference humidity ratio in kgWater/kgDryAir for the reset rule. In other words, when the reference humidity ratio is higher than this value, the humidity ratio setpoint is at it minimum.
-
-  \paragraph{Field: Reference Node Name}\label{field-reference-node-name-2}
-
-  The name of a reference system node which will be used as a reference to determine the setpoint established by this setpoint manager.
-
-  \paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-22}
-
-  The name of a \hyperref[nodelist]{NodeList} object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
-
-Below are examples, showing the inputs for SetpointManager:SystemNodeReset.
-
-\begin{lstlisting}
-
-SetpointManager:SystemNodeReset,
-  Supply Air Temp Manager,    !- Name
-  Temperature,                !- Control Variable
-  20.0,                       !- Setpoint at Low Reference Temperature {C}
-  16.7,                       !- Setpoint at High Reference Temperature {C}
-  12.8,                       !- Low Reference Temperature {C}
-  23.9,                       !- High Reference Temperature {C}
-  ,                           !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
-  ,                           !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
-  ,                           !- Low Reference Humidity Ratio {kgWater/kgDryAir}
-  ,                           !- High Reference Humidity Ratio {kgWater/kgDryAir}
-  Reference Air Node,         !- Reference Node Name
-  Supply Air Temp Nodes;      !- Setpoint Node or NodeList Name
-
-SetpointManager:SystemNodeReset,
-  Supply Humidity Manager,       !- Name
-  Humidity Ratio,                !- Control Variable
-  ,                              !- Setpoint at Low Reference Temperature {C}
-  ,                              !- Setpoint at High Reference Temperature {C}
-  ,                              !- Low Reference Temperature {C}
-  ,                              !- High Reference Temperature {C}
-  0.008,                         !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
-  0.004,                         !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
-  0.003,                         !- Low Reference Humidity Ratio {kgWater/kgDryAir}
-  0.010,                         !- High Reference Humidity Ratio {kgWater/kgDryAir}
-  Reference Air Node,            !- Reference Node Name
-  Supply Air Temp Nodes;         !- Setpoint Node or NodeList Name
 \end{lstlisting}

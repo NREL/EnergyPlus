@@ -762,26 +762,3 @@ However, these examples are for a jagged demand profile full of discontinuous st
 Note the control is working properly, maintaining a return temperature around the target of 12 degrees where possible. Since the load profile is a typical -smooth- profile, the control is also much smoother. This should be a good representation of the capabilities of this setpoint manager.
 
 For jagged load profiles, if tight control is highly important, choosing a smaller timestep (\textasciitilde{}1 minute) is recommended. For normal building profiles, the typical range of timesteps (\textasciitilde{}15 minute) should be fully satisfactory.
-
-\subsection{System Node Reset}\label{system-node-reset}
-
-The input object SetpointManager:SystemNodeReset provides a setpoint manager that places a temperature or humidity setpoint on a system node according to the reference (e.g., return) temperature or humidity using a reset strategy. The user defines a reset rule for this strategy by specifying two temperature or humidity ratio setpoints at two reference air temperatures or humidity ratios. Generally the lower temperature (or humidity ratio) setpoint is matched with the higher reference air temperature (or humidity ratio) and vice versa.
-
-The parameter \(T_{set}\) is determined as per the following pseudo code:
-```
-If \({T_{ret,low}} < {T_{ret,high}}\) ~then
-     If \({T_{ret}} \le {T_{ret,low}}\) ~then
-          \({T_{set}} = {T_{set,atRetlow}}\)
-     End If
-     If \({T_{ret}} \ge {T_{ret,high}}\) ~then
-          \({T_{set}} = {T_{set,atRethigh}}\)
-     Else
-          \({T_{set}} = {T_{set,atRetlow}} - (({T_{ret}} - {T_{ret,low}})/({T_{ret,high}} - {T_{ret,low}}))\cdot ({T_{set,atRetlow}} - {T_{set,atRethigh}})\)
-     End If
-Else
-     \({T_{set}} = 0.5({T_{set,atRetlow}} + {T_{set,atRethigh)}}\)
-End IF
-```
-\emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset} object input.
-
-When humidity ratio is selected as the control variable (e.g., HumdityRatio, MaximumHumidityRatio, or MinimumHumidityRatio), the same pseudo code, but addressing humidity ratio, will be applied.
