@@ -751,19 +751,111 @@ namespace ExhaustAirSystemManager {
         //    "    FlowBalancedSched;        !-Balanced Exhaust Fraction Schedule Name",
         //});
 
-        // Availability schedule: 
-        // if (available) {//then proceed to Steps 0-4 below;}
-        // else {// set inlet and outlet flows to zero}
+        auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(ZoneHVACExhaustControlNum);
+        int InletNode = thisExhCtrl.InletNodeNum;
+        int OutletNode = thisExhCtrl.OutletNodeNum;
+        Real64 MassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        Real64 Tin = state.dataLoopNodes->Node(InletNode).Temp;
+        Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
+        // RhoAir = RhoAirStdInit;        
 
+        // Availability schedule: 
+        if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
+            // state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+        } else {
+            // set inlet and outlet flows to zero}
+        }
         // Basic relations: 
         // 0. Outlet node flow rate and conditions= inlet flow rate and conditions (this might should be the last step instead, after everything is calculated).
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+        
         // 1. outlet node flow rate = Design flow rate * flow fraction schedule name for schedule flow control;
         // 1a. outlet node flow rate is proportional (maybe by 1.0) to supply flow rate for follow-supply;
         // 2. outlet node flow rate need to be >= than the min flow fraction * Design flow rate if scheduled flow;
         // 2a?. outlet node flow rate >= min fraction *(design flow rate still, or design supply flow, or something else?)
         // 2b. if 2 or 2a are not true, then set the flow rate to min 
+        
         // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
-        // 4. How to use balanced exhaust fraction? 
+        // 2022-01: try to adapt from SimZoneExhaustFan() in Fan.cc, probably need to use actual flow rate determinations,
+        // rather than FanIsRunning status flag:
+        /*
+            // apply controls to determine if operating
+    if (Fan(FanNum).AvailManagerMode == ExhaustFanCoupledToAvailManagers) {
+        if (((GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
+            !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) { // available
+            if (Fan(FanNum).MinTempLimitSchedNum > 0) {
+                if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
+                    FanIsRunning = true;
+                } else {
+                    FanIsRunning = false;
+                }
+            } else {
+                FanIsRunning = true;
+            }
+        } else {
+            FanIsRunning = false;
+        }
+
+    } else if (Fan(FanNum).AvailManagerMode == ExhaustFanDecoupledFromAvailManagers) {
+        if (GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
+            if (Fan(FanNum).MinTempLimitSchedNum > 0) {
+                if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
+                    FanIsRunning = true;
+                } else {
+                    FanIsRunning = false;
+                }
+            } else {
+                FanIsRunning = true;
+            }
+        } else {
+            FanIsRunning = false;
+        }
+    }
+        */
+
+
+        // 4. How to use balanced exhaust fraction? // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
+        /* // from UpdateFan() in Fan.cc
+    auto &Fan(state.dataFans->Fan);
+
+    OutletNode = Fan(FanNum).OutletNodeNum;
+    InletNode = Fan(FanNum).InletNodeNum;
+
+    // Set the outlet air nodes of the fan
+    state.dataLoopNodes->Node(OutletNode).MassFlowRate = Fan(FanNum).OutletAirMassFlowRate;
+    state.dataLoopNodes->Node(OutletNode).Temp = Fan(FanNum).OutletAirTemp;
+    state.dataLoopNodes->Node(OutletNode).HumRat = Fan(FanNum).OutletAirHumRat;
+    state.dataLoopNodes->Node(OutletNode).Enthalpy = Fan(FanNum).OutletAirEnthalpy;
+    // Set the outlet nodes for properties that just pass through & not used
+    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+    state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+
+    // Set the Node Flow Control Variables from the Fan Control Variables
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
+
+    if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
+        state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
+        if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
+            state.dataHVACGlobal->UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
+            if (Fan(FanNum).BalancedFractSchedNum > 0) {
+                state.dataHVACGlobal->BalancedExhMassFlow =
+                    state.dataHVACGlobal->UnbalExhMassFlow * GetCurrentScheduleValue(state, Fan(FanNum).BalancedFractSchedNum);
+                state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
+            } else {
+                state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
+            }
+        } else {
+            state.dataHVACGlobal->UnbalExhMassFlow = 0.0;
+            state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
+        }
+        Fan(FanNum).UnbalancedOutletMassFlowRate = state.dataHVACGlobal->UnbalExhMassFlow;
+        Fan(FanNum).BalancedOutletMassFlowRate = state.dataHVACGlobal->BalancedExhMassFlow;
+    }
+        */
 
         // finer details: 
         // In step 3, use the zone temperature, or the the exhaust node temperature for comparision? 
