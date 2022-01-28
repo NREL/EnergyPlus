@@ -71,23 +71,15 @@
 namespace EnergyPlus {
 
 namespace ExhaustAirSystemManager {
-    // Module containing the routines dealing with the AirLoopHVAC:ReturnPath (formerly Return Air Path)
-
-    // MODULE INFORMATION:
-    //       AUTHOR
-    //       DATE WRITTEN   January 2022
-    //       MODIFIED
-    //       RE-ENGINEERED  na
+    // Module containing the routines dealing with the AirLoopHVAC:ExhaustSystem
+    // Date: January 2022
 
     // PURPOSE OF THIS MODULE:
     // To manage the exhaust air system.
 
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Russ Taylor
-        //       DATE WRITTEN:    Nov 1997
+        // Date: Jan 2022
 
         // Locals
         int ExhaustAirSystemNum;
@@ -109,13 +101,8 @@ namespace ExhaustAirSystemManager {
         // 2022-01-11: before setting up a seperate set of files for exhaust systems (which will be done later
         // use this function to develop the input processing function of exhaust systems
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:
-        //       DATE WRITTEN:    Jan 2022
+        // Date:    Jan 2022
 
-        // PURPOSE OF THIS SUBROUTINE: Process exhaust system inputs
-
-        // Using/Aliasing
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
 
@@ -356,32 +343,12 @@ namespace ExhaustAirSystemManager {
 
     void InitExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:
-        //       DATE WRITTEN:    Jan 2022
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
+        // Date: Jan 2022
     }
 
     void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum, bool FirstHVACIteration)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:
-        //       DATE WRITTEN:    Jan 2022
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
+        // Date: Jan 2022
 
         // Using/Aliasing
         using MixerComponent::SimAirMixer;
@@ -456,17 +423,7 @@ namespace ExhaustAirSystemManager {
 
     void ReportExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:
-        //       DATE WRITTEN:    Jan 2022
-
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
+        // Date: Jan 2022
     }
 
     void GetZoneExhaustControlInput(EnergyPlusData &state)
