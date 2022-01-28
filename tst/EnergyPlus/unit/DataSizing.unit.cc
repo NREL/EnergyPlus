@@ -62,6 +62,7 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <nlohmann/json_literals.hpp>
 
 using namespace EnergyPlus;
 
