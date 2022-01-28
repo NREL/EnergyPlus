@@ -923,8 +923,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             } else {
                 DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::DXMultiSpeed;
             }
-            DXCoils::GetDXCoilIndex(
-                state, DesupHtr.HeatingSourceName, DesupHtr.ReclaimHeatingSourceIndexNum, errFlag, cCurrentModuleObject);
+            DXCoils::GetDXCoilIndex(state, DesupHtr.HeatingSourceName, DesupHtr.ReclaimHeatingSourceIndexNum, errFlag, cCurrentModuleObject);
             if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(DesupHtr.ReclaimHeatingSourceIndexNum);
                 if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
@@ -945,8 +944,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             }
         } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:VariableSpeed")) {
             DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::DXVariableCooling;
-            DesupHtr.ReclaimHeatingSourceIndexNum =
-                VariableSpeedCoils::GetCoilIndexVariableSpeed(state, heatSourceObjType, cAlphaArgs(10), errFlag);
+            DesupHtr.ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(state, heatSourceObjType, cAlphaArgs(10), errFlag);
             if (allocated(state.dataHeatBal->HeatReclaimVS_DXCoil)) {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimVS_DXCoil(DesupHtr.ReclaimHeatingSourceIndexNum);
                 if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
@@ -967,8 +965,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             }
         } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
             DesupHtr.ReclaimHeatingSource = ReclaimHeatObjectType::AirWaterHeatPumpEQ;
-            DesupHtr.ReclaimHeatingSourceIndexNum =
-                WaterToAirHeatPumpSimple::GetCoilIndex(state, heatSourceObjType, cAlphaArgs(10), errFlag);
+            DesupHtr.ReclaimHeatingSourceIndexNum = WaterToAirHeatPumpSimple::GetCoilIndex(state, heatSourceObjType, cAlphaArgs(10), errFlag);
             if (allocated(state.dataHeatBal->HeatReclaimSimple_WAHPCoil)) {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                     state.dataHeatBal->HeatReclaimSimple_WAHPCoil(DesupHtr.ReclaimHeatingSourceIndexNum);
