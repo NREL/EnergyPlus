@@ -2461,12 +2461,10 @@
     0.1,                                  !- Steam Side Design Flow Rate
     Steam to Water HX Water Inlet Node,   !- Water Inlet Node Name
     Steam to Water HX Water Outlet Node,  !- Water Outlet Node Name
-    autosize,                                 !- Water Side Design Flow Rate
-    5,                                    !- Degree of SubCooling
-    15,                                   !- Degree of Loop SubCooling
-    TemperatureSetpointControl,                  !- Coil Control Type
-    HW Supply Outlet Node,                !- Heat Exchanger Setpoint Node Name
-    1;                                    !- Sizing Factor
+    autosize,                             !- Water Side Design Flow Rate
+    30000,                                !- Heat Exchanger U-Factor Times Area Value
+    OperationSchemeModulated,             !- Control Type
+    HW Supply Outlet Node;                !- Heat Exchanger Setpoint Node Name
 
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;

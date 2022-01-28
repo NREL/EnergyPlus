@@ -232,7 +232,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
 
-        void findSteamSideLoopFlow(EnergyPlusData &state, Real64 TargetWaterLoopLeavingTemp);
+        void findSteamLoopFlow(EnergyPlusData &state, Real64 TargetWaterLoopLeavingTemp);
 
         Real64 demandSideFlowResidual(EnergyPlusData &state,
                                       Real64 DmdSideMassFlowRate,
