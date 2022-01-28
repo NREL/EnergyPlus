@@ -328,6 +328,9 @@ namespace ExhaustAirSystemManager {
             /* */
         }
 
+        // 2022-01-28: Investigate how the IDD AirLoopHVAC:ExhaustSystem knows which zones each of its forks is connected to.
+        // One poissble way might to add the zonehvac:exhaustcontrol names to the input fields. But may have other ways as well.
+
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
         }
@@ -533,6 +536,9 @@ namespace ExhaustAirSystemManager {
                 }
                 thisExhCtrl.AvailScheduleNum = availSchNum;
 
+                // 2022-01-28: Also need an extra zone name field here: 
+                /* // Change in IDD as well */
+
                 // These two nodes are required inputs:
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
                 // 2022-01: What about nodelist, can GetOnlySingleNode() still used for that?
@@ -563,6 +569,9 @@ namespace ExhaustAirSystemManager {
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
                 // 2022-01-20: may need some sanity check about the input values
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
+                // 2022-01-28: Need to consider the auto-size option: 
+                // This will probably need zone name and some information about zone supplies? 
+                /* */
 
                 std::string flowControlType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type");
                 // 2022-01-20: may need some sanity check here about the input values

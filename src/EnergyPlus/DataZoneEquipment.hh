@@ -470,6 +470,7 @@ namespace DataZoneEquipment {
         }
     };
 
+    // 2022-01-28: May move this definition to ExhaustAirSystemManager.cc
     struct ExhaustAir
     {
         // Members
@@ -497,6 +498,7 @@ namespace DataZoneEquipment {
         }
     };
 
+    // 2022-01-28: May move this definition to ExhaustAirSystemManager.cc as well
     struct ZoneExhaustControl
     {
         std::string Name;
