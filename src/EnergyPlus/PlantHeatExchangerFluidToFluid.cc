@@ -148,9 +148,9 @@ void HeatExchangerStruct::simulate(EnergyPlusData &state,
 
     this->initialize(state);
 
-    // for op scheme led HXs, only call controls if called from Loop Supply Side
     if (this->Type == DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg) {
-        if ((this->controlMode == ControlType::OperationSchemeModulated) || (this->controlMode == ControlType::OperationSchemeOnOff)) {
+        if ((this->controlMode == ControlType::OperationSchemeModulated) ||
+            (this->controlMode == ControlType::OperationSchemeOnOff)) { // for op scheme led HXs, only call controls if called from Loop Supply Side
             if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
                 this->control(state, CurLoad, FirstHVACIteration);
             }
@@ -163,8 +163,16 @@ void HeatExchangerStruct::simulate(EnergyPlusData &state,
                         state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate);
 
     } else if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
-        this->controlSteamToWaterHX(state, CurLoad);
-        this->calculateSteamToWaterHX(state, CurLoad, state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate);
+        if ((this->controlMode == ControlType::OperationSchemeModulated) ||
+            (this->controlMode == ControlType::OperationSchemeOnOff)) { // for op scheme led HXs, only call controls if called from Loop Supply Side
+            if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
+                this->controlSteamToWaterHX(state, CurLoad, FirstHVACIteration);
+            }
+        } else {
+            this->controlSteamToWaterHX(state, CurLoad, FirstHVACIteration);
+        }
+
+        this->calculateSteamToWaterHX(state, state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate);
     }
 }
 
@@ -859,15 +867,13 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
 
-    if (this->Type == DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg) {
-        SetupOutputVariable(state,
-                            "Fluid Heat Exchanger Effectiveness",
-                            OutputProcessor::Unit::None,
-                            this->Effectiveness,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->Name);
-    }
+    SetupOutputVariable(state,
+                        "Fluid Heat Exchanger Effectiveness",
+                        OutputProcessor::Unit::None,
+                        this->Effectiveness,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 }
 
 void HeatExchangerStruct::initialize(EnergyPlusData &state)
@@ -876,7 +882,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   november, 2012
-    //       MODIFIED       na
+    //       MODIFIED       Dec 2021, Dareum Nam, Add steam to water heat exchanger
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -926,7 +932,6 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                this->DemandSideLoop.inletNodeNum,
                                                this->DemandSideLoop.outletNodeNum);
 
-            this->DemandSideLoop.InletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
             this->DemandSideLoop.InletEnthalpy = StartEnthSteam;
             this->DemandSideLoop.InletQuality = 1.0;
             this->DemandSideLoop.InletSteamPress = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press;
@@ -1286,14 +1291,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
                                                                            state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                            RoutineName);
 
-                Real64 CpCondensate = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                                state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                                TempSteamIn,
-                                                                                0.0,
-                                                                                state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                                RoutineName);
-
-                tmpSteamSideDesignVolFlowRate = tmpDesCap / (SteamDensity * (LatentHeatSteam + this->DegOfSubCool * CpCondensate));
+                tmpSteamSideDesignVolFlowRate = tmpDesCap / (SteamDensity * LatentHeatSteam);
 
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpSteamSideDesignVolFlowRate;
 
@@ -1876,11 +1874,11 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
     }
 }
 
-void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 MyLoad)
+void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dareum Nam
+    //       AUTHOR         Dareum Nam, derived from control function by B. Griffith
     //       DATE WRITTEN   July 2021
     //       MODIFIED       na
     //       RE-ENGINEERED  na
@@ -1895,45 +1893,77 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 My
 
     Real64 mdotWaterSide;
     Real64 mdotSteamSide;
-    Real64 AvailSchedValue;
-    bool ScheduledOn;
 
-    AvailSchedValue = ScheduleManager::GetCurrentScheduleValue(state, this->AvailSchedNum);
-    if (AvailSchedValue > 0.0) {
-        ScheduledOn = true;
+    // check if available by schedule
+    bool ScheduledOff;
+    Real64 AvailSchedValue = ScheduleManager::GetCurrentScheduleValue(state, this->AvailSchedNum);
+    if (AvailSchedValue <= 0) {
+        ScheduledOff = true;
     } else {
-        ScheduledOn = false;
+        ScheduledOff = false;
     }
 
-    if (ScheduledOn) {
+    // check if operational limits trip off unit
+    bool LimitTrippedOff = false;
+    if ((state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp < this->MinOperationTemp) ||
+        (state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp < this->MinOperationTemp)) {
+        LimitTrippedOff = true;
+    }
+    if ((state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp > this->MaxOperationTemp) ||
+        (state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp > this->MaxOperationTemp)) {
+        LimitTrippedOff = true;
+    }
+    if (!ScheduledOff && !LimitTrippedOff) {
 
-        mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
-        PlantUtilities::SetComponentFlowRate(
-            state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
-        mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
-        PlantUtilities::SetComponentFlowRate(
-            state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+        switch (this->controlMode) {
 
-        if (this->controlMode == ControlType::LoadControl) {
+        case ControlType::UncontrolledOn: {
+            // make passive request for water side loop flow
+            mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
+            PlantUtilities::SetComponentFlowRate(
+                state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+            if (mdotWaterSide > DataBranchAirLoopPlant::MassFlowTolerance) {
+                // if water side loop has massflow, request steam side flow
+                mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
+            } else {
+                mdotSteamSide = 0.0;
+            }
+            PlantUtilities::SetComponentFlowRate(
+                state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+        } break;
+
+        case ControlType::OperationSchemeModulated: {
             if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
-                mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
-                PlantUtilities::SetComponentFlowRate(
-                    state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
-
-                Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                   this->SupplySideLoop.InletTemp,
-                                                                   state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
-                                                                   RoutineName);
-                Real64 TargetLeavingTemp = this->SupplySideLoop.InletTemp + std::abs(MyLoad) / (cp * mdotWaterSide);
-
-                if (mdotWaterSide > DataBranchAirLoopPlant::MassFlowTolerance && (TargetLeavingTemp > this->SupplySideLoop.InletTemp)) {
-
+                Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
+                if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
+                    mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
                     PlantUtilities::SetComponentFlowRate(
                         state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                    if (mdotWaterSide > DataBranchAirLoopPlant::MassFlowTolerance) {
+                        Real64 cpWater = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
+                                                                                this->SupplySideLoop.InletTemp,
+                                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
+                                                                                RoutineName);
+                        Real64 TargetLeavingWaterTemp = this->SupplySideLoop.InletTemp + std::abs(MyLoad) / (cpWater * mdotWaterSide);
 
-                } else { // no flow on supply side so do not request flow on steam side
-                    mdotSteamSide = 0.0;
+                        this->findSteamSideLoopFlow(state, TargetLeavingWaterTemp);
+                    } else { // no flow on water side so do not request flow on steam side
+                        mdotSteamSide = 0.0;
+                        PlantUtilities::SetComponentFlowRate(
+                            state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+                    }
+                } else { // not able to heat so turn off
+                    mdotWaterSide = 0.0;
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                    // make steam side flow request on first hvac iteration so steam side loop can run as a trial to get a fresh
+                    // steam side inlet temperature value
+                    if (FirstHVACIteration) {
+                        mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
+                    } else {
+                        mdotSteamSide = 0.0;
+                    }
                     PlantUtilities::SetComponentFlowRate(
                         state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
                 }
@@ -1941,19 +1971,123 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 My
                 mdotWaterSide = 0.0;
                 PlantUtilities::SetComponentFlowRate(
                     state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                mdotSteamSide = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
             }
-        } else if (this->controlMode == ControlType::TemperatureSetpointControl) {
+        } break;
+
+        case ControlType::OperationSchemeOnOff: {
+            if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
+                Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
+                if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
+                    mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                    if (mdotWaterSide > DataBranchAirLoopPlant::MassFlowTolerance) {
+                        mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
+                    } else {
+                        mdotSteamSide = 0.0;
+                    }
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+                } else { // not able to heat so turn off
+                    mdotWaterSide = 0.0;
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                    // make steam side flow request on first hvac iteration so steam side loop can run as a trial to get a fresh
+                    // steam side inlet temperature value
+                    if (FirstHVACIteration) {
+                        mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
+                    } else {
+                        mdotSteamSide = 0.0;
+                    }
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+                }
+            } else { // no load
+                mdotWaterSide = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                mdotSteamSide = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+            }
+        } break;
+
+        case ControlType::HeatingSetPointModulated: {
             Real64 SetPointTemp = state.dataLoopNodes->Node(this->SetPointNodeNum).TempSetPoint;
-            if (SetPointTemp > this->SupplySideLoop.InletTemp) {
+            Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
+            if ((DeltaTHeating > this->TempControlTol) && (SetPointTemp > this->SupplySideLoop.InletTemp)) {
+                // can and want to heat
                 mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
                 PlantUtilities::SetComponentFlowRate(
                     state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                if (mdotWaterSide > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    Real64 TargetLeavingWaterTemp = SetPointTemp;
+                    this->findSteamSideLoopFlow(state, TargetLeavingWaterTemp);
+                } else {
+                    mdotSteamSide = 0.0;
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+                }
             } else { // not able are wanting to heat so turn off
                 mdotWaterSide = 0.0;
                 PlantUtilities::SetComponentFlowRate(
                     state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                // make steam side flow request on first hvac iteration so steam side loop can run as a trial to get a fresh
+                // steam side inlet temperature value
+                if (FirstHVACIteration) {
+                    mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
+                } else {
+                    mdotSteamSide = 0.0;
+                }
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
             }
+        } break;
+
+        case ControlType::HeatingSetPointOnOff: {
+            Real64 SetPointTemp = state.dataLoopNodes->Node(this->SetPointNodeNum).TempSetPoint;
+            Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
+            if ((DeltaTHeating > this->TempControlTol) && (SetPointTemp > this->SupplySideLoop.InletTemp)) {
+                // can and want to heat
+                mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                if (mdotWaterSide > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
+                } else {
+                    mdotSteamSide = 0.0;
+                }
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+            } else { // not able or are wanting to heat so turn off
+                mdotWaterSide = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+                // make steam side flow request on first hvac iteration so steam side loop can run as a trial to get a fresh
+                // steam side inlet temperature value
+                if (FirstHVACIteration) {
+                    mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
+                } else {
+                    mdotSteamSide = 0.0;
+                }
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+            }
+        } break;
+
+        default:
+            break;
         }
+    } else { // scheduled off
+        mdotWaterSide = 0.0;
+        PlantUtilities::SetComponentFlowRate(
+            state, mdotWaterSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
+        mdotSteamSide = 0.0;
+        PlantUtilities::SetComponentFlowRate(
+            state, mdotSteamSide, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
     }
 }
 
@@ -2196,382 +2330,93 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
     }
 }
 
-void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 const MyLoad, Real64 const SupSideMdot)
+void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 const SupSideMdot)
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dareum Nam, derived from CalcSteamAirCoil by Rahul Chillar
+    //       AUTHOR         Dareum Nam, derived from calculate by B. Griffith
     //       DATE WRITTEN   July 2021
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Calculate steam leaving mass flow rate
+    // Evalutate heat exchanger model and calculate water leaving temperature and steam leaving mass flow rate
 
     // METHODOLOGY EMPLOYED:
-    // Steam heat exchangers would not have effectivness, since all of the steam is
-    // converted to water and only then the steam trap allows it to leave the heat
-    // exchanger, subsequently heat exchange is latent heat + subcooling.
-    // Steam traps allow only water to leave the coil,the degree of subcooling
-    // desired is input by the user, which is used to calculate water outlet temp.
+    // Apply heat transfer model with NTU method when one of the fluids in a HX undergoes a phase-changer process
 
-    static constexpr std::string_view RoutineName("CalcSteamToWaterHeatExchanger");
+    static constexpr std::string_view RoutineName("CalcSteamToWaterdHeatExchanger");
 
-    Real64 EnthSteamInDry(0.0);
-    Real64 EnthSteamOutWet(0.0);
-    Real64 LatentHeatSteam(0.0);
-    Real64 TempSetPoint(0.0);
-    Real64 TempWaterAtmPress(0.0);
-    Real64 TempLoopOutToPump(0.0);
-    Real64 EnergyLossToEnvironment(0.0);
-    Real64 EnthHXOutlet(0.0);
-    Real64 EnthPumpInlet(0.0);
-    Real64 EnthAtAtmPress(0.0);
-    Real64 CpCondensate(0.0);
-    Real64 CpWaterInlet(0.0);
-    Real64 QmaxHT(0.0);
-    Real64 QHXReq(0.0);
-    Real64 QHXCap(0.0);
-    Real64 HeatingLoad(0.0);
-    Real64 AvailSchedValue(0.0);
-    bool ScheduledOn;
-    Real64 SteamMassFlowRate(0.0);
-    Real64 SubcoolDeltaTemp = this->DegOfSubCool;
-    Real64 SteamInletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
-    Real64 SteamOutletTemp(0.0);
-    Real64 WaterInletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
-    Real64 WaterOutletTemp(0.0);
-    Real64 WaterMassFlowRate(0.0);
+    Real64 WaterLoopInletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
+    Real64 SteamLoopInletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
 
-    QHXReq = MyLoad;
-    WaterMassFlowRate = SupSideMdot;
-
-    this->SupplySideLoop.InletMassFlowRate = WaterMassFlowRate;
-
-    AvailSchedValue = ScheduleManager::GetCurrentScheduleValue(state, this->AvailSchedNum);
-    if (AvailSchedValue > 0.0) {
-        ScheduledOn = true;
-    } else {
-        ScheduledOn = false;
-    }
-
-    if (this->controlMode == ControlType::LoadControl) {
-
-        if ((WaterMassFlowRate > 0.0) && ScheduledOn && (QHXReq > 0.0)) {
-
-            EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                   state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                   SteamInletTemp,
-                                                                   1.0,
-                                                                   state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                   RoutineName);
-            EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                    SteamInletTemp,
-                                                                    0.0,
-                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                    RoutineName);
-            LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-
-            CpCondensate = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                     SteamInletTemp,
-                                                                     0.0,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+    // specific heat of water entering from water side loop at inlet temp
+    Real64 WaterLoopInletCp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                     state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
+                                                                     WaterLoopInletTemp,
+                                                                     state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                      RoutineName);
 
-            CpWaterInlet = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                  state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                  WaterInletTemp,
-                                                                  state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
-                                                                  RoutineName);
+    Real64 MinCapRate = SupSideMdot * WaterLoopInletCp;
+    // The heat capacity rate of a fluid during a phase-change process must approach infinity since the temperature change is practically zero.
+    // Therefore, C_min/C_max = 0, and the noncondensing fluid is the minimum fluid.
 
-            QmaxHT = this->DemandSideLoop.MassFlowRateMax * (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
+    if (MinCapRate > 0.0) {
 
-            if (QHXReq > QmaxHT) {
-                QHXCap = QmaxHT;
+        Real64 NTU = this->UA / MinCapRate;
+        Real64 ExpCheckValue = -NTU;
+        if (ExpCheckValue > DataPrecisionGlobals::EXP_UpperLimit) {
+            if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
+                this->Effectiveness = 1.0 - std::exp(-NTU);
+                this->Effectiveness = min(1.0, this->Effectiveness);
             } else {
-                QHXCap = QHXReq;
+                this->Effectiveness = 1.0;
             }
+        } else {
+            this->Effectiveness = 1.0 - std::exp(-NTU);
+            this->Effectiveness = min(1.0, this->Effectiveness);
+        }
+    } else { // no capacity
+        this->Effectiveness = 0.0;
+    }
 
-            SteamMassFlowRate = QHXCap / (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
+    this->HeatTransferRate = this->Effectiveness * MinCapRate * (WaterLoopInletTemp - SteamLoopInletTemp); // - means water side is heated
 
-            PlantUtilities::SetComponentFlowRate(
-                state, SteamMassFlowRate, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+    if (SupSideMdot > 0.0) {
+        this->SupplySideLoop.OutletTemp = WaterLoopInletTemp - this->HeatTransferRate / (WaterLoopInletCp * SupSideMdot);
+    } else {
+        this->SupplySideLoop.OutletTemp = WaterLoopInletTemp;
+    }
 
-            // recalculate if mass flow rate changed in previous call.
-            QHXCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
-
-            // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
-            // This is required for outlet water temperature, otherwise it will be saturation temperature.
-            // Steam Trap drains off all the Water formed.
-            // Here Degree of Subcooling is used to calculate hot water return temperature.
-
-            // Calculating condensate outlet temperature
-            SteamOutletTemp = SteamInletTemp - SubcoolDeltaTemp;
-
-            // Total Heat Transfer to Water
-            HeatingLoad = QHXCap;
-
-            WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
-
-            state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Temp = SteamOutletTemp;
-            state.dataLoopNodes->Node(this->SupplySideLoop.outletNodeNum).Temp = WaterOutletTemp;
-            this->HeatTransferRate = QHXCap;
-
-            //************************* Loop Losses *****************************
-            // Loop pressure return considerations included in steam coil since the pipes are
-            // perfect and do not account for losses.
-            // Return water is condensate at atmoshperic pressure
-            // Process is considered constant enthalpy expansion
-            // No quality function in EnergyPlus hence no option left apart from
-            // considering saturated state.
-            //              StdBaroPress=101325
-
-            TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
-                                                                         state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                         state.dataEnvrn->StdBaroPress,
-                                                                         state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                         RoutineName);
-
-            // Point 4 at atm - loop delta subcool during return journery back to pump
-            TempLoopOutToPump = TempWaterAtmPress - this->DegOfLoopSubCool;
-
-            EnthHXOutlet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                 SteamInletTemp,
-                                                                 0.0,
-                                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                 RoutineName) -
-                           CpCondensate * SubcoolDeltaTemp;
-
-            // Enthalpy at Point 4
-            EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(state,
+    Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                  state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                  SteamLoopInletTemp,
+                                                                  1.0,
+                                                                  state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                  RoutineName);
+    Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                   TempWaterAtmPress,
+                                                                   SteamLoopInletTemp,
                                                                    0.0,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
+    Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
-            // Reported value of HX outlet enthalpy at the node to match the node outlet temperature
-            CpCondensate = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                     TempLoopOutToPump,
-                                                                     0.0,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                     RoutineName);
+    Real64 SteamMdot = this->HeatTransferRate / LatentHeatSteam;
 
-            EnthPumpInlet = EnthAtAtmPress - CpCondensate * this->DegOfLoopSubCool;
+    this->SupplySideLoop.InletTemp = WaterLoopInletTemp;
+    this->SupplySideLoop.InletMassFlowRate = SupSideMdot;
+    this->DemandSideLoop.InletTemp = SteamLoopInletTemp;
+    this->DemandSideLoop.InletMassFlowRate = SteamMdot;
+    this->DemandSideLoop.OutletTemp = SteamLoopInletTemp;
 
-            this->DemandSideLoop.OutletEnthalpy = EnthPumpInlet;
-
-            // Point 3-Point 5,
-            EnergyLossToEnvironment = SteamMassFlowRate * (EnthHXOutlet - EnthPumpInlet);
-
-            // Loss to enviornment due to pressure drop
-            this->DemandSideLoop.LoopLoss = EnergyLossToEnvironment;
-        } else { // HX is not running
-            WaterOutletTemp = WaterInletTemp;
-            SteamOutletTemp = SteamInletTemp;
-            HeatingLoad = 0.0;
-            this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy;
-            //  this->DemandSideLoop.MassFlowRateMax = 0.0;
-            this->DemandSideLoop.OutletQuality = 0.0;
-            this->DemandSideLoop.LoopLoss = 0.0;
-            TempLoopOutToPump = SteamOutletTemp;
-        }
-    } else if (this->controlMode == ControlType::TemperatureSetpointControl) {
-
-        if ((WaterMassFlowRate > 0.0) && ScheduledOn && (QHXReq > 0.0) &&
-            (std::abs(TempSetPoint - WaterInletTemp) > DataHVACGlobals::TempControlTol)) {
-            EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                   state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                   SteamInletTemp,
-                                                                   1.0,
-                                                                   state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                   RoutineName);
-            EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                    SteamInletTemp,
-                                                                    0.0,
-                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                    RoutineName);
-            LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-
-            CpCondensate = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                     SteamInletTemp,
-                                                                     0.0,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                     RoutineName);
-
-            QmaxHT = this->DemandSideLoop.MassFlowRateMax * (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
-
-            CpWaterInlet = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                  state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                  WaterInletTemp,
-                                                                  state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
-                                                                  RoutineName);
-
-            TempSetPoint = state.dataLoopNodes->Node(this->SetPointNodeNum).TempSetPoint;
-
-            QHXCap = WaterMassFlowRate * CpWaterInlet * (TempSetPoint - WaterInletTemp);
-
-            // Check to see if setpoint is above enetering temperature. If not, set
-            // output to zero.
-
-            if (QHXCap <= 0.0) { // TempSetPoint <= WaterInletTemp
-                QHXCap = 0.0;
-                WaterOutletTemp = WaterInletTemp;
-
-                // Steam Mass Flow Rate Required
-                SteamMassFlowRate = 0.0;
-                PlantUtilities::SetComponentFlowRate(
-                    state, SteamMassFlowRate, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
-
-                // Inlet equal to outlet when not required to run.
-                SteamOutletTemp = SteamInletTemp;
-
-                HeatingLoad = QHXCap;
-
-                this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy;
-
-            } else if (QHXCap > QmaxHT) {
-                // Setting to Maximum Capacity
-                QHXCap = QmaxHT;
-
-                // Temperature of water at outlet
-                WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
-
-                // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
-                // This is required for outlet water temperature, otherwise it will be saturation temperature.
-                // Steam Trap drains off all the Water formed.
-                // Here Degree of Subcooling is used to calculate hot water return temperature.
-
-                // Calculating Condensate outlet temperature
-                SteamOutletTemp = SteamInletTemp - SubcoolDeltaTemp;
-
-                SteamMassFlowRate = QHXCap / (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
-
-                PlantUtilities::SetComponentFlowRate(
-                    state, SteamMassFlowRate, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
-
-                // recalculate if mass flow rate changed in previous call.
-                QHXCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
-                WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
-
-                HeatingLoad = QHXCap;
-
-                // The HeatingLoad is the change in the enthalpy of the condensate at the outlet
-                // this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy - HeatingLoad / SteamMassFlowRate;
-            } else {
-                WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
-
-                // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
-                // This is required for outlet water temperature, otherwise it will be saturation temperature.
-                // Steam Trap drains off all the Water formed.
-                // Here Degree of Subcooling is used to calculate hot water return temperature.
-
-                // Calculating Condensate outlet temperature
-                SteamOutletTemp = SteamInletTemp - SubcoolDeltaTemp;
-
-                SteamMassFlowRate = QHXCap / (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
-
-                PlantUtilities::SetComponentFlowRate(
-                    state, SteamMassFlowRate, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
-
-                // recalculate if mass flow rate changed in previous call.
-                QHXCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
-                WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
-
-                HeatingLoad = QHXCap;
-
-                //************************* Loop Losses *****************************
-                // Loop pressure return considerations included in HX since the pipes are
-                // perfect and do not account for losses.
-                // Return water is condensate at atmoshperic pressure
-                // Process is considered constant enthalpy expansion
-                // No quality function in EnergyPlus hence no option left apart from
-                // considering saturated state.
-                //              StdBaroPress=101325
-
-                TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
-                                                                             state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                             state.dataEnvrn->StdBaroPress,
-                                                                             state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                             RoutineName);
-
-                // Point 4 at atm - loop delta subcool during return journery back to pump
-                TempLoopOutToPump = TempWaterAtmPress - this->DegOfLoopSubCool;
-
-                EnthHXOutlet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                     SteamInletTemp,
-                                                                     0.0,
-                                                                     state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                     RoutineName) -
-                               CpCondensate * SubcoolDeltaTemp;
-
-                // Enthalpy at Point 4
-                EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                       state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                       TempWaterAtmPress,
-                                                                       0.0,
-                                                                       state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                       RoutineName);
-
-                // Reported value of HX outlet enthalpy at the node to match the node outlet temperature
-                CpCondensate = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                         state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                         TempLoopOutToPump,
-                                                                         0.0,
-                                                                         state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                         RoutineName);
-
-                EnthPumpInlet = EnthAtAtmPress - CpCondensate * this->DegOfLoopSubCool;
-
-                this->DemandSideLoop.OutletEnthalpy = EnthPumpInlet;
-
-                // Point 3-Point 5,
-                EnergyLossToEnvironment = SteamMassFlowRate * (EnthHXOutlet - EnthPumpInlet);
-
-                // Loss to enviornment due to pressure drop
-                this->DemandSideLoop.LoopLoss = EnergyLossToEnvironment;
-            }
-        } else {
-            SteamMassFlowRate = 0.0;
-            PlantUtilities::SetComponentFlowRate(
-                state, SteamMassFlowRate, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
-            WaterOutletTemp = WaterInletTemp;
-            SteamOutletTemp = SteamInletTemp;
-            HeatingLoad = 0.0;
-            this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy;
-            //   this->DemandSideLoop.MassFlowRateMax = 0.0;
-            this->DemandSideLoop.OutletQuality = 0.0;
-            this->DemandSideLoop.LoopLoss = 0.0;
-            TempLoopOutToPump = SteamOutletTemp;
-        }
-    }
-
-    //   this->DemandSideLoop.InletMassFlowRate = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate;
-    //   this->SupplySideLoop.InletMassFlowRate = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
-    this->SupplySideLoop.InletTemp = WaterInletTemp;
-    this->DemandSideLoop.InletTemp = SteamInletTemp;
-
-    // Set the outlet conditions
-    this->HeatTransferRate = HeatingLoad;
-    this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->SupplySideLoop.OutletTemp = WaterOutletTemp;
-    this->DemandSideLoop.OutletTemp = TempLoopOutToPump;
-    this->DemandSideLoop.OutletQuality = 0.0;
-
-    state.dataLoopNodes->Node(this->SupplySideLoop.outletNodeNum).Temp = this->SupplySideLoop.OutletTemp;
     state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Temp = this->DemandSideLoop.OutletTemp;
-    state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Enthalpy = this->DemandSideLoop.OutletEnthalpy;
-    state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Quality = this->DemandSideLoop.OutletQuality;
+    state.dataLoopNodes->Node(this->SupplySideLoop.outletNodeNum).Temp = this->SupplySideLoop.OutletTemp;
 
-    if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this->SupplySideLoop.InletMassFlowRate > 0.0) &&
-        (this->DemandSideLoop.InletMassFlowRate > 0.0)) {
+    this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
+    if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
+        (this->SupplySideLoop.InletMassFlowRate > 0.0)) {
         this->OperationStatus = 1.0;
     } else {
         this->OperationStatus = 0.0;
@@ -2740,6 +2585,99 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     }
     default:
         break;
+    }
+}
+
+void HeatExchangerStruct::findSteamSideLoopFlow(EnergyPlusData &state, Real64 TargetWaterLoopLeavingTemp)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Dareum Nam, derived from findDemandSideLoopFlow by B. Griffith
+    //       DATE WRITTEN   Jan 2022
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // modulate steam side flow rate to hit a target leaving temperature (within tolerance)
+
+    // METHODOLOGY EMPLOYED:
+    // uses E+'s Regula Falsi numerical method
+
+    int constexpr MaxIte(500);   // Maximum number of iterations for solver
+    Real64 constexpr Acc(1.e-3); // Accuracy of solver result
+
+    int SolFla;             // Flag of solver
+    Array1D<Real64> Par(2); // Parameter array passed to solver
+
+    // mass flow rate of fluid entering from supply side loop
+    Real64 SupSideMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
+    // first see if root is bracketed
+    // min demand flow
+
+    // mass flow rate of fluid entering from demand side loop
+    Real64 DmdSideMdot = this->DemandSideLoop.MassFlowRateMin;
+    this->calculate(state, SupSideMdot, DmdSideMdot);
+    Real64 LeavingTempMinFlow = this->SupplySideLoop.OutletTemp;
+
+    // full demand flow
+    DmdSideMdot = this->DemandSideLoop.MassFlowRateMax;
+    this->calculate(state, SupSideMdot, DmdSideMdot);
+    Real64 LeavingTempFullFlow = this->SupplySideLoop.OutletTemp;
+
+    if ((LeavingTempFullFlow > TargetWaterLoopLeavingTemp) && (TargetWaterLoopLeavingTemp > LeavingTempMinFlow)) {
+        // need to solve
+        Par(2) = TargetWaterLoopLeavingTemp;
+        auto f = std::bind(&HeatExchangerStruct::demandSideFlowResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+
+        General::SolveRoot(
+            state, Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax, Par);
+
+        if (SolFla == -1) { // no convergence
+            if (!state.dataGlobal->WarmupFlag) {
+                if (this->DmdSideModulatSolvNoConvergeErrorCount < 1) {
+                    ++this->DmdSideModulatSolvNoConvergeErrorCount;
+                    ShowWarningError(
+                        state, ComponentClassName + " named " + this->Name + " - Iteration Limit exceeded calculating demand side loop flow rate");
+                    ShowContinueError(state, format("Simulation continues with calculated demand side mass flow rate = {:.7R}", DmdSideMdot));
+                }
+                ShowRecurringWarningErrorAtEnd(state,
+                                               ComponentClassName + " named " + this->Name +
+                                                   " - Iteration Limit exceeded calculating demand side loop flow rate continues.",
+                                               this->DmdSideModulatSolvNoConvergeErrorIndex,
+                                               DmdSideMdot,
+                                               DmdSideMdot);
+            }
+        } else if (SolFla == -2) { // f(x0) and f(x1) have the same sign
+            DmdSideMdot = this->DemandSideLoop.MassFlowRateMax * (LeavingTempFullFlow - TargetWaterLoopLeavingTemp) /
+                          (LeavingTempFullFlow - LeavingTempMinFlow);
+            if (!state.dataGlobal->WarmupFlag) {
+                if (this->DmdSideModulatSolvFailErrorCount < 1) {
+                    ++this->DmdSideModulatSolvFailErrorCount;
+                    ShowWarningError(state, ComponentClassName + " named " + this->Name + " - Solver failed to calculate demand side loop flow rate");
+                    ShowContinueError(state, format("Simulation continues with estimated demand side mass flow rate = {:.7R}", DmdSideMdot));
+                }
+                ShowRecurringWarningErrorAtEnd(state,
+                                               ComponentClassName + " named " + this->Name +
+                                                   " - Solver failed to calculate demand side loop flow rate continues.",
+                                               this->DmdSideModulatSolvFailErrorIndex,
+                                               DmdSideMdot,
+                                               DmdSideMdot);
+            }
+        }
+        PlantUtilities::SetComponentFlowRate(
+            state, DmdSideMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+
+    } else if ((TargetWaterLoopLeavingTemp >= LeavingTempFullFlow) && (LeavingTempFullFlow > LeavingTempMinFlow)) {
+        // run at full flow
+        DmdSideMdot = this->DemandSideLoop.MassFlowRateMax;
+        PlantUtilities::SetComponentFlowRate(
+            state, DmdSideMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
+
+    } else if (LeavingTempMinFlow >= TargetWaterLoopLeavingTemp) {
+
+        // run at min flow
+        DmdSideMdot = this->DemandSideLoop.MassFlowRateMin;
+        PlantUtilities::SetComponentFlowRate(
+            state, DmdSideMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
     }
 }
 

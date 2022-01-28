@@ -224,13 +224,15 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void calculate(EnergyPlusData &state, Real64 SupSideMdot, Real64 DmdSideMdot);
 
-        void calculateSteamToWaterHX(EnergyPlusData &state, Real64 const MyLoad, Real64 const DmdSideMdot);
+        void calculateSteamToWaterHX(EnergyPlusData &state, Real64 const DmdSideMdot);
 
         void control(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration);
 
-        void controlSteamToWaterHX(EnergyPlusData &state, Real64 MyLoad);
+        void controlSteamToWaterHX(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration);
 
         void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
+
+        void findSteamSideLoopFlow(EnergyPlusData &state, Real64 TargetWaterLoopLeavingTemp);
 
         Real64 demandSideFlowResidual(EnergyPlusData &state,
                                       Real64 DmdSideMassFlowRate,
