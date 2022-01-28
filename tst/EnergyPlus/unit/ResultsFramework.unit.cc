@@ -59,6 +59,8 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <nlohmann/json_literals.hpp>
+
 // Fixture
 #include "Fixtures/ResultsFrameworkFixture.hh"
 
