@@ -1928,7 +1928,7 @@ namespace ThermalComfort {
         int WhichAFList;           // Used in validating AngleFactorList
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ComfortViewFactorAngles";
-        NumOfAngleFactorLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfAngleFactorLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataThermalComforts->AngleFactorList.allocate(NumOfAngleFactorLists);
         for (auto &e : state.dataThermalComforts->AngleFactorList) {
             e.Name.clear();
@@ -1941,18 +1941,18 @@ namespace ThermalComfort {
             AllAngleFacSummed = 0.0;
             auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(Item));
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             thisAngFacList.Name = state.dataIPShortCut->cAlphaArgs(1); // no need for verification/uniqueness.
             thisAngFacList.ZoneName = state.dataIPShortCut->cAlphaArgs(2);

@@ -89,28 +89,28 @@ protected:
 
     bool processErrors(EnergyPlusData &state)
     {
-        return state.dataInputProcessing->inputProcessor()->processErrors(state);
+        return state.dataInputProcessing->inputProcessor->processErrors(state);
     }
 
     std::vector<std::string> const &validationErrors()
     {
-        return state->dataInputProcessing->inputProcessor()->validationErrors();
+        return state->dataInputProcessing->inputProcessor->validationErrors();
     }
 
     std::vector<std::string> const &validationWarnings()
     {
-        return state->dataInputProcessing->inputProcessor()->validationWarnings();
+        return state->dataInputProcessing->inputProcessor->validationWarnings();
     }
 
     std::string encodeIDF()
     {
-        return state->dataInputProcessing->inputProcessor()->idf_parser->encode(state->dataInputProcessing->inputProcessor()->epJSON,
-                                                                                state->dataInputProcessing->inputProcessor()->schema());
+        return state->dataInputProcessing->inputProcessor->idf_parser->encode(state->dataInputProcessing->inputProcessor->epJSON,
+                                                                                state->dataInputProcessing->inputProcessor->schema());
     }
 
     json &getEpJSON()
     {
-        return state->dataInputProcessing->inputProcessor()->epJSON;
+        return state->dataInputProcessing->inputProcessor->epJSON;
     }
 
     void eat_whitespace(std::string const &idf, size_t &index)
@@ -138,7 +138,7 @@ protected:
     {
         IdfParser idfParser;
         idfParser.idf_size = idf.size();
-        return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor()->schema()["properties"]);
+        return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor->schema()["properties"]);
     }
 
     json parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc)

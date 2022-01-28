@@ -320,7 +320,7 @@ namespace HysteresisPhaseChange {
         // convenience variables
         state.dataIPShortCut->cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
         state.dataHysteresisPhaseChange->numHysteresisModels =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= state.dataHysteresisPhaseChange->numHysteresisModels; ++hmNum) {
@@ -331,18 +331,18 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       state.dataIPShortCut->cCurrentModuleObject,
-                                                                       hmNum,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       numAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       numNumbers,
-                                                                       ioStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     hmNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     numAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     numNumbers,
+                                                                     ioStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             // the input processor validates the numeric inputs based on the IDD definition
             // still validate the name to make sure there aren't any duplicates or blanks

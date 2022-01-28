@@ -327,27 +327,27 @@ namespace LowTempRadiantSystem {
         MaxAlphas = 0;
         MaxNumbers = 0;
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "ZoneHVAC:LowTemperatureRadiant:Electric", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
@@ -360,16 +360,16 @@ namespace LowTempRadiantSystem {
         lNumericBlanks.dimension(MaxNumbers, true);
 
         state.dataLowTempRadSys->NumOfHydrLowTempRadSys =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow");
         state.dataLowTempRadSys->NumOfCFloLowTempRadSys =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
         state.dataLowTempRadSys->NumOfElecLowTempRadSys =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:Electric");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:Electric");
 
         state.dataLowTempRadSys->NumOfHydrLowTempRadSysDes =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design");
         state.dataLowTempRadSys->NumOfCFloLowTempRadSysDes =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design");
 
         state.dataLowTempRadSys->TotalNumOfRadSystems = state.dataLowTempRadSys->NumOfHydrLowTempRadSys +
                                                         state.dataLowTempRadSys->NumOfElecLowTempRadSys +
@@ -423,7 +423,7 @@ namespace LowTempRadiantSystem {
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design";
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfHydrLowTempRadSysDes; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        Item,
                                                                        Alphas,
@@ -606,7 +606,7 @@ namespace LowTempRadiantSystem {
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        Item,
                                                                        Alphas,
@@ -846,7 +846,7 @@ namespace LowTempRadiantSystem {
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design";
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfCFloLowTempRadSysDes; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        Item,
                                                                        Alphas,
@@ -910,7 +910,7 @@ namespace LowTempRadiantSystem {
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow";
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        Item,
                                                                        Alphas,
@@ -1153,7 +1153,7 @@ namespace LowTempRadiantSystem {
 
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        Item,
                                                                        Alphas,

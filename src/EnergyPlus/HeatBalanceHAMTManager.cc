@@ -237,25 +237,25 @@ namespace HeatBalanceHAMTManager {
 
         MaxAlphas = 0;
         MaxNums = 0;
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cHAMTObject1, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject1, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cHAMTObject2, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject2, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cHAMTObject3, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject3, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cHAMTObject4, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject4, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cHAMTObject5, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject5, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cHAMTObject6, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject6, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cHAMTObject7, NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject7, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
 
@@ -269,20 +269,20 @@ namespace HeatBalanceHAMTManager {
         lNumericBlanks.dimension(MaxNums, false);
 
         HAMTitems =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cHAMTObject1); // MaterialProperty:HeatAndMoistureTransfer:Settings
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHAMTObject1); // MaterialProperty:HeatAndMoistureTransfer:Settings
         for (item = 1; item <= HAMTitems; ++item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cHAMTObject1,
-                                                                       item,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       status,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cHAMTObject1,
+                                                                     item,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             matid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataMaterial->Material);
 
@@ -302,21 +302,21 @@ namespace HeatBalanceHAMTManager {
             state.dataMaterial->Material(matid).iwater = NumArray(2);
         }
 
-        HAMTitems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
+        HAMTitems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
             state, cHAMTObject2); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
         for (item = 1; item <= HAMTitems; ++item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cHAMTObject2,
-                                                                       item,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       status,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cHAMTObject2,
+                                                                     item,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             matid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataMaterial->Material);
 
@@ -395,20 +395,20 @@ namespace HeatBalanceHAMTManager {
         }
 
         HAMTitems =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cHAMTObject3); // MaterialProperty:HeatAndMoistureTransfer:Suction
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHAMTObject3); // MaterialProperty:HeatAndMoistureTransfer:Suction
         for (item = 1; item <= HAMTitems; ++item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cHAMTObject3,
-                                                                       item,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       status,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cHAMTObject3,
+                                                                     item,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             matid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataMaterial->Material);
 
@@ -441,21 +441,21 @@ namespace HeatBalanceHAMTManager {
                 state.dataMaterial->Material(matid).sucdata(state.dataMaterial->Material(matid).nsuc - 1);
         }
 
-        HAMTitems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
+        HAMTitems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
             state, cHAMTObject4); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
         for (item = 1; item <= HAMTitems; ++item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cHAMTObject4,
-                                                                       item,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       status,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cHAMTObject4,
+                                                                     item,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             matid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
@@ -486,21 +486,21 @@ namespace HeatBalanceHAMTManager {
                 state.dataMaterial->Material(matid).reddata(state.dataMaterial->Material(matid).nred - 1);
         }
 
-        HAMTitems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
-            state, cHAMTObject5); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
+        HAMTitems =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHAMTObject5); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
         for (item = 1; item <= HAMTitems; ++item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cHAMTObject5,
-                                                                       item,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       status,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cHAMTObject5,
+                                                                     item,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             matid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
@@ -534,21 +534,21 @@ namespace HeatBalanceHAMTManager {
             }
         }
 
-        HAMTitems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
+        HAMTitems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
             state, cHAMTObject6); // MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
         for (item = 1; item <= HAMTitems; ++item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cHAMTObject6,
-                                                                       item,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       status,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cHAMTObject6,
+                                                                     item,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             matid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
@@ -582,20 +582,20 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Vapor Transfer coefficients
-        HAMTitems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cHAMTObject7); // SurfaceProperties:VaporCoefficients
+        HAMTitems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHAMTObject7); // SurfaceProperties:VaporCoefficients
         for (item = 1; item <= HAMTitems; ++item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cHAMTObject7,
-                                                                       item,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       status,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cHAMTObject7,
+                                                                     item,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             vtcsid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataSurface->Surface);
             if (vtcsid == 0) {

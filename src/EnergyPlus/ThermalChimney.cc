@@ -170,25 +170,25 @@ namespace ThermalChimney {
         state.dataThermalChimneys->ZnRptThermChim.allocate(state.dataGlobal->NumOfZones);
 
         cCurrentModuleObject = "ZoneThermalChimney";
-        state.dataThermalChimneys->TotThermalChimney = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataThermalChimneys->TotThermalChimney = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataThermalChimneys->ThermalChimneySys.allocate(state.dataThermalChimneys->TotThermalChimney);
         state.dataThermalChimneys->ThermalChimneyReport.allocate(state.dataThermalChimneys->TotThermalChimney);
 
         for (Loop = 1; Loop <= state.dataThermalChimneys->TotThermalChimney; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                 continue;
             }

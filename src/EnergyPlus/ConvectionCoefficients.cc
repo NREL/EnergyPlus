@@ -896,10 +896,10 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
 
     // first get user-defined H models so they can be processed for later objects
     CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:UserCurve";
-    int TotInsideHcUserCurves = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    int TotInsideHcUserCurves = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataConvectionCoefficient->HcInsideUserCurve.allocate(TotInsideHcUserCurves);
     for (int Loop = 1; Loop <= TotInsideHcUserCurves; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -1016,10 +1016,10 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     } // end of 'SurfaceConvectionAlgorithm:Inside:UserCurve'
 
     CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:UserCurve";
-    int TotOutsideHcUserCurves = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    int TotOutsideHcUserCurves = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataConvectionCoefficient->HcOutsideUserCurve.allocate(TotOutsideHcUserCurves);
     for (int Loop = 1; Loop <= TotOutsideHcUserCurves; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -1127,9 +1127,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     state.dataSurface->TotIntConvCoeff = 0;
     state.dataSurface->TotExtConvCoeff = 0;
     CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
-    Count = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     for (int Loop = 1; Loop <= Count; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    Alphas,
@@ -1167,9 +1167,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         }
     }
     CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
-    Count = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     for (int Loop = 1; Loop <= Count; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    Alphas,
@@ -1215,9 +1215,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
 
     //   Now, get for real and check for consistency
     CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
-    Count = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     for (int Loop = 1; Loop <= Count; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    Alphas,
@@ -1473,9 +1473,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     }
 
     CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
-    Count = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     for (int Loop = 1; Loop <= Count; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    Alphas,
@@ -1787,9 +1787,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     // get SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections
 
     CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
-    Count = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     if (Count == 1) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    1,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -2344,9 +2344,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     }
 
     CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
-    Count = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     if (Count == 1) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    1,
                                                                    state.dataIPShortCut->cAlphaArgs,

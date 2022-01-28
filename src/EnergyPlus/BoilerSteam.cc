@@ -162,7 +162,7 @@ namespace BoilerSteam {
         SteamFluidIndex = 0;
         state.dataIPShortCut->cCurrentModuleObject = "Boiler:Steam";
         state.dataBoilerSteam->numBoilers =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataBoilerSteam->numBoilers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -177,7 +177,7 @@ namespace BoilerSteam {
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
         for (BoilerNum = 1; BoilerNum <= state.dataBoilerSteam->numBoilers; ++BoilerNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                        BoilerNum,
                                                                        state.dataIPShortCut->cAlphaArgs,

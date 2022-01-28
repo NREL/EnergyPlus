@@ -679,7 +679,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         int NumAlphas;
         int NumNums;
         int IOStat;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                    DesuperheaterNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -1152,7 +1152,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
 
-    int const NumPumpedCondenser = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
+    int const NumPumpedCondenser = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
         state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
     int nAlphaOffset;                 // the difference of array location between alpha items between pumped and wrapped condensers
     int nNumericOffset;               // the difference of array location between numeric items between pumped and wrapped condensers
@@ -1196,7 +1196,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         int NumAlphas;
         int NumNums;
         int IOStat;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                    HPWaterHeaterNumOfSpecificType,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -2320,7 +2320,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         int NumAlphas;
         int NumNums;
         int IOStat;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                    WaterThermalTankNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -2790,7 +2790,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         int NumAlphas;
         int NumNums;
         int IOStat;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                    WaterThermalTankNum - state.dataWaterThermalTanks->numWaterHeaterMixed,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -3374,7 +3374,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         int NumAlphas;
         int NumNums;
         int IOStat;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(
+        state.dataInputProcessing->inputProcessor->getObjectItem(
             state,
             state.dataIPShortCut->cCurrentModuleObject,
             WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified),
@@ -3668,7 +3668,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         int NumNums;
         int NumAlphas;
         int IOStat;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                    WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed +
                                                                                           state.dataWaterThermalTanks->numWaterHeaterStratified +
@@ -4062,21 +4062,21 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
     RefrigeratedCase::CheckRefrigerationInput(state);
 
     if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
-        state.dataWaterThermalTanks->numWaterHeaterMixed = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cMixedWHModuleObj);
+        state.dataWaterThermalTanks->numWaterHeaterMixed = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cMixedWHModuleObj);
         state.dataWaterThermalTanks->numWaterHeaterStratified =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cStratifiedWHModuleObj);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cStratifiedWHModuleObj);
         state.dataWaterThermalTanks->numChilledWaterMixed =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cMixedCWTankModuleObj);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cMixedCWTankModuleObj);
         state.dataWaterThermalTanks->numChilledWaterStratified =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cStratifiedCWTankModuleObj);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cStratifiedCWTankModuleObj);
         state.dataWaterThermalTanks->numWaterThermalTank =
             state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified +
             state.dataWaterThermalTanks->numChilledWaterMixed + state.dataWaterThermalTanks->numChilledWaterStratified;
         state.dataWaterThermalTanks->numHeatPumpWaterHeater =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cHPWHPumpedCondenser) +
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cHPWHWrappedCondenser);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser) +
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cHPWHWrappedCondenser);
         state.dataWaterThermalTanks->numWaterHeaterDesuperheater =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCoilDesuperheater);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoilDesuperheater);
 
         if (state.dataWaterThermalTanks->numWaterThermalTank > 0) {
             static constexpr std::string_view Format_720(
@@ -4198,7 +4198,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
         // Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
         if (state.dataWaterThermalTanks->numHeatPumpWaterHeater > 0) {
 
-            int const NumPumpedCondenser = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(
+            int const NumPumpedCondenser = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
                 state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
             for (int HPWaterHeaterNum = 1; HPWaterHeaterNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HPWaterHeaterNum) {
 
@@ -4580,7 +4580,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
         // Get water heater sizing input.
         state.dataIPShortCut->cCurrentModuleObject = "WaterHeater:Sizing";
         state.dataWaterThermalTanks->numWaterHeaterSizing =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataWaterThermalTanks->numWaterHeaterSizing > 0) {
 
@@ -4588,7 +4588,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 int NumAlphas;
                 int NumNums;
                 int IOStat;
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            state.dataIPShortCut->cCurrentModuleObject,
                                                                            WHsizingNum,
                                                                            state.dataIPShortCut->cAlphaArgs,

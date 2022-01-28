@@ -146,8 +146,8 @@ namespace EvaporativeFluidCoolers {
         Array1D_string AlphArray(13); // Character string input data array
 
         // Get number of all evaporative fluid coolers specified in the input data file (idf)
-        int NumSingleSpeedEvapFluidCoolers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cEvapFluidCooler_SingleSpeed);
-        int NumTwoSpeedEvapFluidCoolers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cEvapFluidCooler_TwoSpeed);
+        int NumSingleSpeedEvapFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_SingleSpeed);
+        int NumTwoSpeedEvapFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_TwoSpeed);
         state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
         if (state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers <= 0)
@@ -166,18 +166,18 @@ namespace EvaporativeFluidCoolers {
         for (int SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers;
              ++SingleSpeedEvapFluidCoolerNumber) {
             int EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       state.dataIPShortCut->cCurrentModuleObject,
-                                                                       SingleSpeedEvapFluidCoolerNumber,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     SingleSpeedEvapFluidCoolerNumber,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataEvapFluidCoolers->UniqueSimpleEvapFluidCoolerNames,
                                                      AlphArray(1),
@@ -472,18 +472,18 @@ namespace EvaporativeFluidCoolers {
         state.dataIPShortCut->cCurrentModuleObject = cEvapFluidCooler_TwoSpeed;
         for (int TwoSpeedEvapFluidCoolerNumber = 1; TwoSpeedEvapFluidCoolerNumber <= NumTwoSpeedEvapFluidCoolers; ++TwoSpeedEvapFluidCoolerNumber) {
             int EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       state.dataIPShortCut->cCurrentModuleObject,
-                                                                       TwoSpeedEvapFluidCoolerNumber,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     TwoSpeedEvapFluidCoolerNumber,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataEvapFluidCoolers->UniqueSimpleEvapFluidCoolerNames,

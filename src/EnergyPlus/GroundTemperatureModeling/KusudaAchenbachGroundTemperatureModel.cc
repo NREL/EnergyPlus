@@ -91,11 +91,11 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
     std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::KusudaGroundTemp));
-    int numCurrModels = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(
+        state.dataInputProcessing->inputProcessor->getObjectItem(
             state, cCurrentModuleObject, modelNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {

@@ -326,12 +326,12 @@ namespace VariableSpeedCoils {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        NumCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
-        NumHeat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
-        NumCoolAS = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "COIL:COOLING:DX:VARIABLESPEED");
-        NumHeatAS = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "COIL:HEATING:DX:VARIABLESPEED");
+        NumCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
+        NumHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
+        NumCoolAS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COIL:COOLING:DX:VARIABLESPEED");
+        NumHeatAS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COIL:HEATING:DX:VARIABLESPEED");
         NumHPWHAirToWater =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED");
         state.dataVariableSpeedCoils->NumVarSpeedCoils = NumCool + NumHeat + NumCoolAS + NumHeatAS + NumHPWHAirToWater;
         DXCoilNum = 0;
 
@@ -346,24 +346,24 @@ namespace VariableSpeedCoils {
             state.dataHeatBal->HeatReclaimVS_DXCoil.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
         }
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "COIL:COOLING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "COIL:COOLING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "COIL:HEATING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "COIL:HEATING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         // variable speed air-source HPWH
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -383,7 +383,7 @@ namespace VariableSpeedCoils {
             ++DXCoilNum;
             AlfaFieldIncre = 1;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        CoilCounter,
                                                                        AlphArray,
@@ -897,7 +897,7 @@ namespace VariableSpeedCoils {
             ++DXCoilNum;
             AlfaFieldIncre = 1;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        CoilCounter,
                                                                        AlphArray,
@@ -1397,7 +1397,7 @@ namespace VariableSpeedCoils {
 
             ++DXCoilNum;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        CoilCounter,
                                                                        AlphArray,
@@ -1888,7 +1888,7 @@ namespace VariableSpeedCoils {
 
             ++DXCoilNum;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        CoilCounter,
                                                                        AlphArray,
@@ -2329,7 +2329,7 @@ namespace VariableSpeedCoils {
             ++DXCoilNum;
             AlfaFieldIncre = 1;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        CoilCounter,
                                                                        AlphArray,

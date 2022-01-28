@@ -185,12 +185,12 @@ void GetMixerInput(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
     CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-    state.dataMixerComponent->NumMixers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataMixerComponent->NumMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
     if (state.dataMixerComponent->NumMixers > 0) state.dataMixerComponent->MixerCond.allocate(state.dataMixerComponent->NumMixers);
     state.dataMixerComponent->CheckEquipName.dimension(state.dataMixerComponent->NumMixers, true);
 
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
     AlphArray.allocate(NumAlphas);
     cAlphaFields.allocate(NumAlphas);
     lAlphaBlanks.dimension(NumAlphas, true);
@@ -199,18 +199,18 @@ void GetMixerInput(EnergyPlusData &state)
     NumArray.dimension(NumNums, 0.0);
 
     for (MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   MixerNum,
-                                                                   AlphArray,
-                                                                   NumAlphas,
-                                                                   NumArray,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 MixerNum,
+                                                                 AlphArray,
+                                                                 NumAlphas,
+                                                                 NumArray,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
         state.dataMixerComponent->MixerCond(MixerNum).MixerName = AlphArray(1);

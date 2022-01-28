@@ -147,26 +147,26 @@ namespace SolarCollectors {
         MaxAlphas = 0;
 
         CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
-        int NumOfFlatPlateParam = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleParamObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfFlatPlateParam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleParamObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "SolarCollector:FlatPlate:Water";
-        int NumFlatPlateUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        int NumFlatPlateUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleParamObject = "SolarCollectorPerformance:IntegralCollectorStorage";
-        int NumOfICSParam = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleParamObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfICSParam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleParamObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-        int NumOfICSUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfICSUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -188,7 +188,7 @@ namespace SolarCollectors {
             for (int FlatPlateParamNum = 1; FlatPlateParamNum <= NumOfFlatPlateParam; ++FlatPlateParamNum) {
 
                 int ParametersNum = FlatPlateParamNum;
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleParamObject,
                                                                            ParametersNum,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -291,7 +291,7 @@ namespace SolarCollectors {
 
                 int CollectorNum = FlatPlateUnitsNum;
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            CollectorNum,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -423,7 +423,7 @@ namespace SolarCollectors {
 
                 int ParametersNum = ICSParamNum + NumOfFlatPlateParam;
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleParamObject,
                                                                            ICSParamNum,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -526,7 +526,7 @@ namespace SolarCollectors {
 
                 int CollectorNum = ICSUnitsNum + NumFlatPlateUnits;
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            ICSUnitsNum,
                                                                            state.dataIPShortCut->cAlphaArgs,

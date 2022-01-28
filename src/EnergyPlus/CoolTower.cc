@@ -163,7 +163,7 @@ namespace CoolTower {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
         // Initializations and allocations
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
         cAlphaArgs.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNumbers);
@@ -173,14 +173,14 @@ namespace CoolTower {
 
         auto &Zone(state.dataHeatBal->Zone);
 
-        state.dataCoolTower->NumCoolTowers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataCoolTower->NumCoolTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataCoolTower->CoolTowerSys.allocate(state.dataCoolTower->NumCoolTowers);
 
         // Obtain inputs
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        CoolTowerNum,
                                                                        state.dataIPShortCut->cAlphaArgs,

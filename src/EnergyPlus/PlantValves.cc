@@ -160,13 +160,13 @@ namespace PlantValves {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "TemperingValve";
-        state.dataPlantValves->NumTemperingValves = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataPlantValves->NumTemperingValves = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataPlantValves->TemperValve.allocate(state.dataPlantValves->NumTemperingValves);
 
         for (Item = 1; Item <= state.dataPlantValves->NumTemperingValves; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(
+            state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
             //  <process, noting errors>
             state.dataPlantValves->TemperValve(Item).Name = Alphas(1);

@@ -245,12 +245,12 @@ void GetEvapInput(EnergyPlusData &state)
 
     state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
     // Start getting the input data
-    NumDirectEvapCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "EvaporativeCooler:Direct:CelDekPad");
-    NumDryInDirectEvapCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "EvaporativeCooler:Indirect:CelDekPad");
-    NumWetInDirectEvapCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "EvaporativeCooler:Indirect:WetCoil");
-    NumRDDEvapCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "EvaporativeCooler:Indirect:ResearchSpecial");
+    NumDirectEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:CelDekPad");
+    NumDryInDirectEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:CelDekPad");
+    NumWetInDirectEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:WetCoil");
+    NumRDDEvapCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:ResearchSpecial");
     NumDirectResearchSpecialEvapCool =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "EvaporativeCooler:Direct:ResearchSpecial");
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:ResearchSpecial");
 
     // Sum up all of the Evap Cooler Types
     state.dataEvapCoolers->NumEvapCool =
@@ -265,18 +265,18 @@ void GetEvapInput(EnergyPlusData &state)
     cCurrentModuleObject = "EvaporativeCooler:Direct:CelDekPad";
 
     for (EvapCoolNum = 1; EvapCoolNum <= NumDirectEvapCool; ++EvapCoolNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   EvapCoolNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   _,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 EvapCoolNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  UniqueEvapCondNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -364,18 +364,18 @@ void GetEvapInput(EnergyPlusData &state)
     for (IndEvapCoolNum = 1; IndEvapCoolNum <= NumDryInDirectEvapCool; ++IndEvapCoolNum) {
         EvapCoolNum = NumDirectEvapCool + IndEvapCoolNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   IndEvapCoolNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   _,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 IndEvapCoolNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  UniqueEvapCondNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -495,18 +495,18 @@ void GetEvapInput(EnergyPlusData &state)
     for (IndEvapCoolNum = 1; IndEvapCoolNum <= NumWetInDirectEvapCool; ++IndEvapCoolNum) {
         EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + IndEvapCoolNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   IndEvapCoolNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   _,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 IndEvapCoolNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  UniqueEvapCondNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -616,18 +616,18 @@ void GetEvapInput(EnergyPlusData &state)
     cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
     for (IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum) {
         EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   IndEvapCoolNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 IndEvapCoolNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  UniqueEvapCondNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -818,18 +818,18 @@ void GetEvapInput(EnergyPlusData &state)
     cCurrentModuleObject = "EvaporativeCooler:Direct:ResearchSpecial";
     for (DirectEvapCoolNum = 1; DirectEvapCoolNum <= NumDirectResearchSpecialEvapCool; ++DirectEvapCoolNum) {
         EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + DirectEvapCoolNum;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   DirectEvapCoolNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 DirectEvapCoolNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  UniqueEvapCondNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -3716,8 +3716,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     MaxAlphas = 0;
 
     CurrentModuleObject = "ZoneHVAC:EvaporativeCoolerUnit";
-    state.dataEvapCoolers->NumZoneEvapUnits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+    state.dataEvapCoolers->NumZoneEvapUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     Alphas.allocate(MaxAlphas);
@@ -3733,18 +3733,18 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
         state.dataEvapCoolers->ZoneEvapCoolerUnitFields.allocate(state.dataEvapCoolers->NumZoneEvapUnits);
 
         for (UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       UnitLoop,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     UnitLoop,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataEvapCoolers->ZoneEvapCoolerUnitFields(UnitLoop).FieldNames.allocate(NumNumbers);
             state.dataEvapCoolers->ZoneEvapCoolerUnitFields(UnitLoop).FieldNames = "";

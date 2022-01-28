@@ -949,38 +949,38 @@ namespace Furnaces {
         MaxAlphas = 0;
 
         CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
-        NumHeatOnly = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatCool";
-        NumHeatCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatOnly";
-        NumUnitaryHeatOnly = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumUnitaryHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool";
-        NumUnitaryHeatCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumUnitaryHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir";
-        NumHeatPump = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:WaterToAir";
-        NumWaterToAirHeatPump = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumWaterToAirHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -1032,18 +1032,18 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       GetObjectNum,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     GetObjectNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
@@ -1654,18 +1654,18 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = FurnaceType_Num;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       GetObjectNum,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     GetObjectNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
@@ -3012,18 +3012,18 @@ namespace Furnaces {
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       HeatPumpNum,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     HeatPumpNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
@@ -4018,18 +4018,18 @@ namespace Furnaces {
             FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
             state.dataFurnaces->Furnace(FurnaceNum).iterationMode.allocate(3);
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       HeatPumpNum,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     HeatPumpNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);

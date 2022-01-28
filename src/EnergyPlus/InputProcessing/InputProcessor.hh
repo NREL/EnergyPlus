@@ -335,20 +335,40 @@ private:
 
 struct DataInputProcessing : BaseGlobalStruct
 {
-    std::unique_ptr<InputProcessor> m_inputProcessor;
-
-    std::unique_ptr<InputProcessor> &inputProcessor()
+    struct LazyConstructedInputProcessor
     {
-        if (!m_inputProcessor) {
-            clear_state();
+        std::unique_ptr<InputProcessor> m_inputProcessor;
+        void reset()
+        {
+            m_inputProcessor.reset();
         }
-        return m_inputProcessor;
-    }
+
+        LazyConstructedInputProcessor &operator=(std::unique_ptr<InputProcessor> new_val)
+        {
+            m_inputProcessor = std::move(new_val);
+            return *this;
+        }
+
+        explicit operator bool() const noexcept {
+            return static_cast<bool>(m_inputProcessor);
+        }
+
+        InputProcessor *operator->()
+        {
+            if (!m_inputProcessor) {
+                m_inputProcessor = EnergyPlus::InputProcessor::factory();
+            }
+
+            return m_inputProcessor.get();
+        }
+    };
+
+    LazyConstructedInputProcessor inputProcessor;
 
     void clear_state() override
     {
-        m_inputProcessor.reset();
-        m_inputProcessor = EnergyPlus::InputProcessor::factory();
+        inputProcessor.reset();
+        inputProcessor = EnergyPlus::InputProcessor::factory();
     }
 };
 

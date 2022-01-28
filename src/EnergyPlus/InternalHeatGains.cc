@@ -291,7 +291,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->People.allocate(state.dataHeatBal->TotPeople);
             int peopleNum = 0;
             for (int peopleInputNum = 1; peopleInputNum <= state.dataHeatBal->NumPeopleStatements; ++peopleInputNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            peopleModuleObject,
                                                                            peopleInputNum,
                                                                            AlphaName,
@@ -1068,7 +1068,7 @@ namespace InternalHeatGains {
             int lightsNum = 0;
             for (int lightsInputNum = 1; lightsInputNum <= state.dataHeatBal->NumLightsStatements; ++lightsInputNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            lightsModuleObject,
                                                                            lightsInputNum,
                                                                            AlphaName,
@@ -1472,7 +1472,7 @@ namespace InternalHeatGains {
             int elecEqNum = 0;
             for (int elecEqInputNum = 1; elecEqInputNum <= state.dataHeatBal->NumZoneElectricStatements; ++elecEqInputNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            elecEqModuleObject,
                                                                            elecEqInputNum,
                                                                            AlphaName,
@@ -1686,7 +1686,7 @@ namespace InternalHeatGains {
             int gasEqNum = 0;
             for (int gasEqInputNum = 1; gasEqInputNum <= state.dataHeatBal->NumZoneGasStatements; ++gasEqInputNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            gasEqModuleObject,
                                                                            gasEqInputNum,
                                                                            AlphaName,
@@ -1933,7 +1933,7 @@ namespace InternalHeatGains {
             int hwEqNum = 0;
             for (int hwEqInputNum = 1; hwEqInputNum <= state.dataHeatBal->NumHotWaterEqStatements; ++hwEqInputNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            hwEqModuleObject,
                                                                            hwEqInputNum,
                                                                            AlphaName,
@@ -2146,7 +2146,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneSteamEq.allocate(state.dataHeatBal->TotStmEquip);
             int stmEqNum = 0;
             for (int stmEqInputNum = 1; stmEqInputNum <= state.dataHeatBal->NumSteamEqStatements; ++stmEqInputNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            stmEqModuleObject,
                                                                            stmEqInputNum,
                                                                            AlphaName,
@@ -2362,7 +2362,7 @@ namespace InternalHeatGains {
             int othEqNum = 0;
             for (int othEqInputNum = 1; othEqInputNum <= state.dataHeatBal->NumOtherEqStatements; ++othEqInputNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            othEqModuleObject,
                                                                            othEqInputNum,
                                                                            AlphaName,
@@ -2623,7 +2623,7 @@ namespace InternalHeatGains {
             int itEqNum = 0;
             for (int itEqInputNum = 1; itEqInputNum <= state.dataHeatBal->NumZoneITEqStatements; ++itEqInputNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            itEqModuleObject,
                                                                            itEqInputNum,
                                                                            AlphaName,
@@ -3080,7 +3080,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
             int bbHeatNum = 0;
             for (int bbHeatInputNum = 1; bbHeatInputNum <= state.dataHeatBal->NumZoneBBHeatStatements; ++bbHeatInputNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            bbModuleObject,
                                                                            bbHeatInputNum,
                                                                            AlphaName,
@@ -3190,13 +3190,13 @@ namespace InternalHeatGains {
             }     // for bbHeatInputNum
         }         // TotBBHeat > 0
 
-        state.dataHeatBal->TotCO2Gen = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, contamSSModuleObject);
+        state.dataHeatBal->TotCO2Gen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, contamSSModuleObject);
         state.dataHeatBal->ZoneCO2Gen.allocate(state.dataHeatBal->TotCO2Gen);
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotCO2Gen; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        contamSSModuleObject,
                                                                        Loop,
                                                                        AlphaName,
@@ -3819,7 +3819,7 @@ namespace InternalHeatGains {
         constexpr std::string_view routineName = "setupIHGZonesAndSpaces: ";
         bool localErrFlag = false;
 
-        auto &ip = state.dataInputProcessing->inputProcessor();
+        auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(objectType);
         if (instances != ip->epJSON.end()) {
             auto const &objectSchemaProps = ip->getObjectSchemaProps(state, objectType);

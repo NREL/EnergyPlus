@@ -245,8 +245,8 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
     bool ErrorsFound(false);
 
-    NumCoolCoil = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, HPEqFitCoolingUC);
-    NumHeatCoil = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, HPEqFitHeatingUC);
+    NumCoolCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
+    NumHeatCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
     state.dataHPWaterToWaterSimple->NumGSHPs = NumCoolCoil + NumHeatCoil;
 
     if (state.dataHPWaterToWaterSimple->NumGSHPs <= 0) {
@@ -264,16 +264,16 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
         GSHPNum = HPNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   HPEqFitCoolingUC,
-                                                                   HPNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 HPEqFitCoolingUC,
+                                                                 HPNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHPWaterToWaterSimple->HeatPumpWaterUniqueNames, state.dataIPShortCut->cAlphaArgs(1), HPEqFitCoolingUC, ErrorsFound);
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPType = DataPlant::PlantEquipmentType::HPWaterEFCooling;
@@ -440,16 +440,16 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
         GSHPNum = NumCoolCoil + HPNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   HPEqFitHeatingUC,
-                                                                   HPNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 HPEqFitHeatingUC,
+                                                                 HPNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHPWaterToWaterSimple->HeatPumpWaterUniqueNames, state.dataIPShortCut->cAlphaArgs(1), HPEqFitHeatingUC, ErrorsFound);
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPType = DataPlant::PlantEquipmentType::HPWaterEFHeating;

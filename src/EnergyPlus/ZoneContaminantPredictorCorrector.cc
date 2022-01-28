@@ -204,31 +204,31 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
     MaxAlpha = -100;
     MaxNumber = -100;
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
     MaxAlpha = max(MaxAlpha, NumAlpha);
     MaxNumber = max(MaxNumber, NumNumber);
     CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
     MaxAlpha = max(MaxAlpha, NumAlpha);
     MaxNumber = max(MaxNumber, NumNumber);
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
     MaxAlpha = max(MaxAlpha, NumAlpha);
     MaxNumber = max(MaxNumber, NumNumber);
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
     MaxAlpha = max(MaxAlpha, NumAlpha);
     MaxNumber = max(MaxNumber, NumNumber);
     CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
     MaxAlpha = max(MaxAlpha, NumAlpha);
     MaxNumber = max(MaxNumber, NumNumber);
     CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
     MaxAlpha = max(MaxAlpha, NumAlpha);
     MaxNumber = max(MaxNumber, NumNumber);
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
     MaxAlpha = max(MaxAlpha, NumAlpha);
     MaxNumber = max(MaxNumber, NumNumber);
     IHGNumbers.allocate(MaxNumber);
@@ -238,13 +238,13 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
     state.dataZoneContaminantPredictorCorrector->TotGCGenConstant =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericConstant.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenConstant);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenConstant; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    AlphaName,
@@ -376,13 +376,13 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
     CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
     state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericPDriven.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    AlphaName,
@@ -522,13 +522,13 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
     state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericCutoff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    AlphaName,
@@ -640,13 +640,13 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
     state.dataZoneContaminantPredictorCorrector->TotGCGenDecay =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericDecay.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenDecay);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    AlphaName,
@@ -765,13 +765,13 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
     CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
     state.dataZoneContaminantPredictorCorrector->TotGCBLDiff =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericBLDiff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCBLDiff);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCBLDiff; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    AlphaName,
@@ -891,13 +891,13 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
     CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
     state.dataZoneContaminantPredictorCorrector->TotGCDVS =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericDVS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDVS);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDVS; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    AlphaName,
@@ -999,13 +999,13 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
 
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
     state.dataZoneContaminantPredictorCorrector->TotGCDRS =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericDRS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDRS);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDRS; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    Loop,
                                                                    AlphaName,
@@ -1173,14 +1173,14 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ZoneControl:ContaminantController";
     state.dataContaminantBalance->NumContControlledZones =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataContaminantBalance->NumContControlledZones > 0) {
         state.dataContaminantBalance->ContaminantControlledZone.allocate(state.dataContaminantBalance->NumContControlledZones);
     }
 
     for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    ContControlledZoneNum,
                                                                    state.dataIPShortCut->cAlphaArgs,

@@ -3052,7 +3052,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
 
-        state->dataOutputProcessor->NumOfReqVariables = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Output:Variable");
+        state->dataOutputProcessor->NumOfReqVariables = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Variable");
 
         EXPECT_EQ(5, state->dataOutputProcessor->NumOfReqVariables);
 
@@ -3168,7 +3168,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        state->dataInputProcessing->inputProcessor()->preScanReportingVariables(*state);
+        state->dataInputProcessing->inputProcessor->preScanReportingVariables(*state);
         InitializeOutput(*state);
 
         Real64 ilgrGarage;
@@ -3261,7 +3261,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        state->dataInputProcessing->inputProcessor()->preScanReportingVariables(*state);
+        state->dataInputProcessing->inputProcessor->preScanReportingVariables(*state);
         InitializeOutput(*state);
 
         Real64 ilgrGarage;

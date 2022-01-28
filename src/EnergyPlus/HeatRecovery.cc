@@ -315,13 +315,13 @@ namespace HeatRecovery {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         state.dataHeatRecovery->NumAirToAirPlateExchs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
         state.dataHeatRecovery->NumAirToAirGenericExchs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "HeatExchanger:AirToAir:SensibleAndLatent");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:SensibleAndLatent");
         state.dataHeatRecovery->NumDesiccantBalancedExchs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow");
         state.dataHeatRecovery->NumDesBalExchsPerfDataType1 =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
         state.dataHeatRecovery->NumHeatExchangers = state.dataHeatRecovery->NumAirToAirPlateExchs + state.dataHeatRecovery->NumAirToAirGenericExchs +
                                                     state.dataHeatRecovery->NumDesiccantBalancedExchs;
 
@@ -339,7 +339,7 @@ namespace HeatRecovery {
         // loop over the air to air plate heat exchangers and load their input data
         for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumAirToAirPlateExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:AirToAir:FlatPlate";
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ExchIndex,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -466,7 +466,7 @@ namespace HeatRecovery {
         // loop over the air to air generic heat exchangers and load their input data
         for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumAirToAirGenericExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:AirToAir:SensibleAndLatent";
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ExchIndex,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -649,7 +649,7 @@ namespace HeatRecovery {
         // loop over the desiccant balanced heat exchangers and load their input data
         for (ExchIndex = 1; ExchIndex <= state.dataHeatRecovery->NumDesiccantBalancedExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow";
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ExchIndex,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -775,7 +775,7 @@ namespace HeatRecovery {
 
         for (PerfDataIndex = 1; PerfDataIndex <= state.dataHeatRecovery->NumDesBalExchsPerfDataType1; ++PerfDataIndex) {
             cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        PerfDataIndex,
                                                                        state.dataIPShortCut->cAlphaArgs,

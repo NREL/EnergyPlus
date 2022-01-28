@@ -272,9 +272,9 @@ namespace HVACHXAssistedCoolingCoil {
         int MaxAlphas(0);                 // Maximum number of alpha input fields
         int TotalArgs(0);                 // Total number of alpha and numeric arguments (max) for a
 
-        NumHXAssistedDXCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
+        NumHXAssistedDXCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
         NumHXAssistedWaterCoils =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted");
         state.dataHVACAssistedCC->TotalNumHXAssistedCoils = NumHXAssistedDXCoils + NumHXAssistedWaterCoils;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
             state.dataHVACAssistedCC->HXAssistedCoil.allocate(state.dataHVACAssistedCC->TotalNumHXAssistedCoils);
@@ -284,11 +284,11 @@ namespace HVACHXAssistedCoolingCoil {
             state.dataHVACAssistedCC->UniqueHXAssistedCoilNames.reserve(state.dataHVACAssistedCC->TotalNumHXAssistedCoils);
         }
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -304,7 +304,7 @@ namespace HVACHXAssistedCoolingCoil {
         CurrentModuleObject = "CoilSystem:Cooling:DX:HeatExchangerAssisted";
 
         for (HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        HXAssistedCoilNum,
                                                                        AlphArray,
@@ -629,7 +629,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         for (HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        HXAssistedCoilNum,
                                                                        AlphArray,

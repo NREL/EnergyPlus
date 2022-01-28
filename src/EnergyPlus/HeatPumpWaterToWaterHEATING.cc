@@ -210,7 +210,7 @@ void GetGshpInput(EnergyPlusData &state)
 
     bool ErrorsFound(false);
 
-    state.dataHPWaterToWaterHtg->NumGSHPs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ModuleCompName);
+    state.dataHPWaterToWaterHtg->NumGSHPs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ModuleCompName);
 
     if (state.dataHPWaterToWaterHtg->NumGSHPs <= 0) {
         ShowSevereError(state, ModuleCompName + ": No Equipment found");
@@ -221,7 +221,7 @@ void GetGshpInput(EnergyPlusData &state)
     state.dataHPWaterToWaterHtg->GSHP.allocate(state.dataHPWaterToWaterHtg->NumGSHPs);
 
     for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterHtg->NumGSHPs; ++GSHPNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
         UtilityRoutines::IsNameEmpty(state, AlphArray(1), ModuleCompNameUC, ErrorsFound);
 
         state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name = AlphArray(1);

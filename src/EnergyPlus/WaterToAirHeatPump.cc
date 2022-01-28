@@ -240,8 +240,8 @@ namespace WaterToAirHeatPump {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        NumCool = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
-        NumHeat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
+        NumCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
+        NumHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
         state.dataWaterToAirHeatPump->NumWatertoAirHPs = NumCool + NumHeat;
         HPNum = 0;
 
@@ -256,11 +256,11 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->CheckEquipName.dimension(state.dataWaterToAirHeatPump->NumWatertoAirHPs, true);
         }
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -278,7 +278,7 @@ namespace WaterToAirHeatPump {
 
             ++HPNum;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        HPNum,
                                                                        AlphArray,
@@ -476,7 +476,7 @@ namespace WaterToAirHeatPump {
 
             ++HPNum;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        WatertoAirHPNum,
                                                                        AlphArray,

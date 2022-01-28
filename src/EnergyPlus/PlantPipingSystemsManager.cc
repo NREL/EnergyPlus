@@ -123,7 +123,7 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   May 2014
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-        int numSlabsCheck(state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
+        int numSlabsCheck(state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
         state.dataGlobal->AnySlabsInModel = (numSlabsCheck > 0);
     }
 
@@ -134,7 +134,7 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   May 2014
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-        int const numBasementsCheck(state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
+        int const numBasementsCheck(state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
         state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
@@ -397,15 +397,15 @@ namespace PlantPipingSystemsManager {
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         // Read number of objects and allocate main data structures - first domains
-        int NumGeneralizedDomains = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_ug_GeneralDomain);
-        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_HorizTrench);
-        int NumZoneCoupledDomains = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
-        int NumBasements = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
+        int NumGeneralizedDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ug_GeneralDomain);
+        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
+        int NumZoneCoupledDomains = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
+        int NumBasements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
         int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
         state.dataPlantPipingSysMgr->domains.resize(TotalNumDomains);
 
         // then circuits
-        int NumPipeCircuits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_Circuit);
+        int NumPipeCircuits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
 
         // Read in raw inputs, don't try to interpret dependencies yet
         ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
@@ -498,7 +498,7 @@ namespace PlantPipingSystemsManager {
         for (int DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum) {
 
             // Set up all the inputs for this domain object
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        ObjName_ug_GeneralDomain,
                                                                        DomainNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -825,7 +825,7 @@ namespace PlantPipingSystemsManager {
             ++DomainCtr;
 
             // Read all the inputs for this domain object
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        ObjName_ZoneCoupled_Slab,
                                                                        ZoneCoupledDomainCtr,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1121,7 +1121,7 @@ namespace PlantPipingSystemsManager {
             ++DomainNum;
 
             // Read all the inputs for this domain object
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        ObjName_ZoneCoupled_Basement,
                                                                        BasementCtr,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1463,11 +1463,11 @@ namespace PlantPipingSystemsManager {
 
         // get all of the actual generalized pipe circuit objects
 
-        int NumPipeCircuits = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_Circuit);
+        int NumPipeCircuits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
         for (int PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
 
             // Read all the inputs for this pipe circuit
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        ObjName_Circuit,
                                                                        PipeCircuitCounter,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1599,13 +1599,13 @@ namespace PlantPipingSystemsManager {
 
         // now get all the pipe circuits related to horizontal trenches
 
-        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_HorizTrench);
+        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
 
         // Read in all pipe segments
         for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
 
             // Read all inputs for this pipe segment
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        ObjName_HorizTrench,
                                                                        HorizontalGHXCtr,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1749,11 +1749,11 @@ namespace PlantPipingSystemsManager {
         int CurIndex;
 
         // Read in all pipe segments
-        int NumPipeSegmentsInInput = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_Segment);
+        int NumPipeSegmentsInInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_Segment);
         for (int SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
 
             // Read all inputs for this pipe segment
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        ObjName_Segment,
                                                                        SegmentCtr,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1826,7 +1826,7 @@ namespace PlantPipingSystemsManager {
         //  then resolve each one, creating definitions for a pipe domain, pipe circuit, and series of pipe segments
         // This way, the outer get input routines can handle it as though they were generalized routines
 
-        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjName_HorizTrench);
+        int NumHorizontalTrenches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
 
         // Read in all pipe segments
         for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
@@ -1836,7 +1836,7 @@ namespace PlantPipingSystemsManager {
             ++CircuitCtr;
 
             // Read all inputs for this pipe segment
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        ObjName_HorizTrench,
                                                                        HorizontalGHXCtr,
                                                                        state.dataIPShortCut->cAlphaArgs,

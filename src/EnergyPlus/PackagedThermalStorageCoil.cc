@@ -214,13 +214,13 @@ void GetTESCoilInput(EnergyPlusData &state)
     int ZoneIndexTrial;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage";
-    state.dataPackagedThermalStorageCoil->NumTESCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataPackagedThermalStorageCoil->NumTESCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataPackagedThermalStorageCoil->TESCoil.allocate(state.dataPackagedThermalStorageCoil->NumTESCoils);
     state.dataPackagedThermalStorageCoil->CheckEquipName.dimension(state.dataPackagedThermalStorageCoil->NumTESCoils, true);
 
     for (item = 1; item <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++item) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    item,
                                                                    state.dataIPShortCut->cAlphaArgs,

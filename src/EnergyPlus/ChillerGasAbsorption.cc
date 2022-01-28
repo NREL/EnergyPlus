@@ -301,7 +301,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     state.dataIPShortCut->cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
-    NumGasAbsorbers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    NumGasAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (NumGasAbsorbers <= 0) {
         ShowSevereError(state, "No " + cCurrentModuleObject + " equipment found in input file");
@@ -316,18 +316,18 @@ void GetGasAbsorberInput(EnergyPlusData &state)
     // LOAD ARRAYS
 
     for (AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   AbsorberNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   _,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 AbsorberNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
         // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise

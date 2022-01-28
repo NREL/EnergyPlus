@@ -253,13 +253,13 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     state->dataIPShortCut->rNumericArgs = 0.0;
 
     // Original method of initializing epJSON input objects, but couldn't get this to work for extensible arrays
-    // state->dataInputProcessing->inputProcessor()->epJSON["Zone"]["Zone 1"] = {};
-    // state->dataInputProcessing->inputProcessor()->epJSON["Zone"]["Zone 2"] = {};
-    // state->dataInputProcessing->inputProcessor()->epJSON["Space"]["Space 1a"] = {{"zone_name", "Zone 1"}};
+    // state->dataInputProcessing->inputProcessor->epJSON["Zone"]["Zone 1"] = {};
+    // state->dataInputProcessing->inputProcessor->epJSON["Zone"]["Zone 2"] = {};
+    // state->dataInputProcessing->inputProcessor->epJSON["Space"]["Space 1a"] = {{"zone_name", "Zone 1"}};
 
     // Using R_json raw string parsing to get the arrays processed correctly
     // Reference https://github.com/nlohmann/json#json-as-first-class-data-type
-    state->dataInputProcessing->inputProcessor()->epJSON = R"(
+    state->dataInputProcessing->inputProcessor->epJSON = R"(
     {
         "Zone": {
             "Zone 1" : {
@@ -340,7 +340,7 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     )"_json;
 
     state->dataGlobal->isEpJSON = true;
-    state->dataInputProcessing->inputProcessor()->initializeMaps();
+    state->dataInputProcessing->inputProcessor->initializeMaps();
 
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);

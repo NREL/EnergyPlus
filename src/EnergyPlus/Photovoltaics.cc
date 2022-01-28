@@ -267,13 +267,13 @@ namespace Photovoltaics {
 
         // count how many photovoltaic arrays of different types are in the .idf
         state.dataPhotovoltaic->NumPVs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataPhotovoltaic->cPVGeneratorObjectName);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVGeneratorObjectName);
         state.dataPhotovoltaic->NumSimplePVModuleTypes =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSimplePerfObjectName);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSimplePerfObjectName);
         state.dataPhotovoltaic->Num1DiodePVModuleTypes =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName);
         state.dataPhotovoltaic->NumSNLPVModuleTypes =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSandiaPerfObjectName);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataPhotovoltaic->cPVSandiaPerfObjectName);
 
         if (state.dataPhotovoltaic->NumPVs <= 0) {
             ShowSevereError(state, "Did not find any " + state.dataPhotovoltaic->cPVGeneratorObjectName);
@@ -285,7 +285,7 @@ namespace Photovoltaics {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = state.dataPhotovoltaic->cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= state.dataPhotovoltaic->NumPVs; ++PVnum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        PVnum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -439,7 +439,7 @@ namespace Photovoltaics {
             tmpSimpleModuleParams.allocate(state.dataPhotovoltaic->NumSimplePVModuleTypes);
             cCurrentModuleObject = state.dataPhotovoltaic->cPVSimplePerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->NumSimplePVModuleTypes; ++ModNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            ModNum,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -490,7 +490,7 @@ namespace Photovoltaics {
             tmpTNRSYSModuleParams.allocate(state.dataPhotovoltaic->Num1DiodePVModuleTypes);
             cCurrentModuleObject = state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->Num1DiodePVModuleTypes; ++ModNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            ModNum,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -550,7 +550,7 @@ namespace Photovoltaics {
             cCurrentModuleObject = state.dataPhotovoltaic->cPVSandiaPerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->NumSNLPVModuleTypes; ++ModNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            ModNum,
                                                                            state.dataIPShortCut->cAlphaArgs,

@@ -120,70 +120,70 @@ namespace EMSManager {
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-        state.dataRuntimeLang->NumSensors = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumSensors = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-        state.dataRuntimeLang->numActuatorsUsed = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->numActuatorsUsed = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-        state.dataRuntimeLang->NumProgramCallManagers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumProgramCallManagers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Program";
-        state.dataRuntimeLang->NumErlPrograms = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumErlPrograms = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-        state.dataRuntimeLang->NumErlSubroutines = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumErlSubroutines = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-        state.dataRuntimeLang->NumUserGlobalVariables = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumUserGlobalVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-        state.dataRuntimeLang->NumEMSOutputVariables = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSOutputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
         state.dataRuntimeLang->NumEMSMeteredOutputVariables =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-        state.dataRuntimeLang->NumEMSCurveIndices = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSCurveIndices = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ExternalInterface:Variable";
         state.dataRuntimeLang->NumExternalInterfaceGlobalVariables =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUImport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
         state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUExport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
         state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ExternalInterface:Actuator";
         state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUImport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
         state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUExport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
         state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
         state.dataRuntimeLang->NumEMSConstructionIndices =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "Output:EnergyManagementSystem";
-        int NumOutputEMSs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumOutputEMSs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // Python plugin instances also count since actuators need to be set up for them
-        int numPythonPlugins = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PythonPlugin:Instance");
+        int numPythonPlugins = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
         int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(state);
 
         // added for FMU
@@ -540,59 +540,59 @@ namespace EMSManager {
         bool errFlag;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
         MaxNumAlphas = NumAlphas;
         cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:Program";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:Variable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         //  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
-        //  CALL state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
+        //  CALL state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
         //  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
         //  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
         cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -608,7 +608,7 @@ namespace EMSManager {
             state.dataRuntimeLang->Sensor.allocate(state.dataRuntimeLang->NumSensors);
 
             for (SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            SensorNum,
                                                                            cAlphaArgs,
@@ -687,7 +687,7 @@ namespace EMSManager {
                 // If we process the ExternalInterface actuators, all we need to do is to change the
                 // name of the module object, and shift the ActuatorNum in GetObjectItem
                 if (ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                ActuatorNum,
                                                                                cAlphaArgs,
@@ -702,7 +702,7 @@ namespace EMSManager {
                 } else if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed &&
                            ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:Actuator";
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                ActuatorNum - state.dataRuntimeLang->numActuatorsUsed,
                                                                                cAlphaArgs,
@@ -718,7 +718,7 @@ namespace EMSManager {
                            ActuatorNum <= (state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed +
                                            state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed)) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                ActuatorNum - state.dataRuntimeLang->numActuatorsUsed -
                                                                                    state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed,
@@ -737,7 +737,7 @@ namespace EMSManager {
                                               state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
                                               state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(
+                    state.dataInputProcessing->inputProcessor->getObjectItem(
                         state,
                         cCurrentModuleObject,
                         ActuatorNum - state.dataRuntimeLang->numActuatorsUsed - state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed -
@@ -825,12 +825,12 @@ namespace EMSManager {
 
         cCurrentModuleObject = "EnergyManagementSystem:InternalVariable";
         state.dataRuntimeLang->NumInternalVariablesUsed =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumInternalVariablesUsed > 0) {
             state.dataRuntimeLang->EMSInternalVarsUsed.allocate(state.dataRuntimeLang->NumInternalVariablesUsed);
 
             for (InternVarNum = 1; InternVarNum <= state.dataRuntimeLang->NumInternalVariablesUsed; ++InternVarNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            InternVarNum,
                                                                            cAlphaArgs,
@@ -891,7 +891,7 @@ namespace EMSManager {
 
             for (CallManagerNum = 1; CallManagerNum <= state.dataRuntimeLang->NumProgramCallManagers; ++CallManagerNum) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            CallManagerNum,
                                                                            cAlphaArgs,
@@ -1748,7 +1748,7 @@ namespace EMSManager {
         bool FoundControl = CheckIfNodeSetPointManaged(state, NodeNum, SetPointType, false);
 
         if ((!ErrorFlag) && (!FoundControl)) {
-            int numPythonPlugins = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "PythonPlugin:Instance");
+            int numPythonPlugins = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
             int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(state); // errorCallback;
             if ((numPythonPlugins + numActiveCallbacks) == 0) {
                 ErrorFlag = true;

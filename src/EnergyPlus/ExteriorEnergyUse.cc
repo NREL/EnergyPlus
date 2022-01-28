@@ -128,11 +128,11 @@ namespace ExteriorEnergyUse {
         Real64 SchMax; // Max value of schedule for item
         Real64 SchMin; // Min value of schedule for item
 
-        state.dataExteriorEnergyUse->NumExteriorLights = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Exterior:Lights");
+        state.dataExteriorEnergyUse->NumExteriorLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:Lights");
         state.dataExteriorEnergyUse->ExteriorLights.allocate(state.dataExteriorEnergyUse->NumExteriorLights);
 
-        NumFuelEq = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Exterior:FuelEquipment");
-        NumWtrEq = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Exterior:WaterEquipment");
+        NumFuelEq = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:FuelEquipment");
+        NumWtrEq = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:WaterEquipment");
         state.dataExteriorEnergyUse->ExteriorEquipment.allocate(NumFuelEq + NumWtrEq);
         state.dataExteriorEnergyUse->UniqueExteriorEquipNames.reserve(NumFuelEq + NumWtrEq);
 
@@ -143,7 +143,7 @@ namespace ExteriorEnergyUse {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Exterior:Lights";
         for (Item = 1; Item <= state.dataExteriorEnergyUse->NumExteriorLights; ++Item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Item,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -272,7 +272,7 @@ namespace ExteriorEnergyUse {
 
         cCurrentModuleObject = "Exterior:FuelEquipment";
         for (Item = 1; Item <= NumFuelEq; ++Item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Item,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -413,7 +413,7 @@ namespace ExteriorEnergyUse {
 
         cCurrentModuleObject = "Exterior:WaterEquipment";
         for (Item = 1; Item <= NumWtrEq; ++Item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Item,
                                                                        state.dataIPShortCut->cAlphaArgs,

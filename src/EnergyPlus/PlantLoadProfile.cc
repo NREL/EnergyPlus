@@ -329,24 +329,24 @@ void GetPlantProfileInput(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "LoadProfile:Plant";
-    state.dataPlantLoadProfile->NumOfPlantProfile = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataPlantLoadProfile->NumOfPlantProfile = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataPlantLoadProfile->NumOfPlantProfile > 0) {
         state.dataPlantLoadProfile->PlantProfile.allocate(state.dataPlantLoadProfile->NumOfPlantProfile);
 
         for (ProfileNum = 1; ProfileNum <= state.dataPlantLoadProfile->NumOfPlantProfile; ++ProfileNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       ProfileNum,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       _,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ProfileNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name = state.dataIPShortCut->cAlphaArgs(1);

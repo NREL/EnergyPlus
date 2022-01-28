@@ -133,7 +133,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
-    int numPerformances = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CoilCoolingDXCurveFitPerformance::object_name);
+    int numPerformances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
         // error
     }
@@ -142,7 +142,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CoilCoolingDXCurveFitPerformance::object_name,
                                                                    perfNum,
                                                                    state.dataIPShortCut->cAlphaArgs,

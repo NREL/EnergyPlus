@@ -1195,7 +1195,7 @@ void GetIHPInput(EnergyPlusData &state)
     int OutNode(0);        // outlet air or water node
     int ChildCoilIndex(0); // refer to a child coil
 
-    NumASIHPs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
+    NumASIHPs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
     DXCoilNum = 0;
 
     if (NumASIHPs <= 0) return;
@@ -1204,7 +1204,7 @@ void GetIHPInput(EnergyPlusData &state)
     state.dataIntegratedHP->IntegratedHeatPumps.allocate(NumASIHPs);
 
     // air-source integrated heat pump
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", NumParams, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", NumParams, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -1224,7 +1224,7 @@ void GetIHPInput(EnergyPlusData &state)
         ++DXCoilNum;
         AlfaFieldIncre = 1;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    CoilCounter,
                                                                    AlphArray,

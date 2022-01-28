@@ -169,8 +169,8 @@ namespace OutAirNodeManager {
         int MaxAlphas(0);                // Maximum number of alpha input fields
         int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
 
-        NumOutAirInletNodeLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "OutdoorAir:NodeList");
-        NumOutsideAirNodeSingles = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "OutdoorAir:Node");
+        NumOutAirInletNodeLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "OutdoorAir:NodeList");
+        NumOutsideAirNodeSingles = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "OutdoorAir:Node");
         state.dataOutAirNodeMgr->NumOutsideAirNodes = 0;
         ErrorsFound = false;
         NextFluidStreamNum = 1;
@@ -179,13 +179,13 @@ namespace OutAirNodeManager {
         CurSize = 100;
         TmpNums.dimension(CurSize, 0);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         NodeNums.dimension(NumParams, 0);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -200,18 +200,18 @@ namespace OutAirNodeManager {
             // Loop over all outside air inlet nodes in the input and count them
             CurrentModuleObject = "OutdoorAir:NodeList";
             for (OutAirInletNodeListNum = 1; OutAirInletNodeListNum <= NumOutAirInletNodeLists; ++OutAirInletNodeListNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                           CurrentModuleObject,
-                                                                           OutAirInletNodeListNum,
-                                                                           Alphas,
-                                                                           NumAlphas,
-                                                                           Numbers,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericBlanks,
-                                                                           lAlphaBlanks,
-                                                                           cAlphaFields,
-                                                                           cNumericFields);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         OutAirInletNodeListNum,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 for (AlphaNum = 1; AlphaNum <= NumAlphas; ++AlphaNum) {
                     ErrInList = false;
@@ -258,18 +258,18 @@ namespace OutAirNodeManager {
             // Loop over all single outside air nodes in the input
             CurrentModuleObject = "OutdoorAir:Node";
             for (OutsideAirNodeSingleNum = 1; OutsideAirNodeSingleNum <= NumOutsideAirNodeSingles; ++OutsideAirNodeSingleNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                           CurrentModuleObject,
-                                                                           OutsideAirNodeSingleNum,
-                                                                           Alphas,
-                                                                           NumAlphas,
-                                                                           Numbers,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericBlanks,
-                                                                           lAlphaBlanks,
-                                                                           cAlphaFields,
-                                                                           cNumericFields);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         OutsideAirNodeSingleNum,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 ErrInList = false;
                 //  To support HVAC diagram, every outside inlet node must have a unique fluid stream number

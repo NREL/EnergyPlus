@@ -285,9 +285,9 @@ void GetWaterCoilInput(EnergyPlusData &state)
     int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a certain object in the input file
     bool ErrorsFound(false);         // If errors detected in input
 
-    NumSimpHeat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:Water");
-    NumFlatFin = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
-    NumCooling = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Cooling:Water");
+    NumSimpHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
+    NumFlatFin = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
+    NumCooling = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water");
     state.dataWaterCoils->NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
     if (state.dataWaterCoils->NumWaterCoils > 0) {
@@ -298,13 +298,13 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->CheckEquipName.dimension(state.dataWaterCoils->NumWaterCoils, true);
     }
 
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
     MaxNums = max(MaxNums, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -321,7 +321,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
 
         CoilNum = SimpHeatNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    SimpHeatNum,
                                                                    AlphArray,
@@ -499,7 +499,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
 
         CoilNum = NumSimpHeat + FlatFinNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    FlatFinNum,
                                                                    AlphArray,
@@ -728,7 +728,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
 
         CoilNum = NumSimpHeat + NumFlatFin + CoolingNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    CoolingNum,
                                                                    AlphArray,

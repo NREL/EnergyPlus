@@ -122,15 +122,15 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
     auto &NumOfSurfListVentSlab(state.dataSurfLists->NumOfSurfListVentSlab);
 
     ErrorsFound = false;
-    NumOfSurfaceLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject1);
-    NumOfSurfListVentSlab = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject2);
+    NumOfSurfaceLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
+    NumOfSurfListVentSlab = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
 
     SurfList.allocate(NumOfSurfaceLists);
     SlabList.allocate(NumOfSurfListVentSlab);
 
     if (NumOfSurfaceLists > 0) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
         Alphas.allocate(MaxAlphas);
         lAlphaBlanks.dimension(MaxAlphas, false);
         cAlphaFields.allocate(MaxAlphas);
@@ -140,7 +140,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
 
         for (Item = 1; Item <= NumOfSurfaceLists; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject1,
                                                                        Item,
                                                                        Alphas,
@@ -236,7 +236,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
     }
 
     if (NumOfSurfListVentSlab > 0) {
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
         Alphas.allocate(MaxAlphas);
         lAlphaBlanks.dimension(MaxAlphas, false);
         cAlphaFields.allocate(MaxAlphas);
@@ -246,7 +246,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
 
         for (Item = 1; Item <= NumOfSurfListVentSlab; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject2,
                                                                        Item,
                                                                        Alphas,

@@ -235,7 +235,7 @@ namespace PVWatts {
         int IOStat;
         bool errorsFound = false;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    "Generator:PVWatts",
                                                                    objNum,
                                                                    cAlphaArgs,

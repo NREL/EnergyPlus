@@ -7284,8 +7284,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
-    EXPECT_EQ(0, state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Output:Variable"));
+    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
+    EXPECT_EQ(0, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Variable"));
 
     // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
     // for the SetpointsNotMetWithTemperatureMonthly report
@@ -10000,7 +10000,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_N
     state->dataGlobal->DoZoneSizing = false;
     state->dataGlobal->DoSystemSizing = false;
 
-    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
+    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
 
     EXPECT_EQ(0, state->dataOutRptPredefined->numReportName);
     SetPredefinedTables(*state);
@@ -10034,7 +10034,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_W
     state->dataGlobal->DoZoneSizing = true;
     state->dataGlobal->DoSystemSizing = false;
 
-    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
+    EXPECT_EQ(1, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Table:SummaryReports"));
 
     EXPECT_EQ(0, state->dataOutRptPredefined->numReportName);
     SetPredefinedTables(*state);

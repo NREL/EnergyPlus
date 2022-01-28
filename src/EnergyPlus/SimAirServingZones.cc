@@ -368,11 +368,11 @@ void GetAirPathData(EnergyPlusData &state)
     // Object Data
     Array1D<AirUniqueNodes> TestUniqueNodes;
 
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "ConnectorList", NumParams, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ConnectorList", NumParams, NumAlphas, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNumbers = max(MaxNumbers, NumNumbers);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNumbers = max(MaxNumbers, NumNumbers);
 
@@ -393,13 +393,13 @@ void GetAirPathData(EnergyPlusData &state)
 
     state.dataSimAirServingZones->NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
     NodeNums.dimension(NumParams, 0);
 
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // Find number of primary air systems
-    NumPrimaryAirSys = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC");
+    NumPrimaryAirSys = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
     TestUniqueNodes.allocate(NumPrimaryAirSys * 4); // used to look at specific nodes that must be unique, fields A6-A9
 
     PrimaryAirSystems.allocate(NumPrimaryAirSys);                  // allocate the primary air sys data array
@@ -440,7 +440,7 @@ void GetAirPathData(EnergyPlusData &state)
 
         CurrentModuleObject = "AirLoopHVAC";
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    AirSysNum,
                                                                    Alphas,
@@ -883,9 +883,9 @@ void GetAirPathData(EnergyPlusData &state)
         MixerExists = false;
 
         if (ConnectorListName != std::string()) {
-            ConListNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(state, "ConnectorList", ConnectorListName);
+            ConListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ConnectorList", ConnectorListName);
             if (ConListNum > 0) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(
+                state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, "ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
                 if ((UtilityRoutines::SameString(Alphas(2), "Connector:Splitter")) ||
                     (UtilityRoutines::SameString(Alphas(4), "Connector:Splitter"))) {
@@ -908,7 +908,7 @@ void GetAirPathData(EnergyPlusData &state)
 
         // If there is a SPLITTER, get its data
         if (SplitterExists) {
-            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Connector:Splitter", NumParams, NumAlphas, NumNodes);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Connector:Splitter", NumParams, NumAlphas, NumNodes);
             NodeNames.allocate(NumAlphas);
             NodeNumbers.allocate(NumAlphas);
             GetLoopSplitter(state,
@@ -969,7 +969,7 @@ void GetAirPathData(EnergyPlusData &state)
 
         // If there is a MIXER, get its data
         if (MixerExists) {
-            state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Connector:Mixer", NumParams, NumAlphas, NumNodes);
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Connector:Mixer", NumParams, NumAlphas, NumNodes);
             NodeNames.allocate(NumAlphas);
             NodeNumbers.allocate(NumAlphas);
             GetLoopMixer(state,
@@ -1032,9 +1032,9 @@ void GetAirPathData(EnergyPlusData &state)
         if (ControllerListName != std::string()) { // If not blank, then must be there and valid
             // Loop through the controller lists until you find the one attached to this primary air system
             ControllerListNum =
-                state.dataInputProcessing->inputProcessor()->getObjectItemNum(state, "AirLoopHVAC:ControllerList", ControllerListName);
+                state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "AirLoopHVAC:ControllerList", ControllerListName);
             if (ControllerListNum > 0) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(
+                state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, "AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
                 // Check the current controller list and if it matches input names
                 NumControllers = (NumAlphas - 1) / 2; // Subtract off the controller list name first
@@ -1071,7 +1071,7 @@ void GetAirPathData(EnergyPlusData &state)
             }
         }
         if (NumOASysSimpControllers > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(
+            state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, "AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // allocate air primary system controller lists if not already done
             if (NumControllers == 0) {
@@ -1409,7 +1409,7 @@ void GetAirPathData(EnergyPlusData &state)
     }
 
     state.dataAirLoopHVACDOAS->numAirLoopDOAS =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem");
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem");
     if (state.dataAirLoopHVACDOAS->numAirLoopDOAS > 0) {
         if (state.dataAirLoopHVACDOAS->GetInputOnceFlag) {
             AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);

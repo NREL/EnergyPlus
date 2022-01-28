@@ -4036,7 +4036,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     ErrorsFound = false;
     cCurrentModuleObject = "Daylighting:Controls";
-    TotDaylightingControls = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    TotDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (TotDaylightingControls > 0) {
         state.dataDaylightingData->enclDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         GetInputDayliteRefPt(state, ErrorsFound);
@@ -4302,9 +4302,9 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
 
     // TH 6/3/2010, added to report daylight factors
     cCurrentModuleObject = "Output:DaylightFactors";
-    NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (NumReports > 0) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    1,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -4379,14 +4379,14 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Output:IlluminanceMap";
-    state.dataDaylightingData->TotIllumMaps = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataDaylightingData->TotIllumMaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataDaylightingData->IllumMap.allocate(state.dataDaylightingData->TotIllumMaps);
     state.dataDaylightingData->IllumMapCalc.allocate(state.dataDaylightingData->TotIllumMaps);
 
     if (state.dataDaylightingData->TotIllumMaps > 0) {
         for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        MapNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -4484,13 +4484,13 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             }
         } // MapNum
         cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-        MapStyleIn = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        MapStyleIn = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (MapStyleIn == 0) {
             state.dataIPShortCut->cAlphaArgs(1) = "COMMA";
             state.dataDaylightingData->MapColSep = CharComma; // comma
         } else if (MapStyleIn == 1) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        1,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -4794,7 +4794,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
     constexpr Real64 FractionTolerance(0.001);
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Daylighting:Controls";
-    state.dataDaylightingData->totDaylightingControls = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataDaylightingData->totDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataDaylightingData->daylightControl.allocate(state.dataDaylightingData->totDaylightingControls);
     Array1D<bool> spaceHasDaylightingControl;
     spaceHasDaylightingControl.dimension(state.dataGlobal->numSpaces, false);
@@ -4805,7 +4805,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
     for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
         state.dataIPShortCut->cAlphaArgs = "";
         state.dataIPShortCut->rNumericArgs = 0.0;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    controlNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -5261,10 +5261,10 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
     int NumNumber;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Daylighting:ReferencePoint";
-    state.dataDaylightingData->TotRefPoints = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataDaylightingData->TotRefPoints = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataDaylightingData->DaylRefPt.allocate(state.dataDaylightingData->TotRefPoints);
     for (auto &pt : state.dataDaylightingData->DaylRefPt) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    ++RefPtNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -5424,12 +5424,12 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     // Get the total number of Light Well objects
     cCurrentModuleObject = "DaylightingDevice:LightWell";
-    TotLightWells = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    TotLightWells = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (TotLightWells == 0) return;
 
     for (loop = 1; loop <= TotLightWells; ++loop) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    loop,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -10651,8 +10651,8 @@ void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64
     OldAspectRatio = 1.0;
     NewAspectRatio = 1.0;
 
-    if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject) == 1) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+    if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    1,
                                                                    cAlphas,

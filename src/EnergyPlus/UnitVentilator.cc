@@ -295,8 +295,8 @@ namespace UnitVentilator {
         // Figure out how many unit ventilators there are in the input file
 
         CurrentModuleObject = state.dataUnitVentilators->cMO_UnitVentilator;
-        state.dataUnitVentilators->NumOfUnitVents = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataUnitVentilators->NumOfUnitVents = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
@@ -316,7 +316,7 @@ namespace UnitVentilator {
         for (UnitVentNum = 1; UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents;
              ++UnitVentNum) { // Begin looping over all of the unit ventilators found in the input file...
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        UnitVentNum,
                                                                        Alphas,

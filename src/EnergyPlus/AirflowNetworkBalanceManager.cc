@@ -330,8 +330,8 @@ namespace AirflowNetworkBalanceManager {
         ReferenceConditions defaultReferenceConditions("Default");                // Defaulted conditions
         bool conditionsAreDefaulted(true);                                        // Conditions are defaulted?
         CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
-        auto instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+        auto instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             // globalSolverObject.referenceConditions.clear();
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -371,7 +371,7 @@ namespace AirflowNetworkBalanceManager {
             }
             // Check that there is more than one
             if (referenceConditions.size() == 1) {
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                               referenceConditions.begin()->second.name);
                 defaultReferenceConditions = referenceConditions.begin()->second;
 
@@ -388,9 +388,9 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation surface crack component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->MultizoneSurfaceCrackData.allocate(
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks); // Temporary workaround
@@ -398,7 +398,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_at_reference_conditions")}; // Required field
                 Real64 expnt{0.65};
@@ -422,7 +422,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
-                            state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
+                            state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                           result->second.name);
                         }
                     }
@@ -444,11 +444,11 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation zone exhaust fan component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
         state.dataAirflowNetwork->AirflowNetworkNumOfExhFan =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
         state.dataAirflowNetworkBalanceManager->NumOfExhaustFans =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Fan:ZoneExhaust"); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ZoneExhaust"); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->MultizoneCompExhaustFanData.allocate(
                 state.dataAirflowNetwork->AirflowNetworkNumOfExhFan); // Temporary workaround
@@ -456,7 +456,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_the_zone_exhaust_fan_is_off_at_reference_conditions")}; // Required field
                 Real64 expnt{0.65};
@@ -510,7 +510,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
-                            state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
+                            state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                           result->second.name);
                         }
                     }
@@ -544,16 +544,16 @@ namespace AirflowNetworkBalanceManager {
         // Read Outdoor Airflow object
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:OutdoorAirFlow";
         state.dataAirflowNetworkBalanceManager->NumOfOAFans =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                        // Temporary workaround
             state.dataAirflowNetwork->DisSysCompOutdoorAirData.allocate(state.dataAirflowNetworkBalanceManager->NumOfOAFans); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name").get<std::string>());
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
@@ -587,7 +587,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
-                            state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
+                            state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                           result->second.name);
                         }
                     }
@@ -619,9 +619,9 @@ namespace AirflowNetworkBalanceManager {
         // Read Relief Airflow object
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:ReliefAirFlow";
         state.dataAirflowNetworkBalanceManager->NumOfReliefFans =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->DisSysCompReliefAirData.allocate(
                 state.dataAirflowNetworkBalanceManager->NumOfReliefFans); // Temporary workaround
@@ -629,7 +629,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name").get<std::string>());
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
@@ -663,7 +663,7 @@ namespace AirflowNetworkBalanceManager {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
                             refW = result->second.humidity_ratio;
-                            state.dataInputProcessing->inputProcessor()->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
+                            state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                           result->second.name);
                         }
                     }
@@ -693,9 +693,9 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork simulation detailed openings
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:DetailedOpening";
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->MultizoneCompDetOpeningData.allocate(
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings); // Temporary workaround
@@ -703,7 +703,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
@@ -993,9 +993,9 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork simulation simple openings
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:SimpleOpening";
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->MultizoneCompSimpleOpeningData.allocate(
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings); // Temporary workaround
@@ -1003,7 +1003,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
@@ -1036,9 +1036,9 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork simulation horizontal openings
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:HorizontalOpening";
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->MultizoneCompHorOpeningData.allocate(
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings); // Temporary workaround
@@ -1046,7 +1046,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
@@ -1081,9 +1081,9 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation surface effective leakage area component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea";
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->MultizoneSurfaceELAData.allocate(
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA); // Temporary workaround
@@ -1091,7 +1091,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 ela{fields.at("effective_leakage_area")};
                 Real64 cd{1.0};
@@ -1130,9 +1130,9 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation specified flow components
         CurrentModuleObject = "AirflowNetwork:MultiZone:SpecifiedFlowRate";
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSFR =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i_mass = 0; // Temporary workaround that increasingly looks like the long term solution
             int i_vol = 0;
             auto &instancesValue = instances.value();
@@ -1141,7 +1141,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 flow_rate{fields.at("air_flow_value")};
                 bool is_mass_flow = true;
@@ -1176,16 +1176,16 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: duct leakage
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Leak";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                       // Temporary workaround
             state.dataAirflowNetwork->DisSysCompLeakData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 coeff{fields.at("air_mass_flow_coefficient")};
                 Real64 expnt{0.65};
@@ -1213,16 +1213,16 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: duct effective leakage ratio
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:LeakageRatio";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfELRs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                     // Temporary workaround
             state.dataAirflowNetwork->DisSysCompELRData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfELRs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 elr{fields.at("effective_leakage_ratio")};
                 Real64 maxflow{fields.at("maximum_flow_rate")};
@@ -1254,16 +1254,16 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: duct
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                       // Temporary workaround
             state.dataAirflowNetwork->DisSysCompDuctData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 L{fields.at("duct_length")};
                 Real64 D{fields.at("hydraulic_diameter")};
@@ -1331,29 +1331,29 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: constant volume fan
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs > 0 &&
             state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs !=
-                state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC")) {
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC")) {
             ShowSevereError(state,
                             format("The number of entered AirflowNetwork:Distribution:Component:Fan objects is {}",
                                    state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs));
             ShowSevereError(state,
                             format("The number of entered AirLoopHVAC objects is {}",
-                                   state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC")));
+                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC")));
             ShowContinueError(state, "Both numbers should be equal. Please check your inputs.");
             success = false;
         }
 
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                     // Temporary workaround
             state.dataAirflowNetwork->DisSysCompCVFData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string fan_name = UtilityRoutines::MakeUPPERCase(fields.at("fan_name").get<std::string>());
                 std::string fan_type = fields.at("supply_fan_object_type").get<std::string>();
@@ -1463,16 +1463,16 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: coil
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                       // Temporary workaround
             state.dataAirflowNetwork->DisSysCompCoilData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string coil_name = fields.at("coil_name").get<std::string>();
                 std::string coil_type = fields.at("coil_object_type").get<std::string>();
@@ -1504,16 +1504,16 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: heat exchanger
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:HeatExchanger";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                   // Temporary workaround
             state.dataAirflowNetwork->DisSysCompHXData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string hx_name = fields.at("heatexchanger_name").get<std::string>();
                 std::string hx_type = fields.at("heatexchanger_object_type").get<std::string>();
@@ -1546,9 +1546,9 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: terminal unit
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:TerminalUnit";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1; // Temporary workaround
             state.dataAirflowNetwork->DisSysCompTermUnitData.allocate(
                 state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits); // Temporary workaround
@@ -1556,7 +1556,7 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 std::string tu_name = fields.at("terminal_unit_name").get<std::string>();
                 std::string tu_type = fields.at("terminal_unit_object_type").get<std::string>();
@@ -1588,16 +1588,16 @@ namespace AirflowNetworkBalanceManager {
         // Get input data of constant pressure drop component
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:ConstantPressureDrop";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
-        instances = state.dataInputProcessing->inputProcessor()->epJSON.find(CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                                                                     // Temporary workaround
             state.dataAirflowNetwork->DisSysCompCPDData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
                 Real64 dp{fields.at("pressure_difference_across_the_component")};
 
@@ -1699,53 +1699,53 @@ namespace AirflowNetworkBalanceManager {
         static constexpr std::string_view Format_120("AirflowNetwork Model:Control,{}\n");
 
         // Set the maximum numbers of input fields
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirflowNetwork:MultiZone:Zone", TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirflowNetwork:MultiZone:Zone", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirflowNetwork:MultiZone:Surface", TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirflowNetwork:MultiZone:Surface", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:MultiZone:Component:DetailedOpening", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:MultiZone:ExternalNode", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:MultiZone:WindPressureCoefficientArray", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirflowNetwork:Distribution:Node", TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirflowNetwork:Distribution:Node", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:Distribution:Linkage", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:OccupantVentilationControl", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirflowNetwork:IntraZone:Node", TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirflowNetwork:IntraZone:Node", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "AirflowNetwork:IntraZone:Linkage", TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirflowNetwork:IntraZone:Linkage", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -1766,12 +1766,12 @@ namespace AirflowNetworkBalanceManager {
         // simple ventilation objects
         CurrentModuleObject = "AirflowNetwork:OccupantVentilationControl";
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls > 0) {
             state.dataAirflowNetworkBalanceManager->OccupantVentilationControl.allocate(
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -1948,10 +1948,10 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation parameters
         CurrentModuleObject = "AirflowNetwork:SimulationControl";
         state.dataAirflowNetworkBalanceManager->NumAirflowNetwork =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->NumAirflowNetwork == 0) {
-            if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirflowNetwork:MultiZone:Zone") >= 1 &&
-                state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirflowNetwork:MultiZone:Surface") >= 2) {
+            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:Zone") >= 1 &&
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:Surface") >= 2) {
                 state.dataAirflowNetwork->AFNDefaultControlFlag = true;
                 state.dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName = "AFNDefaultControl";
                 state.dataAirflowNetwork->AirflowNetworkSimu.Control = "MULTIZONEWITHOUTDISTRIBUTION";
@@ -1987,7 +1987,7 @@ namespace AirflowNetworkBalanceManager {
 
         SimObjectError = false;
         if (!state.dataAirflowNetwork->AFNDefaultControlFlag) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        state.dataAirflowNetworkBalanceManager->NumAirflowNetwork,
                                                                        Alphas,
@@ -2045,7 +2045,7 @@ namespace AirflowNetworkBalanceManager {
         // Check the number of primary air loops
         if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS ||
             state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
-            NumAPL = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC");
+            NumAPL = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
             if (NumAPL > 0) {
                 state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio.allocate(NumAPL);
                 state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction.allocate(NumAPL);
@@ -2067,9 +2067,9 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
             if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing +
                     state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotZoneAirBalance +
-                    state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneEarthtube") +
-                    state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneThermalChimney") +
-                    state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneCoolTower:Shower") ==
+                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneEarthtube") +
+                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneThermalChimney") +
+                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneCoolTower:Shower") ==
                 0) {
                 ShowWarningError(state, format(RoutineName) + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\".");
                 ShowContinueError(
@@ -2112,18 +2112,18 @@ namespace AirflowNetworkBalanceManager {
                     state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneAirBalance:OutdoorAir objects are present.");
                 ShowContinueError(state, "..ZoneAirBalance:OutdoorAir objects will not be simulated.");
             }
-            if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneEarthtube") > 0) {
+            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneEarthtube") > 0) {
                 ShowWarningError(state, format(RoutineName) + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneEarthtube objects are present.");
                 ShowContinueError(state, "..ZoneEarthtube objects will not be simulated.");
             }
-            if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneThermalChimney") > 0) {
+            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneThermalChimney") > 0) {
                 ShowWarningError(state, format(RoutineName) + CurrentModuleObject + " object, ");
                 ShowContinueError(state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneThermalChimney objects are present.");
                 ShowContinueError(state, "..ZoneThermalChimney objects will not be simulated.");
             }
-            if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "ZoneCoolTower:Shower") > 0) {
+            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneCoolTower:Shower") > 0) {
                 ShowWarningError(state, format(RoutineName) + CurrentModuleObject + " object, ");
                 ShowContinueError(state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneCoolTower:Shower objects are present.");
@@ -2239,12 +2239,12 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation zone data
         CurrentModuleObject = "AirflowNetwork:MultiZone:Zone";
         state.dataAirflowNetwork->AirflowNetworkNumOfZones =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetwork->AirflowNetworkNumOfZones > 0) {
             state.dataAirflowNetwork->MultizoneZoneData.allocate(state.dataAirflowNetwork->AirflowNetworkNumOfZones);
             state.dataAirflowNetwork->AirflowNetworkZoneFlag.dimension(state.dataGlobal->NumOfZones, false); // AirflowNetwork zone flag
             for (int i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfZones; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -2492,10 +2492,10 @@ namespace AirflowNetworkBalanceManager {
         if (state.dataAirflowNetwork->AirflowNetworkSimu.iWPCCnt == iWPCCntr::Input) {
             // Wind coefficient == Surface-Average does not need inputs of external nodes
             state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode =
-                state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirflowNetwork:MultiZone:ExternalNode");
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:ExternalNode");
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode =
-                    state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "OutdoorAir:Node");
+                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "OutdoorAir:Node");
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode +=
                     state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode;
             }
@@ -2506,7 +2506,7 @@ namespace AirflowNetworkBalanceManager {
                 for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode -
                                          state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode;
                      ++i) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                CurrentModuleObject,
                                                                                i,
                                                                                Alphas,
@@ -2562,7 +2562,7 @@ namespace AirflowNetworkBalanceManager {
                                  state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode + 1;
                          i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode;
                          ++i) {
-                        state.dataInputProcessing->inputProcessor()->getObjectItem(
+                        state.dataInputProcessing->inputProcessor->getObjectItem(
                             state,
                             CurrentModuleObject,
                             i - (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode -
@@ -2640,11 +2640,11 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation surface data
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
         state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces > 0) {
             state.dataAirflowNetwork->MultizoneSurfaceData.allocate(state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces);
             for (int i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -3661,11 +3661,11 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Intra zone node
         CurrentModuleObject = "AirflowNetwork:IntraZone:Node";
         state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes > 0) {
             state.dataAirflowNetwork->IntraZoneNodeData.allocate(state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -3743,13 +3743,13 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Intra linkage
         CurrentModuleObject = "AirflowNetwork:IntraZone:Linkage";
         state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks > 0) {
             state.dataAirflowNetwork->IntraZoneLinkageData.allocate(state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks);
             state.dataAirflowNetworkBalanceManager->UniqueAirflowNetworkSurfaceName.reserve(
                 state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -4058,11 +4058,11 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system node
         CurrentModuleObject = "AirflowNetwork:Distribution:Node";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes > 0) {
             state.dataAirflowNetwork->DisSysNodeData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -4126,12 +4126,12 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork distribution system component: DuctViewFactors
         CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors > 0) {
             state.dataAirflowNetwork->AirflowNetworkLinkageViewFactorData.allocate(
                 state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -4233,7 +4233,7 @@ namespace AirflowNetworkBalanceManager {
         // Read PressureController
         CurrentModuleObject = "AirflowNetwork:ZoneControl:PressureController";
         state.dataAirflowNetworkBalanceManager->NumOfPressureControllers =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers > 1) {
             ShowSevereError(state,
                             format(RoutineName) + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject +
@@ -4245,7 +4245,7 @@ namespace AirflowNetworkBalanceManager {
         if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers > 0) {
             state.dataAirflowNetwork->PressureControllerData.allocate(state.dataAirflowNetworkBalanceManager->NumOfPressureControllers);
             for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->NumOfPressureControllers; ++i) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            i,
                                                                            Alphas,
@@ -4786,7 +4786,7 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork linkage data
         CurrentModuleObject = "AirflowNetwork:Distribution:Linkage";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks > 0 &&
             state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Multizone + Distribution
             state.dataAirflowNetwork->AirflowNetworkNumOfLinks =
@@ -5106,7 +5106,7 @@ namespace AirflowNetworkBalanceManager {
             for (count = state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces + 1; count <= state.dataAirflowNetwork->AirflowNetworkNumOfLinks;
                  ++count) {
 
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            CurrentModuleObject,
                                                                            count - state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces,
                                                                            Alphas,

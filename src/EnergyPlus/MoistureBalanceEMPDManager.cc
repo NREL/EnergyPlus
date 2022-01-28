@@ -173,7 +173,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 
     // Load the additional EMPD Material properties
     cCurrentModuleObject = "MaterialProperty:MoisturePenetrationDepth:Settings";
-    EMPDMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    EMPDMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (EMPDMat == 0) {
         ShowSevereError(state, "EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found.");
@@ -183,18 +183,18 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     for (Loop = 1; Loop <= EMPDMat; ++Loop) {
 
         // Call Input Get routine to retrieve material data
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Loop,
-                                                                   MaterialNames,
-                                                                   MaterialNumAlpha,
-                                                                   MaterialProps,
-                                                                   MaterialNumProp,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 Loop,
+                                                                 MaterialNames,
+                                                                 MaterialNumAlpha,
+                                                                 MaterialProps,
+                                                                 MaterialNumProp,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         // Load the material derived type from the input data.
         MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), state.dataMaterial->Material);

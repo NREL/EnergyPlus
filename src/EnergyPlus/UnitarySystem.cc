@@ -357,8 +357,8 @@ namespace UnitarySystems {
     {
         std::string cCurrentModuleObject = "UnitarySystemPerformance:Multispeed";
 
-        auto const instances = state.dataInputProcessing->inputProcessor()->epJSON.find(cCurrentModuleObject);
-        if (instances == state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             errorsFound = true;
         } else {
             int designSpecNum = 0;
@@ -369,7 +369,7 @@ namespace UnitarySystems {
                 int TotalArgs = 0;
                 int NumAlphas = 0;
                 int NumNumbers = 0;
-                state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+                state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
                 int IOStatus = 0;
                 Array1D_string Alphas(NumAlphas);
                 Array1D<Real64> Numbers(NumNumbers, 0.0);
@@ -377,7 +377,7 @@ namespace UnitarySystems {
                 Array1D_bool lAlphaBlanks(NumAlphas, true);
                 Array1D_string cAlphaFields(NumAlphas);
                 Array1D_string cNumericFields(NumNumbers);
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            ++designSpecNum,
                                                                            Alphas,
@@ -6915,8 +6915,8 @@ namespace UnitarySystems {
         EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
         std::string cCurrentModuleObject = "CoilSystem:Cooling:DX";
-        auto const instances = state.dataInputProcessing->inputProcessor()->epJSON.find(cCurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
@@ -6928,7 +6928,7 @@ namespace UnitarySystems {
 
                 int sysNum = getUnitarySystemIndex(state, thisObjectName);
                 if (sysNum == -1) ++state.dataUnitarySystems->numUnitarySystems;
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(cCurrentModuleObject, instance.key());
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 // get CoilSystem:Cooling:DX object inputs
                 UnitarySysInputSpec original_input_specs;
@@ -7019,9 +7019,9 @@ namespace UnitarySystems {
     void UnitarySys::allocateUnitarySys(EnergyPlusData &state)
     {
         if (state.dataUnitarySystems->unitarySys.size() > 0) return;
-        int numUnitarySystems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem");
-        int numCoilSystems = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "CoilSystem:Cooling:DX");
-        int numCoilSystemsWater = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "CoilSystem:Cooling:Water");
+        int numUnitarySystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem");
+        int numCoilSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX");
+        int numCoilSystemsWater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water");
         int numAllSystemTypes = numUnitarySystems + numCoilSystems + numCoilSystemsWater;
         for (int sysCount = 0; sysCount < numAllSystemTypes; ++sysCount) {
             UnitarySys thisSys;
@@ -7035,8 +7035,8 @@ namespace UnitarySystems {
 
         std::string cCurrentModuleObject("CoilSystem:Cooling:Water");
         static const std::string routineName("getCoilWaterSystemInputData: ");
-        auto const instances = state.dataInputProcessing->inputProcessor()->epJSON.find(cCurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
@@ -7050,7 +7050,7 @@ namespace UnitarySystems {
                 if (sysNum == -1) {
                     ++state.dataUnitarySystems->numUnitarySystems;
                     auto const &thisObjName = instance.key();
-                    state.dataInputProcessing->inputProcessor()->markObjectAsUsed(cCurrentModuleObject, thisObjName);
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);
                 } else {
                     thisSys = state.dataUnitarySystems->unitarySys[sysNum];
                 }
@@ -7175,11 +7175,11 @@ namespace UnitarySystems {
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
 
-        auto const instances = state.dataInputProcessing->inputProcessor()->epJSON.find(cCurrentModuleObject);
-        if (instances == state.dataInputProcessing->inputProcessor()->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
             ShowSevereError(state, "getUnitarySystemInputData: did not find AirLoopHVAC:UnitarySystem object in input file. Check inputs");
             errorsFound = true;
-        } else if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+        } else if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
@@ -7193,7 +7193,7 @@ namespace UnitarySystems {
                 if (sysNum == -1) {
                     ++state.dataUnitarySystems->numUnitarySystems;
                     auto const &thisObjName = instance.key();
-                    state.dataInputProcessing->inputProcessor()->markObjectAsUsed(cCurrentModuleObject, thisObjName);
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);
                 } else {
                     thisSys = state.dataUnitarySystems->unitarySys[sysNum];
                 }

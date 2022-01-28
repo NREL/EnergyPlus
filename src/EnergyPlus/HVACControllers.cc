@@ -522,7 +522,7 @@ void GetControllerInput(EnergyPlusData &state)
     // be retrieved by name as they are needed.
 
     CurrentModuleObject = "Controller:WaterCoil";
-    NumSimpleControllers = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+    NumSimpleControllers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     NumControllers = NumSimpleControllers;
 
     // Allocate stats data structure for each air loop and controller if needed
@@ -545,7 +545,7 @@ void GetControllerInput(EnergyPlusData &state)
     RootFinders.allocate(NumControllers);
     CheckEquipName.dimension(NumControllers, true);
 
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNums);
     AlphArray.allocate(NumAlphas);
     cAlphaFields.allocate(NumAlphas);
     cNumericFields.allocate(NumNums);
@@ -556,7 +556,7 @@ void GetControllerInput(EnergyPlusData &state)
     // Now find and load all of the simple controllers.
     if (NumSimpleControllers > 0) {
         for (Num = 1; Num <= NumSimpleControllers; ++Num) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        Num,
                                                                        AlphArray,

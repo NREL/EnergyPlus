@@ -261,15 +261,15 @@ namespace RoomAirModelManager {
 
         // access input file and setup
         state.dataRoomAirMod->numTempDistContrldZones =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cUserDefinedControlObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cUserDefinedControlObject);
 
         state.dataRoomAirMod->NumConstantGradient =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cTempPatternConstGradientObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternConstGradientObject);
         state.dataRoomAirMod->NumTwoGradientInterp =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cTempPatternTwoGradientObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternTwoGradientObject);
         state.dataRoomAirMod->NumNonDimensionalHeight =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cTempPatternNDHeightObject);
-        state.dataRoomAirMod->NumSurfaceMapping = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cTempPatternSurfMapObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternNDHeightObject);
+        state.dataRoomAirMod->NumSurfaceMapping = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternSurfMapObject);
 
         state.dataRoomAirMod->NumAirTempPatterns = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp +
                                                    state.dataRoomAirMod->NumNonDimensionalHeight + state.dataRoomAirMod->NumSurfaceMapping;
@@ -290,7 +290,7 @@ namespace RoomAirModelManager {
 
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->numTempDistContrldZones; ++ObjNum) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ObjNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -387,7 +387,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternConstGradientObject;
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumConstantGradient; ++ObjNum) {
             thisPattern = ObjNum;
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ObjNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -412,7 +412,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternTwoGradientObject;
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumTwoGradientInterp; ++ObjNum) {
             thisPattern = state.dataRoomAirMod->NumConstantGradient + ObjNum;
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ObjNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -495,7 +495,7 @@ namespace RoomAirModelManager {
             thisPattern = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp + ObjNum;
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeight;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ObjNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -547,7 +547,7 @@ namespace RoomAirModelManager {
                           state.dataRoomAirMod->NumNonDimensionalHeight + ObjNum;
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTemp;
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ObjNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -679,7 +679,7 @@ namespace RoomAirModelManager {
         state.dataRoomAirMod->TotNumOfZoneAirNodes = 0;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "RoomAir:Node";
-        state.dataRoomAirMod->TotNumOfAirNodes = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRoomAirMod->TotNumOfAirNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataRoomAirMod->TotNumOfAirNodes <= 0) {
             // no air node object is found, terminate the program
@@ -695,7 +695,7 @@ namespace RoomAirModelManager {
         for (AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
 
             // get air node objects
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        AirNodeNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -881,7 +881,7 @@ namespace RoomAirModelManager {
         state.dataRoomAirMod->InfiltratFloorSplit = 0.0;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
-        NumOfMundtContrl = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumOfMundtContrl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumOfMundtContrl > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
             ShowContinueError(state, "There cannot be more " + cCurrentModuleObject + " objects than number of zones.");
@@ -896,7 +896,7 @@ namespace RoomAirModelManager {
         // this zone uses Mundt model so get Mundt Model Control
         // loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
         for (ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        ControlNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -955,7 +955,7 @@ namespace RoomAirModelManager {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         if (!state.dataRoomAirMod->UCSDModelUsed) return;
         cCurrentModuleObject = "RoomAirSettings:ThreeNodeDisplacementVentilation";
-        state.dataRoomAirMod->TotUCSDDV = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRoomAirMod->TotUCSDDV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataRoomAirMod->TotUCSDDV <= 0) return;
 
@@ -963,7 +963,7 @@ namespace RoomAirModelManager {
 
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDDV; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1039,7 +1039,7 @@ namespace RoomAirModelManager {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         if (!state.dataRoomAirMod->UCSDModelUsed) return;
         cCurrentModuleObject = "RoomAirSettings:CrossVentilation";
-        state.dataRoomAirMod->TotUCSDCV = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRoomAirMod->TotUCSDCV = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataRoomAirMod->TotUCSDCV <= 0) return;
 
@@ -1047,7 +1047,7 @@ namespace RoomAirModelManager {
 
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDCV; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1197,9 +1197,9 @@ namespace RoomAirModelManager {
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
-        state.dataRoomAirMod->TotUCSDUI = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRoomAirMod->TotUCSDUI = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionExterior";
-        state.dataRoomAirMod->TotUCSDUE = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRoomAirMod->TotUCSDUE = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataRoomAirMod->TotUCSDUI <= 0 && state.dataRoomAirMod->TotUCSDUE <= 0) return;
 
@@ -1209,7 +1209,7 @@ namespace RoomAirModelManager {
 
         cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDUI; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1280,7 +1280,7 @@ namespace RoomAirModelManager {
 
         cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionExterior";
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotUCSDUE; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1404,7 +1404,7 @@ namespace RoomAirModelManager {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "RoomAirSettings:AirflowNetwork";
         state.dataRoomAirMod->NumOfRoomAirflowNetControl =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRoomAirMod->NumOfRoomAirflowNetControl == 0) return;
         if (state.dataRoomAirMod->NumOfRoomAirflowNetControl > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
@@ -1417,7 +1417,7 @@ namespace RoomAirModelManager {
         }
 
         for (Loop = 1; Loop <= state.dataRoomAirMod->NumOfRoomAirflowNetControl; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1491,9 +1491,9 @@ namespace RoomAirModelManager {
         } // loop thru NumOfRoomAirflowNetControl
 
         cCurrentModuleObject = "RoomAir:Node:AirflowNetwork";
-        state.dataRoomAirMod->TotNumOfRoomAFNNodes = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRoomAirMod->TotNumOfRoomAFNNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= state.dataRoomAirMod->TotNumOfRoomAFNNodes; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1550,10 +1550,10 @@ namespace RoomAirModelManager {
         } // loop thru TotNumOfRoomAFNNodes
 
         cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList";
-        TotNumOfRAFNNodeSurfLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        TotNumOfRAFNNodeSurfLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= TotNumOfRAFNNodeSurfLists; ++Loop) {
             foundList = false;
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1629,10 +1629,10 @@ namespace RoomAirModelManager {
         } // loop thru TotNumOfRAFNNodeSurfLists
 
         cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:InternalGains";
-        TotNumOfRAFNNodeGainsLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        TotNumOfRAFNNodeGainsLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= TotNumOfRAFNNodeGainsLists; ++Loop) {
             foundList = false;
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1737,9 +1737,9 @@ namespace RoomAirModelManager {
 
         // Get data of HVAC equipment
         cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
-        TotNumOfRAFNNodeHVACLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        TotNumOfRAFNNodeHVACLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= TotNumOfRAFNNodeHVACLists; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1803,7 +1803,7 @@ namespace RoomAirModelManager {
                                 state.dataIPShortCut->cAlphaArgs(3 + (EquipLoop - 1) * 2);
 
                             // verify type and name and get pointer to device in HVAC equipment type and name structure array
-                            TotNumEquip = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ZoneHVACTerminalTypes(TypeNum));
+                            TotNumEquip = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ZoneHVACTerminalTypes(TypeNum));
                             if (TotNumEquip == 0) {
                                 ShowSevereError(state,
                                                 "GetRoomAirflowNetworkData: No such " +
@@ -3083,7 +3083,7 @@ namespace RoomAirModelManager {
 
         if (TypeNum == 0) return EquipFind;
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, EquipType, TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, EquipType, TotalArgs, NumAlphas, NumNumbers);
 
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -3103,7 +3103,7 @@ namespace RoomAirModelManager {
         }
 
         for (I = 1; I <= TotNumEquip; ++I) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state, EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status);
             if (UtilityRoutines::SameString(Alphas(1), EquipName)) {
                 EquipFind = true;
                 break;

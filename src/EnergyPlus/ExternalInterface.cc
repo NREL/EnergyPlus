@@ -166,11 +166,11 @@ void GetExternalInterfaceInput(EnergyPlusData &state)
     int Loop;       // Loop counter
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ExternalInterface";
-    state.dataExternalInterface->NumExternalInterfaces = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataExternalInterface->NumExternalInterfaces = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (Loop = 1; Loop <= state.dataExternalInterface->NumExternalInterfaces;
          ++Loop) { // This loop determines whether the external interface is for FMU or BCVTB
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Loop,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -240,7 +240,7 @@ void GetExternalInterfaceInput(EnergyPlusData &state)
         state.dataExternalInterface->haveExternalInterfaceFMUImport = true;
         DisplayString(state, "Instantiating FunctionalMockupUnitImport interface");
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
-        state.dataExternalInterface->NumFMUObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataExternalInterface->NumFMUObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         VerifyExternalInterfaceObject(state);
     } else if ((state.dataExternalInterface->NumExternalInterfacesFMUImport == 1) &&
                (state.dataExternalInterface->NumExternalInterfacesFMUExport != 0)) {
@@ -1060,7 +1060,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
         for (Loop = 1; Loop <= state.dataExternalInterface->NumFMUObjects; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1132,7 +1132,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // get the names of the input variables each state.dataExternalInterface->FMU(and the names of the
         // corresponding output variables in EnergyPlus --).
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:From:Variable";
-        NumFMUInputVariables = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // Determine the number of instances for each FMUs
         for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
             Name_NEW = "";
@@ -1142,7 +1142,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
             state.dataExternalInterface->FMU(i).Instance.allocate(NumFMUInputVariables);
             state.dataExternalInterface->checkInstanceName.allocate(NumFMUInputVariables);
             for (l = 1; l <= NumFMUInputVariables; ++l) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            l,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -1341,7 +1341,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable.allocate(NumFMUInputVariables);
                 k = 1;
                 for (l = 1; l <= NumFMUInputVariables; ++l) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                l,
                                                                                state.dataIPShortCut->cAlphaArgs,
@@ -1484,12 +1484,12 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // get the names of the output variables each fmu (and the names of the
         // corresponding input variables in EnergyPlus -- schedule).
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-        NumFMUInputVariables = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
             j = 1;
             for (k = 1; k <= NumFMUInputVariables; ++k) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            k,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -1514,7 +1514,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule.allocate(NumFMUInputVariables);
                 k = 1;
                 for (l = 1; l <= NumFMUInputVariables; ++l) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                l,
                                                                                state.dataIPShortCut->cAlphaArgs,
@@ -1597,12 +1597,12 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // get the names of the output variables each fmu (and the names of the
         // corresponding input variables in EnergyPlus -- variable).
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-        NumFMUInputVariables = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
             j = 1;
             for (k = 1; k <= NumFMUInputVariables; ++k) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            k,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -1627,7 +1627,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableVariable.allocate(NumFMUInputVariables);
                 k = 1;
                 for (l = 1; l <= NumFMUInputVariables; ++l) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                l,
                                                                                state.dataIPShortCut->cAlphaArgs,
@@ -1706,12 +1706,12 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // get the names of the output variables each fmu (and the names of the
         // corresponding input variables in EnergyPlus -- actuator).
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-        NumFMUInputVariables = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
             j = 1;
             for (k = 1; k <= NumFMUInputVariables; ++k) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            k,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -1736,7 +1736,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableActuator.allocate(NumFMUInputVariables);
                 k = 1;
                 for (l = 1; l <= NumFMUInputVariables; ++l) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                l,
                                                                                state.dataIPShortCut->cAlphaArgs,
@@ -2282,9 +2282,9 @@ void ValidateRunControl(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "SimulationControl";
-    int const NumRunControl = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    int const NumRunControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (NumRunControl > 0) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    1,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -2532,7 +2532,7 @@ void WarnIfExternalInterfaceObjectsAreUsed(EnergyPlusData &state, std::string co
     // This subroutine writes a warning if ExternalInterface objects are used in the
     // idf file, but the ExternalInterface link is not specified.
 
-    int const NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ObjectWord);
+    int const NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ObjectWord);
     if (NumObjects > 0) {
         ShowWarningError(state, "IDF file contains object \"" + ObjectWord + "\",");
         ShowContinueError(state, "but object \"ExternalInterface\" with appropriate key entry is not specified. Values will not be updated.");
@@ -2558,7 +2558,7 @@ void VerifyExternalInterfaceObject(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "ExternalInterface";
-    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                cCurrentModuleObject,
                                                                1,
                                                                state.dataIPShortCut->cAlphaArgs,

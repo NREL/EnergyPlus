@@ -208,7 +208,7 @@ namespace HeatBalanceManager {
             //  The surface octree holds live references to surfaces so it must be updated
             //   if in the future surfaces are altered after this point
             if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                                  // Octree can be active
-                if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
+                if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
                     state.dataHeatBalMgr->surfaceOctree.init(state.dataSurface->Surface);                                 // Set up surface octree
                 }
             }
@@ -410,9 +410,9 @@ namespace HeatBalanceManager {
 
         // Needs to account for Pipe:HeatTransfer/indoor, etc constructions.
         for (ONum = 1; ONum <= NumConstrObjects; ++ONum) {
-            NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, ConstrObjects(ONum));
+            NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ConstrObjects(ONum));
             for (Loop = 1; Loop <= NumObjects; ++Loop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            ConstrObjects(ONum),
                                                                            Loop,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -476,21 +476,21 @@ namespace HeatBalanceManager {
         bool ValidSimulation; // True is other objects appear to make this a valid simulation.
 
         ValidSimulation = false;
-        if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "SolarCollector:FlatPlate:Water") > 0) {
+        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SolarCollector:FlatPlate:Water") > 0) {
             ValidSimulation = true;
-        } else if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Generator:Photovoltaic") > 0) {
+        } else if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:Photovoltaic") > 0) {
             ValidSimulation = true;
-        } else if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Generator:InternalCombustionEngine") > 0) {
+        } else if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:InternalCombustionEngine") > 0) {
             ValidSimulation = true;
-        } else if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Generator:CombustionTurbine") > 0) {
+        } else if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:CombustionTurbine") > 0) {
             ValidSimulation = true;
-        } else if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Generator:FuelCell") > 0) {
+        } else if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:FuelCell") > 0) {
             ValidSimulation = true;
-        } else if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Generator:MicroCHP") > 0) {
+        } else if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:MicroCHP") > 0) {
             ValidSimulation = true;
-        } else if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Generator:MicroTurbine") > 0) {
+        } else if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:MicroTurbine") > 0) {
             ValidSimulation = true;
-        } else if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Generator:WindTurbine") > 0) {
+        } else if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Generator:WindTurbine") > 0) {
             ValidSimulation = true;
         }
 
@@ -520,15 +520,15 @@ namespace HeatBalanceManager {
         state.dataHeatBal->MaxSolidWinLayers = 7;
 
         // Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
-        if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:ComplexFenestrationState") > 0) {
+        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState") > 0) {
             state.dataHeatBal->MaxSolidWinLayers = max(state.dataHeatBal->MaxSolidWinLayers, 10);
         }
 
         // then process the rest of the relevant constructions
         std::string constructName("Construction:WindowEquivalentLayer");
-        int numConstructions(state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, constructName));
+        int numConstructions(state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, constructName));
         for (int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        constructName,
                                                                        constructionNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -601,10 +601,10 @@ namespace HeatBalanceManager {
         // Assign the values to the building data
 
         state.dataHeatBalMgr->CurrentModuleObject = "Building";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
 
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -789,9 +789,9 @@ namespace HeatBalanceManager {
         // Above should be validated...
 
         state.dataHeatBalMgr->CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -853,9 +853,9 @@ namespace HeatBalanceManager {
 
         // Get only the first (if more were input)
         state.dataHeatBalMgr->CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        "SurfaceConvectionAlgorithm:Outside",
                                                                        1,
                                                                        AlphaName,
@@ -909,9 +909,9 @@ namespace HeatBalanceManager {
         print(state.files.eio, Format_723, AlphaName(1));
 
         state.dataHeatBalMgr->CurrentModuleObject = "HeatBalanceAlgorithm";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -1006,10 +1006,10 @@ namespace HeatBalanceManager {
         print(state.files.eio, Format_724);
 
         state.dataHeatBalMgr->CurrentModuleObject = "Compliance:Building";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
 
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -1027,9 +1027,9 @@ namespace HeatBalanceManager {
 
         // A new object is added by L. Gu, 12/09
         state.dataHeatBalMgr->CurrentModuleObject = "ZoneAirHeatBalanceAlgorithm";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -1081,9 +1081,9 @@ namespace HeatBalanceManager {
 
         // A new object is added by L. Gu, 06/10
         state.dataHeatBalMgr->CurrentModuleObject = "ZoneAirContaminantBalance";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -1193,11 +1193,11 @@ namespace HeatBalanceManager {
 
         // A new object is added by B. Nigusse, 02/14
         state.dataHeatBalMgr->CurrentModuleObject = "ZoneAirMassFlowConservation";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -1297,9 +1297,9 @@ namespace HeatBalanceManager {
 
         // A new object is added by L. Gu, 4/17
         state.dataHeatBalMgr->CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphaName,
@@ -1377,10 +1377,10 @@ namespace HeatBalanceManager {
         constexpr const char *Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
         state.dataHeatBalMgr->CurrentModuleObject = "Site:HeightVariation";
-        NumObjects = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
 
         if (NumObjects == 1) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        1,
                                                                        AlphArray,
@@ -1497,35 +1497,35 @@ namespace HeatBalanceManager {
 
         static constexpr std::string_view RoutineName("GetMaterialData: ");
 
-        RegMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Material");
-        RegRMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Material:NoMass");
-        IRTMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Material:InfraredTransparent");
-        AirMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Material:AirGap");
-        state.dataHeatBal->W5GlsMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Glazing");
+        RegMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material");
+        RegRMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material:NoMass");
+        IRTMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material:InfraredTransparent");
+        AirMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material:AirGap");
+        state.dataHeatBal->W5GlsMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing");
         state.dataHeatBal->W5GlsMatAlt =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Glazing:RefractionExtinctionMethod");
-        state.dataHeatBal->W5GasMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Gas");
-        state.dataHeatBal->W5GasMatMixture = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:GasMixture");
-        state.dataHeatBal->TotShades = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Shade");
-        state.dataHeatBal->TotComplexShades = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
-        state.dataHeatBal->TotComplexGaps = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Gap");
-        state.dataHeatBal->TotScreens = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Screen");
-        state.dataHeatBal->TotBlinds = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Blind");
-        EcoRoofMat = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Material:RoofVegetation");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:RefractionExtinctionMethod");
+        state.dataHeatBal->W5GasMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gas");
+        state.dataHeatBal->W5GasMatMixture = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:GasMixture");
+        state.dataHeatBal->TotShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade");
+        state.dataHeatBal->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
+        state.dataHeatBal->TotComplexGaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap");
+        state.dataHeatBal->TotScreens = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen");
+        state.dataHeatBal->TotBlinds = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind");
+        EcoRoofMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Material:RoofVegetation");
         state.dataHeatBal->TotSimpleWindow =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:SimpleGlazingSystem");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:SimpleGlazingSystem");
 
         state.dataHeatBal->W5GlsMatEQL =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Glazing:EquivalentLayer");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:EquivalentLayer");
         state.dataHeatBal->TotShadesEQL =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Shade:EquivalentLayer");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade:EquivalentLayer");
         state.dataHeatBal->TotDrapesEQL =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Drape:EquivalentLayer");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Drape:EquivalentLayer");
         state.dataHeatBal->TotBlindsEQL =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Blind:EquivalentLayer");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind:EquivalentLayer");
         state.dataHeatBal->TotScreensEQL =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
-        state.dataHeatBal->W5GapMatEQL = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
+        state.dataHeatBal->W5GapMatEQL = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
 
         state.dataHeatBal->TotMaterials =
             RegMat + RegRMat + AirMat + state.dataHeatBal->W5GlsMat + state.dataHeatBal->W5GlsMatAlt + state.dataHeatBal->W5GasMat +
@@ -1534,8 +1534,8 @@ namespace HeatBalanceManager {
             state.dataHeatBal->W5GlsMatEQL + state.dataHeatBal->TotShadesEQL + state.dataHeatBal->TotDrapesEQL + state.dataHeatBal->TotBlindsEQL +
             state.dataHeatBal->TotScreensEQL + state.dataHeatBal->W5GapMatEQL;
 
-        TotFfactorConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
-        TotCfactorConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
+        TotFfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
+        TotCfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
             state.dataHeatBal->NoFfactorConstructionsUsed = false;
@@ -1558,7 +1558,7 @@ namespace HeatBalanceManager {
         MaterNum = 0;
 
         // Regular Materials
-        auto &ip = state.dataInputProcessing->inputProcessor();
+        auto &ip = state.dataInputProcessing->inputProcessor;
 
         state.dataHeatBalMgr->CurrentModuleObject = "Material";
         auto const instances = ip->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
@@ -1639,7 +1639,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= RegRMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -1715,7 +1715,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= AirMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -1754,7 +1754,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= IRTMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -1801,7 +1801,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -2269,7 +2269,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMatAlt; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -2363,7 +2363,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -2456,7 +2456,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GasMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -2575,7 +2575,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GapMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -2703,7 +2703,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->W5GasMatMixture; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -2787,7 +2787,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotShades; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -2873,7 +2873,7 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -2964,7 +2964,7 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -3051,7 +3051,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotScreens; ++Loop) {
 
             // Call GetObjectItem routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -3246,7 +3246,7 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call GetObjectItem routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -3395,7 +3395,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotBlinds; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -3690,7 +3690,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotBlindsEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -3871,7 +3871,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= EcoRoofMat; ++Loop) {
             // Call Input Get Routine to retrieve material data from ecoroof
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        MaterialNames,
@@ -3965,14 +3965,14 @@ namespace HeatBalanceManager {
         // get the number of WindowMaterial:GlazingGroup:Thermochromic objects in the idf file
         state.dataHeatBalMgr->CurrentModuleObject = "WindowMaterial:GlazingGroup:Thermochromic";
         state.dataHeatBal->TotTCGlazings =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (state.dataHeatBal->TotTCGlazings >= 1) {
             // Read TC glazings
             state.dataHeatBal->TCGlazings.allocate(state.dataHeatBal->TotTCGlazings);
 
             for (Loop = 1; Loop <= state.dataHeatBal->TotTCGlazings; ++Loop) {
                 // Get each TCGlazings from the input processor
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            state.dataHeatBalMgr->CurrentModuleObject,
                                                                            Loop,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -4048,7 +4048,7 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "WindowMaterial:SimpleGlazingSystem";
         for (Loop = 1; Loop <= state.dataHeatBal->TotSimpleWindow; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -4215,7 +4215,7 @@ namespace HeatBalanceManager {
 
         state.dataHeatBalMgr->CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
         state.dataHeatBal->TotSpectralData =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         state.dataHeatBal->SpectralData.allocate(state.dataHeatBal->TotSpectralData);
         if (state.dataHeatBal->TotSpectralData > 0) SpecDataProps.allocate(Construction::MaxSpectralDataElements * 4);
 
@@ -4225,7 +4225,7 @@ namespace HeatBalanceManager {
             // Name is followed by up to 450 sets of normal-incidence measured values of
             // [wavelength (microns), transmittance, front reflectance, back reflectance] for
             // wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        SpecDataNames,
@@ -4453,11 +4453,11 @@ namespace HeatBalanceManager {
         Array1D_string WConstructNames;
 
         // Get the Total number of Constructions from the input
-        TotRegConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction");
-        int totAirBoundaryConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:AirBoundary");
+        TotRegConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction");
+        int totAirBoundaryConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
 
-        TotFfactorConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
-        TotCfactorConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
+        TotFfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
+        TotCfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
             state.dataHeatBal->NoFfactorConstructionsUsed = false;
@@ -4468,10 +4468,10 @@ namespace HeatBalanceManager {
         }
 
         state.dataBSDFWindow->TotComplexFenStates =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
-        TotWindow5Constructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:WindowDataFile");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
+        TotWindow5Constructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:WindowDataFile");
         state.dataWindowEquivLayer->TotWinEquivLayerConstructs =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:WindowEquivalentLayer");
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:WindowEquivalentLayer");
 
         WConstructNames.allocate(TotWindow5Constructs);
 
@@ -4513,7 +4513,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotRegConstructs; ++Loop) { // Loop through all constructs in the input...
 
             // Get the object names for each construction from the input processor
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        ConstructAlphas,
@@ -4645,8 +4645,8 @@ namespace HeatBalanceManager {
 
         state.dataHeatBalMgr->CurrentModuleObject = "ConstructionProperty:InternalHeatSource";
 
-        auto instances = state.dataInputProcessing->inputProcessor()->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+        auto instances = state.dataInputProcessing->inputProcessor->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             state.dataHeatBal->AnyInternalHeatSourceInInput = true;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -4676,7 +4676,7 @@ namespace HeatBalanceManager {
                     continue;
                 }
 
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
 
                 auto &thisConstruct(state.dataConstruction->Construct(construction_index));
 
@@ -4725,7 +4725,7 @@ namespace HeatBalanceManager {
              ++Loop) { // Loop through all constructs with Window EquivalentLayer ...
 
             // Get the object names for each construction from the input processor
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        ConstructAlphas,
@@ -4815,7 +4815,7 @@ namespace HeatBalanceManager {
                                                                // from the Window5 data file and can be referenced only by windows
 
             // Get the object names for each construction from the input processor
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        ConstructAlphas,
@@ -4957,7 +4957,7 @@ namespace HeatBalanceManager {
         int GroupNum;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Zone";
-        state.dataGlobal->NumOfZones = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataGlobal->NumOfZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
@@ -4967,7 +4967,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
 
             state.dataIPShortCut->rNumericArgs = 0.0; // Zero out just in case
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -5012,7 +5012,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             // Check to see if "nominally" controlled -- Zone Name appears in Zone Equip Configuration
             // relies on zone name being the "name" of the Zone Controlled Equip Configuration
-            if (state.dataInputProcessing->inputProcessor()->getObjectItemNum(
+            if (state.dataInputProcessing->inputProcessor->getObjectItemNum(
                     state, "ZoneHVAC:EquipmentConnections", "zone_name", state.dataHeatBal->Zone(Loop).Name) > 0) {
                 state.dataHeatBal->Zone(Loop).isNominalControlled = true;
             } else {
@@ -5022,14 +5022,14 @@ namespace HeatBalanceManager {
 
         // Get ZONE LIST objects
         cCurrentModuleObject = "ZoneList";
-        state.dataHeatBal->NumOfZoneLists = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumOfZoneLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataHeatBal->NumOfZoneLists > 0) {
 
             state.dataHeatBal->ZoneList.allocate(state.dataHeatBal->NumOfZoneLists);
 
             for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            ListNum,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -5093,13 +5093,13 @@ namespace HeatBalanceManager {
 
         // Get ZONE GROUP objects
         cCurrentModuleObject = "ZoneGroup";
-        state.dataHeatBal->NumOfZoneGroups = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumOfZoneGroups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataHeatBal->NumOfZoneGroups > 0) {
             state.dataHeatBal->ZoneGroup.allocate(state.dataHeatBal->NumOfZoneGroups);
 
             for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            GroupNum,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -5208,7 +5208,7 @@ namespace HeatBalanceManager {
         //-----------------------------------------------------------------------
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
-        TotZoneEnv = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        TotZoneEnv = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotZoneEnv > 0) {
             // Check if IDD definition is correct
@@ -5219,7 +5219,7 @@ namespace HeatBalanceManager {
             }
 
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            Loop,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -5457,7 +5457,7 @@ namespace HeatBalanceManager {
     {
         constexpr const char *RoutineName("GetSpaceData: ");
         std::string cCurrentModuleObject = "Space";
-        auto &ip = state.dataInputProcessing->inputProcessor();
+        auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
         if (instances != ip->epJSON.end()) {
             auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
@@ -6610,7 +6610,7 @@ namespace HeatBalanceManager {
 
         state.dataHeatBalMgr->CurrentModuleObject = "WindowProperty:FrameAndDivider";
         state.dataHeatBal->TotFrameDivider =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         state.dataSurface->FrameDivider.allocate(state.dataHeatBal->TotFrameDivider);
         if (state.dataHeatBal->TotFrameDivider == 0) return;
 
@@ -6619,7 +6619,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotFrameDivider; ++Loop) {
 
             // Call Input Get routine to retrieve frame/divider data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        FrameDividerNames,
@@ -7799,8 +7799,8 @@ namespace HeatBalanceManager {
         Rcon = state.dataMaterial->Material(iFCConcreteLayer).Resistance;
 
         // Count number of constructions defined with Ffactor or Cfactor method
-        TotFfactorConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
-        TotCfactorConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
+        TotFfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
+        TotCfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
             state.dataHeatBal->NoFfactorConstructionsUsed = false;
@@ -7817,7 +7817,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotFfactorConstructs; ++Loop) {
 
             // Get the object names for each construction from the input processor
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        ConstructAlphas,
@@ -7916,7 +7916,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotCfactorConstructs; ++Loop) { // Loop through all constructs defined with Ffactor method
 
             // Get the object names for each construction from the input processor
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        state.dataHeatBalMgr->CurrentModuleObject,
                                                                        Loop,
                                                                        ConstructAlphas,
@@ -8012,10 +8012,10 @@ namespace HeatBalanceManager {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Construction:AirBoundary";
         static constexpr std::string_view RoutineName = "CreateAirBoundaryConstructions";
-        int numAirBoundaryConstructs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        int numAirBoundaryConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numAirBoundaryConstructs > 0) {
-            auto const instances = state.dataInputProcessing->inputProcessor()->epJSON.find(cCurrentModuleObject);
-            if (instances == state.dataInputProcessing->inputProcessor()->epJSON.end()) {
+            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+            if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
                 // Cannot imagine how you would have numAirBoundaryConstructs > 0 and yet the instances is empty
                 // this would indicate a major problem in the input processor, not a problem here
                 // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
@@ -8027,7 +8027,7 @@ namespace HeatBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto thisObjectName = instance.key();
-                state.dataInputProcessing->inputProcessor()->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(
                         state, state.dataHeatBalMgr->UniqueConstructNames, thisObjectName, cCurrentModuleObject, "Name", errorsFound)) {
@@ -8051,7 +8051,7 @@ namespace HeatBalanceManager {
                     if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
                         thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour").get<Real64>();
                     } else {
-                        if (!state.dataInputProcessing->inputProcessor()->getDefaultValue(
+                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
                                 state, cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
                             errorsFound = true;
                         }
@@ -8113,7 +8113,7 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "SurfaceProperty:SolarIncidentInside";
 
         // Check if IDD definition is correct
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric);
         if (NumAlpha != 4) {
             ShowSevereError(
                 state,
@@ -8121,14 +8121,14 @@ namespace HeatBalanceManager {
             ErrorsFound = true;
         }
 
-        state.dataSurface->TotSurfIncSolSSG = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotSurfIncSolSSG = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotSurfIncSolSSG > 0) {
             if (!allocated(state.dataSurface->SurfIncSolSSG)) {
                 state.dataSurface->SurfIncSolSSG.allocate(state.dataSurface->TotSurfIncSolSSG);
             }
 
             for (Loop = 1; Loop <= state.dataSurface->TotSurfIncSolSSG; ++Loop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            Loop,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -8210,14 +8210,14 @@ namespace HeatBalanceManager {
         //-----------------------------------------------------------------------
         cCurrentModuleObject = "ComplexFenestrationProperty:SolarAbsorbedLayers";
 
-        state.dataSurface->TotFenLayAbsSSG = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotFenLayAbsSSG = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotFenLayAbsSSG > 0) {
             if (!allocated(state.dataSurface->FenLayAbsSSG)) {
                 state.dataSurface->FenLayAbsSSG.allocate(state.dataSurface->TotFenLayAbsSSG);
             }
 
             for (Loop = 1; Loop <= state.dataSurface->TotFenLayAbsSSG; ++Loop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            Loop,
                                                                            state.dataIPShortCut->cAlphaArgs,
@@ -8746,10 +8746,10 @@ namespace HeatBalanceManager {
         // Reading WindowGap:SupportPillar
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "WindowGap:SupportPillar";
-        state.dataHeatBal->W7SupportPillars = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->W7SupportPillars = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->SupportPillar.allocate(state.dataHeatBal->W7SupportPillars);
         for (Loop = 1; Loop <= state.dataHeatBal->W7SupportPillars; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -8798,10 +8798,10 @@ namespace HeatBalanceManager {
 
         // Reading WindowGap:DeflectionState
         cCurrentModuleObject = "WindowGap:DeflectionState";
-        state.dataHeatBal->W7DeflectionStates = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->W7DeflectionStates = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->DeflectionState.allocate(state.dataHeatBal->W7DeflectionStates);
         for (Loop = 1; Loop <= state.dataHeatBal->W7DeflectionStates; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -8838,10 +8838,10 @@ namespace HeatBalanceManager {
         // Reading WindowMaterial:Gap
 
         cCurrentModuleObject = "WindowMaterial:Gap";
-        state.dataHeatBal->W7MaterialGaps = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->W7MaterialGaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // ALLOCATE(DeflectionState(W7DeflectionStates))
         for (Loop = 1; Loop <= state.dataHeatBal->W7MaterialGaps; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -8913,14 +8913,14 @@ namespace HeatBalanceManager {
 
         // Reading WindowMaterial:ComplexShade
         cCurrentModuleObject = "WindowMaterial:ComplexShade";
-        state.dataHeatBal->TotComplexShades = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotComplexShades = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataHeatBal->TotComplexShades > 0) {
             state.dataHeatBal->ComplexShade.allocate(state.dataHeatBal->TotComplexShades); // Allocate the array Size to the number of complex shades
         }
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotComplexShades; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -9255,11 +9255,11 @@ namespace HeatBalanceManager {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Reading WindowThermalModel:Params
         cCurrentModuleObject = "WindowThermalModel:Params";
-        state.dataBSDFWindow->TotThermalModels = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataBSDFWindow->TotThermalModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->WindowThermalModel.allocate(state.dataBSDFWindow->TotThermalModels);
 
         for (Loop = 1; Loop <= state.dataBSDFWindow->TotThermalModels; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -9389,9 +9389,9 @@ namespace HeatBalanceManager {
 
         // Reading Construction:ComplexFenestrationState
         locCurrentModuleObject = "Construction:ComplexFenestrationState";
-        state.dataBSDFWindow->TotComplexFenStates = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, locCurrentModuleObject);
+        state.dataBSDFWindow->TotComplexFenStates = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, locCurrentModuleObject);
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         if (!allocated(locAlphaFieldNames)) locAlphaFieldNames.allocate(NumAlphas);
         if (!allocated(locNumericFieldNames)) locNumericFieldNames.allocate(NumNumbers);
         if (!allocated(locNumericFieldBlanks)) locNumericFieldBlanks.allocate(NumNumbers);
@@ -9401,7 +9401,7 @@ namespace HeatBalanceManager {
 
         state.dataBSDFWindow->FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
         for (Loop = 1; Loop <= state.dataBSDFWindow->TotComplexFenStates; ++Loop) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        locCurrentModuleObject,
                                                                        Loop,
                                                                        locAlphaArgs,

@@ -221,11 +221,11 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     // Initializations and allocations
     cCurrentModuleObject = "Pipe:Indoor";
-    NumOfPipeHTInt = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    NumOfPipeHTInt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     cCurrentModuleObject = "Pipe:Outdoor";
-    NumOfPipeHTExt = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    NumOfPipeHTExt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     cCurrentModuleObject = "Pipe:Underground";
-    NumOfPipeHTUG = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    NumOfPipeHTUG = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataPipeHT->nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
     // allocate data structures
@@ -239,7 +239,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     for (PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem) {
         ++Item;
         // get the object name
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    PipeItem,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -394,7 +394,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     for (PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem) {
         ++Item;
         // get the object name
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    PipeItem,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -531,7 +531,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         ++Item;
         // get the object name
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    PipeItem,
                                                                    state.dataIPShortCut->cAlphaArgs,

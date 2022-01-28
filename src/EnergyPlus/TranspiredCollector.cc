@@ -279,7 +279,7 @@ namespace TranspiredCollector {
         std::string CurrentModuleMultiObject; // for ease in renaming.
 
         CurrentModuleObject = "SolarCollector:UnglazedTranspired";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
 
         if (MaxNumNumbers != 11) {
             ShowSevereError(state,
@@ -292,16 +292,16 @@ namespace TranspiredCollector {
         Numbers = 0.0;
         Alphas = "";
 
-        state.dataTranspiredCollector->NumUTSC = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataTranspiredCollector->NumUTSC = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
-        NumUTSCSplitter = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, CurrentModuleMultiObject);
+        NumUTSCSplitter = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleMultiObject);
 
         state.dataTranspiredCollector->UTSC.allocate(state.dataTranspiredCollector->NumUTSC);
         state.dataTranspiredCollector->CheckEquipName.dimension(state.dataTranspiredCollector->NumUTSC, true);
         SplitterNameOK.dimension(NumUTSCSplitter, false);
 
         for (Item = 1; Item <= state.dataTranspiredCollector->NumUTSC; ++Item) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        CurrentModuleObject,
                                                                        Item,
                                                                        Alphas,
@@ -319,7 +319,7 @@ namespace TranspiredCollector {
 
             // now check for multisystem
             if (NumUTSCSplitter > 0) {
-                state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+                state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
                     state, CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit);
 
                 if (MaxNumNumbersSplit != 0) {
@@ -333,7 +333,7 @@ namespace TranspiredCollector {
                 NumbersSplit = 0.0;
                 AlphasSplit = "";
                 for (ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(
+                    state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit);
                     if (!(UtilityRoutines::SameString(AlphasSplit(1), Alphas(1)))) continue;
                     SplitterNameOK(ItemSplit) = true;

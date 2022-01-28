@@ -1370,7 +1370,7 @@ void ScanForReports(EnergyPlusData &state,
 
         cCurrentModuleObject = "Output:Surfaces:List";
 
-        NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         enum
         {
@@ -1396,7 +1396,7 @@ void ScanForReports(EnergyPlusData &state,
                                                {"DECAYCURVESFROMCOMPONENTLOADSSUMMARY", DECAYCURVESFROMCOMPONENTLOADSSUMMARY}};
 
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        RepNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1453,9 +1453,9 @@ void ScanForReports(EnergyPlusData &state,
 
         cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-        NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        RepNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1499,7 +1499,7 @@ void ScanForReports(EnergyPlusData &state,
             }
         }
 
-        RepNum = state.dataInputProcessing->inputProcessor()->getNumSectionsFound("Report Variable Dictionary");
+        RepNum = state.dataInputProcessing->inputProcessor->getNumSectionsFound("Report Variable Dictionary");
         if (RepNum > 0) {
             state.dataGeneral->VarDict = true;
             VarDictOption1 = "REGULAR";
@@ -1508,9 +1508,9 @@ void ScanForReports(EnergyPlusData &state,
 
         cCurrentModuleObject = "Output:VariableDictionary";
 
-        NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        RepNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1528,9 +1528,9 @@ void ScanForReports(EnergyPlusData &state,
         }
 
         cCurrentModuleObject = "Output:Constructions";
-        NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        RepNum,
                                                                        state.dataIPShortCut->cAlphaArgs,
@@ -1557,9 +1557,9 @@ void ScanForReports(EnergyPlusData &state,
         }
 
         cCurrentModuleObject = "Output:EnergyManagementSystem";
-        NumReports = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        RepNum,
                                                                        state.dataIPShortCut->cAlphaArgs,

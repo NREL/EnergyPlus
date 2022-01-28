@@ -265,11 +265,11 @@ void GetPumpInput(EnergyPlusData &state)
     ErrorsFound = false;
 
     // GET NUMBER OF ALL EQUIPMENT TYPES
-    NumVarSpeedPumps = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cPump_VarSpeed);
-    NumConstSpeedPumps = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cPump_ConSpeed);
-    NumCondensatePumps = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cPump_Cond);
-    NumPumpBankSimpleVar = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cPumpBank_VarSpeed);
-    NumPumpBankSimpleConst = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cPumpBank_ConSpeed);
+    NumVarSpeedPumps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPump_VarSpeed);
+    NumConstSpeedPumps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPump_ConSpeed);
+    NumCondensatePumps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPump_Cond);
+    NumPumpBankSimpleVar = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPumpBank_VarSpeed);
+    NumPumpBankSimpleConst = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cPumpBank_ConSpeed);
     state.dataPumps->NumPumps = NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar + NumPumpBankSimpleConst;
 
     if (state.dataPumps->NumPumps <= 0) {
@@ -285,18 +285,18 @@ void GetPumpInput(EnergyPlusData &state)
 
     for (NumVarPump = 1; NumVarPump <= NumVarSpeedPumps; ++NumVarPump) {
         PumpNum = NumVarPump;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   NumVarPump,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 NumVarPump,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPumps->PumpUniqueNames,
@@ -536,18 +536,18 @@ void GetPumpInput(EnergyPlusData &state)
 
     for (NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump) {
         PumpNum = NumVarSpeedPumps + NumConstPump;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   NumConstPump,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 NumConstPump,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPumps->PumpUniqueNames,
@@ -709,18 +709,18 @@ void GetPumpInput(EnergyPlusData &state)
     cCurrentModuleObject = cPump_Cond;
     for (NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump) {
         PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   NumCondPump,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 NumCondPump,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPumps->PumpUniqueNames,
@@ -850,18 +850,18 @@ void GetPumpInput(EnergyPlusData &state)
     cCurrentModuleObject = cPumpBank_VarSpeed;
     for (NumVarPumpBankSimple = 1; NumVarPumpBankSimple <= NumPumpBankSimpleVar; ++NumVarPumpBankSimple) {
         PumpNum = NumVarPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   NumVarPumpBankSimple,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 NumVarPumpBankSimple,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPumps->PumpUniqueNames,
@@ -1010,18 +1010,18 @@ void GetPumpInput(EnergyPlusData &state)
     cCurrentModuleObject = cPumpBank_ConSpeed;
     for (NumConstPumpBankSimple = 1; NumConstPumpBankSimple <= NumPumpBankSimpleConst; ++NumConstPumpBankSimple) {
         PumpNum = NumConstPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   NumConstPumpBankSimple,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 NumConstPumpBankSimple,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPumps->PumpUniqueNames,

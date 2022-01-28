@@ -561,7 +561,7 @@ void GetWrapperInput(EnergyPlusData &state)
 
     state.dataIPShortCut->cCurrentModuleObject = "CentralHeatPumpSystem";
     state.dataPlantCentralGSHP->numWrappers =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (state.dataPlantCentralGSHP->numWrappers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -571,7 +571,7 @@ void GetWrapperInput(EnergyPlusData &state)
 
     // Load arrays with electric EIR chiller data
     for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                    WrapperNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -1184,7 +1184,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
 
     state.dataIPShortCut->cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
     state.dataPlantCentralGSHP->numChillerHeaters =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (state.dataPlantCentralGSHP->numChillerHeaters <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
@@ -1197,7 +1197,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
 
     // Load arrays with electric EIR chiller data
     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= state.dataPlantCentralGSHP->numChillerHeaters; ++ChillerHeaterNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                    ChillerHeaterNum,
                                                                    state.dataIPShortCut->cAlphaArgs,

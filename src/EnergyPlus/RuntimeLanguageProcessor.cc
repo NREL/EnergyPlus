@@ -2657,71 +2657,71 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         state.dataRuntimeLangProcessor->GetInput = false;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
         MaxNumAlphas = NumAlphas;
         cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:Program";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:Variable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         //  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
-        //  CALL state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
+        //  CALL state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
         //  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
         //  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
         cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -2747,7 +2747,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 // name of the module object, and add an offset for the variable number
                 // This is done in the following IF/THEN section.
                 if (GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables) {
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                GlobalNum,
                                                                                cAlphaArgs,
@@ -2762,7 +2762,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables &&
                            GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:Variable";
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables,
                                                                                cAlphaArgs,
@@ -2778,7 +2778,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                            GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                cCurrentModuleObject,
                                                                                GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables -
                                                                                    state.dataRuntimeLang->NumExternalInterfaceGlobalVariables,
@@ -2798,7 +2798,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-                    state.dataInputProcessing->inputProcessor()->getObjectItem(
+                    state.dataInputProcessing->inputProcessor->getObjectItem(
                         state,
                         cCurrentModuleObject,
                         GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables - state.dataRuntimeLang->NumExternalInterfaceGlobalVariables -
@@ -2854,11 +2854,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         }
 
         cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-        state.dataRuntimeLang->NumEMSCurveIndices = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSCurveIndices = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumEMSCurveIndices > 0) {
             state.dataRuntimeLangProcessor->CurveIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSCurveIndices, 0);
             for (loop = 1; loop <= state.dataRuntimeLang->NumEMSCurveIndices; ++loop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            loop,
                                                                            cAlphaArgs,
@@ -2915,11 +2915,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
         cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
         state.dataRuntimeLang->NumEMSConstructionIndices =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumEMSConstructionIndices > 0) {
             state.dataRuntimeLangProcessor->ConstructionIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSConstructionIndices, 0);
             for (loop = 1; loop <= state.dataRuntimeLang->NumEMSConstructionIndices; ++loop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            loop,
                                                                            cAlphaArgs,
@@ -2984,7 +2984,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         if (state.dataRuntimeLang->NumErlPrograms > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:Program";
             for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlPrograms; ++StackNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            StackNum,
                                                                            cAlphaArgs,
@@ -3020,7 +3020,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         if (state.dataRuntimeLang->NumErlSubroutines > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
             for (StackNum = state.dataRuntimeLang->NumErlPrograms + 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            StackNum - state.dataRuntimeLang->NumErlPrograms,
                                                                            cAlphaArgs,
@@ -3053,11 +3053,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         }
 
         cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-        state.dataRuntimeLang->NumErlTrendVariables = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumErlTrendVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumErlTrendVariables > 0) {
             state.dataRuntimeLang->TrendVariable.allocate(state.dataRuntimeLang->NumErlTrendVariables);
             for (TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            TrendNum,
                                                                            cAlphaArgs,
@@ -3153,7 +3153,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         if (state.dataRuntimeLang->NumEMSOutputVariables > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
             for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables; ++RuntimeReportVarNum) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            RuntimeReportVarNum,
                                                                            cAlphaArgs,
@@ -3334,7 +3334,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
             cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
             for (loop = 1; loop <= state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++loop) {
                 RuntimeReportVarNum = state.dataRuntimeLang->NumEMSOutputVariables + loop;
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            loop,
                                                                            cAlphaArgs,

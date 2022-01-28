@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     // Need to initialize enclosure num
     state->dataHeatBal->space(1).solarEnclosureNum = 1;
 
-    int numObjs = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
@@ -248,7 +248,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
-    int numObjs = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
@@ -1611,7 +1611,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
-    int numObjs = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
@@ -1727,7 +1727,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
 
-    int numObjs = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, "Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);

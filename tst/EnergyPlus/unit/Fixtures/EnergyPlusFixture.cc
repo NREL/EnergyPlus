@@ -74,7 +74,7 @@ namespace EnergyPlus {
 
 // void EnergyPlusFixture::SetUpTestCase()
 //{
-//    state->dataInputProcessing->inputProcessor() = InputProcessor::factory();
+//    state->dataInputProcessing->inputProcessor = InputProcessor::factory();
 //}
 
 void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
@@ -292,7 +292,7 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
-    auto &inputProcessor = state->dataInputProcessing->inputProcessor();
+    auto &inputProcessor = state->dataInputProcessing->inputProcessor;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema(), success);
 
     // Add common objects that will trigger a warning if not present

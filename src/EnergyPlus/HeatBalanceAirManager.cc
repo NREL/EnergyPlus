@@ -491,39 +491,39 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                         "Environment");
 
     cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = NumAlpha;
     maxNumber = NumNumber;
     cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
     cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
     cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
     cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
     cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
     cCurrentModuleObject = "ZoneMixing";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
     cCurrentModuleObject = "ZoneCrossMixing";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
     cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
     maxNumber = max(NumNumber, maxNumber);
 
@@ -535,12 +535,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     lNumericFieldBlanks.dimension(maxNumber, true);
 
     cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-    state.dataHeatBal->TotZoneAirBalance = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->TotZoneAirBalance = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataHeatBal->ZoneAirBalance.allocate(state.dataHeatBal->TotZoneAirBalance);
 
     for (Loop = 1; Loop <= state.dataHeatBal->TotZoneAirBalance; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Loop,
                                                                    cAlphaArgs,
@@ -738,20 +738,20 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-    state.dataHeatBal->TotShermGrimsInfiltration = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->TotShermGrimsInfiltration = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-    state.dataHeatBal->TotAIM2Infiltration = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->TotAIM2Infiltration = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-    state.dataHeatBal->NumInfiltrationStatements = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->NumInfiltrationStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataHeatBal->InfiltrationObjects.allocate(state.dataHeatBal->NumInfiltrationStatements);
 
     state.dataHeatBal->TotDesignFlowInfiltration = 0;
     errFlag = false;
     for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Item,
                                                                    cAlphaArgs,
@@ -806,7 +806,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
         for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Item,
                                                                        cAlphaArgs,
@@ -1048,7 +1048,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
     InfiltCount = state.dataHeatBal->TotDesignFlowInfiltration;
     for (Loop = 1; Loop <= state.dataHeatBal->TotShermGrimsInfiltration; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Loop,
                                                                    cAlphaArgs,
@@ -1116,7 +1116,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
     for (Loop = 1; Loop <= state.dataHeatBal->TotAIM2Infiltration; ++Loop) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Loop,
                                                                    cAlphaArgs,
@@ -1391,10 +1391,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     RepVarSet = true;
 
     cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-    state.dataHeatBal->NumVentilationStatements = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->NumVentilationStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-    state.dataHeatBal->TotWindAndStackVentilation = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->TotWindAndStackVentilation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     state.dataHeatBal->VentilationObjects.allocate(state.dataHeatBal->NumVentilationStatements);
 
@@ -1402,7 +1402,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     errFlag = false;
     cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
     for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Item,
                                                                    cAlphaArgs,
@@ -1456,7 +1456,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
         for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Item,
                                                                        cAlphaArgs,
@@ -2153,7 +2153,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     VentiCount = state.dataHeatBal->TotDesignFlowVentilation;
     for (Loop = 1; Loop <= state.dataHeatBal->TotWindAndStackVentilation; ++Loop) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Loop,
                                                                    cAlphaArgs,
@@ -2629,12 +2629,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     RepVarSet = true;
 
     cCurrentModuleObject = "ZoneMixing";
-    state.dataHeatBal->TotMixing = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->TotMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataHeatBal->Mixing.allocate(state.dataHeatBal->TotMixing);
 
     for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    Loop,
                                                                    cAlphaArgs,
@@ -3133,7 +3133,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
     }
     cCurrentModuleObject = "ZoneCrossMixing";
-    int inputCrossMixing = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    int inputCrossMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataHeatBal->TotCrossMixing = inputCrossMixing + state.dataHeatBal->NumAirBoundaryMixing;
     state.dataHeatBal->CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
 
@@ -3150,7 +3150,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             state.dataHeatBal->CrossMixing(Loop).DesignLevel = state.dataHeatBal->AirBoundaryMixingVol[airBoundaryIndex];
             state.dataHeatBal->CrossMixing(Loop).FromZone = zone2;
         } else {
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        cAlphaArgs,
@@ -3648,7 +3648,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-    state.dataHeatBal->TotRefDoorMixing = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataHeatBal->TotRefDoorMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (state.dataHeatBal->TotRefDoorMixing > 0) {
         state.dataHeatBal->RefDoorMixing.allocate(state.dataGlobal->NumOfZones);
         for (auto &e : state.dataHeatBal->RefDoorMixing)
@@ -3656,7 +3656,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotRefDoorMixing; ++Loop) {
 
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Loop,
                                                                        cAlphaArgs,
@@ -4401,14 +4401,14 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "RoomAirModelType";
-    NumOfAirModels = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+    NumOfAirModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (NumOfAirModels > state.dataGlobal->NumOfZones) {
         ShowSevereError(state, "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones.");
         ErrorsFound = true;
     }
 
     for (AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum) {
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    AirModelNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -4522,7 +4522,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 } else if (SELECT_CASE_var == "AIRFLOWNETWORK") {
                     state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
                     state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    if (state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
+                    if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
                         ShowSevereError(state,
                                         "In " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " +
                                             state.dataIPShortCut->cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");

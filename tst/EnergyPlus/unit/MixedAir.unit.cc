@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     int IOStat(0);
     auto const CurrentModuleObject = CurrentModuleObjects(static_cast<std::size_t>(CMO::OAController));
 
-    state->dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         *state, CurrentModuleObjects(static_cast<std::size_t>(CMO::OAController)), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
@@ -155,12 +155,12 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_bool lNumericBlanks(NumNums, true);
 
-    state->dataMixedAir->NumOAControllers = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, CurrentModuleObject);
+    state->dataMixedAir->NumOAControllers = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);
 
     ControllerNum = 1;
 
-    state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
                                                                 CurrentModuleObject,
                                                                 ControllerNum,
                                                                 AlphArray,
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, state->dataMixedAir->OAController(1).OANode));
 
     ControllerNum = 2;
-    state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
                                                                 CurrentModuleObject,
                                                                 ControllerNum,
                                                                 AlphArray,
@@ -1494,7 +1494,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     int IOStat(0);
     auto const CurrentModuleObject = CurrentModuleObjects(static_cast<std::size_t>(CMO::OAController));
 
-    state->dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         *state, CurrentModuleObjects(static_cast<std::size_t>(CMO::OAController)), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
@@ -1504,7 +1504,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_bool lNumericBlanks(NumNums, true);
 
-    state->dataMixedAir->NumOAControllers = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, CurrentModuleObject);
+    state->dataMixedAir->NumOAControllers = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);
 
     ControllerNum = 1;
@@ -1536,7 +1536,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     state->dataZoneCtrls->HumidityControlZone(1).ActualZoneNum = 1;
     state->dataZoneCtrls->NumHumidityControlZones = 1;
 
-    state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
                                                                 CurrentModuleObject,
                                                                 ControllerNum,
                                                                 AlphArray,
@@ -1628,7 +1628,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     int IOStat(0);
     auto const CurrentModuleObject = CurrentModuleObjects(static_cast<std::size_t>(CMO::OAController));
 
-    state->dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         *state, CurrentModuleObjects(static_cast<std::size_t>(CMO::OAController)), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
@@ -1638,7 +1638,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_bool lNumericBlanks(NumNums, true);
 
-    state->dataMixedAir->NumOAControllers = state->dataInputProcessing->inputProcessor()->getNumObjectsFound(*state, CurrentModuleObject);
+    state->dataMixedAir->NumOAControllers = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
     state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);
 
     ControllerNum = 1;
@@ -1671,7 +1671,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     state->dataZoneCtrls->HumidityControlZone(1).ActualZoneNum = 1;
     state->dataZoneCtrls->NumHumidityControlZones = 1;
 
-    state->dataInputProcessing->inputProcessor()->getObjectItem(*state,
+    state->dataInputProcessing->inputProcessor->getObjectItem(*state,
                                                                 CurrentModuleObject,
                                                                 ControllerNum,
                                                                 AlphArray,

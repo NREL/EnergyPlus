@@ -200,7 +200,7 @@ namespace SurfaceGroundHeatExchanger {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Initializations and allocations
         cCurrentModuleObject = "GroundHeatExchanger:Surface";
-        int NumOfSurfaceGHEs = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumOfSurfaceGHEs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // allocate data structures
         if (allocated(state.dataSurfaceGroundHeatExchangers->SurfaceGHE)) state.dataSurfaceGroundHeatExchangers->SurfaceGHE.deallocate();
 
@@ -213,7 +213,7 @@ namespace SurfaceGroundHeatExchanger {
         for (Item = 1; Item <= NumOfSurfaceGHEs; ++Item) {
 
             // get the input data
-            state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                        cCurrentModuleObject,
                                                                        Item,
                                                                        state.dataIPShortCut->cAlphaArgs,

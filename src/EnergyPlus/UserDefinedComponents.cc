@@ -542,7 +542,7 @@ namespace UserDefinedComponents {
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
@@ -552,12 +552,12 @@ namespace UserDefinedComponents {
         // need to make sure GetEMSInput has run...
 
         state.dataUserDefinedComponents->NumUserPlantComps =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserPlantComps > 0) {
             state.dataUserDefinedComponents->UserPlantComp.allocate(state.dataUserDefinedComponents->NumUserPlantComps);
             state.dataUserDefinedComponents->CheckUserPlantCompName.dimension(state.dataUserDefinedComponents->NumUserPlantComps, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserPlantComps; ++CompLoop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            CompLoop,
                                                                            cAlphaArgs,
@@ -989,20 +989,20 @@ namespace UserDefinedComponents {
         }
 
         cCurrentModuleObject = "Coil:UserDefined";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
             state.dataUserDefinedComponents->UserCoil.allocate(state.dataUserDefinedComponents->NumUserCoils);
             state.dataUserDefinedComponents->CheckUserCoilName.dimension(state.dataUserDefinedComponents->NumUserCoils, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserCoils; ++CompLoop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            CompLoop,
                                                                            cAlphaArgs,
@@ -1388,7 +1388,7 @@ namespace UserDefinedComponents {
         }
 
         cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
@@ -1396,12 +1396,12 @@ namespace UserDefinedComponents {
         rNumericArgs.dimension(NumNums, 0.0);
 
         state.dataUserDefinedComponents->NumUserZoneAir =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserZoneAir > 0) {
             state.dataUserDefinedComponents->UserZoneAirHVAC.allocate(state.dataUserDefinedComponents->NumUserZoneAir);
             state.dataUserDefinedComponents->CheckUserZoneAirName.dimension(state.dataUserDefinedComponents->NumUserZoneAir, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserZoneAir; ++CompLoop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            CompLoop,
                                                                            cAlphaArgs,
@@ -1836,7 +1836,7 @@ namespace UserDefinedComponents {
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
 
-        state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
@@ -1844,12 +1844,12 @@ namespace UserDefinedComponents {
         rNumericArgs.dimension(NumNums, 0.0);
 
         state.dataUserDefinedComponents->NumUserAirTerminals =
-            state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserAirTerminals > 0) {
             state.dataUserDefinedComponents->UserAirTerminal.allocate(state.dataUserDefinedComponents->NumUserAirTerminals);
             state.dataUserDefinedComponents->CheckUserAirTerminal.dimension(state.dataUserDefinedComponents->NumUserAirTerminals, true);
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserAirTerminals; ++CompLoop) {
-                state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                            cCurrentModuleObject,
                                                                            CompLoop,
                                                                            cAlphaArgs,

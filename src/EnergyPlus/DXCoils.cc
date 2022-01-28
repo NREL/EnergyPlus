@@ -807,23 +807,23 @@ void GetDXCoils(EnergyPlusData &state)
     Real64 CurveInput;  // index used for testing PLF curve output
 
     // find number of each type of DX coil and calculate the total number
-    state.dataDXCoils->NumDoe2DXCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Cooling:DX:SingleSpeed");
-    state.dataDXCoils->NumDXHeatingCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:DX:SingleSpeed");
-    state.dataDXCoils->NumDXMulSpeedCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Cooling:DX:TwoSpeed");
+    state.dataDXCoils->NumDoe2DXCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:SingleSpeed");
+    state.dataDXCoils->NumDXHeatingCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:SingleSpeed");
+    state.dataDXCoils->NumDXMulSpeedCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoSpeed");
     state.dataDXCoils->NumDXMulModeCoils =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
     state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped));
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped));
     state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped));
-    state.dataDXCoils->NumDXMulSpeedCoolCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Cooling:DX:MultiSpeed");
-    state.dataDXCoils->NumDXMulSpeedHeatCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Coil:Heating:DX:MultiSpeed");
-    state.dataDXCoils->NumVRFCoolingCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Cooling));
-    state.dataDXCoils->NumVRFHeatingCoils = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Heating));
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped));
+    state.dataDXCoils->NumDXMulSpeedCoolCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:MultiSpeed");
+    state.dataDXCoils->NumDXMulSpeedHeatCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:MultiSpeed");
+    state.dataDXCoils->NumVRFCoolingCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Cooling));
+    state.dataDXCoils->NumVRFHeatingCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Heating));
     state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
     state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils =
-        state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
 
     state.dataDXCoils->NumDXCoils = state.dataDXCoils->NumDoe2DXCoils + state.dataDXCoils->NumDXHeatingCoils + state.dataDXCoils->NumDXMulSpeedCoils +
                                     state.dataDXCoils->NumDXMulModeCoils + state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils +
@@ -833,48 +833,48 @@ void GetDXCoils(EnergyPlusData &state)
                                     state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils;
 
     // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = NumNumbers;
     MaxAlphas = NumAlphas;
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Heating:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Cooling:DX:TwoSpeed", TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:TwoSpeed", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped), TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped), TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "Coil:Heating:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Cooling), TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Cooling), TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Heating), TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Heating), TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling), TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating), TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
-    state.dataInputProcessing->inputProcessor()->getObjectDefMaxArgs(state, "CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers);
     MaxNumbers = max(MaxNumbers, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -928,7 +928,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = "Coil:Cooling:DX:SingleSpeed";
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDoe2DXCoils; ++DXCoilIndex) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -1443,7 +1443,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXMulModeCoils; ++DXCoilIndex) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -1573,10 +1573,10 @@ void GetDXCoils(EnergyPlusData &state)
                     }
                     state.dataDXCoils->DXCoil(DXCoilNum).CoilPerformanceName(PerfModeNum) = PerfObjectName;
                     // Get for CoilPerformance object
-                    PerfObjectNum = state.dataInputProcessing->inputProcessor()->getObjectItemNum(state, PerfObjectType, PerfObjectName);
+                    PerfObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, PerfObjectType, PerfObjectName);
                     if (PerfObjectNum > 0) {
 
-                        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+                        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                                    PerfObjectType,
                                                                                    PerfObjectNum,
                                                                                    Alphas2,
@@ -2026,7 +2026,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -2514,7 +2514,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -3129,7 +3129,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped);
     for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils; ++DXHPWaterHeaterCoilNum) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXHPWaterHeaterCoilNum,
                                                                    Alphas,
@@ -3656,7 +3656,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped);
     for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils; ++DXHPWaterHeaterCoilNum) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXHPWaterHeaterCoilNum,
                                                                    Alphas,
@@ -4065,7 +4065,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -4653,7 +4653,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         ++DXCoilNum;
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -5174,7 +5174,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_Cooling);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingCoils; ++DXCoilIndex) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -5327,7 +5327,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_Heating);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingCoils; ++DXCoilIndex) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -5471,7 +5471,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils; ++DXCoilIndex) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,
@@ -5595,7 +5595,7 @@ void GetDXCoils(EnergyPlusData &state)
     CurrentModuleObject = cAllCoilTypes(CoilVRF_FluidTCtrl_Heating);
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils; ++DXCoilIndex) {
 
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    CurrentModuleObject,
                                                                    DXCoilIndex,
                                                                    Alphas,

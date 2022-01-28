@@ -157,8 +157,8 @@ void GetPipeInput(EnergyPlusData &state)
     bool ErrorsFound(false);
 
     // GET NUMBER OF ALL EQUIPMENT TYPES
-    int NumWaterPipes = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Pipe:Adiabatic");
-    int NumSteamPipes = state.dataInputProcessing->inputProcessor()->getNumObjectsFound(state, "Pipe:Adiabatic:Steam");
+    int NumWaterPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Pipe:Adiabatic");
+    int NumSteamPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Pipe:Adiabatic:Steam");
     int const NumLocalPipes = NumWaterPipes + NumSteamPipes;
     state.dataPipes->LocalPipe.allocate(NumLocalPipes);
     state.dataPipes->LocalPipeUniqueNames.reserve(static_cast<unsigned>(NumLocalPipes));
@@ -166,7 +166,7 @@ void GetPipeInput(EnergyPlusData &state)
     cCurrentModuleObject = "Pipe:Adiabatic";
     for (int PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {
         ++PipeNum;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    PipeWaterNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
@@ -210,7 +210,7 @@ void GetPipeInput(EnergyPlusData &state)
 
     for (int PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum) {
         ++PipeNum;
-        state.dataInputProcessing->inputProcessor()->getObjectItem(state,
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                    cCurrentModuleObject,
                                                                    PipeSteamNum,
                                                                    state.dataIPShortCut->cAlphaArgs,
