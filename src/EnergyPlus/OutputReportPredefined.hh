@@ -1131,6 +1131,17 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchCoolingSETUnmetDuration = 0;
     int pdchCoolingSETUnmetTime = 0;
 
+    int pdstHourOfSafetyColdEvent = 0;
+    int pdchColdHourOfSafety = 0;
+    int pdchColdSafetyEndTime = 0;
+    int pdchColdSafeTempExceedHour = 0;
+    int pdchColdSafeTempExceedOccHour = 0;
+    int pdstHourOfSafetyHeatEvent = 0;
+    int pdchHeatHourOfSafety = 0;
+    int pdchHeatSafetyEndTime = 0;
+    int pdchHeatSafeTempExceedHour = 0;
+    int pdchHeatSafeTempExceedOccHour = 0;
+
     int pdrCO2Resilience = 0;
     int pdstCO2Hours = 0;
     int pdchCO2HourSafe = 0;
@@ -2035,6 +2046,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchCoolingSETOccuHours = 0;
         this->pdchCoolingSETUnmetDuration = 0;
         this->pdchCoolingSETUnmetTime = 0;
+        this->pdstHourOfSafetyColdEvent = 0;
+        this->pdchColdHourOfSafety = 0;
+        this->pdchColdSafetyEndTime = 0;
+        this->pdchColdSafeTempExceedHour = 0;
+        this->pdchColdSafeTempExceedOccHour = 0;
+        this->pdstHourOfSafetyHeatEvent = 0;
+        this->pdchHeatHourOfSafety = 0;
+        this->pdchHeatSafetyEndTime = 0;
+        this->pdchHeatSafeTempExceedHour = 0;
+        this->pdchHeatSafeTempExceedOccHour = 0;
         this->pdrCO2Resilience = 0;
         this->pdstCO2Hours = 0;
         this->pdchCO2HourSafe = 0;

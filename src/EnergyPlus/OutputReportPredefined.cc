@@ -1255,6 +1255,18 @@ namespace OutputReportPredefined {
         s->pdchCoolingSETUnmetDuration = newPreDefColumn(state, s->pdstCoolingSETHours, "Longest SET > 30°C Duration [hr]");
         s->pdchCoolingSETUnmetTime = newPreDefColumn(state, s->pdstCoolingSETHours, "Start Time of the Longest SET > 30°C Duration");
 
+        s->pdstHourOfSafetyColdEvent = newPreDefSubTable(state, s->pdrThermalResilience, "Hours of Safety for Cold Events");
+        s->pdchColdHourOfSafety = newPreDefColumn(state, s->pdstHourOfSafetyColdEvent, "Hours of Safety [h]");
+        s->pdchColdSafetyEndTime = newPreDefColumn(state, s->pdstHourOfSafetyColdEvent, "End Time of the Safety Duration");
+        s->pdchColdSafeTempExceedHour = newPreDefColumn(state, s->pdstHourOfSafetyColdEvent, "Safe Temperature Exceedance Hours [h]");
+        s->pdchColdSafeTempExceedOccHour = newPreDefColumn(state, s->pdstHourOfSafetyColdEvent, "Safe Temperature Exceedance OccupantHours [h]");
+
+        s->pdstHourOfSafetyHeatEvent = newPreDefSubTable(state, s->pdrThermalResilience, "Hours of Safety for Heat Events");
+        s->pdchHeatHourOfSafety = newPreDefColumn(state, s->pdstHourOfSafetyHeatEvent, "Hours of Safety [h]");
+        s->pdchHeatSafetyEndTime = newPreDefColumn(state, s->pdstHourOfSafetyHeatEvent, "End Time of the Safety Duration");
+        s->pdchHeatSafeTempExceedHour = newPreDefColumn(state, s->pdstHourOfSafetyHeatEvent, "Safe Temperature Exceedance Hours [h]");
+        s->pdchHeatSafeTempExceedOccHour = newPreDefColumn(state, s->pdstHourOfSafetyHeatEvent, "Safe Temperature Exceedance OccupantHours [h]");
+
         s->pdrCO2Resilience = newPreDefReport(state, "CO2ResilienceSummary", "CO2R", "Annual CO2 Resilience Summary");
 
         s->pdstCO2Hours = newPreDefSubTable(state, s->pdrCO2Resilience, "CO2 Level Hours");
