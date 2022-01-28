@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SystemReports.hh>
 
@@ -470,62 +471,6 @@ namespace DataZoneEquipment {
         }
     };
 
-    // 2022-01-28: May move this definition to ExhaustAirSystemManager.cc
-    struct ExhaustAir
-    {
-        // Members
-        std::string Name;
-        // int NumOfComponents;
-        // int OutletNodeNum;
-
-        // 2022-01-20: Exhaust system does not need to be specified this way, so the following lines
-        // should be replaced by some new variables, which might be simpler to handle. 
-        // Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
-        // Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
-        // Array1D_string ComponentName;
-        // Array1D_int ComponentIndex;
-
-        int AvailScheduleNum;
-        std::string ZoneMixerName;
-        int ZoneMixerIndex;
-        int CentralFanTypeNum;
-        std::string CentralFanName; // 2022-01: adding this seems to make the sim call easier
-        int CentralFanIndex;
-
-        // Default Constructor
-        ExhaustAir() : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanName(""), CentralFanIndex(0)
-        {
-        }
-    };
-
-    // 2022-01-28: May move this definition to ExhaustAirSystemManager.cc as well
-    struct ZoneExhaustControl
-    {
-        std::string Name;
-        // int NumOfComponents; // not sure if this is necessary
-
-        int AvailScheduleNum;
-        int InletNodeNum;
-        int OutletNodeNum;
-
-        Real64 DesignExhaustFlowRate;
-        int FlowControlTypeNum; // for now define 0 = Scheduled; 1 = Follow-supply
-        int ExhaustFlowFractionScheduleNum;
-        int SupplyNodeOrNodelistNum;
-        int MinZoneTempLimitScheduleNum;
-        int MinExhFlowFracScheduleNum;
-        int BalancedExhFracScheduleNum;
-
-        // default constructor
-        // Question: why the constructor skipped the first element std::string Name?
-        ZoneExhaustControl()
-            : AvailScheduleNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlTypeNum(0),
-              ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0), MinExhFlowFracScheduleNum(0),
-              BalancedExhFracScheduleNum(0)
-        {
-        }
-    };
-
     void GetZoneEquipmentData(EnergyPlusData &state);
 
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
@@ -584,8 +529,8 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
     Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
-    Array1D<DataZoneEquipment::ExhaustAir> ExhaustAirSystem;
-    Array1D<DataZoneEquipment::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
+    Array1D<ExhaustAirSystemManager::ExhaustAir> ExhaustAirSystem;
+    Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
 
     void clear_state() override
     {
