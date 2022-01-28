@@ -53,6 +53,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -494,7 +495,11 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.AvailScheduleNum = availSchNum;
 
                 // 2022-01-28: Also need an extra zone name field here: 
-                /* // Change in IDD as well */
+                /* zone_name */
+                std::string zoneName =
+                    ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+                thisExhCtrl.ZoneName = zoneName;
+                int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
 
                 // These two nodes are required inputs:
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
