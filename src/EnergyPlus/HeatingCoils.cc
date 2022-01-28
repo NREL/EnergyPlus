@@ -2813,6 +2813,8 @@ namespace HeatingCoils {
                         thisCoolingCoil.reclaimHeat.AvailCapacity * Effic - thisCoolingCoil.reclaimHeat.WaterHeatingDesuperheaterReclaimedHeatTotal;
                 }
                 break;
+            default:
+                assert(false);
             }
 
         } else {
