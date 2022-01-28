@@ -12388,6 +12388,49 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
     }
 }
 
+void WriteHourOfSafetyTable(EnergyPlusData &state,
+                            int const columnNum,
+                            std::vector<int> const &columnHead,
+                            Array1D<std::vector<Real64>> const &ZoneBins,
+                            int const dateColIdx)
+{
+    auto &Zone(state.dataHeatBal->Zone);
+
+    std::vector<Real64> columnMax(columnNum, 0);
+    std::vector<Real64> columnMin(columnNum, 0);
+    std::vector<Real64> columnSum(columnNum, 0);
+    for (int j = 0; j < columnNum; j++) {
+        columnMin[j] = ZoneBins(1)[j];
+    }
+    for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
+        for (int j = 0; j < columnNum; j++) {
+            if (j == dateColIdx) {
+                std::string startDateTime = DateToString(int(ZoneBins(i)[dateColIdx]));
+                PreDefTableEntry(state, columnHead[dateColIdx], Zone(i).Name, startDateTime);
+            } else {
+                Real64 curValue = ZoneBins(i)[j];
+                if (curValue > columnMax[j]) columnMax[j] = curValue;
+                if (curValue < columnMin[j]) columnMin[j] = curValue;
+                columnSum[j] += curValue;
+                PreDefTableEntry(state, columnHead[j], Zone(i).Name, RealToStr(curValue, 2));
+            }
+        }
+    }
+    for (int j = 0; j < columnNum; j++) {
+        if (j == dateColIdx) {
+            PreDefTableEntry(state, columnHead[j], "Min", "-");
+            PreDefTableEntry(state, columnHead[j], "Max", "-");
+            PreDefTableEntry(state, columnHead[j], "Average", "-");
+            PreDefTableEntry(state, columnHead[j], "Sum", "-");
+        } else {
+            PreDefTableEntry(state, columnHead[j], "Min", RealToStr(columnMin[j], 2));
+            PreDefTableEntry(state, columnHead[j], "Max", RealToStr(columnMax[j], 2));
+            PreDefTableEntry(state, columnHead[j], "Average", RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2));
+            PreDefTableEntry(state, columnHead[j], "Sum", RealToStr(columnSum[j], 2));
+        }
+    }
+}
+
 void WriteSETHoursTable(EnergyPlusData &state, int const columnNum, std::vector<int> const &columnHead, Array1D<std::vector<Real64>> const &ZoneBins)
 {
     auto &Zone(state.dataHeatBal->Zone);
@@ -12492,6 +12535,18 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                           state.dataOutRptPredefined->pdchCoolingSETUnmetTime};
             WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHighSETHours);
         }
+
+        columnNum = 4;
+        columnHead = {state.dataOutRptPredefined->pdchColdHourOfSafety,
+                      state.dataOutRptPredefined->pdchColdSafetyEndTime,
+                      state.dataOutRptPredefined->pdchColdSafeTempExceedHour,
+                      state.dataOutRptPredefined->pdchColdSafeTempExceedOccHour};
+        WriteHourOfSafetyTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins, 1);
+        columnHead = {state.dataOutRptPredefined->pdchHeatHourOfSafety,
+                      state.dataOutRptPredefined->pdchHeatSafetyEndTime,
+                      state.dataOutRptPredefined->pdchHeatSafeTempExceedHour,
+                      state.dataOutRptPredefined->pdchHeatSafeTempExceedOccHour};
+        WriteHourOfSafetyTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins, 1);
     }
 }
 

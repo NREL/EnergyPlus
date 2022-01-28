@@ -5535,9 +5535,11 @@ void CalcThermalResilience(EnergyPlusData &state)
 void ReportThermalResilience(EnergyPlusData &state)
 {
 
-    int HINoBins = 5;      // Heat Index range - number of bins
-    int HumidexNoBins = 5; // Humidex range - number of bins
-    int SETNoBins = 4;     // SET report column numbers
+    int HINoBins = 5;               // Heat Index range - number of bins
+    int HumidexNoBins = 5;          // Humidex range - number of bins
+    int SETNoBins = 4;              // SET report column numbers
+    int ColdHourOfSafetyNoBins = 4; // Cold Stress Hour of Safety column numbers
+    int HeatHourOfSafetyNoBins = 4; // Heat Stress Hour of Safety column numbers
 
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
@@ -5551,6 +5553,8 @@ void ReportThermalResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum).assign(HINoBins, 0.0);
             state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
             state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
+            state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum).assign(ColdHourOfSafetyNoBins, 0.0);
+            state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum).assign(HeatHourOfSafetyNoBins, 0.0);
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
                 state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum).assign(SETNoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum).assign(SETNoBins, 0.0);
@@ -5565,6 +5569,9 @@ void ReportThermalResilience(EnergyPlusData &state)
 
     // Count hours only during weather simulation periods
     if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
+        // use default value if there are no user inputs
+        Real64 ColdTempThresh = 15.56;
+        Real64 HeatTempThresh = 30.0;
         // Trace current time step Zone Pierce SET; NaN if no occupant or SET not calculated
         // Record last time step SET to trace SET unmet duration;
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
@@ -5581,6 +5588,8 @@ void ReportThermalResilience(EnergyPlusData &state)
             } else {
                 state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum) = -1;
             }
+            ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
+            HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 HI = state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum);
@@ -5619,6 +5628,55 @@ void ReportThermalResilience(EnergyPlusData &state)
             } else {
                 state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum)[4] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum)[4] += NumOcc * state.dataGlobal->TimeStepZone;
+            }
+
+            Real64 Temperature = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            bool &CrossedColdThresh = state.dataHeatBalFanSys->CrossedColdThresh(ZoneNum);
+            if (Temperature > ColdTempThresh) {
+                if (!CrossedColdThresh) {
+                    // compute the number of hours before threshold is reached
+                    state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
+                }
+                // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+            } else {
+                // first time crossing threshold
+                if (!CrossedColdThresh) {
+                    // compute the time when the zone crosses the threshold temperature
+                    int encodedMonDayHrMin;
+                    General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                               state.dataEnvrn->Month,
+                                               state.dataEnvrn->DayOfMonth,
+                                               state.dataGlobal->HourOfDay,
+                                               state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                    state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[1] = encodedMonDayHrMin;
+                    CrossedColdThresh = true;
+                }
+            }
+            
+            bool &CrossedHeatThresh = state.dataHeatBalFanSys->CrossedHeatThresh(ZoneNum);
+            if (Temperature < HeatTempThresh) {
+                if (!CrossedHeatThresh) {
+                    // compute the number of hours before threshold is reached
+                    state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
+                }
+                // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+            } else {
+                // first time crossing threshold
+                if (!CrossedHeatThresh) {
+                    // compute the time when the zone crosses the threshold temperature
+                    int encodedMonDayHrMin;
+                    General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                               state.dataEnvrn->Month,
+                                               state.dataEnvrn->DayOfMonth,
+                                               state.dataGlobal->HourOfDay,
+                                               state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                    state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[1] = encodedMonDayHrMin;
+                    CrossedHeatThresh = true;
+                }
             }
 
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
