@@ -833,6 +833,8 @@ namespace DataHeatBalance {
         Real64 TimeNotMetCEN15251CatI;
         Real64 TimeNotMetCEN15251CatII;
         Real64 TimeNotMetCEN15251CatIII;
+        Real64 ColdStressTempThresh; // Cold Stress Temperature Threshold, default to 15.56 [C]
+        Real64 HeatStressTempThresh; // Heat Stress Temperature Threshold, default to 30 [C]
 
         // Default Constructor
         PeopleData()
@@ -844,7 +846,7 @@ namespace DataHeatBalance {
               CO2RateFactor(0.0), NumOcc(0.0), TemperatureInZone(0.0), RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0),
               SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0),
               LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0), TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0),
-              TimeNotMetCEN15251CatII(0.0), TimeNotMetCEN15251CatIII(0.0)
+              TimeNotMetCEN15251CatII(0.0), TimeNotMetCEN15251CatIII(0.0), ColdStressTempThresh(15.56), HeatStressTempThresh(30.0)
         {
         }
     };
