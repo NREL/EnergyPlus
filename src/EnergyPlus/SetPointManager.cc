@@ -453,8 +453,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-    state.dataSetPointManager->NumIdealCondEntSetPtMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
-        state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset:Ideal'
+    state.dataSetPointManager->NumIdealCondEntSetPtMgrs =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset:Ideal'
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
@@ -528,17 +528,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSchSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -636,17 +636,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumDualSchSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->DualSchSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -738,17 +738,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumOutAirSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -857,17 +857,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZRhSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -976,17 +976,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZHtSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1094,17 +1094,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1212,17 +1212,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1316,17 +1316,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1422,17 +1422,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:MixedAir";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMixedAirSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1571,17 +1571,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumOAPretreatSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1754,17 +1754,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:Warmest";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1857,17 +1857,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:Coldest";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumColdestSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1961,17 +1961,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2079,17 +2079,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2150,17 +2150,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2239,17 +2239,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2329,17 +2329,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2419,17 +2419,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2510,17 +2510,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2597,17 +2597,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2686,17 +2686,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumFollowOATempSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2799,17 +2799,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumFollowSysNodeTempSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2925,17 +2925,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumGroundTempSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -3105,17 +3105,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumCondEntSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -3209,17 +3209,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumIdealCondEntSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -3293,17 +3293,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -3404,17 +3404,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -3517,17 +3517,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // get the object inputs
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->ReturnWaterResetChWSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -3614,17 +3614,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // get the object inputs
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SetPtMgrNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SetPtMgrNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -8988,8 +8988,7 @@ void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state)
     std::string cCurrentModuleObject;
 
     cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-    state.dataSetPointManager->NumIdealCondEntSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataSetPointManager->NumIdealCondEntSetPtMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataSetPointManager->NumIdealCondEntSetPtMgrs > 0) {
         state.dataGlobal->AnyIdealCondEntSetPointInModel = true;

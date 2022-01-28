@@ -183,16 +183,16 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
 
         int NumAlphas = 0, NumNums = 0, IOStat = 0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   thisIndex,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   _,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 thisIndex,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 _,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames);
 
         if (EnergySourceNum > 1) {
             GlobalNames::VerifyUniqueInterObjectName(state,

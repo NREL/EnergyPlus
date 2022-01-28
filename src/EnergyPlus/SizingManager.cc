@@ -2341,17 +2341,17 @@ void GetOARequirements(EnergyPlusData &state)
         for (int OAIndex = 1; OAIndex <= numOARequirements; ++OAIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       OAIndex,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     OAIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataSize->OARequirements(OAIndex).Name = Alphas(1);
@@ -2654,17 +2654,17 @@ void GetZoneAirDistribution(EnergyPlusData &state)
         for (ZADIndex = 1; ZADIndex <= state.dataSize->NumZoneAirDistribution; ++ZADIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       ZADIndex,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     ZADIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataSize->ZoneAirDistribution(ZADIndex).Name = Alphas(1);
@@ -2768,17 +2768,17 @@ void GetSizingParams(EnergyPlusData &state)
 
     if (NumSizParams == 1) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   1,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 1,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         if (state.dataIPShortCut->lNumericFieldBlanks(1) || state.dataIPShortCut->rNumericArgs(1) < 0.0) {
             state.dataSize->GlobalHeatSizingFactor = 1.0;
         } else {
@@ -2819,17 +2819,17 @@ void GetSizingParams(EnergyPlusData &state)
         state.dataSize->SizingFileColSep = CharComma; // comma
     } else if (Temp == 1) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   1,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 1,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         if (state.dataIPShortCut->cAlphaArgs(1) == "COMMA") {
             state.dataSize->SizingFileColSep = CharComma; // comma
             state.dataIPShortCut->cAlphaArgs(1) = "Comma";
@@ -2923,17 +2923,17 @@ void GetZoneSizingInput(EnergyPlusData &state)
     errFlag = false;
     for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Item,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 Item,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         SizingZoneObjects(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -2982,17 +2982,17 @@ void GetZoneSizingInput(EnergyPlusData &state)
         for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             for (Item1 = 1; Item1 <= SizingZoneObjects(Item).NumOfZones; ++Item1) {
                 ++ZoneSizIndex;
@@ -3546,17 +3546,17 @@ void GetZoneAndZoneListNames(
 
     for (Item = 1; Item <= NumZones; ++Item) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Item,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 Item,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         // validation, but no error
         Found = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), ZoneNames, Item - 1);
         if (Found == 0) {
@@ -3572,17 +3572,17 @@ void GetZoneAndZoneListNames(
 
     for (Item = 1; Item <= NumZoneLists; ++Item) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Item,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 Item,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         // validation, but no error
         Found = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), ZoneListNames, Item - 1);
         if (Found == 0) {
@@ -3685,17 +3685,17 @@ void GetSystemSizingInput(EnergyPlusData &state)
 
     for (SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   SysSizIndex,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 SysSizIndex,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum), cCurrentModuleObject, ErrorsFound);
 
         SysSizInput(SysSizIndex).AirPriLoopName = state.dataIPShortCut->cAlphaArgs(iNameAlphaNum);
@@ -4270,17 +4270,17 @@ void GetPlantSizingInput(EnergyPlusData &state)
 
     for (PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   PltSizIndex,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 PltSizIndex,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSize->PlantSizData(PltSizIndex).PlantLoopName = state.dataIPShortCut->cAlphaArgs(1);
@@ -4678,17 +4678,17 @@ void GetZoneHVACSizing(EnergyPlusData &state)
             lNumericBlanks = true;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       zSIndex,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     zSIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataSize->ZoneHVACSizing(zSIndex).Name = Alphas(1);
@@ -5238,17 +5238,17 @@ void GetAirTerminalSizing(EnergyPlusData &state)
         for (int zSIndex = 1; zSIndex <= state.dataSize->NumAirTerminalSizingSpec; ++zSIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       zSIndex,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     zSIndex,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 

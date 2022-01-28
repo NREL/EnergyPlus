@@ -305,17 +305,17 @@ namespace HVACHXAssistedCoolingCoil {
 
         for (HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       HXAssistedCoilNum,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     HXAssistedCoilNum,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataHVACAssistedCC->UniqueHXAssistedCoilNames, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
@@ -630,17 +630,17 @@ namespace HVACHXAssistedCoolingCoil {
         for (HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       HXAssistedCoilNum,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     HXAssistedCoilNum,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataHVACAssistedCC->UniqueHXAssistedCoilNames, AlphArray(1), CurrentModuleObject, ErrorsFound);
 

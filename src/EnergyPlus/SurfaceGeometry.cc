@@ -3070,17 +3070,17 @@ namespace SurfaceGeometry {
             if (SELECT_CASE_var == 1) {
                 // This is the valid case
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           1,
-                                                                           GAlphas,
-                                                                           NAlphas,
-                                                                           GNum,
-                                                                           NNum,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         1,
+                                                                         GAlphas,
+                                                                         NAlphas,
+                                                                         GNum,
+                                                                         NNum,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 // Even though these will be validated, set defaults in case error here -- wont
                 // cause aborts in later surface gets (hopefully)
@@ -3338,17 +3338,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                              state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -3515,17 +3515,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                              state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -3766,17 +3766,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           SurfaceNumAlpha,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           SurfaceNumProp,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         SurfaceNumAlpha,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         SurfaceNumProp,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                              state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -4382,17 +4382,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                              state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -4936,17 +4936,17 @@ namespace SurfaceGeometry {
 
         for (Loop = 1; Loop <= TotHTSubs; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       SurfaceNumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       SurfaceNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     SurfaceNumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     SurfaceNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -5349,17 +5349,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                              state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -6350,17 +6350,17 @@ namespace SurfaceGeometry {
 
         for (Loop = 1; Loop <= TotShdSubs; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -6569,17 +6569,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                              state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -7005,17 +7005,17 @@ namespace SurfaceGeometry {
         NumIntMassSurfaces = 0;
         for (int Item = 1; Item <= TotIntMass; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       SurfaceNumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       SurfaceNumArg,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     SurfaceNumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     SurfaceNumArg,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataSurfaceGeometry->UniqueSurfaceNames,
@@ -7225,17 +7225,17 @@ namespace SurfaceGeometry {
         // scan for zones and zone lists in InternalMass objects
         for (int Item = 1; Item <= TotIntMass; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       SurfaceNumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       SurfaceNumArg,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     SurfaceNumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     SurfaceNumArg,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             int Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             int ZLItem = 0;
@@ -7316,17 +7316,17 @@ namespace SurfaceGeometry {
         for (Loop = 1; Loop <= TotShadingSurfaceReflectance; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) {
@@ -7483,17 +7483,17 @@ namespace SurfaceGeometry {
 
         for (Item = 1; Item <= state.dataSurface->TotExtVentCav; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             // first handle cAlphaArgs
             ErrorInName = false;
             IsBlank = false;
@@ -7770,17 +7770,17 @@ namespace SurfaceGeometry {
             int alpF = 1;
             int numF = 1;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       obj,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     obj,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             int Found =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (Found == 0) {
@@ -7967,17 +7967,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlpha,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumeric,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlpha,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumeric,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataSurface->SurfLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -8122,17 +8122,17 @@ namespace SurfaceGeometry {
 
             for (Loop = 1; Loop <= TotSrdSurfProperties; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlpha,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumeric,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlpha,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumeric,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // A1: Name
@@ -8239,17 +8239,17 @@ namespace SurfaceGeometry {
 
         for (Item = 1; Item <= CountAddHeatSourceSurf; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             Found = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
 
             if (Found == 0) {
@@ -8312,17 +8312,17 @@ namespace SurfaceGeometry {
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         for (Item = 1; Item <= CountHTAlgoObjectsSingleSurf; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundSingleSurf = false;
             Found = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
 
@@ -8366,17 +8366,17 @@ namespace SurfaceGeometry {
 
         for (Item = 1; Item <= CountHTAlgoObjectsMultiSurf; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundMultiSurf = false;
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
@@ -8522,17 +8522,17 @@ namespace SurfaceGeometry {
         CountHTAlgoObjectsSurfList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundSurfList = false;
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
@@ -8580,17 +8580,17 @@ namespace SurfaceGeometry {
         CountHTAlgoObjectsSurfList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ErrorsFoundByConstruct = false;
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
@@ -8650,8 +8650,7 @@ namespace SurfaceGeometry {
         NumHAMTMat2 =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm");
         NumHAMTMat3 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Suction");
-        NumHAMTMat4 =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Redistribution");
+        NumHAMTMat4 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Redistribution");
         NumHAMTMat5 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Diffusion");
         NumHAMTMat6 =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity");
@@ -9554,17 +9553,17 @@ namespace SurfaceGeometry {
         for (Loop = 1; Loop <= state.dataSurface->TotWinShadingControl; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       ControlNumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       ControlNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     ControlNumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     ControlNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             ErrorInName = false;
             IsBlank = false;
@@ -10216,17 +10215,17 @@ namespace SurfaceGeometry {
         for (loop = 1; loop <= state.dataSurface->TotStormWin; ++loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       StormWinNumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       StormWinNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     StormWinNumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     StormWinNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ++StormWinNum;
             state.dataSurface->StormWindow(StormWinNum).BaseWindowNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
@@ -10437,17 +10436,17 @@ namespace SurfaceGeometry {
         for (Loop = 1; Loop <= TotWinAirflowControl; ++Loop) { // Loop through all surfaces in the input...
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       ControlNumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       ControlNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     ControlNumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     ControlNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
@@ -10684,17 +10683,17 @@ namespace SurfaceGeometry {
 
         if (TotKivaStgs == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       1,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumProps,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     1,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumProps,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             int numF = 1;
             int alpF = 1;
@@ -10784,17 +10783,17 @@ namespace SurfaceGeometry {
 
             for (int Loop = 1; Loop <= TotKivaFnds; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumProps,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumProps,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 int numF = 1;
                 int alpF = 1;
@@ -11304,17 +11303,17 @@ namespace SurfaceGeometry {
         OSCNum = 0;
         for (Loop = 1; Loop <= state.dataSurface->TotOSC; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumProps,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumProps,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             ErrorInName = false;
             IsBlank = false;
             UtilityRoutines::VerifyName(
@@ -11648,17 +11647,17 @@ namespace SurfaceGeometry {
         NMatInsul = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= NMatInsul; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NNums,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NNums,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             MaterNum =
@@ -14365,17 +14364,17 @@ namespace SurfaceGeometry {
         if (state.dataSurfaceGeometry->firstTime) {
             if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           CurrentModuleObject,
-                                                                           1,
-                                                                           cAlphas,
-                                                                           NAlphas,
-                                                                           rNumerics,
-                                                                           NNum,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         CurrentModuleObject,
+                                                                         1,
+                                                                         cAlphas,
+                                                                         NAlphas,
+                                                                         rNumerics,
+                                                                         NNum,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 OldAspectRatio = rNumerics(1);
                 NewAspectRatio = rNumerics(2);
                 transformPlane = cAlphas(1);
@@ -14643,13 +14642,13 @@ namespace SurfaceGeometry {
             for (CollectorNum = 1; CollectorNum <= NumOfFlatPlateUnits; ++CollectorNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           CollectorNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus);
+                                                                         cCurrentModuleObject,
+                                                                         CollectorNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus);
 
                 TmpCandidateSurfaceNames(CollectorNum) = state.dataIPShortCut->cAlphaArgs(3);
                 TmpCandidateICSBCTypeNames(CollectorNum) = "";
@@ -14661,13 +14660,13 @@ namespace SurfaceGeometry {
             for (PVTnum = 1; PVTnum <= NumPVTs; ++PVTnum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           PVTnum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus);
+                                                                         cCurrentModuleObject,
+                                                                         PVTnum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus);
 
                 TmpCandidateSurfaceNames(NumOfFlatPlateUnits + PVTnum) = state.dataIPShortCut->cAlphaArgs(2);
             }
@@ -14677,13 +14676,13 @@ namespace SurfaceGeometry {
             cCurrentModuleObject = "Generator:Photovoltaic";
             for (PVnum = 1; PVnum <= NumPVs; ++PVnum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           PVnum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus);
+                                                                         cCurrentModuleObject,
+                                                                         PVnum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus);
                 TmpCandidateSurfaceNames(NumOfFlatPlateUnits + NumPVTs + PVnum) = state.dataIPShortCut->cAlphaArgs(2);
             }
         }
@@ -14692,13 +14691,13 @@ namespace SurfaceGeometry {
             cCurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
             for (CollectorNum = 1; CollectorNum <= NumOfICSUnits; ++CollectorNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           CollectorNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus);
+                                                                         cCurrentModuleObject,
+                                                                         CollectorNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus);
                 TmpCandidateSurfaceNames(NumOfFlatPlateUnits + NumPVTs + NumPVs + CollectorNum) = state.dataIPShortCut->cAlphaArgs(3);
                 TmpCandidateICSSurfaceNames(NumOfFlatPlateUnits + CollectorNum) = state.dataIPShortCut->cAlphaArgs(3);
                 TmpCandidateICSBCTypeNames(NumOfFlatPlateUnits + CollectorNum) = state.dataIPShortCut->cAlphaArgs(4);

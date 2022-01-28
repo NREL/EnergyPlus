@@ -929,17 +929,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDoe2DXCoils; ++DXCoilIndex) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
         // allocate single performance mode for numeric field strings used for sizing routine
@@ -1444,17 +1444,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumDXMulModeCoils; ++DXCoilIndex) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
         UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
@@ -1577,17 +1577,17 @@ void GetDXCoils(EnergyPlusData &state)
                     if (PerfObjectNum > 0) {
 
                         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                                   PerfObjectType,
-                                                                                   PerfObjectNum,
-                                                                                   Alphas2,
-                                                                                   NumAlphas2,
-                                                                                   Numbers2,
-                                                                                   NumNumbers2,
-                                                                                   IOStatus,
-                                                                                   lNumericBlanks2,
-                                                                                   lAlphaBlanks2,
-                                                                                   cAlphaFields2,
-                                                                                   cNumericFields2);
+                                                                                 PerfObjectType,
+                                                                                 PerfObjectNum,
+                                                                                 Alphas2,
+                                                                                 NumAlphas2,
+                                                                                 Numbers2,
+                                                                                 NumNumbers2,
+                                                                                 IOStatus,
+                                                                                 lNumericBlanks2,
+                                                                                 lAlphaBlanks2,
+                                                                                 cAlphaFields2,
+                                                                                 cNumericFields2);
 
                         // allocate performance mode numeric field strings used for sizing routine
                         state.dataDXCoils->DXCoilNumericFields(DXCoilNum)
@@ -2027,17 +2027,17 @@ void GetDXCoils(EnergyPlusData &state)
         ++DXCoilNum;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         // allocate single performance mode for numeric field strings used for sizing routine
         state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
@@ -2515,17 +2515,17 @@ void GetDXCoils(EnergyPlusData &state)
         ++DXCoilNum;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         // allocate single performance mode for numeric field strings used for sizing routine
         state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
@@ -3130,17 +3130,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterPumpedCoils; ++DXHPWaterHeaterCoilNum) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXHPWaterHeaterCoilNum,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXHPWaterHeaterCoilNum,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
 
@@ -3657,17 +3657,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= state.dataDXCoils->NumDXHeatPumpWaterHeaterWrappedCoils; ++DXHPWaterHeaterCoilNum) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXHPWaterHeaterCoilNum,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXHPWaterHeaterCoilNum,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
 
@@ -4066,17 +4066,17 @@ void GetDXCoils(EnergyPlusData &state)
         ++DXCoilNum;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         // allocate single performance mode for numeric field strings used for sizing routine (all fields are in this object)
         state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
@@ -4654,17 +4654,17 @@ void GetDXCoils(EnergyPlusData &state)
         ++DXCoilNum;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         // *** will have to circle back to this one to fix since the multispeed coil has all fields in this coil object ***
         // allocate single performance mode for numeric field strings used for sizing routine
@@ -5175,17 +5175,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingCoils; ++DXCoilIndex) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
 
@@ -5328,17 +5328,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingCoils; ++DXCoilIndex) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
 
@@ -5472,17 +5472,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFCoolingFluidTCtrlCoils; ++DXCoilIndex) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
 
@@ -5596,17 +5596,17 @@ void GetDXCoils(EnergyPlusData &state)
     for (DXCoilIndex = 1; DXCoilIndex <= state.dataDXCoils->NumVRFHeatingFluidTCtrlCoils; ++DXCoilIndex) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   DXCoilIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 DXCoilIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         ++DXCoilNum;
 

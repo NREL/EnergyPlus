@@ -469,25 +469,24 @@ namespace DaylightingDevices {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "DaylightingDevice:Tubular";
-        state.dataDaylightingDevicesData->NumOfTDDPipes =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingDevicesData->NumOfTDDPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
             state.dataDaylightingDevicesData->TDDPipe.allocate(state.dataDaylightingDevicesData->NumOfTDDPipes);
 
             for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           PipeNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         PipeNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(
                     state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetTDDInputErrorsFound);
                 // Pipe name
@@ -814,17 +813,17 @@ namespace DaylightingDevices {
 
             for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           ShelfNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         ShelfNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(
                     state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetShelfInputErrorsFound);
                 // Shelf name

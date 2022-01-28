@@ -204,17 +204,17 @@ namespace HVACDuct {
 
         for (DuctNum = 1; DuctNum <= state.dataHVACDuct->NumDucts; ++DuctNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       DuctNum,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     DuctNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataHVACDuct->Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);

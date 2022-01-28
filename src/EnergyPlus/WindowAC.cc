@@ -291,17 +291,17 @@ namespace WindowAC {
         for (WindACIndex = 1; WindACIndex <= state.dataWindowAC->NumWindACCyc; ++WindACIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       WindACIndex,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     WindACIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             WindACNum = WindACIndex;
 

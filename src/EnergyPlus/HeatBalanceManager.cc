@@ -207,9 +207,9 @@ namespace HeatBalanceManager {
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
             //   if in the future surfaces are altered after this point
-            if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                                  // Octree can be active
+            if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                                // Octree can be active
                 if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
-                    state.dataHeatBalMgr->surfaceOctree.init(state.dataSurface->Surface);                                 // Set up surface octree
+                    state.dataHeatBalMgr->surfaceOctree.init(state.dataSurface->Surface);                               // Set up surface octree
                 }
             }
 
@@ -413,13 +413,13 @@ namespace HeatBalanceManager {
             NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ConstrObjects(ONum));
             for (Loop = 1; Loop <= NumObjects; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           ConstrObjects(ONum),
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           Status);
+                                                                         ConstrObjects(ONum),
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         Status);
                 if (ONum == 5) {
                     CNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct);
                 } else {
@@ -529,17 +529,17 @@ namespace HeatBalanceManager {
         int numConstructions(state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, constructName));
         for (int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       constructName,
-                                                                       constructionNum,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     constructName,
+                                                                     constructionNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             int numLayersInThisConstruct(NumAlpha - 1);
             state.dataHeatBal->MaxSolidWinLayers = max(state.dataHeatBal->MaxSolidWinLayers, numLayersInThisConstruct);
         }
@@ -605,17 +605,17 @@ namespace HeatBalanceManager {
 
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             // Building Name (remove certain characters)
             state.dataHeatBal->BuildingName = AlphaName(1);
             TMP = index(state.dataHeatBal->BuildingName, char(1));
@@ -792,17 +792,17 @@ namespace HeatBalanceManager {
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             {
                 auto const SELECT_CASE_var(AlphaName(1));
@@ -856,17 +856,17 @@ namespace HeatBalanceManager {
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       "SurfaceConvectionAlgorithm:Outside",
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     "SurfaceConvectionAlgorithm:Outside",
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(AlphaName(1));
 
@@ -912,17 +912,17 @@ namespace HeatBalanceManager {
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(AlphaName(1));
                 // The default is CTF
@@ -1010,17 +1010,17 @@ namespace HeatBalanceManager {
 
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             // Building Rotation for Appendix G
             state.dataHeatBal->BuildingRotationAppendixG = mod(BuildingNumbers(1), 360.0);
         }
@@ -1030,17 +1030,17 @@ namespace HeatBalanceManager {
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
@@ -1084,17 +1084,17 @@ namespace HeatBalanceManager {
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
@@ -1198,17 +1198,17 @@ namespace HeatBalanceManager {
 
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
                     int FlowTypeNum = getEnumerationValue(AdjustmentTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(1)));
@@ -1300,17 +1300,17 @@ namespace HeatBalanceManager {
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphaName,
-                                                                       NumAlpha,
-                                                                       BuildingNumbers,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphaName,
+                                                                     NumAlpha,
+                                                                     BuildingNumbers,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 HVACSystemRootFinding.Algorithm = AlphaName(1);
                 {
@@ -1381,17 +1381,17 @@ namespace HeatBalanceManager {
 
         if (NumObjects == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       1,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             if (NumNums > 0) state.dataEnvrn->SiteWindExp = NumArray(1);
             if (NumNums > 1) state.dataEnvrn->SiteWindBLHeight = NumArray(2);
@@ -1640,17 +1640,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -1716,17 +1716,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -1755,17 +1755,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -1802,17 +1802,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2270,17 +2270,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2364,17 +2364,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2457,17 +2457,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2576,17 +2576,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2704,17 +2704,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          state.dataIPShortCut->cAlphaArgs(1),
@@ -2788,17 +2788,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2874,17 +2874,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -2965,17 +2965,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3052,17 +3052,17 @@ namespace HeatBalanceManager {
 
             // Call GetObjectItem routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3247,17 +3247,17 @@ namespace HeatBalanceManager {
 
             // Call GetObjectItem routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3396,17 +3396,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3691,17 +3691,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve material data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3872,17 +3872,17 @@ namespace HeatBalanceManager {
             // Call Input Get Routine to retrieve material data from ecoroof
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       MaterialNames,
-                                                                       MaterialNumAlpha,
-                                                                       MaterialProps,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     MaterialNames,
+                                                                     MaterialNumAlpha,
+                                                                     MaterialProps,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          MaterialNames(1),
@@ -3973,17 +3973,17 @@ namespace HeatBalanceManager {
             for (Loop = 1; Loop <= state.dataHeatBal->TotTCGlazings; ++Loop) {
                 // Get each TCGlazings from the input processor
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           state.dataHeatBalMgr->CurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           MaterialNumAlpha,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           MaterialNumProp,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         state.dataHeatBalMgr->CurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         MaterialNumAlpha,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         MaterialNumProp,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 if (UtilityRoutines::IsNameEmpty(
                         state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
@@ -4049,17 +4049,17 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataHeatBal->TotSimpleWindow; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       MaterialNumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       MaterialNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     MaterialNumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     MaterialNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          state.dataIPShortCut->cAlphaArgs(1),
@@ -4226,17 +4226,17 @@ namespace HeatBalanceManager {
             // [wavelength (microns), transmittance, front reflectance, back reflectance] for
             // wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       SpecDataNames,
-                                                                       SpecDataNumAlpha,
-                                                                       SpecDataProps,
-                                                                       SpecDataNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     SpecDataNames,
+                                                                     SpecDataNumAlpha,
+                                                                     SpecDataProps,
+                                                                     SpecDataNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             if (UtilityRoutines::IsNameEmpty(state, SpecDataNames(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
 
@@ -4514,17 +4514,17 @@ namespace HeatBalanceManager {
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       ConstructAlphas,
-                                                                       ConstructNumAlpha,
-                                                                       DummyProps,
-                                                                       DummyNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     ConstructAlphas,
+                                                                     ConstructNumAlpha,
+                                                                     DummyProps,
+                                                                     DummyNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(0),
@@ -4726,17 +4726,17 @@ namespace HeatBalanceManager {
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       ConstructAlphas,
-                                                                       ConstructNumAlpha,
-                                                                       DummyProps,
-                                                                       DummyNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     ConstructAlphas,
+                                                                     ConstructNumAlpha,
+                                                                     DummyProps,
+                                                                     DummyNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(0),
@@ -4816,17 +4816,17 @@ namespace HeatBalanceManager {
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       ConstructAlphas,
-                                                                       ConstructNumAlpha,
-                                                                       DummyProps,
-                                                                       DummyNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     ConstructAlphas,
+                                                                     ConstructNumAlpha,
+                                                                     DummyProps,
+                                                                     DummyNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, ConstructAlphas(0), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
 
             ++ConstrNum;
@@ -4968,17 +4968,17 @@ namespace HeatBalanceManager {
 
             state.dataIPShortCut->rNumericArgs = 0.0; // Zero out just in case
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             TMP = index(state.dataIPShortCut->cAlphaArgs(1), char(1));
             while (TMP != std::string::npos) {
                 state.dataIPShortCut->cAlphaArgs(1)[TMP] = ',';
@@ -5030,17 +5030,17 @@ namespace HeatBalanceManager {
 
             for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           ListNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         ListNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataHeatBal->ZoneList(ListNum).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -5100,17 +5100,17 @@ namespace HeatBalanceManager {
 
             for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           GroupNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         GroupNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataHeatBal->ZoneGroup(GroupNum).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -5220,17 +5220,17 @@ namespace HeatBalanceManager {
 
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlpha,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumeric,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlpha,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumeric,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataHeatBal->ZoneLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -6620,17 +6620,17 @@ namespace HeatBalanceManager {
 
             // Call Input Get routine to retrieve frame/divider data
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       FrameDividerNames,
-                                                                       FrameDividerNumAlpha,
-                                                                       FrameDividerProps,
-                                                                       FrameDividerNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     FrameDividerNames,
+                                                                     FrameDividerNumAlpha,
+                                                                     FrameDividerProps,
+                                                                     FrameDividerNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, FrameDividerNames(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
 
             // Load the frame/divider derived type from the input data.
@@ -7818,17 +7818,17 @@ namespace HeatBalanceManager {
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       ConstructAlphas,
-                                                                       ConstructNumAlpha,
-                                                                       DummyProps,
-                                                                       DummyNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     ConstructAlphas,
+                                                                     ConstructNumAlpha,
+                                                                     DummyProps,
+                                                                     DummyNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(1),
@@ -7917,17 +7917,17 @@ namespace HeatBalanceManager {
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataHeatBalMgr->CurrentModuleObject,
-                                                                       Loop,
-                                                                       ConstructAlphas,
-                                                                       ConstructNumAlpha,
-                                                                       DummyProps,
-                                                                       DummyNumProp,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     Loop,
+                                                                     ConstructAlphas,
+                                                                     ConstructNumAlpha,
+                                                                     DummyProps,
+                                                                     DummyNumProp,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          ConstructAlphas(1),
@@ -8129,17 +8129,17 @@ namespace HeatBalanceManager {
 
             for (Loop = 1; Loop <= state.dataSurface->TotSurfIncSolSSG; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlpha,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumeric,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlpha,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumeric,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     ShowContinueError(
                         state, "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name");
@@ -8218,17 +8218,17 @@ namespace HeatBalanceManager {
 
             for (Loop = 1; Loop <= state.dataSurface->TotFenLayAbsSSG; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlpha,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumeric,
-                                                                           IOStat,
-                                                                           state.dataIPShortCut->lNumericFieldBlanks,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlpha,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumeric,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     ShowContinueError(state,
                                       "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other "
@@ -8750,17 +8750,17 @@ namespace HeatBalanceManager {
         state.dataHeatBal->SupportPillar.allocate(state.dataHeatBal->W7SupportPillars);
         for (Loop = 1; Loop <= state.dataHeatBal->W7SupportPillars; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -8802,17 +8802,17 @@ namespace HeatBalanceManager {
         state.dataHeatBal->DeflectionState.allocate(state.dataHeatBal->W7DeflectionStates);
         for (Loop = 1; Loop <= state.dataHeatBal->W7DeflectionStates; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -8842,17 +8842,17 @@ namespace HeatBalanceManager {
         // ALLOCATE(DeflectionState(W7DeflectionStates))
         for (Loop = 1; Loop <= state.dataHeatBal->W7MaterialGaps; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueMaterialNames,
                                                          state.dataIPShortCut->cAlphaArgs(1),
@@ -8921,17 +8921,17 @@ namespace HeatBalanceManager {
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotComplexShades; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -9260,17 +9260,17 @@ namespace HeatBalanceManager {
 
         for (Loop = 1; Loop <= state.dataBSDFWindow->TotThermalModels; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       _,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     _,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
             state.dataHeatBal->WindowThermalModel(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -9402,17 +9402,17 @@ namespace HeatBalanceManager {
         state.dataBSDFWindow->FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
         for (Loop = 1; Loop <= state.dataBSDFWindow->TotComplexFenStates; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       locCurrentModuleObject,
-                                                                       Loop,
-                                                                       locAlphaArgs,
-                                                                       NumAlphas,
-                                                                       locNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       locNumericFieldBlanks,
-                                                                       _,
-                                                                       locAlphaFieldNames,
-                                                                       locNumericFieldNames);
+                                                                     locCurrentModuleObject,
+                                                                     Loop,
+                                                                     locAlphaArgs,
+                                                                     NumAlphas,
+                                                                     locNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     locNumericFieldBlanks,
+                                                                     _,
+                                                                     locAlphaFieldNames,
+                                                                     locNumericFieldNames);
             if (GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataHeatBalMgr->UniqueConstructNames,
                                                          locAlphaArgs(1),

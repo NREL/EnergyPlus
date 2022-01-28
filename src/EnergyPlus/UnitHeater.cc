@@ -282,17 +282,17 @@ namespace UnitHeater {
              ++UnitHeatNum) { // Begin looping over all of the unit heaters found in the input file...
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       UnitHeatNum,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     UnitHeatNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames.allocate(NumNumbers);
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames = "";

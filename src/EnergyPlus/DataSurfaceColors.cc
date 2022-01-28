@@ -160,17 +160,17 @@ void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std
         rNumerics({1, numNumbers}) = 0.0;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   numptr,
-                                                                   cAlphas,
-                                                                   NumAlphas,
-                                                                   rNumerics,
-                                                                   numNumbers,
-                                                                   status,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 numptr,
+                                                                 cAlphas,
+                                                                 NumAlphas,
+                                                                 rNumerics,
+                                                                 numNumbers,
+                                                                 status,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
         for (numargs = 1; numargs <= numNumbers; ++numargs) {
             numptr = rNumerics(numargs); // set to integer
             if (lNumericBlanks(numargs)) {

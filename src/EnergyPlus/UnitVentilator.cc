@@ -317,17 +317,17 @@ namespace UnitVentilator {
              ++UnitVentNum) { // Begin looping over all of the unit ventilators found in the input file...
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       UnitVentNum,
-                                                                       Alphas,
-                                                                       NumAlphas,
-                                                                       Numbers,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       lNumericBlanks,
-                                                                       lAlphaBlanks,
-                                                                       cAlphaFields,
-                                                                       cNumericFields);
+                                                                     CurrentModuleObject,
+                                                                     UnitVentNum,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
 
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames.allocate(NumNumbers);
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames = "";

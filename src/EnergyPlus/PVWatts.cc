@@ -236,17 +236,17 @@ namespace PVWatts {
         bool errorsFound = false;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   "Generator:PVWatts",
-                                                                   objNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 "Generator:PVWatts",
+                                                                 objNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
 
         const std::string name(cAlphaArgs(AlphaFields::NAME));
         const Real64 dcSystemCapacity(rNumericArgs(NumFields::DC_SYSTEM_CAPACITY));

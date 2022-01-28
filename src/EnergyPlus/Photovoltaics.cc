@@ -286,17 +286,17 @@ namespace Photovoltaics {
         cCurrentModuleObject = state.dataPhotovoltaic->cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= state.dataPhotovoltaic->NumPVs; ++PVnum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       PVnum,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     PVnum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             state.dataPhotovoltaic->PVarray(PVnum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -440,17 +440,17 @@ namespace Photovoltaics {
             cCurrentModuleObject = state.dataPhotovoltaic->cPVSimplePerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->NumSimplePVModuleTypes; ++ModNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           ModNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           _,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         ModNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         _,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
@@ -491,17 +491,17 @@ namespace Photovoltaics {
             cCurrentModuleObject = state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName;
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->Num1DiodePVModuleTypes; ++ModNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           ModNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           _,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         ModNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         _,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
@@ -551,17 +551,17 @@ namespace Photovoltaics {
             for (ModNum = 1; ModNum <= state.dataPhotovoltaic->NumSNLPVModuleTypes; ++ModNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           ModNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           _,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         ModNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         _,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }

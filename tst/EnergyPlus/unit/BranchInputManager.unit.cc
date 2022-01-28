@@ -118,17 +118,17 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
             state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-                                                                        CurrentModuleObject,
-                                                                        Count,
-                                                                        Alphas,
-                                                                        NumAlphas,
-                                                                        Numbers,
-                                                                        NumNumbers,
-                                                                        IOStat,
-                                                                        lNumericBlanks,
-                                                                        lAlphaBlanks,
-                                                                        cAlphaFields,
-                                                                        cNumericFields);
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
             UtilityRoutines::VerifyName(
@@ -284,17 +284,17 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
             state->dataInputProcessing->inputProcessor->getObjectItem(*state,
-                                                                        CurrentModuleObject,
-                                                                        Count,
-                                                                        Alphas,
-                                                                        NumAlphas,
-                                                                        Numbers,
-                                                                        NumNumbers,
-                                                                        IOStat,
-                                                                        lNumericBlanks,
-                                                                        lAlphaBlanks,
-                                                                        cAlphaFields,
-                                                                        cNumericFields);
+                                                                      CurrentModuleObject,
+                                                                      Count,
+                                                                      Alphas,
+                                                                      NumAlphas,
+                                                                      Numbers,
+                                                                      NumNumbers,
+                                                                      IOStat,
+                                                                      lNumericBlanks,
+                                                                      lAlphaBlanks,
+                                                                      cAlphaFields,
+                                                                      cNumericFields);
             IsNotOK = false;
             IsBlank = false;
             UtilityRoutines::VerifyName(

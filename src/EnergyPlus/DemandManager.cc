@@ -352,17 +352,17 @@ void GetDemandManagerListInput(EnergyPlusData &state)
         for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       ListNum,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     ListNum,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             DemandManagerList(ListNum).Name = AlphArray(1);
@@ -683,17 +683,17 @@ void GetDemandManagerInput(EnergyPlusData &state)
         for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       MgrNum - StartIndex + 1,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     MgrNum - StartIndex + 1,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataDemandManager->UniqueDemandMgrNames,
                                                      AlphArray(1),
@@ -806,17 +806,17 @@ void GetDemandManagerInput(EnergyPlusData &state)
         for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       MgrNum - StartIndex + 1,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     MgrNum - StartIndex + 1,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataDemandManager->UniqueDemandMgrNames,
                                                      AlphArray(1),
@@ -950,17 +950,17 @@ void GetDemandManagerInput(EnergyPlusData &state)
         for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       MgrNum - StartIndex + 1,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     MgrNum - StartIndex + 1,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataDemandManager->UniqueDemandMgrNames,
                                                      AlphArray(1),
@@ -1094,17 +1094,17 @@ void GetDemandManagerInput(EnergyPlusData &state)
         for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       MgrNum - StartIndex + 1,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     MgrNum - StartIndex + 1,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataDemandManager->UniqueDemandMgrNames,
@@ -1251,17 +1251,17 @@ void GetDemandManagerInput(EnergyPlusData &state)
         for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       MgrNum - StartIndex + 1,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     MgrNum - StartIndex + 1,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataDemandManager->UniqueDemandMgrNames,

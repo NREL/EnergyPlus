@@ -105,7 +105,7 @@ protected:
     std::string encodeIDF()
     {
         return state->dataInputProcessing->inputProcessor->idf_parser->encode(state->dataInputProcessing->inputProcessor->epJSON,
-                                                                                state->dataInputProcessing->inputProcessor->schema());
+                                                                              state->dataInputProcessing->inputProcessor->schema());
     }
 
     json &getEpJSON()

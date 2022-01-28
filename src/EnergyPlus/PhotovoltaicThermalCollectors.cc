@@ -173,17 +173,17 @@ namespace PhotovoltaicThermalCollectors {
             tmpSimplePVTperf.allocate(NumSimplePVTPerform);
             for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           state.dataIPShortCut->cCurrentModuleObject,
-                                                                           Item,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus,
-                                                                           _,
-                                                                           state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                           state.dataIPShortCut->cAlphaFieldNames,
-                                                                           state.dataIPShortCut->cNumericFieldNames);
+                                                                         state.dataIPShortCut->cCurrentModuleObject,
+                                                                         Item,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         _,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound))
                     continue;
 
@@ -220,17 +220,17 @@ namespace PhotovoltaicThermalCollectors {
 
         for (Item = 1; Item <= state.dataPhotovoltaicThermalCollector->NumPVT; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataIPShortCut->cCurrentModuleObject,
-                                                                       Item,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     Item,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound))
                 continue;
 

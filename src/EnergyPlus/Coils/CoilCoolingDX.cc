@@ -102,13 +102,13 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state)
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                   coilNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus);
+                                                                 state.dataCoilCooingDX->coilCoolingDXObjectName,
+                                                                 coilNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus);
         CoilCoolingDXInputSpecification input_specs;
         input_specs.name = state.dataIPShortCut->cAlphaArgs(1);
         input_specs.evaporator_inlet_node_name = state.dataIPShortCut->cAlphaArgs(2);

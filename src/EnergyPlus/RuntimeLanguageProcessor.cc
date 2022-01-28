@@ -2748,49 +2748,49 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 // This is done in the following IF/THEN section.
                 if (GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                               cCurrentModuleObject,
-                                                                               GlobalNum,
-                                                                               cAlphaArgs,
-                                                                               NumAlphas,
-                                                                               rNumericArgs,
-                                                                               NumNums,
-                                                                               IOStat,
-                                                                               lNumericFieldBlanks,
-                                                                               lAlphaFieldBlanks,
-                                                                               cAlphaFieldNames,
-                                                                               cNumericFieldNames);
+                                                                             cCurrentModuleObject,
+                                                                             GlobalNum,
+                                                                             cAlphaArgs,
+                                                                             NumAlphas,
+                                                                             rNumericArgs,
+                                                                             NumNums,
+                                                                             IOStat,
+                                                                             lNumericFieldBlanks,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
                 } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables &&
                            GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:Variable";
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                               cCurrentModuleObject,
-                                                                               GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables,
-                                                                               cAlphaArgs,
-                                                                               NumAlphas,
-                                                                               rNumericArgs,
-                                                                               NumNums,
-                                                                               IOStat,
-                                                                               lNumericFieldBlanks,
-                                                                               lAlphaFieldBlanks,
-                                                                               cAlphaFieldNames,
-                                                                               cNumericFieldNames);
+                                                                             cCurrentModuleObject,
+                                                                             GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables,
+                                                                             cAlphaArgs,
+                                                                             NumAlphas,
+                                                                             rNumericArgs,
+                                                                             NumNums,
+                                                                             IOStat,
+                                                                             lNumericFieldBlanks,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
                 } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables &&
                            GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
                                             state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                               cCurrentModuleObject,
-                                                                               GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables -
-                                                                                   state.dataRuntimeLang->NumExternalInterfaceGlobalVariables,
-                                                                               cAlphaArgs,
-                                                                               NumAlphas,
-                                                                               rNumericArgs,
-                                                                               NumNums,
-                                                                               IOStat,
-                                                                               lNumericFieldBlanks,
-                                                                               lAlphaFieldBlanks,
-                                                                               cAlphaFieldNames,
-                                                                               cNumericFieldNames);
+                                                                             cCurrentModuleObject,
+                                                                             GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables -
+                                                                                 state.dataRuntimeLang->NumExternalInterfaceGlobalVariables,
+                                                                             cAlphaArgs,
+                                                                             NumAlphas,
+                                                                             rNumericArgs,
+                                                                             NumNums,
+                                                                             IOStat,
+                                                                             lNumericFieldBlanks,
+                                                                             lAlphaFieldBlanks,
+                                                                             cAlphaFieldNames,
+                                                                             cNumericFieldNames);
 
                 } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
                                            state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables &&
@@ -2859,17 +2859,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
             state.dataRuntimeLangProcessor->CurveIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSCurveIndices, 0);
             for (loop = 1; loop <= state.dataRuntimeLang->NumEMSCurveIndices; ++loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           loop,
-                                                                           cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericFieldBlanks,
-                                                                           lAlphaFieldBlanks,
-                                                                           cAlphaFieldNames,
-                                                                           cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         loop,
+                                                                         cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
                 // check if variable name is unique and well formed
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -2914,23 +2914,22 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
         } // NumEMSCurveIndices > 0
 
         cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-        state.dataRuntimeLang->NumEMSConstructionIndices =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSConstructionIndices = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataRuntimeLang->NumEMSConstructionIndices > 0) {
             state.dataRuntimeLangProcessor->ConstructionIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSConstructionIndices, 0);
             for (loop = 1; loop <= state.dataRuntimeLang->NumEMSConstructionIndices; ++loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           loop,
-                                                                           cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericFieldBlanks,
-                                                                           lAlphaFieldBlanks,
-                                                                           cAlphaFieldNames,
-                                                                           cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         loop,
+                                                                         cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
                 // check if variable name is unique and well formed
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -2985,17 +2984,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
             cCurrentModuleObject = "EnergyManagementSystem:Program";
             for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlPrograms; ++StackNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           StackNum,
-                                                                           cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericFieldBlanks,
-                                                                           lAlphaFieldBlanks,
-                                                                           cAlphaFieldNames,
-                                                                           cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         StackNum,
+                                                                         cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataRuntimeLangProcessor->ErlStackUniqueNames,
                                                          cAlphaArgs(1),
@@ -3021,17 +3020,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
             cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
             for (StackNum = state.dataRuntimeLang->NumErlPrograms + 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           StackNum - state.dataRuntimeLang->NumErlPrograms,
-                                                                           cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericFieldBlanks,
-                                                                           lAlphaFieldBlanks,
-                                                                           cAlphaFieldNames,
-                                                                           cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         StackNum - state.dataRuntimeLang->NumErlPrograms,
+                                                                         cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataRuntimeLangProcessor->ErlStackUniqueNames,
                                                          cAlphaArgs(1),
@@ -3058,17 +3057,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
             state.dataRuntimeLang->TrendVariable.allocate(state.dataRuntimeLang->NumErlTrendVariables);
             for (TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           TrendNum,
-                                                                           cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericFieldBlanks,
-                                                                           lAlphaFieldBlanks,
-                                                                           cAlphaFieldNames,
-                                                                           cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         TrendNum,
+                                                                         cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
@@ -3154,17 +3153,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
             cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
             for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables; ++RuntimeReportVarNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           RuntimeReportVarNum,
-                                                                           cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericFieldBlanks,
-                                                                           lAlphaFieldBlanks,
-                                                                           cAlphaFieldNames,
-                                                                           cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         RuntimeReportVarNum,
+                                                                         cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
                 GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataRuntimeLangProcessor->RuntimeReportVarUniqueNames,
                                                          cAlphaArgs(1),
@@ -3335,17 +3334,17 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
             for (loop = 1; loop <= state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++loop) {
                 RuntimeReportVarNum = state.dataRuntimeLang->NumEMSOutputVariables + loop;
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           loop,
-                                                                           cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericFieldBlanks,
-                                                                           lAlphaFieldBlanks,
-                                                                           cAlphaFieldNames,
-                                                                           cNumericFieldNames);
+                                                                         cCurrentModuleObject,
+                                                                         loop,
+                                                                         cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericFieldBlanks,
+                                                                         lAlphaFieldBlanks,
+                                                                         cAlphaFieldNames,
+                                                                         cNumericFieldNames);
 
                 GlobalNames::VerifyUniqueInterObjectName(state,
                                                          state.dataRuntimeLangProcessor->RuntimeReportVarUniqueNames,

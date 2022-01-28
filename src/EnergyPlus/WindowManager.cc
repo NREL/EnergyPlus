@@ -9129,13 +9129,13 @@ namespace WindowManager {
 
         if (NumSiteSpectrum == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       1,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStatus);
+                                                                     cCurrentModuleObject,
+                                                                     1,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStatus);
 
             // use default spectrum data, done!
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Default")) {
@@ -9166,13 +9166,13 @@ namespace WindowManager {
             for (Loop = 1; Loop <= NumSiteSpectrum; ++Loop) {
                 // Step 2 - read user-defined spectrum data
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           cCurrentModuleObject,
-                                                                           Loop,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNumbers,
-                                                                           IOStatus);
+                                                                         cCurrentModuleObject,
+                                                                         Loop,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cSolarSpectrum)) {
                     iSolarSpectrum = Loop;
                     // overwrite the default solar spectrum

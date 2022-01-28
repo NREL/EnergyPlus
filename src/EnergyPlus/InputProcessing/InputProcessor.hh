@@ -349,7 +349,8 @@ struct DataInputProcessing : BaseGlobalStruct
             return *this;
         }
 
-        explicit operator bool() const noexcept {
+        explicit operator bool() const noexcept
+        {
             return static_cast<bool>(m_inputProcessor);
         }
 

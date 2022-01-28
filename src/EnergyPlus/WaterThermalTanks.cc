@@ -680,17 +680,17 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         int NumNums;
         int IOStat;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   DesuperheaterNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 DesuperheaterNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -1197,17 +1197,17 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         int NumNums;
         int IOStat;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   HPWaterHeaterNumOfSpecificType,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 HPWaterHeaterNumOfSpecificType,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         // Copy those lists into C++ std::maps
         std::map<int, std::string> hpwhAlpha;
@@ -2321,17 +2321,17 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         int NumNums;
         int IOStat;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   WaterThermalTankNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 WaterThermalTankNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -2791,17 +2791,17 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         int NumNums;
         int IOStat;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   WaterThermalTankNum - state.dataWaterThermalTanks->numWaterHeaterMixed,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 WaterThermalTankNum - state.dataWaterThermalTanks->numWaterHeaterMixed,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -3669,19 +3669,19 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         int NumAlphas;
         int IOStat;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed +
-                                                                                          state.dataWaterThermalTanks->numWaterHeaterStratified +
-                                                                                          state.dataWaterThermalTanks->numChilledWaterMixed),
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed +
+                                                                                        state.dataWaterThermalTanks->numWaterHeaterStratified +
+                                                                                        state.dataWaterThermalTanks->numChilledWaterMixed),
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -4589,13 +4589,13 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 int NumNums;
                 int IOStat;
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           state.dataIPShortCut->cCurrentModuleObject,
-                                                                           WHsizingNum,
-                                                                           state.dataIPShortCut->cAlphaArgs,
-                                                                           NumAlphas,
-                                                                           state.dataIPShortCut->rNumericArgs,
-                                                                           NumNums,
-                                                                           IOStat);
+                                                                         state.dataIPShortCut->cCurrentModuleObject,
+                                                                         WHsizingNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNums,
+                                                                         IOStat);
 
                 // find which water heater this object is for
                 int WaterThermalTankNum =

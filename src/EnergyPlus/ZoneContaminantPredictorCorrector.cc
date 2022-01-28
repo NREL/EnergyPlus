@@ -245,17 +245,17 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         AlphaName = "";
         IHGNumbers = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   Loop,
-                                                                   AlphaName,
-                                                                   NumAlpha,
-                                                                   IHGNumbers,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 Loop,
+                                                                 AlphaName,
+                                                                 NumAlpha,
+                                                                 IHGNumbers,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name = AlphaName(1);
 
@@ -383,17 +383,17 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         AlphaName = "";
         IHGNumbers = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   Loop,
-                                                                   AlphaName,
-                                                                   NumAlpha,
-                                                                   IHGNumbers,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 Loop,
+                                                                 AlphaName,
+                                                                 NumAlpha,
+                                                                 IHGNumbers,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name = AlphaName(1);
 
@@ -529,17 +529,17 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         AlphaName = "";
         IHGNumbers = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   Loop,
-                                                                   AlphaName,
-                                                                   NumAlpha,
-                                                                   IHGNumbers,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 Loop,
+                                                                 AlphaName,
+                                                                 NumAlpha,
+                                                                 IHGNumbers,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name = AlphaName(1);
 
@@ -647,17 +647,17 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         AlphaName = "";
         IHGNumbers = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   Loop,
-                                                                   AlphaName,
-                                                                   NumAlpha,
-                                                                   IHGNumbers,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 Loop,
+                                                                 AlphaName,
+                                                                 NumAlpha,
+                                                                 IHGNumbers,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name = AlphaName(1);
 
@@ -772,17 +772,17 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         AlphaName = "";
         IHGNumbers = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   Loop,
-                                                                   AlphaName,
-                                                                   NumAlpha,
-                                                                   IHGNumbers,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 Loop,
+                                                                 AlphaName,
+                                                                 NumAlpha,
+                                                                 IHGNumbers,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name = AlphaName(1);
 
@@ -890,25 +890,24 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
     }
 
     CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-    state.dataZoneContaminantPredictorCorrector->TotGCDVS =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataZoneContaminantPredictorCorrector->TotGCDVS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericDVS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDVS);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDVS; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   Loop,
-                                                                   AlphaName,
-                                                                   NumAlpha,
-                                                                   IHGNumbers,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 Loop,
+                                                                 AlphaName,
+                                                                 NumAlpha,
+                                                                 IHGNumbers,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name = AlphaName(1);
 
@@ -998,25 +997,24 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
     }
 
     CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-    state.dataZoneContaminantPredictorCorrector->TotGCDRS =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    state.dataZoneContaminantPredictorCorrector->TotGCDRS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataContaminantBalance->ZoneContamGenericDRS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDRS);
 
     for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDRS; ++Loop) {
         AlphaName = "";
         IHGNumbers = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   Loop,
-                                                                   AlphaName,
-                                                                   NumAlpha,
-                                                                   IHGNumbers,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 Loop,
+                                                                 AlphaName,
+                                                                 NumAlpha,
+                                                                 IHGNumbers,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name = AlphaName(1);
 
@@ -1172,8 +1170,7 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
     };
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ZoneControl:ContaminantController";
-    state.dataContaminantBalance->NumContControlledZones =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataContaminantBalance->NumContControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataContaminantBalance->NumContControlledZones > 0) {
         state.dataContaminantBalance->ContaminantControlledZone.allocate(state.dataContaminantBalance->NumContControlledZones);
@@ -1181,17 +1178,17 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
 
     for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   ContControlledZoneNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 ContControlledZoneNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).Name = state.dataIPShortCut->cAlphaArgs(1);

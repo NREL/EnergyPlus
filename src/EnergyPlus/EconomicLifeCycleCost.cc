@@ -192,17 +192,17 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
     } else if (NumObj == 1) {
         elcc->LCCparamPresent = true;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   1,
-                                                                   AlphaArray,
-                                                                   NumAlphas,
-                                                                   NumArray,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 1,
+                                                                 AlphaArray,
+                                                                 NumAlphas,
+                                                                 NumArray,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another life cycle cost object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -446,17 +446,17 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
     elcc->RecurringCosts.resize(elcc->numRecurringCosts);
     for (iInObj = 0; iInObj < elcc->numRecurringCosts; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   iInObj + 1, // since this index needs to start from 1
-                                                                   AlphaArray,
-                                                                   NumAlphas,
-                                                                   NumArray,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 iInObj + 1, // since this index needs to start from 1
+                                                                 AlphaArray,
+                                                                 NumAlphas,
+                                                                 NumArray,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another life cycle cost object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -640,17 +640,17 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
     }
     for (iInObj = 0; iInObj < elcc->numNonrecurringCost; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   iInObj + 1, // since this index needs to start from 1
-                                                                   AlphaArray,
-                                                                   NumAlphas,
-                                                                   NumArray,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 iInObj + 1, // since this index needs to start from 1
+                                                                 AlphaArray,
+                                                                 NumAlphas,
+                                                                 NumArray,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another life cycle cost object
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -774,17 +774,17 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
     if (elcc->numUsePriceEscalation > 0) {
         for (iInObj = 1; iInObj <= elcc->numUsePriceEscalation; ++iInObj) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       iInObj,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     iInObj,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
@@ -922,17 +922,17 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
     if (elcc->numUseAdjustment > 0) {
         for (iInObj = 1; iInObj <= elcc->numUseAdjustment; ++iInObj) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       CurrentModuleObject,
-                                                                       iInObj,
-                                                                       AlphaArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     CurrentModuleObject,
+                                                                     iInObj,
+                                                                     AlphaArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {

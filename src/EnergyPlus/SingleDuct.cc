@@ -299,52 +299,52 @@ void GetSysInput(EnergyPlusData &state)
     state.dataSingleDuct->CheckEquipName.dimension(state.dataSingleDuct->NumSDAirTerminal, true);
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
-                                                                     "AirTerminal:SingleDuct:VAV:Reheat",
-                                                                     state.dataSingleDuct->TotalArgsGSI,
-                                                                     state.dataSingleDuct->NumAlphasGSI,
-                                                                     state.dataSingleDuct->NumNumsGSI);
+                                                                   "AirTerminal:SingleDuct:VAV:Reheat",
+                                                                   state.dataSingleDuct->TotalArgsGSI,
+                                                                   state.dataSingleDuct->NumAlphasGSI,
+                                                                   state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
-                                                                     "AirTerminal:SingleDuct:VAV:NoReheat",
-                                                                     state.dataSingleDuct->TotalArgsGSI,
-                                                                     state.dataSingleDuct->NumAlphasGSI,
-                                                                     state.dataSingleDuct->NumNumsGSI);
+                                                                   "AirTerminal:SingleDuct:VAV:NoReheat",
+                                                                   state.dataSingleDuct->TotalArgsGSI,
+                                                                   state.dataSingleDuct->NumAlphasGSI,
+                                                                   state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
-                                                                     "AirTerminal:SingleDuct:ConstantVolume:Reheat",
-                                                                     state.dataSingleDuct->TotalArgsGSI,
-                                                                     state.dataSingleDuct->NumAlphasGSI,
-                                                                     state.dataSingleDuct->NumNumsGSI);
+                                                                   "AirTerminal:SingleDuct:ConstantVolume:Reheat",
+                                                                   state.dataSingleDuct->TotalArgsGSI,
+                                                                   state.dataSingleDuct->NumAlphasGSI,
+                                                                   state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
-                                                                     "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-                                                                     state.dataSingleDuct->TotalArgsGSI,
-                                                                     state.dataSingleDuct->NumAlphasGSI,
-                                                                     state.dataSingleDuct->NumNumsGSI);
+                                                                   "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+                                                                   state.dataSingleDuct->TotalArgsGSI,
+                                                                   state.dataSingleDuct->NumAlphasGSI,
+                                                                   state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
-                                                                     "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
-                                                                     state.dataSingleDuct->TotalArgsGSI,
-                                                                     state.dataSingleDuct->NumAlphasGSI,
-                                                                     state.dataSingleDuct->NumNumsGSI);
+                                                                   "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
+                                                                   state.dataSingleDuct->TotalArgsGSI,
+                                                                   state.dataSingleDuct->NumAlphasGSI,
+                                                                   state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
-                                                                     "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
-                                                                     state.dataSingleDuct->TotalArgsGSI,
-                                                                     state.dataSingleDuct->NumAlphasGSI,
-                                                                     state.dataSingleDuct->NumNumsGSI);
+                                                                   "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
+                                                                   state.dataSingleDuct->TotalArgsGSI,
+                                                                   state.dataSingleDuct->NumAlphasGSI,
+                                                                   state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state,
-                                                                     "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
-                                                                     state.dataSingleDuct->TotalArgsGSI,
-                                                                     state.dataSingleDuct->NumAlphasGSI,
-                                                                     state.dataSingleDuct->NumNumsGSI);
+                                                                   "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
+                                                                   state.dataSingleDuct->TotalArgsGSI,
+                                                                   state.dataSingleDuct->NumAlphasGSI,
+                                                                   state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxNumsGSI = max(state.dataSingleDuct->MaxNumsGSI, state.dataSingleDuct->NumNumsGSI);
     state.dataSingleDuct->MaxAlphasGSI = max(state.dataSingleDuct->MaxAlphasGSI, state.dataSingleDuct->NumAlphasGSI);
 
@@ -362,17 +362,17 @@ void GetSysInput(EnergyPlusData &state)
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   state.dataSingleDuct->SysIndexGSI,
-                                                                   Alphas,
-                                                                   state.dataSingleDuct->NumAlphasGSI,
-                                                                   Numbers,
-                                                                   state.dataSingleDuct->NumNumsGSI,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 state.dataSingleDuct->SysIndexGSI,
+                                                                 Alphas,
+                                                                 state.dataSingleDuct->NumAlphasGSI,
+                                                                 Numbers,
+                                                                 state.dataSingleDuct->NumNumsGSI,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         state.dataSingleDuct->SysNumGSI = state.dataSingleDuct->SysIndexGSI;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysNum = state.dataSingleDuct->SysNumGSI;
@@ -770,17 +770,17 @@ void GetSysInput(EnergyPlusData &state)
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   state.dataSingleDuct->SysIndexGSI,
-                                                                   Alphas,
-                                                                   state.dataSingleDuct->NumAlphasGSI,
-                                                                   Numbers,
-                                                                   state.dataSingleDuct->NumNumsGSI,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 state.dataSingleDuct->SysIndexGSI,
+                                                                 Alphas,
+                                                                 state.dataSingleDuct->NumAlphasGSI,
+                                                                 Numbers,
+                                                                 state.dataSingleDuct->NumNumsGSI,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         state.dataSingleDuct->SysNumGSI = state.dataSingleDuct->SysIndexGSI + state.dataSingleDuct->NumVAVSysGSI;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysNum = state.dataSingleDuct->SysNumGSI;
@@ -1068,17 +1068,17 @@ void GetSysInput(EnergyPlusData &state)
          ++state.dataSingleDuct->SysIndexGSI) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   state.dataSingleDuct->SysIndexGSI,
-                                                                   Alphas,
-                                                                   state.dataSingleDuct->NumAlphasGSI,
-                                                                   Numbers,
-                                                                   state.dataSingleDuct->NumNumsGSI,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 state.dataSingleDuct->SysIndexGSI,
+                                                                 Alphas,
+                                                                 state.dataSingleDuct->NumAlphasGSI,
+                                                                 Numbers,
+                                                                 state.dataSingleDuct->NumNumsGSI,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         state.dataSingleDuct->SysNumGSI =
             state.dataSingleDuct->SysIndexGSI + state.dataSingleDuct->NumVAVSysGSI + state.dataSingleDuct->NumCBVAVSysGSI;
@@ -1322,17 +1322,17 @@ void GetSysInput(EnergyPlusData &state)
          ++state.dataSingleDuct->SysIndexGSI) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   state.dataSingleDuct->SysIndexGSI,
-                                                                   Alphas,
-                                                                   state.dataSingleDuct->NumAlphasGSI,
-                                                                   Numbers,
-                                                                   state.dataSingleDuct->NumNumsGSI,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 state.dataSingleDuct->SysIndexGSI,
+                                                                 Alphas,
+                                                                 state.dataSingleDuct->NumAlphasGSI,
+                                                                 Numbers,
+                                                                 state.dataSingleDuct->NumNumsGSI,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         state.dataSingleDuct->SysNumGSI = state.dataSingleDuct->SysIndexGSI + state.dataSingleDuct->NumVAVSysGSI +
                                           state.dataSingleDuct->NumCBVAVSysGSI + state.dataSingleDuct->NumConstVolSys;
@@ -1522,17 +1522,17 @@ void GetSysInput(EnergyPlusData &state)
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:NoReheat";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   state.dataSingleDuct->SysIndexGSI,
-                                                                   Alphas,
-                                                                   state.dataSingleDuct->NumAlphasGSI,
-                                                                   Numbers,
-                                                                   state.dataSingleDuct->NumNumsGSI,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 state.dataSingleDuct->SysIndexGSI,
+                                                                 Alphas,
+                                                                 state.dataSingleDuct->NumAlphasGSI,
+                                                                 Numbers,
+                                                                 state.dataSingleDuct->NumNumsGSI,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         state.dataSingleDuct->SysNumGSI = state.dataSingleDuct->SysIndexGSI + state.dataSingleDuct->NumVAVSysGSI +
                                           state.dataSingleDuct->NumCBVAVSysGSI + state.dataSingleDuct->NumConstVolSys +
@@ -1784,17 +1784,17 @@ void GetSysInput(EnergyPlusData &state)
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   state.dataSingleDuct->SysIndexGSI,
-                                                                   Alphas,
-                                                                   state.dataSingleDuct->NumAlphasGSI,
-                                                                   Numbers,
-                                                                   state.dataSingleDuct->NumNumsGSI,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 state.dataSingleDuct->SysIndexGSI,
+                                                                 Alphas,
+                                                                 state.dataSingleDuct->NumAlphasGSI,
+                                                                 Numbers,
+                                                                 state.dataSingleDuct->NumNumsGSI,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         state.dataSingleDuct->SysNumGSI = state.dataSingleDuct->SysIndexGSI + state.dataSingleDuct->NumVAVSysGSI +
                                           state.dataSingleDuct->NumCBVAVSysGSI + state.dataSingleDuct->NumConstVolSys +
@@ -1974,17 +1974,17 @@ void GetSysInput(EnergyPlusData &state)
         CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   state.dataSingleDuct->SysIndexGSI,
-                                                                   Alphas,
-                                                                   state.dataSingleDuct->NumAlphasGSI,
-                                                                   Numbers,
-                                                                   state.dataSingleDuct->NumNumsGSI,
-                                                                   IOStat,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 state.dataSingleDuct->SysIndexGSI,
+                                                                 Alphas,
+                                                                 state.dataSingleDuct->NumAlphasGSI,
+                                                                 Numbers,
+                                                                 state.dataSingleDuct->NumNumsGSI,
+                                                                 IOStat,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         state.dataSingleDuct->SysNumGSI = state.dataSingleDuct->SysIndexGSI + state.dataSingleDuct->NumVAVSysGSI +
                                           state.dataSingleDuct->NumCBVAVSysGSI + state.dataSingleDuct->NumConstVolSys +
@@ -6022,17 +6022,17 @@ void GetATMixers(EnergyPlusData &state)
 
     for (ATMixerNum = 1; ATMixerNum <= state.dataSingleDuct->NumATMixers; ++ATMixerNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   ATMixerNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 ATMixerNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataSingleDuct->SysATMixer(ATMixerNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         if (state.dataIPShortCut->cAlphaArgs(7) == "INLETSIDE") {

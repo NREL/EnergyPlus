@@ -193,8 +193,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
 
     cCurrentModuleObject = "HeatExchanger:FluidToFluid";
 
-    state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs == 0) return;
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
@@ -212,17 +211,17 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
         state.dataPlantHXFluidToFluid->FluidHX.allocate(state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs);
         for (int CompLoop = 1; CompLoop <= state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs; ++CompLoop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       CompLoop,
-                                                                       cAlphaArgs,
-                                                                       NumAlphas,
-                                                                       rNumericArgs,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       lNumericFieldBlanks,
-                                                                       lAlphaFieldBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     CompLoop,
+                                                                     cAlphaArgs,
+                                                                     NumAlphas,
+                                                                     rNumericArgs,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).Name = cAlphaArgs(1);

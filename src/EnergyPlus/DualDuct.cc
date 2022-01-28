@@ -254,17 +254,17 @@ namespace DualDuct {
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDConstantVolume;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           CurrentModuleObject,
-                                                                           DamperIndex,
-                                                                           AlphArray,
-                                                                           NumAlphas,
-                                                                           NumArray,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericBlanks,
-                                                                           lAlphaBlanks,
-                                                                           cAlphaFields,
-                                                                           cNumericFields);
+                                                                         CurrentModuleObject,
+                                                                         DamperIndex,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
                 DDNum = DamperIndex;
@@ -418,17 +418,17 @@ namespace DualDuct {
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDVariableVolume;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           CurrentModuleObject,
-                                                                           DamperIndex,
-                                                                           AlphArray,
-                                                                           NumAlphas,
-                                                                           NumArray,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericBlanks,
-                                                                           lAlphaBlanks,
-                                                                           cAlphaFields,
-                                                                           cNumericFields);
+                                                                         CurrentModuleObject,
+                                                                         DamperIndex,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
                 DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers;
@@ -604,17 +604,17 @@ namespace DualDuct {
                 CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                           CurrentModuleObject,
-                                                                           DamperIndex,
-                                                                           AlphArray,
-                                                                           NumAlphas,
-                                                                           NumArray,
-                                                                           NumNums,
-                                                                           IOStat,
-                                                                           lNumericBlanks,
-                                                                           lAlphaBlanks,
-                                                                           cAlphaFields,
-                                                                           cNumericFields);
+                                                                         CurrentModuleObject,
+                                                                         DamperIndex,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
                 DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers;
@@ -2356,17 +2356,17 @@ namespace DualDuct {
                     CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
 
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                               CurrentModuleObject,
-                                                                               DamperIndex,
-                                                                               AlphArray,
-                                                                               NumAlphas,
-                                                                               NumArray,
-                                                                               NumNums,
-                                                                               IOStat,
-                                                                               lNumericBlanks,
-                                                                               lAlphaBlanks,
-                                                                               cAlphaFields,
-                                                                               cNumericFields);
+                                                                             CurrentModuleObject,
+                                                                             DamperIndex,
+                                                                             AlphArray,
+                                                                             NumAlphas,
+                                                                             NumArray,
+                                                                             NumNums,
+                                                                             IOStat,
+                                                                             lNumericBlanks,
+                                                                             lAlphaBlanks,
+                                                                             cAlphaFields,
+                                                                             cNumericFields);
                     state.dataDualDuct->DamperNamesARR(DamperIndex) = AlphArray(1);
                     if (!lAlphaBlanks(5)) {
                         state.dataDualDuct->RecircIsUsedARR(DamperIndex) = true;

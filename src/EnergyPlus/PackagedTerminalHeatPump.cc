@@ -593,17 +593,17 @@ void GetPTUnit(EnergyPlusData &state)
 
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   PTUnitIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 PTUnitIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         PTUnitNum = PTUnitIndex;
         state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;
@@ -1617,17 +1617,17 @@ void GetPTUnit(EnergyPlusData &state)
 
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   PTUnitIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 PTUnitIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         PTUnitNum = PTUnitIndex + state.dataPTHP->NumPTHP;
         state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;
@@ -2534,17 +2534,17 @@ void GetPTUnit(EnergyPlusData &state)
 
         CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   PTUnitIndex,
-                                                                   Alphas,
-                                                                   NumAlphas,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   lNumericBlanks,
-                                                                   lAlphaBlanks,
-                                                                   cAlphaFields,
-                                                                   cNumericFields);
+                                                                 CurrentModuleObject,
+                                                                 PTUnitIndex,
+                                                                 Alphas,
+                                                                 NumAlphas,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
 
         PTUnitNum = PTUnitIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
         state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;

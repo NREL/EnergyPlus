@@ -4305,17 +4305,17 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (NumReports > 0) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   1,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumNames,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 1,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumNames,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         if (has_prefix(state.dataIPShortCut->cAlphaArgs(1), "SIZINGDAYS")) {
             state.dataDaylightingData->DFSReportSizingDays = true;
         } else if (has_prefix(state.dataIPShortCut->cAlphaArgs(1), "ALLSHADOWCALCULATIONDAYS")) {
@@ -4387,17 +4387,17 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     if (state.dataDaylightingData->TotIllumMaps > 0) {
         for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       MapNum,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     MapNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             state.dataDaylightingData->IllumMap(MapNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataDaylightingData->IllumMap(MapNum).zoneIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), Zone);
 
@@ -4491,17 +4491,17 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             state.dataDaylightingData->MapColSep = CharComma; // comma
         } else if (MapStyleIn == 1) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       1,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumber,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     1,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (state.dataIPShortCut->cAlphaArgs(1) == "COMMA") {
                 state.dataDaylightingData->MapColSep = CharComma; // comma
             } else if (state.dataIPShortCut->cAlphaArgs(1) == "TAB") {
@@ -4806,17 +4806,17 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         state.dataIPShortCut->cAlphaArgs = "";
         state.dataIPShortCut->rNumericArgs = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   controlNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlpha,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 controlNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlpha,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         auto &daylightControl(state.dataDaylightingData->daylightControl(controlNum));
         daylightControl.Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -5265,17 +5265,17 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
     state.dataDaylightingData->DaylRefPt.allocate(state.dataDaylightingData->TotRefPoints);
     for (auto &pt : state.dataDaylightingData->DaylRefPt) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   ++RefPtNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlpha,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumber,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 ++RefPtNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlpha,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumber,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         pt.Name = state.dataIPShortCut->cAlphaArgs(1);
         pt.ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (pt.ZoneNum == 0) {
@@ -5430,17 +5430,17 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
     for (loop = 1; loop <= TotLightWells; ++loop) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   loop,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlpha,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumProp,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 loop,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlpha,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumProp,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
         if (SurfNum == 0) {
@@ -10653,17 +10653,17 @@ void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64
 
     if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   1,
-                                                                   cAlphas,
-                                                                   NAlphas,
-                                                                   rNumerics,
-                                                                   NNum,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 1,
+                                                                 cAlphas,
+                                                                 NAlphas,
+                                                                 rNumerics,
+                                                                 NNum,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         OldAspectRatio = rNumerics(1);
         NewAspectRatio = rNumerics(2);
         transformPlane = cAlphas(1);

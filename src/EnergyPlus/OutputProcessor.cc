@@ -674,17 +674,17 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= op->NumOfReqVariables; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStat,
-                                                                       lNumericFieldBlanks,
-                                                                       lAlphaFieldBlanks,
-                                                                       cAlphaFieldNames,
-                                                                       cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
             // Check for duplicates?
 
@@ -1135,33 +1135,33 @@ namespace OutputProcessor {
 
         for (Loop = 1; Loop <= NumCustomMeters; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             namesOfMeterCustom.emplace(UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         for (Loop = 1; Loop <= NumCustomMeters; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             lbrackPos = index(state.dataIPShortCut->cAlphaArgs(1), '[');
             if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(1).erase(lbrackPos);
             MeterCreated = false;
@@ -1361,17 +1361,17 @@ namespace OutputProcessor {
 
         for (Loop = 1; Loop <= NumCustomDecMeters; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       cCurrentModuleObject,
-                                                                       Loop,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       NumAlpha,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       NumNumbers,
-                                                                       IOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumbers,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             lbrackPos = index(state.dataIPShortCut->cAlphaArgs(1), '[');
             if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(1).erase(lbrackPos);
             MeterCreated = false;
@@ -6497,17 +6497,17 @@ void UpdateMeterReporting(EnergyPlusData &state)
     for (Loop = 1; Loop <= NumReqMeters; ++Loop) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Loop,
-                                                                   Alphas,
-                                                                   NumAlpha,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 Loop,
+                                                                 Alphas,
+                                                                 NumAlpha,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
@@ -6529,17 +6529,17 @@ void UpdateMeterReporting(EnergyPlusData &state)
     for (Loop = 1; Loop <= NumReqMeterFOs; ++Loop) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Loop,
-                                                                   Alphas,
-                                                                   NumAlpha,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 Loop,
+                                                                 Alphas,
+                                                                 NumAlpha,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
@@ -6562,17 +6562,17 @@ void UpdateMeterReporting(EnergyPlusData &state)
     for (Loop = 1; Loop <= NumReqMeters; ++Loop) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Loop,
-                                                                   Alphas,
-                                                                   NumAlpha,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 Loop,
+                                                                 Alphas,
+                                                                 NumAlpha,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
@@ -6594,17 +6594,17 @@ void UpdateMeterReporting(EnergyPlusData &state)
     for (Loop = 1; Loop <= NumReqMeterFOs; ++Loop) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   Loop,
-                                                                   Alphas,
-                                                                   NumAlpha,
-                                                                   Numbers,
-                                                                   NumNumbers,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 Loop,
+                                                                 Alphas,
+                                                                 NumAlpha,
+                                                                 Numbers,
+                                                                 NumNumbers,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);

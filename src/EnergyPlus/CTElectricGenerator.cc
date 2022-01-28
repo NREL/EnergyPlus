@@ -172,17 +172,17 @@ namespace CTElectricGenerator {
         // LOAD ARRAYS WITH CT CURVE FIT Generator DATA
         for (int genNum = 1; genNum <= state.dataCTElectricGenerator->NumCTGenerators; ++genNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataIPShortCut->cCurrentModuleObject,
-                                                                       genNum,
-                                                                       AlphArray,
-                                                                       NumAlphas,
-                                                                       NumArray,
-                                                                       NumNums,
-                                                                       IOStat,
-                                                                       _,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     genNum,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             state.dataCTElectricGenerator->CTGenerator(genNum).Name = AlphArray(1);

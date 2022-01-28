@@ -195,17 +195,17 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
 
         // get the input data
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   Item,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus,
-                                                                   _,
-                                                                   _,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 Item,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus,
+                                                                 _,
+                                                                 _,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         state.dataPondGHE->PondGHE(Item).WaterIndex = FluidProperties::FindGlycol(state, fluidNameWater);
 

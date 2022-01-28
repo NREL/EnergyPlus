@@ -264,17 +264,17 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
         for (auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataIPShortCut->cCurrentModuleObject,
-                                                                       loopTransformer,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       numAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       numNums,
-                                                                       iOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     loopTransformer,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     numAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     numNums,
+                                                                     iOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
                 if (!foundInFromGridTransformer) {
@@ -697,17 +697,17 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     errorsFound = false;
     if (objectNum > 0) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   objectNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   numAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   numNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 objectNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 numAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 numNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
@@ -984,17 +984,17 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         state.dataInputProcessing->inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, generatorListName_);
     if (genListObjectNum > 0) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   genListObjectNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   numAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   numNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 genListObjectNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 numAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 numNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         // Calculate the number of generators in list
         numGenerators = numNums / 2; // note IDD needs Min Fields = 6
@@ -1072,17 +1072,17 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         int iOStat;
         if (transformerItemNum > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                       state.dataIPShortCut->cCurrentModuleObject,
-                                                                       transformerItemNum,
-                                                                       state.dataIPShortCut->cAlphaArgs,
-                                                                       numAlphas,
-                                                                       state.dataIPShortCut->rNumericArgs,
-                                                                       numNums,
-                                                                       iOStat,
-                                                                       state.dataIPShortCut->lNumericFieldBlanks,
-                                                                       state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                       state.dataIPShortCut->cAlphaFieldNames,
-                                                                       state.dataIPShortCut->cNumericFieldNames);
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     transformerItemNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     numAlphas,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     numNums,
+                                                                     iOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
                                             "LoadCenterPowerConditioning")) { // this is the right kind of transformer
                 transformerObj = std::make_unique<ElectricTransformer>(state, transformerName_);
@@ -2482,17 +2482,17 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     if (foundInverter) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   invertIDFObjectNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 invertIDFObjectNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
@@ -2956,17 +2956,17 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   testConvertIndex,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 testConvertIndex,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         name_ = state.dataIPShortCut->cAlphaArgs(1);
         // need a new general approach for verify names are unique across objects,  next gen GlobalNames
@@ -3299,17 +3299,17 @@ ElectricStorage::ElectricStorage( // main constructor
 
     if (foundStorage) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   storageIDFObjectNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   numAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   numNums,
-                                                                   iOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 storageIDFObjectNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 numAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 numNums,
+                                                                 iOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
 
         name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
@@ -4612,17 +4612,17 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
     transformerIDFObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Transformer", objectName);
     if (transformerIDFObjectNum > 0) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   state.dataIPShortCut->cCurrentModuleObject,
-                                                                   transformerIDFObjectNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   numAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   numNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 state.dataIPShortCut->cCurrentModuleObject,
+                                                                 transformerIDFObjectNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 numAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 numNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {

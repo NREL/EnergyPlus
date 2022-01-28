@@ -287,13 +287,13 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CoilCoolingDXCurveFitSpeed::object_name,
-                                                                   speedNum,
-                                                                   state.dataIPShortCut->cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   state.dataIPShortCut->rNumericArgs,
-                                                                   NumNumbers,
-                                                                   IOStatus);
+                                                                 CoilCoolingDXCurveFitSpeed::object_name,
+                                                                 speedNum,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }

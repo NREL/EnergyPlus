@@ -322,8 +322,7 @@ void GetInputTabularMonthly(EnergyPlusData &state)
     AlphArray.allocate(NumAlphas);
     NumArray.dimension(NumNums, 0.0);
     for (int TabNum = 1, TabNum_end = ort->MonthlyInputCount; TabNum <= TabNum_end; ++TabNum) { // MonthlyInputCount is modified in the loop
-        state.dataInputProcessing->inputProcessor->getObjectItem(
-            state, CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
 
         if (TabNum - 1 > 0) {
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
@@ -1077,17 +1076,17 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
     ort->BinResultsTableCount = 0;
     for (iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   iInObj,
-                                                                   AlphArray,
-                                                                   NumAlphas,
-                                                                   NumArray,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 iInObj,
+                                                                 AlphArray,
+                                                                 NumAlphas,
+                                                                 NumArray,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         ort->OutputTableBinned(iInObj).keyValue = AlphArray(1);
         ort->OutputTableBinned(iInObj).varOrMeter = AlphArray(2);
         // if a schedule has been specified assign
@@ -1286,17 +1285,17 @@ void GetInputTabularStyle(EnergyPlusData &state)
         ort->unitsStyle = UnitsStyle::None;
     } else if (NumTabularStyle == 1) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   CurrentModuleObject,
-                                                                   1,
-                                                                   AlphArray,
-                                                                   NumAlphas,
-                                                                   NumArray,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   state.dataIPShortCut->lNumericFieldBlanks,
-                                                                   state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                   state.dataIPShortCut->cAlphaFieldNames,
-                                                                   state.dataIPShortCut->cNumericFieldNames);
+                                                                 CurrentModuleObject,
+                                                                 1,
+                                                                 AlphArray,
+                                                                 NumAlphas,
+                                                                 NumArray,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
         // ColumnSeparator
         if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
             ort->numStyles = 1;

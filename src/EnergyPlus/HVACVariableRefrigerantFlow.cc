@@ -1580,17 +1580,17 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "ZoneTerminalUnitList";
     for (VRFNum = 1; VRFNum <= state.dataHVACVarRefFlow->NumVRFTULists; ++VRFNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   VRFNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 VRFNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataHVACVarRefFlow->TerminalUnitList(VRFNum).Name = cAlphaArgs(1);
@@ -1639,17 +1639,17 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow";
     for (VRFNum = 1; VRFNum <= state.dataHVACVarRefFlow->NumVRFCond_SysCurve; ++VRFNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   VRFNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 VRFNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHVACVarRefFlow->VrfUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
@@ -2552,17 +2552,17 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
          VRFNum <= state.dataHVACVarRefFlow->NumVRFCond_SysCurve + state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HP;
          ++VRFNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   VRFNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 VRFNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHVACVarRefFlow->VrfUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
@@ -2974,17 +2974,17 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                        state.dataHVACVarRefFlow->NumVRFCond_FluidTCtrl_HR;
          ++VRFNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   VRFNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 VRFNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHVACVarRefFlow->VrfUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
@@ -3454,17 +3454,17 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         OANodeNums = 0;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                   cCurrentModuleObject,
-                                                                   VRFTUNum,
-                                                                   cAlphaArgs,
-                                                                   NumAlphas,
-                                                                   rNumericArgs,
-                                                                   NumNums,
-                                                                   IOStat,
-                                                                   lNumericFieldBlanks,
-                                                                   lAlphaFieldBlanks,
-                                                                   cAlphaFieldNames,
-                                                                   cNumericFieldNames);
+                                                                 cCurrentModuleObject,
+                                                                 VRFTUNum,
+                                                                 cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 rNumericArgs,
+                                                                 NumNums,
+                                                                 IOStat,
+                                                                 lNumericFieldBlanks,
+                                                                 lAlphaFieldBlanks,
+                                                                 cAlphaFieldNames,
+                                                                 cNumericFieldNames);
 
         state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames.allocate(NumNums);
         state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames = cNumericFieldNames;
