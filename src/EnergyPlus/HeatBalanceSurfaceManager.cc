@@ -835,7 +835,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
                         const auto stateUValue{GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
                         const auto stateSHGC{GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
-                        const auto windowName{state.dataConstruction->Construct(stateConstrNum).Name};
+                        std::string const &windowName{state.dataConstruction->Construct(stateConstrNum).Name};
 
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdUfact, windowName, stateUValue, 3);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, windowName, stateSHGC, 3);
