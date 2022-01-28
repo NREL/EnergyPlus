@@ -164,9 +164,8 @@ namespace WindowManager {
 
         int getNumOfLayers(EnergyPlusData &state) const;
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
-                                                                       Material::MaterialProperties const &material,
-                                                                       int const t_Index);
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
+        getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const &material, int const t_Index);
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
 
