@@ -1267,6 +1267,12 @@ namespace OutputReportPredefined {
         s->pdchHeatSafeTempExceedHour = newPreDefColumn(state, s->pdstHourOfSafetyHeatEvent, "Safe Temperature Exceedance Hours [h]");
         s->pdchHeatSafeTempExceedOccHour = newPreDefColumn(state, s->pdstHourOfSafetyHeatEvent, "Safe Temperature Exceedance OccupantHours [h]");
 
+        s->pdstUnmetDegreeHour = newPreDefSubTable(state, s->pdrThermalResilience, "Unmet Degree Hours");
+        s->pdchCoolingUnmetDegreeHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Degree Hours [°C•h]");
+        s->pdchCoolingUnmetDegreeOccHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Degree OccupantHours [°C•h]");
+        s->pdchHeatingUnmetDegreeHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Degree Hours [°C•h]");
+        s->pdchHeatingUnmetDegreeOccHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Degree OccupantHours [°C•h]");
+
         s->pdrCO2Resilience = newPreDefReport(state, "CO2ResilienceSummary", "CO2R", "Annual CO2 Resilience Summary");
 
         s->pdstCO2Hours = newPreDefSubTable(state, s->pdrCO2Resilience, "CO2 Level Hours");

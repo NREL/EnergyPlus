@@ -5538,8 +5538,9 @@ void ReportThermalResilience(EnergyPlusData &state)
     int HINoBins = 5;               // Heat Index range - number of bins
     int HumidexNoBins = 5;          // Humidex range - number of bins
     int SETNoBins = 4;              // SET report column numbers
-    int ColdHourOfSafetyNoBins = 4; // Cold Stress Hour of Safety column numbers
-    int HeatHourOfSafetyNoBins = 4; // Heat Stress Hour of Safety column numbers
+    int ColdHourOfSafetyNoBins = 4; // Cold Stress Hour of Safety number of columns
+    int HeatHourOfSafetyNoBins = 4; // Heat Stress Hour of Safety number of columns
+    int UnmetDegreeHourNoBins = 4;  // Unmet Degree Hour number of columns
 
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
@@ -5555,6 +5556,7 @@ void ReportThermalResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
             state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum).assign(ColdHourOfSafetyNoBins, 0.0);
             state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum).assign(HeatHourOfSafetyNoBins, 0.0);
+            state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum).assign(UnmetDegreeHourNoBins, 0.0);
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
                 state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum).assign(SETNoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum).assign(SETNoBins, 0.0);
@@ -5677,6 +5679,24 @@ void ReportThermalResilience(EnergyPlusData &state)
                     state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[1] = encodedMonDayHrMin;
                     CrossedHeatThresh = true;
                 }
+            }
+
+            // Uncontrolled: do nothing, value will be zero
+            // Single Cooling Setpoint
+            // Single Heating Setpoint
+            // Single Heating/Cooling Setpoint
+            // Dual Setpoint (Heating and Cooling) with deadband
+
+            Real64 CoolingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
+            Real64 HeatingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
+
+            if ((CoolingSetpoint > 0) && (Temperature > CoolingSetpoint)) {
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[0] += (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[1] += NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+            }
+            if ((HeatingSetpoint > 0) && (Temperature < HeatingSetpoint)) {
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[2] += (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[3] += NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
             }
 
             if (state.dataHeatBalSurfMgr->hasPierceSET) {

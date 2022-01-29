@@ -1142,6 +1142,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHeatSafeTempExceedHour = 0;
     int pdchHeatSafeTempExceedOccHour = 0;
 
+    int pdstUnmetDegreeHour = 0;
+    int pdchCoolingUnmetDegreeHour = 0;
+    int pdchCoolingUnmetDegreeOccHour = 0;
+    int pdchHeatingUnmetDegreeHour = 0;
+    int pdchHeatingUnmetDegreeOccHour = 0;
+
     int pdrCO2Resilience = 0;
     int pdstCO2Hours = 0;
     int pdchCO2HourSafe = 0;
@@ -2056,6 +2062,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchHeatSafetyEndTime = 0;
         this->pdchHeatSafeTempExceedHour = 0;
         this->pdchHeatSafeTempExceedOccHour = 0;
+        this->pdstUnmetDegreeHour = 0;
+        this->pdchCoolingUnmetDegreeHour = 0;
+        this->pdchCoolingUnmetDegreeOccHour = 0;
+        this->pdchHeatingUnmetDegreeHour = 0;
+        this->pdchHeatingUnmetDegreeOccHour = 0;
         this->pdrCO2Resilience = 0;
         this->pdstCO2Hours = 0;
         this->pdchCO2HourSafe = 0;
