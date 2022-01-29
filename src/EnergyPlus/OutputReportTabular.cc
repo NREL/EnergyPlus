@@ -12553,6 +12553,12 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                       state.dataOutRptPredefined->pdchHeatingUnmetDegreeHour,
                       state.dataOutRptPredefined->pdchHeatingUnmetDegreeOccHour};
         WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins);
+
+        columnHead = {state.dataOutRptPredefined->pdchVeryColdExceedHour,
+                      state.dataOutRptPredefined->pdchCoolExceedHour,
+                      state.dataOutRptPredefined->pdchWarmExceedHour,
+                      state.dataOutRptPredefined->pdchVeryHotExceedHour};
+        WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins);
     }
 }
 

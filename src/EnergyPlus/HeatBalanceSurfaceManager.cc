@@ -5541,6 +5541,7 @@ void ReportThermalResilience(EnergyPlusData &state)
     int ColdHourOfSafetyNoBins = 4; // Cold Stress Hour of Safety number of columns
     int HeatHourOfSafetyNoBins = 4; // Heat Stress Hour of Safety number of columns
     int UnmetDegreeHourNoBins = 4;  // Unmet Degree Hour number of columns
+    int DiscomfortWtExceedHourNoBins = 4;  // Unmet Degree Hour number of columns
 
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
@@ -5557,6 +5558,7 @@ void ReportThermalResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum).assign(ColdHourOfSafetyNoBins, 0.0);
             state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum).assign(HeatHourOfSafetyNoBins, 0.0);
             state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum).assign(UnmetDegreeHourNoBins, 0.0);
+            state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins(ZoneNum).assign(DiscomfortWtExceedHourNoBins, 0.0);
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
                 state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum).assign(SETNoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum).assign(SETNoBins, 0.0);
@@ -5592,6 +5594,30 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
             ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
             HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
+            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+
+            Real64 VeryHotPMVThresh = 3.0;
+            Real64 WarmPMVThresh = 0.7;
+            Real64 CoolPMVThresh = -0.7;
+            Real64 VeryColdPMVThresh = -3.0;
+            Real64 PMV = state.dataThermalComforts->ThermalComfortData(iPeople).FangerPMV;
+            // divide by the number of occupant to calculate zone average
+            if (PMV < VeryColdPMVThresh) {
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins(ZoneNum)[0] +=
+                    (VeryColdPMVThresh - PMV) * state.dataGlobal->TimeStepZone / max(1, NumOcc);
+            }
+            if (PMV < CoolPMVThresh) {
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins(ZoneNum)[1] +=
+                    (CoolPMVThresh - PMV) * state.dataGlobal->TimeStepZone / max(1, NumOcc);
+            }
+            if (PMV > WarmPMVThresh) {
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins(ZoneNum)[2] +=
+                    (PMV - WarmPMVThresh) * state.dataGlobal->TimeStepZone / max(1, NumOcc);
+            }
+            if (PMV > VeryHotPMVThresh) {
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins(ZoneNum)[3] +=
+                    (PMV - VeryHotPMVThresh) * state.dataGlobal->TimeStepZone / max(1, NumOcc);
+            }
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 HI = state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum);
