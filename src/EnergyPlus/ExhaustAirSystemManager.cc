@@ -500,6 +500,8 @@ namespace ExhaustAirSystemManager {
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
                 thisExhCtrl.ZoneName = zoneName;
                 int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+                thisExhCtrl.ZoneNum = zoneNum;
+                // 2022-01: need to make sure zoneNum is greater than zero. 
 
                 // These two nodes are required inputs:
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
@@ -577,21 +579,37 @@ namespace ExhaustAirSystemManager {
                 int NumNodes = 0;
 
                 Array1D_int supplyNodeOrNodelistArray; // 2022-01: this needs some extra allocation and initialization
-                GetNodeNums(state,
-                            supplyNodeOrNodelistName,
-                            NumNodes,
-                            supplyNodeOrNodelistArray,
-                            NodeListError,
-                            DataLoopNode::NodeFluidType::Air,
-                            "ZoneHVAC:ExhaustControl",
-                            thisExhCtrl.Name,
-                            DataLoopNode::NodeConnectionType::Sensor,
-                            NodeInputManager::CompFluidStream::Primary,
-                            ObjectIsNotParent); // ,
-                                                // _,
-                                                // supplyNodeOrNodelistName);
-
-                thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
+                // still having a problem getting it debugged properly. Maybe for now replace with a single node to move forward.
+                // just a temp way to test further:
+                bool singlenodeyes = true;
+                int supplynodenum_single = 0;
+                if (singlenodeyes) {
+                    supplynodenum_single = GetOnlySingleNode(state,
+                                                          supplyNodeOrNodelistName,
+                                                          ErrorsFound,
+                                                          cCurrentModuleObject, // change type
+                                                          thisExhCtrl.Name,
+                                                          DataLoopNode::NodeFluidType::Air,
+                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                          NodeInputManager::CompFluidStream::Primary,
+                                                          ObjectIsParent);
+                    thisExhCtrl.SupplyNodeOrNodelistNum = supplynodenum_single;
+                } else {
+                    GetNodeNums(state,
+                                supplyNodeOrNodelistName,
+                                NumNodes,
+                                supplyNodeOrNodelistArray,
+                                NodeListError,
+                                DataLoopNode::NodeFluidType::Air,
+                                "ZoneHVAC:ExhaustControl",
+                                thisExhCtrl.Name,
+                                DataLoopNode::NodeConnectionType::Sensor,
+                                NodeInputManager::CompFluidStream::Primary,
+                                ObjectIsNotParent); // ,
+                                                    // _,
+                                                    // supplyNodeOrNodelistName);
+                    thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
+                }
 
                 std::string minZoneTempLimitScheduleName =
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "minimum_zone_temperature_limit_schedule_name");

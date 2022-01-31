@@ -4338,12 +4338,13 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    Central Exhaust 1,     !-Name Exhaust Avail List",
         "    Omni_Sched,                      !-Availability Manager List Name",
         "    AirLoopExhaustMixer1,  !-AirLoopHVAC:ZoneMixer Name",
-        "    Fan:SystemModel,     !-Fan Object Type,"
+        "    Fan:SystemModel,     !-Fan Object Type",
         "    CentralExhaustFan1;    !-Fan Name",
 
         "ZoneHVAC:ExhaustControl,",
-        "    Zone1 Exhaust Control,           !-Name",
+        "    Zone2 Exhaust Control,           !-Name",
         "    HVACOperationSchd,              !- Availability Schedule Name",
+        "    Zone2,                          !- Zone Name",
         "    Zone2 Exhaust Node,             !- Inlet Node Name",
         "    Zone2 ExhaustSystem Node,       !- Outlet Node Name",
         "    0.1,                            !- Design Flow Rate {m3/s}",
@@ -4400,8 +4401,9 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     ScheduleManager::ProcessScheduleInput(*state);
 
     // Call the processing codes
-    ExhaustAirSystemManager::GetExhaustAirSystemInput(*state);
     ExhaustAirSystemManager::GetZoneExhaustControlInput(*state);
+
+    ExhaustAirSystemManager::GetExhaustAirSystemInput(*state);
 
     // Expected values:
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(1).DesignExhaustFlowRate, 0.1, 1e-5);
