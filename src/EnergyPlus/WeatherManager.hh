@@ -244,6 +244,25 @@ namespace WeatherManager {
         }
     };
 
+    struct ReportPeriodData {
+        std::string title;
+        std::string reportName;
+        int startYear;
+        int startMonth;
+        int startDay;
+        int startHour;
+        int endYear;
+        int endMonth;
+        int endDay;
+        int endHour;
+
+        // Default Constructor
+        ReportPeriodData()
+            : startYear(2017), startMonth(1), startDay(1), startHour(1), endYear(2017), endMonth(12), endDay(31), endHour(24)
+        {
+        }
+    };
+
     struct RunPeriodData
     {
         // Members
@@ -685,6 +704,10 @@ namespace WeatherManager {
 
     void ReadUserWeatherInput(EnergyPlusData &state);
 
+    void GetReportPeriodData(EnergyPlusData &state,
+                             int &nReportPeriods, // Total number of Report Periods requested
+                             bool &ErrorsFound);
+
     void GetRunPeriodData(EnergyPlusData &state,
                           int &nRunPeriods, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -839,6 +862,7 @@ struct WeatherManagerData : BaseGlobalStruct
 
     int TotRunPers;    // Total number of Run Periods (Weather data) to Setup
     int TotRunDesPers; // Total number of Run Design Periods (Weather data) to Setup
+    int TotReportPers; // Total number of reporting periods
 
     int NumSpecialDays;
     Array1D_int SpecialDayTypes; // To hold holiday types given in input file NOLINT(cert-err58-cpp)
@@ -961,6 +985,8 @@ struct WeatherManagerData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
     EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
+    Array1D<WeatherManager::ReportPeriodData> ReportPeriodInput;
+    std::unordered_map<std::string, std::string> ReportPeriodInputUniqueNames;
     EPVector<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
     WeatherManager::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
     WeatherManager::DaylightSavingPeriodData IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
@@ -1038,6 +1064,7 @@ struct WeatherManagerData : BaseGlobalStruct
         this->wthFCGroundTemps = false;
         this->TotRunPers = 0;    // Total number of Run Periods (Weather data) to Setup
         this->TotRunDesPers = 0; // Total number of Run Design Periods (Weather data) to Setup
+        this->TotReportPers = 0; // Total number of reporting periods
         this->NumSpecialDays = 0;
 
         this->SpecialDayTypes = Array1D<int>(366, 0);
@@ -1132,6 +1159,8 @@ struct WeatherManagerData : BaseGlobalStruct
         this->RunPeriodInputUniqueNames.clear();
         this->RunPeriodDesignInput.deallocate();
         this->RunPeriodDesignInputUniqueNames.clear();
+        this->ReportPeriodInput.deallocate();
+        this->ReportPeriodInputUniqueNames.clear();
         this->TypicalExtremePeriods.deallocate();
 
         this->EPWDST.StDateType = WeatherManager::DateType::InvalidDate;
@@ -1214,7 +1243,7 @@ struct WeatherManagerData : BaseGlobalStruct
           WeatherFileElevation(0.0), GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
           SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),
           WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""), wthFCGroundTemps(false),
-          TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0),
+          TotRunPers(0), TotRunDesPers(0), TotReportPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0),
           NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false),
           IDFDaylightSaving(false), DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0),
           NumEPWTypExtSets(0), NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0),

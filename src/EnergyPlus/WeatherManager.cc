@@ -5152,6 +5152,7 @@ namespace WeatherManager {
         state.dataWeatherManager->TotRunPers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod");
         state.dataWeatherManager->NumOfEnvrn = state.dataEnvrn->TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
         state.dataGlobal->WeathSimReq = state.dataWeatherManager->TotRunPers > 0;
+        state.dataWeatherManager->TotReportPers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:ReportPeriod");
 
         state.dataWeatherManager->SPSiteScheduleNamePtr.allocate(state.dataEnvrn->TotDesDays * 5);
         state.dataWeatherManager->SPSiteScheduleUnits.allocate(state.dataEnvrn->TotDesDays * 5);
@@ -5196,6 +5197,10 @@ namespace WeatherManager {
         // which will have to be completed to run the annual run.
         if (state.dataWeatherManager->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
             GetRunPeriodData(state, state.dataWeatherManager->TotRunPers, ErrorsFound);
+        }
+
+        if (state.dataWeatherManager->TotReportPers >= 1) {
+            GetReportPeriodData(state, state.dataWeatherManager->TotReportPers, ErrorsFound);
         }
 
         if (state.dataSysVars->FullAnnualRun) {
@@ -5258,6 +5263,97 @@ namespace WeatherManager {
 
         int rem = calculateDayOfYear(month, day, true) % 7;
         return defaultLeapYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
+    }
+
+    void GetReportPeriodData(EnergyPlusData &state,
+                             int &nReportPeriods, // Total number of Report Periods requested
+                             bool &ErrorsFound)
+    {
+        // Call Input Get routine to retrieve annual run data
+        state.dataWeatherManager->ReportPeriodInput.allocate(nReportPeriods);
+        state.dataWeatherManager->ReportPeriodInputUniqueNames.reserve(static_cast<unsigned>(nReportPeriods));
+
+        state.dataIPShortCut->cCurrentModuleObject = "Output:Table:ReportPeriod";
+        int Count = 0;
+        int NumAlpha;   // Number of alphas being input
+        int NumNumeric; // Number of numbers being input
+        int IOStat;     // IO Status when calling get input subroutine
+        for (int i = 1; i <= nReportPeriods; ++i) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     i,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumeric,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+
+            // A1, \field Name
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
+                GlobalNames::VerifyUniqueInterObjectName(state,
+                                                         state.dataWeatherManager->ReportPeriodInputUniqueNames,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         state.dataIPShortCut->cCurrentModuleObject,
+                                                         state.dataIPShortCut->cAlphaFieldNames(1),
+                                                         ErrorsFound);
+            }
+
+            ++Count;
+            // Loop = RP + Ptr;
+            // Note JM 2018-11-20: IDD allows blank name, but input processor will create a name such as "ReportPeriod 1" anyways
+            // which is fine for our reporting below
+            state.dataWeatherManager->ReportPeriodInput(i).title = state.dataIPShortCut->cAlphaArgs(1);
+
+            // set the start and end day of month from user input
+            // N1, \field Begin Year
+            // N2, \field Begin Month
+            // N3, \field Begin Day of Month
+            // N4, \field Begin Hour of Day
+            // N5, \field End Year
+            // N6, \field End Month
+            // N7, \field End Day of Month
+            // N8; \field End Hour of Day
+            state.dataWeatherManager->ReportPeriodInput(i).startYear = int(state.dataIPShortCut->rNumericArgs(1));
+            state.dataWeatherManager->ReportPeriodInput(i).startMonth = int(state.dataIPShortCut->rNumericArgs(2));
+            state.dataWeatherManager->ReportPeriodInput(i).startDay = int(state.dataIPShortCut->rNumericArgs(3));
+            state.dataWeatherManager->ReportPeriodInput(i).startHour = int(state.dataIPShortCut->rNumericArgs(4));
+            state.dataWeatherManager->ReportPeriodInput(i).endYear = int(state.dataIPShortCut->rNumericArgs(5));
+            state.dataWeatherManager->ReportPeriodInput(i).endMonth = int(state.dataIPShortCut->rNumericArgs(6));
+            state.dataWeatherManager->ReportPeriodInput(i).endDay = int(state.dataIPShortCut->rNumericArgs(7));
+            state.dataWeatherManager->ReportPeriodInput(i).endHour = int(state.dataIPShortCut->rNumericArgs(8));
+
+            // Validate year inputs
+            if (state.dataWeatherManager->ReportPeriodInput(i).startYear == 0) {
+                if (state.dataWeatherManager->ReportPeriodInput(i).endYear != 0) { // Have to have an input start year to input an end year
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + ": object=" + state.dataWeatherManager->ReportPeriodInput(i).title +
+                                        ", end year cannot be specified if the start year is not.");
+                    ErrorsFound = true;
+                }
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).startYear < 1583) { // Bail on the proleptic Gregorian calendar
+                ShowSevereError(state,
+                                format("{}: object={}, start year ({}) is too early, please choose a date after 1582.",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataWeatherManager->ReportPeriodInput(i).title,
+                                       state.dataWeatherManager->ReportPeriodInput(i).startYear));
+                ErrorsFound = true;
+            }
+
+            if (state.dataWeatherManager->ReportPeriodInput(i).endYear != 0 &&
+                state.dataWeatherManager->ReportPeriodInput(i).startYear > state.dataWeatherManager->ReportPeriodInput(i).endYear) {
+                ShowSevereError(state,
+                                format("{}: object={}, start year ({}) is after the end year ({}).",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataWeatherManager->ReportPeriodInput(i).title,
+                                       state.dataWeatherManager->ReportPeriodInput(i).startYear,
+                                       state.dataWeatherManager->ReportPeriodInput(i).endYear));
+                ErrorsFound = true;
+            }
+        }
     }
 
     void GetRunPeriodData(EnergyPlusData &state,
