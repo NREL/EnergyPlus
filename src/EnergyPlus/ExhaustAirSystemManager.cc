@@ -590,7 +590,7 @@ namespace ExhaustAirSystemManager {
                                                           cCurrentModuleObject, // change type
                                                           thisExhCtrl.Name,
                                                           DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                          DataLoopNode::NodeConnectionType::Sensor,
                                                           NodeInputManager::CompFluidStream::Primary,
                                                           ObjectIsParent);
                     thisExhCtrl.SupplyNodeOrNodelistNum = supplynodenum_single;
@@ -777,16 +777,16 @@ namespace ExhaustAirSystemManager {
         Real64 MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
 
         // 2022-01-27: Need to be refined more based on the schedule availability as well
-        if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
-            if (FlowFrac < MinFlowFrac) {
-                FlowFrac = MinFlowFrac;
-            } else {
-                //
-            }
-            // MassFlow = DesignFlowRate * FlowFrac;
-        } else { // follow-supply
-            // 2022-01: Deal with the node or nodelist flow sum etc.
-        }
+        // if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
+        if (FlowFrac < MinFlowFrac) {
+            FlowFrac = MinFlowFrac;
+        } // else {
+        //
+        // }
+        // MassFlow = DesignFlowRate * FlowFrac;
+        // } else { // follow-supply
+        // 2022-01: Deal with the node or nodelist flow sum etc.
+        // }
 
         // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
         // 2022-01: try to adapt from SimZoneExhaustFan() in Fan.cc, probably need to use actual flow rate determinations,
@@ -809,7 +809,12 @@ namespace ExhaustAirSystemManager {
             FlowFrac = 0.0; // or directly set flow rate to zero.
         }
         // 2022-01-27: still need some logic to blend availabiltiy, frac, min fract, and flow rate together to get a single final flow number.
-        MassFlow = DesignFlowRate * FlowFrac;
+        double SupplyFlowRate = DesignFlowRate; // 2022-01: This needs an update of value when having the supply nodes sum
+        if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
+            MassFlow = DesignFlowRate * FlowFrac;
+        } else { // follow-supply
+            MassFlow = SupplyFlowRate *FlowFrac;
+        }
 
         // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
         // from UpdateFan() in Fan.cc
