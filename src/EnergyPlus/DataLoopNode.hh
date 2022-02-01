@@ -384,6 +384,7 @@ namespace DataLoopNode {
         ZoneHVACEnergyRecoveryVentilator,
         ZoneHVACEquipmentConnections,
         ZoneHVACEvaporativeCoolerUnit,
+        ZoneHVACExhaustControl,
         ZoneHVACForcedAirUserDefined,
         ZoneHVACFourPipeFanCoil,
         ZoneHVACHighTemperatureRadiant,
