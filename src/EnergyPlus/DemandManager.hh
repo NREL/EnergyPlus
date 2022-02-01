@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,44 +69,50 @@ namespace DemandManager {
     // MODULE PARAMETER DEFINITIONS:
     enum class ManagerType
     {
-        Unassigned,
-        ManagerTypeExtLights,
-        ManagerTypeLights,
-        ManagerTypeElecEquip,
-        ManagerTypeThermostats,
-        ManagerTypeVentilation
+        Invalid = -1,
+        ExtLights,
+        Lights,
+        ElecEquip,
+        Thermostats,
+        Ventilation,
+        Num
     };
 
     enum class ManagePriorityType
     {
-        Unassigned,
-        ManagerPrioritySequential,
-        ManagerPriorityOptimal,
-        ManagerPriorityAll
+        Invalid = -1,
+        Sequential,
+        Optimal,
+        All,
+        Num
     };
 
-    enum class Limit
+    enum class ManagerLimit
     {
-        Unassigned,
-        ManagerLimitOff,
-        ManagerLimitFixed,
-        ManagerLimitVariable,
-        ManagerLimitReductionRatio
+        Invalid = -1,
+        Off,
+        Fixed,
+        Variable,
+        ReductionRatio,
+        Num
     };
 
-    enum class Selection
+    enum class ManagerSelection
     {
-        Unassigned,
-        ManagerSelectionAll,
-        ManagerSelectionMany,
-        ManagerSelectionOne
+        Invalid = -1,
+        All,
+        Many,
+        One,
+        Num
     };
 
     enum class DemandAction
     {
+        Invalid = -1,
         CheckCanReduce,
         SetLimit,
-        ClearLimit
+        ClearLimit,
+        Num
     };
 
     // Types
@@ -137,7 +143,7 @@ namespace DemandManager {
         // Default Constructor
         DemandManagerListData()
             : Meter(0), LimitSchedule(0), SafetyFraction(1.0), BillingSchedule(0), BillingPeriod(0.0), PeakSchedule(0), AveragingWindow(1),
-              ManagerPriority(ManagePriorityType::Unassigned), MeterDemand(0.0), AverageDemand(0.0), PeakDemand(0.0), ScheduledLimit(0.0),
+              ManagerPriority(ManagePriorityType::Invalid), MeterDemand(0.0), AverageDemand(0.0), PeakDemand(0.0), ScheduledLimit(0.0),
               DemandLimit(0.0), AvoidedDemand(0.0), OverLimit(0.0), OverLimitDuration(0.0)
         {
         }
@@ -154,8 +160,8 @@ namespace DemandManager {
         bool Available;        // Availability flag
         bool Activate;         // Flag to activate the manager
         bool Active;           // Flag to indicate that the manager is active
-        Limit LimitControl;
-        Selection SelectionControl;
+        ManagerLimit LimitControl;
+        ManagerSelection SelectionControl;
         int LimitDuration;       // Minimum duration of demand manager activity (min)
         int ElapsedTime;         // Elapsed time for the demand manager activity (min)
         int RotationDuration;    // Rotation duration (min)
@@ -174,8 +180,8 @@ namespace DemandManager {
 
         // Default Constructor
         DemandManagerData()
-            : Type(ManagerType::Unassigned), DemandManagerList(0), CanReduceDemand(false), AvailSchedule(0), Available(false), Activate(false),
-              Active(false), LimitControl(Limit::Unassigned), SelectionControl(Selection::Unassigned), LimitDuration(0), ElapsedTime(0),
+            : Type(ManagerType::Invalid), DemandManagerList(0), CanReduceDemand(false), AvailSchedule(0), Available(false), Activate(false),
+              Active(false), LimitControl(ManagerLimit::Invalid), SelectionControl(ManagerSelection::Invalid), LimitDuration(0), ElapsedTime(0),
               RotationDuration(0), ElapsedRotationTime(0), RotatedLoadNum(0), LowerLimit(0.0), UpperLimit(0.0), NumOfLoads(0), FixedRate(0.0),
               ReductionRatio(0.0)
         {

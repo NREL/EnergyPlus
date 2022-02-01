@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -189,10 +189,10 @@ namespace WindowManager {
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto &material(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
-                    if BITF_TEST_NONE (BITF(material.Group),
+                    if (BITF_TEST_NONE(BITF(material.Group),
                                        BITF(DataHeatBalance::MaterialGroup::WindowGas) | BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) |
                                            BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap) |
-                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
+                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade))) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.

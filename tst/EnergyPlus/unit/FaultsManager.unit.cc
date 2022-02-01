@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,9 +100,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs: fan curve
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
@@ -351,9 +351,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     // Inputs: fan curve
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
@@ -877,10 +877,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         int FaultIndex = 1;
         EXPECT_EQ("AHU HW HEATING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
         EXPECT_NEAR(6.64, state->dataWaterCoils->WaterCoil(CoilNum).UACoil, 0.0001);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType));
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_TRUE(
+            compare_enums(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilType));
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -905,10 +906,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         int CoilNum = 2;
         int FaultIndex = 2;
         EXPECT_EQ("AHU CHW COOLING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType));
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilType));
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -938,7 +939,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     {
         int CoilNum = 3;
         EXPECT_EQ("AHU CHW COIL WITH NO FAULT", state->dataWaterCoils->WaterCoil(CoilNum).Name);
-        EXPECT_EQ(DataPlant::TypeOf_CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType);
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType));
 
         EXPECT_FALSE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(0, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);

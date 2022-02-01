@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,8 +87,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     Real64 AvgEqOfTime(0.0);       // Average value of Equation of Time for period
     Real64 AvgSinSolarDeclin(1.0); // Average value of Sine of Solar Declination for period
     Real64 AvgCosSolarDeclin(0.0); // Average value of Cosine of Solar Declination for period
-    int const NumTimeSteps(6);
-    int const HoursInDay(24);
+    int constexpr NumTimeSteps(6);
+    int constexpr HoursInDay(24);
 
     state->dataGlobal->TimeStep = 1;
     state->dataSurface->TotSurfaces = 3;

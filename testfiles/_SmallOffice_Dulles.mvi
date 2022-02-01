@@ -44,22 +44,22 @@ Pb:Facility
 WaterEnvironmentalFactors:Facility
 Nuclear High:Facility
 Nuclear Low:Facility
-ElectricEmissions:CO2
-ElectricEmissions:CO
-ElectricEmissions:CH4
-ElectricEmissions:NOx
-ElectricEmissions:N2O
-ElectricEmissions:SO2
-ElectricEmissions:PM
-ElectricEmissions:PM10
-ElectricEmissions:PM2.5
-ElectricEmissions:NH3
-ElectricEmissions:NMVOC
-ElectricEmissions:Hg
-ElectricEmissions:Pb
-ElectricEmissions:WaterEnvironmentalFactors
-ElectricEmissions:Nuclear High
-ElectricEmissions:Nuclear Low
+ElectricityEmissions:CO2
+ElectricityEmissions:CO
+ElectricityEmissions:CH4
+ElectricityEmissions:NOx
+ElectricityEmissions:N2O
+ElectricityEmissions:SO2
+ElectricityEmissions:PM
+ElectricityEmissions:PM10
+ElectricityEmissions:PM2.5
+ElectricityEmissions:NH3
+ElectricityEmissions:NMVOC
+ElectricityEmissions:Hg
+ElectricityEmissions:Pb
+ElectricityEmissions:WaterEnvironmentalFactors
+ElectricityEmissions:Nuclear High
+ElectricityEmissions:Nuclear Low
 NaturalGasEmissions:CO2
 NaturalGasEmissions:CO
 NaturalGasEmissions:CH4

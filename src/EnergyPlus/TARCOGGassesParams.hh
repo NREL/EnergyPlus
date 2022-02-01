@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,10 +59,11 @@ int constexpr maxgas = 10;
 // Standards:
 enum class Stdrd
 {
-    Unassigned = -1,
-    ISO15099,   // standard = ISO15099
-    EN673,      // standard = EN 673 / ISO 10292 Declared
-    EN673Design // standard = EN 673 / ISO 10292 Design
+    Invalid = -1,
+    ISO15099,    // standard = ISO15099
+    EN673,       // standard = EN 673 / ISO 10292 Declared
+    EN673Design, // standard = EN 673 / ISO 10292 Design
+    Num
 };
 
 int constexpr MinStandard = static_cast<int>(Stdrd::ISO15099);    // minimum index for standard

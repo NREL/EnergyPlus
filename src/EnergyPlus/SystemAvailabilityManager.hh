@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,6 +63,35 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace SystemAvailabilityManager {
+
+    int constexpr StayOff = 0;
+    int constexpr CycleOnAny = 1;
+    int constexpr CycleOnControlZone = 2;
+    int constexpr ZoneFansOnly = 3;
+    int constexpr CycleOnAnyCoolingOrHeatingZone = 4;
+    int constexpr CycleOnAnyCoolingZone = 5;
+    int constexpr CycleOnAnyHeatingZone = 6;
+    int constexpr CycleOnAnyHeatingZoneFansOnly = 7;
+
+    // Cycling Run Time Control Type
+    int constexpr FixedRunTime = 1;
+    int constexpr Thermostat = 2;
+    int constexpr ThermostatWithMinimumRunTime = 3;
+
+    int constexpr NumValidSysAvailManagerTypes = 12;
+
+    int constexpr SysAvailMgr_Scheduled = 1;
+    int constexpr SysAvailMgr_ScheduledOn = 2;
+    int constexpr SysAvailMgr_ScheduledOff = 3;
+    int constexpr SysAvailMgr_NightCycle = 4;
+    int constexpr SysAvailMgr_DiffThermo = 5;
+    int constexpr SysAvailMgr_HiTempTOff = 6;
+    int constexpr SysAvailMgr_HiTempTOn = 7;
+    int constexpr SysAvailMgr_LoTempTOff = 8;
+    int constexpr SysAvailMgr_LoTempTOn = 9;
+    int constexpr SysAvailMgr_NightVent = 10;
+    int constexpr SysAvailMgr_HybridVent = 11;
+    int constexpr SysAvailMgr_OptimumStart = 12;
 
     struct DefineSchedSysAvailManager // Derived type for Scheduled Sys Avail Managers
     {
@@ -472,7 +501,7 @@ namespace SystemAvailabilityManager {
                                  int &AvailStatus       // System status indicator
     );
 
-    int ValidateAndSetSysAvailabilityManagerType(EnergyPlusData &state, std::string const &AvailMgrName); // name to validate
+    int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName); // name to validate
 
     void ManageHybridVentilation(EnergyPlusData &state);
 
@@ -491,61 +520,6 @@ namespace SystemAvailabilityManager {
 
 struct SystemAvailabilityManagerData : BaseGlobalStruct
 {
-
-    int const MaxDayTypes = 12;
-    int const StayOff = 0;
-    int const CycleOnAny = 1;
-    int const CycleOnControlZone = 2;
-    int const ZoneFansOnly = 3;
-    int const CycleOnAnyCoolingOrHeatingZone = 4;
-    int const CycleOnAnyCoolingZone = 5;
-    int const CycleOnAnyHeatingZone = 6;
-    int const CycleOnAnyHeatingZoneFansOnly = 7;
-
-    // Cycling Run Time Control Type
-    int const FixedRunTime = 1;
-    int const Thermostat = 2;
-    int const ThermostatWithMinimumRunTime = 3;
-
-    // Optimum start parameter definations
-    int const ControlZone = 4;
-    int const MaximumOfZoneList = 5;
-
-    int const ConstantTemperatureGradient = 0;
-    int const AdaptiveTemperatureGradient = 1;
-    int const AdaptiveASHRAE = 2;
-    int const ConstantStartTime = 3;
-
-    // Hybrid Ventilation parameters
-    int const HybridVentMode_No = 0;       // No hybrid ventilation control
-    int const HybridVentMode_Temp = 1;     // Temperature control
-    int const HybridVentMode_Enth = 2;     // Enthalpy control
-    int const HybridVentMode_DewPoint = 3; // Dew point control
-    int const HybridVentMode_OA = 4;       // Outdoor air control
-    int const HybridVentMode_OperT80 = 5;  // Operative temperature control with 80% acceptability limits
-    int const HybridVentMode_OperT90 = 6;  // Operative temperature control with 90% acceptability limits
-    int const HybridVentMode_CO2 = 7;      // CO2 control
-
-    int const HybridVentCtrl_NoAction = 0; // No hybrid ventilation control
-    int const HybridVentCtrl_Open = 1;     // Open windows or doors
-    int const HybridVentCtrl_Close = 2;    // Close windows or doors
-
-    int const NumValidSysAvailManagerTypes = 12;
-
-    int const SysAvailMgr_Scheduled = 1;
-    int const SysAvailMgr_ScheduledOn = 2;
-    int const SysAvailMgr_ScheduledOff = 3;
-    int const SysAvailMgr_NightCycle = 4;
-    int const SysAvailMgr_DiffThermo = 5;
-    int const SysAvailMgr_HiTempTOff = 6;
-    int const SysAvailMgr_HiTempTOn = 7;
-    int const SysAvailMgr_LoTempTOff = 8;
-    int const SysAvailMgr_LoTempTOn = 9;
-    int const SysAvailMgr_NightVent = 10;
-    int const SysAvailMgr_HybridVent = 11;
-
-    int const SysAvailMgr_OptimumStart = 12;
-
     int NumSchedSysAvailMgrs = 0;
     int NumSchedOnSysAvailMgrs = 0;
     int NumSchedOffSysAvailMgrs = 0;
@@ -584,9 +558,6 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
     EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
 
     bool BeginOfDayResetFlag = true;
-
-    Array1D_string const cValidSysAvailManagerTypes;
-    Array1D_int const ValidSysAvailManagerTypes;
 
     Array1D_bool ZoneCompNCControlType;
     bool MyOneTimeFlag = true; // One time flag
@@ -638,37 +609,6 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
         CurrentEndTime = 0.0;
         CurrentEndTimeLast = 0.0;
         TimeStepSysLast = 0.0;
-    }
-
-    // Default Constructor
-    SystemAvailabilityManagerData()
-        : cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
-                                     {"AvailabilityManager:Scheduled",
-                                      "AvailabilityManager:ScheduledOn",
-                                      "AvailabilityManager:ScheduledOff",
-                                      "AvailabilityManager:NightCycle",
-                                      "AvailabilityManager:DifferentialThermostat",
-                                      "AvailabilityManager:HighTemperatureTurnOff",
-                                      "AvailabilityManager:HighTemperatureTurnOn",
-                                      "AvailabilityManager:LowTemperatureTurnOff",
-                                      "AvailabilityManager:LowTemperatureTurnOn",
-                                      "AvailabilityManager:NightVentilation",
-                                      "AvailabilityManager:HybridVentilation",
-                                      "AvailabilityManager:OptimumStart"}),
-          ValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
-                                    {SysAvailMgr_Scheduled,
-                                     SysAvailMgr_ScheduledOn,
-                                     SysAvailMgr_ScheduledOff,
-                                     SysAvailMgr_NightCycle,
-                                     SysAvailMgr_DiffThermo,
-                                     SysAvailMgr_HiTempTOff,
-                                     SysAvailMgr_HiTempTOn,
-                                     SysAvailMgr_LoTempTOff,
-                                     SysAvailMgr_LoTempTOn,
-                                     SysAvailMgr_NightVent,
-                                     SysAvailMgr_HybridVent,
-                                     SysAvailMgr_OptimumStart})
-    {
     }
 };
 } // namespace EnergyPlus

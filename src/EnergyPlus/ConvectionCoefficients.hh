@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -664,88 +664,88 @@ namespace ConvectionCoefficients {
                                     Real64 HydraulicDiameter // [m] characteristic size, = (4 * area) / perimeter
     );
 
-    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
-                                                   Real64 const &Height,        // [m] characteristic size
-                                                   Real64 const &SurfTemp,      // [C] surface temperature
-                                                   Real64 const &SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const &AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 Height,        // [m] characteristic size
+                                                   Real64 SurfTemp,      // [C] surface temperature
+                                                   Real64 SupplyAirTemp, // [C] temperature of supply air into zone
+                                                   Real64 AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
     );
 
     Real64 CalcBeausoleilMorrisonMixedAssistedWall(EnergyPlusData &state,
-                                                   Real64 const &DeltaTemp, // [C] temperature difference between surface and air
-                                                   Real64 const &Height,    // [m] characteristic size
-                                                   Real64 const &SurfTemp,  // [C] surface temperature
-                                                   int ZoneNum              // index of zone for messaging
+                                                   Real64 DeltaTemp, // [C] temperature difference between surface and air
+                                                   Real64 Height,    // [m] characteristic size
+                                                   Real64 SurfTemp,  // [C] surface temperature
+                                                   int ZoneNum       // index of zone for messaging
     );
 
-    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
-                                                   Real64 const &Height,        // [m] characteristic size
-                                                   Real64 const &SurfTemp,      // [C] surface temperature
-                                                   Real64 const &SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const &AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 Height,        // [m] characteristic size
+                                                   Real64 SurfTemp,      // [C] surface temperature
+                                                   Real64 SupplyAirTemp, // [C] temperature of supply air into zone
+                                                   Real64 AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
     );
 
     Real64 CalcBeausoleilMorrisonMixedOpposingWall(EnergyPlusData &state,
-                                                   Real64 const &DeltaTemp, // [C] temperature difference between surface and air
-                                                   Real64 const &Height,    // [m] characteristic size
-                                                   Real64 const &SurfTemp,  // [C] surface temperature
-                                                   int ZoneNum              // index of zone for messaging
+                                                   Real64 DeltaTemp, // [C] temperature difference between surface and air
+                                                   Real64 Height,    // [m] characteristic size
+                                                   Real64 SurfTemp,  // [C] surface temperature
+                                                   int ZoneNum       // index of zone for messaging
     );
 
-    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                  Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                  Real64 const &SurfTemp,          // [C] surface temperature
-                                                  Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                  Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 SurfTemp,          // [C] surface temperature
+                                                  Real64 SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                  Real64 AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     );
 
     Real64 CalcBeausoleilMorrisonMixedStableFloor(EnergyPlusData &state,
-                                                  Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                  Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                  Real64 const &SurfTemp,          // [C] surface temperature
-                                                  int ZoneNum                      // index of zone for messaging
+                                                  Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 SurfTemp,          // [C] surface temperature
+                                                  int ZoneNum               // index of zone for messaging
     );
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const &SurfTemp,          // [C] surface temperature
-                                                    Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 SurfTemp,          // [C] surface temperature
+                                                    Real64 SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                    Real64 AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     );
 
     Real64 CalcBeausoleilMorrisonMixedUnstableFloor(EnergyPlusData &state,
-                                                    Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const &SurfTemp,          // [C] surface temperature
-                                                    int ZoneNum                      // index of zone for messaging
+                                                    Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 SurfTemp,          // [C] surface temperature
+                                                    int ZoneNum               // index of zone for messaging
     );
 
-    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const &SurfTemp,          // [C] surface temperature
-                                                    Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 SurfTemp,          // [C] surface temperature
+                                                    Real64 SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                    Real64 AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     );
 
     Real64 CalcBeausoleilMorrisonMixedStableCeiling(EnergyPlusData &state,
-                                                    Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const &SurfTemp,          // [C] surface temperature
-                                                    int ZoneNum                      // index of zone for messaging
+                                                    Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 SurfTemp,          // [C] surface temperature
+                                                    int ZoneNum               // index of zone for messaging
     );
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                      Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                      Real64 const &SurfTemp,          // [C] surface temperature
-                                                      Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                      Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                      Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                      Real64 SurfTemp,          // [C] surface temperature
+                                                      Real64 SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                      Real64 AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     );
 
     Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(EnergyPlusData &state,
-                                                      Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                      Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                      Real64 const &SurfTemp,          // [C] surface temperature
-                                                      int ZoneNum                      // index of zone for messaging
+                                                      Real64 DeltaTemp,         // [C] temperature difference between surface and air
+                                                      Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                      Real64 SurfTemp,          // [C] surface temperature
+                                                      int ZoneNum               // index of zone for messaging
     );
 
     Real64 CalcFohannoPolidoriVerticalWall(Real64 DeltaTemp, // [C] temperature difference between surface and air
@@ -831,22 +831,21 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMitchell(EnergyPlusData &state, Real64 WindAtZ, Real64 LengthScale, int SurfNum);
 
-    Real64 CalcBlockenWindward(Real64 WindAt10m,
-                               Real64 WindDir,    // Wind direction measured clockwise from geographic North
-                               Real64 SurfAzimuth // or Facing, Direction the surface outward normal faces (degrees)
-    );
+    Real64 CalcBlockenWindward(EnergyPlusData &state,
+                               Real64 WindAt10m,
+                               Real64 WindDir,     // Wind direction measured clockwise from geographic North
+                               Real64 SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
+                               int SurfNum);
 
-    Real64 CalcEmmelVertical(EnergyPlusData &state,
-                             Real64 WindAt10m,
-                             Real64 WindDir,     // Wind direction measured clockwise from geographic North
-                             Real64 SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
-                             int SurfNum);
+    Real64 CalcWindSurfaceTheta(Real64 const WindDir, Real64 const SurfAzimuth);
 
-    Real64 CalcEmmelRoof(EnergyPlusData &state,
-                         Real64 WindAt10m,
-                         Real64 WindDir,                // Wind direction measured clockwise from geographic North
-                         Real64 LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
-                         int SurfNum);
+    Real64 CalcEmmelVertical(Real64 WindAt10m,
+                             Real64 WindDir,      // Wind direction measured clockwise from geographic North
+                             Real64 SurfAzimuth); // or Facing, Direction the surface outward normal faces (degrees)
+
+    Real64 CalcEmmelRoof(Real64 WindAt10m,
+                         Real64 WindDir,                 // Wind direction measured clockwise from geographic North
+                         Real64 LongAxisOutwardAzimuth); // or Facing, Direction the surface outward normal faces (degrees)
 
     Real64 CalcClearRoof(EnergyPlusData &state,
                          Real64 AirTemp,
@@ -908,8 +907,7 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
     int CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
     int CalcSparrowWindwardErrorIDX = 0;
     int CalcSparrowLeewardErrorIDX = 0;
-    int CalcEmmelVerticalErrorIDX = 0;
-    int CalcEmmelRoofErrorIDX = 0;
+    int CalcBlockenWindwardErrorIDX = 0;
     int CalcClearRoofErrorIDX = 0;
     int CalcMitchellErrorIDX = 0;
 
@@ -971,8 +969,7 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
         this->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
         this->CalcSparrowWindwardErrorIDX = 0;
         this->CalcSparrowLeewardErrorIDX = 0;
-        this->CalcEmmelVerticalErrorIDX = 0;
-        this->CalcEmmelRoofErrorIDX = 0;
+        this->CalcBlockenWindwardErrorIDX = 0;
         this->CalcClearRoofErrorIDX = 0;
         this->CalcMitchellErrorIDX = 0;
 
