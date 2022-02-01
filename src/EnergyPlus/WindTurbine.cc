@@ -100,6 +100,11 @@ namespace WindTurbine {
         "VARIABLESPEEDVARIABLEPITCH",
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(RotorType::Num)> RotorNamesUC{
+        "HORIZONTALAXISWINDTURBINE",
+        "VERTICALAXISWINDTURBINE",
+    };
+
     void SimWindTurbine(EnergyPlusData &state,
                         [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
                         std::string const &GeneratorName,                   // User specified name of Generator
@@ -270,12 +275,11 @@ namespace WindTurbine {
                 }
             }
             // Select rotor type
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
-                if ((SELECT_CASE_var == "HORIZONTALAXISWINDTURBINE") || (SELECT_CASE_var == "")) {
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType =
+                static_cast<RotorType>(getEnumerationValue(WindTurbine::RotorNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType == RotorType::Invalid) {
+                if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType = RotorType::HAWT;
-                } else if (SELECT_CASE_var == "VERTICALAXISWINDTURBINE") {
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType = RotorType::VAWT;
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" +
@@ -288,7 +292,7 @@ namespace WindTurbine {
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType =
                 static_cast<ControlType>(getEnumerationValue(WindTurbine::ControlNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType == ControlType::Invalid) {
-                if (state.dataIPShortCut->cAlphaArgs(4) == "") {
+                if (state.dataIPShortCut->cAlphaArgs(4).empty()) {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType = ControlType::VSVP;
                 } else {
                     ShowSevereError(state,
