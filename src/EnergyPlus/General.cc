@@ -781,6 +781,24 @@ void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
     PDay = Number - (EndOfMonth(WMonth - 1) + LeapAddCur);
 }
 
+bool BetweenDateHours(int const TestDate,
+                      int const TestHour,
+                      int const StartDate,
+                      int const StartHour,
+                      int const EndDate,
+                      int const EndHour)
+{
+    Real64 TestRatioOfDay = TestHour / 24.0;
+    Real64 StartRatioOfDay = StartHour / 24.0;
+    Real64 EndRatioOfDay = EndHour / 24.0;
+
+    if (StartDate + StartRatioOfDay <= EndDate + EndRatioOfDay) { // Start Date <= End Date
+        return (StartDate + StartRatioOfDay < TestDate + TestRatioOfDay) && (TestDate + TestRatioOfDay <= EndDate + EndRatioOfDay);
+    } else { // EndDate < StartDate
+        return (EndDate + EndRatioOfDay < TestDate + TestRatioOfDay) && (TestDate + TestRatioOfDay <= StartDate + StartRatioOfDay);
+    }
+}
+
 bool BetweenDates(int const TestDate,  // Date to test
                   int const StartDate, // Start date in sequence
                   int const EndDate    // End date in sequence

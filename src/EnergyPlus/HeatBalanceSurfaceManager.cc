@@ -113,6 +113,7 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
@@ -5543,6 +5544,10 @@ void ReportThermalResilience(EnergyPlusData &state)
     int UnmetDegreeHourNoBins = 4;  // Unmet Degree Hour number of columns
     int DiscomfortWtExceedHourNoBins = 4;  // Unmet Degree Hour number of columns
 
+    // fixme: to be implemented
+    int currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+    int ReportPeriodIdx = findReportPeriodIdx(state, currentDate, state.dataGlobal->HourOfDay);
+
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
@@ -5893,6 +5898,23 @@ void ReportVisualResilience(EnergyPlusData &state)
             }
         }
     } // loop over zones
+}
+
+int findReportPeriodIdx(EnergyPlusData &state, const int currentDate, const int currentHour)
+{
+    // fixme: test case for returning -1 or not
+    int nReportPeriods = state.dataWeatherManager->TotReportPers;
+    for (int i = 1; i <= nReportPeriods; i++) {
+        int reportStartDate = state.dataWeatherManager->ReportPeriodInput(i).startJulianDate;
+        int reportStartHour = state.dataWeatherManager->ReportPeriodInput(i).startHour;
+        int reportEndDate = state.dataWeatherManager->ReportPeriodInput(i).endJulianDate;
+        int reportEndHour = state.dataWeatherManager->ReportPeriodInput(i).endHour;
+        if (General::BetweenDateHours(currentDate, currentHour, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {
+            return i;
+        };
+    }
+    // means didn't find a match
+    return -1;
 }
 
 void ReportSurfaceHeatBalance(EnergyPlusData &state)

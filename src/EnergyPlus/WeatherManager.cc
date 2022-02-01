@@ -5353,6 +5353,15 @@ namespace WeatherManager {
                                        state.dataWeatherManager->ReportPeriodInput(i).endYear));
                 ErrorsFound = true;
             }
+
+            state.dataWeatherManager->ReportPeriodInput(i).startJulianDate =
+                computeJulianDate(state.dataWeatherManager->ReportPeriodInput(i).startYear,
+                                  state.dataWeatherManager->ReportPeriodInput(i).startMonth,
+                                  state.dataWeatherManager->ReportPeriodInput(i).startDay);
+            state.dataWeatherManager->ReportPeriodInput(i).endJulianDate =
+                computeJulianDate(state.dataWeatherManager->ReportPeriodInput(i).endYear,
+                                  state.dataWeatherManager->ReportPeriodInput(i).endMonth,
+                                  state.dataWeatherManager->ReportPeriodInput(i).endDay);
         }
     }
 

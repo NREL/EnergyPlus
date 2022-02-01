@@ -244,21 +244,25 @@ namespace WeatherManager {
         }
     };
 
-    struct ReportPeriodData {
+    struct ReportPeriodData
+    {
         std::string title;
         std::string reportName;
         int startYear;
         int startMonth;
         int startDay;
         int startHour;
+        int startJulianDate;
         int endYear;
         int endMonth;
         int endDay;
         int endHour;
+        int endJulianDate;
 
         // Default Constructor
         ReportPeriodData()
-            : startYear(2017), startMonth(1), startDay(1), startHour(1), endYear(2017), endMonth(12), endDay(31), endHour(24)
+            : startYear(2017), startMonth(1), startDay(1), startHour(1), startJulianDate(2457755), endYear(2017), endMonth(12), endDay(31),
+              endHour(24), endJulianDate(2458119)
         {
         }
     };
