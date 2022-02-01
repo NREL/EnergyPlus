@@ -576,7 +576,10 @@ namespace ExhaustAirSystemManager {
 
                 // InducedNodeListName = AlphArray(5);
                 bool NodeListError = false;
+                int NumNum = 0;
+                int NumParams = 0;
                 int NumNodes = 0;
+                Array1D_int NodeNums;
 
                 Array1D_int supplyNodeOrNodelistArray; // 2022-01: this needs some extra allocation and initialization
                 // still having a problem getting it debugged properly. Maybe for now replace with a single node to move forward.
@@ -595,10 +598,13 @@ namespace ExhaustAirSystemManager {
                                                           ObjectIsParent);
                     thisExhCtrl.SupplyNodeOrNodelistNum = supplynodenum_single;
                 } else {
+                    // 2022-02: Refer to GetZoneEquipmentData() in DataZoneEquipment.cc:
+                    ip->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
+                    NodeNums.dimension(NumParams, 0);
                     GetNodeNums(state,
                                 supplyNodeOrNodelistName,
                                 NumNodes,
-                                supplyNodeOrNodelistArray,
+                                NodeNums,
                                 NodeListError,
                                 DataLoopNode::NodeFluidType::Air,
                                 "ZoneHVAC:ExhaustControl",
