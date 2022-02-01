@@ -2570,7 +2570,7 @@ inline std::string escape(std::string s)
  *
  * Note the order of escaping "~1" to "/" and "~0" to "~" is important.
  */
-static void unescape(std::string& s)
+static inline void unescape(std::string& s)
 {
     replace_substring(s, "~1", "/");
     replace_substring(s, "~0", "~");
