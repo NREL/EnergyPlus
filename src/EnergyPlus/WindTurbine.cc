@@ -281,7 +281,7 @@ namespace WindTurbine {
                 static_cast<RotorType>(getEnumerationValue(WindTurbine::RotorNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             if (windTurbine.rotorType == RotorType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
-                    windTurbine.rotorType = RotorType::HAWT;
+                    windTurbine.rotorType = RotorType::HorizontalAxis;
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" +
@@ -490,7 +490,7 @@ namespace WindTurbine {
             }
 
             windTurbine.MaxPowerCoeff = state.dataIPShortCut->rNumericArgs(11); // Maximum power coefficient
-            if (windTurbine.rotorType == RotorType::HAWT &&
+            if (windTurbine.rotorType == RotorType::HorizontalAxis &&
                 windTurbine.MaxPowerCoeff == 0.0) {
                 if (lNumericBlanks(11)) {
                     ShowSevereError(state,
@@ -561,7 +561,7 @@ namespace WindTurbine {
 
             windTurbine.ChordArea =
                 state.dataIPShortCut->rNumericArgs(14); // Chord area of a single blade for VAWTs
-            if (windTurbine.rotorType == RotorType::VAWT &&
+            if (windTurbine.rotorType == RotorType::VerticalAxis &&
                 windTurbine.ChordArea == 0.0) {
                 if (lNumericBlanks(14)) {
                     ShowSevereError(state,
@@ -579,7 +579,7 @@ namespace WindTurbine {
             }
 
             windTurbine.DragCoeff = state.dataIPShortCut->rNumericArgs(15); // Blade drag coefficient
-            if (windTurbine.rotorType == RotorType::VAWT &&
+            if (windTurbine.rotorType == RotorType::VerticalAxis &&
                 windTurbine.DragCoeff == 0.0) {
                 if (lNumericBlanks(15)) {
                     ShowSevereError(state,
@@ -597,7 +597,7 @@ namespace WindTurbine {
             }
 
             windTurbine.LiftCoeff = state.dataIPShortCut->rNumericArgs(16); // Blade lift coefficient
-            if (windTurbine.rotorType == RotorType::VAWT &&
+            if (windTurbine.rotorType == RotorType::VerticalAxis &&
                 windTurbine.LiftCoeff == 0.0) {
                 if (lNumericBlanks(16)) {
                     ShowSevereError(state,
@@ -698,7 +698,7 @@ namespace WindTurbine {
                                 OutputProcessor::SOVStoreType::Average,
                                 windTurbine.Name);
             switch (windTurbine.rotorType) {
-            case RotorType::HAWT: {
+            case RotorType::HorizontalAxis: {
                 SetupOutputVariable(state,
                                     "Generator Turbine Power Coefficient",
                                     OutputProcessor::Unit::None,
@@ -707,7 +707,7 @@ namespace WindTurbine {
                                     OutputProcessor::SOVStoreType::Average,
                                     windTurbine.Name);
             } break;
-            case RotorType::VAWT: {
+            case RotorType::VerticalAxis: {
                 SetupOutputVariable(state,
                                     "Generator Turbine Chordal Component Velocity",
                                     OutputProcessor::Unit::m_s,
@@ -970,7 +970,7 @@ namespace WindTurbine {
             }
 
             switch (windTurbine.rotorType) {
-            case RotorType::HAWT: { // Horizontal axis wind turbine
+            case RotorType::HorizontalAxis: { // Horizontal axis wind turbine
                 MaxPowerCoeff = windTurbine.MaxPowerCoeff;
                 // Check if empirical constants are available
                 C1 = windTurbine.PowerCoeffC1;
@@ -1007,7 +1007,7 @@ namespace WindTurbine {
                 // Recalculated Cp at the rated power
                 windTurbine.PowerCoeff = PowerCoeff;
             } break;
-            case RotorType::VAWT: { // Vertical axis wind turbine
+            case RotorType::VerticalAxis: { // Vertical axis wind turbine
                 RotorVel = Omega * (RotorD / 2.0);
                 // Recalculated omega, if TSR is greater than the maximum
                 if (TipSpeedRatio >= windTurbine.MaxTipSpeedRatio) {

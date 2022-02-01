@@ -67,8 +67,8 @@ namespace WindTurbine {
     enum class RotorType
     {
         Invalid = -1,
-        HAWT, // 'HorizontalAxisWindTurbine'
-        VAWT, // 'VerticalAxisWindTurbine',
+        HorizontalAxis,
+        VerticalAxis,
         Num
     };
 
