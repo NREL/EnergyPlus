@@ -35,8 +35,11 @@ if(ENABLE_PCH)
   target_precompile_headers(
     cpp_pch_files
     INTERFACE
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/DataGlobalConstants.hh"
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/DataGlobals.hh"
     "${PROJECT_SOURCE_DIR}/src/EnergyPlus/Data/EnergyPlusData.hh"
     "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array.functions.hh"
+    "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh"
     "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json.hpp"
     )
 endif()
