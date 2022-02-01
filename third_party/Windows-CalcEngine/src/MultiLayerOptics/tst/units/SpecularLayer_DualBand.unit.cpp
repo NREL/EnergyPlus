@@ -56,7 +56,6 @@ TEST_F(TestSpecularLayer_102, TestSpecularDualBandSingleLayer1)
 {
     SCOPED_TRACE("Begin Test: Scattering Specular Layer with Dual Band Material.");
 
-    const auto thickness = 3.048e-3;   // [m]
     const auto TfSolar{0.6};
     const auto TbSolar{0.6};
     const auto RfSolar{0.074764};
