@@ -93,6 +93,13 @@ namespace WindTurbine {
     // Mazharul Islam, David S.K. Ting, and Amir Fartaj. 2008. Aerodynamic Models for Darrieus-type sSraight-bladed
     //     Vertical Axis Wind Turbines. Renewable & Sustainable Energy Reviews, Volume 12, pp.1087-1109
 
+    constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> ControlNamesUC{
+        "FIXEDSPEEDFIXEDPITCH",
+        "FIXEDSPEEDVARIABLEPITCH",
+        "VARIABLESPEEDFIXEDPITCH",
+        "VARIABLESPEEDVARIABLEPITCH",
+    };
+
     void SimWindTurbine(EnergyPlusData &state,
                         [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
                         std::string const &GeneratorName,                   // User specified name of Generator
@@ -278,15 +285,10 @@ namespace WindTurbine {
             }
 
             // Select control type
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
-                if (SELECT_CASE_var == "FIXEDSPEEDFIXEDPITCH") {
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType = ControlType::FSFP;
-                } else if (SELECT_CASE_var == "FIXEDSPEEDVARIABLEPITCH") {
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType = ControlType::FSVP;
-                } else if (SELECT_CASE_var == "VARIABLESPEEDFIXEDPITCH") {
-                    state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType = ControlType::VSFP;
-                } else if ((SELECT_CASE_var == "VARIABLESPEEDVARIABLEPITCH") || (SELECT_CASE_var == "")) {
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType =
+                static_cast<ControlType>(getEnumerationValue(WindTurbine::ControlNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+            if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType == ControlType::Invalid) {
+                if (state.dataIPShortCut->cAlphaArgs(4) == "") {
                     state.dataWindTurbine->WindTurbineSys(WindTurbineNum).controlType = ControlType::VSVP;
                 } else {
                     ShowSevereError(state,
