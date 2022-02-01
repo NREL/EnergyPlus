@@ -295,7 +295,7 @@ namespace WindTurbine {
                 static_cast<ControlType>(getEnumerationValue(WindTurbine::ControlNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
             if (windTurbine.controlType == ControlType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(4).empty()) {
-                    windTurbine.controlType = ControlType::VSVP;
+                    windTurbine.controlType = ControlType::VariableSpeedVariablePitch;
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" +

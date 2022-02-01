@@ -75,10 +75,10 @@ namespace WindTurbine {
     enum class ControlType
     {
         Invalid = -1,
-        FSFP, // 'FixedSpeedFixedPitch'
-        FSVP, // 'FixedSpeedVariablePitch'
-        VSFP, // 'VariableSpeedFixedPitch'
-        VSVP, // 'VariableSpeedVariablePitch'
+        FixedSpeedFixedPitch,
+        FixedSpeedVariablePitch,
+        VariableSpeedFixedPitch,
+        VariableSpeedVariablePitch,
         Num
     };
 
