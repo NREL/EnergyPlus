@@ -293,7 +293,8 @@ namespace ExhaustAirSystemManager {
                         } else { // mine data from fan object
                             // Get the fan index
                             bool errFlag(false);
-                            EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                            // EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                            EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag);
                             if (errFlag) {
                                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
                                 ErrorsFound = true;
@@ -509,10 +510,10 @@ namespace ExhaustAirSystemManager {
                 int inletNodeNum = GetOnlySingleNode(state,
                                                      inletNodeName,
                                                      ErrorsFound,
-                                                     cCurrentModuleObject,
+                                                     DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
                                                      thisExhCtrl.Name,
                                                      DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsParent);
                 thisExhCtrl.InletNodeNum = inletNodeNum;
@@ -522,10 +523,10 @@ namespace ExhaustAirSystemManager {
                 int outletNodeNum = GetOnlySingleNode(state,
                                                       outletNodeName,
                                                       ErrorsFound,
-                                                      cCurrentModuleObject,
+                                                      DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
                                                       thisExhCtrl.Name,
                                                       DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsParent);
                 thisExhCtrl.OutletNodeNum = outletNodeNum;
@@ -590,10 +591,10 @@ namespace ExhaustAirSystemManager {
                     supplynodenum_single = GetOnlySingleNode(state,
                                                           supplyNodeOrNodelistName,
                                                           ErrorsFound,
-                                                          cCurrentModuleObject, // change type
+                                                          DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // may need to change type, maybe zone inlets?
                                                           thisExhCtrl.Name,
                                                           DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::NodeConnectionType::Sensor,
+                                                          DataLoopNode::ConnectionType::Sensor,
                                                           NodeInputManager::CompFluidStream::Primary,
                                                           ObjectIsParent);
                     thisExhCtrl.SupplyNodeOrNodelistNum = supplynodenum_single;
@@ -607,9 +608,9 @@ namespace ExhaustAirSystemManager {
                                 NodeNums,
                                 NodeListError,
                                 DataLoopNode::NodeFluidType::Air,
-                                "ZoneHVAC:ExhaustControl",
+                                DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // maybe zone inlets?
                                 thisExhCtrl.Name,
-                                DataLoopNode::NodeConnectionType::Sensor,
+                                DataLoopNode::ConnectionType::Sensor,
                                 NodeInputManager::CompFluidStream::Primary,
                                 ObjectIsNotParent); // ,
                                                     // _,
