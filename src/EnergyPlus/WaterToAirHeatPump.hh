@@ -63,7 +63,7 @@ struct EnergyPlusData;
 
 namespace WaterToAirHeatPump {
 
-    enum class CompressType
+    enum class CompressorType
     {
         Invalid = -1,
         Reciprocating,
@@ -134,7 +134,7 @@ namespace WaterToAirHeatPump {
         Real64 SourceSideHTR2;  // Source Side Heat Transfer Resistance coefficient 2 [k/kW]
         Real64 HighPressCutoff; // High Pressure Cut-off [Pa]
         Real64 LowPressCutoff;  // Low Pressure Cut-off [Pa]
-        CompressType CompressorType;     // Type of Compressor ie. Reciprocating,Rotary or Scroll
+        CompressorType compressorType;     // Type of Compressor ie. Reciprocating,Rotary or Scroll
         int AirInletNodeNum;    // air side coil inlet node number
         int AirOutletNodeNum;   // air side coil outlet node number
         int WaterInletNodeNum;  // water side coil inlet node number
@@ -156,7 +156,7 @@ namespace WaterToAirHeatPump {
               HPTimeConstant(0.0), FanDelayTime(0.0), SourceSideUACoeff(0.0), LoadSideTotalUACoeff(0.0), LoadSideOutsideUACoeff(0.0),
               CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0),
               RefVolFlowRate(0.0), VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0),
-              LowPressCutoff(0.0), CompressorType(CompressType::Invalid), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              LowPressCutoff(0.0), compressorType(CompressorType::Invalid), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), plantLoc{}
         {
         }

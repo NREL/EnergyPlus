@@ -241,7 +241,7 @@ namespace WaterToAirHeatPump {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        constexpr std::array<std::string_view, static_cast<int>(CompressType::Num)> CompressTypeNamesUC {
+        constexpr std::array<std::string_view, static_cast<int>(CompressorType::Num)> CompressTypeNamesUC {
             "RECIPROCATING",
             "ROTARY",
             "SCROLL"
@@ -373,22 +373,22 @@ namespace WaterToAirHeatPump {
             HeatPump.PowerLosses = NumArray(10);
             HeatPump.LossFactor = NumArray(11);
 
-            HeatPump.CompressorType =
-                static_cast<CompressType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
+            HeatPump.compressorType =
+                static_cast<CompressorType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
 
-            switch (HeatPump.CompressorType) {
-            case CompressType::Reciprocating: {
+            switch (HeatPump.compressorType) {
+            case CompressorType::Reciprocating: {
                 HeatPump.CompPistonDisp = NumArray(12);
                 HeatPump.CompSucPressDrop = NumArray(13);
                 HeatPump.CompClearanceFactor = NumArray(14);
                 break;
             }
-            case CompressType::Rotary: {
+            case CompressorType::Rotary: {
                 HeatPump.CompPistonDisp = NumArray(12);
                 HeatPump.CompSucPressDrop = NumArray(13);
                 break;
             }
-            case CompressType::Scroll: {
+            case CompressorType::Scroll: {
                 HeatPump.RefVolFlowRate = NumArray(15);
                 HeatPump.VolumeRatio = NumArray(16);
                 HeatPump.LeakRateCoeff = NumArray(17);
@@ -567,21 +567,21 @@ namespace WaterToAirHeatPump {
             HeatPump.PowerLosses = NumArray(7);
             HeatPump.LossFactor = NumArray(8);
 
-            HeatPump.CompressorType =
-                static_cast<CompressType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
-            switch (HeatPump.CompressorType) {
-            case CompressType::Reciprocating: {
+            HeatPump.compressorType =
+                static_cast<CompressorType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
+            switch (HeatPump.compressorType) {
+            case CompressorType::Reciprocating: {
                 HeatPump.CompPistonDisp = NumArray(9);
                 HeatPump.CompSucPressDrop = NumArray(10);
                 HeatPump.CompClearanceFactor = NumArray(11);
                 break;
             }
-            case CompressType::Rotary: {
+            case CompressorType::Rotary: {
                 HeatPump.CompPistonDisp = NumArray(9);
                 HeatPump.CompSucPressDrop = NumArray(10);
                 break;
             }
-            case CompressType::Scroll: {
+            case CompressorType::Scroll: {
                 HeatPump.RefVolFlowRate = NumArray(12);
                 HeatPump.VolumeRatio = NumArray(13);
                 HeatPump.LeakRateCoeff = NumArray(14);
@@ -1210,7 +1210,7 @@ namespace WaterToAirHeatPump {
         int NumIteration3;                // Number of Iteration3
         int NumIteration4;                // Number of Iteration4 (use of latent degradation model ONLY)
         int SourceSideFluidIndex;         // Source Side Fluid Index
-        CompressType CompressorType;               // Type of Compressor ie. Reciprocating,Rotary or Scroll
+        CompressorType CompressorType;               // Type of Compressor ie. Reciprocating,Rotary or Scroll
         std::string SourceSideFluidName;  // Name of source side fluid
         std::string Refrigerant;          // Name of refrigerant
         Real64 NominalCoolingCapacity;    // Nominal Cooling Capacity (W)
@@ -1305,7 +1305,7 @@ namespace WaterToAirHeatPump {
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
         NominalCoolingCapacity = HeatPump.CoolingCapacity;
-        CompressorType = HeatPump.CompressorType;
+        CompressorType = HeatPump.compressorType;
         Refrigerant = HeatPump.Refrigerant;
         LoadSideTotalUA = HeatPump.LoadSideTotalUACoeff;
         LoadSideoutsideUA = HeatPump.LoadSideOutsideUACoeff;
@@ -1532,13 +1532,13 @@ namespace WaterToAirHeatPump {
                     }
 
                     // Determine Suction Pressure & Discharge Pressure at Compressor Exit
-                    if (CompressorType == CompressType::Reciprocating) { // RECIPROCATING
+                    if (CompressorType == CompressorType::Reciprocating) { // RECIPROCATING
                         SuctionPr = LoadSidePressure - PressureDrop;
                         DischargePr = SourceSidePressure + PressureDrop;
-                    } else if (CompressorType == CompressType::Rotary) { // ROTARY
+                    } else if (CompressorType == CompressorType::Rotary) { // ROTARY
                         SuctionPr = LoadSidePressure;
                         DischargePr = SourceSidePressure + PressureDrop;
-                    } else if (CompressorType == CompressType::Scroll) { // SCROLL
+                    } else if (CompressorType == CompressorType::Scroll) { // SCROLL
                         SuctionPr = LoadSidePressure;
                         DischargePr = SourceSidePressure;
                     }
@@ -1609,16 +1609,16 @@ namespace WaterToAirHeatPump {
 
                     // Find Refrigerant Flow Rate
                     switch (CompressorType) {
-                    case CompressType::Reciprocating: {
+                    case CompressorType::Reciprocating: {
                         MassRef = PistonDisp * CompSuctionDensity *
                                   (1.0 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1.0 / gamma));
                         break;
                     }
-                    case CompressType::Rotary: {
+                    case CompressorType::Rotary: {
                         MassRef = PistonDisp * CompSuctionDensity;
                         break;
                     }
-                    case CompressType::Scroll: {
+                    case CompressorType::Scroll: {
                         MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
                         break;
                     }
@@ -1638,13 +1638,13 @@ namespace WaterToAirHeatPump {
 
                 // Determine the Power Consumption
                 switch (CompressorType) {
-                case CompressType::Reciprocating:
-                case CompressType::Rotary:{
+                case CompressorType::Reciprocating:
+                case CompressorType::Rotary:{
                     Power = PowerLos + (1.0 / LosFac) * (MassRef * gamma / (gamma - 1.0) * SuctionPr / CompSuctionDensity *
                                                          (std::pow(DischargePr / SuctionPr, (gamma - 1.0) / gamma) - 1.0));
                     break;
                 }
-                case CompressType::Scroll: {
+                case CompressorType::Scroll: {
                     Power = PowerLos + (1.0 / LosFac) * (gamma / (gamma - 1.0)) * SuctionPr * RefVolFlowRate *
                                            (((gamma - 1.0) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
                                             ((1.0 / gamma) * std::pow(VolumeRatio, gamma - 1.0)) - 1.0);
@@ -1865,7 +1865,7 @@ namespace WaterToAirHeatPump {
         int NumIteration3;        // Number of Iteration3
         int SourceSideFluidIndex; // Source Side Fluid Index
 
-        CompressType CompressorType;              // Type of Compressor ie. Reciprocating,Rotary or Scroll
+        CompressorType CompressorType;              // Type of Compressor ie. Reciprocating,Rotary or Scroll
         std::string SourceSideFluidName; // Name of source side fluid
         std::string Refrigerant;         // Name of refrigerant
         //      CHARACTER(len=25) :: CErrCount
@@ -1938,7 +1938,7 @@ namespace WaterToAirHeatPump {
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
 
         NominalHeatingCapacity = HeatPump.HeatingCapacity;
-        CompressorType = HeatPump.CompressorType;
+        CompressorType = HeatPump.compressorType;
         Refrigerant = HeatPump.Refrigerant;
 
         LoadSideUA = HeatPump.LoadSideTotalUACoeff;
@@ -2094,17 +2094,17 @@ namespace WaterToAirHeatPump {
 
                 // Determine Suction Pressure at Compressor Entrance & Discharge Pressure at Compressor Exit
                 switch (CompressorType) {
-                case CompressType::Reciprocating: {
+                case CompressorType::Reciprocating: {
                     SuctionPr = SourceSidePressure - PressureDrop;
                     DischargePr = LoadSidePressure + PressureDrop;
                     break;
                 }
-                case CompressType::Rotary: {
+                case CompressorType::Rotary: {
                     SuctionPr = SourceSidePressure;
                     DischargePr = LoadSidePressure + PressureDrop;
                     break;
                 }
-                case CompressType::Scroll: {
+                case CompressorType::Scroll: {
                     SuctionPr = SourceSidePressure;
                     DischargePr = LoadSidePressure;
                     break;
@@ -2188,16 +2188,16 @@ namespace WaterToAirHeatPump {
 
                 // Find Refrigerant Flow Rate
                 switch (CompressorType) {
-                case CompressType::Reciprocating: {
+                case CompressorType::Reciprocating: {
                     MassRef =
                         PistonDisp * CompSuctionDensity * (1 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1 / gamma));
                     break;
                 }
-                case CompressType::Rotary: {
+                case CompressorType::Rotary: {
                     MassRef = PistonDisp * CompSuctionDensity;
                     break;
                 }
-                case CompressType::Scroll: {
+                case CompressorType::Scroll: {
                     MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
                     break;
                 }
@@ -2215,13 +2215,13 @@ namespace WaterToAirHeatPump {
 
             // Determine the Power Consumption
             switch (CompressorType) {
-            case CompressType::Reciprocating:
-            case CompressType::Rotary: {
+            case CompressorType::Reciprocating:
+            case CompressorType::Rotary: {
                 Power = PowerLos + (1 / LosFac) * (MassRef * gamma / (gamma - 1) * SuctionPr / CompSuctionDensity *
                                                    (std::pow(DischargePr / SuctionPr, (gamma - 1) / gamma) - 1));
                 break;
             }
-            case CompressType::Scroll: {
+            case CompressorType::Scroll: {
                 Power = PowerLos + (1 / LosFac) * (gamma / (gamma - 1)) * SuctionPr * RefVolFlowRate *
                                        (((gamma - 1) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
                                         ((1 / gamma) * std::pow(VolumeRatio, gamma - 1)) - 1);
