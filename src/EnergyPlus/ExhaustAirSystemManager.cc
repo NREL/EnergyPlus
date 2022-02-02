@@ -895,6 +895,10 @@ namespace ExhaustAirSystemManager {
         BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Efficiency []", Fan(FanNum).VFDEff);
         BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Combined Efficiency []", Fan(FanNum).FanEff);
         */ 
+    }
+
+    void SizeExhaustControlFlow(EnergyPlusData &state)
+    {
 
     }
 
