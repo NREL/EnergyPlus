@@ -74,7 +74,7 @@ namespace WaterUse {
         Num
     };
 
-    enum struct HeatRecovConfig
+    enum class HeatRecovConfig
     {
         Invalid = -1,
         Plant,
