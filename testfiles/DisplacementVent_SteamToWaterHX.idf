@@ -909,7 +909,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,107.00;     !- Field 3
+    Until: 24:00,100.00;     !- Field 3
 
   People,
     ZONE1 People 1,          !- Name
@@ -1272,7 +1272,7 @@
   Sizing:Plant,
     Steam Loop,              !- Plant or Condenser Loop Name
     Steam,                   !- Loop Type
-    110.,                    !- Design Loop Exit Temperature {C}
+    110,                    !- Design Loop Exit Temperature {C}
     25;                      !- Loop Design Temperature Difference {deltaC}
 
   NodeList,
@@ -1357,7 +1357,8 @@
     Steam Supply Side Branches,  !- Name
     Steam Supply Inlet Branch,   !- Branch 1 Name
     Steam Boiler Branch,         !- Branch 2 Name
-    Steam Supply Outlet Branch;  !- Branch 3 Name
+    Steam Supply Bypass Branch,  !- Branch 3 Name
+    Steam Supply Outlet Branch;  !- Branch 4 Name
 
   BranchList,
     Steam Demand Side Branches,          !- Name
@@ -1649,7 +1650,15 @@
     Central Steam Boiler,      !- Component 1 Name
     Steam Boiler Inlet Node,   !- Component 1 Inlet Node Name
     Steam Boiler Outlet Node;  !- Component 1 Outlet Node Name
-  
+
+  Branch,
+    Steam Supply Bypass Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic:Steam,    !- Component 1 Object Type
+    Steam Supply Bypass,   !- Component 1 Name
+    Steam Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    Steam Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
   Branch,
     Steam Supply Outlet Branch,         !- Name
     ,                                   !- Pressure Drop Curve Name
@@ -1769,6 +1778,11 @@
     Steam Supply Outlet Pipe,  !- Name
     Steam Supply Exit Pipe Inlet Node,  !- Inlet Node Name
     Steam Supply Outlet Node;  !- Outlet Node Name
+
+  Pipe:Adiabatic:Steam,
+    Steam Supply Bypass,   !- Name
+    Steam Supply Bypass Inlet Node,  !- Inlet Node Name
+    Steam Supply Bypass Outlet Node;  !- Outlet Node Name
 
   Pipe:Adiabatic:Steam,
     Steam Demand Inlet Pipe,  !- Name
@@ -1974,9 +1988,10 @@
     Heating Supply Bypass Branch;    !- Outlet Branch 2 Name
 
   Connector:Splitter,
-    Steam Supply Splitter,  !- Name
-    Steam Supply Inlet Branch,  !- Inlet Branch Name
-    Steam Boiler Branch;  !- Outlet Branch 1 Name
+    Steam Supply Splitter,       !- Name
+    Steam Supply Inlet Branch,   !- Inlet Branch Name
+    Steam Boiler Branch,         !- Outlet Branch 1 Name
+    Steam Supply Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Splitter,
     Steam Demand Splitter,               !- Name
@@ -2021,9 +2036,10 @@
     Heating Supply Bypass Branch;    !- Inlet Branch 2 Name
 
   Connector:Mixer,
-    Steam Supply Mixer,  !- Name
+    Steam Supply Mixer,          !- Name
     Steam Supply Outlet Branch,  !- Outlet Branch Name
-    Steam Boiler Branch;  !- Inlet Branch 1 Name
+    Steam Boiler Branch,         !- Inlet Branch 1 Name
+    Steam Supply Bypass Branch;  !- Inlet Branch 2 Name
 
   Connector:Mixer,
     Steam Demand Mixer,                  !- Name
@@ -2458,11 +2474,11 @@
     HeatingAvailSched,                    !- Availability Schedule Name
     Steam to Water HX Steam Inlet Node,   !- Steam Inlet Node Name
     Steam to Water HX Steam Outlet Node,  !- Steam Outlet Node Name
-    0.1,                                  !- Steam Side Design Flow Rate
+    autosize,                                  !- Steam Side Design Flow Rate
     Steam to Water HX Water Inlet Node,   !- Water Inlet Node Name
     Steam to Water HX Water Outlet Node,  !- Water Outlet Node Name
     autosize,                             !- Water Side Design Flow Rate
-    30000,                                !- Heat Exchanger U-Factor Times Area Value
+    autosize,                                !- Heat Exchanger U-Factor Times Area Value
     OperationSchemeModulated,             !- Control Type
     HW Supply Outlet Node;                !- Heat Exchanger Setpoint Node Name
 

@@ -2348,7 +2348,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
     Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-    Real64 SteamMdot = this->HeatTransferRate / LatentHeatSteam;
+    Real64 SteamMdot = std::abs(this->HeatTransferRate / LatentHeatSteam);
     PlantUtilities::SetComponentFlowRate(
         state, SteamMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
 
