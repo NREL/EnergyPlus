@@ -517,6 +517,7 @@ namespace WaterUse {
                     }
                 }
 
+
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(8)) && (state.dataIPShortCut->cAlphaArgs(8) != "NONE")) {
                     waterConnection.HeatRecovery = true;
 

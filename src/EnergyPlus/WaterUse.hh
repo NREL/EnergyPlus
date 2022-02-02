@@ -65,11 +65,13 @@ struct EnergyPlusData;
 
 namespace WaterUse {
 
-    enum struct HeatRecoveryHXEnum
+    enum class HeatRecoveryHXEnum
     {
+        Invalid = -1,
         Ideal,
         CounterFlow,
-        CrossFlow
+        CrossFlow,
+        Num
     };
 
     enum struct HeatRecoveryConfigEnum
