@@ -647,7 +647,8 @@ namespace WindowManager {
         }
         static constexpr double standardizedRadiationIntensity{783.0};
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
-            const auto ConstrNum{state.dataSurface->Surface(m_SurfNum).Construction};
+            auto &surface(state.dataSurface->Surface(m_SurfNum));
+            const auto ConstrNum{getActiveConstructionNumber(state, surface, m_SurfNum)};
             std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> aLayer =
                 CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
 
