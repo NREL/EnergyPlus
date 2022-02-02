@@ -134,7 +134,6 @@ namespace WaterToAirHeatPump {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HPNum; // The WatertoAirHP that you are currently loading input into
-        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataWaterToAirHeatPump->GetCoilsInputFlag) {                            // First time subroutine has been entered
@@ -159,27 +158,27 @@ namespace WaterToAirHeatPump {
                                       CompName));
             }
             if (state.dataWaterToAirHeatPump->CheckEquipName(HPNum)) {
-                if (!CompName.empty() && CompName != heatPump.Name) {
+                if (!CompName.empty() && CompName != state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name) {
                     ShowFatalError(
                         state,
                         format("SimWatertoAirHP: Invalid CompIndex passed={}, WaterToAir HP name={}, stored WaterToAir HP Name for that index={}",
                                HPNum,
                                CompName,
-                               heatPump.Name));
+                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name));
                 }
                 state.dataWaterToAirHeatPump->CheckEquipName(HPNum) = false;
             }
         }
         // Calculate the Correct Water to Air HP Model with the current HPNum
 
-        if (heatPump.WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
+        if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
-        } else if (heatPump.WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
+        } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
