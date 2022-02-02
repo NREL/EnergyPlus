@@ -241,6 +241,12 @@ namespace WaterToAirHeatPump {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
+        constexpr std::array<std::string_view, static_cast<int>(CompressType::Num)> CompressTypeNamesUC {
+            "RECIPROCATING",
+            "ROTARY",
+            "SCROLL"
+        };
+
         NumCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
         NumHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
         state.dataWaterToAirHeatPump->NumWatertoAirHPs = NumCool + NumHeat;
@@ -367,32 +373,34 @@ namespace WaterToAirHeatPump {
             HeatPump.PowerLosses = NumArray(10);
             HeatPump.LossFactor = NumArray(11);
 
-            {
-                auto const SELECT_CASE_var(AlphArray(2));
+            HeatPump.CompressorType =
+                static_cast<CompressType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
 
-                if (SELECT_CASE_var == "RECIPROCATING") {
-                    HeatPump.CompressorType = CompressType::Reciprocating;
-                    HeatPump.CompPistonDisp = NumArray(12);
-                    HeatPump.CompSucPressDrop = NumArray(13);
-                    HeatPump.CompClearanceFactor = NumArray(14);
-
-                } else if (SELECT_CASE_var == "ROTARY") {
-                    HeatPump.CompressorType = CompressType::Rotary;
-                    HeatPump.CompPistonDisp = NumArray(12);
-                    HeatPump.CompSucPressDrop = NumArray(13);
-
-                } else if (SELECT_CASE_var == "SCROLL") {
-                    HeatPump.CompressorType = CompressType::Scroll;
-                    HeatPump.RefVolFlowRate = NumArray(15);
-                    HeatPump.VolumeRatio = NumArray(16);
-                    HeatPump.LeakRateCoeff = NumArray(17);
-
-                } else {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." +
-                                        CurrentModuleObject + '=' + HeatPump.Name);
-                    ErrorsFound = true;
-                }
+            switch (HeatPump.CompressorType) {
+            case CompressType::Reciprocating: {
+                HeatPump.CompPistonDisp = NumArray(12);
+                HeatPump.CompSucPressDrop = NumArray(13);
+                HeatPump.CompClearanceFactor = NumArray(14);
+                break;
+            }
+            case CompressType::Rotary: {
+                HeatPump.CompPistonDisp = NumArray(12);
+                HeatPump.CompSucPressDrop = NumArray(13);
+                break;
+            }
+            case CompressType::Scroll: {
+                HeatPump.RefVolFlowRate = NumArray(15);
+                HeatPump.VolumeRatio = NumArray(16);
+                HeatPump.LeakRateCoeff = NumArray(17);
+                break;
+            }
+            default: {
+                ShowSevereError(state,
+                                std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject +
+                                    '=' + HeatPump.Name);
+                ErrorsFound = true;
+                break;
+            }
             }
 
             HeatPump.SourceSideUACoeff = NumArray(18);
@@ -559,32 +567,33 @@ namespace WaterToAirHeatPump {
             HeatPump.PowerLosses = NumArray(7);
             HeatPump.LossFactor = NumArray(8);
 
-            {
-                auto const SELECT_CASE_var(AlphArray(2));
-
-                if (SELECT_CASE_var == "RECIPROCATING") {
-                    HeatPump.CompressorType = CompressType::Reciprocating;
-                    HeatPump.CompPistonDisp = NumArray(9);
-                    HeatPump.CompSucPressDrop = NumArray(10);
-                    HeatPump.CompClearanceFactor = NumArray(11);
-
-                } else if (SELECT_CASE_var == "ROTARY") {
-                    HeatPump.CompressorType = CompressType::Rotary;
-                    HeatPump.CompPistonDisp = NumArray(9);
-                    HeatPump.CompSucPressDrop = NumArray(10);
-
-                } else if (SELECT_CASE_var == "SCROLL") {
-                    HeatPump.CompressorType = CompressType::Scroll;
-                    HeatPump.RefVolFlowRate = NumArray(12);
-                    HeatPump.VolumeRatio = NumArray(13);
-                    HeatPump.LeakRateCoeff = NumArray(14);
-
-                } else {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." +
-                                        CurrentModuleObject + '=' + HeatPump.Name);
-                    ErrorsFound = true;
-                }
+            HeatPump.CompressorType =
+                static_cast<CompressType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
+            switch (HeatPump.CompressorType) {
+            case CompressType::Reciprocating: {
+                HeatPump.CompPistonDisp = NumArray(9);
+                HeatPump.CompSucPressDrop = NumArray(10);
+                HeatPump.CompClearanceFactor = NumArray(11);
+                break;
+            }
+            case CompressType::Rotary: {
+                HeatPump.CompPistonDisp = NumArray(9);
+                HeatPump.CompSucPressDrop = NumArray(10);
+                break;
+            }
+            case CompressType::Scroll: {
+                HeatPump.RefVolFlowRate = NumArray(12);
+                HeatPump.VolumeRatio = NumArray(13);
+                HeatPump.LeakRateCoeff = NumArray(14);
+                break;
+            }
+            default: {
+                ShowSevereError(state,
+                                std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject +
+                                    '=' + HeatPump.Name);
+                ErrorsFound = true;
+                break;
+            }
             }
 
             HeatPump.SourceSideUACoeff = NumArray(15);
@@ -1599,16 +1608,22 @@ namespace WaterToAirHeatPump {
                                                                  RoutineNameCompSuctionTemp);
 
                     // Find Refrigerant Flow Rate
-                    {
-                        auto const SELECT_CASE_var(CompressorType);
-                        if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
-                            MassRef = PistonDisp * CompSuctionDensity *
-                                      (1.0 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1.0 / gamma));
-                        } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
-                            MassRef = PistonDisp * CompSuctionDensity;
-                        } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
-                            MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
-                        }
+                    switch (CompressorType) {
+                    case CompressType::Reciprocating: {
+                        MassRef = PistonDisp * CompSuctionDensity *
+                                  (1.0 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1.0 / gamma));
+                        break;
+                    }
+                    case CompressType::Rotary: {
+                        MassRef = PistonDisp * CompSuctionDensity;
+                        break;
+                    }
+                    case CompressType::Scroll: {
+                        MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
+                        break;
+                    }
+                    default:
+                        break;
                     }
                     MassRef = max(0.0, MassRef);
 
@@ -1622,19 +1637,21 @@ namespace WaterToAirHeatPump {
                 }
 
                 // Determine the Power Consumption
-                {
-                    auto const SELECT_CASE_var(CompressorType);
-                    if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
-                        Power = PowerLos + (1.0 / LosFac) * (MassRef * gamma / (gamma - 1.0) * SuctionPr / CompSuctionDensity *
-                                                             (std::pow(DischargePr / SuctionPr, (gamma - 1.0) / gamma) - 1.0));
-                    } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
-                        Power = PowerLos + (1.0 / LosFac) * (MassRef * gamma / (gamma - 1.0) * SuctionPr / CompSuctionDensity *
-                                                             (std::pow(DischargePr / SuctionPr, (gamma - 1.0) / gamma) - 1.0));
-                    } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
-                        Power = PowerLos + (1.0 / LosFac) * (gamma / (gamma - 1.0)) * SuctionPr * RefVolFlowRate *
-                                               (((gamma - 1.0) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
-                                                ((1.0 / gamma) * std::pow(VolumeRatio, gamma - 1.0)) - 1.0);
-                    }
+                switch (CompressorType) {
+                case CompressType::Reciprocating:
+                case CompressType::Rotary:{
+                    Power = PowerLos + (1.0 / LosFac) * (MassRef * gamma / (gamma - 1.0) * SuctionPr / CompSuctionDensity *
+                                                         (std::pow(DischargePr / SuctionPr, (gamma - 1.0) / gamma) - 1.0));
+                    break;
+                }
+                case CompressType::Scroll: {
+                    Power = PowerLos + (1.0 / LosFac) * (gamma / (gamma - 1.0)) * SuctionPr * RefVolFlowRate *
+                                           (((gamma - 1.0) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
+                                            ((1.0 / gamma) * std::pow(VolumeRatio, gamma - 1.0)) - 1.0);
+                    break;
+                }
+                default:
+                    break;
                 }
 
                 // Determine the Sourceside Heat Rate
@@ -2076,18 +2093,24 @@ namespace WaterToAirHeatPump {
                 }
 
                 // Determine Suction Pressure at Compressor Entrance & Discharge Pressure at Compressor Exit
-                {
-                    auto const SELECT_CASE_var(CompressorType);
-                    if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
-                        SuctionPr = SourceSidePressure - PressureDrop;
-                        DischargePr = LoadSidePressure + PressureDrop;
-                    } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
-                        SuctionPr = SourceSidePressure;
-                        DischargePr = LoadSidePressure + PressureDrop;
-                    } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
-                        SuctionPr = SourceSidePressure;
-                        DischargePr = LoadSidePressure;
-                    }
+                switch (CompressorType) {
+                case CompressType::Reciprocating: {
+                    SuctionPr = SourceSidePressure - PressureDrop;
+                    DischargePr = LoadSidePressure + PressureDrop;
+                    break;
+                }
+                case CompressType::Rotary: {
+                    SuctionPr = SourceSidePressure;
+                    DischargePr = LoadSidePressure + PressureDrop;
+                    break;
+                }
+                case CompressType::Scroll: {
+                    SuctionPr = SourceSidePressure;
+                    DischargePr = LoadSidePressure;
+                    break;
+                }
+                default:
+                    break;
                 }
 
                 // Determine the Source Side Outlet Enthalpy
@@ -2164,16 +2187,22 @@ namespace WaterToAirHeatPump {
                     state, Refrigerant, CompSuctionTemp, SuctionPr, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameCompSuctionTemp);
 
                 // Find Refrigerant Flow Rate
-                {
-                    auto const SELECT_CASE_var(CompressorType);
-                    if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
-                        MassRef =
-                            PistonDisp * CompSuctionDensity * (1 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1 / gamma));
-                    } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
-                        MassRef = PistonDisp * CompSuctionDensity;
-                    } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
-                        MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
-                    }
+                switch (CompressorType) {
+                case CompressType::Reciprocating: {
+                    MassRef =
+                        PistonDisp * CompSuctionDensity * (1 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1 / gamma));
+                    break;
+                }
+                case CompressType::Rotary: {
+                    MassRef = PistonDisp * CompSuctionDensity;
+                    break;
+                }
+                case CompressType::Scroll: {
+                    MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
+                    break;
+                }
+                default:
+                    break;
                 }
                 MassRef = max(0.0, MassRef);
 
@@ -2185,19 +2214,21 @@ namespace WaterToAirHeatPump {
             }
 
             // Determine the Power Consumption
-            {
-                auto const SELECT_CASE_var(CompressorType);
-                if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
-                    Power = PowerLos + (1 / LosFac) * (MassRef * gamma / (gamma - 1) * SuctionPr / CompSuctionDensity *
-                                                       (std::pow(DischargePr / SuctionPr, (gamma - 1) / gamma) - 1));
-                } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
-                    Power = PowerLos + (1 / LosFac) * (MassRef * gamma / (gamma - 1) * SuctionPr / CompSuctionDensity *
-                                                       (std::pow(DischargePr / SuctionPr, (gamma - 1) / gamma) - 1));
-                } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
-                    Power = PowerLos + (1 / LosFac) * (gamma / (gamma - 1)) * SuctionPr * RefVolFlowRate *
-                                           (((gamma - 1) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
-                                            ((1 / gamma) * std::pow(VolumeRatio, gamma - 1)) - 1);
-                }
+            switch (CompressorType) {
+            case CompressType::Reciprocating:
+            case CompressType::Rotary: {
+                Power = PowerLos + (1 / LosFac) * (MassRef * gamma / (gamma - 1) * SuctionPr / CompSuctionDensity *
+                                                   (std::pow(DischargePr / SuctionPr, (gamma - 1) / gamma) - 1));
+                break;
+            }
+            case CompressType::Scroll: {
+                Power = PowerLos + (1 / LosFac) * (gamma / (gamma - 1)) * SuctionPr * RefVolFlowRate *
+                                       (((gamma - 1) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
+                                        ((1 / gamma) * std::pow(VolumeRatio, gamma - 1)) - 1);
+                break;
+            }
+            default:
+                break;
             }
 
             // Determine the Load Side Heat Rate
