@@ -121,6 +121,16 @@ namespace SetPointManager {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> controlTypeName = {"Temperature",
+                                                                                                  "MaximumTemperature",
+                                                                                                  "MinimumTemperature",
+                                                                                                  "HumidityRatio",
+                                                                                                  "MaximumHumidityRatio",
+                                                                                                  "MinimumHumidityRatio",
+                                                                                                  "MassFlowRate",
+                                                                                                  "MaximumMassFlowRate",
+                                                                                                  "MinimumMassFlowRate"};
+
     constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> controlTypeNameUC = {"TEMPERATURE",
                                                                                                     "MAXIMUMTEMPERATURE",
                                                                                                     "MINIMUMTEMPERATURE",

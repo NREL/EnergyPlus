@@ -4036,7 +4036,9 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                 ShowContinueError(state,
                                   format("...duplicate node specified = {}",
                                          state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum))));
-                ShowContinueError(state, format("...control type variable    = {}", state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).ctrlVarType));
+                ShowContinueError(state,
+                                  format("...control type variable    = {}",
+                                         controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
             }
         }
 
@@ -4087,8 +4089,9 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                 state,
                                 "...conflicting node name = " +
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                            ShowContinueError(
-                                state, format("...control type variable = {}", state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).ctrlVarType));
+                            ShowContinueError(state,
+                                              format("...control type variable = {}",
+                                                     controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             //            ErrorsFound=.TRUE.
                         }
                     }
@@ -4126,8 +4129,9 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                 state,
                                 "...conflicting node name = " +
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                            ShowContinueError(
-                                state, format("...control type variable = {}", state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).ctrlVarType));
+                            ShowContinueError(state,
+                                              format("...control type variable = {}",
+                                                     controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             ShowContinueError(state,
                                               "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node.");
                         } else { // severe error for other SP manager types
@@ -4145,8 +4149,9 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                 state,
                                 "...conflicting node name = " +
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                            ShowContinueError(
-                                state, format("...control type variable = {}", state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode));
+                            ShowContinueError(state,
+                                              format("...control type variable = {}",
+                                                     controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             //            ErrorsFound=.TRUE.
                         }
                     }
@@ -8434,7 +8439,6 @@ void DefineSysNodeResetSetPointManager::calculate(EnergyPlusData &state)
     Real64 LowRefVal;    // Low reference value
     Real64 HighRefVal;   // High reference value
     Real64 RefValue = 0; // Reference value from the Reference node
-    Real64 SetPt = 0;    // Setpoint
     int RefNode;         // Reference node number
 
     RefNode = this->RefNodeNum;
