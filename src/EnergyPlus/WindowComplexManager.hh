@@ -66,6 +66,18 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace WindowComplexManager {
+    
+    enum class RayIdentificationType
+    {
+        Invalid = -1,
+        Front_Incident,
+        Front_Transmitted,
+        Front_Reflected,
+        Back_Incident,
+        Back_Transmitted,
+        Back_Reflected,
+        Num
+    };
 
     // Using/Aliasing
     using DataBSDFWindow::BasisElemDescr;
@@ -195,14 +207,14 @@ namespace WindowComplexManager {
     Vector WorldVectFromW6(EnergyPlusData &state,
                            Real64 const Theta, // Polar angle in W6 Coords
                            Real64 const Phi,   // Azimuthal angle in W6 Coords
-                           int const RadType,  // Type of radiation: Front_Incident, etc.
+                           const RayIdentificationType RadType,  // Type of radiation: Front_Incident, etc.
                            Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
                            Real64 const Alpha  // Surface azimuth, radians, world coordinate system
     );
 
     int FindInBasis(EnergyPlusData &state,
                     Vector const &RayToFind,  // Ray vector direction in world CS
-                    int const RadType,        // Type of radiation: Front_Incident, etc.
+                    const RayIdentificationType RadType,        // Type of radiation: Front_Incident, etc.
                     int const ISurf,          // Window Surface number
                     int const IState,         // Complex Fenestration state number
                     BasisStruct const &Basis, // Complex Fenestration basis root
@@ -212,7 +224,7 @@ namespace WindowComplexManager {
 
     void W6CoordsFromWorldVect(EnergyPlusData &state,
                                Vector const &RayVect, // Ray vector direction in world CS
-                               int const RadType,     // Type of radiation: Front_Incident, etc.
+                               const RayIdentificationType RadType,     // Type of radiation: Front_Incident, etc.
                                Real64 const Gamma,    // Surface tilt angle, world coordinate system
                                Real64 const Alpha,    // Surface azimuth, world coordinate system
                                Real64 &Theta,         // Polar angle in W6 Coords
@@ -253,13 +265,6 @@ struct WindowComplexManagerData : BaseGlobalStruct
     int const Copy_Geometry;
 
     int const TmpLen; // Length increment of temporary arrays
-
-    int const Front_Incident; // Ray identification types
-    int const Front_Transmitted;
-    int const Front_Reflected;
-    int const Back_Incident;
-    int const Back_Transmitted;
-    int const Back_Reflected;
 
     int NumComplexWind; // Total number of complex windows
 
@@ -390,8 +395,8 @@ struct WindowComplexManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowComplexManagerData()
-        : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2), TmpLen(20), Front_Incident(1), Front_Transmitted(2),
-          Front_Reflected(3), Back_Incident(4), Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0), NumBasis(0), MatrixNo(0)
+        : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2), TmpLen(20), NumComplexWind(0), NumBasis(0),
+          MatrixNo(0)
     {
     }
 };

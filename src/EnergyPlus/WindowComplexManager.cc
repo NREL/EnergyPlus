@@ -606,7 +606,7 @@ namespace WindowComplexManager {
                     Phi = 0.0;
                     if (state.dataBSDFWindow->SUNCOSTS(TS, Hour)(3) > DataEnvironment::SunIsUpValue) {
                         IncRay = FindInBasis(
-                            state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
+                            state, SunDir, RayIdentificationType::Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
                         complexWindowGeom.PhiBm[lHT] = Phi;
                     } else {
@@ -657,7 +657,7 @@ namespace WindowComplexManager {
             Theta = 0.0;
             Phi = 0.0;
             if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay)(3) > DataEnvironment::SunIsUpValue) {
-                IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
+                IncRay = FindInBasis(state, SunDir, RayIdentificationType::Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
             } else {
@@ -857,7 +857,7 @@ namespace WindowComplexManager {
             SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour);
             BkIncRay = FindInBasis(state,
                                    SunDir,
-                                   state.dataWindowComplexManager->Back_Incident,
+                                   RayIdentificationType::Back_Incident,
                                    ISurf,
                                    IState,
                                    state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Trn,
@@ -1317,7 +1317,7 @@ namespace WindowComplexManager {
             Phi = Geom.Inc.Grid(ElemNo).Phi;
             // The following puts in the vectors depending on
             // window orientation
-            Geom.sInc(ElemNo) = WorldVectFromW6(state, Theta, Phi, state.dataWindowComplexManager->Front_Incident, Tilt, Azimuth);
+            Geom.sInc(ElemNo) = WorldVectFromW6(state, Theta, Phi, RayIdentificationType::Front_Incident, Tilt, Azimuth);
             Geom.pInc(ElemNo) = DaylghtAltAndAzimuth(Geom.sInc(ElemNo));
 
             Geom.CosInc(ElemNo) = std::cos(Geom.Inc.Grid(ElemNo).Theta);
@@ -1335,7 +1335,7 @@ namespace WindowComplexManager {
             Phi = Geom.Trn.Grid(ElemNo).Phi;
             // The following puts in the vectors depending on
             // window orientation
-            Geom.sTrn(ElemNo) = WorldVectFromW6(state, Theta, Phi, state.dataWindowComplexManager->Front_Transmitted, Tilt, Azimuth);
+            Geom.sTrn(ElemNo) = WorldVectFromW6(state, Theta, Phi, RayIdentificationType::Front_Transmitted, Tilt, Azimuth);
             Geom.pTrn(ElemNo) = DaylghtAltAndAzimuth(Geom.sTrn(ElemNo));
         }
         //  Incident Basis:
@@ -2101,7 +2101,7 @@ namespace WindowComplexManager {
     Vector WorldVectFromW6(EnergyPlusData &state,
                            Real64 const Theta, // Polar angle in W6 Coords
                            Real64 const Phi,   // Azimuthal angle in W6 Coords
-                           int const RadType,  // Type of radiation: Front_Incident, etc.
+                           const RayIdentificationType RadType,  // Type of radiation: Front_Incident, etc.
                            Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
                            Real64 const Alpha  // Surface azimuth, radians, world coordinate system
     )
@@ -2144,29 +2144,28 @@ namespace WindowComplexManager {
 
         {
             auto const SELECT_CASE_var(RadType);
-            if (SELECT_CASE_var == state.dataWindowComplexManager
-                                       ->Front_Incident) { // W6 vector will point in direction of propagation, must reverse to get world vector
+            if (SELECT_CASE_var == RayIdentificationType::Front_Incident) { // W6 vector will point in direction of propagation, must reverse to get world vector
                 //  after the W6 vector has been rotated into the world CS
                 UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha;
                 UnitVect.z = -(sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma);
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Transmitted) {
+            } else if (SELECT_CASE_var == RayIdentificationType::Front_Transmitted) {
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Reflected) {
+            } else if (SELECT_CASE_var == RayIdentificationType::Front_Reflected) {
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Incident) {
+            } else if (SELECT_CASE_var == RayIdentificationType::Back_Incident) {
                 UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * cos_Alpha;
                 UnitVect.z = -cos_Theta * cos_Gamma - sin_Theta * sin_Phi * sin_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Transmitted) { // This is same as front reflected
+            } else if (SELECT_CASE_var == RayIdentificationType::Back_Transmitted) { // This is same as front reflected
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Reflected) { // This is same as front transmitted
+            } else if (SELECT_CASE_var == RayIdentificationType::Back_Reflected) { // This is same as front transmitted
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
@@ -2183,7 +2182,7 @@ namespace WindowComplexManager {
 
     int FindInBasis(EnergyPlusData &state,
                     Vector const &RayToFind,           // Ray vector direction in world CS
-                    int const RadType,                 // Type of radiation: Front_Incident, etc.
+                    const RayIdentificationType RadType,                 // Type of radiation: Front_Incident, etc.
                     int const ISurf,                   // Window Surface number
                     [[maybe_unused]] int const IState, // Complex Fenestration state number
                     BasisStruct const &Basis,          // Complex Fenestration basis root
@@ -2304,7 +2303,7 @@ namespace WindowComplexManager {
 
     void W6CoordsFromWorldVect(EnergyPlusData &state,
                                Vector const &RayVect, // Ray vector direction in world CS
-                               int const RadType,     // Type of radiation: Front_Incident, etc.
+                               const RayIdentificationType RadType,     // Type of radiation: Front_Incident, etc.
                                Real64 const Gamma,    // Surface tilt angle, world coordinate system
                                Real64 const Alpha,    // Surface azimuth, world coordinate system
                                Real64 &Theta,         // Polar angle in W6 Coords
@@ -2351,7 +2350,7 @@ namespace WindowComplexManager {
         W6z.z = -std::cos(Gamma);
         {
             auto const SELECT_CASE_var(RadType);
-            if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Incident) {
+            if (SELECT_CASE_var == RayIdentificationType::Front_Incident) {
                 RdotZ = dot(W6z, RayVect);
                 Cost = -RdotZ;
                 Sint = std::sqrt(1.0 - pow_2(Cost));
@@ -2364,7 +2363,7 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Transmitted) {
+            } else if (SELECT_CASE_var == RayIdentificationType::Front_Transmitted) {
                 Cost = dot(W6z, RayVect);
                 Sint = std::sqrt(1.0 - pow_2(Cost));
                 Theta = std::acos(Cost);
@@ -2376,7 +2375,7 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Reflected) {
+            } else if (SELECT_CASE_var == RayIdentificationType::Front_Reflected) {
                 RdotZ = dot(W6z, RayVect);
                 Cost = -RdotZ;
                 Sint = std::sqrt(1.0 - pow_2(Cost));
@@ -2389,7 +2388,7 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Incident) {
+            } else if (SELECT_CASE_var == RayIdentificationType::Back_Incident) {
                 Cost = dot(W6z, RayVect);
                 Sint = std::sqrt(1.0 - pow_2(Cost));
                 Theta = std::acos(Cost);
@@ -2401,7 +2400,7 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Transmitted) { // This is same as front reflected
+            } else if (SELECT_CASE_var == RayIdentificationType::Back_Transmitted) { // This is same as front reflected
                 RdotZ = dot(W6z, RayVect);
                 Cost = -RdotZ;
                 Sint = std::sqrt(1.0 - pow_2(Cost));
@@ -2414,7 +2413,7 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Reflected) { // This is same as front transmitted
+            } else if (SELECT_CASE_var == RayIdentificationType::Back_Reflected) { // This is same as front transmitted
                 Cost = dot(W6z, RayVect);
                 Sint = std::sqrt(1.0 - pow_2(Cost));
                 Theta = std::acos(Cost);
