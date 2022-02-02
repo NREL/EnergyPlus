@@ -403,15 +403,9 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
 
     CWCEHeatTransferFactory::CWCEHeatTransferFactory(EnergyPlusData &state, SurfaceData const &surface, int const t_SurfNum, int const t_ConstrNum)
-        : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_ConstructionNumber(t_ConstrNum), m_InteriorBSDFShade(false),
-          m_ExteriorShade(false)
+        : m_Surface(surface), m_Window(state.dataSurface->SurfaceWindow(t_SurfNum)), m_ShadePosition(ShadePosition::NoShade), m_SurfNum(t_SurfNum),
+          m_SolidLayerIndex(0), m_ConstructionNumber(t_ConstrNum), m_TotLay(getNumOfLayers(state)), m_InteriorBSDFShade(false), m_ExteriorShade(false)
     {
-        m_Window = state.dataSurface->SurfaceWindow(t_SurfNum);
-
-        m_ShadePosition = ShadePosition::NoShade;
-
-        m_TotLay = getNumOfLayers(state);
-
         const auto ShadeFlag{getShadeType(state, t_ConstrNum)};
 
         if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
@@ -487,7 +481,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     Material::MaterialProperties *CWCEHeatTransferFactory::getLayerMaterial(EnergyPlusData &state, int const t_Index) const
     {
-        auto ConstrNum = m_Surface.Construction;
+        auto ConstrNum = m_ConstructionNumber;
 
         // BSDF window do not have special shading flag
         if (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) {
@@ -698,13 +692,12 @@ namespace WindowManager {
         auto aGas = getAir();
         auto thickness = 0.0;
 
-        if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::IntBlind ||
-            state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtBlind) {
+        const auto ShadeFlag{getShadeType(state, m_ConstructionNumber)};
+
+        if (ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind) {
             thickness = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
-        if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::IntShade ||
-            state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtShade ||
-            state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtScreen) {
+        if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
             const auto material = getLayerMaterial(state, t_Index);
             thickness = material->WinShadeToGlassDist;
         }
