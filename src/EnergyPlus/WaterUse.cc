@@ -298,6 +298,12 @@ namespace WaterUse {
             "CROSSFLOW"
         };
 
+        constexpr std::array<std::string_view, static_cast<int>(HeatRecoveryConfig::Num)>  HeatRecoveryConfigNamesUC {
+            "PLANT",
+            "EQUIPMENT",
+            "PLANTANDEQUIPMENT"
+        };
+
         state.dataIPShortCut->cCurrentModuleObject = "WaterUse:Equipment";
         state.dataWaterUse->numWaterEquipment =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
@@ -534,21 +540,13 @@ namespace WaterUse {
                         ErrorsFound = true;
                     }
 
-                    {
-                        auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
-                        if (SELECT_CASE_var == "PLANT") {
-                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfig::Plant;
-                        } else if (SELECT_CASE_var == "EQUIPMENT") {
-                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfig::Equipment;
-                        } else if (SELECT_CASE_var == "PLANTANDEQUIPMENT") {
-                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfig::PlantAndEquip;
-                        } else {
-                            ShowSevereError(state,
-                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
-                            ShowContinueError(state,
-                                              "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                            ErrorsFound = true;
-                        }
+                    waterConnection.HeatRecoveryConfig = static_cast<HeatRecoveryConfig>(
+                        getEnumerationValue(HeatRecoveryConfigNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+                    if (waterConnection.HeatRecoveryConfig == HeatRecoveryConfig::Invalid) {
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+                        ShowContinueError(state,
+                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ErrorsFound = true;
                     }
                 }
 
