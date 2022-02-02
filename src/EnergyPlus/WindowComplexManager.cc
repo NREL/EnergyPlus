@@ -2142,34 +2142,45 @@ namespace WindowComplexManager {
         Real64 const sin_Theta = std::sin(Theta);
         Real64 const cos_Theta = std::cos(Theta);
 
-        {
-            auto const SELECT_CASE_var(RadType);
-            if (SELECT_CASE_var == RayIdentificationType::Front_Incident) { // W6 vector will point in direction of propagation, must reverse to get world vector
+        switch (RadType){
+        case RayIdentificationType::Front_Incident: { // W6 vector will point in direction of propagation, must reverse to get world vector
                 //  after the W6 vector has been rotated into the world CS
                 UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha;
                 UnitVect.z = -(sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma);
-            } else if (SELECT_CASE_var == RayIdentificationType::Front_Transmitted) {
+                break;
+            }
+            case RayIdentificationType::Front_Transmitted: {
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == RayIdentificationType::Front_Reflected) {
+                break;
+            }
+            case RayIdentificationType::Front_Reflected: {
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == RayIdentificationType::Back_Incident) {
+                break;
+            }
+            case RayIdentificationType::Back_Incident: {
                 UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * cos_Alpha;
                 UnitVect.z = -cos_Theta * cos_Gamma - sin_Theta * sin_Phi * sin_Gamma;
-            } else if (SELECT_CASE_var == RayIdentificationType::Back_Transmitted) { // This is same as front reflected
+                break;
+            }
+            case RayIdentificationType::Back_Transmitted: { // This is same as front reflected
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == RayIdentificationType::Back_Reflected) { // This is same as front transmitted
+                break;
+            } case RayIdentificationType::Back_Reflected: { // This is same as front transmitted
                 UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
                 UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
                 UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
+                break;
             }
+                default:
+                    break;
         }
 
         // Remove small numbers from evaluation (due to limited decimal points for pi)
@@ -2348,9 +2359,9 @@ namespace WindowComplexManager {
         W6z.x = -std::sin(Gamma) * std::sin(Alpha);
         W6z.y = -std::sin(Gamma) * std::cos(Alpha);
         W6z.z = -std::cos(Gamma);
-        {
-            auto const SELECT_CASE_var(RadType);
-            if (SELECT_CASE_var == RayIdentificationType::Front_Incident) {
+
+        switch (RadType) {
+        case RayIdentificationType::Front_Incident: {
                 RdotZ = dot(W6z, RayVect);
                 Cost = -RdotZ;
                 Sint = std::sqrt(1.0 - pow_2(Cost));
@@ -2363,7 +2374,9 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == RayIdentificationType::Front_Transmitted) {
+                break;
+            }
+            case RayIdentificationType::Front_Transmitted: {
                 Cost = dot(W6z, RayVect);
                 Sint = std::sqrt(1.0 - pow_2(Cost));
                 Theta = std::acos(Cost);
@@ -2375,7 +2388,9 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == RayIdentificationType::Front_Reflected) {
+                break;
+            }
+            case RayIdentificationType::Front_Reflected: {
                 RdotZ = dot(W6z, RayVect);
                 Cost = -RdotZ;
                 Sint = std::sqrt(1.0 - pow_2(Cost));
@@ -2388,7 +2403,9 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == RayIdentificationType::Back_Incident) {
+                break;
+            }
+            case RayIdentificationType::Back_Incident: {
                 Cost = dot(W6z, RayVect);
                 Sint = std::sqrt(1.0 - pow_2(Cost));
                 Theta = std::acos(Cost);
@@ -2400,7 +2417,9 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == RayIdentificationType::Back_Transmitted) { // This is same as front reflected
+                break;
+            }
+            case RayIdentificationType::Back_Transmitted: { // This is same as front reflected
                 RdotZ = dot(W6z, RayVect);
                 Cost = -RdotZ;
                 Sint = std::sqrt(1.0 - pow_2(Cost));
@@ -2413,7 +2432,9 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else if (SELECT_CASE_var == RayIdentificationType::Back_Reflected) { // This is same as front transmitted
+                break;
+            }
+            case RayIdentificationType::Back_Reflected: { // This is same as front transmitted
                 Cost = dot(W6z, RayVect);
                 Sint = std::sqrt(1.0 - pow_2(Cost));
                 Theta = std::acos(Cost);
@@ -2425,9 +2446,11 @@ namespace WindowComplexManager {
                 } else {
                     Phi = Psi;
                 }
-            } else {
-                assert(false);
+                break;
             }
+            default:
+                assert(false);
+                break;
         }
         if (std::abs(Cost) < DataGlobalConstants::rTinyValue) Cost = 0.0;
         if (Cost < 0.0) Theta = DataGlobalConstants::Pi - Theta; // This signals ray out of hemisphere
