@@ -292,13 +292,13 @@ namespace WaterUse {
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int AlphaNum;
 
-        constexpr std::array<std::string_view, static_cast<int>(HeatRecoveryHX::Num)> HeatRecoverHXNamesUC {
+        constexpr std::array<std::string_view, static_cast<int>(HeatRecovHX::Num)> HeatRecoverHXNamesUC {
             "IDEAL",
             "COUNTERFLOW",
             "CROSSFLOW"
         };
 
-        constexpr std::array<std::string_view, static_cast<int>(HeatRecoveryConfig::Num)>  HeatRecoveryConfigNamesUC {
+        constexpr std::array<std::string_view, static_cast<int>(HeatRecovConfig::Num)>  HeatRecoveryConfigNamesUC {
             "PLANT",
             "EQUIPMENT",
             "PLANTANDEQUIPMENT"
@@ -531,18 +531,18 @@ namespace WaterUse {
 
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(8)) && (state.dataIPShortCut->cAlphaArgs(8) != "NONE")) {
                     waterConnection.HeatRecovery = true;
-                    waterConnection.HeatRecoveryHX = static_cast<HeatRecoveryHX>(
+                    waterConnection.HeatRecoveryHX = static_cast<HeatRecovHX>(
                         getEnumerationValue(HeatRecoverHXNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
-                    if (waterConnection.HeatRecoveryHX == HeatRecoveryHX::Invalid) {
+                    if (waterConnection.HeatRecoveryHX == HeatRecovHX::Invalid) {
                         ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
                         ShowContinueError(state,
                                           "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
 
-                    waterConnection.HeatRecoveryConfig = static_cast<HeatRecoveryConfig>(
+                    waterConnection.HeatRecoveryConfig = static_cast<HeatRecovConfig>(
                         getEnumerationValue(HeatRecoveryConfigNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
-                    if (waterConnection.HeatRecoveryConfig == HeatRecoveryConfig::Invalid) {
+                    if (waterConnection.HeatRecoveryConfig == HeatRecovConfig::Invalid) {
                         ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
                         ShowContinueError(state,
                                           "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -1495,13 +1495,13 @@ namespace WaterUse {
         } else { // WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
 
             switch (this->HeatRecoveryConfig) {
-            case HeatRecoveryConfig::Plant: {
+            case HeatRecovConfig::Plant: {
                 this->RecoveryMassFlowRate = this->HotMassFlowRate;
             } break;
-            case HeatRecoveryConfig::Equipment: {
+            case HeatRecovConfig::Equipment: {
                 this->RecoveryMassFlowRate = this->ColdMassFlowRate;
             } break;
-            case HeatRecoveryConfig::PlantAndEquip: {
+            case HeatRecovConfig::PlantAndEquip: {
                 this->RecoveryMassFlowRate = this->TotalMassFlowRate;
             } break;
             default:
@@ -1513,10 +1513,10 @@ namespace WaterUse {
             Real64 MinCapacityRate = min(DrainCapacityRate, HXCapacityRate);
 
             switch (this->HeatRecoveryHX) {
-            case HeatRecoveryHX::Ideal: {
+            case HeatRecovHX::Ideal: {
                 this->Effectiveness = 1.0;
             } break;
-            case HeatRecoveryHX::CounterFlow: { // Unmixed
+            case HeatRecovHX::CounterFlow: { // Unmixed
                 Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
                 Real64 NTU = this->HXUA / MinCapacityRate;
                 if (CapacityRatio == 1.0) {
@@ -1526,7 +1526,7 @@ namespace WaterUse {
                     this->Effectiveness = (1.0 - ExpVal) / (1.0 - CapacityRatio * ExpVal);
                 }
             } break;
-            case HeatRecoveryHX::CrossFlow: { // Unmixed
+            case HeatRecovHX::CrossFlow: { // Unmixed
                 Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
                 Real64 NTU = this->HXUA / MinCapacityRate;
                 this->Effectiveness = 1.0 - std::exp((std::pow(NTU, 0.22) / CapacityRatio) * (std::exp(-CapacityRatio * std::pow(NTU, 0.78)) - 1.0));
@@ -1547,17 +1547,17 @@ namespace WaterUse {
             }
 
             switch (this->HeatRecoveryConfig) {
-            case HeatRecoveryConfig::Plant: {
+            case HeatRecovConfig::Plant: {
                 this->TempError = 0.0; // No feedback back to the cold supply
                 this->ReturnTemp = this->RecoveryTemp;
             } break;
-            case HeatRecoveryConfig::Equipment: {
+            case HeatRecovConfig::Equipment: {
                 this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
                 this->ColdTemp = this->RecoveryTemp;
                 this->ReturnTemp = this->ColdSupplyTemp;
             } break;
-            case HeatRecoveryConfig::PlantAndEquip: {
+            case HeatRecovConfig::PlantAndEquip: {
                 this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
                 this->ColdTemp = this->RecoveryTemp;
