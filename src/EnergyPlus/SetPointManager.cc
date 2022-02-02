@@ -138,6 +138,26 @@ using namespace CurveManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
 
+constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> controlTypeName = {"Temperature",
+                                                                                              "MaximumTemperature",
+                                                                                              "MinimumTemperature",
+                                                                                              "HumidityRatio",
+                                                                                              "MaximumHumidityRatio",
+                                                                                              "MinimumHumidityRatio",
+                                                                                              "MassFlowRate",
+                                                                                              "MaximumMassFlowRate",
+                                                                                              "MinimumMassFlowRate"};
+
+constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> controlTypeNameUC = {"TEMPERATURE",
+                                                                                                "MAXIMUMTEMPERATURE",
+                                                                                                "MINIMUMTEMPERATURE",
+                                                                                                "HUMIDITYRATIO",
+                                                                                                "MAXIMUMHUMIDITYRATIO",
+                                                                                                "MINIMUMHUMIDITYRATIO",
+                                                                                                "MASSFLOWRATE",
+                                                                                                "MAXIMUMMASSFLOWRATE",
+                                                                                                "MINIMUMMASSFLOWRATE"};
+
 void ManageSetPoints(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
