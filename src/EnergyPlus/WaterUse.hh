@@ -74,11 +74,13 @@ namespace WaterUse {
         Num
     };
 
-    enum struct HeatRecoveryConfigEnum
+    enum struct HeatRecoveryConfig
     {
+        Invalid = -1,
         Plant,
         Equipment,
-        PlantAndEquip
+        PlantAndEquip,
+        Num
     };
 
     struct WaterEquipmentType
@@ -171,7 +173,7 @@ namespace WaterUse {
         int TankSupplyID; // array to send flow to recovery tank
         bool HeatRecovery;
         HeatRecoveryHX HeatRecoveryHX;
-        HeatRecoveryConfigEnum HeatRecoveryConfig;
+        HeatRecoveryConfig HeatRecoveryConfig;
         Real64 HXUA;
         Real64 Effectiveness;
         Real64 RecoveryRate;
@@ -218,7 +220,7 @@ namespace WaterUse {
 
         WaterConnectionsType()
             : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
-              TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHX::Ideal), HeatRecoveryConfig(HeatRecoveryConfigEnum::Plant),
+              TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHX::Ideal), HeatRecoveryConfig(HeatRecoveryConfig::Plant),
               HXUA(0.0), Effectiveness(0.0), RecoveryRate(0.0), RecoveryEnergy(0.0), MainsMassFlowRate(0.0), TankMassFlowRate(0.0),
               ColdMassFlowRate(0.0), HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), RecoveryMassFlowRate(0.0),
               PeakVolFlowRate(0.0), MainsVolFlowRate(0.0), TankVolFlowRate(0.0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0),

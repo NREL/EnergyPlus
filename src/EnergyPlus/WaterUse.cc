@@ -537,11 +537,11 @@ namespace WaterUse {
                     {
                         auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
                         if (SELECT_CASE_var == "PLANT") {
-                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfigEnum::Plant;
+                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfig::Plant;
                         } else if (SELECT_CASE_var == "EQUIPMENT") {
-                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfigEnum::Equipment;
+                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfig::Equipment;
                         } else if (SELECT_CASE_var == "PLANTANDEQUIPMENT") {
-                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfigEnum::PlantAndEquip;
+                            waterConnection.HeatRecoveryConfig = HeatRecoveryConfig::PlantAndEquip;
                         } else {
                             ShowSevereError(state,
                                             "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
@@ -1497,13 +1497,13 @@ namespace WaterUse {
         } else { // WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
 
             switch (this->HeatRecoveryConfig) {
-            case HeatRecoveryConfigEnum::Plant: {
+            case HeatRecoveryConfig::Plant: {
                 this->RecoveryMassFlowRate = this->HotMassFlowRate;
             } break;
-            case HeatRecoveryConfigEnum::Equipment: {
+            case HeatRecoveryConfig::Equipment: {
                 this->RecoveryMassFlowRate = this->ColdMassFlowRate;
             } break;
-            case HeatRecoveryConfigEnum::PlantAndEquip: {
+            case HeatRecoveryConfig::PlantAndEquip: {
                 this->RecoveryMassFlowRate = this->TotalMassFlowRate;
             } break;
             default:
@@ -1549,17 +1549,17 @@ namespace WaterUse {
             }
 
             switch (this->HeatRecoveryConfig) {
-            case HeatRecoveryConfigEnum::Plant: {
+            case HeatRecoveryConfig::Plant: {
                 this->TempError = 0.0; // No feedback back to the cold supply
                 this->ReturnTemp = this->RecoveryTemp;
             } break;
-            case HeatRecoveryConfigEnum::Equipment: {
+            case HeatRecoveryConfig::Equipment: {
                 this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
                 this->ColdTemp = this->RecoveryTemp;
                 this->ReturnTemp = this->ColdSupplyTemp;
             } break;
-            case HeatRecoveryConfigEnum::PlantAndEquip: {
+            case HeatRecoveryConfig::PlantAndEquip: {
                 this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
                 this->ColdTemp = this->RecoveryTemp;
