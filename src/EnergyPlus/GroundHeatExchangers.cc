@@ -343,11 +343,6 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             // Response factors come from array object
             this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
                 state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
-
-            if (!this->myRespFactors) {
-                errorsFound = true;
-                ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
-            }
         } else {
             if (j.find("vertical_well_locations") == j.end()) {
                 // No ResponseFactors, GHEArray, or SingleBH object are referenced
@@ -577,7 +572,8 @@ std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string c
         }
     }
 
-    ShowFatalError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Properties, Name={} - not found.", objectName));
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Properties, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
 
     // needed to silence compiler, but should never get here
     return nullptr;
@@ -595,7 +591,8 @@ std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string c
         }
     }
 
-    ShowFatalError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Single, Name={} - not found.", objectName));
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Single, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
 
     // needed to silence compiler, but should never get here
     return nullptr;
@@ -613,7 +610,8 @@ std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string c
         }
     }
 
-    ShowFatalError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Array, Name={} - not found.", objectName));
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Array, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
 
     // needed to silence compiler, but should never get here
     return nullptr;
@@ -631,7 +629,8 @@ std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, st
         }
     }
 
-    ShowFatalError(state, fmt::format("Object=GroundHeatExchanger:ResponseFactors, Name={} - not found.", objectName));
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:ResponseFactors, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
 
     // needed to silence compiler, but should never get here
     return nullptr;
