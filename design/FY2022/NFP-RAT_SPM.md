@@ -148,10 +148,10 @@ Below are examples, showing the inputs for SetpointManager:SystemNodeReset:Humid
 SetpointManager:SystemNodeReset:Humidity,
   Supply Humidity Manager,                !- Name
   MaximumHumidityRatio,                   !- Control Variable
-  0.00924,                                !- Setpoint at Low Reference Maximum Humidity (kgWater/kgDryAir)
-  0.00600,                                !- Setpoint at High Reference Maximum Humidity (kgWater/kgDryAir)
-  0.00850,                                !- Low Reference Maximum Humdity (kgWater/kgDryAir)
-  0.01000,                                !- High Reference Maximum Humidity (kgWater/kgDryAir)
+  0.00924,                                !- Setpoint at Low Reference Humidity Ratio (kgWater/kgDryAir)
+  0.00600,                                !- Setpoint at High Reference Humidity Ratio (kgWater/kgDryAir)
+  0.00850,                                !- Low Reference Humidity Ratio (kgWater/kgDryAir)
+  0.01000,                                !- High Reference Humidity Ratio (kgWater/kgDryAir)
   Plenum-1 Out Node,                      !- Reference Node Name
   DOAS Cooling Coil Outlet;               !- Setpoint Node or NodeList Name
 \end{lstlisting}
@@ -231,39 +231,39 @@ The input object SetpointManager:SystemNodeReset:Temperature provides a setpoint
 
 The parameter \(T_{set}\) is determined as per the following pseudo code:
 ```
-If \({T_{ret,low}} < {T_{ret,high}}\) ~then
-     If \({T_{ret}} \le {T_{ret,low}}\) ~then
-          \({T_{set}} = {T_{set,atRetlow}}\)
+If \({T_{ref,low}} < {T_{ref,high}}\) ~then
+     If \({T_{ref}} \le {T_{ref,low}}\) ~then
+          \({T_{set}} = {T_{set,atReflow}}\)
      End If
-     If \({T_{ret}} \ge {T_{ret,high}}\) ~then
-          \({T_{set}} = {T_{set,atRethigh}}\)
+     If \({T_{ref}} \ge {T_{ref,high}}\) ~then
+          \({T_{set}} = {T_{set,atRefhigh}}\)
      Else
-          \({T_{set}} = {T_{set,atRetlow}} - (({T_{ret}} - {T_{ret,low}})/({T_{ret,high}} - {T_{ret,low}}))\cdot ({T_{set,atRetlow}} - {T_{set,atRethigh}})\)
+          \({T_{set}} = {T_{set,atReflow}} - (({T_{ref}} - {T_{ref,low}})/({T_{ref,high}} - {T_{ref,low}}))\cdot ({T_{set,atReflow}} - {T_{set,atRefhigh}})\)
      End If
 Else
-     \({T_{set}} = 0.5({T_{set,atRetlow}} + {T_{set,atRethigh)}}\)
+     \({T_{set}} = 0.5({T_{set,atReflow}} + {T_{set,atRefhigh)}}\)
 End IF
 ```
 \emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Temperature} object input.
 
 The input object SetpointManager:SystemNodeReset:Humidity provides a setpoint manager that places a humidity ratio setpoint on a system node according to the reference (e.g., return) humidity ratio using a reset strategy. The user defines a reset rule for this strategy by specifying two temperature setpoints at two reference temperatures. Generally the lower temperature setpoint is matched with the higher reference temperature.
 
-The parameter \(T_{set}\) is determined as per the following pseudo code:
+The parameter \(H_{set}\) is determined as per the following pseudo code:
 ```
-If \({T_{ret,low}} < {T_{ret,high}}\) ~then
-     If \({T_{ret}} \le {T_{ret,low}}\) ~then
-          \({T_{set}} = {T_{set,atRetlow}}\)
+If \({H_{ref,low}} < {H_{ref,high}}\) ~then
+     If \({H_{ref}} \le {H_{ref,low}}\) ~then
+          \({H_{set}} = {H_{set,atReflow}}\)
      End If
-     If \({T_{ret}} \ge {T_{ret,high}}\) ~then
-          \({T_{set}} = {T_{set,atRethigh}}\)
+     If \({H_{ref}} \ge {H_{ref,high}}\) ~then
+          \({H_{set}} = {H_{set,atRefhigh}}\)
      Else
-          \({T_{set}} = {T_{set,atRetlow}} - (({T_{ret}} - {T_{ret,low}})/({T_{ret,high}} - {T_{ret,low}}))\cdot ({T_{set,atRetlow}} - {T_{set,atRethigh}})\)
+          \({H_{set}} = {H_{set,atReflow}} - (({H_{ref}} - {H_{ref,low}})/({H_{ref,high}} - {H_{ref,low}}))\cdot ({H_{sef,atReflow}} - {H_{set,atRefhigh}})\)
      End If
 Else
-     \({T_{set}} = 0.5({T_{set,atRetlow}} + {T_{set,atRethigh)}}\)
+     \({H_{set}} = 0.5({H_{set,atReflow}} + {H_{set,atRefhigh)}}\)
 End IF
 ```
-\emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Humidity} object input.
+\emph{\({H_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Humidity} object input.
 
 ## Example File and Transition Changes ##
 

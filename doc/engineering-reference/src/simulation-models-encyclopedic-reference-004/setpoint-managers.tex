@@ -762,3 +762,63 @@ However, these examples are for a jagged demand profile full of discontinuous st
 Note the control is working properly, maintaining a return temperature around the target of 12 degrees where possible. Since the load profile is a typical -smooth- profile, the control is also much smoother. This should be a good representation of the capabilities of this setpoint manager.
 
 For jagged load profiles, if tight control is highly important, choosing a smaller timestep (\textasciitilde{}1 minute) is recommended. For normal building profiles, the typical range of timesteps (\textasciitilde{}15 minute) should be fully satisfactory.
+
+\subsection{System Node Reset Temperature}\label{system-node-reset-temperature}
+
+The input object SetpointManager:SystemNodeReset:Temperature provides a setpoint manager that places a temperature setpoint on a system node according to the reference (e.g., return) temperature using a reset strategy. The user defines a reset rule for this strategy by specifying two temperature setpoints at two reference temperatures. Generally the lower temperature setpoint is matched with the higher reference temperature.
+
+The parameter \(T_{set}\) is determined as per the following pseudo code:
+
+If \({T_{ref,low}} < {T_{ref,high}}\) ~then
+
+~~~ If \({T_{ref}} \le {T_{ref,low}}\) ~then
+
+~~~~~ \({T_{set}} = {T_{set,atReflow}}\)
+
+~~~ If \({T_{ref}} \ge {T_{ref,high}}\) ~then
+
+~~~~~ \({T_{set}} = {T_{set,atRefhigh}}\)
+
+~~~ Otherwise
+
+~~~~~ \({T_{set}} = {T_{set,atReflow}} - (({T_{ref}} - {T_{ref,low}})/({T_{ref,high}} - {T_{ref,low}}))\cdot ({T_{set,atReflow}} - {T_{set,atRefhigh}})\)
+
+~~~ End If
+
+Otherwise
+
+~~~ \({T_{set}} = 0.5({T_{set,atReflow}} + {T_{set,atRefhigh)}}\)
+
+End IF
+
+\emph{\({T_{set}}\)}will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Temperature} object input.
+
+\subsection{System Node Reset Humidity}\label{system-node-reset-humidity}
+
+The input object SetpointManager:SystemNodeReset:Humidity provides a setpoint manager that places a humidity ratio setpoint on a system node according to the reference (e.g., return) humidity ratio using a reset strategy. The user defines a reset rule for this strategy by specifying two temperature setpoints at two reference temperatures. Generally the lower temperature setpoint is matched with the higher reference temperature.
+
+The parameter \(H_{set}\) is determined as per the following pseudo code:
+
+If \({H_{ref,low}} < {H_{ref,high}}\) ~then
+
+~~~ If \({H_{ref}} \le {H_{ref,low}}\) ~then
+
+~~~~~ \({H_{set}} = {H_{set,atReflow}}\)
+
+~~~ If \({H_{ref}} \ge {H_{ref,high}}\) ~then
+
+~~~~~ \({H_{set}} = {H_{set,atRefhigh}}\)
+
+~~~ Otherwise
+
+~~~~~ \({H_{set}} = {H_{set,atReflow}} - (({H_{ref}} - {H_{ref,low}})/({H_{ref,high}} - {H_{ref,low}}))\cdot ({H_{set,atReflow}} - {H_{set,atRefhigh}})\)
+
+~~~ End If
+
+Otherwise
+
+~~~ \({H_{set}} = 0.5({H_{set,atReflow}} + {H_{set,atRefhigh)}}\)
+
+End IF
+
+\emph{\({H_{set}}\)}will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Humidity} object input.
