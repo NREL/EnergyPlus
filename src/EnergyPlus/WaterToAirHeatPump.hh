@@ -63,6 +63,15 @@ struct EnergyPlusData;
 
 namespace WaterToAirHeatPump {
 
+    enum class CompressType
+    {
+        Invalid = -1,
+        Reciprocating,
+        Rotary,
+        Scroll,
+        Num
+    };
+
     struct WatertoAirHPEquipConditions
     {
         // Members
@@ -125,7 +134,7 @@ namespace WaterToAirHeatPump {
         Real64 SourceSideHTR2;  // Source Side Heat Transfer Resistance coefficient 2 [k/kW]
         Real64 HighPressCutoff; // High Pressure Cut-off [Pa]
         Real64 LowPressCutoff;  // Low Pressure Cut-off [Pa]
-        int CompressorType;     // Type of Compressor ie. Reciprocating,Rotary or Scroll
+        CompressType CompressorType;     // Type of Compressor ie. Reciprocating,Rotary or Scroll
         int AirInletNodeNum;    // air side coil inlet node number
         int AirOutletNodeNum;   // air side coil outlet node number
         int WaterInletNodeNum;  // water side coil inlet node number
@@ -147,7 +156,7 @@ namespace WaterToAirHeatPump {
               HPTimeConstant(0.0), FanDelayTime(0.0), SourceSideUACoeff(0.0), LoadSideTotalUACoeff(0.0), LoadSideOutsideUACoeff(0.0),
               CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0),
               RefVolFlowRate(0.0), VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0),
-              LowPressCutoff(0.0), CompressorType(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              LowPressCutoff(0.0), CompressorType(CompressType::Invalid), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), plantLoc{}
         {
         }
@@ -257,10 +266,6 @@ namespace WaterToAirHeatPump {
 struct WaterToAirHeatPumpData : BaseGlobalStruct
 {
 
-    int const CompressorType_Reciprocating;
-    int const CompressorType_Rotary;
-    int const CompressorType_Scroll;
-
     int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
     Array1D_bool CheckEquipName;
 
@@ -310,9 +315,7 @@ struct WaterToAirHeatPumpData : BaseGlobalStruct
     }
 
     // Default Constructor
-    WaterToAirHeatPumpData()
-        : CompressorType_Reciprocating(1), CompressorType_Rotary(2), CompressorType_Scroll(3), NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0),
-          GetCoilsInputFlag(true), MyOneTimeFlag(true), firstTime(true)
+    WaterToAirHeatPumpData() : NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true), MyOneTimeFlag(true), firstTime(true)
     {
     }
 };

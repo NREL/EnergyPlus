@@ -368,18 +368,18 @@ namespace WaterToAirHeatPump {
                 auto const SELECT_CASE_var(AlphArray(2));
 
                 if (SELECT_CASE_var == "RECIPROCATING") {
-                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = state.dataWaterToAirHeatPump->CompressorType_Reciprocating;
+                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = CompressType::Reciprocating;
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompPistonDisp = NumArray(12);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompSucPressDrop = NumArray(13);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompClearanceFactor = NumArray(14);
 
                 } else if (SELECT_CASE_var == "ROTARY") {
-                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = state.dataWaterToAirHeatPump->CompressorType_Rotary;
+                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = CompressType::Rotary;
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompPistonDisp = NumArray(12);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompSucPressDrop = NumArray(13);
 
                 } else if (SELECT_CASE_var == "SCROLL") {
-                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = state.dataWaterToAirHeatPump->CompressorType_Scroll;
+                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = CompressType::Scroll;
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).RefVolFlowRate = NumArray(15);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).VolumeRatio = NumArray(16);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LeakRateCoeff = NumArray(17);
@@ -559,18 +559,18 @@ namespace WaterToAirHeatPump {
                 auto const SELECT_CASE_var(AlphArray(2));
 
                 if (SELECT_CASE_var == "RECIPROCATING") {
-                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = state.dataWaterToAirHeatPump->CompressorType_Reciprocating;
+                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = CompressType::Reciprocating;
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompPistonDisp = NumArray(9);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompSucPressDrop = NumArray(10);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompClearanceFactor = NumArray(11);
 
                 } else if (SELECT_CASE_var == "ROTARY") {
-                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = state.dataWaterToAirHeatPump->CompressorType_Rotary;
+                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = CompressType::Rotary;
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompPistonDisp = NumArray(9);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompSucPressDrop = NumArray(10);
 
                 } else if (SELECT_CASE_var == "SCROLL") {
-                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = state.dataWaterToAirHeatPump->CompressorType_Scroll;
+                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompressorType = CompressType::Scroll;
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).RefVolFlowRate = NumArray(12);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).VolumeRatio = NumArray(13);
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LeakRateCoeff = NumArray(14);
@@ -1195,7 +1195,7 @@ namespace WaterToAirHeatPump {
         int NumIteration3;                // Number of Iteration3
         int NumIteration4;                // Number of Iteration4 (use of latent degradation model ONLY)
         int SourceSideFluidIndex;         // Source Side Fluid Index
-        int CompressorType;               // Type of Compressor ie. Reciprocating,Rotary or Scroll
+        CompressType CompressorType;               // Type of Compressor ie. Reciprocating,Rotary or Scroll
         std::string SourceSideFluidName;  // Name of source side fluid
         std::string Refrigerant;          // Name of refrigerant
         Real64 NominalCoolingCapacity;    // Nominal Cooling Capacity (W)
@@ -1515,13 +1515,13 @@ namespace WaterToAirHeatPump {
                     }
 
                     // Determine Suction Pressure & Discharge Pressure at Compressor Exit
-                    if (CompressorType == state.dataWaterToAirHeatPump->CompressorType_Reciprocating) { // RECIPROCATING
+                    if (CompressorType == CompressType::Reciprocating) { // RECIPROCATING
                         SuctionPr = LoadSidePressure - PressureDrop;
                         DischargePr = SourceSidePressure + PressureDrop;
-                    } else if (CompressorType == state.dataWaterToAirHeatPump->CompressorType_Rotary) { // ROTARY
+                    } else if (CompressorType == CompressType::Rotary) { // ROTARY
                         SuctionPr = LoadSidePressure;
                         DischargePr = SourceSidePressure + PressureDrop;
-                    } else if (CompressorType == state.dataWaterToAirHeatPump->CompressorType_Scroll) { // SCROLL
+                    } else if (CompressorType == CompressType::Scroll) { // SCROLL
                         SuctionPr = LoadSidePressure;
                         DischargePr = SourceSidePressure;
                     }
@@ -1593,12 +1593,12 @@ namespace WaterToAirHeatPump {
                     // Find Refrigerant Flow Rate
                     {
                         auto const SELECT_CASE_var(CompressorType);
-                        if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Reciprocating) { // RECIPROCATING
+                        if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
                             MassRef = PistonDisp * CompSuctionDensity *
                                       (1.0 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1.0 / gamma));
-                        } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Rotary) { // ROTARY
+                        } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
                             MassRef = PistonDisp * CompSuctionDensity;
-                        } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Scroll) { // SCROLL
+                        } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
                             MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
                         }
                     }
@@ -1616,13 +1616,13 @@ namespace WaterToAirHeatPump {
                 // Determine the Power Consumption
                 {
                     auto const SELECT_CASE_var(CompressorType);
-                    if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Reciprocating) { // RECIPROCATING
+                    if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
                         Power = PowerLos + (1.0 / LosFac) * (MassRef * gamma / (gamma - 1.0) * SuctionPr / CompSuctionDensity *
                                                              (std::pow(DischargePr / SuctionPr, (gamma - 1.0) / gamma) - 1.0));
-                    } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Rotary) { // ROTARY
+                    } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
                         Power = PowerLos + (1.0 / LosFac) * (MassRef * gamma / (gamma - 1.0) * SuctionPr / CompSuctionDensity *
                                                              (std::pow(DischargePr / SuctionPr, (gamma - 1.0) / gamma) - 1.0));
-                    } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Scroll) { // SCROLL
+                    } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
                         Power = PowerLos + (1.0 / LosFac) * (gamma / (gamma - 1.0)) * SuctionPr * RefVolFlowRate *
                                                (((gamma - 1.0) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
                                                 ((1.0 / gamma) * std::pow(VolumeRatio, gamma - 1.0)) - 1.0);
@@ -1840,7 +1840,7 @@ namespace WaterToAirHeatPump {
         int NumIteration3;        // Number of Iteration3
         int SourceSideFluidIndex; // Source Side Fluid Index
 
-        int CompressorType;              // Type of Compressor ie. Reciprocating,Rotary or Scroll
+        CompressType CompressorType;              // Type of Compressor ie. Reciprocating,Rotary or Scroll
         std::string SourceSideFluidName; // Name of source side fluid
         std::string Refrigerant;         // Name of refrigerant
         //      CHARACTER(len=25) :: CErrCount
@@ -2069,13 +2069,13 @@ namespace WaterToAirHeatPump {
                 // Determine Suction Pressure at Compressor Entrance & Discharge Pressure at Compressor Exit
                 {
                     auto const SELECT_CASE_var(CompressorType);
-                    if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Reciprocating) { // RECIPROCATING
+                    if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
                         SuctionPr = SourceSidePressure - PressureDrop;
                         DischargePr = LoadSidePressure + PressureDrop;
-                    } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Rotary) { // ROTARY
+                    } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
                         SuctionPr = SourceSidePressure;
                         DischargePr = LoadSidePressure + PressureDrop;
-                    } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Scroll) { // SCROLL
+                    } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
                         SuctionPr = SourceSidePressure;
                         DischargePr = LoadSidePressure;
                     }
@@ -2157,12 +2157,12 @@ namespace WaterToAirHeatPump {
                 // Find Refrigerant Flow Rate
                 {
                     auto const SELECT_CASE_var(CompressorType);
-                    if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Reciprocating) { // RECIPROCATING
+                    if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
                         MassRef =
                             PistonDisp * CompSuctionDensity * (1 + ClearanceFactor - ClearanceFactor * std::pow(DischargePr / SuctionPr, 1 / gamma));
-                    } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Rotary) { // ROTARY
+                    } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
                         MassRef = PistonDisp * CompSuctionDensity;
-                    } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Scroll) { // SCROLL
+                    } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
                         MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * (DischargePr / SuctionPr);
                     }
                 }
@@ -2178,13 +2178,13 @@ namespace WaterToAirHeatPump {
             // Determine the Power Consumption
             {
                 auto const SELECT_CASE_var(CompressorType);
-                if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Reciprocating) { // RECIPROCATING
+                if (SELECT_CASE_var == CompressType::Reciprocating) { // RECIPROCATING
                     Power = PowerLos + (1 / LosFac) * (MassRef * gamma / (gamma - 1) * SuctionPr / CompSuctionDensity *
                                                        (std::pow(DischargePr / SuctionPr, (gamma - 1) / gamma) - 1));
-                } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Rotary) { // ROTARY
+                } else if (SELECT_CASE_var == CompressType::Rotary) { // ROTARY
                     Power = PowerLos + (1 / LosFac) * (MassRef * gamma / (gamma - 1) * SuctionPr / CompSuctionDensity *
                                                        (std::pow(DischargePr / SuctionPr, (gamma - 1) / gamma) - 1));
-                } else if (SELECT_CASE_var == state.dataWaterToAirHeatPump->CompressorType_Scroll) { // SCROLL
+                } else if (SELECT_CASE_var == CompressType::Scroll) { // SCROLL
                     Power = PowerLos + (1 / LosFac) * (gamma / (gamma - 1)) * SuctionPr * RefVolFlowRate *
                                            (((gamma - 1) / gamma) * ((DischargePr / SuctionPr) / VolumeRatio) +
                                             ((1 / gamma) * std::pow(VolumeRatio, gamma - 1)) - 1);
