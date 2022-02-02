@@ -3829,7 +3829,12 @@ namespace VariableSpeedCoils {
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed &&
             state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum)) {
 
-            SizeVarSpeedCoil(state, DXCoilNum);
+            SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
+
+            if (ErrorsFound) {
+                ShowSevereError(state, format("{}: Failed to size variable speed coil.", RoutineName));
+                ShowFatalError(state, "Program terminates due to preceding condition(s).");
+            }
 
             //   get rated coil bypass factor excluding fan heat
 
@@ -3873,7 +3878,12 @@ namespace VariableSpeedCoils {
         if (!state.dataGlobal->SysSizingCalc && state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum) &&
             !state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
-            SizeVarSpeedCoil(state, DXCoilNum);
+            SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
+
+            if (ErrorsFound) {
+                ShowSevereError(state, format("{}: Failed to size variable speed coil.", RoutineName));
+                ShowFatalError(state, "Program terminates due to preceding condition(s).");
+            }
 
             state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum) = false;
 
@@ -4440,7 +4450,7 @@ namespace VariableSpeedCoils {
         state.dataHeatBal->HeatReclaimVS_DXCoil(DXCoilNum).AvailCapacity = 0.0;
     }
 
-    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum)
+    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4503,7 +4513,6 @@ namespace VariableSpeedCoils {
         bool RatedCapHeatAutoSized;
         bool RatedAirFlowAutoSized;
         bool RatedWaterFlowAutoSized;
-        bool ErrorsFound;
         Real64 SystemCapacity;
         Real64 rho;
         Real64 cp;

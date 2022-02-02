@@ -1936,6 +1936,7 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     using VariableSpeedCoils::SimVariableSpeedCoils;
     using VariableSpeedCoils::SizeVarSpeedCoil;
 
+    bool SizingErrors = false;
     bool ErrorsFound(false);   // If errors detected in input
     Real64 RatedCapacity(0.0); // rated building cooling load
 
@@ -1962,21 +1963,21 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     SetVarSpeedCoilData(state, ihp.SCCoilIndex, ErrorsFound, _, ihp.SHCoilIndex);
     if (ErrorsFound) {
         ShowSevereError(state, format(R"(SizeIHP: Could not match cooling coil"{}" with heating coil="{}")", ihp.SCCoilName, ihp.SHCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
 
-    SizeVarSpeedCoil(state, ihp.SCCoilIndex); // size cooling coil
+    SizeVarSpeedCoil(state, ihp.SCCoilIndex, ErrorsFound); // size cooling coil
     if (ErrorsFound) {
-        ShowFatalError(state, format("SizeIHP: failed to size SC coil\"{}\"", ihp.SCCoilName));
-        ErrorsFound = false;
+        ShowSevereError(state, format("SizeIHP: failed to size SC coil\"{}\"", ihp.SCCoilName));
+        SizingErrors = true;
     } else {
         RatedCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCCoilIndex).RatedCapCoolTotal;
     };
 
-    SizeVarSpeedCoil(state, ihp.SHCoilIndex); // size heating coil
+    SizeVarSpeedCoil(state, ihp.SHCoilIndex, ErrorsFound); // size heating coil
     if (ErrorsFound) {
         ShowSevereError(state, format("SizeIHP: failed to size SH coil\"{}\"", ihp.SHCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
 
     // pass SC coil capacity to SCDWH cool coil
@@ -1988,17 +1989,17 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     SetVarSpeedCoilData(state, ihp.SCDWHCoolCoilIndex, ErrorsFound, _, ihp.SHDWHHeatCoilIndex);
 
     // size SCDWH air coil
-    SizeVarSpeedCoil(state, ihp.SCDWHCoolCoilIndex);
+    SizeVarSpeedCoil(state, ihp.SCDWHCoolCoilIndex, ErrorsFound);
     if (ErrorsFound) {
         ShowSevereError(state, format("SizeIHP: failed to size SCDWH cooling coil\"{}\"", ihp.SCDWHCoolCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
 
     // size SHDWH air coil
-    SizeVarSpeedCoil(state, ihp.SHDWHHeatCoilIndex);
+    SizeVarSpeedCoil(state, ihp.SHDWHHeatCoilIndex, ErrorsFound);
     if (ErrorsFound) {
         ShowSevereError(state, format("SizeIHP: failed to size SHDWH heating coil\"{}\"", ihp.SHDWHHeatCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
 
     // size the water coils below
@@ -2008,10 +2009,10 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
             RatedCapacity / (1.0 - 1.0 / state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).RatedCOPHeat);
     }
 
-    SizeVarSpeedCoil(state, ihp.SCWHCoilIndex);
+    SizeVarSpeedCoil(state, ihp.SCWHCoilIndex, ErrorsFound);
     if (ErrorsFound) {
         ShowSevereError(state, format("SizeIHP: failed to size SCWH coil\"{}\"", ihp.SCWHCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
 
     // size DWH water coil
@@ -2019,10 +2020,10 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
         state.dataVariableSpeedCoils->VarSpeedCoil(ihp.DWHCoilIndex).RatedCapWH = RatedCapacity;
     }
 
-    SizeVarSpeedCoil(state, ihp.DWHCoilIndex);
+    SizeVarSpeedCoil(state, ihp.DWHCoilIndex, ErrorsFound);
     if (ErrorsFound) {
         ShowSevereError(state, format("SizeIHP: failed to size DWH coil\"{}\"", ihp.DWHCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
 
     // size SCDWH water coil
@@ -2030,10 +2031,10 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
         state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHWHCoilIndex).RatedCapWH = RatedCapacity * 0.13;
     }
 
-    SizeVarSpeedCoil(state, ihp.SCDWHWHCoilIndex);
+    SizeVarSpeedCoil(state, ihp.SCDWHWHCoilIndex, ErrorsFound);
     if (ErrorsFound) {
         ShowSevereError(state, format("SizeIHP: failed to size SCDWH water heating coil\"{}\"", ihp.SCDWHWHCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
 
     // size SHDWH water coil
@@ -2041,12 +2042,15 @@ void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
         state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHDWHWHCoilIndex).RatedCapWH = RatedCapacity * 0.1;
     }
 
-    SizeVarSpeedCoil(state, ihp.SHDWHWHCoilIndex);
-
+    SizeVarSpeedCoil(state, ihp.SHDWHWHCoilIndex, ErrorsFound);
     if (ErrorsFound) {
         ShowSevereError(state, format("SizeIHP: failed to size SHDWH water heating coil\"{}\"", ihp.SHDWHWHCoilName));
-        ErrorsFound = false;
+        SizingErrors = true;
     };
+
+    if (SizingErrors) {
+        ShowFatalError(state, "Program terminates due to preceding condition(s).");
+    }
 
     ihp.IHPCoilsSized = true;
 }
