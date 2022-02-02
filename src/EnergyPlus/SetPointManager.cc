@@ -234,7 +234,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     //                          SetpointManager:MultiZone:Humidity:Minimum
     //                          SetpointManager:MultiZone:Humidity:Maximum
     //                      Jan 2022 Wooyoung Jung, Jeremy Lerond, and Jian Zhang, PNNL
-    //                        Added new setpoint managers: 
+    //                        Added new setpoint managers:
     //                          SetpointManager:SystemNodeReset:Temperature
     //                          SetpointManager:SystemNodeReset:Humidity
 
@@ -493,14 +493,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     cCurrentModuleObject = "SetpointManager:SystemNodeReset:Temperature";
     state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SystemNodeReset:Temperature'
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
 
     cCurrentModuleObject = "SetpointManager:SystemNodeReset:Humidity";
     state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SystemNodeReset:Humidity'
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumNumbers, NumNums);
     state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas = max(state.dataSetPointManager->GetSetPointManagerInputMaxNumAlphas, NumAlphas);
@@ -3728,9 +3728,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     // Input the System Node Reset Temperature Setpoint Managers
 
-    if (state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs > 0)
-        state.dataSetPointManager->SystemNodeResetTempSetPtMgr.allocate(
-            state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs); // Allocate the Setpoint Manager input data array
+    if (state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs > 0 || state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs > 0)
+        state.dataSetPointManager->SystemNodeResetSetPtMgr.allocate(
+            state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs +
+            state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs); // Allocate the Setpoint Manager input data array
 
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:SystemNodeReset:Temperature";
@@ -3750,7 +3751,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-        auto &setpointManager = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum);
+        auto &setpointManager = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum);
 
         setpointManager.Name = cAlphaArgs(1);
         setpointManager.ctrlVarType = cAlphaArgs(2);
@@ -3761,20 +3762,19 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, format("GetSetPointManagerInputs: {}=\"{}\", invalid field.", cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-            ShowContinueError(state,
-                              "..Valid values are \"Temperature\", \"MaximumTemperature\", or \"MinimumTemperature\".");
+            ShowContinueError(state, "..Valid values are \"Temperature\", \"MaximumTemperature\", or \"MinimumTemperature\".");
             ErrorsFound = true;
         }
 
-        setpointManager.SpAtLowRefTemp = rNumericArgs(1);
-        setpointManager.SpAtHighRefTemp = rNumericArgs(2);
-        setpointManager.LowRefTemp = rNumericArgs(3);
-        setpointManager.HighRefTemp = rNumericArgs(4);
+        setpointManager.SpAtLowRef = rNumericArgs(1);
+        setpointManager.SpAtHighRef = rNumericArgs(2);
+        setpointManager.LowRef = rNumericArgs(3);
+        setpointManager.HighRef = rNumericArgs(4);
 
         setpointManager.RefNodeNum = GetOnlySingleNode(state,
                                                        cAlphaArgs(3),
                                                        ErrorsFound,
-                                                       DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeReset,
+                                                       DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeResetTemperature,
                                                        cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Blank,
                                                        DataLoopNode::ConnectionType::Sensor,
@@ -3782,14 +3782,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                        ObjectIsNotParent);
 
         setpointManager.CtrlNodeListName = cAlphaArgs(4);
-        if (setpointManager.SpAtLowRefTemp < setpointManager.SpAtHighRefTemp) {
+        if (setpointManager.SpAtLowRef < setpointManager.SpAtHighRef) {
             ShowWarningError(state, format("GetSetPointManagerInputs: {}=\"{}\", invalid setpoints.", cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state,
                               format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
                                      cNumericFieldNames(1),
-                                     setpointManager.SpAtLowRefTemp,
+                                     setpointManager.SpAtLowRef,
                                      cNumericFieldNames(2),
-                                     setpointManager.SpAtHighRefTemp));
+                                     setpointManager.SpAtHighRef));
         }
 
         NodeListError = false;
@@ -3800,7 +3800,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeReset,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeResetTemperature,
                     cAlphaArgs(1),
                     DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
@@ -3840,22 +3840,18 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (!NodeListError) {
             state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
             state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlNodes =
-                state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlNodes;
+                state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlNodes;
         }
-        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).Name = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).Name;
+        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).Name = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).Name;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SystemNodeResetTemp;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode =
-            state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlTypeMode;
+            state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlTypeMode;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes =
-            state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
+            state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).NumCtrlNodes;
     }
 
     // Input the System Node Reset Humidity Setpoint Managers
-
-    if (state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs > 0)
-        state.dataSetPointManager->SystemNodeResetHumSetPtMgr.allocate(
-            state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs); // Allocate the Setpoint Manager input data array
 
     // Input the data for each Setpoint Manager
     cCurrentModuleObject = "SetpointManager:SystemNodeReset:Humidity";
@@ -3875,7 +3871,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-        auto &setpointManager = state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum);
+        int SetPtRstMgrNum = SetPtMgrNum + state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs;
+
+        auto &setpointManager = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtRstMgrNum);
 
         setpointManager.Name = cAlphaArgs(1);
         setpointManager.ctrlVarType = cAlphaArgs(2);
@@ -3890,15 +3888,15 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         }
 
-        setpointManager.SpAtLowRefHumRat = rNumericArgs(1);
-        setpointManager.SpAtHighRefHumRat = rNumericArgs(2);
-        setpointManager.LowRefHumRat = rNumericArgs(3);
-        setpointManager.HighRefHumRat = rNumericArgs(4);
+        setpointManager.SpAtLowRef = rNumericArgs(1);
+        setpointManager.SpAtHighRef = rNumericArgs(2);
+        setpointManager.LowRef = rNumericArgs(3);
+        setpointManager.HighRef = rNumericArgs(4);
 
         setpointManager.RefNodeNum = GetOnlySingleNode(state,
                                                        cAlphaArgs(3),
                                                        ErrorsFound,
-                                                       DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeReset,
+                                                       DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeResetHumidity,
                                                        cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Blank,
                                                        DataLoopNode::ConnectionType::Sensor,
@@ -3906,14 +3904,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                        ObjectIsNotParent);
 
         setpointManager.CtrlNodeListName = cAlphaArgs(4);
-        if (setpointManager.SpAtLowRefHumRat < setpointManager.SpAtHighRefHumRat) {
+        if (setpointManager.SpAtLowRef < setpointManager.SpAtHighRef) {
             ShowWarningError(state, format("GetSetPointManagerInputs: {}=\"{}\", invalid setpoints.", cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state,
                               format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
                                      cNumericFieldNames(1),
-                                     setpointManager.SpAtLowRefHumRat,
+                                     setpointManager.SpAtLowRef,
                                      cNumericFieldNames(2),
-                                     setpointManager.SpAtHighRefHumRat));
+                                     setpointManager.SpAtHighRef));
         }
 
         NodeListError = false;
@@ -3924,7 +3922,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Blank,
-                    DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeReset,
+                    DataLoopNode::ConnectionObjectType::SetpointManagerSystemNodeResetHumidity,
                     cAlphaArgs(1),
                     DataLoopNode::ConnectionType::SetPoint,
                     NodeInputManager::CompFluidStream::Primary,
@@ -3964,15 +3962,15 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (!NodeListError) {
             state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
             state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlNodes =
-                state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).CtrlNodes;
+                state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtRstMgrNum).CtrlNodes;
         }
-        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).Name = state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).Name;
+        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).Name = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).Name;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SystemNodeResetHum;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode =
-            state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
+            state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtRstMgrNum).CtrlTypeMode;
         state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes =
-            state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
+            state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtRstMgrNum).NumCtrlNodes;
     }
 
     cAlphaFieldNames.deallocate();
@@ -4033,7 +4031,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                     continue;
                 ShowWarningError(state,
                                  format("{} =\"{}\"",
-                                        managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
+                                        managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
                                         state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).Name));
                 ShowContinueError(state,
                                   format("...duplicate node specified = {}",
@@ -4053,12 +4051,12 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                     state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).AirLoopNum) {
                     ShowWarningError(state,
                                      format("{}=\"{}\"",
-                                            managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
+                                            managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
                                             state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).Name));
                     ShowContinueError(state, "...air loop name conflicts with another setpoint manager.");
                     ShowContinueError(state,
                                       format("...conflicting setpoint manager = {} \"{}\"",
-                                             managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
+                                             managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
                                              state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).Name));
                     ShowContinueError(state, "...conflicting air loop name = " + state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).AirLoopName);
                     //        ErrorsFound=.TRUE.
@@ -4077,13 +4075,14 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                             state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) != 0) {
                             ShowWarningError(state,
                                              format("{}=\"{}\"",
-                                                    managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
+                                                    managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
                                                     state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).Name));
                             ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
-                            ShowContinueError(state,
-                                              format("...conflicting setpoint manager = {} \"{}\"",
-                                                     managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
-                                                     state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).Name));
+                            ShowContinueError(
+                                state,
+                                format("...conflicting setpoint manager = {} \"{}\"",
+                                       managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
+                                       state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).Name));
                             ShowContinueError(
                                 state,
                                 "...conflicting node name = " +
@@ -4115,13 +4114,14 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                             state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType == SetPointManagerType::RAB) {
                             ShowWarningError(state,
                                              format("{}=\"{}\"",
-                                                    managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
+                                                    managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
                                                     state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).Name));
                             ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
-                            ShowContinueError(state,
-                                              format("...conflicting setpoint manager ={}:\"{}\"",
-                                                     managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
-                                                     state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).Name));
+                            ShowContinueError(
+                                state,
+                                format("...conflicting setpoint manager ={}:\"{}\"",
+                                       managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
+                                       state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).Name));
                             ShowContinueError(
                                 state,
                                 "...conflicting node name = " +
@@ -4133,13 +4133,14 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                         } else { // severe error for other SP manager types
                             ShowWarningError(state,
                                              format("{}=\"{}\"",
-                                                    managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
+                                                    managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType)],
                                                     state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).Name));
                             ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
-                            ShowContinueError(state,
-                                              format("...conflicting setpoint manager = {}:\"{}\"",
-                                                     managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
-                                                     state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).Name));
+                            ShowContinueError(
+                                state,
+                                format("...conflicting setpoint manager = {}:\"{}\"",
+                                       managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType)],
+                                       state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).Name));
                             ShowContinueError(
                                 state,
                                 "...conflicting node name = " +
@@ -4190,7 +4191,7 @@ void InitSetPointManagers(EnergyPlusData &state)
     //                         Added new setpoint managers:
     //                          SetpointManager:SystemNodeReset:Temperature
     //                          SetpointManager:SystemNodeReset:Humidity
-    // 
+    //
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -5694,35 +5695,34 @@ void InitSetPointManagers(EnergyPlusData &state)
                 state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).maximumHotWaterSetpoint;
         }
 
-        // System Node Reset Temperature
-        for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs; ++SetPtMgrNum) {
-            for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
-                state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).calculate(state);
-                NodeNum = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                switch (state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+        // System Node Reset Temperature and Humidity
+        for (SetPtMgrNum = 1;
+             SetPtMgrNum <= (state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs + state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs);
+             ++SetPtMgrNum) {
+            for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
+                state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).calculate(state);
+                NodeNum = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
+                switch (state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
                 case CtrlVarType::Temp:
-                    state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).SetPt;
+                    state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
+                    break;
                 case CtrlVarType::MaxTemp:
-                    state.dataLoopNodes->Node(NodeNum).TempSetPointHi = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).SetPt;
+                    state.dataLoopNodes->Node(NodeNum).TempSetPointHi = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
+                    break;
                 case CtrlVarType::MinTemp:
-                    state.dataLoopNodes->Node(NodeNum).TempSetPointLo = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).SetPt;
-                }
-            }
-        }
-
-        // System Node Reset Temperature
-        for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs; ++SetPtMgrNum) {
-            for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
-                 ++CtrlNodeIndex) {
-                state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).calculate(state);
-                NodeNum = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                switch (state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+                    state.dataLoopNodes->Node(NodeNum).TempSetPointLo = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
+                    break;
                 case CtrlVarType::HumRat:
-                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint = state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).SetPt;
+                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
+                    break;
                 case CtrlVarType::MaxHumRat:
-                    state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).SetPt;
+                    state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
+                    break;
                 case CtrlVarType::MinHumRat:
-                    state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).SetPt;
+                    state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt;
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -5943,12 +5943,12 @@ void SimSetPointManagers(EnergyPlusData &state)
 
     // The System Node Reset Temperature Setpoint Managers
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs; ++SetPtMgrNum) {
-        state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).calculate(state);
+        state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).calculate(state);
     }
 
     // The System Node Reset Humidity Setpoint Managers
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs; ++SetPtMgrNum) {
-        state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).calculate(state);
+        state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum + state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs).calculate(state);
     }
 }
 
@@ -6593,16 +6593,16 @@ void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int RefNode;            // setpoint reference node number
-    int MixedOutNode;       // mixed air outlet node number
-    int OAInNode;           // outside air inlet node number
-    int ReturnInNode;       // return air inlet node number
-    Real64 OAFraction;      // outside air fraction of mixed flow rate
-    Real64 ReturnInValue;   // return air inlet node mass flow rate
-    Real64 RefNodeSetPoint; // setpoint at reference node
-    Real64 MinSetPoint;     // minimum allowed setpoint
-    Real64 MaxSetPoint;     // maximum allowed setpoint
-    bool HumiditySetPoint;  // logical to indicate if this is a humidity setpoint
+    int RefNode;                // setpoint reference node number
+    int MixedOutNode;           // mixed air outlet node number
+    int OAInNode;               // outside air inlet node number
+    int ReturnInNode;           // return air inlet node number
+    Real64 OAFraction;          // outside air fraction of mixed flow rate
+    Real64 ReturnInValue = 0;   // return air inlet node mass flow rate
+    Real64 RefNodeSetPoint = 0; // setpoint at reference node
+    Real64 MinSetPoint = 0;     // minimum allowed setpoint
+    Real64 MaxSetPoint = 0;     // maximum allowed setpoint
+    bool HumiditySetPoint;      // logical to indicate if this is a humidity setpoint
 
     RefNode = this->RefNode;
     MixedOutNode = this->MixedOutNode;
@@ -8411,7 +8411,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     this->CndPumpVarIndex = VarIndexes(1);
 }
 
-void DefineSysNodeResetTempSetPointManager::calculate(EnergyPlusData &state)
+void DefineSysNodeResetSetPointManager::calculate(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Wooyoung Jung, Jeremy Lerond, and Jian Zhang, PNNL
@@ -8429,58 +8429,43 @@ void DefineSysNodeResetTempSetPointManager::calculate(EnergyPlusData &state)
     // Using Return Air Temperature or Outside Air Temperature? Architectural Engineering Conference (AEI) 2003. Sep 17-20, Austin, TX.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 SpAtLow;    // Setpoint at low reference value
-    Real64 SpAtHigh;   // Setpoint at high reference value
-    Real64 LowRefVal;  // Low reference value
-    Real64 HighRefVal; // High reference value
-    Real64 RefValue;   // Reference value from the Reference node
-    Real64 SetPt;      // Setpoint
-    int RefNode;       // Reference node number
+    Real64 SpAtLow;      // Setpoint at low reference value
+    Real64 SpAtHigh;     // Setpoint at high reference value
+    Real64 LowRefVal;    // Low reference value
+    Real64 HighRefVal;   // High reference value
+    Real64 RefValue = 0; // Reference value from the Reference node
+    Real64 SetPt = 0;    // Setpoint
+    int RefNode;         // Reference node number
 
     RefNode = this->RefNodeNum;
 
-    RefValue = state.dataLoopNodes->Node(RefNode).Temp;
-    SpAtLow = this->SpAtLowRefTemp;
-    SpAtHigh = this->SpAtHighRefTemp;
-    LowRefVal = this->LowRefTemp;
-    HighRefVal = this->HighRefTemp;
+    switch (this->CtrlTypeMode) {
+    case CtrlVarType::Temp: {
+        RefValue = state.dataLoopNodes->Node(RefNode).Temp;
+    } break;
+    case CtrlVarType::MaxTemp: {
+        RefValue = state.dataLoopNodes->Node(RefNode).Temp;
+    } break;
+    case CtrlVarType::MinTemp: {
+        RefValue = state.dataLoopNodes->Node(RefNode).Temp;
+    } break;
+    case CtrlVarType::HumRat: {
+        RefValue = state.dataLoopNodes->Node(RefNode).HumRat;
+    } break;
+    case CtrlVarType::MaxHumRat: {
+        RefValue = state.dataLoopNodes->Node(RefNode).HumRat;
+    } break;
+    case CtrlVarType::MinHumRat: {
+        RefValue = state.dataLoopNodes->Node(RefNode).HumRat;
+    } break;
+    default:
+        break;
+    }
 
-    this->SetPt = CalcSetPointLinInt(LowRefVal, HighRefVal, RefValue, SpAtLow, SpAtHigh);
-}
-
-void DefineSysNodeResetHumSetPointManager::calculate(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Wooyoung Jung, Jeremy Lerond, and Jian Zhang, PNNL
-    //       DATE WRITTEN   Jan 2022
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Set a humidity ratio setpoint at a user-defiend node based on the humidity ratio at another user-specified (i.e., reference) node.
-    // The setpoint is determined using a linear relationship defined by the user. In general, the higher the reference humidity ratio,
-    // the lower the setpoint.
-
-    // REFERENCE:
-    // Guanghua Wei, W. Dan Turner, David E. Claridge, and Mingsheng Liu. 2003. Single-Duct Constant Air Volume System Supply Air Temperature Reset:
-    // Using Return Air Temperature or Outside Air Temperature? Architectural Engineering Conference (AEI) 2003. Sep 17-20, Austin, TX.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 SpAtLow;    // Setpoint at low reference value
-    Real64 SpAtHigh;   // Setpoint at high reference value
-    Real64 LowRefVal;  // Low reference value
-    Real64 HighRefVal; // High reference value
-    Real64 RefValue;   // Reference value from the Reference node
-    Real64 SetPt;      // Setpoint
-    int RefNode;       // Reference node number
-
-    RefNode = this->RefNodeNum;
-
-    RefValue = state.dataLoopNodes->Node(RefNode).HumRat;
-    SpAtLow = this->SpAtLowRefHumRat;
-    SpAtHigh = this->SpAtHighRefHumRat;
-    LowRefVal = this->LowRefHumRat;
-    HighRefVal = this->HighRefHumRat;
+    SpAtLow = this->SpAtLowRef;
+    SpAtHigh = this->SpAtHighRef;
+    LowRefVal = this->LowRef;
+    HighRefVal = this->HighRef;
 
     this->SetPt = CalcSetPointLinInt(LowRefVal, HighRefVal, RefValue, SpAtLow, SpAtHigh);
 }
@@ -8993,44 +8978,42 @@ void UpdateSetPointManagers(EnergyPlusData &state)
         }
     }
 
-    // Loop over all the System Node Reset Temperature Setpoint Managers
-    for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs; ++SetPtMgrNum) {
+    // Loop over all the System Node Reset Setpoint Managers
+    for (SetPtMgrNum = 1;
+         SetPtMgrNum <= (state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs + state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs);
+         ++SetPtMgrNum) {
 
-        for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
+        for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).NumCtrlNodes;
              ++CtrlNodeIndex) { // Loop over the list of nodes wanting
             // setpoints from this setpoint manager
-            NodeNum = state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-            switch (state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+            NodeNum = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
+            switch (state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
             case CtrlVarType::Temp:
                 state.dataLoopNodes->Node(NodeNum).TempSetPoint =
-                    state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
+                    state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
+                break;
             case CtrlVarType::MaxTemp:
                 state.dataLoopNodes->Node(NodeNum).TempSetPointHi =
-                    state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).SetPt; // Set the maximum temperature setpoint
+                    state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the maximum temperature setpoint
+                break;
             case CtrlVarType::MinTemp:
                 state.dataLoopNodes->Node(NodeNum).TempSetPointLo =
-                    state.dataSetPointManager->SystemNodeResetTempSetPtMgr(SetPtMgrNum).SetPt; // Set the minimum temperature setpoint
-            }
-        }
-    }
-
-    // Loop over all the System Node Reset Humidity Setpoint Managers
-    for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs; ++SetPtMgrNum) {
-
-        for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
-             ++CtrlNodeIndex) { // Loop over the list of nodes wanting
-            // setpoints from this setpoint manager
-            NodeNum = state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-            switch (state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+                    state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the minimum temperature setpoint
+                break;
             case CtrlVarType::HumRat:
                 state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
-                    state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).SetPt; // Set the humidity ratio setpoint
+                    state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the humidity ratio setpoint
+                break;
             case CtrlVarType::MaxHumRat:
                 state.dataLoopNodes->Node(NodeNum).HumRatMax =
-                    state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).SetPt; // Set the maximum humidity ratio setpoint
+                    state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the maximum humidity ratio setpoint
+                break;
             case CtrlVarType::MinHumRat:
                 state.dataLoopNodes->Node(NodeNum).HumRatMin =
-                    state.dataSetPointManager->SystemNodeResetHumSetPtMgr(SetPtMgrNum).SetPt; // Set the minimum humidity ratio setpoint
+                    state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).SetPt; // Set the minimum humidity ratio setpoint
+                break;
+            default:
+                break;
             }
         }
     }
@@ -9383,7 +9366,7 @@ SPMLoop_exit:;
         ShowWarningError(state,
                          format("{}{}=\"{}\". ",
                                 RoutineName,
-                                managerTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).SPMType)],
+                                managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).SPMType)],
                                 state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).Name));
         ShowContinueError(state, format(" ..Humidity ratio control variable type specified is = HumidityRatio"));
         ShowContinueError(state, format(" ..Humidity ratio control variable type allowed with water coils is = MaximumHumidityRatio"));

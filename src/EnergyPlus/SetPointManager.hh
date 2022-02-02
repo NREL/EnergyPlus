@@ -949,44 +949,21 @@ namespace SetPointManager {
         void calculate(EnergyPlusData &state);
     };
 
-    struct DefineSysNodeResetTempSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
+    struct DefineSysNodeResetSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
     {
         // Members
-        Real64 SpAtLowRefTemp;  // Setpoint at Low Reference Temperature (i.e., Maximum Temperature Setpoint)
-        Real64 SpAtHighRefTemp; // Setpoint at High Reference Temperature (i.e., Minimum Temperature Setpoint)
-        Real64 LowRefTemp;      // Low Reference Temperature
-        Real64 HighRefTemp;     // High Reference Temperature
-        int RefNodeNum;         // Reference Node Number
+        Real64 SpAtLowRef;  // Setpoint at Low Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
+        Real64 SpAtHighRef; // Setpoint at High Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
+        Real64 LowRef;      // Low Reference Temperature or Humidity Ratio
+        Real64 HighRef;     // High Reference Temperature or Humidity Ratio
+        int RefNodeNum;     // Reference Node Number
         int NumCtrlNodes;
         std::string CtrlNodeListName;
         Array1D_int CtrlNodes;
         Real64 SetPt; // current setpoint value
 
         // Default Constructor
-        DefineSysNodeResetTempSetPointManager()
-            : SpAtLowRefTemp(0.0), SpAtHighRefTemp(0.0), LowRefTemp(0.0), HighRefTemp(0.0), RefNodeNum(0), NumCtrlNodes(0), SetPt(0.0)
-        {
-        }
-
-        void calculate(EnergyPlusData &state);
-    };
-
-    struct DefineSysNodeResetHumSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
-    {
-        // Members
-        Real64 SpAtLowRefHumRat;  // Setpoint at Low Reference Humidity Ratio (i.e., Maximum Humidity Ratio Setpoint)
-        Real64 SpAtHighRefHumRat; // Setpoint at High Reference Humidity Ratio (i.e., Maximum Humidity Ratio Setpoint)
-        Real64 LowRefHumRat;      // Low Reference Humidity Ratio
-        Real64 HighRefHumRat;     // High Reference Humidity Ratio
-        int RefNodeNum;           // Reference Node Number
-        int NumCtrlNodes;
-        std::string CtrlNodeListName;
-        Array1D_int CtrlNodes;
-        Real64 SetPt; // current setpoint value
-
-        // Default Constructor
-        DefineSysNodeResetHumSetPointManager()
-            : SpAtLowRefHumRat(0.0), SpAtHighRefHumRat(0.0), LowRefHumRat(0.0), HighRefHumRat(0.0), RefNodeNum(0), NumCtrlNodes(0), SetPt(0.0)
+        DefineSysNodeResetSetPointManager() : SpAtLowRef(0.0), SpAtHighRef(0.0), LowRef(0.0), HighRef(0.0), RefNodeNum(0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -1149,8 +1126,7 @@ struct SetPointManagerData : BaseGlobalStruct
     Array1D<SetPointManager::DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
     Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
     Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
-    Array1D<SetPointManager::DefineSysNodeResetTempSetPointManager> SystemNodeResetTempSetPtMgr;  // Array for System Node Reset Setpoint Manager data
-    Array1D<SetPointManager::DefineSysNodeResetHumSetPointManager> SystemNodeResetHumSetPtMgr;    // Array for System Node Reset Setpoint Manager data
+    Array1D<SetPointManager::DefineSysNodeResetSetPointManager> SystemNodeResetSetPtMgr;          // Array for System Node Reset Setpoint Manager data
 
     Real64 CondWaterSetPoint = 0; // Condenser entering water temperature setpoint this timestep, C
     Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
@@ -1195,7 +1171,6 @@ struct SetPointManagerData : BaseGlobalStruct
         NumSchTESSetPtMgrs = 0;              // number of TES Scheduled setpoint Managers
         NumSystemNodeResetTempSetPtMgrs = 0; // Number of SystemNodeReset:Temperature setpoint managers
         NumSystemNodeResetHumSetPtMgrs = 0;  // Number of SystemNodeReset:Humidity setpoint managers
-
 
         DCESPMDsn_EntCondTemp = 0.0;
         DCESPMDsn_MinCondSetpt = 0.0;
@@ -1258,8 +1233,7 @@ struct SetPointManagerData : BaseGlobalStruct
         ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
         ReturnWaterResetHWSetPtMgr.deallocate();  // hot-water return water reset
         SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
-        SystemNodeResetTempSetPtMgr.deallocate(); // Array for System Node Reset Temperature Set Pt Mgr
-        SystemNodeResetHumSetPtMgr.deallocate();  // Array for System Node Reset Humidity Set Pt Mgr
+        SystemNodeResetSetPtMgr.deallocate();     // Array for System Node Reset Temperature and Humidity Ratio setpoint manager
 
         NoSurfaceGroundTempObjWarning = true;
         NoShallowGroundTempObjWarning = true;

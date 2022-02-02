@@ -40,7 +40,7 @@ A new subsection for the new SPM will be added to the I/O reference guide as fol
 
 \subsection{SetpointManager:SystemNodeReset:Temperature}\label{setpointmanagersystemnoderesettemperature}
 
-This System Node Reset Setpoint Manager is used to place a temperature setpoint on a system node according to the reference (e.g., return) temperature of a system node using a reset rule. The reset rule is determined by two points: setpoints at low and high reference temperature (SpAtLowRefTemp and SpAtHighRefTemp). In general, the higher the reference temperature, the lower the setpoint. Specifically, the temperature setpoint at low reference temperature starts decreasing linearly to the temperature setpoint at high reference temperature when the temperature becomes higher than the low reference temperature (LowRefTemp) until the high reference temperature (HighRefTemp). The reference temperature is obtained from the user-specified system node during the simulation. This SPM can be used to place a temperature or humidity ratio setpoint on HVAC system nodes.
+The System Node Reset Setpoint Manager is used to place a temperature setpoint on a system node according to the reference temperature (e.g., return air or outdoor air temperature) of a system node using a linear interpolation between two user-specified reference values and two user-specified setpoint values. In general, the higher the reference temperature, the lower the setpoint. During the simulation, the reference temperature is obtained from the user-specified reference system node.
 
 The input consists of the setpoint manager name, the control variable, the name of the node or node list affected by the setpoint, the name of the reference node name, and the data for the reset rule: setpoints at low and high reference temperatures, and low and high reference temperatures.
 
@@ -52,7 +52,7 @@ A unique, user-assigned name for an instance of a system node reset setpoint man
 
 \paragraph{Field: Control Variable}
 
-The type of variable that will be controlled. There are six key choices for this type of set point manager:
+The type of variable that will be controlled. There are three key choices for this type of set point manager:
 \begin{itemize}
   \item Temperature
   \item MaximumTemperature
@@ -68,11 +68,11 @@ The temperature setpoint in \(^{o}\)C at the high reference temperature for the 
 
 \paragraph{Field: Low Reference Temperature}\label{field-low-reference-temperature}
 
-The low reference temperature in \(^{o}\)C for the reset rule. In other words, when the reference temperature is lower than this value, the temperature setpoint is at its maximum.
+The low reference temperature in \(^{o}\)C for the reset rule. When the reference temperature is lower than this value, the temperature setpoint is at its maximum.
 
 \paragraph{Field: High Reference Temperature}\label{field-high-reference-temperature}
 
-The high reference temperature in \(^{o}\)C for the reset rule. In other words, when the reference temperature is higher than this value, the temperature setpoint is at its minimum.
+The high reference temperature in \(^{o}\)C for the reset rule. When the reference temperature is higher than this value, the temperature setpoint is at its minimum.
 
 \paragraph{Field: Reference Node Name}\label{field-reference-node-name}
 
@@ -87,19 +87,19 @@ Below are examples, showing the inputs for SetpointManager:SystemNodeReset:Tempe
 \begin{lstlisting}
 
 SetpointManager:SystemNodeReset:Temperature,
-  Supply Temp Manager,        !- Name
-  Temperature,                !- Control Variable
-  20.0,                       !- Setpoint at Low Reference Temperature {C}
-  16.7,                       !- Setpoint at High Reference Temperature {C}
-  12.8,                       !- Low Reference Temperature {C}
-  23.9,                       !- High Reference Temperature {C}
-  Reference Node,             !- Reference Node Name
-  Supply Nodes;               !- Setpoint Node or NodeList Name
+  Supply Temp Manager,              !- Name
+  Temperature,                      !- Control Variable
+  16.7,                             !- Setpoint at Low Reference Temperature {C}
+  12.8,                             !- Setpoint at High Reference Temperature {C}
+  20.0,                             !- Low Reference Temperature {C}
+  23.3,                             !- High Reference Temperature {C}
+  Plenum-1 Out Node,                !- Reference Node Name
+  VAV Sys 1 Outlet Node;            !- Setpoint Node or NodeList Name
 \end{lstlisting}
 
 \subsection{SetpointManager:SystemNodeReset:Humidity}\label{setpointmanagersystemnoderesethumidity}
 
-This System Node Reset Setpoint Manager is used to place a humidity ratio setpoint on a system node according to the reference (e.g., return) humidity ratio of a system node using a reset rule. The reset rule is determined by two points: setpoints at low and high reference humidity ratio (SpAtLowRefHumRat and SpAtHighRefHumRat). In general, the higher the reference humidity ratio, the lower the setpoint. Specifically, the humidity ratio setpoint at low reference humidity ratio starts decreasing linearly to the humidity ratio setpoint at high reference humidity ratio when the humidity ratio becomes higher than the low reference humidity ratio (LowRefHumRat) until the high reference humidity ratio (HighRefHumRat). The reference humidity ratio is obtained from the user-specified system node during the simulation. This SPM can be used to place a humidity ratio setpoint on HVAC system nodes.
+The System Node Reset Setpoint Manager is used to place a humidity ratio setpoint on a system node according to the reference humidity ratio (e.g., return air or outdoor air humidity ratio) of a system node using a linear interpolation between two user-specified reference values and two user-specified setpoint values. In general, the higher the reference humidity ratio, the lower the setpoint. During the simulation, the reference humidity ratio is obtained from the user-specified reference system node.
 
 The input consists of the setpoint manager name, the control variable, the name of the node or node list affected by the setpoint, the name of the reference node name, and the data for the reset rule: setpoints at low and high reference humidity ratios, and low and high reference humidity ratios.
 
@@ -111,7 +111,7 @@ A unique, user-assigned name for an instance of a system node reset setpoint man
 
 \paragraph{Field: Control Variable}
 
-The type of variable that will be controlled. There are six key choices for this type of set point manager:
+The type of variable that will be controlled. There are three key choices for this type of set point manager:
 \begin{itemize}
   \item HumidityRatio
   \item MaximumHumidityRatio
@@ -119,7 +119,7 @@ The type of variable that will be controlled. There are six key choices for this
 
 \paragraph{Field: Setpoint at Low Reference Humidity Ratio}\label{field-setpoint-at-low-reference-humidity-ratio}
 
-The humidity ratio setpoint in  at the low reference humidity ratio for the reset rule.
+The humidity ratio setpoint in \kg\of{W}\per\kg\of{DA} at the low reference humidity ratio for the reset rule.
 
 \paragraph{Field: Setpoint at High Reference Humidity Ratio}\label{field-setpoint-at-high-reference-humidity-ratio}
 
@@ -127,11 +127,11 @@ The humidity ratio setpoint in \kg\of{W}\per\kg\of{DA} at the high reference hum
 
 \paragraph{Field: Low Reference Humidity Ratio}\label{field-low-reference-humidity-ratio}
 
-The low reference humidity ratio in \kg\of{W}\per\kg\of{DA} for the reset rule. In other words, when the reference humidity ratio is lower than this value, the humidity ratio setpoint is at its maximum.
+The low reference humidity ratio in \kg\of{W}\per\kg\of{DA} for the reset rule. When the reference humidity ratio is lower than this value, the humidity ratio setpoint is at its maximum.
 
 \paragraph{Field: High Reference Humidity Ratio}\label{field-high-reference-humidity-ratio}
 
-The high reference humidity ratio in \kg\of{W}\per\kg\of{DA} for the reset rule. In other words, when the reference humidity ratio is higher than this value, the humidity ratio setpoint is at it minimum.
+The high reference humidity ratio in \kg\of{W}\per\kg\of{DA} for the reset rule. When the reference humidity ratio is higher than this value, the humidity ratio setpoint is at it minimum.
 
 \paragraph{Field: Reference Node Name}\label{field-reference-node-name}
 
@@ -146,14 +146,14 @@ Below are examples, showing the inputs for SetpointManager:SystemNodeReset:Humid
 \begin{lstlisting}
 
 SetpointManager:SystemNodeReset:Humidity,
-  Supply Humidity Manager,       !- Name
-  HumidityRatio,                 !- Control Variable
-  0.008,                         !- Setpoint at Low Reference Humidity Ratio (kgWater/kgDryAir)
-  0.004,                         !- Setpoint at High Reference Humidity Ratio (kgWater/kgDryAir)
-  0.003,                         !- Low Reference Humidity Ratio (kgWater/kgDryAir)
-  0.010,                         !- High Reference Humidity Ratio (kgWater/kgDryAir)
-  Reference Node,                !- Reference Node Name
-  Supply Nodes;                  !- Setpoint Node or NodeList Name
+  Supply Humidity Manager,                !- Name
+  MaximumHumidityRatio,                   !- Control Variable
+  0.00924,                                !- Setpoint at Low Reference Maximum Humidity (kgWater/kgDryAir)
+  0.00600,                                !- Setpoint at High Reference Maximum Humidity (kgWater/kgDryAir)
+  0.00850,                                !- Low Reference Maximum Humdity (kgWater/kgDryAir)
+  0.01000,                                !- High Reference Maximum Humidity (kgWater/kgDryAir)
+  Plenum-1 Out Node,                      !- Reference Node Name
+  DOAS Cooling Coil Outlet;               !- Setpoint Node or NodeList Name
 \end{lstlisting}
 
 ## Input Description ##
@@ -161,9 +161,8 @@ Two new `SetpointManager:SystemNodeReset:Temperature` and `SetpointManager:Syste
 
 ```
 SetpointManager:SystemNodeReset:Temperature,
-     \memo This Setpoint Manager is used to place a temperature or humidity ratio setpoint on a system node according to the reference (e.g., return) temperature or humidity ratio using a reset rule.
-     \memo The temperature or humidity ratio setpoint is obtained by retrieving the temperature or humidity ratio of the user specified reference system node.
-     \memo
+     \memo This Setpoint Manager is used to place a temperature setpoint on a system node according to the reference (e.g., return) temperature using a reset rule.
+     \memo The temperature setpoint is obtained by retrieving the temperature of the user specified reference system node.
   A1 , \field Name
        \required-field
   A2 , \field Control Variable
@@ -194,7 +193,6 @@ SetpointManager:SystemNodeReset:Temperature,
 SetpointManager:SystemNodeReset:Humidity,
      \memo This Setpoint Manager is used to place a humidity ratio setpoint on a system node according to the reference (e.g., return) humidity ratio using a reset rule.
      \memo The humidity ratio setpoint is obtained by retrieving the humidity ratio of the user specified reference system node.
-     \memo
   A1 , \field Name
        \required-field
   A2 , \field Control Variable
@@ -227,7 +225,7 @@ No new outputs will be created.
 
 ## Engineering Reference ##
 
-Two new subsections under SPMs will be created and contain the following text:
+Two new subsections under the SPMs section will be created and contain the following text:
 
 The input object SetpointManager:SystemNodeReset:Temperature provides a setpoint manager that places a temperature setpoint on a system node according to the reference (e.g., return) temperature using a reset strategy. The user defines a reset rule for this strategy by specifying two temperature setpoints at two reference temperatures. Generally the lower temperature setpoint is matched with the higher reference temperature.
 
@@ -246,7 +244,7 @@ Else
      \({T_{set}} = 0.5({T_{set,atRetlow}} + {T_{set,atRethigh)}}\)
 End IF
 ```
-\emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset} object input.
+\emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Temperature} object input.
 
 The input object SetpointManager:SystemNodeReset:Humidity provides a setpoint manager that places a humidity ratio setpoint on a system node according to the reference (e.g., return) humidity ratio using a reset strategy. The user defines a reset rule for this strategy by specifying two temperature setpoints at two reference temperatures. Generally the lower temperature setpoint is matched with the higher reference temperature.
 
@@ -265,11 +263,11 @@ Else
      \({T_{set}} = 0.5({T_{set,atRetlow}} + {T_{set,atRethigh)}}\)
 End IF
 ```
-\emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Temperature} object input.
+\emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset:Humidity} object input.
 
 ## Example File and Transition Changes ##
 
-A new example idf file using `SetpointManager:SystemNodeReset:Temperature` and `SetpointManager:SystemNodeReset:Humidity` will be created to demonstrate how this new feature can be used. This example file will demonstrate how this new SetpointManager will be applied to air loop and plant loop nodes. Also, the Output:Variable objects in the example idf will be added so that this example file produces the output files showing how `SetpointManager:SystemNodeReset:Temperature` and `SetpointManager:SystemNodeReset:Humidity` plays a role to determine the setpoints.
+A new example idf file using the new `SetpointManager:SystemNodeReset:Temperature` and `SetpointManager:SystemNodeReset:Humidity` objects will be created to demonstrate how this new feature can be used. This example file will demonstrate how this new SetpointManager will be applied to air loop and plant loop nodes. Also, the necessary `Output:Variable` objects in the example idf will be added so that this example file produces the output files showing how `SetpointManager:SystemNodeReset:Temperature` and `SetpointManager:SystemNodeReset:Humidity` plays a role to determine the setpoints.
 
 No transition changes are expected.
 
@@ -282,13 +280,13 @@ No transition changes are expected.
 This new feature revises modules: SetpointManager.
 
 ## Changes to the IDD file ##
-A new object called SetpointManager:SystemNodeReset:Temperature, SetpointManager:SystemNodeReset:Humidity, as shown in the Input Description Section, will be added to the idd file.
+A new object called `SetpointManager:SystemNodeReset:Temperature`, `SetpointManager:SystemNodeReset:Humidity`, as shown in the Input Description Section, will be added to the idd file.
 
 ## Setpoint Manager ##
-This code change adds two new structures called `DefineSysNodeResetTempSetPointManager` and `DefineSysNodeResetHumSetPointManager` to the header file (`SetPointManager.hh`) and the other changes are made to `SetPointManager.cc`.
+This code change adds one new structure called `DefineSysNodeResetSetPointManager` to the header file (`SetPointManager.hh`), the other changes are made to `SetPointManager.cc`.
 
 The inputs will be grabbed through the `GetSetPointManagerInputData` function, similar with other SetpointManager objects. The following are the cases that the error gets produced: (1) when the invalid control variable is inputted, (2) the maximum temperature or humidity ratio setpoint is higher than the minimum temperature or humidity ratio setpoint.
 
-The new functions called `DefineSystemNdResetTempSetPointManager::calculate` and `DefineSystemNdResetHumSetPointManager` will calculate the setpoint based on (1) the inputs provided by the users and (2) the reference node. Since the calculation for the setpoint is the same as the SetpointManager:OutdoorAirReset (`DefineOutsideAirSetPointManager::CalcSetPoint`), the function will be moved outside the `DefineOutsideAirSetPointManager` struct and called `CalcSetPointLinInt`. Then, this function is called to `DefineOutsideAirSetPointManager::calculate`, `DefineSysNodeResetTempSetPointManager::calculate`, and `DefineSysNodeResetHumSetPointManager::calculate`.
+A new functions called `DefineSysNodeResetSetPointManager::calculate` will calculate the setpoint based on (1) the inputs provided by the users and (2) the reference node. Since the calculation for the setpoint is the same as the SetpointManager:OutdoorAirReset (`DefineOutsideAirSetPointManager::CalcSetPoint`), the function used to calculate its value will be moved outside the `DefineOutsideAirSetPointManager` struct and called `CalcSetPointLinInt`. Then, this function is called within `DefineOutsideAirSetPointManager::calculate` and  `DefineSysNodeResetSetPointManager::calculate`.
 
 The calculated setpoint gets applied through `InitSetPointManagers`, `SimSetPointManagers`, and `UpdateSetPointManagers` functions, similar with other SetpointManager objects.
