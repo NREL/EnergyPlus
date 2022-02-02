@@ -284,12 +284,7 @@ namespace IntegratedHeatPump {
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
-                                  int const DXCoilNum,
-                                  int const SpeedNum,
-                                  Real64 const SpeedRatio,
-                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
-    );
+    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio);
 
     Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
                                  int const DXCoilNum,

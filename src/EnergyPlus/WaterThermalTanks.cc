@@ -10140,22 +10140,30 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
 void WaterThermalTankData::CalcWaterThermalTank(EnergyPlusData &state)
 {
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+    switch (this->WaterThermalTankType) {
+    case DataPlant::PlantEquipmentType::WtrHeaterMixed:
         this->CalcWaterThermalTankMixed(state);
-    } else if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
+        break;
+    case DataPlant::PlantEquipmentType::WtrHeaterStratified:
         this->CalcWaterThermalTankStratified(state);
-    } else {
+        break;
+    default:
         assert(false);
     }
 }
 
 Real64 WaterThermalTankData::GetHPWHSensedTankTemp(EnergyPlusData &state)
 {
-    if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
+    switch (this->WaterThermalTankType) {
+    case DataPlant::PlantEquipmentType::WtrHeaterMixed:
         return this->TankTemp;
-    } else {
-        assert(this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified);
+        break;
+    case DataPlant::PlantEquipmentType::WtrHeaterStratified:
         return this->FindStratifiedTankSensedTemp(state);
+        break;
+    default:
+        assert(false);
+        return 0.0; // silence compiler
     }
 }
 
@@ -10205,7 +10213,7 @@ void WaterThermalTankData::SetVSHPWHFlowRates(EnergyPlusData &state,
     int HPWaterInletNode = HPWH.CondWaterInletNode;
     int DXCoilAirInletNode = HPWH.DXCoilAirInletNode;
     if (HPWH.bIsIHP) {
-        HPWH.OperatingWaterFlowRate = IntegratedHeatPump::GetWaterVolFlowRateIHP(state, HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
+        HPWH.OperatingWaterFlowRate = IntegratedHeatPump::GetWaterVolFlowRateIHP(state, HPWH.DXCoilNum, SpeedNum, SpeedRatio);
         state.dataWaterThermalTanks->mdotAir = IntegratedHeatPump::GetAirMassFlowRateIHP(state, HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
         HPWH.OperatingAirFlowRate = IntegratedHeatPump::GetAirVolFlowRateIHP(state, HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
         state.dataLoopNodes->Node(DXCoilAirInletNode).MassFlowRate = state.dataWaterThermalTanks->mdotAir;

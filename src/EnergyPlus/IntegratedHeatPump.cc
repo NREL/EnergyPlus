@@ -71,6 +71,8 @@ namespace EnergyPlus::IntegratedHeatPump {
 // Using/Aliasing
 using namespace DataLoopNode;
 
+Real64 constexpr WaterDensity(986.0); // standard water density at 60 C
+
 void SimIHP(EnergyPlusData &state,
             std::string_view CompName,                               // Coil Name
             int &CompIndex,                                          // Index for Component name
@@ -104,7 +106,6 @@ void SimIHP(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int DXCoilNum(0); // The IHP No that you are currently dealing with
-    Real64 airMassFlowRate(0);
 
     // Obtains and Allocates ASIHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -142,7 +143,7 @@ void SimIHP(EnergyPlusData &state,
 
     InitializeIHP(state, DXCoilNum);
 
-    airMassFlowRate = state.dataLoopNodes->Node(ihp.AirCoolInletNodeNum).MassFlowRate;
+    Real64 airMassFlowRate = state.dataLoopNodes->Node(ihp.AirCoolInletNodeNum).MassFlowRate;
     ihp.AirLoopFlowRate = airMassFlowRate;
 
     switch (ihp.CurMode) {
@@ -2088,10 +2089,6 @@ void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
 {
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
-    int VSCoilIndex(0);
-    Real64 ReportingConstant(0.0);
-    Real64 TotalDelivery(0.0);
-
     // Obtains and Allocates AS-IHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
         GetIHPInput(state);
@@ -2106,69 +2103,60 @@ void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
     }
 
     auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
-    auto &vsCoil = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex);
 
     switch (ihp.CurMode) {
     case IHPOperationMode::SpaceClg:
-        VSCoilIndex = ihp.SCCoilIndex;
-        ihp.TotalCoolingRate = vsCoil.QLoadTotal; // total cooling rate [w]
-        ihp.TotalWaterHeatingRate = 0.0;          // total water heating rate [w]
-        ihp.TotalSpaceHeatingRate = 0.0;          // total space heating rate [w]
-        ihp.TotalPower = vsCoil.Power;            // total power consumption  [w]
-        ihp.TotalLatentLoad = vsCoil.QLatent;     // total latent cooling rate [w]
-        ihp.Qsource = vsCoil.QSource;             // source energy rate, [w]
+        ihp.TotalCoolingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCCoilIndex).QLoadTotal; // total cooling rate [w]
+        ihp.TotalWaterHeatingRate = 0.0;                                                               // total water heating rate [w]
+        ihp.TotalSpaceHeatingRate = 0.0;                                                               // total space heating rate [w]
+        ihp.TotalPower = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCCoilIndex).Power;            // total power consumption  [w]
+        ihp.TotalLatentLoad = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCCoilIndex).QLatent;     // total latent cooling rate [w]
+        ihp.Qsource = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCCoilIndex).QSource;             // source energy rate, [w]
         break;
     case IHPOperationMode::SpaceHtg:
-        VSCoilIndex = ihp.SHCoilIndex;
-        ihp.TotalCoolingRate = 0.0;                    // total cooling rate [w]
-        ihp.TotalWaterHeatingRate = 0.0;               // total water heating rate [w]
-        ihp.TotalSpaceHeatingRate = vsCoil.QLoadTotal; // total space heating rate [w]
-        ihp.TotalPower = vsCoil.Power;                 // total power consumption  [w]
-        ihp.TotalLatentLoad = 0.0;                     // total latent cooling rate [w]
-        ihp.Qsource = vsCoil.QSource;                  // source energy rate, [w]
+        ihp.TotalCoolingRate = 0.0;                                                                         // total cooling rate [w]
+        ihp.TotalWaterHeatingRate = 0.0;                                                                    // total water heating rate [w]
+        ihp.TotalSpaceHeatingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHCoilIndex).QLoadTotal; // total space heating rate [w]
+        ihp.TotalPower = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHCoilIndex).Power;                 // total power consumption  [w]
+        ihp.TotalLatentLoad = 0.0;                                                                          // total latent cooling rate [w]
+        ihp.Qsource = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHCoilIndex).QSource;                  // source energy rate, [w]
         break;
     case IHPOperationMode::DedicatedWaterHtg:
-        VSCoilIndex = ihp.DWHCoilIndex;
-        ihp.TotalCoolingRate = 0.0;                 // total cooling rate [w]
-        ihp.TotalWaterHeatingRate = vsCoil.QSource; // total water heating rate [w]
-        ihp.TotalSpaceHeatingRate = 0.0;            // total space heating rate [w]
-        ihp.TotalPower = vsCoil.Power;              // total power consumption  [w]
-        ihp.TotalLatentLoad = 0.0;                  // total latent cooling rate [w]
-        ihp.Qsource = vsCoil.QLoadTotal;            // source energy rate, [w]
+        ihp.TotalCoolingRate = 0.0;                                                                       // total cooling rate [w]
+        ihp.TotalWaterHeatingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.DWHCoilIndex).QSource; // total water heating rate [w]
+        ihp.TotalSpaceHeatingRate = 0.0;                                                                  // total space heating rate [w]
+        ihp.TotalPower = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.DWHCoilIndex).Power;              // total power consumption  [w]
+        ihp.TotalLatentLoad = 0.0;                                                                        // total latent cooling rate [w]
+        ihp.Qsource = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.DWHCoilIndex).QLoadTotal;            // source energy rate, [w]
         break;
     case IHPOperationMode::SCWHMatchSC:
     case IHPOperationMode::SCWHMatchWH:
-        VSCoilIndex = ihp.SCWHCoilIndex;
-        ihp.TotalCoolingRate = vsCoil.QLoadTotal;   // total cooling rate [w]
-        ihp.TotalWaterHeatingRate = vsCoil.QSource; // total water heating rate [w]
-        ihp.TotalSpaceHeatingRate = 0.0;            // total space heating rate [w]
-        ihp.TotalPower = vsCoil.Power;              // total power consumption  [w]
-        ihp.TotalLatentLoad = vsCoil.QLatent;       // total latent cooling rate [w]
-        ihp.Qsource = 0.0;                          // source energy rate, [w]
+        ihp.TotalCoolingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).QLoadTotal;   // total cooling rate [w]
+        ihp.TotalWaterHeatingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).QSource; // total water heating rate [w]
+        ihp.TotalSpaceHeatingRate = 0.0;                                                                   // total space heating rate [w]
+        ihp.TotalPower = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).Power;              // total power consumption  [w]
+        ihp.TotalLatentLoad = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).QLatent;       // total latent cooling rate [w]
+        ihp.Qsource = 0.0;                                                                                 // source energy rate, [w]
         break;
     case IHPOperationMode::SpaceClgDedicatedWaterHtg:
-        VSCoilIndex = ihp.SCDWHCoolCoilIndex;
-        ihp.TotalCoolingRate = vsCoil.QLoadTotal; // total cooling rate [w]
-        ihp.TotalSpaceHeatingRate = 0.0;          // total space heating rate [w]
-        ihp.TotalPower = vsCoil.Power;            // total power consumption  [w]
-        ihp.TotalLatentLoad = vsCoil.QLatent;     // total latent cooling rate [w]
-        ihp.Qsource = vsCoil.QSource;             // source energy rate, [w]
+        ihp.TotalCoolingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).QLoadTotal; // total cooling rate [w]
+        ihp.TotalSpaceHeatingRate = 0.0;                                                                      // total space heating rate [w]
+        ihp.TotalPower = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).Power;            // total power consumption  [w]
+        ihp.TotalLatentLoad = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).QLatent;     // total latent cooling rate [w]
+        ihp.Qsource = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).QSource;             // source energy rate, [w]
 
-        VSCoilIndex = ihp.SCDWHWHCoilIndex;
-        ihp.TotalWaterHeatingRate = vsCoil.QSource; // total water heating rate [w]
+        ihp.TotalWaterHeatingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHWHCoilIndex).QSource; // total water heating rate [w]
 
         break;
     case IHPOperationMode::SHDWHElecHeatOff:
     case IHPOperationMode::SHDWHElecHeatOn:
-        VSCoilIndex = ihp.SHDWHHeatCoilIndex;
-        ihp.TotalCoolingRate = 0.0;                    // total cooling rate [w]
-        ihp.TotalSpaceHeatingRate = vsCoil.QLoadTotal; // total space heating rate [w]
-        ihp.TotalPower = vsCoil.Power;                 // total power consumption  [w]
-        ihp.TotalLatentLoad = 0.0;                     // total latent cooling rate [w]
-        ihp.Qsource = vsCoil.QSource;                  // source energy rate, [w]
+        ihp.TotalCoolingRate = 0.0;                                                                                // total cooling rate [w]
+        ihp.TotalSpaceHeatingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHDWHHeatCoilIndex).QLoadTotal; // total space heating rate [w]
+        ihp.TotalPower = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHDWHHeatCoilIndex).Power;                 // total power consumption  [w]
+        ihp.TotalLatentLoad = 0.0;                                                                                 // total latent cooling rate [w]
+        ihp.Qsource = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHDWHHeatCoilIndex).QSource;                  // source energy rate, [w]
 
-        VSCoilIndex = ihp.SHDWHWHCoilIndex;
-        ihp.TotalWaterHeatingRate = vsCoil.QSource; // total water heating rate [w]
+        ihp.TotalWaterHeatingRate = state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SHDWHWHCoilIndex).QSource; // total water heating rate [w]
 
         break;
     case IHPOperationMode::Idle:
@@ -2176,7 +2164,7 @@ void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
         break;
     }
 
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
     ihp.Energy = ihp.TotalPower * ReportingConstant;                                 // total electric energy consumption
                                                                                      // [J]
@@ -2187,7 +2175,7 @@ void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
     ihp.EnergySource = ihp.Qsource * ReportingConstant;                              // total source energy
 
     if (ihp.TotalPower > 0.0) {
-        TotalDelivery = ihp.TotalCoolingRate + ihp.TotalSpaceHeatingRate + ihp.TotalWaterHeatingRate;
+        Real64 TotalDelivery = ihp.TotalCoolingRate + ihp.TotalSpaceHeatingRate + ihp.TotalWaterHeatingRate;
         ihp.TotalCOP = TotalDelivery / ihp.TotalPower;
     }
 }
@@ -2208,8 +2196,9 @@ void DecideWorkMode(EnergyPlusData &state,
 
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using WaterThermalTanks::GetWaterThermalTankInput;
+
+    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     Real64 MyLoad(0.0);
     Real64 WHHeatTimeSav(0.0); // time accumulation for water heating
@@ -2240,8 +2229,7 @@ void DecideWorkMode(EnergyPlusData &state,
     {
         ihp.IsWHCallAvail = false;
     } else {
-        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate =
-            GetWaterVolFlowRateIHP(state, DXCoilNum, 1.0, 1.0, true) * 987.0; // 987.0 water density at 60 C.
+        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate = GetWaterVolFlowRateIHP(state, DXCoilNum, 1.0, 1.0) * WaterDensity;
         state.dataLoopNodes->Node(ihp.WaterOutletNodeNum).Temp = state.dataLoopNodes->Node(ihp.WaterInletNodeNum).Temp;
 
         DataPlant::PlantEquipmentType tankType = ihp.WHtankType;
@@ -2992,13 +2980,7 @@ Real64 GetAirVolFlowRateIHP(EnergyPlusData &state,
     return (AirVolFlowRate);
 }
 
-Real64 GetWaterVolFlowRateIHP(
-    EnergyPlusData &state,
-    int const DXCoilNum,
-    int const SpeedNum,
-    Real64 const SpeedRatio,
-    [[maybe_unused]] bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
-)
+Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio)
 {
     int IHPCoilIndex(0);
     Real64 WaterVolFlowRate(0.0);
@@ -3078,8 +3060,7 @@ Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
     int IHPCoilIndex(0);
     Real64 AirMassFlowRate(0.0);
     Real64 FlowScale(1.0);
-    bool IsResultFlow(false);   // IsResultFlow = true, the air flow rate will be from a simultaneous mode, won't be re-calculated
-    Real64 WaterDensity(986.0); // standard water density at 60 C
+    bool IsResultFlow(false); // IsResultFlow = true, the air flow rate will be from a simultaneous mode, won't be re-calculated
 
     // Obtains and Allocates WatertoAirHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -3129,8 +3110,7 @@ Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
     case IHPOperationMode::SCWHMatchSC:
         IHPCoilIndex = ihp.SCWHCoilIndex;
         FlowScale = ihp.CoolVolFlowScale;
-        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate =
-            GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
+        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate = GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio) * WaterDensity;
         if (IsCallbyWH) {
             IsResultFlow = true;
             AirMassFlowRate = ihp.AirFlowSavInAirLoop;
@@ -3147,8 +3127,7 @@ Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
     case IHPOperationMode::SpaceClgDedicatedWaterHtg:
         IHPCoilIndex = ihp.SCDWHCoolCoilIndex;
         FlowScale = ihp.CoolVolFlowScale;
-        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate =
-            GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
+        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate = GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio) * WaterDensity;
         if (IsCallbyWH) {
             IsResultFlow = true;
             AirMassFlowRate = ihp.AirFlowSavInAirLoop;
@@ -3158,8 +3137,7 @@ Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
     case IHPOperationMode::SHDWHElecHeatOn:
         IHPCoilIndex = ihp.SHDWHHeatCoilIndex;
         FlowScale = ihp.HeatVolFlowScale;
-        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate =
-            GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
+        state.dataLoopNodes->Node(ihp.WaterInletNodeNum).MassFlowRate = GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio) * WaterDensity;
         if (IsCallbyWH) {
             IsResultFlow = true;
             AirMassFlowRate = ihp.AirFlowSavInAirLoop;
