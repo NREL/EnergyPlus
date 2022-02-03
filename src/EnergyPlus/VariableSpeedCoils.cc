@@ -4553,7 +4553,6 @@ namespace VariableSpeedCoils {
         UpperSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds;
         NormSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel;
         PltSizNum = 0;
-        ErrorsFound = false;
         RatedAirFlowAutoSized = false;
         RatedWaterFlowAutoSized = false;
         RatedCapHeatAutoSized = false;
