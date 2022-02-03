@@ -2319,12 +2319,7 @@ namespace WaterToAirHeatPump {
         //   at the current operating conditions (sec)
         Real64 Gamma; // Initial moisture evaporation rate divided by steady-state AC latent capacity
         //   at the current operating conditions
-        Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
-        Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
         Real64 Twet_max;              // Maximum allowed value for Twet
-        Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant;        // Heat pump time constant [s]
-        Real64 FanDelayTime;          // Fan delay time, time delay for the HP's fan to
         // shut off after compressor cycle off  [s]
 
         Real64 Ton;     // Coil on time (sec)
@@ -2337,17 +2332,11 @@ namespace WaterToAirHeatPump {
         Real64 LHRmult; // Latent Heat Ratio (LHR) multiplier. The effective latent heat ratio LHR = (1-SHRss)*LHRmult
         auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
-        Twet_Rated = heatPump.Twet_Rated;
-        Gamma_Rated = heatPump.Gamma_Rated;
-        MaxONOFFCyclesperHour = heatPump.MaxONOFFCyclesperHour;
-        HPTimeConstant = heatPump.HPTimeConstant;
-        FanDelayTime = heatPump.FanDelayTime;
-
         //  No moisture evaporation (latent degradation) occurs for runtime fraction of 1.0
         //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
         //  Latent degradation model parameters initialize to 0.0 meaning no evaporation model used.
-        if ((RTF >= 1.0) || (QLatRated == 0.0) || (QLatActual == 0.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0) ||
-            (MaxONOFFCyclesperHour <= 0.0) || (HPTimeConstant <= 0.0) || (RTF <= 0.0)) {
+        if ((RTF >= 1.0) || (QLatRated == 0.0) || (QLatActual == 0.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) ||
+            (heatPump.MaxONOFFCyclesperHour <= 0.0) || (heatPump.HPTimeConstant <= 0.0) || (RTF <= 0.0)) {
             SHReff = SHRss;
             return SHReff;
         }
@@ -2355,20 +2344,20 @@ namespace WaterToAirHeatPump {
         Twet_max = 9999.0; // high limit for Twet
 
         //  Calculate the model parameters at the actual operating conditions
-        Twet = min(Twet_Rated * QLatRated / (QLatActual + 1.e-10), Twet_max);
-        Gamma = Gamma_Rated * QLatRated * (EnteringDB - EnteringWB) / ((26.7 - 19.4) * QLatActual + 1.e-10);
+        Twet = min(heatPump.Twet_Rated * QLatRated / (QLatActual + 1.e-10), Twet_max);
+        Gamma = heatPump.Gamma_Rated * QLatRated * (EnteringDB - EnteringWB) / ((26.7 - 19.4) * QLatActual + 1.e-10);
 
         //  Calculate the compressor on and off times using a converntional thermostat curve
-        Ton = 3600.0 / (4.0 * MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
+        Ton = 3600.0 / (4.0 * heatPump.MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
-        if ((CyclingScheme == CycFanCycCoil) && (FanDelayTime != 0.0)) {
+        if ((CyclingScheme == CycFanCycCoil) && (heatPump.FanDelayTime != 0.0)) {
             //  For CycFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
             //  until the fan cycle off. Assume no evaporation from the coil after the fan shuts off.
-            Toff = FanDelayTime;
+            Toff = heatPump.FanDelayTime;
         } else {
             //  For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
             //  for the entire heat pump off-cycle.
-            Toff = 3600.0 / (4.0 * MaxONOFFCyclesperHour * RTF); // duration of cooling coil off-cycle (sec)
+            Toff = 3600.0 / (4.0 * heatPump.MaxONOFFCyclesperHour * RTF); // duration of cooling coil off-cycle (sec)
         }
 
         //  Cap Toff to meet the equation restriction
@@ -2381,10 +2370,10 @@ namespace WaterToAirHeatPump {
         //  Use sucessive substitution to solve for To
         aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
 
-        To1 = aa + HPTimeConstant;
+        To1 = aa + heatPump.HPTimeConstant;
         Error = 1.0;
         while (Error > 0.001) {
-            To2 = aa - HPTimeConstant * (std::exp(-To1 / HPTimeConstant) - 1.0);
+            To2 = aa - heatPump.HPTimeConstant * (std::exp(-To1 / heatPump.HPTimeConstant) - 1.0);
             Error = std::abs((To2 - To1) / To1);
             To1 = To2;
         }
@@ -2392,9 +2381,9 @@ namespace WaterToAirHeatPump {
         //  Adjust Sensible Heat Ratio (SHR) using Latent Heat Ratio (LHR) multiplier
         //  Floating underflow errors occur when -Ton/HPTimeConstant is a large negative number.
         //  Cap lower limit at -700 to avoid the underflow errors.
-        aa = std::exp(max(-700.0, -Ton / HPTimeConstant));
+        aa = std::exp(max(-700.0, -Ton / heatPump.HPTimeConstant));
         //  Calculate latent heat ratio multiplier
-        LHRmult = max(((Ton - To2) / (Ton + HPTimeConstant * (aa - 1.0))), 0.0);
+        LHRmult = max(((Ton - To2) / (Ton + heatPump.HPTimeConstant * (aa - 1.0))), 0.0);
 
         //  Calculate part-load or "effective" sensible heat ratio
         SHReff = 1.0 - (1.0 - SHRss) * LHRmult;
