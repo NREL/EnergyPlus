@@ -935,17 +935,16 @@ namespace ExhaustAirSystemManager {
 
     void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int & NodeNums)
     {
-
         auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(zoneExhCtrlNum);
 
         Real64 designFlow = 0.0;
  
         if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
             // size based on supply nodelist flow
-            if (NodeNums.size() > 0) {
-                for (int i = 1; i <= NodeNums.size(); ++i) {
-                    designFlow += state.dataLoopNodes->Node(NodeNums(i)).MassFlowRateMax; 
-                }
+            // for (auto instance = NodeNums.begin(); instance != NodeNums.end(); ++instance) {
+            for (int i = 1; i <= NodeNums.size(); ++i)
+            {
+                designFlow += state.dataLoopNodes->Node(NodeNums(i)).MassFlowRateMax;
             }
         } else { // scheduled etc.
             // based on zone OA.
@@ -953,6 +952,15 @@ namespace ExhaustAirSystemManager {
         }
 
         thisExhCtrl.DesignExhaustFlowRate = designFlow;
+    }
+
+    void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound)
+    {
+        // 2022-02: trying to check a node to see if it is truely a supply node
+        //          for a nodelist, need a call loop to check each node in the list
+        // SUBROUTINE INFORMATION:
+        // This subroutine checks that the supply node number matches the air inlet node number of some zone or airloop hvac systems
+        // Refer to some exapmle code in CheckForSensorAndSetPointNode() or CheckActuatorNode() in WaterCoils.cc
     }
 
 } // namespace ExhaustAirSystemManager
