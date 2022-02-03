@@ -96,6 +96,9 @@ namespace ExhaustAirSystemManager {
     };
 
     std::vector<MixerBranchZone> mixerToZoneTable;
+    // map might be aa better choice: 
+    std::map<int, int> mixerBranchMap;
+
     bool mappingDone = false;
 
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration)
@@ -553,6 +556,8 @@ namespace ExhaustAirSystemManager {
 
                 if (!mappingDone) {
                     mixerToZoneTable.emplace_back(MixerBranchZone{outletNodeNum, inletNodeNum, zoneNum, true});
+                    // map could be a better solution:
+                    mixerBranchMap.emplace(outletNodeNum, zoneNum);
                 }
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
