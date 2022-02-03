@@ -181,7 +181,6 @@ void PlantProfileData::simulate(EnergyPlusData &state,
                                                                DataEnvironment::StdPressureSeaLevel,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                RoutineName);
-
             Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                     TempWaterAtmPress,

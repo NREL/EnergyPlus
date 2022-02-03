@@ -2365,10 +2365,10 @@
     Purchased CHW Plant ChW Supply Outlet Branch;  !- Branch 4 Name
 
   BranchList,
-    DistrictHeating Steam Steam Supply Side Branches,  !- Name
-    DistrictHeating Steam Steam Supply Inlet Branch,  !- Branch 1 Name
+    DistrictHeating Steam Supply Side Branches,  !- Name
+    DistrictHeating Steam Supply Inlet Branch,  !- Branch 1 Name
     DistrictHeating Steam Branch,  !- Branch 2 Name
-    DistrictHeating Steam Steam Supply Outlet Branch;  !- Branch 3 Name
+    DistrictHeating Steam Supply Outlet Branch;  !- Branch 3 Name
 
   ConnectorList,
     CHW Demand 1 ChW Demand Side Connectors,  !- Name
@@ -2392,11 +2392,11 @@
     Purchased CHW Plant ChW Supply Mixer;  !- Connector 2 Name
 
   ConnectorList,
-    DistrictHeating Steam Steam Supply Side Connectors,  !- Name
+    DistrictHeating Steam Supply Side Connectors,  !- Name
     Connector:Splitter,      !- Connector 1 Object Type
-    DistrictHeating Steam Steam Supply Splitter,  !- Connector 1 Name
+    DistrictHeating Steam Supply Splitter,  !- Connector 1 Name
     Connector:Mixer,         !- Connector 2 Object Type
-    DistrictHeating Steam Steam Supply Mixer;  !- Connector 2 Name
+    DistrictHeating Steam Supply Mixer;  !- Connector 2 Name
 
   Branch,
     SPACE1-1 Steam-Branch,   !- Name
@@ -2563,20 +2563,20 @@
     DistrictHeating Steam Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
-    DistrictHeating Steam Steam Supply Outlet Branch,  !- Name
+    DistrictHeating Steam Supply Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
-    DistrictHeating Steam Steam Supply Outlet,  !- Component 1 Name
-    DistrictHeating Steam Steam Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    DistrictHeating Steam Steam Supply Outlet Node;  !- Component 1 Outlet Node Name
+    DistrictHeating Steam Supply Outlet,  !- Component 1 Name
+    DistrictHeating Steam Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    DistrictHeating Steam Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
-    DistrictHeating Steam Steam Supply Inlet Branch,  !- Name
+    DistrictHeating Steam Supply Inlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed:Condensate,  !- Component 1 Object Type
-    DistrictHeating Steam Steam Circ Pump,  !- Component 1 Name
-    DistrictHeating Steam Steam Supply Inlet Node,  !- Component 1 Inlet Node Name
-    DistrictHeating Steam Steam Pump Outlet Node;  !- Component 1 Outlet Node Name
+    DistrictHeating Steam Circ Pump,  !- Component 1 Name
+    DistrictHeating Steam Supply Inlet Node,  !- Component 1 Inlet Node Name
+    DistrictHeating Steam Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHW Demand 1 ChW Inlet Pipe,  !- Name
@@ -2614,9 +2614,9 @@
     Steam Demand 1 Steam Demand Outlet Node;  !- Outlet Node Name
 
   Pipe:Adiabatic:Steam,
-    DistrictHeating Steam Steam Supply Outlet,  !- Name
-    DistrictHeating Steam Steam Supply Exit Pipe Inlet Node,  !- Inlet Node Name
-    DistrictHeating Steam Steam Supply Outlet Node;  !- Outlet Node Name
+    DistrictHeating Steam Supply Outlet,  !- Name
+    DistrictHeating Steam Supply Exit Pipe Inlet Node,  !- Inlet Node Name
+    DistrictHeating Steam Supply Outlet Node;  !- Outlet Node Name
 
   Pipe:Adiabatic:Steam,
     Heating Demand Bypass,   !- Name
@@ -2649,16 +2649,16 @@
     Steam,                   !- Fluid Type
     ,                        !- User Defined Fluid Type
     DistrictHeating Steam Operation,  !- Plant Equipment Operation Scheme Name
-    DistrictHeating Steam Steam Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
+    DistrictHeating Steam Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
     110,                     !- Maximum Loop Temperature {C}
     10,                      !- Minimum Loop Temperature {C}
     autosize,                !- Maximum Loop Flow Rate {m3/s}
     0.0,                     !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
-    DistrictHeating Steam Steam Supply Inlet Node,  !- Plant Side Inlet Node Name
-    DistrictHeating Steam Steam Supply Outlet Node,  !- Plant Side Outlet Node Name
-    DistrictHeating Steam Steam Supply Side Branches,  !- Plant Side Branch List Name
-    DistrictHeating Steam Steam Supply Side Connectors,  !- Plant Side Connector List Name
+    DistrictHeating Steam Supply Inlet Node,  !- Plant Side Inlet Node Name
+    DistrictHeating Steam Supply Outlet Node,  !- Plant Side Outlet Node Name
+    DistrictHeating Steam Supply Side Branches,  !- Plant Side Branch List Name
+    DistrictHeating Steam Supply Side Connectors,  !- Plant Side Connector List Name
     Steam Demand 1 Steam Demand Inlet Node,  !- Demand Side Inlet Node Name
     Steam Demand 1 Steam Demand Outlet Node,  !- Demand Side Outlet Node Name
     Steam Demand 1 Steam Demand Side Branches,  !- Demand Side Branch List Name
@@ -2723,8 +2723,8 @@
     Purchased CHW Plant ChW Supply Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Splitter,
-    DistrictHeating Steam Steam Supply Splitter,  !- Name
-    DistrictHeating Steam Steam Supply Inlet Branch,  !- Inlet Branch Name
+    DistrictHeating Steam Supply Splitter,  !- Name
+    DistrictHeating Steam Supply Inlet Branch,  !- Inlet Branch Name
     DistrictHeating Steam Branch;  !- Outlet Branch 1 Name
 
   Connector:Mixer,
@@ -2751,8 +2751,8 @@
     Purchased CHW Plant ChW Supply Bypass Branch;  !- Inlet Branch 2 Name
 
   Connector:Mixer,
-    DistrictHeating Steam Steam Supply Mixer,  !- Name
-    DistrictHeating Steam Steam Supply Outlet Branch,  !- Outlet Branch Name
+    DistrictHeating Steam Supply Mixer,  !- Name
+    DistrictHeating Steam Supply Outlet Branch,  !- Outlet Branch Name
     DistrictHeating Steam Branch;  !- Inlet Branch 1 Name
 
   AirLoopHVAC,
@@ -2826,10 +2826,10 @@
     Purchased CHW Plant ChW Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:Scheduled,
-    DistrictHeating Steam Steam Temp Manager,  !- Name
+    DistrictHeating Steam Temp Manager,  !- Name
     Temperature,             !- Control Variable
     Steam-Loop-Temp-Schedule,!- Schedule Name
-    DistrictHeating Steam Steam Supply Outlet Node;  !- Setpoint Node or NodeList Name
+    DistrictHeating Steam Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
     VAV SYS 1 Cooling Coil Air Temp Manager,  !- Name
@@ -3295,9 +3295,9 @@
     INTERMITTENT;            !- Pump Control Type
 
   Pump:VariableSpeed:Condensate,
-    DistrictHeating Steam Steam Circ Pump,  !- Name
-    DistrictHeating Steam Steam Supply Inlet Node,  !- Inlet Node Name
-    DistrictHeating Steam Steam Pump Outlet Node,  !- Outlet Node Name
+    DistrictHeating Steam Circ Pump,  !- Name
+    DistrictHeating Steam Supply Inlet Node,  !- Inlet Node Name
+    DistrictHeating Steam Pump Outlet Node,  !- Outlet Node Name
     autosize,                !- Design Steam Volume Flow Rate {m3/s}
     179352,                  !- Design Pump Head {Pa}
     autosize,                !- Design Power Consumption {W}

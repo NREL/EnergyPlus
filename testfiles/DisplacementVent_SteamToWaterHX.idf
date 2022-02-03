@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! DisplacementVent_1ZoneOffice.idf
+! DisplacementVent_SteamToWaterHX.idf
 ! Basic file description:  Single zone representing one floor of a large, open plan single story
 !                          commercial office building with displacement ventilation.
 !
