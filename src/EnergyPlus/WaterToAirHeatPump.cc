@@ -919,6 +919,7 @@ namespace WaterToAirHeatPump {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
+        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -941,7 +942,6 @@ namespace WaterToAirHeatPump {
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
-        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         if (state.dataWaterToAirHeatPump->MyOneTimeFlag) {
             state.dataWaterToAirHeatPump->MyEnvrnFlag.allocate(state.dataWaterToAirHeatPump->NumWatertoAirHPs);
@@ -1160,7 +1160,6 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using namespace FluidProperties;
-
         using General::SolveRoot;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
@@ -1168,6 +1167,7 @@ namespace WaterToAirHeatPump {
         using Psychrometrics::PsyTsatFnHPb;
         using Psychrometrics::PsyTwbFnTdbWPb;
         using Psychrometrics::PsyWFnTdbH;
+        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 CpWater(4210.0);         // Specific heat of water J/kg_C
@@ -1258,8 +1258,6 @@ namespace WaterToAirHeatPump {
                 PsyHFnTdbW(state.dataWaterToAirHeatPump->LoadSideInletDBTemp_Init, state.dataWaterToAirHeatPump->LoadSideInletHumRat_Init);
             state.dataWaterToAirHeatPump->firstTime = false;
         }
-
-        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         //  SET LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
         // Set indoor air conditions to the actual condition
@@ -1756,6 +1754,7 @@ namespace WaterToAirHeatPump {
         using Psychrometrics::PsyCpAirFnW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbH;
+        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1832,7 +1831,6 @@ namespace WaterToAirHeatPump {
         int SolFlag;               // Solution flag returned from RegulaFalsi function
         Real64 LoadResidual;       // loop convergence criteria
         Real64 SourceResidual;     // loop convergence criteria
-        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
 
@@ -2300,7 +2298,8 @@ namespace WaterToAirHeatPump {
         //    1996 ASHRAE Transactions, Volume 102, Part 1, Pp. 266 - 274,
         //    Hugh I. Henderson, Jr., P.E., Kannan Rengarajan, P.E.
 
-        // USE STATEMENTS:
+        // Using/Aliasing
+        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         // Return value
         Real64 SHReff; // Effective sensible heat ratio, includes degradation due to cycling effects
@@ -2321,7 +2320,6 @@ namespace WaterToAirHeatPump {
         Real64 To2;     // Intermediate variable (second guess at To). To = time to the start of moisture removal
         Real64 Error;   // Error for iteration (DO) loop
         Real64 LHRmult; // Latent Heat Ratio (LHR) multiplier. The effective latent heat ratio LHR = (1-SHRss)*LHRmult
-        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         //  No moisture evaporation (latent degradation) occurs for runtime fraction of 1.0
         //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
