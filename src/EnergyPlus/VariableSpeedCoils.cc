@@ -3795,12 +3795,11 @@ namespace VariableSpeedCoils {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int AirInletNode;   // Node Number of the air inlet
-        int WaterInletNode; // Node Number of the Water inlet
-        Real64 rho;         // local fluid density
-        Real64 Cp;          // local fluid specific heat
-        int SpeedCal;       // calculated speed level
-        bool errFlag;
+        int AirInletNode;                  // Node Number of the air inlet
+        int WaterInletNode;                // Node Number of the Water inlet
+        Real64 rho;                        // local fluid density
+        Real64 Cp;                         // local fluid specific heat
+        int SpeedCal;                      // calculated speed level
         bool ErrorsFound(false);           // TRUE when errors found, air loop initialization error
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
         int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
@@ -3829,11 +3828,10 @@ namespace VariableSpeedCoils {
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed &&
             state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum)) {
 
+            ErrorsFound = false;
             SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
-
             if (ErrorsFound) {
-                ShowSevereError(state, format("{}: Failed to size variable speed coil.", RoutineName));
-                ShowFatalError(state, "Program terminates due to preceding condition(s).");
+                ShowFatalError(state, format("{}: Failed to size variable speed coil.", RoutineName));
             }
 
             //   get rated coil bypass factor excluding fan heat
@@ -3855,18 +3853,18 @@ namespace VariableSpeedCoils {
                            DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
                     CoilVSWAHPType = DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit;
                 }
-                errFlag = false;
+                ErrorsFound = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                         CoilVSWAHPType,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc,
-                                        errFlag,
+                                        ErrorsFound,
                                         _,
                                         _,
                                         _,
                                         _,
                                         _);
-                if (errFlag) {
+                if (ErrorsFound) {
                     ShowFatalError(state, "InitVarSpeedCoil: Program terminated for previous conditions.");
                 }
                 state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum) = false;
@@ -3878,11 +3876,10 @@ namespace VariableSpeedCoils {
         if (!state.dataGlobal->SysSizingCalc && state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum) &&
             !state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
+            ErrorsFound = false;
             SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
-
             if (ErrorsFound) {
-                ShowSevereError(state, format("{}: Failed to size variable speed coil.", RoutineName));
-                ShowFatalError(state, "Program terminates due to preceding condition(s).");
+                ShowFatalError(state, format("{}: Failed to size variable speed coil.", RoutineName));
             }
 
             state.dataVariableSpeedCoils->MySizeFlag(DXCoilNum) = false;
