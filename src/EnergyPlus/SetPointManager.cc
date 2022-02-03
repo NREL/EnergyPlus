@@ -4143,9 +4143,10 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                 state,
                                 "...conflicting node name = " +
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                            ShowContinueError(state,
-                                              format("...control type variable = {}",
-                                                     controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
+                            ShowContinueError(
+                                state,
+                                format("...control type variable = {}",
+                                       controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             //            ErrorsFound=.TRUE.
                         }
                     }
@@ -4183,9 +4184,10 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                 state,
                                 "...conflicting node name = " +
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                            ShowContinueError(state,
-                                              format("...control type variable = {}",
-                                                     controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
+                            ShowContinueError(
+                                state,
+                                format("...control type variable = {}",
+                                       controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             ShowContinueError(state,
                                               "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node.");
                         } else { // severe error for other SP manager types
@@ -4203,9 +4205,10 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                 state,
                                 "...conflicting node name = " +
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                            ShowContinueError(state,
-                                              format("...control type variable = {}",
-                                                     controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
+                            ShowContinueError(
+                                state,
+                                format("...control type variable = {}",
+                                       controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             //            ErrorsFound=.TRUE.
                         }
                     }
