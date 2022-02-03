@@ -1,16 +1,16 @@
-! PlantLoadProfile.idf
+! PlantLoadProfileSteam.idf
 !
 ! Basic file description:
-! This input file is a plant-only simulation using the PLANT LOAD PROFILE STEAM object; no zones are simulated.
-! The PLANT LOAD PROFILE (STEAM) object allows a scheduled load to be connected to the plant demand side loop.
+! This input file is a plant-only simulation using the PLANT LOAD PROFILE object for steam loop; no zones are simulated.
+! The PLANT LOAD PROFILE object allows a scheduled load to be connected to the plant demand side loop.
 ! This is useful when the building plant load profile is already known.  It's also useful for testing the
 ! operation of plant supply side components.
 ! Run:      1 design day.
 ! Building: None.
 ! System:   None.
-! Plant:    PLANT LOAD PROFILE STEAM with Boiler:Steam.
+! Plant:    PLANT LOAD PROFILE with Boiler:Steam.
 
-  Version,9.6;
+  Version,22.1;
 
   Building,
     Plant Load Profile Steam Example,  !- Name
@@ -97,7 +97,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -286,20 +286,21 @@
   Branch,
     Load Profile Branch 1,   !- Name
     ,                        !- Pressure Drop Curve Name
-    LoadProfile:Plant:Steam,       !- Component 1 Object Type
+    LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name
     Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name
 
-  LoadProfile:Plant:Steam,
-    Load Profile 1,          !- Name
-    Demand Load Profile 1 Inlet Node,  !- Inlet Node Name
+  LoadProfile:Plant,
+    Load Profile 1,                     !- Name
+    Demand Load Profile 1 Inlet Node,   !- Inlet Node Name
     Demand Load Profile 1 Outlet Node,  !- Outlet Node Name
-    Load Profile 1 Load Schedule,  !- Load Schedule Name
-    0.008,                   !- Peak Flow Rate {m3/s}
+    Load Profile 1 Load Schedule,       !- Load Schedule Name
+    0.008,                              !- Peak Flow Rate {m3/s}
     Load Profile 1 Flow Frac Schedule,  !- Flow Rate Fraction Schedule Name
-    3,                       !- Degree of SubCooling
-    15;                      !- Degree of Loop SubCooling
+    Steam,                              !-Plant Loop Fluid Type
+    3,                                  !- Degree of SubCooling
+    15;                                 !- Degree of Loop SubCooling
 
   Branch,
     Demand Outlet Branch,    !- Name
@@ -342,7 +343,7 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 24:00,8000;      !- Field 11
+    UNTIL: 24:00,5555;      !- Field 11
 
   Schedule:Compact,
     Load Profile 1 Flow Frac Schedule,  !- Name
@@ -374,6 +375,10 @@
   Output:Variable,*,Boiler Heating Rate,Hourly;
 
   Output:Variable,*,Boiler Steam Efficiency,Hourly;
+
+  Output:Variable,Main Loop,Plant Supply Side Heating Demand Rate,Hourly;
+
+  Output:Variable,Main Loop,Plant Supply Side Unmet Demand Rate,Hourly;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
