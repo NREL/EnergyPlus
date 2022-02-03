@@ -158,6 +158,40 @@ constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> contr
                                                                                                 "MAXIMUMMASSFLOWRATE",
                                                                                                 "MINIMUMMASSFLOWRATE"};
 
+constexpr std::array<std::string_view, static_cast<int>(SetPointManagerType::Num)> managerTypeName = {
+    "SetpointManager:Scheduled",
+    "SetpointManager:Scheduled:DualSetpoint",
+    "SetpointManager:OutdoorAirReset",
+    "SetpointManager:SingleZone:Reheat",
+    "SetpointManager:SingleZone:Heating",
+    "SetpointManager:SingleZone:Cooling",
+    "SetpointManager:SingleZone:Humidity:Minimum",
+    "SetpointManager:SingleZone:Humidity:Maximum",
+    "SetpointManager:MixedAir",
+    "SetpointManager:OutdoorAirPretreat",
+    "SetpointManager:Warmest",
+    "SetpointManager:Coldest",
+    "SetpointManager:WarmestTemperatureFlow",
+    "SetpointManager:ReturnAirBypassFlow",
+    "SetpointManager:MultiZone:Cooling:Average",
+    "SetpointManager:MultiZone:Heating:Average",
+    "SetpointManager:MultiZone:MinimumHumidity:Average",
+    "SetpointManager:MultiZone:MaximumHumidity:Average",
+    "SetpointManager:MultiZone:Humidity:Minimum",
+    "SetpointManager:MultiZone:Humidity:Maximum",
+    "SetpointManager:FollowOutdoorAirTemperature",
+    "SetpointManager:FollowSystemNodeTemperature",
+    "SetpointManager:FollowGroundTemperature",
+    "SetpointManager:CondenserEnteringReset",
+    "SetpointManager:CondenserEnteringReset:Ideal",
+    "SetpointManager:SingleZone:OneStageCooling",
+    "SetpointManager:SingleZone:OneStageHeating",
+    "SetpointManager:ReturnTemperature:ChilledWater",
+    "SetpointManager:ReturnTemperature:HotWater",
+    "SetpointManager:ScheduledTES",
+    "SetpointManager:SystemNodeReset:Temperature",
+    "SetpointManager:SystemNodeReset:Humidity"};
+
 void ManageSetPoints(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -4058,7 +4092,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                          state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum))));
                 ShowContinueError(state,
                                   format("...control type variable    = {}",
-                                         controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
+                                         controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
             }
         }
 
@@ -4111,7 +4145,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
                             ShowContinueError(state,
                                               format("...control type variable = {}",
-                                                     controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
+                                                     controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             //            ErrorsFound=.TRUE.
                         }
                     }
@@ -4151,7 +4185,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
                             ShowContinueError(state,
                                               format("...control type variable = {}",
-                                                     controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
+                                                     controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             ShowContinueError(state,
                                               "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node.");
                         } else { // severe error for other SP manager types
@@ -4171,7 +4205,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                                     state.dataLoopNodes->NodeID(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
                             ShowContinueError(state,
                                               format("...control type variable = {}",
-                                                     controlTypeName[int(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
+                                                     controlTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)]));
                             //            ErrorsFound=.TRUE.
                         }
                     }
