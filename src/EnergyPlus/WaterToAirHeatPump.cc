@@ -145,7 +145,7 @@ namespace WaterToAirHeatPump {
         if (CompIndex == 0) {
             HPNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterToAirHeatPump->WatertoAirHP);
             if (HPNum == 0) {
-                ShowFatalError(state, "WaterToAir HP not found=" + std::string{CompName});
+                ShowFatalError(state, format("WaterToAir HP not found={}", CompName));
             }
             CompIndex = HPNum;
         } else {
@@ -394,9 +394,9 @@ namespace WaterToAirHeatPump {
                 break;
             }
             default: {
-                ShowSevereError(state,
-                                std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject +
-                                    '=' + heatPump.Name);
+                ShowSevereError(
+                    state,
+                    format("{}Invalid {} ({}) entered. {}={}", RoutineName, cAlphaFields(2), AlphArray(2), CurrentModuleObject, heatPump.Name));
                 ErrorsFound = true;
                 break;
             }
@@ -584,9 +584,9 @@ namespace WaterToAirHeatPump {
                 break;
             }
             default: {
-                ShowSevereError(state,
-                                std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject +
-                                    '=' + heatPump.Name);
+                ShowSevereError(
+                    state,
+                    format("{}Invalid {} ({}) entered. {}={}", RoutineName, cAlphaFields(2), AlphArray(2), CurrentModuleObject, heatPump.Name));
                 ErrorsFound = true;
                 break;
             }
@@ -657,7 +657,7 @@ namespace WaterToAirHeatPump {
         NumArray.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found getting input. Program terminates.");
+            ShowFatalError(state, format("{}Errors found getting input. Program terminates.", RoutineName));
         }
 
         for (HPNum = 1; HPNum <= state.dataWaterToAirHeatPump->NumWatertoAirHPs; ++HPNum) {
