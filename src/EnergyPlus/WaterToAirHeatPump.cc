@@ -2191,15 +2191,11 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int AirInletNode;
-        int WaterInletNode;
-        int AirOutletNode;
-        int WaterOutletNode;
         Real64 ReportingConstant;
-        auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // WatertoAirHP(HPNum)%SimFlag=.FALSE.
@@ -2227,33 +2223,28 @@ namespace WaterToAirHeatPump {
             heatPump.OutletWaterEnthalpy = heatPump.InletWaterEnthalpy;
         }
 
-        AirInletNode = heatPump.AirInletNodeNum;
-        WaterInletNode = heatPump.WaterInletNodeNum;
-        AirOutletNode = heatPump.AirOutletNodeNum;
-        WaterOutletNode = heatPump.WaterOutletNodeNum;
-
         // Set the outlet air nodes of the WatertoAirHP
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
-        state.dataLoopNodes->Node(AirOutletNode).Temp = heatPump.OutletAirDBTemp;
-        state.dataLoopNodes->Node(AirOutletNode).HumRat = heatPump.OutletAirHumRat;
-        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = heatPump.OutletAirEnthalpy;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).Temp = heatPump.OutletAirDBTemp;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).HumRat = heatPump.OutletAirHumRat;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).Enthalpy = heatPump.OutletAirEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
+        SafeCopyPlantNode(state, heatPump.WaterInletNodeNum, heatPump.WaterOutletNodeNum);
         // Set the outlet water nodes for the heat pump
-        state.dataLoopNodes->Node(WaterOutletNode).Temp = heatPump.OutletWaterTemp;
-        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = heatPump.OutletWaterEnthalpy;
+        state.dataLoopNodes->Node(heatPump.WaterOutletNodeNum).Temp = heatPump.OutletWaterTemp;
+        state.dataLoopNodes->Node(heatPump.WaterOutletNodeNum).Enthalpy = heatPump.OutletWaterEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
-        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).Quality = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).Quality;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).Press = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).Press;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).MassFlowRateMin = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRateMin;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).MassFlowRateMax = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRateMax;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).MassFlowRateMinAvail = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRateMaxAvail;
 
         // Pass through the load side mass flow rates
-        heatPump.InletAirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
+        heatPump.InletAirMassFlowRate = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRate;
         heatPump.OutletAirMassFlowRate = heatPump.InletAirMassFlowRate;
 
         heatPump.Energy = heatPump.Power * ReportingConstant;
@@ -2263,10 +2254,10 @@ namespace WaterToAirHeatPump {
         heatPump.EnergySource = heatPump.QSource * ReportingConstant;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
+            state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).CO2 = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
+            state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).GenContam = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).GenContam;
         }
     }
 
