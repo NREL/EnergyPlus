@@ -775,9 +775,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
 
-                    double uValueRep{0.1};
-                    double shgcRep{0.1};
-                    double vtRep{0.1};
+                    double uValueRep{0.0};
+                    double shgcRep{0.0};
+                    double vtRep{0.0};
 
                     GetWindowAssemblyNfrcForReport(
                         state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueRep, shgcRep, vtRep);
