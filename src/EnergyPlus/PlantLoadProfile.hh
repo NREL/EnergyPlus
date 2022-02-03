@@ -69,7 +69,8 @@ namespace PlantLoadProfile {
     {
         Invalid = -1,
         Water,
-        Steam
+        Steam,
+        Num
     };
 
     struct PlantProfileData : public PlantComponent
