@@ -137,7 +137,7 @@ namespace ExhaustAirSystemManager {
 
     void SizeExhaustSystem(EnergyPlusData &state);
 
-    void SizeExhaustControlFlow(EnergyPlusData &state);
+    void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int &NodeNums);
 } // namespace ExhaustAirSystemManager
 
 struct ExhaustAirSystemMgr : BaseGlobalStruct

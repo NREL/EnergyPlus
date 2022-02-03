@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/Fans.hh>
@@ -648,6 +649,12 @@ namespace ExhaustAirSystemManager {
                 }
                 // 2022-02: Following the node/nodelist checkout, it also need to verify these nodes are "indeed" supply nodes.
 
+                // 2022-02: Deal with design exhaust auto size here;
+                bool autosizeflag = false; // need a connnection to activat this flag from input to do autosize
+                if (autosizeflag) {
+                    SizeExhaustControlFlow(state, exhCtrlNum, NodeNums);
+                }
+
                 std::string minZoneTempLimitScheduleName =
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "minimum_zone_temperature_limit_schedule_name");
                 int minZoneTempLimitScheduleNum = 0;
@@ -927,9 +934,26 @@ namespace ExhaustAirSystemManager {
         */ 
     }
 
-    void SizeExhaustControlFlow(EnergyPlusData &state)
+    void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int & NodeNums)
     {
 
+        auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(zoneExhCtrlNum);
+
+        Real64 designFlow = 0.0;
+ 
+        if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
+            // size based on supply nodelist flow
+            if (NodeNums.size() > 0) {
+                for (int i = 1; i <= NodeNums.size(); ++i) {
+                    designFlow += state.dataLoopNodes->Node(NodeNums(i)).MassFlowRateMax; 
+                }
+            }
+        } else { // scheduled etc.
+            // based on zone OA.
+            designFlow = state.dataSize->FinalZoneSizing(thisExhCtrl.ZoneNum).MinOA;
+        }
+
+        thisExhCtrl.DesignExhaustFlowRate = designFlow;
     }
 
 } // namespace ExhaustAirSystemManager
