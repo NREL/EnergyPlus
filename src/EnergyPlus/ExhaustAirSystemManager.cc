@@ -77,6 +77,26 @@ namespace ExhaustAirSystemManager {
 
     // PURPOSE OF THIS MODULE:
     // To manage the exhaust air system.
+    struct MixerBranchZone
+    {
+        int mixerInletNodeNum;
+        int zoneExhaustNodeNum;
+        int zoneNum;
+        bool collected;
+
+        // default constructor
+        // Question: why the constructor skipped the first element std::string Name?
+        MixerBranchZone() : mixerInletNodeNum(0), zoneExhaustNodeNum(0), zoneNum(0), collected(false)
+        {
+        }
+
+        MixerBranchZone(int a, int b, int c, bool d) : mixerInletNodeNum(a), zoneExhaustNodeNum(b), zoneNum(c), collected(d)
+        {
+        }
+    };
+
+    std::vector<MixerBranchZone> mixerToZoneTable;
+    bool mappingDone = false;
 
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration)
     {
@@ -531,6 +551,10 @@ namespace ExhaustAirSystemManager {
                                                       ObjectIsParent);
                 thisExhCtrl.OutletNodeNum = outletNodeNum;
 
+                if (!mappingDone) {
+                    mixerToZoneTable.emplace_back(MixerBranchZone{outletNodeNum, inletNodeNum, zoneNum, true});
+                }
+
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
                 // 2022-01-20: may need some sanity check about the input values
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
@@ -690,6 +714,7 @@ namespace ExhaustAirSystemManager {
             // and also need to create a map that contains a table of for each zone how many of these exhasut controls
             state.dataZoneEquip->NumZoneExhaustControls = numZoneExhaustControls; // or exhCtrlNum? */
 
+            mappingDone = true;
         } else {
             // If no exhaust systems are defined, then do something <or nothing>:
             /* */
