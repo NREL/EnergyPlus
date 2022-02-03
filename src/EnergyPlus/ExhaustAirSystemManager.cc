@@ -650,8 +650,7 @@ namespace ExhaustAirSystemManager {
                 // 2022-02: Following the node/nodelist checkout, it also need to verify these nodes are "indeed" supply nodes.
 
                 // 2022-02: Deal with design exhaust auto size here;
-                bool autosizeflag = false; // need a connnection to activat this flag from input to do autosize
-                if (autosizeflag) {
+                if (thisExhCtrl.DesignExhaustFlowRate == EnergyPlus::DataSizing::AutoSize) {
                     SizeExhaustControlFlow(state, exhCtrlNum, NodeNums);
                 }
 
