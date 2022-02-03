@@ -979,11 +979,6 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case PlantEquipmentType::PlantLoadProfileSteam: {
-                        this_comp.CurOpSchemeType = OpScheme::Demand;
-                        this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory(state, CompNames(CompNum));
-                        break;
-                    }
                     case PlantEquipmentType::GrndHtExchgSystem: {
                         this_comp.CurOpSchemeType = OpScheme::Uncontrolled;
                         this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, PlantEquipmentType::GrndHtExchgSystem, CompNames(CompNum));
@@ -2853,8 +2848,7 @@ void CheckPlantOnAbort(EnergyPlusData &state)
                         case DataPlant::PlantEquipmentType::CoilWaterSimpleHeating:
                         case DataPlant::PlantEquipmentType::CoilSteamAirHeating:
                         case DataPlant::PlantEquipmentType::SolarCollectorFlatPlate:
-                        case DataPlant::PlantEquipmentType::PlantLoadProfile:
-                        case DataPlant::PlantEquipmentType::PlantLoadProfileSteam: {
+                        case DataPlant::PlantEquipmentType::PlantLoadProfile: {
                             ShouldBeACTIVE = true;
                         } break;
                         default: {
@@ -3846,7 +3840,7 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
                     } break;
-                    case DataPlant::PlantEquipmentType::PurchSteam: { //                    
+                    case DataPlant::PlantEquipmentType::PurchSteam: { //
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
@@ -3944,11 +3938,6 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                     } break;
                     case DataPlant::PlantEquipmentType::PlantLoadProfile: { //            = 44  ! demand side component
-                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                        this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
-                        this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
-                    } break;
-                    case DataPlant::PlantEquipmentType::PlantLoadProfileSteam: { // 
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                         this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
@@ -4192,13 +4181,12 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         }
                     } break;
-                    case DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg: { //  
+                    case DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg: { //
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         if (LoopSideCtr == LoopSideLocation::Demand) {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                             this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
-                        }
-                        else {
+                        } else {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                             this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         }

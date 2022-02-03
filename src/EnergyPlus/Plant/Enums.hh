@@ -203,7 +203,6 @@ enum class PlantEquipmentType
     CoolingPanel_Simple,
     HeatPumpEIRCooling,
     HeatPumpEIRHeating,
-    PlantLoadProfileSteam,
     PurchSteam,
     SteamToWaterPlantHtExchg,
     Num

@@ -8962,7 +8962,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 }
             } break;
             case colPurchHeat:
-            case colPurchHeatSt:{
+            case colPurchHeatSt: {
                 if (produceTabular) {
                     footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
