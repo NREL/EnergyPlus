@@ -144,16 +144,10 @@ void PlantProfileData::simulate(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static constexpr std::string_view RoutineName("SimulatePlantProfile");
     Real64 DeltaTemp;
-    Real64 EnthSteamInDry;
-    Real64 EnthSteamOutWet;
-    Real64 LatentHeatSteam;
-    static std::string const fluidNameSteam("STEAM");
-    int FluidIndex;
-    Real64 CpWater;
-    Real64 TempWaterAtmPress;
 
     this->InitPlantProfile(state);
-    if (this->Type == DataPlant::PlantEquipmentType::PlantLoadProfile) {
+
+    if (this->FluidType == PlantLoopFluidType::Water) {
         if (this->MassFlowRate > 0.0) {
             Real64 Cp = GetSpecificHeatGlycol(state,
                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -165,21 +159,40 @@ void PlantProfileData::simulate(EnergyPlusData &state,
             this->Power = 0.0;
             DeltaTemp = 0.0;
         }
-
         this->OutletTemp = this->InletTemp - DeltaTemp;
+    } else if (this->FluidType == PlantLoopFluidType::Steam) {
+        if ((this->MassFlowRate > 0.0) && (this->Power > 0.0)) {
+            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                          this->InletTemp,
+                                                                          1.0,
+                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                          RoutineName);
+            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                           this->InletTemp,
+                                                                           0.0,
+                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                           RoutineName);
+            Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
-    } else if (this->Type == DataPlant::PlantEquipmentType::PlantLoadProfileSteam) {
-        if (((this->MassFlowRate) > 0.0) && (this->Power > 0.0)) {
-            // Steam heat exchangers would not have effectivness, since all of the steam is
-            // converted to water and only then the steam trap allows it to leave the heat
-            // exchanger, subsequently heat exchange is latent heat + subcooling.
-
-            FluidIndex = FluidProperties::FindRefrigerant(state, "Steam");
-            EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, this->InletTemp, 1.0, FluidIndex, RoutineName);
-            EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, this->InletTemp, 0.0, FluidIndex, RoutineName);
-            LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-
-            CpWater = FluidProperties::GetSatSpecificHeatRefrig(state, fluidNameSteam, this->InletTemp, 0.0, FluidIndex, RoutineName);
+            Real64 CpWater = FluidProperties::GetSatSpecificHeatRefrig(state,
+                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                       this->InletTemp,
+                                                                       0.0,
+                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                       RoutineName);
+            Real64 CpWatertest = FluidProperties::GetSatSpecificHeatRefrig(state,
+                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                           this->InletTemp,
+                                                                           0.0,
+                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                           RoutineName);
+            Real64 CpWatertest2 = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                         this->InletTemp,
+                                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                         RoutineName);
 
             // Steam Mass Flow Rate Required
             this->MassFlowRate = this->Power / (LatentHeatSteam + this->DegOfSubcooling * CpWater);
@@ -192,7 +205,11 @@ void PlantProfileData::simulate(EnergyPlusData &state,
             // Here Degree of Subcooling is used to calculate hot water return temperature.
 
             // Calculating Water outlet temperature
-            TempWaterAtmPress = GetSatTemperatureRefrig(state, fluidNameSteam, DataEnvironment::StdPressureSeaLevel, FluidIndex, RoutineName);
+            Real64 TempWaterAtmPress = GetSatTemperatureRefrig(state,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                               DataEnvironment::StdPressureSeaLevel,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                               RoutineName);
             this->OutletTemp = TempWaterAtmPress - this->LoopSubcoolReturn;
         }
     }
