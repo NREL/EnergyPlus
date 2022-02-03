@@ -2336,7 +2336,7 @@ namespace WaterToAirHeatPump {
         Twet = min(heatPump.Twet_Rated * QLatRated / (QLatActual + 1.e-10), Twet_max);
         Gamma = heatPump.Gamma_Rated * QLatRated * (EnteringDB - EnteringWB) / ((26.7 - 19.4) * QLatActual + 1.e-10);
 
-        //  Calculate the compressor on and off times using a converntional thermostat curve
+        //  Calculate the compressor on and off times using a conventional thermostat curve
         Ton = 3600.0 / (4.0 * heatPump.MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
         if ((CyclingScheme == CycFanCycCoil) && (heatPump.FanDelayTime != 0.0)) {
