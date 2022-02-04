@@ -132,10 +132,6 @@ namespace VentilatedSlab {
     std::string const cMO_VentilatedSlab = "ZoneHVAC:VentilatedSlab";
 
     // Parameters for outside air control types:
-    int constexpr Heating_ElectricCoilType = 1;
-    int constexpr Heating_GasCoilType = 2;
-    int constexpr Heating_WaterCoilType = 3;
-    int constexpr Heating_SteamCoilType = 4;
     int constexpr Cooling_CoilWaterCooling = 1;
     int constexpr Cooling_CoilDetailedCooling = 2;
     int constexpr Cooling_CoilHXAssisted = 3;
@@ -1027,10 +1023,10 @@ namespace VentilatedSlab {
                     {
                         auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(27));
                         if (SELECT_CASE_var == "COIL:HEATING:WATER") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = Heating_WaterCoilType;
+                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Water;
                             state.dataVentilatedSlab->VentSlab(Item).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                         } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = Heating_SteamCoilType;
+                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Steam;
                             state.dataVentilatedSlab->VentSlab(Item).HeatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
                             state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
                             if (state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex == 0) {
@@ -1042,9 +1038,9 @@ namespace VentilatedSlab {
                                 SteamMessageNeeded = false;
                             }
                         } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = Heating_ElectricCoilType;
+                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Electric;
                         } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = Heating_GasCoilType;
+                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Gas;
                         } else {
                             ShowSevereError(state,
                                             CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(27) +
@@ -1074,8 +1070,8 @@ namespace VentilatedSlab {
 
                     // The heating coil control node is necessary for a hot water coil, but not necessary for an
                     // electric or gas coil.
-                    if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_GasCoilType ||
-                        state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_ElectricCoilType) {
+                    if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Gas ||
+                        state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Electric) {
                         if (!lAlphaBlanks(29)) {
                             ShowWarningError(state,
                                              CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" " + cAlphaFields(29) + "=\"" +
@@ -1102,12 +1098,12 @@ namespace VentilatedSlab {
                     }
                     state.dataVentilatedSlab->VentSlab(Item).HotControlOffset = 0.001;
 
-                    if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_WaterCoilType) {
+                    if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Water) {
                         state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow =
                             GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", state.dataVentilatedSlab->VentSlab(Item).HCoilName, ErrorsFound);
                         state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow =
                             GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", state.dataVentilatedSlab->VentSlab(Item).HCoilName, ErrorsFound);
-                    } else if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_SteamCoilType) {
+                    } else if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Steam) {
                         state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow =
                             GetSteamCoilMaxFlowRate(state, "Coil:Heating:Steam", state.dataVentilatedSlab->VentSlab(Item).HCoilName, ErrorsFound);
                         state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow =
@@ -2186,7 +2182,7 @@ namespace VentilatedSlab {
         if (state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_WaterCoilType) {
+        if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Water) {
 
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) {
@@ -2339,7 +2335,7 @@ namespace VentilatedSlab {
         if (state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_SteamCoilType) {
+        if (state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Steam) {
 
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) {
@@ -2772,25 +2768,25 @@ namespace VentilatedSlab {
                 {
                     auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).HCoilType);
 
-                    if (SELECT_CASE_var1 == Heating_WaterCoilType) {
+                    if (SELECT_CASE_var1 == HeatingCoilType::Water) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Heating:Water",
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == Heating_SteamCoilType) {
+                    } else if (SELECT_CASE_var1 == HeatingCoilType::Steam) {
                         CheckSteamCoilSchedule(state,
                                                "Coil:Heating:Steam",
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
+                    } else if (SELECT_CASE_var1 == HeatingCoilType::Electric) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Electric",
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
+                    } else if (SELECT_CASE_var1 == HeatingCoilType::Gas) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Fuel",
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoilName,
@@ -2830,25 +2826,25 @@ namespace VentilatedSlab {
                 {
                     auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).HCoilType);
 
-                    if (SELECT_CASE_var1 == Heating_WaterCoilType) {
+                    if (SELECT_CASE_var1 == HeatingCoilType::Water) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Heating:Water",
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == Heating_SteamCoilType) {
+                    } else if (SELECT_CASE_var1 == HeatingCoilType::Steam) {
                         CheckSteamCoilSchedule(state,
                                                "Coil:Heating:Steam",
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
+                    } else if (SELECT_CASE_var1 == HeatingCoilType::Electric) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Electric",
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
+                    } else if (SELECT_CASE_var1 == HeatingCoilType::Gas) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Fuel",
                                                  state.dataVentilatedSlab->VentSlab(Item).HCoilName,
@@ -3055,12 +3051,12 @@ namespace VentilatedSlab {
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
 
-                if (!FirstHVACIteration && state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_WaterCoilType) {
+                if (!FirstHVACIteration && state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Water) {
                     MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
                     MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                 }
 
-                if (!FirstHVACIteration && state.dataVentilatedSlab->VentSlab(Item).HCoilType == Heating_SteamCoilType) {
+                if (!FirstHVACIteration && state.dataVentilatedSlab->VentSlab(Item).HCoilType == HeatingCoilType::Steam) {
                     MaxSteamFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
                     MinSteamFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                 }
@@ -3252,7 +3248,7 @@ namespace VentilatedSlab {
                     {
                         auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).HCoilType);
 
-                        if (SELECT_CASE_var == Heating_WaterCoilType) {
+                        if (SELECT_CASE_var == HeatingCoilType::Water) {
                             // control water flow to obtain output matching QZnReq
 
                             ControlCompOutput(state,
@@ -3274,8 +3270,8 @@ namespace VentilatedSlab {
                                               _,
                                               state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc);
 
-                        } else if ((SELECT_CASE_var == Heating_GasCoilType) || (SELECT_CASE_var == Heating_ElectricCoilType) ||
-                                   (SELECT_CASE_var == Heating_SteamCoilType)) {
+                        } else if ((SELECT_CASE_var == HeatingCoilType::Gas) || (SELECT_CASE_var == HeatingCoilType::Electric) ||
+                                   (SELECT_CASE_var == HeatingCoilType::Steam)) {
 
                             CalcVentilatedSlabComps(state, Item, FirstHVACIteration, QUnitOut);
                         }
@@ -3656,14 +3652,14 @@ namespace VentilatedSlab {
             {
                 auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).HCoilType);
 
-                if (SELECT_CASE_var == Heating_WaterCoilType) {
+                if (SELECT_CASE_var == HeatingCoilType::Water) {
 
                     SimulateWaterCoilComponents(state,
                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                 FirstHVACIteration,
                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
 
-                } else if (SELECT_CASE_var == Heating_SteamCoilType) {
+                } else if (SELECT_CASE_var == HeatingCoilType::Steam) {
 
                     if (!state.dataVentilatedSlab->HCoilOn) {
                         QCoilReq = 0.0;
@@ -3683,7 +3679,7 @@ namespace VentilatedSlab {
                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index,
                                                 QCoilReq);
 
-                } else if ((SELECT_CASE_var == Heating_ElectricCoilType) || (SELECT_CASE_var == Heating_GasCoilType)) {
+                } else if ((SELECT_CASE_var == HeatingCoilType::Electric) || (SELECT_CASE_var == HeatingCoilType::Gas)) {
 
                     if (!state.dataVentilatedSlab->HCoilOn) {
                         QCoilReq = 0.0;
