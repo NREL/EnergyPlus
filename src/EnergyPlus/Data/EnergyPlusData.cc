@@ -229,6 +229,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataResultsFramework = std::make_unique<ResultsFrameworkData>();
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
     this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
+    this->dataExhCtrlSystemMrg = std::make_unique<ExhaustControlSystemMgr>();
     this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
