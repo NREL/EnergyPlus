@@ -680,11 +680,16 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     computedNetArea.allocate(state.dataSurface->TotSurfaces);
     computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
 
-    if (state.dataHeatBal->TotFrameDivider > 0)
+    // set up for EIO <FenestrationAssembly> output
+    if (state.dataHeatBal->TotFrameDivider > 0){
         print(state.files.eio,
               "{}\n",
-              "! <FenestrationAssembly>,Surface Name,Construction Name,Frame and Divider Name,NFRC Product Type,"
+              "! <FenestrationAssembly>,Construction Name,Frame and Divider Name,NFRC Product Type,"
               "NFRC Product Type,Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+        }
+    static constexpr std::string_view FenestrationAssemblyFormat("FenestrationAssembly,{},{},{},{:.3R},{:.3R},{:.3R}\n");
+    std::vector<std::string> uniqueConstFrame;
+    std::string constructionAndFrame;
 
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         zonePt = Surface(iSurf).Zone;
@@ -797,16 +802,19 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcRep, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtRep, 3);
 
-                    static constexpr std::string_view WindowAssemblyFormat("FenestrationAssembly,{},{},{},{},{:.3R},{:.3R},{:.3R}\n");
-                    print(state.files.eio,
-                          WindowAssemblyFormat,
-                          surfName,
-                          state.dataConstruction->Construct(curCons).Name,
-                          state.dataSurface->FrameDivider(frameDivNum).Name,
-                          NFRCname,
-                          uValueRep,
-                          shgcRep,
-                          vtRep);
+                    // output EIO <FenestrationAssembly> for each unique combination of construction and frame/divider
+                    constructionAndFrame = state.dataConstruction->Construct(curCons).Name + state.dataSurface->FrameDivider(frameDivNum).Name;
+                    if (std::find(uniqueConstFrame.begin(), uniqueConstFrame.end(), constructionAndFrame) == uniqueConstFrame.end()) {
+                        uniqueConstFrame.push_back(constructionAndFrame);
+                        print(state.files.eio,
+                              FenestrationAssemblyFormat,
+                              state.dataConstruction->Construct(curCons).Name,
+                              state.dataSurface->FrameDivider(frameDivNum).Name,
+                              NFRCname,
+                              uValueRep,
+                              shgcRep,
+                              vtRep);
+                    }
                 }
                 windowAreaWMult = windowArea * mult;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
