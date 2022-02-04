@@ -276,11 +276,16 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.CentralFanTypeNum = centralFanTypeNum;
 
                 std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
-                int centralFanIndex = 0; // zero based
+                int centralFanIndex = -1; // zero based
                 // 2022-01: also in general, should this processing may need to checked first that
                 // all the fan objects have already been processed already to be fail-safe.
                 // probably simialr to other like schedules etc, although schedules might have been processed early in most cases.
                 if (centralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+                
+                    if (state.dataHVACFan->fanObjs.size() == 0) {
+                        // 2022-02-04: Need to process the System fan here first
+                    }
+                    
                     centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
                     if (centralFanIndex >= 0) {
                         // normal index
@@ -909,7 +914,7 @@ namespace ExhaustAirSystemManager {
         // variables playground:        
         // state.dataHeatBal->ZoneAirMassFlow.
         // state.dataHeatBal->Zone(1).
-         
+        // state.dataLoopNodes->Node(1).
         
         // Write fan sizing to eio report: example code in SizeFan() in Fan.cc:
 
