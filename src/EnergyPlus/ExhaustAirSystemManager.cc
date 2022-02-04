@@ -281,11 +281,11 @@ namespace ExhaustAirSystemManager {
                 // all the fan objects have already been processed already to be fail-safe.
                 // probably simialr to other like schedules etc, although schedules might have been processed early in most cases.
                 if (centralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                
-                    if (state.dataHVACFan->fanObjs.size() == 0) {
-                        // 2022-02-04: Need to process the System fan here first
-                    }
-                    
+                    // 2022-02-04: This type is zero indexed.
+
+                    // 2022-02-04: Need to process the System fan here first
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, centralFanName));
+
                     centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
                     if (centralFanIndex >= 0) {
                         // normal index
@@ -305,6 +305,8 @@ namespace ExhaustAirSystemManager {
                         ErrorsFound = true;
                     }
                 } else if (centralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
+                    // 2022-02-04: This type index starting from 1.
+
                     bool isNotOK(false);
                     int fanType_Num_Check(0);
                     EnergyPlus::Fans::GetFanType(state, centralFanName, fanType_Num_Check, isNotOK, cCurrentModuleObject, thisExhSys.Name);
@@ -339,7 +341,7 @@ namespace ExhaustAirSystemManager {
 
                 thisExhSys.CentralFanIndex = centralFanIndex;
             }
-            state.dataZoneEquip->NumReturnAirPaths = numExhaustSystems;
+            state.dataZoneEquip->NumExhaustAirSystems = numExhaustSystems;
 
         } else {
             // If no exhaust systems are defined, then do something <or nothing>:
