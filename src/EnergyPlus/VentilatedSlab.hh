@@ -82,6 +82,16 @@ namespace VentilatedSlab {
         Num
     };
 
+    // Parameters for outside air control types:
+    enum class OutsideAirControlType
+    {
+        Invalid = -1,
+        VariablePercent,
+        FixedTemperature,
+        FixedOAControl,
+        Num
+    };
+
     struct VentilatedSlabData
     {
         // Members
@@ -124,7 +134,7 @@ namespace VentilatedSlab {
         int CompErrIndex;
         Real64 MaxAirVolFlow;       // m3/s
         Real64 MaxAirMassFlow;      // kg/s
-        int OAControlType;          // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
+        OutsideAirControlType outsideAirControlType;          // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
         std::string MinOASchedName; // schedule of fraction for minimum outside air (all controls)
         int MinOASchedPtr;          // index to schedule
         std::string MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
@@ -250,7 +260,7 @@ namespace VentilatedSlab {
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0), ControlType(0),
               ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
-              ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0), MaxOASchedPtr(0),
+              ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0),
               TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
               MinOutAirMassFlow(0.0), SysConfg(0), CoilOption(0), HCoilPresent(false), HCoilType(HeatingCoilType::Invalid), HCoil_Index(0),
               heatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),

@@ -131,10 +131,6 @@ namespace VentilatedSlab {
     static std::string const fluidNameWater("WATER");
     std::string const cMO_VentilatedSlab = "ZoneHVAC:VentilatedSlab";
 
-    // Parameters for outside air control types:
-    int constexpr VariablePercent = 1;
-    int constexpr FixedTemperature = 2;
-    int constexpr FixedOAControl = 3;
     //    int constexpr NotOperating = 0; // Parameter for use with OperatingMode variable, set for no heating/cooling
     int constexpr HeatingMode = 1; // Parameter for use with OperatingMode variable, set for heating
     int constexpr CoolingMode = 2; // Parameter for use with OperatingMode variable, set for cooling
@@ -498,7 +494,7 @@ namespace VentilatedSlab {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(5));
                 if (SELECT_CASE_var == "VARIABLEPERCENT") {
-                    state.dataVentilatedSlab->VentSlab(Item).OAControlType = VariablePercent;
+                    state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType = OutsideAirControlType::VariablePercent;
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(6);
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
                         GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
@@ -514,7 +510,7 @@ namespace VentilatedSlab {
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == "FIXEDAMOUNT") {
-                    state.dataVentilatedSlab->VentSlab(Item).OAControlType = FixedOAControl;
+                    state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType = OutsideAirControlType::FixedOAControl;
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(7);
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
                         GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
@@ -530,7 +526,7 @@ namespace VentilatedSlab {
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == "FIXEDTEMPERATURE") {
-                    state.dataVentilatedSlab->VentSlab(Item).OAControlType = FixedTemperature;
+                    state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType = OutsideAirControlType::FixedTemperature;
                     state.dataVentilatedSlab->VentSlab(Item).TempSchedName = state.dataIPShortCut->cAlphaArgs(7);
                     state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr =
                         GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
@@ -962,7 +958,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
             }
 
-            if (state.dataVentilatedSlab->VentSlab(Item).OAControlType == FixedOAControl) {
+            if (state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType == OutsideAirControlType::FixedOAControl) {
                 state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow = state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow;
                 state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataVentilatedSlab->VentSlab(Item).MinOASchedName;
                 state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
@@ -3081,14 +3077,14 @@ namespace VentilatedSlab {
                     OutletNode = FanOutletNode;
 
                     {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).OAControlType);
+                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
 
-                        if (SELECT_CASE_var == FixedOAControl) {
+                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == VariablePercent) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
                             // This algorithm is probably a bit simplistic in that it just bounces
                             // back and forth between the maximum outside air and the minimum.  In
                             // reality, a system *might* vary between the two based on the load in
@@ -3108,7 +3104,7 @@ namespace VentilatedSlab {
                                 state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
                             }
 
-                        } else if (SELECT_CASE_var == FixedTemperature) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
                             Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
                             MaxOAFrac = 1.0;
@@ -3158,9 +3154,9 @@ namespace VentilatedSlab {
                 } else { // Heating Coil present
 
                     {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).OAControlType);
+                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
 
-                        if (SELECT_CASE_var == FixedOAControl) {
+                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
@@ -3171,13 +3167,13 @@ namespace VentilatedSlab {
                             MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
                             state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == VariablePercent) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
                             // In heating mode, the ouside air for "variable percent" control
                             // is set to the minimum value
 
                             state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == FixedTemperature) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
                             Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
                             MaxOAFrac = 1.0;
@@ -3338,9 +3334,9 @@ namespace VentilatedSlab {
                     OutletNode = FanOutletNode;
 
                     {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).OAControlType);
+                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
 
-                        if (SELECT_CASE_var == FixedOAControl) {
+                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
@@ -3351,7 +3347,7 @@ namespace VentilatedSlab {
                             MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
                             state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == VariablePercent) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
                             // This algorithm is probably a bit simplistic in that it just bounces
                             // back and forth between the maximum outside air and the minimum.  In
                             // reality, a system *might* vary between the two based on the load in
@@ -3372,7 +3368,7 @@ namespace VentilatedSlab {
                                 state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
                             }
 
-                        } else if (SELECT_CASE_var == FixedTemperature) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
                             Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
                             MaxOAFrac = 1.0;
@@ -3426,9 +3422,9 @@ namespace VentilatedSlab {
                     // the desired mixed air temperature.
 
                     {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).OAControlType);
+                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
 
-                        if (SELECT_CASE_var == FixedOAControl) {
+                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
@@ -3439,11 +3435,11 @@ namespace VentilatedSlab {
                             MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
                             state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == VariablePercent) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
                             // A cooling coil is present so let it try to do the cooling...
                             state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == FixedTemperature) {
+                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
                             Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
 
