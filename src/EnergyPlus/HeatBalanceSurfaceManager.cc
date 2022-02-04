@@ -681,15 +681,21 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
 
     // set up for EIO <FenestrationAssembly> output
-    if (state.dataHeatBal->TotFrameDivider > 0){
+    if (state.dataHeatBal->TotFrameDivider > 0) {
         print(state.files.eio,
               "{}\n",
               "! <FenestrationAssembly>,Construction Name,Frame and Divider Name,NFRC Product Type,"
-              "NFRC Product Type,Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
-        }
+              "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+    }
     static constexpr std::string_view FenestrationAssemblyFormat("FenestrationAssembly,{},{},{},{:.3R},{:.3R},{:.3R}\n");
     std::vector<std::string> uniqueConstFrame;
     std::string constructionAndFrame;
+
+    // set up for EIO <FenestrationShadedState> output
+    bool fenestrationShadedStateHeaderShown(false);
+    static constexpr std::string_view FenestrationShadedStateFormat("FenestrationShadedState,{},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{:.3R}\n");
+    std::vector<std::string> uniqueShdConstFrame;
+    std::string shdConstructionAndFrame;
 
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         zonePt = Surface(iSurf).Zone;
@@ -766,6 +772,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                          state.dataSurface->FrameDivider(frameDivNum).VertDividers * Surface(iSurf).Height -
                          state.dataSurface->FrameDivider(frameDivNum).HorDividers * state.dataSurface->FrameDivider(frameDivNum).VertDividers *
                              state.dataSurface->FrameDivider(frameDivNum).DividerWidth);
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchFenFrameDivName, surfName, state.dataSurface->FrameDivider(frameDivNum).Name);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchFenFrameConductance,
                                      surfName,
@@ -860,21 +868,25 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
                         const auto stateUValue{GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
                         const auto stateSHGC{GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
-                        std::string const &windowName{state.dataConstruction->Construct(stateConstrNum).Name};
+                        std::string const &constructionName{state.dataConstruction->Construct(stateConstrNum).Name};
 
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdUfact, windowName, stateUValue, 3);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, windowName, stateSHGC, 3);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchFenShdFrameDiv,
+                                         constructionName,
+                                         state.dataSurface->FrameDivider(frameDivNum).Name);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdUfact, constructionName, stateUValue, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, constructionName, stateSHGC, 3);
                         PreDefTableEntry(state,
                                          state.dataOutRptPredefined->pdchFenShdVisTr,
-                                         windowName,
+                                         constructionName,
                                          state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
                                          3);
 
                         frameDivNum = Surface(iSurf).FrameDivider;
                         if (frameDivNum != 0) {
-                            double stateAssemblyUValue{0.1};
-                            double stateAssemblySHGC{0.1};
-                            double stateAssemblyVT{0.1};
+                            double stateAssemblyUValue{0.0};
+                            double stateAssemblySHGC{0.0};
+                            double stateAssemblyVT{0.0};
 
                             GetWindowAssemblyNfrcForReport(state,
                                                            iSurf,
@@ -886,9 +898,39 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                                            stateAssemblySHGC,
                                                            stateAssemblyVT);
 
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, windowName, stateAssemblyUValue, 3);
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, windowName, stateAssemblySHGC, 3);
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, windowName, stateAssemblyVT, 3);
+                            std::string_view NFRCname =
+                                DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
+
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, constructionName, stateAssemblyUValue, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, constructionName, stateAssemblySHGC, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, constructionName, stateAssemblyVT, 3);
+
+                            if (!fenestrationShadedStateHeaderShown) {
+                                print(state.files.eio,
+                                      "{}\n",
+                                      "! <FenestrationShadedState>,Construction Name,Glass U-Factor {W/m2-K},"
+                                      "Glass SHGC, Glass Visible Transmittance, Frame and Divider Name,NFRC Product Type,"
+                                      "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+                                fenestrationShadedStateHeaderShown = true;
+                            }
+
+                            shdConstructionAndFrame = constructionName + state.dataSurface->FrameDivider(frameDivNum).Name;
+                            if (std::find(uniqueShdConstFrame.begin(), uniqueShdConstFrame.end(), shdConstructionAndFrame) ==
+                                uniqueShdConstFrame.end()) {
+                                uniqueShdConstFrame.push_back(shdConstructionAndFrame);
+                                print(state.files.eio,
+                                      FenestrationShadedStateFormat,
+                                      constructionName,
+                                      stateUValue,
+                                      stateSHGC,
+                                      state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                      state.dataSurface->FrameDivider(frameDivNum).Name,
+                                      NFRCname,
+                                      stateAssemblyUValue,
+                                      stateAssemblySHGC,
+                                      stateAssemblyVT);
+                            }
                         }
                     }
                 }
