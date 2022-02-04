@@ -831,6 +831,7 @@ TEST_F(EnergyPlusFixture, ScheduleFileColumnSeparator)
                                                       "  8760,                    !- Number of Hours of Data",
                                                       "  Space,                   !- Column Separator",
                                                       "  No;                      !- Interpolate to Timestep"});
+                                                      // Enter N4 and A6 fields here? (based on what is now defined in the IDD)
 
     ASSERT_TRUE(process_idf(idf_objects));
 }
@@ -1326,3 +1327,40 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap)
         EXPECT_EQ(8760.0, HourOfYear);
     }
 }
+
+TEST_F(EnergyPlusFixture, ScheduleFileDSTtoggleOptionTest)
+{
+    // P. Shrestha - February 2022
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:File,",
+        "  Test1,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  nofile.txt,              !- File Name",
+        "  1,                       !- Column Number",
+        "  0,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Space,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  Yes;                     !- Turns daylight savings On or Off"
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    int SomeSchedIndex = GetScheduleIndex(*state, "TEST1");
+    ScheduleManager::ScheduleData &test1_sched = state->dataScheduleMgr->Schedule(SomeSchedIndex);
+
+    ASSERT_TRUE(true);
+    /* state->dataScheduleMgr->UseDaylightSaving = true; // must initialize this to get schedules initialized with DST
+    
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    EXPECT_EQ("Yes", ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
+    EXPECT_EQ("No", ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
+    EXPECT_EQ(NULL, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
+
+    EXPECT_EQ("Yes", ScheduleManager::ScheduleData(     ));*/
+    // EXPECT_TRUE()
+
+}
+

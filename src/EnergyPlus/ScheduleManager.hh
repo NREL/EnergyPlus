@@ -164,7 +164,7 @@ namespace ScheduleManager {
         Real64 MinValue;                        // Minimum value for this schedule
         Real64 CurrentValue;                    // For Reporting
         bool EMSActuatedOn;                     // indicates if EMS computed
-        Real64 EMSValue;
+        Real64 EMSValue;                        // EMS value
         bool UseDaylightSaving;                 // Toggles between daylight saving ON (default) and OFF - used for Schedule:File only
 
         // Default Constructor
