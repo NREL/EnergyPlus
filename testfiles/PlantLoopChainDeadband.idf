@@ -305,7 +305,8 @@
     Heat Demand Load Profile 1 Outlet Node,  !- Outlet Node Name
     Heat Load Profile 1 Load Schedule,  !- Load Schedule Name
     0.002,                   !- Peak Flow Rate {m3/s}
-    Heat Load Profile 1 Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
+    Heat Load Profile 1 Flow Frac Schedule,  !- Flow Rate Fraction Schedule Name
+    Water;                   !- Plant Loop Fluid Type
 
   Branch,
     USE Heat Demand Outlet Branch,  !- Name

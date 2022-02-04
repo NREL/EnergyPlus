@@ -298,7 +298,7 @@
     Load Profile 1 Load Schedule,       !- Load Schedule Name
     0.008,                              !- Peak Flow Rate {m3/s}
     Load Profile 1 Flow Frac Schedule,  !- Flow Rate Fraction Schedule Name
-    Steam,                              !-Plant Loop Fluid Type
+    Steam,                              !- Plant Loop Fluid Type
     3,                                  !- Degree of SubCooling
     15;                                 !- Degree of Loop SubCooling
 
