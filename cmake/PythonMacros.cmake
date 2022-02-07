@@ -84,35 +84,39 @@ macro(CPYTHON_POST_EXE_BUILD_OPERATIONS)
             COMMAND ${CMAKE_COMMAND}
             -E copy_directory ${CPYTHON_STDLIB_DIR} $<TARGET_FILE_DIR:energyplus>/python_standard_lib
     )
-    # Then also copy python standard library built modules into the standard library folder
-    if (MSVC)
-        file(GLOB CPYTHON_DLLS ${CPYTHON_LIBRARY_DIR}/*.dll)
-        file(GLOB CPYTHON_PYDS ${CPYTHON_LIBRARY_DIR}/*.pyd)
-        file(GLOB CPYTHON_EXES ${CPYTHON_LIBRARY_DIR}/*.exe)
-        set(CPYTHON_ALL ${CPYTHON_DLLS} ${CPYTHON_PYDS} ${CPYTHON_EXES})
-        foreach (MODULE IN LISTS CPYTHON_ALL)
-            # message("Copying module: ${MODULE}")
-            add_custom_command(
-                    TARGET energyplusapi
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND}
-                    -E copy "${MODULE}" $<TARGET_FILE_DIR:energyplusapi>/python_standard_lib
-            )
-        endforeach ()
-    else ()
-        file(GLOB MODULES ${PROJECT_SOURCE_DIR}/third_party/CPython/build/lib*/*)  # TODO: Verify this on Windows/Mac
-        foreach (MODULE IN LISTS MODULES)
-            message("Copying module: ${MODULE}")
-            add_custom_command(
-                    TARGET energyplusapi
-                    POST_BUILD
-                    DEPENDS
-                    __ALWAYSRUNME
-                    COMMAND ${CMAKE_COMMAND}
-                    -E copy "${MODULE}" $<TARGET_FILE_DIR:energyplusapi>/python_standard_lib
-            )
-        endforeach ()
-    endif ()
+    add_custom_command(
+            TARGET energyplus
+            POST_BUILD
+            COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" ${CPYTHON_LIBRARY_DIR} $<TARGET_FILE_DIR:energyplus>/python_standard_lib ${PROJECT_SOURCE_DIR})
+#    # Then also copy python standard library built modules into the standard library folder
+#    if (MSVC)
+#        file(GLOB CPYTHON_DLLS ${CPYTHON_LIBRARY_DIR}/*.dll)
+#        file(GLOB CPYTHON_PYDS ${CPYTHON_LIBRARY_DIR}/*.pyd)
+#        file(GLOB CPYTHON_EXES ${CPYTHON_LIBRARY_DIR}/*.exe)
+#        set(CPYTHON_ALL ${CPYTHON_DLLS} ${CPYTHON_PYDS} ${CPYTHON_EXES})
+#        foreach (MODULE IN LISTS CPYTHON_ALL)
+#            # message("Copying module: ${MODULE}")
+#            add_custom_command(
+#                    TARGET energyplusapi
+#                    POST_BUILD
+#                    COMMAND ${CMAKE_COMMAND}
+#                    -E copy "${MODULE}" $<TARGET_FILE_DIR:energyplusapi>/python_standard_lib
+#            )
+#        endforeach ()
+#    else ()
+#        file(GLOB MODULES ${PROJECT_SOURCE_DIR}/third_party/CPython/build/lib*/*)  # TODO: Verify this on Windows/Mac
+#        foreach (MODULE IN LISTS MODULES)
+#            message("Copying module: ${MODULE}")
+#            add_custom_command(
+#                    TARGET energyplusapi
+#                    POST_BUILD
+#                    DEPENDS
+#                    __ALWAYSRUNME
+#                    COMMAND ${CMAKE_COMMAND}
+#                    -E copy "${MODULE}" $<TARGET_FILE_DIR:energyplusapi>/python_standard_lib
+#            )
+#        endforeach ()
+#    endif ()
     if (APPLE)
         add_custom_command(
                 TARGET energyplusapi
