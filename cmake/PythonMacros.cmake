@@ -79,6 +79,8 @@ macro(CPYTHON_POST_EXE_BUILD_OPERATIONS)
     add_custom_command(
             TARGET energyplus
             POST_BUILD
+            DEPENDS
+            __ALWAYSRUNME
             COMMAND ${CMAKE_COMMAND}
             -E copy_directory ${CPYTHON_STDLIB_DIR} $<TARGET_FILE_DIR:energyplus>/python_standard_lib
     )
@@ -100,10 +102,12 @@ macro(CPYTHON_POST_EXE_BUILD_OPERATIONS)
     else ()
         file(GLOB MODULES ${PROJECT_SOURCE_DIR}/third_party/CPython/build/lib*/*)  # TODO: Verify this on Windows/Mac
         foreach (MODULE IN LISTS MODULES)
-            # message("Copying module: ${MODULE}")
+            message("Copying module: ${MODULE}")
             add_custom_command(
                     TARGET energyplusapi
                     POST_BUILD
+                    DEPENDS
+                    __ALWAYSRUNME
                     COMMAND ${CMAKE_COMMAND}
                     -E copy "${MODULE}" $<TARGET_FILE_DIR:energyplusapi>/python_standard_lib
             )
