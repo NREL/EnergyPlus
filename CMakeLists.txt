@@ -137,6 +137,15 @@ endif()
 #######################################################################
 
 option(LINK_WITH_PYTHON "Link with Python Library for Python Plugin Builds" OFF)
+if(LINK_WITH_PYTHON)
+  if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/CPython/LICENSE)
+    message(STATUS "LINK_WITH_PYTHON=ON and CPython found, excellent...")
+  else()
+    message(SEND_ERROR "LINK_WITH_SUBMODULE_LIB enabled, but third_party/CPython is not set up yet.")
+    message(SEND_ERROR "For Git command line usage, cd into third_party/CPython and run git submodule init then git submodule update!")
+    message(SEND_ERROR "For TortoiseGit and similar tools, see the Submodule Update section here: https://tortoisegit.org/docs/tortoisegit/tgit-dug-submodules.html")
+  endif()
+endif()
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
@@ -157,12 +166,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
-# If LINK_WITH_PYTHON, also request the Development (libs) at the same time, to ensure consistent version between interpreter and Development
-if(LINK_WITH_PYTHON)
-  find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
-else()
-  find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
-endif()
+find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
 
 if(BUILD_TESTING)
   option(ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF)
@@ -232,6 +236,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products")
 
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
+include(cmake/PythonMacros.cmake)
 
 add_subdirectory(third_party)
 
@@ -257,6 +262,7 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/ssc)
+target_include_directories(project_options INTERFACE ${CPYTHON_INCLUDE_DIR})
 set(SAM_SKIP_TOOLS ON FORCE)
 set(SAM_SKIP_TESTS ON FORCE)
 set(SAMAPI_EXPORT OFF FORCE)

@@ -18,6 +18,8 @@ jobs:
 #
 #    steps:
 #    - uses: actions/checkout@v2
+#      with:
+#        submodule: true
 #
 #    - name: Set up Python 3.7
 #      uses: actions/setup-python@v2
@@ -52,7 +54,7 @@ jobs:
         os: [ubuntu-20.04]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2  # don't need submodule since LINK_WITH_PYTHON is OFF for this build configuration
 
       - name: Install System Dependencies
         shell: bash

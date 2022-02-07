@@ -715,37 +715,6 @@ add_custom_target(
 
 add_subdirectory(AirflowNetwork)
 
-if(LINK_WITH_PYTHON)
-  # check the python bit version here...if we are building against Python it has
-  # to match up bitwise if we aren't, then the identified interpreter can be
-  # whatever bit it wants
-  if(MSVC)
-    execute_process(COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-    # PYTHON_BIT_SIZE will be either "32" or "64"
-    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:x64
-    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:X86
-    if("${PYTHON_BIT_SIZE}" EQUAL "32")
-      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "86" PY_BITS_IN_ARCH)
-      if("${PY_BITS_IN_ARCH}" GREATER -1)
-        message(STATUS "Architecture of Python lib and EnergyPlus build align at 32-bit")
-      else()
-        message(FATAL_ERROR "Python is 32-bit while EnergyPlus architecture appears to be 64-bit!")
-      endif()
-    else() # assuming 64 bit
-      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "64" PY_BITS_IN_ARCH)
-      if("${PY_BITS_IN_ARCH}" GREATER -1)
-        message(STATUS "Architecture of Python lib and EnergyPlus build align at 64-bit")
-      else()
-        message(FATAL_ERROR "Python is 64-bit while EnergyPlus architecture appears to be 32-bit!")
-      endif()
-    endif()
-  endif()
-
-  # now we need to get the Python libs and add the include path for further compiling
-  # The Development (libs) was already found in the root level CMakeLists.txt
-  include_directories("${Python_INCLUDE_DIRS}")
-endif()
-
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
 add_dependencies(energyplusparser GenerateEmbeddedEpJSONSchema)
 target_link_libraries(energyplusparser PUBLIC ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
@@ -801,9 +770,14 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(energypluslib PUBLIC util)
   endif()
 endif()
+
 if(LINK_WITH_PYTHON)
-  target_link_libraries(energypluslib PUBLIC ${Python_LIBRARIES})
+  set_cpython_variables()
+  create_cpython_project()
+  create_cpython_library()
+  target_include_directories(energypluslib PRIVATE ${CPYTHON_INCLUDE_DIR})
 endif()
+
 # See https://en.cppreference.com/w/cpp/filesystem#Notes
 if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
     ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
@@ -844,6 +818,11 @@ endif()
 target_link_libraries(energyplusapi PUBLIC energypluslib)
 target_link_libraries(energyplusapi PRIVATE project_options project_fp_options project_warnings)
 
+if(LINK_WITH_PYTHON)
+  target_include_directories(energyplusapi PRIVATE ${CPYTHON_INCLUDE_DIR})
+  target_link_libraries(energyplusapi PRIVATE cpython_library)
+endif()
+
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
 install(
   TARGETS energyplusapi
@@ -856,6 +835,10 @@ if(APPLE OR UNIX)
   add_executable(energyplus main.cc)
 else() # windows
   add_executable(energyplus main.cc "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc")
+endif()
+if(LINK_WITH_PYTHON)
+  target_include_directories(energyplus PRIVATE ${CPYTHON_INCLUDE_DIR})
+  target_link_directories(energyplus PRIVATE ${CPYTHON_LIBRARY_DIR})
 endif()
 target_link_libraries(energyplus PRIVATE energyplusapi project_options project_fp_options project_warnings)
 
@@ -878,82 +861,44 @@ add_custom_command(
     -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}" -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}" -P
     "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake")
 
-install(TARGETS energyplus energyplusapi DESTINATION ./)
-
 if(LINK_WITH_PYTHON)
-  # link the executable to the dll and bring it in
-  get_filename_component(RESOLVED_PYTHON_LIBRARY "${Python_LIBRARIES}" REALPATH)
-  if(WIN32)
-
-    # In case you have both release and debug Python libraries on your system, Python_LIBRARIES might be "optimized;C:/.../python38.lib;debug;C:/.../python38_d.lib"
-    # so it can't be used directly, we could use a generator expression to find the $<TARGET_FILE:Python::Python> library used and that'd point directly
-    # to the DLL. But it won't work nicely for the install(code ...) command below... so we do a hack, get the optimized one always...
-    list(LENGTH Python_LIBRARIES _LEN)
-    if (_LEN GREATER 1)
-      set (_Python_DOING_RELEASE FALSE)
-      foreach(_currentArg ${Python_LIBRARIES})
-        if ("x${_currentArg}" STREQUAL "xoptimized")
-          set(_Python_DOING_RELEASE TRUE)
-        elseif(_Python_DOING_RELEASE)
-          get_filename_component(RESOLVED_PYTHON_LIBRARY "${_currentArg}" REALPATH)
-          break()
-        endif()
-      endforeach()
-    # else()
-      # No-op, already done above
-    endif()
-
-    # Windows is being ugly and linking against the Python DLL but not running
-    # unless it's close by Force it here.
-    add_custom_command(
-      TARGET energyplusapi
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY} -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi> -P
-              ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake)
-  endif()
-  install(
-    CODE "execute_process(
-      COMMAND ${CMAKE_COMMAND}
-      -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
-      -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
-      -P ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
-    )")
+  cpython_post_exe_build_operations()
   if(APPLE)
     install(
-      CODE "execute_process(
-        COMMAND ${CMAKE_COMMAND}
-        -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
-        -DEPLUS_DYNAMIC_LIB_NAME=libenergyplusapi.${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.dylib
-        -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
-        -P ${PROJECT_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
-      )")
+        CODE "execute_process(
+          COMMAND ${CMAKE_COMMAND}
+          -DEPLUS_DYNAMIC_LIB_NAME=libenergyplusapi.${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.dylib
+          -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
+          -P ${PROJECT_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
+        )"
+    )
   endif()
-  # along with the python standard lib
-  add_custom_command(
-    TARGET energyplusapi
-    POST_BUILD # TODO: I don't think we want to quote the generator expression
-    COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib")
 endif()
+
+install(TARGETS energyplus energyplusapi DESTINATION ./)
 
 if(BUILD_PACKAGE)
   # if we are building package, we need to drop in some API/Plugin stuff
   if(LINK_WITH_PYTHON)
-    # we'll want to grab the standard lib for python plugins
-    # TODO: I don't think we want to quote the generator expression
-    install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/" DESTINATION "./python_standard_lib")
+    # we'll want to grab the standard lib and the Python shared object library for python plugins
+    install(DIRECTORY $<TARGET_FILE_DIR:energyplus>/python_standard_lib/ DESTINATION "./python_standard_lib")
+    install(FILES ${CPYTHON_BUILT_BIN} DESTINATION "./")
   endif()
   # we'll want to always provide the C API headers
   foreach(HEADER ${API_HEADERS})
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}" DESTINATION "./include/EnergyPlus/api")
   endforeach()
   # we'll want to always grab the python API wrapper
-  # TODO: I don't think we want to quote the generator expression
-  install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/" DESTINATION "./pyenergyplus")
+  install(DIRECTORY $<TARGET_FILE_DIR:energyplus>/pyenergyplus/ DESTINATION "./pyenergyplus")
 endif()
 
 if(BUILD_TESTING)
   # Build the test executable
   add_executable(TestEnergyPlusCallbacks test_ep_as_library.cc)
+  if(LINK_WITH_PYTHON)
+    target_include_directories(TestEnergyPlusCallbacks PRIVATE ${CPYTHON_INCLUDE_DIR})
+    target_link_directories(TestEnergyPlusCallbacks PRIVATE ${CPYTHON_LIBRARY_DIR})
+  endif()
   target_link_libraries(TestEnergyPlusCallbacks PRIVATE energyplusapi project_options project_fp_options project_warnings)
   add_test(NAME "API.LegacyCallbackTest"
            COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${PROJECT_SOURCE_DIR} -DBINARY_DIR=${PROJECT_BINARY_DIR} -DIDF_FILE=1ZoneUncontrolled.idf

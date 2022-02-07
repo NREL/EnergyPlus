@@ -255,13 +255,19 @@ set(test_src
 set(test_dependencies energyplusapi)
 
 if(LINK_WITH_PYTHON)
+  set_cpython_variables() # the CPYTHON_INCLUDE_DIR things can go away with this added
   add_definitions("-DLINK_WITH_PYTHON")
-  find_package(PythonLibs 3 REQUIRED)
-  include_directories(${Python_INCLUDE_DIRS})
+  if(MSVC)
+    set(CPYTHON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/CPython/Include ${PROJECT_SOURCE_DIR}/third_party/CPython/PC)
+  else()
+    set(CPYTHON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/CPython/Include ${PROJECT_SOURCE_DIR}/third_party/CPython)
+  endif()
+  include_directories(${CPYTHON_INCLUDE_DIR})
   if(CMAKE_HOST_UNIX)
     list(APPEND test_src api/datatransfer.unit.cc)
     list(APPEND test_src PluginManager.unit.cc)
-    list(APPEND test_dependencies ${Python_LIBRARIES})
+    list(APPEND test_dependencies "python3.10")
+    link_directories("${PROJECT_SOURCE_DIR}/third_party/CPython")
   endif()
 endif()
 
@@ -271,7 +277,11 @@ if(CMAKE_HOST_UNIX)
   endif()
 endif()
 
-# Executable name will be EnergyPlus_tests
+# Executable name will be energyPlus_tests
 # Execute energyplus_tests --help for options using gtest runner
 # Execute energyplus_tests with no arguments to run all tests
 create_test_targets(energyplus "${test_src}" "${test_dependencies}" True)
+
+if(LINK_WITH_PYTHON)
+  target_link_directories(energyplus_tests PRIVATE ${CPYTHON_LIBRARY_DIR})
+endif()

@@ -16,6 +16,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: 'clone_branch'
+        submodule: true
 
     - name: Checkout Baseline
       if: ${{ env.DO_REGRESSIONS == 'true' }}
@@ -25,6 +26,7 @@ jobs:
         ref: 'develop'
         path: 'clone_baseline'
         fetch-depth: '1'
+        submodule: true
 
     - name: Checkout Regressions
       if: ${{ env.DO_REGRESSIONS == 'true' }}
@@ -34,6 +36,7 @@ jobs:
         ref: 'master'
         path: 'clone_regressions'
         fetch-depth: '1'
+        submodule: true
 
     - name: Set up Python 3.7
       if: ${{ env.INSTALL_DEPENDENCIES == 'true' }}
