@@ -107,7 +107,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A Win32 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A Win32 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="DoNotBuild" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
