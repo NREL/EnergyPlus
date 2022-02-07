@@ -143,7 +143,7 @@ if(LINK_WITH_PYTHON)
   else()
     message(SEND_ERROR "LINK_WITH_SUBMODULE_LIB enabled, but third_party/CPython is not set up yet.")
     message(SEND_ERROR "For Git command line usage, cd into third_party/CPython and run git submodule init then git submodule update!")
-    message(SEND_ERROR "For TortoiseGit and similar tools, see the Submodule Update section here: https://tortoisegit.org/docs/tortoisegit/tgit-dug-submodules.html")
+    message(FATAL_ERROR "For TortoiseGit and similar tools, see the Submodule Update section here: https://tortoisegit.org/docs/tortoisegit/tgit-dug-submodules.html")
   endif()
 endif()
 
