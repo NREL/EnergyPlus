@@ -121,3 +121,18 @@ Two variables in the emission system were renamed to use "OtherFuel" instead of 
 - Environmental Impact OtherFuel2 CO2 Water Consumption Volume -> Environmental Impact OtherFuel2 Water Consumption Volume
 
 See pull request [#9089](https://github.com/NREL/EnergyPlus/pull/9089) for more details.
+
+## Fenestration Assembly Reporting
+
+Added several items to Envelope Summary in tabular output report:
+
+- For Exterior Fenestration subtable, added Frame and Divider Name
+- For Exterior Fenestration subtable, added NFRC product type, assembly u-factor, assembly SHGC, assembly visible transmittance
+- Added new Exterior Fenestration Shaded State subtable by construction listing some of the same items as the Exterior Fenestration subtable but when the shading is deployed.
+
+Also added two new EIO lines showing same additions as were added to the tabular output report:
+
+- FenestrationAssembly
+- FenestrationShadedState
+
+See pull request [#8740](https://github.com/NREL/EnergyPlus/pull/8740) for more details.

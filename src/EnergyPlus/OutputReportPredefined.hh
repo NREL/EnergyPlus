@@ -346,6 +346,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIntOpDir = 0;
     int pdstFen = 0;
     int pdchFenCons = 0;
+    int pdchFenFrameDivName = 0;
     int pdchFenAreaOf1 = 0;
     int pdchFenGlassAreaOf1 = 0;
     int pdchFenFrameAreaOf1 = 0;
@@ -367,9 +368,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFenDir = 0;
 
     int pdstFenShd = 0;
+    int pdchFenShdFrameDiv = 0;
     int pdchFenShdUfact = 0;
     int pdchFenShdSHGC = 0;
     int pdchFenShdVisTr = 0;
+    int pdchFenShdAssemNfrcType = 0;
     int pdchFenShdAssemUfact = 0;
     int pdchFenShdAssemSHGC = 0;
     int pdchFenShdAssemVisTr = 0;
@@ -393,10 +396,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIntFenUfact = 0;
     int pdchIntFenSHGC = 0;
     int pdchIntFenVisTr = 0;
-    int pdchIntFenAssemNfrcType = 0;
-    int pdchIntFenAssemUfact = 0;
-    int pdchIntFenAssemSHGC = 0;
-    int pdchIntFenAssemVisTr = 0;
     int pdchIntFenParent = 0;
 
     // Shading Report
@@ -1338,6 +1337,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchIntOpDir = 0;
         this->pdstFen = 0;
         this->pdchFenCons = 0;
+        this->pdchFenFrameDivName = 0;
         this->pdchFenAreaOf1 = 0;
         this->pdchFenGlassAreaOf1 = 0;
         this->pdchFenFrameAreaOf1 = 0;
@@ -1346,6 +1346,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchFenUfact = 0;
         this->pdchFenSHGC = 0;
         this->pdchFenVisTr = 0;
+        this->pdchFenAssemNfrcType = 0;
+        this->pdchFenAssemUfact = 0;
+        this->pdchFenAssemSHGC = 0;
+        this->pdchFenAssemVisTr = 0;
         this->pdchFenFrameConductance = 0;
         this->pdchFenDividerConductance = 0;
         this->pdchFenSwitchable = 0;
@@ -1353,6 +1357,15 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchFenAzimuth = 0;
         this->pdchFenTilt = 0;
         this->pdchFenDir = 0;
+        this->pdstFenShd = 0;
+        this->pdchFenShdFrameDiv = 0;
+        this->pdchFenShdUfact = 0;
+        this->pdchFenShdSHGC = 0;
+        this->pdchFenShdVisTr = 0;
+        this->pdchFenShdAssemNfrcType = 0;
+        this->pdchFenShdAssemUfact = 0;
+        this->pdchFenShdAssemSHGC = 0;
+        this->pdchFenShdAssemVisTr = 0;
         this->pdstDoor = 0;
         this->pdchDrCons = 0;
         this->pdchDrUfactFilm = 0;

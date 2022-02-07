@@ -142,6 +142,7 @@ namespace OutputReportPredefined {
         s->pdstFen = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Fenestration");
 
         s->pdchFenCons = newPreDefColumn(state, s->pdstFen, "Construction");
+        s->pdchFenFrameDivName = newPreDefColumn(state, s->pdstFen, "Frame and Divider");
         s->pdchFenGlassAreaOf1 = newPreDefColumn(state, s->pdstFen, "Glass Area [m2]");
         s->pdchFenFrameAreaOf1 = newPreDefColumn(state, s->pdstFen, "Frame Area [m2]");
         s->pdchFenDividerAreaOf1 = newPreDefColumn(state, s->pdstFen, "Divider Area [m2]");
@@ -164,9 +165,11 @@ namespace OutputReportPredefined {
 
         s->pdstFenShd = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Fenestration Shaded State");
 
+        s->pdchFenShdFrameDiv = newPreDefColumn(state, s->pdstFenShd, "Frame and Divider");
         s->pdchFenShdUfact = newPreDefColumn(state, s->pdstFenShd, "Glass U-Factor [W/m2-K]");
         s->pdchFenShdSHGC = newPreDefColumn(state, s->pdstFenShd, "Glass SHGC");
         s->pdchFenShdVisTr = newPreDefColumn(state, s->pdstFenShd, "Glass Visible Transmittance");
+        s->pdchFenShdAssemNfrcType = newPreDefColumn(state, s->pdstFenShd, "NFRC Product Type");
         s->pdchFenShdAssemUfact = newPreDefColumn(state, s->pdstFenShd, "Assembly U-Factor [W/m2-K]");
         s->pdchFenShdAssemSHGC = newPreDefColumn(state, s->pdstFenShd, "Assembly SHGC");
         s->pdchFenShdAssemVisTr = newPreDefColumn(state, s->pdstFenShd, "Assembly Visible Transmittance");
@@ -184,14 +187,8 @@ namespace OutputReportPredefined {
         // s->pdchIntFenDividerAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Divider Area [m2]')
         // s->pdchIntFenFrameConductance =  newPreDefColumn(state, s->pdstIntFen,'Frame Conductance [W/m2-K]')
         // s->pdchIntFenDividerConductance =  newPreDefColumn(state, s->pdstIntFen,'Divider Conductance [W/m2-K]')
-        s->pdchIntFenAssemNfrcType = newPreDefColumn(state, s->pdstIntFen, "NFRC Product Type");
-        s->pdchIntFenAssemUfact = newPreDefColumn(state, s->pdstIntFen, "Assembly U-Factor [W/m2-K]");
-        s->pdchIntFenAssemSHGC = newPreDefColumn(state, s->pdstIntFen, "Assembly SHGC");
-        s->pdchIntFenAssemVisTr = newPreDefColumn(state, s->pdstIntFen, "Assembly Visible Transmittance");
-        s->pdchIntFenParent = newPreDefColumn(state, s->pdstIntFen, "Parent Surface");
 
         s->pdstDoor = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Door");
-
         s->pdchDrCons = newPreDefColumn(state, s->pdstDoor, "Construction");
         s->pdchDrUfactFilm = newPreDefColumn(state, s->pdstDoor, "U-Factor with Film [W/m2-K]");
         s->pdchDrUfactNoFilm = newPreDefColumn(state, s->pdstDoor, "U-Factor no Film [W/m2-K]");
