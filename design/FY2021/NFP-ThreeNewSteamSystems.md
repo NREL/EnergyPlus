@@ -1,4 +1,4 @@
-Three New Steam Systems: HeatExchanger:SteamToWater, LoadProfile:Plant:Steam, and DistrictHeatingSteam
+Implement steam features
 ================
 
 **Dareum Nam, NREL**
@@ -9,7 +9,7 @@ Three New Steam Systems: HeatExchanger:SteamToWater, LoadProfile:Plant:Steam, an
 
 ## Justification for New Feature ##
 
-Steam heating for hot water loops is common in university campuses and cities like New York. Often, steam energy is transferred at the building to a hot water system via a heat exchanger. Currently users can make both steam and hot water systems, but cannot link them together. This forces modelers to use HW boilers/systems to approximate the steam systems, which isn’t accurate and reduces confidence in the energy model. The request for this new feature came from Bractlet. There have also been several upvotes on the new feature request from EnergyPlus Github.
+Steam heating for hot water loops is common in university campuses and cities like New York. Often, steam energy is transferred at the building to a hot water system via a heat exchanger. Currently users can make both steam and hot water systems, but cannot link them together. This forces modelers to use HW boilers/systems to approximate the steam systems, which isn’t accurate and reduces confidence in the energy model. The request for steam to water heat exchanger came from Bractlet. There have also been several upvotes on the new feature request from EnergyPlus Github. In addition, the current energyplus does not allow to use districtheating and LoadProfile:Plant in a steam loop.
 
 ## E-mail and Conference Call Conclusions ##
 
@@ -17,7 +17,6 @@ EnergyPlus Technicalities Call on 2/24/2021
 - We only have one phase steam plant fluid modeling. There is a lot of room for improvement and basic validation of current steam plant.
 - If we are going to add more complexity to remove assumptions, we need new ways to find those value; for example, how do we calculate the quality if we want to remove quality 0 & 1 assumption?
 - New systems could use current assumption for now. And if CoolProp is implemented, the steam systems can be renewed with enthalpy-based system.
-- 
 
 ## Overview ##
 
@@ -30,10 +29,16 @@ Steam loop is assumed to have no transportation losses by friction and heat tran
 Boiler operation is assumed to generate steam at quality equal to 1 every time and steam enters the coils at boiler outlet conditions
 Steam coils are designed with steam traps, which only allow condensed steam to leave the coil; hence the steam always condenses and leaves the coil at quality of 0
 
-These assumptions are applied to the new objects.
+These assumptions are applied to the new objects: LoadProfile:Plant in a steam loop, districtheatingsteam, and steam to water heat exchanger.
 
 ## Approach ##
 
+1. The current LoadProfile:Plant calculates the outlet water temperature based on the inlet water temperature from the plant loop and user inputs for the scheduled plant load and the requested flow rate. 
+In the new LoadProfile:Plant, three additional input fields were added: Plant Loop Fluid Type (Water or steam); Degree of SubCooling (optional input for steam loop); and Degree of Loop SubCooling (otional input for steam loop). The new LoadProfile:Plant in a steam loop calculates the outlet mass flow rate based on the scheduled plant load and user inputs of degree of subcooling, because the inlet steam temperature and the outlet steam temperature before the steam trap are fixed to saturation temperature according to the assumption.
+
+2. Like DistrictHeating or DistrictCooling, DistrictHeatingSteam calculates the output capacity necessary from the inlet temperature to the setpoint temperature for that loop with the given mass flow rate in Watts.
+
+3. H
 Figure 1 describes the loop structure with steam to water heat exchanger.
 
 ![figure1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/figure1.png)

@@ -182,7 +182,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
             EnergyType = DataPlant::PlantEquipmentType::PurchChilledWater;
             coolIndex++;
             thisIndex = coolIndex;
-        } else {
+        } else { // EnergySourceNum > NumDistrictUnitsHeat + NumDistrictUnitsCool
             state.dataIPShortCut->cCurrentModuleObject = "DistrictHeatingSteam";
             objType = DataLoopNode::ConnectionObjectType::DistrictHeatingSteam;
             nodeNames = "Steam Nodes";
@@ -514,12 +514,35 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                 this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
                 MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             }
-        } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) {
-            this->OutletTemp = FluidProperties::GetSatTemperatureRefrig(state,
-                                                                        state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                                                        state.dataEnvrn->StdBaroPress,
-                                                                        state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
-                                                                        RoutineName);
+        } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on MyLoad
+            Real64 SatTemp = FluidProperties::GetSatTemperatureRefrig(state,
+                                                                      state.dataPlnt->PlantLoop(LoopNum).FluidName,
+                                                                      state.dataEnvrn->StdBaroPress,
+                                                                      state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
+                                                                      RoutineName);
+
+            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                          this->InletTemp,
+                                                                          1.0,
+                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                          RoutineName);
+            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                           this->InletTemp,
+                                                                           0.0,
+                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                           RoutineName);
+            Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
+            Real64 SteamMassFlowRate = MyLoad / LatentHeatSteam;
+
+            PlantUtilities::SetComponentFlowRate(state, SteamMassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
+
+            this->MassFlowRate = SteamMassFlowRate;
+            this->OutletTemp = SatTemp;
+            this->OutletSteamQuality = 1.0;
+            MyLoad = this->MassFlowRate * LatentHeatSteam;
+            state.dataLoopNodes->Node(this->OutletNodeNum).Quality = this->OutletSteamQuality;
         }
     } else {
         this->OutletTemp = this->InletTemp;
