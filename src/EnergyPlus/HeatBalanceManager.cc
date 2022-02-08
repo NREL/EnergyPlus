@@ -6036,6 +6036,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->CrossedColdThresh.dimension(state.dataGlobal->NumOfZones, false);
         state.dataHeatBalFanSys->CrossedHeatThresh.dimension(state.dataGlobal->NumOfZones, false);
         state.dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);

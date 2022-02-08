@@ -5536,17 +5536,16 @@ void CalcThermalResilience(EnergyPlusData &state)
 void ReportThermalResilience(EnergyPlusData &state)
 {
 
-    int HINoBins = 5;               // Heat Index range - number of bins
-    int HumidexNoBins = 5;          // Humidex range - number of bins
-    int SETNoBins = 4;              // SET report column numbers
-    int ColdHourOfSafetyNoBins = 4; // Cold Stress Hour of Safety number of columns
-    int HeatHourOfSafetyNoBins = 4; // Heat Stress Hour of Safety number of columns
-    int UnmetDegreeHourNoBins = 4;  // Unmet Degree Hour number of columns
-    int DiscomfortWtExceedHourNoBins = 4;  // Unmet Degree Hour number of columns
+    int HINoBins = 5;                     // Heat Index range - number of bins
+    int HumidexNoBins = 5;                // Humidex range - number of bins
+    int SETNoBins = 4;                    // SET report column numbers
+    int ColdHourOfSafetyNoBins = 4;       // Cold Stress Hour of Safety number of columns
+    int HeatHourOfSafetyNoBins = 4;       // Heat Stress Hour of Safety number of columns
+    int UnmetDegreeHourNoBins = 4;        // Unmet Degree Hour number of columns
+    int DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
 
-    // fixme: to be implemented
-    int currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-    int ReportPeriodIdx = findReportPeriodIdx(state, currentDate, state.dataGlobal->HourOfDay);
+    int ReportPeriodIdx =
+        findReportPeriodIdx(state, state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay);
 
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
@@ -5556,7 +5555,12 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            // the whole period
             state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum).assign(HINoBins, 0.0);
+            // user specified reporting period
+            for (int i = 1; i <= state.dataWeatherManager->TotReportPers; i++) {
+                state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
+            }
             state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum).assign(HINoBins, 0.0);
             state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
             state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
@@ -5695,6 +5699,28 @@ void ReportThermalResilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum)[4] += NumOcc * state.dataGlobal->TimeStepZone;
             }
 
+            if (ReportPeriodIdx > 0) {
+                // fixme: debug print
+                // fixme: move to outer loop
+                fmt::print("Environment {}, date {}/{} {}-{}\n",
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->Year,
+                           state.dataEnvrn->CurMnDy,
+                           state.dataGlobal->HourOfDay,
+                           state.dataGlobal->TimeStep);
+                if (HI <= 26.7) {
+                    state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                } else if (HI > 26.7 && HI <= 32.2) {
+                    state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] += state.dataGlobal->TimeStepZone;
+                } else if (HI > 32.2 && HI <= 39.4) {
+                    state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                } else if (HI > 39.4 && HI <= 51.7) {
+                    state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] += state.dataGlobal->TimeStepZone;
+                } else {
+                    state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] += state.dataGlobal->TimeStepZone;
+                }
+            }
+
             if (Humidex <= 29) {
                 state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
@@ -5718,11 +5744,13 @@ void ReportThermalResilience(EnergyPlusData &state)
 
             if ((CoolingSetpoint > 0) && (Temperature > CoolingSetpoint)) {
                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[0] += (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[1] += NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[1] +=
+                    NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
             }
             if ((HeatingSetpoint > 0) && (Temperature < HeatingSetpoint)) {
                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[2] += (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[3] += NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[3] +=
+                    NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
             }
 
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
@@ -5900,20 +5928,25 @@ void ReportVisualResilience(EnergyPlusData &state)
     } // loop over zones
 }
 
-int findReportPeriodIdx(EnergyPlusData &state, const int currentDate, const int currentHour)
+int findReportPeriodIdx(EnergyPlusData &state, const int Year, const int Month, const int Day, const int Hour)
 {
     // fixme: test case for returning -1 or not
     int nReportPeriods = state.dataWeatherManager->TotReportPers;
+    int currentDate;
     for (int i = 1; i <= nReportPeriods; i++) {
         int reportStartDate = state.dataWeatherManager->ReportPeriodInput(i).startJulianDate;
         int reportStartHour = state.dataWeatherManager->ReportPeriodInput(i).startHour;
         int reportEndDate = state.dataWeatherManager->ReportPeriodInput(i).endJulianDate;
         int reportEndHour = state.dataWeatherManager->ReportPeriodInput(i).endHour;
-        if (General::BetweenDateHours(currentDate, currentHour, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {
+        if (state.dataWeatherManager->ReportPeriodInput(i).startYear > 0) {
+            currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        } else {
+            currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        }
+        if (General::BetweenDateHours(currentDate, Hour, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {
             return i;
         };
     }
-    // means didn't find a match
     return -1;
 }
 

@@ -625,6 +625,8 @@ namespace OutputReportTabular {
 
     void WriteAdaptiveComfortTable(EnergyPlusData &state);
 
+    void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const periodIdx);
+
     void WriteThermalResilienceTables(EnergyPlusData &state);
 
     void WriteCO2ResilienceTables(EnergyPlusData &state);

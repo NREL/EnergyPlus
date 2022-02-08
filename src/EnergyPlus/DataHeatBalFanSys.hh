@@ -262,6 +262,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D_int ZoneNumOcc;
 
     Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
+    Array2D<std::vector<Real64>>ZoneHeatIndexHourBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneHumidexHourBins;
     Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
     Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;

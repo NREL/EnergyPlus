@@ -3236,6 +3236,7 @@ void WriteTableOfContents(EnergyPlusData &state)
     static std::string const Annual_Thermal_Resilience_Summary("Annual Thermal Resilience Summary");
     static std::string const Annual_CO2_Resilience_Summary("Annual CO2 Resilience Summary");
     static std::string const Annual_Visual_Resilience_Summary("Annual Visual Resilience Summary");
+    static std::string const ReportPeriod_Thermal_Resilience_Summary("Reporting Period Thermal Resilience Summary");
 
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
@@ -5259,6 +5260,9 @@ void WriteTabularReports(EnergyPlusData &state)
         WriteEioTables(state);
         WriteLoadComponentSummaryTables(state);
         WriteHeatEmissionTable(state);
+        for (int i = 1; i <= state.dataWeatherManager->TotReportPers; i++) {
+            WriteThermalResilienceTablesRepPeriod(state, i);
+        }
 
         if (ort->displayThermalResilienceSummary) WriteThermalResilienceTables(state);
         if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
@@ -12357,6 +12361,93 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
                 tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
         }
     }
+}
+
+void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const periodIdx) {
+
+        Array1D_string columnHead(5);
+        Array1D_int columnWidth;
+        Array1D_string rowHead;
+        Array2D_string tableBody;
+        auto &ort(state.dataOutRptTab);
+
+        // Should deallocate after writing table. - LKL
+        int columnNum = 5;
+
+        if (ort->WriteTabularFiles) {
+
+            rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+            tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
+
+            WriteReportHeaders(state, "Heat Index Hours", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            // fixme: add reporting period data accessed with periodIdx
+            WriteSubtitle(state,
+                          format("Report period: {}/{}/{} {}:00 -- {}/{}/{} {}:00",
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear,
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endYear,
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
+                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+
+            columnWidth.allocate(5);
+            columnWidth = 10;
+            columnHead(1) = "Safe (≤ 26.7°C) [hr]";
+            columnHead(2) = "Caution (> 26.7, ≤ 32.2°C) [hr]";
+            columnHead(3) = "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]";
+            columnHead(4) = "Danger (> 39.4, ≤ 51.7°C) [hr]";
+            columnHead(5) = "Extreme Danger (> 51.7°C) [hr]";
+
+            tableBody = "";
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
+                for (int j = 1; j <= columnNum; j++) {
+                    tableBody(j, ZoneNum) = RealToStr(state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, periodIdx)[j], 2);
+                }
+            }
+
+            std::vector<Real64> columnMax(columnNum, 0);
+            std::vector<Real64> columnMin(columnNum, 0);
+            std::vector<Real64> columnSum(columnNum, 0);
+
+            for (int j = 0; j < columnNum; j++) {
+                columnMin[j] = state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, periodIdx)[j + 1];
+            }
+            for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
+                std::string ZoneName = state.dataHeatBal->Zone(i).Name;
+                for (int j = 0; j < columnNum; j++) {
+                    Real64 curValue = state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(i, periodIdx)[j + 1];
+                    if (curValue > columnMax[j]) columnMax[j] = curValue;
+                    if (curValue < columnMin[j]) columnMin[j] = curValue;
+                    columnSum[j] += curValue;
+                }
+            }
+
+            rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
+            rowHead(state.dataGlobal->NumOfZones + 2) = "Max";
+            rowHead(state.dataGlobal->NumOfZones + 3) = "Average";
+            rowHead(state.dataGlobal->NumOfZones + 4) = "Sum";
+
+            for (int j = 0; j < columnNum; j++) {
+                tableBody(j + 1, state.dataGlobal->NumOfZones + 1) = RealToStr(columnMin[j], 2);
+                tableBody(j + 1, state.dataGlobal->NumOfZones + 2) = RealToStr(columnMax[j], 2);
+                tableBody(j + 1, state.dataGlobal->NumOfZones + 3) = RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2);
+                tableBody(j + 1, state.dataGlobal->NumOfZones + 4) = RealToStr(columnSum[j], 2);
+            }
+
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+
+//            if (state.dataSQLiteProcedures->sqlite) {
+//                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+//                    tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+//            }
+//            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+//                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+//                    tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
+//            }
+        }
 }
 
 void WriteResilienceBinsTable(EnergyPlusData &state,
