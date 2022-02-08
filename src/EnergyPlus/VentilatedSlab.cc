@@ -275,6 +275,7 @@ namespace VentilatedSlab {
 
         std::array<std::string_view, static_cast<int>(OutsideAirControlType::Num)> OutsideAirControlTypeNamesUC{
             "VARIABLEPERCENT", "FIXEDTEMPERATURE", "FIXEDAMOUNT"};
+        std::array<std::string_view, static_cast<int>(CoilType::Num)> CoilTypeNamesUC{"NONE", "HEATING", "COOLING", "HEATINGANDCOOLING"};
 
         // Figure out how many Ventilated Slab Systems there are in the input file
 
@@ -481,61 +482,61 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
             state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow = state.dataIPShortCut->rNumericArgs(3);
 
-            state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType =
-                static_cast<OutsideAirControlType>(getEnumerationValue(OutsideAirControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+            state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType = static_cast<OutsideAirControlType>(
+                getEnumerationValue(OutsideAirControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
 
-            switch(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType){
+            switch (state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType) {
             case OutsideAirControlType::VariablePercent: {
-                    state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(6);
-                    state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
-                    if (state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr == 0) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
-                        ErrorsFound = true;
-                    } else if (!CheckScheduleValueMinMax(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(7) + "\" values out of range [0,1].");
-                        ErrorsFound = true;
-                    }
-                    break;
-                }
-                case OutsideAirControlType::FixedOAControl: {
-                    state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(7);
-                    state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
-                    if (state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr == 0) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
-                        ErrorsFound = true;
-                    } else if (!CheckScheduleValueMinMax(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0)) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(7) + "\" values out of range (must be >=0).");
-                        ErrorsFound = true;
-                    }
-                    break;
-                }
-                case OutsideAirControlType::FixedTemperature: {
-                    state.dataVentilatedSlab->VentSlab(Item).TempSchedName = state.dataIPShortCut->cAlphaArgs(7);
-                    state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
-                    if (state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr == 0) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
-                        ErrorsFound = true;
-                    }
-                    break;
-                }
-                default: {
+                state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(6);
+                state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
+                    GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
+                if (state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(5) + "\".");
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
+                    ErrorsFound = true;
+                } else if (!CheckScheduleValueMinMax(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(7) + "\" values out of range [0,1].");
+                    ErrorsFound = true;
                 }
+                break;
+            }
+            case OutsideAirControlType::FixedOAControl: {
+                state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(7);
+                state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
+                    GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
+                if (state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr == 0) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
+                    ErrorsFound = true;
+                } else if (!CheckScheduleValueMinMax(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0)) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(7) + "\" values out of range (must be >=0).");
+                    ErrorsFound = true;
+                }
+                break;
+            }
+            case OutsideAirControlType::FixedTemperature: {
+                state.dataVentilatedSlab->VentSlab(Item).TempSchedName = state.dataIPShortCut->cAlphaArgs(7);
+                state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr =
+                    GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
+                if (state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr == 0) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
+                    ErrorsFound = true;
+                }
+                break;
+            }
+            default: {
+                ShowSevereError(state,
+                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(5) + "\".");
+            }
             }
 
             state.dataVentilatedSlab->VentSlab(Item).MinOASchedName = state.dataIPShortCut->cAlphaArgs(6);
@@ -971,22 +972,14 @@ namespace VentilatedSlab {
 
             // Coil options assign
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(26));
-                if (SELECT_CASE_var == "HEATINGANDCOOLING") {
-                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::Both;
-                } else if (SELECT_CASE_var == "HEATING") {
-                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::Heating;
-                } else if (SELECT_CASE_var == "COOLING") {
-                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::Cooling;
-                } else if (SELECT_CASE_var == "NONE") {
-                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::None;
-                } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(26) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(26) + "\".");
-                    ErrorsFound = true;
-                }
+            state.dataVentilatedSlab->VentSlab(Item).coilOption =
+                static_cast<CoilType>(getEnumerationValue(CoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(26))));
+
+            if (state.dataVentilatedSlab->VentSlab(Item).coilOption == CoilType::Invalid) {
+                ShowSevereError(state,
+                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(26) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(26) + "\".");
+                ErrorsFound = true;
             }
 
             if (state.dataVentilatedSlab->VentSlab(Item).coilOption == CoilType::Both ||
