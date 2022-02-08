@@ -46,6 +46,9 @@ macro(CREATE_CPYTHON_PROJECT)
     # Add cpython as an external project that will be included in the build
     if (MSVC)
         ExternalProject_Add(CPYTHON
+                URL https://github.com/python/cpython/archive/refs/tags/v3.10.2.tar.gz
+                URL_HASH SHA256=1818464b0285e8eb90e2495f9a4c506f6a01774879e6737af517adb524fffe4e
+                BUILD_IN_SOURCE 1
                 SOURCE_DIR ${CPYTHON_DIR}
                 CONFIGURE_COMMAND ""
                 BUILD_COMMAND cd ${CPYTHON_DIR} && ${CPYTHON_DIR}/PCbuild/build.bat ${CPYTHON_BUILD_TYPE_FLAG} -p ${CPYTHON_PLATFORM}
@@ -54,6 +57,9 @@ macro(CREATE_CPYTHON_PROJECT)
                 )
     else ()
         ExternalProject_Add(CPYTHON
+                URL https://github.com/python/cpython/archive/refs/tags/v3.10.2.tar.gz
+                URL_HASH SHA256=1818464b0285e8eb90e2495f9a4c506f6a01774879e6737af517adb524fffe4e
+                BUILD_IN_SOURCE 1
                 SOURCE_DIR ${CPYTHON_DIR}
                 CONFIGURE_COMMAND cd ${CPYTHON_DIR} && ./configure --enable-shared # --enable-optimizations
                 BUILD_COMMAND cd ${CPYTHON_DIR} && make -j 4
