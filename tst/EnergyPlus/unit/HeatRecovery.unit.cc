@@ -66,10 +66,14 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
-#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/MixerComponent.hh>
+#include <EnergyPlus/HVACFan.hh>
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -4334,10 +4338,11 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     // 2022-01: For now, place the unit test here; may move to a new place with other tests later.
     std::string const idf_objects = delimited_string({
         "! Zone1,",
-
         "! Zone2,",
 
         "! AirLoopHVAC:ZoneMixer,",
+        "! Mixer1,"
+        "! Mixer2,",
 
         "! Fan:SystemModel,",
 
@@ -4465,11 +4470,23 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     ASSERT_TRUE(process_idf(idf_objects));
     ScheduleManager::ProcessScheduleInput(*state);
 
+    // Preset some elements
+    state->dataHeatBal->Zone.allocate(4);
+    state->dataSize->FinalZoneSizing.allocate(4);
+
+    state->dataMixerComponent->MixerCond.allocate(2);
+    state->dataMixerComponent->MixerCond(1).MixerName = "MIXER1";
+    state->dataMixerComponent->MixerCond(2).MixerName = "MIXER2";
+
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan1"));
+    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan2"));
+
     // Call the processing codes
     ExhaustAirSystemManager::GetZoneExhaustControlInput(*state);
 
     ExhaustAirSystemManager::GetExhaustAirSystemInput(*state);
 
     // Expected values:
+    // EXPECT_STREQ();
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(1).DesignExhaustFlowRate, 0.1, 1e-5);
 }
