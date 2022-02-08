@@ -823,7 +823,7 @@ if(LINK_WITH_PYTHON)
   target_link_libraries(energyplusapi PRIVATE cpython_library)
 endif()
 
-set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
+set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@loader_path")
 install(
   TARGETS energyplusapi
   RUNTIME DESTINATION ./
