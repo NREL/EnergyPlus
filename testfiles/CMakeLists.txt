@@ -47,6 +47,7 @@ add_simulation_test(IDF_FILE 5ZoneAirCooledDemandLimiting_ReductionRatioVentilat
 add_simulation_test(IDF_FILE 5ZoneAirCooledWithCoupledInGradeSlab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledWithCoupledInGradeSlab_HorizInsThickness.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledWithDOASAirLoop.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE 5ZoneAirCooledWithDOASAirLoop_ExhaustSystem.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_AirBoundaries.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_AirBoundaries_Daylighting.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled_RunaroundHeatRecovery.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
