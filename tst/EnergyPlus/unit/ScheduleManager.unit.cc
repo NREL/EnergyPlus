@@ -1333,47 +1333,86 @@ TEST_F(EnergyPlusFixture, ScheduleFileDSTtoggleOptionTest)
 {
     // P. Shrestha - February 2022
 
-    // TODO: create this file with test data in it.
+    // TODO: create this file with test data in it. (PS: Created)
     // This test will fail until you do that.
     fs::path scheduleFile = configured_source_directory() / "tst/EnergyPlus/unit/Resources/schedule_file1.csv";
 
-    std::string const idf_objects = delimited_string({"Schedule:File,",
-                                                      "  Test1,                   !- Name",
-                                                      "  ,                        !- Schedule Type Limits Name",
-                                                      "  " + scheduleFile.string() + ",              !- File Name",
-                                                      "  1,                       !- Column Number",
-                                                      "  0,                       !- Rows to Skip at Top",
-                                                      "  8760,                    !- Number of Hours of Data",
-                                                      "  Space,                   !- Column Separator",
-                                                      "  No,                      !- Interpolate to Timestep",
-                                                      "  60,                      !- Minutes per item",
-                                                      "  Yes;                     !- Adjust Schedule for Daylight Savings"});
+    std::string const idf_objects = delimited_string({
+        "Schedule:File,",
+        "  Test1,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  1,                       !- Column Number",
+        "  0,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",         // Changed the "space" separators to "comma"
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  Yes,                     !- Adjust Schedule for Daylight Savings",
+        " ",
+        "Schedule:File,",
+        "  Test2,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  1,                       !- Column Number",
+        "  0,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  No,                     !- Adjust Schedule for Daylight Savings",
+        " ",
+        "Schedule:File,",
+        "  Test3,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  1,                       !- Column Number",
+        "  0,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  ;                     !- Adjust Schedule for Daylight Savings",
+        " ",
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    const int sch1idx = GetScheduleIndex(*state, "TEST1");
-    ScheduleManager::ScheduleData &sch1 = state->dataScheduleMgr->Schedule(sch1idx);
 
-    // Checks that the member variable got set correctly.
-    ASSERT_TRUE(sch1.UseDaylightSaving);
+
 
     // TODO: Add additional Schedule:File blocks above that test other possibilities to make sure they work right
     // such as: 1.) Setting to "No"
     //          2.) Leaving empty (should default to "No")
     //          3.) Omitting the last field (should default to "No")
+
+    // (PS: TODO items above -- Done)
+    
     // Test that each option sets UseDaylightSaving correctly on the each schedule.
 
-    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're in daylight savings
+    const int sch1idx = GetScheduleIndex(*state, "TEST1"); //Index of the IDF schedule object identified
+    ScheduleManager::ScheduleData &sch1 = state->dataScheduleMgr->Schedule(sch1idx); //sch1 object initialized of type ScheduleData
+    ASSERT_TRUE(sch1.UseDaylightSaving); // Checks that the member variable got set correctly.
+    state->dataEnvrn->DSTIndicator = 1;  // Tells the simulation that we're in daylight savings
+    EXPECT_EQ(state->dataGlobal->HourOfDay + state->dataEnvrn->DSTIndicator,
+              ScheduleManager::LookUpScheduleValue(*state, state->dataScheduleMgr->Schedule(sch1idx), state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
 
-    // TODO: Call LookUpScheduleValue with DSTIndicator on and off and check that the correct hour of data is being returned.
-
+    const int sch1idx = GetScheduleIndex(*state, "TEST2");
+    ScheduleManager::ScheduleData &sch2 = state->dataScheduleMgr->Schedule(sch1idx);
+    ASSERT_TRUE(sch2.UseDaylightSaving);
     state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT in daylight savings
-    // Commenting out your previous testing code below
-    /* ScheduleManager::UpdateScheduleValues(*state);
+    EXPECT_EQ(state->dataGlobal->HourOfDay,
+              ScheduleManager::LookUpScheduleValue(
+                  *state, state->dataScheduleMgr->Schedule(sch1idx), state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
 
-    EXPECT_EQ("Yes", ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-    EXPECT_EQ("No", ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-    EXPECT_EQ(NULL, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
+    const int sch1idx = GetScheduleIndex(*state, "TEST3");
+    ScheduleManager::ScheduleData &sch3 = state->dataScheduleMgr->Schedule(sch1idx);
+    ASSERT_FALSE(sch3.UseDaylightSaving);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT in daylight savings
+    EXPECT_EQ(state->dataGlobal->HourOfDay,
+              ScheduleManager::LookUpScheduleValue(
+                  *state, state->dataScheduleMgr->Schedule(sch1idx), state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
+    // TODO: Call LookUpScheduleValue with DSTIndicator on and off and check that the correct hour of data is being returned. (PS -- Done)
 
-    EXPECT_EQ("Yes", ScheduleManager::ScheduleData(     ));*/
-    // EXPECT_TRUE()
+    
+    
 }
