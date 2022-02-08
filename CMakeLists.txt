@@ -137,15 +137,6 @@ endif()
 #######################################################################
 
 option(LINK_WITH_PYTHON "Link with Python Library for Python Plugin Builds" OFF)
-if(LINK_WITH_PYTHON)
-  if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/CPython/LICENSE)
-    message(STATUS "LINK_WITH_PYTHON=ON and CPython found, excellent...")
-  else()
-    message(SEND_ERROR "LINK_WITH_PYTHON enabled, but third_party/CPython is not set up yet.")
-    message(SEND_ERROR "For Git command line usage, cd into third_party/CPython and run git submodule init then git submodule update!")
-    message(FATAL_ERROR "For TortoiseGit and similar tools, see the Submodule Update section here: https://tortoisegit.org/docs/tortoisegit/tgit-dug-submodules.html")
-  endif()
-endif()
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
