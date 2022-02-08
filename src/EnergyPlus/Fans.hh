@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -261,18 +261,18 @@ namespace Fans {
 
     void ReportFan(EnergyPlusData &state, int FanNum);
 
-    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
+    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view const ThisObjectType = {});
 
     void GetFanVolFlow(EnergyPlusData &state, int FanIndex, Real64 &FanVolFlow);
 
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
     void GetFanType(EnergyPlusData &state,
-                    std::string const &FanName,               // Fan name
-                    int &FanType,                             // returned fantype number
-                    bool &ErrorsFound,                        // error indicator
-                    Optional_string_const ThisObjectType = _, // parent object type (for error message)
-                    Optional_string_const ThisObjectName = _  // parent object name (for error message)
+                    std::string const &FanName,                 // Fan name
+                    int &FanType,                               // returned fantype number
+                    bool &ErrorsFound,                          // error indicator
+                    std::string_view const ThisObjectType = {}, // parent object type (for error message)
+                    std::string_view const ThisObjectName = {}  // parent object name (for error message)
     );
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
@@ -289,8 +289,8 @@ namespace Fans {
     );
 
     int getFanInNodeIndex(EnergyPlusData &state,
-                          int const &FanIndex, // fan index
-                          bool &ErrorsFound    // set to true if problem
+                          int FanIndex,     // fan index
+                          bool &ErrorsFound // set to true if problem
     );
 
     int GetFanOutletNode(EnergyPlusData &state,
@@ -340,7 +340,7 @@ namespace Fans {
     void SetFanAirLoopNumber(EnergyPlusData &state, int FanIndex, int AirLoopNum);
 
     void FanInputsForDesHeatGain(EnergyPlusData &state,
-                                 int const &fanIndex,
+                                 int fanIndex,
                                  Real64 &deltaP,
                                  Real64 &motEff,
                                  Real64 &totEff,

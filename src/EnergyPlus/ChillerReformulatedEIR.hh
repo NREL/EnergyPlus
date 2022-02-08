@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,9 +67,10 @@ namespace ChillerReformulatedEIR {
 
     enum class PLR
     {
-        Unassigned,
+        Invalid = -1,
         LeavingCondenserWaterTemperature, // Type 1_LeavingCondenserWaterTemperature
-        Lift                              // Type 2_Lift
+        Lift,                             // Type 2_Lift
+        Num
     };
 
     struct ReformulatedEIRChillerSpecs : PlantComponent
@@ -170,18 +171,9 @@ namespace ChillerReformulatedEIR {
         int IterFailedIndex;           // Index to iteration limit failed for RegulaFalsi routine
         int DeltaTErrCount;            // Evaporator delta T equals 0 for variable flow chiller warning messages
         int DeltaTErrCountIndex;       // Index to evaporator delta T = 0 for variable flow chiller warning messages
-        int CWLoopNum;                 // chilled water plant loop index number
-        int CWLoopSideNum;             // chilled water plant loop side index
-        int CWBranchNum;               // chilled water plant loop branch index
-        int CWCompNum;                 // chilled water plant loop component index
-        int CDLoopNum;                 // condenser water plant loop index number
-        int CDLoopSideNum;             // condenser water plant loop side index
-        int CDBranchNum;               // condenser water plant loop branch index
-        int CDCompNum;                 // condenser water plant loop component index
-        int HRLoopNum;                 // heat recovery water plant loop index
-        int HRLoopSideNum;             // heat recovery water plant loop side index
-        int HRBranchNum;               // heat recovery water plant loop branch index
-        int HRCompNum;                 // heat recovery water plant loop component index
+        PlantLocation CWPlantLoc;      // chilled water plant loop component index
+        PlantLocation CDPlantLoc;      // condenser water plant loop component index
+        PlantLocation HRPlantLoc;      // heat recovery water plant loop component index
         int CondMassFlowIndex;
         bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
         // Operational fault parameters
@@ -218,16 +210,16 @@ namespace ChillerReformulatedEIR {
         Real64 EnergyHeatRecovery; // Energy recovered from water-cooled condenser [J]
         Real64 HeatRecInletTemp;   // Heat reclaim inlet temperature [C]
         Real64 HeatRecMassFlow;    // Heat reclaim mass flow rate [kg/s]
-        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlType EquipFlowCtrl;
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0),
-              RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
-              ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
-              CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
-              CondInletNodeNum(0), CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0),
-              TempRefCondIn(0.0), TempRefCondOut(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Invalid), PartLoadCurveType(PLR::Invalid), RefCap(0.0), RefCapWasAutoSized(false),
+              RefCOP(0.0), FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
+              CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
+              CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0), TempRefCondIn(0.0),
+              TempRefCondOut(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), SizFac(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
               HeatRecInletLimitSchedNum(0), ChillerCapFTIndex(0), ChillerEIRFTIndex(0), ChillerEIRFPLRIndex(0), ChillerCapFTError(0),
@@ -238,15 +230,14 @@ namespace ChillerReformulatedEIR {
               ChillerTdevNomMax(10.0), CAPFTXIter(0), CAPFTXIterIndex(0), CAPFTYIter(0), CAPFTYIterIndex(0), EIRFTXIter(0), EIRFTXIterIndex(0),
               EIRFTYIter(0), EIRFTYIterIndex(0), EIRFPLRTIter(0), EIRFPLRTIterIndex(0), EIRFPLRPLRIter(0), EIRFPLRPLRIterIndex(0),
               FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), IterLimitExceededNum(0), IterLimitErrIndex(0),
-              IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0),
-              CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
-              HRCompNum(0), CondMassFlowIndex(0), PossibleSubcooling(false), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
+              IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0), CWPlantLoc{}, CDPlantLoc{}, HRPlantLoc{},
+              CondMassFlowIndex(0), PossibleSubcooling(false), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
               FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true), MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0),
               ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0), ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0),
               ChillerCapFT(0.0), HeatRecOutletTemp(0.0), QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0),
               CondOutletTemp(0.0), EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
               CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecMassFlow(0.0),
-              EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              EquipFlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid)
         {
         }
 

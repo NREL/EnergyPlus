@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,13 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace ThermalComfort {
+
+    Real64 constexpr TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
+    Real64 constexpr ActLevelConv = 58.2;                        // Converter for activity level (1Met = 58.2 W/m2)
+    Real64 constexpr BodySurfArea = 1.8;                         // Dubois body surface area of the human body (m2)
+    Real64 constexpr BodySurfAreaPierce = 1.8258;                // Pierce two node body surface area of the human body (m2)
+    Real64 constexpr RadSurfEff = 0.72;                          // Fraction of surface effective for radiation
+    Real64 constexpr StefanBoltz = 5.6697e-8;                    // Stefan-Boltzmann constant (W/m2K4)
 
     struct ThermalComfortDataType
     {
@@ -255,14 +262,6 @@ struct ThermalComfortsData : BaseGlobalStruct
     int AnkleDraftAirVelWarningInd = 0;       // Counter for ankle draft invalid air velocity warnings.
     int AnkleDraftCloUnitWarningInd = 0;      // Counter for ankle draft invalid clothing unit warnings.
     int AnkleDraftActMetWarningInd = 0;       // Counter for ankle draft invalid activity level warnings.
-
-    // MODULE PARAMETER DEFINITIONS
-    Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
-    Real64 const ActLevelConv = 58.2;                        // Converter for activity level (1Met = 58.2 W/m2)
-    Real64 const BodySurfArea = 1.8;                         // Dubois body surface area of the human body (m2)
-    Real64 const BodySurfAreaPierce = 1.8258;                // Pierce two node body surface area of the human body (m2)
-    Real64 const RadSurfEff = 0.72;                          // Fraction of surface effective for radiation
-    Real64 const StefanBoltz = 5.6697e-8;                    // Stefan-Boltzmann constant (W/m2K4)
 
     // MODULE VARIABLE DECLARATIONS:
     Real64 AbsAirTemp = 0.0;                // Absolute air temperature; K

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -163,11 +163,11 @@ namespace AirLoopHVACDOAS {
                 thisMixer.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                               thisMixer.OutletNodeName,
                                                                               errorsFound,
-                                                                              cCurrentModuleObject,
+                                                                              DataLoopNode::ConnectionObjectType::AirLoopHVACMixer,
                                                                               thisObjectName,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              DataLoopNode::ConnectionType::Outlet,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               DataLoopNode::ObjectIsParent);
 
                 auto NodeNames = fields.find("nodes");
@@ -460,7 +460,7 @@ namespace AirLoopHVACDOAS {
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         thisDOAS.m_FanTypeNum = SimAirServingZones::CompType::Fan_ComponentModel;
-                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound, ObjexxFCL::Optional_string_const());
+                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound);
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;
@@ -501,19 +501,8 @@ namespace AirLoopHVACDOAS {
                                               "The control node number is not found in " + CurrentModuleObject + " = " +
                                                   state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                                CompName,
-                                                                DataPlant::TypeOf_CoilWaterCooling,
-                                                                thisDOAS.CWLoopNum,
-                                                                thisDOAS.CWLoopSide,
-                                                                thisDOAS.CWBranchNum,
-                                                                thisDOAS.CWCompNum,
-                                                                errorsFound,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _);
+                        PlantUtilities::ScanPlantLoopsForObject(
+                            state, CompName, DataPlant::PlantEquipmentType::CoilWaterCooling, thisDOAS.CWPlantLoc, errorsFound, _, _, _, _, _);
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
@@ -534,19 +523,8 @@ namespace AirLoopHVACDOAS {
                                               "The control node number is not found in " + CurrentModuleObject + " = " +
                                                   state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                                CompName,
-                                                                DataPlant::TypeOf_CoilWaterSimpleHeating,
-                                                                thisDOAS.HWLoopNum,
-                                                                thisDOAS.HWLoopSide,
-                                                                thisDOAS.HWBranchNum,
-                                                                thisDOAS.HWCompNum,
-                                                                errorsFound,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _);
+                        PlantUtilities::ScanPlantLoopsForObject(
+                            state, CompName, DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, thisDOAS.HWPlantLoc, errorsFound, _, _, _, _, _);
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
@@ -576,11 +554,8 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterDetailedFlatCooling,
-                                                                thisDOAS.CWLoopNum,
-                                                                thisDOAS.CWLoopSide,
-                                                                thisDOAS.CWBranchNum,
-                                                                thisDOAS.CWCompNum,
+                                                                DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
+                                                                thisDOAS.CWPlantLoc,
                                                                 errorsFound,
                                                                 _,
                                                                 _,
@@ -902,56 +877,44 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_HeatCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::HWInitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->HWCtrlNodeNum,
-                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->HWLoopNum,
-                                                       this->HWLoopSide,
-                                                       this->HWBranchNum,
-                                                       this->HWCompNum);
+                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum));
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->CWCtrlNodeNum,
-                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->CWLoopNum,
-                                                       this->CWLoopSide,
-                                                       this->CWBranchNum,
-                                                       this->CWCompNum);
+                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum));
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->CWCtrlNodeNum,
-                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->CWLoopNum,
-                                                       this->CWLoopSide,
-                                                       this->CWBranchNum,
-                                                       this->CWCompNum);
+                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum));
                 }
             }
 
@@ -1056,8 +1019,8 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
     {
 
-        int const summerDesignDayTypeIndex(9);
-        int const winterDesignDayTypeIndex(10);
+        int constexpr summerDesignDayTypeIndex(9);
+        int constexpr winterDesignDayTypeIndex(10);
 
         for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
             // Summer design day

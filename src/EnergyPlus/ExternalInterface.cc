@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -288,8 +288,8 @@ void StopExternalInterfaceIfError(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int retVal; // Return value, needed to catch return value of function call
-    int const flag1(-10);
-    int const flag2(-20);
+    int constexpr flag1(-10);
+    int constexpr flag2(-20);
 
     if ((state.dataExternalInterface->NumExternalInterfacesBCVTB != 0) || (state.dataExternalInterface->NumExternalInterfacesFMUExport != 0)) {
         if (state.dataExternalInterface->ErrorsFound) {
@@ -2322,7 +2322,7 @@ void CalcExternalInterface(EnergyPlusData &state)
     // using DataPrecisionGlobals;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const nDblMax(1024); // Maximum number of doubles
+    int constexpr nDblMax(1024); // Maximum number of doubles
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int i;      // Loop counter
@@ -2484,14 +2484,14 @@ void GetReportVariableKey(
     // Gets the sensor key index and type for the specified variable key and name
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound);         // 0=not found, 1=integer, 2=real, 3=meter
-    int numKeys(0);                                                                         // Number of keys found
-    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);             // Variable  is Averaged=1 or Summed=2
-    OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::TimeStepZone); // Variable time step is Zone=1 or HVAC=2
-    OutputProcessor::Unit varUnits(OutputProcessor::Unit::None);                            // Units sting, may be blank
-    Array1D_int keyIndexes;                                                                 // Array index for
-    Array1D_string NamesOfKeys;                                                             // Specific key name
-    int Loop, iKey;                                                                         // Loop counters
+    OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound); // 0=not found, 1=integer, 2=real, 3=meter
+    int numKeys(0);                                                                 // Number of keys found
+    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);     // Variable  is Averaged=1 or Summed=2
+    OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::Zone); // Variable time step is Zone=1 or HVAC=2
+    OutputProcessor::Unit varUnits(OutputProcessor::Unit::None);                    // Units sting, may be blank
+    Array1D_int keyIndexes;                                                         // Array index for
+    Array1D_string NamesOfKeys;                                                     // Specific key name
+    int Loop, iKey;                                                                 // Loop counters
 
     // Get pointers for variables to be sent to Ptolemy
     for (Loop = 1; Loop <= numberOfKeys; ++Loop) {

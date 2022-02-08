@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -272,7 +272,7 @@ namespace Construction {
         ConstructionProps()
             : TotLayers(0), TotSolidLayers(0), TotGlassLayers(0), LayerPoint(MaxLayersInConstruct, 0), IsUsed(false), IsUsedCTF(false),
               InsideAbsorpVis(0.0), OutsideAbsorpVis(0.0), InsideAbsorpSolar(0.0), OutsideAbsorpSolar(0.0), InsideAbsorpThermal(0.0),
-              OutsideAbsorpThermal(0.0), OutsideRoughness(DataSurfaces::SurfaceRoughness::Unassigned), DayltPropPtr(0), W5FrameDivider(0),
+              OutsideAbsorpThermal(0.0), OutsideRoughness(DataSurfaces::SurfaceRoughness::Invalid), DayltPropPtr(0), W5FrameDivider(0),
               CTFCross({0, MaxCTFTerms - 1}, 0.0), CTFFlux(MaxCTFTerms - 1, 0.0), CTFInside({0, MaxCTFTerms - 1}, 0.0),
               CTFOutside({0, MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0),
@@ -289,7 +289,7 @@ namespace Construction {
               TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0),
               tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0),
               abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0),
-              W5FileMullionOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), W5FileGlazingSysWidth(0.0), W5FileGlazingSysHeight(0.0),
+              W5FileMullionOrientation(DataWindowEquivalentLayer::Orientation::Invalid), W5FileGlazingSysWidth(0.0), W5FileGlazingSysHeight(0.0),
               SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0), SourceSinkPresent(false), TypeIsWindow(false), WindowTypeBSDF(false),
               TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0), TCLayer(0), TCMasterConst(0),
               TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -260,14 +260,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const VentilTempLimit(100.0);                                        // degrees Celsius
-    Real64 const MixingTempLimit(100.0);                                        // degrees Celsius
-    Real64 const VentilWSLimit(40.0);                                           // m/s
+    Real64 constexpr VentilTempLimit(100.0);                                    // degrees Celsius
+    Real64 constexpr MixingTempLimit(100.0);                                    // degrees Celsius
+    Real64 constexpr VentilWSLimit(40.0);                                       // m/s
     static constexpr std::string_view RoutineName("GetSimpleAirModelInputs: "); // include trailing blank space
     // Refrigeration Door Mixing Protection types, factors used to moderate mixing flow.
-    Real64 const RefDoorNone(0.0);
-    Real64 const RefDoorAirCurtain(0.5);
-    Real64 const RefDoorStripCurtain(0.9);
+    Real64 constexpr RefDoorNone(0.0);
+    Real64 constexpr RefDoorAirCurtain(0.5);
+    Real64 constexpr RefDoorStripCurtain(0.9);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array2D<Real64> SVals1;
@@ -574,9 +574,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         {
-            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = static_cast<AirBalance>(getEnumerationValue(
-                DataHeatBalance::AirBalanceTypeNamesUC, cAlphaArgs(3))); // Air balance method type character input-->convert to enum
-            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Unassigned) {
+            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = static_cast<AirBalance>(
+                getEnumerationValue(DataHeatBalance::AirBalanceTypeNamesUC,
+                                    UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
+            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Invalid) {
                 state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
                                  std::string{RoutineName} + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + " not valid choice for " +
@@ -4577,23 +4578,33 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         {
             static constexpr std::string_view RoomAirZoneFmt("RoomAir Model,{},{}\n");
 
-            auto const SELECT_CASE_var(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType);
-            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) {
+            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType) {
+            case DataRoomAirModel::RoomAirModel::Mixing: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "Mixing/Well-Stirred");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::Mundt: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "OneNodeDisplacementVentilation");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDDV: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "ThreeNodeDisplacementVentilation");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDCV: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "CrossVentilation");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDUFI: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UnderFloorAirDistributionInterior");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDUFE: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UnderFloorAirDistributionExterior");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UserDefined: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UserDefined");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::AirflowNetwork: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "AirflowNetwork");
+            } break;
+            default:
+                break;
             }
         }
     }

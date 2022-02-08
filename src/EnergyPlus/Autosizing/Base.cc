@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,7 @@ namespace EnergyPlus {
 void BaseSizer::initializeWithinEP(EnergyPlusData &state,
                                    std::string_view const _compType,
                                    std::string_view const _compName,
-                                   bool const &_printWarningFlag,
+                                   bool _printWarningFlag,
                                    std::string_view const _callingRoutine)
 {
     this->initialized = true;
@@ -188,7 +188,7 @@ std::string BaseSizer::getLastErrorMessages()
 
 void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 {
-    if (this->sizingType == AutoSizingType::Unknown) {
+    if (this->sizingType == AutoSizingType::Invalid) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
         ShowSevereError(state, msg);
@@ -623,7 +623,7 @@ void BaseSizer::overrideSizingString(std::string &string)
     this->overrideSizeString = false;
 }
 
-Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
+Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
 {
     Real64 outAirFrac = 0.0;
     if (desMassFlow <= 0.0) return outAirFrac;
@@ -637,7 +637,7 @@ Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &
     return outAirFrac;
 }
 
-Real64 BaseSizer::setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setHeatCoilInletTempForZoneEqSizing(Real64 const outAirFrac,
                                                       DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                       DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -655,7 +655,7 @@ Real64 BaseSizer::setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
     return coilInTemp;
 }
 
-Real64 BaseSizer::setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setHeatCoilInletHumRatForZoneEqSizing(Real64 const outAirFrac,
                                                         DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                         DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -671,7 +671,7 @@ Real64 BaseSizer::setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac
     return coilInHumRat;
 }
 
-Real64 BaseSizer::setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setCoolCoilInletTempForZoneEqSizing(Real64 const outAirFrac,
                                                       DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                       DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -689,7 +689,7 @@ Real64 BaseSizer::setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
     return coilInTemp;
 }
 
-Real64 BaseSizer::setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setCoolCoilInletHumRatForZoneEqSizing(Real64 const outAirFrac,
                                                         DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                         DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -788,7 +788,7 @@ void BaseSizer::clearState()
     dataAirFlowUsedForSizing = 0.0;
     dataDesInletAirTemp = 0.0;
     dataDesAccountForFanHeat = false;
-    dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
     dataDesicRegCoil = false;
     dataHeatSizeRatio = 0.0;
     dataZoneUsedForSizing = 0;

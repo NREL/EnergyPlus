@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,7 +126,7 @@ protected:
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONEHVACEVAPEQUIPMENT";
         state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = 1;
         state->dataZoneEquip->ZoneEquipList(1).EquipType.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipName.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex = 1;
@@ -136,7 +136,7 @@ protected:
         state->dataZoneEquip->ZoneEquipList(1).EquipType(1) = "ZoneHVAC:EvaporativeCoolerUnit";
         state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
         state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit;
     }
 
     virtual void TearDown()

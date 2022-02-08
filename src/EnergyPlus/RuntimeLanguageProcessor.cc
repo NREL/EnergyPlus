@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -357,9 +357,9 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const IfDepthAllowed(5);        // depth of IF block nesting
-    int const ELSEIFLengthAllowed(200); // number of ELSEIFs allowed
-    int const WhileDepthAllowed(1);     // depth of While block nesting
+    int constexpr IfDepthAllowed(5);        // depth of IF block nesting
+    int constexpr ELSEIFLengthAllowed(200); // number of ELSEIFs allowed
+    int constexpr WhileDepthAllowed(1);     // depth of While block nesting
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LineNum;
@@ -1018,7 +1018,7 @@ void ParseExpression(EnergyPlusData &state,
 
     // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxDoLoopCounts(500);
+    int constexpr MaxDoLoopCounts(500);
 
     // SUBROUTINE ARGUMENT DEFINITIONS:
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,27 +77,30 @@ namespace HeatRecovery {
     // Heat exchanger configurations
     enum class HXConfiguration
     {
-        Unassigned = -1,
+        Invalid = -1,
         CounterFlow,
         ParallelFlow,
         CrossFlowBothUnmixed,
-        CrossFlowOther
+        CrossFlowOther,
+        Num
     };
 
     // Heat exchanger configuration types
     enum class HXConfigurationType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Plate,
-        Rotary
+        Rotary,
+        Num
     };
 
     // Economizer lockout operation
     enum class EconomizerLockout
     {
-        Unassigned = -1,
+        Invalid = -1,
         No,
-        Yes
+        Yes,
+        Num
     };
 
     struct HeatExchCond
@@ -198,14 +201,14 @@ namespace HeatRecovery {
 
         // Default Constructor
         HeatExchCond()
-            : ExchTypeNum(0), HeatExchPerfTypeNum(0), SchedPtr(0), FlowArr(HXConfiguration::Unassigned), EconoLockOut(EconomizerLockout::Unassigned),
+            : ExchTypeNum(0), HeatExchPerfTypeNum(0), SchedPtr(0), FlowArr(HXConfiguration::Invalid), EconoLockOut(EconomizerLockout::Invalid),
               hARatio(0.0), NomSupAirVolFlow(0.0), NomSupAirInTemp(0.0), NomSupAirOutTemp(0.0), NomSecAirVolFlow(0.0), NomSecAirInTemp(0.0),
               NomElecPower(0.0), UA0(0.0), mTSup0(0.0), mTSec0(0.0), NomSupAirMassFlow(0.0), NomSecAirMassFlow(0.0), SupInletNode(0),
               SupOutletNode(0), SecInletNode(0), SecOutletNode(0), SupInTemp(0.0), SupInHumRat(0.0), SupInEnth(0.0), SupInMassFlow(0.0),
               SecInTemp(0.0), SecInHumRat(0.0), SecInEnth(0.0), SecInMassFlow(0.0), PerfDataIndex(0), FaceArea(0.0), UnbalancedWarningFlag(true),
               HeatEffectSensible100(0.0), HeatEffectSensible75(0.0), HeatEffectLatent100(0.0), HeatEffectLatent75(0.0), CoolEffectSensible100(0.0),
               CoolEffectSensible75(0.0), CoolEffectLatent100(0.0), CoolEffectLatent75(0.0), HeatExchEconoMode(0),
-              ExchConfig(HXConfigurationType::Unassigned), ThresholdTemperature(0.0), InitialDefrostTime(0.0), RateofDefrostTimeIncrease(0.0),
+              ExchConfig(HXConfigurationType::Invalid), ThresholdTemperature(0.0), InitialDefrostTime(0.0), RateofDefrostTimeIncrease(0.0),
               DefrostFraction(0.0), ControlToTemperatureSetPoint(false), SupOutTemp(0.0), SupOutHumRat(0.0), SupOutEnth(0.0), SupOutMassFlow(0.0),
               SecOutTemp(0.0), SecOutHumRat(0.0), SecOutEnth(0.0), SecOutMassFlow(0.0), SensHeatingRate(0.0), SensHeatingEnergy(0.0),
               LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0),
