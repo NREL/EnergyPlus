@@ -215,7 +215,7 @@ namespace VentilatedSlab {
         std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
         std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
         DataPlant::PlantEquipmentType coolingCoilType;
-        CoolingCoilType CCoilType; // type of cooling coil:
+        CoolingCoilType cCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
         std::string CCoilSchedName; // availability schedule for the cooling coil
@@ -290,7 +290,7 @@ namespace VentilatedSlab {
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
               HotControlOffset(0.0), HWPlantLoc{}, HotAirHiTempSchedPtr(0), HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0),
-              HotCtrlLoTempSchedPtr(0), CCoilPresent(false), CCoil_Index(0), coolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(CoolingCoilType::Invalid),
+              HotCtrlLoTempSchedPtr(0), CCoilPresent(false), CCoil_Index(0), coolingCoilType(DataPlant::PlantEquipmentType::Invalid), cCoilType(CoolingCoilType::Invalid),
               CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
               MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWPlantLoc{}, ColdAirHiTempSchedPtr(0),
               ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0), ColdCtrlLoTempSchedPtr(0), CondErrIndex(0), EnrgyImbalErrIndex(0), RadSurfNum(0),
