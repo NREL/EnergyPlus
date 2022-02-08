@@ -175,7 +175,7 @@ namespace VentilatedSlab {
         int SysConfg;             // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
         CoilType coilOption;           // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
         bool HCoilPresent;        // .TRUE. if ventilated slab has a heating coil
-        HeatingCoilType HCoilType;            // type of heating coil (water, gas, electric, etc.)
+        HeatingCoilType hCoilType;            // type of heating coil (water, gas, electric, etc.)
         std::string HCoilName;    // name of heating coil
         std::string HCoilTypeCh;  // type of heating coil (character string)
         int HCoil_Index;
@@ -285,7 +285,7 @@ namespace VentilatedSlab {
               ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0),
               TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
-              MinOutAirMassFlow(0.0), SysConfg(0), coilOption(CoilType::Invalid), HCoilPresent(false), HCoilType(HeatingCoilType::Invalid), HCoil_Index(0),
+              MinOutAirMassFlow(0.0), SysConfg(0), coilOption(CoilType::Invalid), HCoilPresent(false), hCoilType(HeatingCoilType::Invalid), HCoil_Index(0),
               heatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
