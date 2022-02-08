@@ -691,48 +691,50 @@ namespace ExhaustAirSystemManager {
                 int NumNum = 0;
                 int NumParams = 0;
                 int NumNodes = 0;
-                Array1D_int NodeNums;
+                // Array1D_int NodeNums;
 
                 Array1D_int supplyNodeOrNodelistArray; // 2022-01: this needs some extra allocation and initialization
                 // still having a problem getting it debugged properly. Maybe for now replace with a single node to move forward.
                 // just a temp way to test further:
-                bool singlenodeyes = true;
-                int supplynodenum_single = 0;
-                if (singlenodeyes) {
-                    supplynodenum_single = GetOnlySingleNode(state,
-                                                          supplyNodeOrNodelistName,
-                                                          ErrorsFound,
-                                                          DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // may need to change type, maybe zone inlets?
-                                                          thisExhCtrl.Name,
-                                                          DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::ConnectionType::Sensor,
-                                                          NodeInputManager::CompFluidStream::Primary,
-                                                          ObjectIsParent);
-                    thisExhCtrl.SupplyNodeOrNodelistNum = supplynodenum_single;
-                } else {
-                    // 2022-02: Refer to GetZoneEquipmentData() in DataZoneEquipment.cc:
-                    ip->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
-                    NodeNums.dimension(NumParams, 0);
-                    GetNodeNums(state,
-                                supplyNodeOrNodelistName,
-                                NumNodes,
-                                NodeNums,
-                                NodeListError,
-                                DataLoopNode::NodeFluidType::Air,
-                                DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // maybe zone inlets?
-                                thisExhCtrl.Name,
-                                DataLoopNode::ConnectionType::Sensor,
-                                NodeInputManager::CompFluidStream::Primary,
-                                ObjectIsNotParent); // ,
-                                                    // _,
-                                                    // supplyNodeOrNodelistName);
-                    thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
-                }
+                //bool singlenodeyes = true;
+                //int supplynodenum_single = 0;
+                //if (singlenodeyes) {
+                //    supplynodenum_single = GetOnlySingleNode(state,
+                //                                          supplyNodeOrNodelistName,
+                //                                          ErrorsFound,
+                //                                          DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // may need to change type, maybe zone inlets?
+                //                                          thisExhCtrl.Name,
+                //                                          DataLoopNode::NodeFluidType::Air,
+                //                                          DataLoopNode::ConnectionType::Sensor,
+                //                                          NodeInputManager::CompFluidStream::Primary,
+                //                                          ObjectIsParent);
+                //    thisExhCtrl.SupplyNodeOrNodelistNum = supplynodenum_single;
+                //} else {
+                
+                // 2022-02: Refer to GetZoneEquipmentData() in DataZoneEquipment.cc:
+                ip->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
+                thisExhCtrl.SuppNodeNums.dimension(NumParams, 0);
+                GetNodeNums(state,
+                            supplyNodeOrNodelistName,
+                            NumNodes,
+                            thisExhCtrl.SuppNodeNums,
+                            NodeListError,
+                            DataLoopNode::NodeFluidType::Air,
+                            DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // maybe zone inlets?
+                            thisExhCtrl.Name,
+                            DataLoopNode::ConnectionType::Sensor,
+                            NodeInputManager::CompFluidStream::Primary,
+                            ObjectIsNotParent); // ,
+                                                // _,
+                                                // supplyNodeOrNodelistName);
+                thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
+                // 2022-02: thisExhCtrl.SuppNodeNums already updated in the above function call.
+                //}
                 // 2022-02: Following the node/nodelist checkout, it also need to verify these nodes are "indeed" supply nodes.
 
                 // 2022-02: Deal with design exhaust auto size here;
                 if (thisExhCtrl.DesignExhaustFlowRate == EnergyPlus::DataSizing::AutoSize) {
-                    SizeExhaustControlFlow(state, exhCtrlNum, NodeNums);
+                    SizeExhaustControlFlow(state, exhCtrlNum, thisExhCtrl.SuppNodeNums);
                 }
 
                 std::string minZoneTempLimitScheduleName =
@@ -933,12 +935,16 @@ namespace ExhaustAirSystemManager {
             runExhaust = false;
             FlowFrac = 0.0; // or directly set flow rate to zero.
         }
-        // 2022-01-27: still need some logic to blend availabiltiy, frac, min fract, and flow rate together to get a single final flow number.
-        double SupplyFlowRate = DesignFlowRate; // 2022-01: This needs an update of value when having the supply nodes sum
+
         if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
             MassFlow = DesignFlowRate * FlowFrac;
         } else { // follow-supply
-            MassFlow = SupplyFlowRate *FlowFrac;
+            Real64 supplyFlowRate = 0.0;
+            int numOfSuppNodes = thisExhCtrl.SuppNodeNums.size();
+            for (int i = 1; i <= numOfSuppNodes; ++i) {
+                supplyFlowRate += state.dataLoopNodes->Node(thisExhCtrl.SuppNodeNums(i)).MassFlowRate;
+            }
+            MassFlow = supplyFlowRate *FlowFrac;
         }
 
         // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:

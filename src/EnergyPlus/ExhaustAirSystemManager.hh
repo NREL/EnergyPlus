@@ -116,6 +116,8 @@ namespace ExhaustAirSystemManager {
         int MinExhFlowFracScheduleNum;
         int BalancedExhFracScheduleNum;
 
+        Array1D_int SuppNodeNums;
+
         // default constructor
         // Question: why the constructor skipped the first element std::string Name?
         ZoneExhaustControl()
