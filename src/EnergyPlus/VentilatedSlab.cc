@@ -273,9 +273,12 @@ namespace VentilatedSlab {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         bool SteamMessageNeeded;
 
-        std::array<std::string_view, static_cast<int>(OutsideAirControlType::Num)> OutsideAirControlTypeNamesUC{
+        constexpr std::array<std::string_view, static_cast<int>(OutsideAirControlType::Num)> OutsideAirControlTypeNamesUC{
             "VARIABLEPERCENT", "FIXEDTEMPERATURE", "FIXEDAMOUNT"};
-        std::array<std::string_view, static_cast<int>(CoilType::Num)> CoilTypeNamesUC{"NONE", "HEATING", "COOLING", "HEATINGANDCOOLING"};
+        constexpr std::array<std::string_view, static_cast<int>(CoilType::Num)> CoilTypeNamesUC{"NONE", "HEATING", "COOLING", "HEATINGANDCOOLING"};
+
+        constexpr std::array<std::string_view, static_cast<int>(HeatingCoilType::Num)> HeatingCoilTypeNamesUC{
+            "COIL:HEATING:ELECTRIC", "COIL:HEATING:FUEL", "COIL:HEATING:WATER", "COIL:HEATING:STEAM"};
 
         // Figure out how many Ventilated Slab Systems there are in the input file
 
@@ -1001,34 +1004,37 @@ namespace VentilatedSlab {
                     state.dataVentilatedSlab->VentSlab(Item).HCoilTypeCh = state.dataIPShortCut->cAlphaArgs(27);
                     errFlag = false;
 
-                    {
-                        auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(27));
-                        if (SELECT_CASE_var == "COIL:HEATING:WATER") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Water;
-                            state.dataVentilatedSlab->VentSlab(Item).heatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-                        } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Steam;
-                            state.dataVentilatedSlab->VentSlab(Item).heatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-                            state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
-                            if (state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex == 0) {
-                                ShowSevereError(state,
-                                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "Steam Properties not found.");
-                                if (SteamMessageNeeded)
-                                    ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
-                                ErrorsFound = true;
-                                SteamMessageNeeded = false;
-                            }
-                        } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Electric;
-                        } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
-                            state.dataVentilatedSlab->VentSlab(Item).HCoilType = HeatingCoilType::Gas;
-                        } else {
-                            ShowSevereError(state,
-                                            CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(27) +
-                                                "=\"" + state.dataIPShortCut->cAlphaArgs(27) + "\".");
+                    state.dataVentilatedSlab->VentSlab(Item).HCoilType = static_cast<HeatingCoilType>(
+                        getEnumerationValue(HeatingCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(27))));
+
+                    switch (state.dataVentilatedSlab->VentSlab(Item).HCoilType) {
+
+                    case HeatingCoilType::Water: {
+                        state.dataVentilatedSlab->VentSlab(Item).heatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+                        break;
+                    }
+                    case HeatingCoilType::Steam: {
+                        state.dataVentilatedSlab->VentSlab(Item).heatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+                        state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
+                        if (state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex == 0) {
+                            ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "Steam Properties not found.");
+                            if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                             ErrorsFound = true;
-                            errFlag = true;
+                            SteamMessageNeeded = false;
                         }
+                        break;
+                    }
+                    case HeatingCoilType::Electric:
+                    case HeatingCoilType::Gas:
+                        break;
+                    default: {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(27) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(27) + "\".");
+                        ErrorsFound = true;
+                        errFlag = true;
+                        break;
+                    }
                     }
                     if (!errFlag) {
                         state.dataVentilatedSlab->VentSlab(Item).HCoilName = state.dataIPShortCut->cAlphaArgs(28);
