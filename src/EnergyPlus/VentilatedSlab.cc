@@ -279,6 +279,8 @@ namespace VentilatedSlab {
 
         constexpr std::array<std::string_view, static_cast<int>(HeatingCoilType::Num)> HeatingCoilTypeNamesUC{
             "COIL:HEATING:ELECTRIC", "COIL:HEATING:FUEL", "COIL:HEATING:WATER", "COIL:HEATING:STEAM"};
+        constexpr std::array<std::string_view, static_cast<int>(CoolingCoilType::Num)> CoolingCoilTypeNamesUC{
+            "COIL:COOLING:WATER", "COIL:COOLING:WATER:DETAILEDGEOMETRY", "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED"};
 
         // Figure out how many Ventilated Slab Systems there are in the input file
 
@@ -1122,48 +1124,54 @@ namespace VentilatedSlab {
                     state.dataVentilatedSlab->VentSlab(Item).CCoilTypeCh = state.dataIPShortCut->cAlphaArgs(30);
                     errFlag = false;
 
-                    {
-                        auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(30));
-                        if (SELECT_CASE_var == "COIL:COOLING:WATER") {
-                            state.dataVentilatedSlab->VentSlab(Item).CCoilType = CoolingCoilType::WaterCooling;
+                    state.dataVentilatedSlab->VentSlab(Item).CCoilType= static_cast<CoolingCoilType>(
+                        getEnumerationValue(CoolingCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(30))));
+
+                    switch (state.dataVentilatedSlab->VentSlab(Item).CCoilType) {
+                    case CoolingCoilType::WaterCooling: {
+                        state.dataVentilatedSlab->VentSlab(Item).coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
+                        state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
+                        break;
+                    }
+                    case CoolingCoilType::DetailedCooling: {
+                        state.dataVentilatedSlab->VentSlab(Item).coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
+                        state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
+                        break;
+                    }
+                    case CoolingCoilType::HXAssisted: {
+                        state.dataVentilatedSlab->VentSlab(Item).CCoilType = CoolingCoilType::HXAssisted;
+                        GetHXCoilTypeAndName(state,
+                                             state.dataIPShortCut->cAlphaArgs(30),
+                                             state.dataIPShortCut->cAlphaArgs(31),
+                                             ErrorsFound,
+                                             state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType,
+                                             state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName);
+                        if (UtilityRoutines::SameString(state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType, "Coil:Cooling:Water")) {
                             state.dataVentilatedSlab->VentSlab(Item).coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                            state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
-                        } else if (SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-                            state.dataVentilatedSlab->VentSlab(Item).CCoilType = CoolingCoilType::DetailedCooling;
+                        } else if (UtilityRoutines::SameString(state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType,
+                                                               "Coil:Cooling:Water:DetailedGeometry")) {
                             state.dataVentilatedSlab->VentSlab(Item).coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
-                            state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
-                        } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
-                            state.dataVentilatedSlab->VentSlab(Item).CCoilType = CoolingCoilType::HXAssisted;
-                            GetHXCoilTypeAndName(state,
-                                                 state.dataIPShortCut->cAlphaArgs(30),
-                                                 state.dataIPShortCut->cAlphaArgs(31),
-                                                 ErrorsFound,
-                                                 state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType,
-                                                 state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName);
-                            if (UtilityRoutines::SameString(state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType, "Coil:Cooling:Water")) {
-                                state.dataVentilatedSlab->VentSlab(Item).coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                            } else if (UtilityRoutines::SameString(state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType,
-                                                                   "Coil:Cooling:Water:DetailedGeometry")) {
-                                state.dataVentilatedSlab->VentSlab(Item).coolingCoilType =
-                                    DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
-                            } else {
-                                ShowSevereError(state,
-                                                "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" +
-                                                    state.dataVentilatedSlab->VentSlab(Item).Name + "\", invalid");
-                                ShowContinueError(state, "For: " + cAlphaFields(30) + "=\"" + state.dataIPShortCut->cAlphaArgs(30) + "\".");
-                                ShowContinueError(state,
-                                                  "Invalid Coil Type=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType +
-                                                      ", Name=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName);
-                                ShowContinueError(state, "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
-                                ErrorsFound = true;
-                            }
                         } else {
                             ShowSevereError(state,
-                                            CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(29) +
-                                                "=\"" + state.dataIPShortCut->cAlphaArgs(29) + "\".");
+                                            "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                                "\", invalid");
+                            ShowContinueError(state, "For: " + cAlphaFields(30) + "=\"" + state.dataIPShortCut->cAlphaArgs(30) + "\".");
+                            ShowContinueError(state,
+                                              "Invalid Coil Type=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType +
+                                                  ", Name=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName);
+                            ShowContinueError(state, "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
                             ErrorsFound = true;
-                            errFlag = true;
                         }
+                        break;
+                    }
+                    default: {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(29) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(29) + "\".");
+                        ErrorsFound = true;
+                        errFlag = true;
+                        break;
+                    }
                     }
 
                     if (!errFlag) {
