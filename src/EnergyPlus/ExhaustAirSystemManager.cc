@@ -297,6 +297,30 @@ namespace ExhaustAirSystemManager {
                         new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
                         }
                         */
+                        SetupOutputVariable(state,
+                                            "Central Exhaust Fan Outlet Air Mass Flow Rate",
+                                            OutputProcessor::Unit::kg_s,
+                                            thisExhSys.centralFan_MassFlowRate,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisExhSys.Name);
+
+                        SetupOutputVariable(state,
+                                            "Central Exhaust Fan Power",
+                                            OutputProcessor::Unit::W,
+                                            thisExhSys.centralFan_Power,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisExhSys.Name);
+
+                        SetupOutputVariable(state,
+                                            "Central Exhaust Fan Energy",
+                                            OutputProcessor::Unit::J,
+                                            thisExhSys.centralFan_Energy,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisExhSys.Name);
+
                     } else {
                         centralFanIndex = -1;
                         // here a severe error message is needed
@@ -326,6 +350,31 @@ namespace ExhaustAirSystemManager {
                             bool errFlag(false);
                             // EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag, ObjexxFCL::Optional_string_const());
                             EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag);
+
+                            SetupOutputVariable(state,
+                                                "Central Exhaust Fan Outlet Air Mass Flow Rate",
+                                                OutputProcessor::Unit::kg_s,
+                                                thisExhSys.centralFan_MassFlowRate,
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
+                                                thisExhSys.Name);
+
+                            SetupOutputVariable(state,
+                                                "Central Exhaust Fan Power",
+                                                OutputProcessor::Unit::W,
+                                                thisExhSys.centralFan_Power,
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
+                                                thisExhSys.Name);
+
+                            SetupOutputVariable(state,
+                                                "Central Exhaust Fan Energy",
+                                                OutputProcessor::Unit::J,
+                                                thisExhSys.centralFan_Energy,
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Summed,
+                                                thisExhSys.Name);
+
                             if (errFlag) {
                                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
                                 ErrorsFound = true;
@@ -393,6 +442,9 @@ namespace ExhaustAirSystemManager {
             SimAirMixer(state,
                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+        } else {
+            // 2022-02: Give a warning that the current model does not work with AirflowNetwork for now
+        
         }
 
         // 2022-01-26: One additional step here might be to consider the avaiability schedule of the exhasut system
@@ -421,6 +473,18 @@ namespace ExhaustAirSystemManager {
             // 2022-01: use a simpler call instead (checkout SimAirServingZones.cc)
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
             state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(state, _, _, _, _);
+        
+            // Update report variables
+            int outletNode_Num = state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->outletNodeNum;
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate;
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power =
+                state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->fanPower();
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Energy =
+                state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power * state.dataHVACGlobal->TimeStepSys *
+                DataGlobalConstants::SecInHour;
+        
         } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             // 2022-01: Component model, look in Fan name space
             // if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -439,6 +503,16 @@ namespace ExhaustAirSystemManager {
                                                                                                                      // FanSpeedRatio,
                                                                                                                      // ZoneCompTurnFansOn,
                                                                                                                      // ZoneCompTurnFansOff);
+        
+            // Update output variables
+
+            auto &fancomp = state.dataFans->Fan(state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex);
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanPower * 1000.0;
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanEnergy * 1000.0;
         }
 
         // 2022-01: Determine if there are some "iteration" or revisit step for the zone mixer and fan simulation
