@@ -138,14 +138,6 @@ namespace VentilatedSlab {
     int constexpr SlabOnly = 1;    // Air circulate through cores of slab only
     int constexpr SlabAndZone = 2; // Circulated Air is introduced to zone
     int constexpr SeriesSlabs = 3;
-    //  Control Types
-    int constexpr MATControl = 1;  // Controls system using mean air temperature
-    int constexpr MRTControl = 2;  // Controls system using mean radiant temperature
-    int constexpr OPTControl = 3;  // Controls system using operative temperature
-    int constexpr ODBControl = 4;  // Controls system using outside air dry-bulb temperature
-    int constexpr OWBControl = 5;  // Controls system using outside air wet-bulb temperature
-    int constexpr SURControl = 6;  // Controls system using surface temperature !Phase2-A
-    int constexpr DPTZControl = 7; // Controls system using dew-point temperature of zone!Phase2-A
 
     void SimVentilatedSlab(EnergyPlusData &state,
                            std::string const &CompName,   // name of the fan coil unit
@@ -597,25 +589,25 @@ namespace VentilatedSlab {
 
             // Process the temperature control type
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), OutsideAirDryBulbTemperature)) {
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = ODBControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::ODB;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), OutsideAirWetBulbTemperature)) {
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = OWBControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::OWB;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), OperativeTemperature)) {
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = OPTControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::OPT;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), MeanAirTemperature)) {
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = MATControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::MAT;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), MeanRadiantTemperature)) {
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = MRTControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::MRT;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), SlabSurfaceTemperature)) {
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = SURControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::SUR;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), SlabSurfaceDewPointTemperature)) {
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = DPTZControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::DPTZ;
             } else {
                 ShowSevereError(state,
                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(9) + "\".");
                 ShowContinueError(state, "Control reset to ODB control.");
-                state.dataVentilatedSlab->VentSlab(Item).ControlType = ODBControl;
+                state.dataVentilatedSlab->VentSlab(Item).controlType = ControlType::ODB;
             }
 
             // Heating User Input Data For Ventilated Slab Control :
@@ -2895,20 +2887,20 @@ namespace VentilatedSlab {
 
         // Control Type Check
         {
-            auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).ControlType);
-            if (SELECT_CASE_var == MATControl) {
+            auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).controlType);
+            if (SELECT_CASE_var == ControlType::MAT) {
                 SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            } else if (SELECT_CASE_var == MRTControl) {
+            } else if (SELECT_CASE_var == ControlType::MRT) {
                 SetPointTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
-            } else if (SELECT_CASE_var == OPTControl) {
+            } else if (SELECT_CASE_var == ControlType::OPT) {
                 SetPointTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-            } else if (SELECT_CASE_var == ODBControl) {
+            } else if (SELECT_CASE_var == ControlType::ODB) {
                 SetPointTemp = state.dataEnvrn->OutDryBulbTemp;
-            } else if (SELECT_CASE_var == OWBControl) {
+            } else if (SELECT_CASE_var == ControlType::OWB) {
                 SetPointTemp = state.dataEnvrn->OutWetBulbTemp;
-            } else if (SELECT_CASE_var == SURControl) {
+            } else if (SELECT_CASE_var == ControlType::SUR) {
                 SetPointTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
-            } else if (SELECT_CASE_var == DPTZControl) {
+            } else if (SELECT_CASE_var == ControlType::DPTZ) {
                 SetPointTemp = PsyTdpFnWPb(
                     state, state.dataHeatBalFanSys->ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), state.dataEnvrn->OutBaroPress);
             } else {                // Should never get here

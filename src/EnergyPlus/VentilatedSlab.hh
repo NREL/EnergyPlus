@@ -101,6 +101,20 @@ namespace VentilatedSlab {
         Num        
     };
 
+    //  Control Types
+    enum class ControlType
+    {
+        Invalid = -1,
+        MAT,  // Controls system using mean air temperature
+        MRT,  // Controls system using mean radiant temperature
+        OPT,  // Controls system using operative temperature
+        ODB,  // Controls system using outside air dry-bulb temperature
+        OWB,  // Controls system using outside air wet-bulb temperature
+        SUR,  // Controls system using surface temperature !Phase2-A
+        DPTZ, // Controls system using dew-point temperature of zone!Phase2-A
+        Num
+    };
+
     struct VentilatedSlabData
     {
         // Members
@@ -127,7 +141,7 @@ namespace VentilatedSlab {
         Real64 CoreDiameter;             // tube diameter for embedded tubing
         Real64 CoreLength;               // tube length embedded in radiant surface
         Real64 CoreNumbers;              // tube length embedded in radiant surface
-        int ControlType;                 // Control type for the system
+        ControlType controlType;                 // Control type for the system
         // (MAT, MRT, Op temp, ODB, OWB, DPTZ, Surf Temp.)
         int ReturnAirNode; // inlet air node number
         int RadInNode;     // outlet air node number
@@ -267,7 +281,7 @@ namespace VentilatedSlab {
         bool FirstPass;      // detects first time through for resetting sizing data
         // Default Constructor
         VentilatedSlabData()
-            : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0), ControlType(0),
+            : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0), controlType(ControlType::Invalid),
               ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0),
               TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
