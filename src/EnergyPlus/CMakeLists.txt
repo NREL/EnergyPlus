@@ -863,16 +863,6 @@ add_custom_command(
 
 if(LINK_WITH_PYTHON)
   cpython_post_exe_build_operations()
-  if(APPLE)
-    install(
-        CODE "execute_process(
-          COMMAND ${CMAKE_COMMAND}
-          -DEPLUS_DYNAMIC_LIB_NAME=libenergyplusapi.${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.dylib
-          -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
-          -P ${PROJECT_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
-        )"
-    )
-  endif()
 endif()
 
 install(TARGETS energyplus energyplusapi DESTINATION ./)
