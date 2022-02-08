@@ -483,10 +483,7 @@ namespace ExhaustAirSystemManager {
                 if (availSchNum > 0) {
                     // normal conditions
                 } else if (availSchNum == 0) {
-                    // blank or anything like that, treat as always avaialabe
-                    /* //may not need to process the detailed schedule value here, but if yes, use this example:
-                    GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr)
-                    */
+                    // blank or anything like that, treat as always available
                 } else {
                     availSchNum = 0;
                     // a regular warning is ok.
@@ -496,8 +493,7 @@ namespace ExhaustAirSystemManager {
                 }
                 thisExhCtrl.AvailScheduleNum = availSchNum;
 
-                // 2022-01-28: Also need an extra zone name field here: 
-                /* zone_name */
+                // 2022-01-28: an extra zone name field here: 
                 std::string zoneName =
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
                 thisExhCtrl.ZoneName = zoneName;
@@ -542,9 +538,7 @@ namespace ExhaustAirSystemManager {
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
                 // 2022-01-20: may need some sanity check about the input values
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
-                // 2022-01-28: Need to consider the auto-size option: 
-                // This will probably need zone name and some information about zone supplies? 
-                /* */
+                // 2022-01-28: auto-size option (yes, some lines later)
 
                 std::string flowControlType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type");
                 // 2022-01-20: may need some sanity check here about the input values
@@ -562,8 +556,7 @@ namespace ExhaustAirSystemManager {
                 if (exhaustFlowFractionScheduleNum > 0) {
                     // normal conditions
                 } else if (exhaustFlowFractionScheduleNum == 0) {
-                    // blank or anything like that, treat as always avaialabe?
-                    /* */
+                    // blank or anything like that, treat as always available?
                 } else {
                     exhaustFlowFractionScheduleNum = 0;
                     // a regular warning would do.
@@ -575,12 +568,6 @@ namespace ExhaustAirSystemManager {
 
                 std::string supplyNodeOrNodelistName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "supply_node_or_nodelist_name");
                 int supplyNodeOrNodelistNum = 0;
-                // to do: check the requirement dependent on the control type:
-                /* // Logic: if (control is scheduled) then do not process this or
-                   // set a number out of range
-                   // if (control is follow-supply) then need to make sure this is not blank
-                   // and also need make sure it is a valid node or nodelist
-                */
                 // Also to do: convert text to interger node values (or node list values?)
 
                 // InducedNodeListName = AlphArray(5);
