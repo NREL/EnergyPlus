@@ -770,35 +770,24 @@ namespace ExhaustAirSystemManager {
         } else {
             // set inlet and outlet flows to zero}
         }
-        // Basic relations:
-        // 0. Outlet node flow rate and conditions= inlet flow rate and conditions (this might should be the last step instead, after everything is
-        // calculated).
-        //2022-01-07: moved this Step 0 to the very end:
-        // state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        // state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
-        // state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-
-        // 1. outlet node flow rate = Design flow rate * flow fraction schedule name for schedule flow control;
-        // 1a. outlet node flow rate is proportional (maybe by 1.0) to supply flow rate for follow-supply;
-        // 2. outlet node flow rate need to be >= than the min flow fraction * Design flow rate if scheduled flow;
-        // 2a?. outlet node flow rate >= min fraction *(design flow rate still, or design supply flow, or something else?)
-        // 2b. if 2 or 2a are not true, then set the flow rate to min
 
         Real64 DesignFlowRate = thisExhCtrl.DesignExhaustFlowRate;
-        Real64 FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
-        Real64 MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
-
+        Real64 FlowFrac = 0.0; 
+        if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
+            FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
+        }
+        Real64 MinFlowFrac = 0.0;
+        if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
+            MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
+        }
         // 2022-01-27: Need to be refined more based on the schedule availability as well
-        // if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
         if (FlowFrac < MinFlowFrac) {
             FlowFrac = MinFlowFrac;
         } 
 
-        // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
-        // 2022-01: try to adapt from SimZoneExhaustFan() in Fan.cc, probably need to use actual flow rate determinations,
-
         bool runExhaust = true;
-        if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) > 0.0) { // available
+        if (thisExhCtrl.AvailScheduleNum == 0 || (thisExhCtrl.AvailScheduleNum > 0 && EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) >
+            0.0)) { // available
             if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
                 if (Tin >= EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
                     runExhaust = true;
@@ -871,12 +860,7 @@ namespace ExhaustAirSystemManager {
 
     void SizeExhaustSystem(EnergyPlusData &state)
     {
-        // variables playground:        
-        // state.dataHeatBal->ZoneAirMassFlow.
-        // state.dataHeatBal->Zone(1).
-        // state.dataLoopNodes->Node(1).
-        
-        // Write fan sizing to eio report: example code in SizeFan() in Fan.cc:
+        // Sizing and write fan sizing to eio report: example code in SizeFan() in Fan.cc:
         //// Report fan, belt, motor, and VFD characteristics at design condition to .eio file
         // BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
     }
