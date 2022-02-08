@@ -34,6 +34,7 @@ get_filename_component(BASE_PATH ${EXECUTABLE_PATH} DIRECTORY) # Path to the sta
 set(ENERGYPLUS_API_PATH "${BASE_PATH}/${EPLUS_DYNAMIC_LIB_NAME}") # Path to the EnergyPlus dylib once copied into the install tree
 
 # for the energyplus dylib, search for the python dylib prereq and change it to use @loader_path
+message("COMMAND install_name_tool -change @executable_path/libpython3.10.dylib @loader_path/libpython3.10.dylib ${ENERGYPLUS_API_PATH}")
 execute_process(COMMAND install_name_tool -change @executable_path/libpython3.10.dylib @loader_path/libpython3.10.dylib "${ENERGYPLUS_API_PATH}")
 
 # and the python library itself depends on a gettext lib (on our github actions builds anyway)
