@@ -260,6 +260,81 @@ CentralExhaustFan1;        !- Fan Name
 
 \end{lstlisting}
 
+\subsection{ZoneHVAC:ExhaustControl}
+
+The input fields for the ZoneHVAC:ExhaustControl object are as follows.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the name of the ZoneHVAC:ExhaustControl.
+
+\paragraph{Field: Availability Schedule Name}
+
+This is the availability schedule name of the ZoneHVAC:ExhaustControl equipment. A schedule value of zero means off, and >0 means on. If the connected AirloopHVAC:ExhaustSystem is on, then this schedule may be used to turn on (or off) the ZoneHVAC:ExhaustControl system. If the connected AirloopHVAC:ExhaustSystem is off, then this ZoneHVAC:ExhaustControl system will be off, and this schedule will be ignored.
+
+\paragraph{Zone Name}
+
+The name of the zone that the exhaust is located within.
+
+\paragraph{Field: Inlet Node Name}
+
+This is the inlet node name of the ZoneHVAC:ExhaustControl object. This should be an exhaust node of the zone.
+
+\paragraph{Field: Outlet Node Name}
+
+This is the outlet node name of the ZoneHVAC:ExhaustControl object. This node must be connected to an AirLoopHVAC:ExhaustSystem object as an inlet node.
+
+\paragraph{Field: Design Flow Rate {m3/s}}
+
+This numerical field is the design exhaust flow rate of the exhaust system in [m3/s]. This field could be autosized. The default is autosize.
+
+\paragraph{Field: Flow Control Type}
+
+This field is the control type on how the exhaust flows are controlled. The available choices are: Scheduled or FollowSupply. Scheduled means that the target exhaust flow rate will be the Design Flow Rate times the Flow Fraction Schedule. FollowSupply means that the target exhaust flow rate will be the current total flow rate at the node(s) specified in Supply Node or NodeList Name times the Flow Fraction Schedule. For both control types, if the central exhaust fan is not able to meet the total target exhaust flow rate for all of its inlets, then the flow rate will be reduced proportionally to match the available fan flow.
+
+\paragraph{Field: Flow Fraction Schedule Name}
+
+This is the schedule name for the exhaust flow fraction. If left empty, the default value is 1.0. This schedule is only applied for Flow Control Type - Schedules.
+
+\paragraph{Field: Supply Node or NodeList Name}
+
+This is the supply air node or nodelist name used for the \emph{FollowSupply} flow control type.
+
+\paragraph{Field: Minimum Zone Temperature Limit Schedule Name}
+
+This will be the minimum zone temperature limit schedule name. It will be used to shut down the exhaust flow rate to the Minimum Flow Fraction Schedule value if the zone temperature get below this limit.
+
+\paragraph{Field: Minimum Flow Fraction Schedule Name}
+
+This is the schedule name for the minimum exhaust flow fraction. If left empty, the default value would be 1.0.
+
+\paragraph{Field: Balanced Exhaust Fraction Schedule Name}
+
+This field is optional. If it is not used, then all the exhaust air flow is assumed to be unbalanced by any simple air flows, such as infiltration, ventilation, or zone mixing. Unbalanced exhaust is then modeled as being provided by the outdoor air system in the central air system. The modeling of unbalanced will reduce the flow rates at the zone’s return air node by the flow rate that is being exhausted and will ensure that the outdoor air flow rate is sufficient to serve the exhaust. If this field is used, then enter the name of a schedule with fractional values between 0.0 and 1.0, inclusive. This fraction is applied to the exhaust fan flow rate and the model tracks the portion of the exhaust that is balanced. Balanced exhaust is then modeled as being provided by simple airflows and does not impact the central air system return air or outdoor air flow rates. For example, if a kitchen zone with an exhaust fan is designed to draw half of its make up air from a neighboring dining room and the other half from the outdoor air system, then a schedule value of 0.5 could be used here. This input field must be blank when the zone air flow balance is enforced. If user specifies a schedule and zone air flow balance is enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.
+
+An example of the ZoneHVAC:ExhaustControl input object is like this:
+
+\begin{lstlisting}
+
+ZoneHVAC:ExhaustControl,
+Zone2 Exhaust System,           !-Name
+HVACOperationSchd,              !- Availability Schedule Name
+Zone2,                          !- Zone Name
+Zone2 Exhaust Node,             !- Inlet Node Name
+Zone2 ExhaustSystem Node,       !- Outlet Node Name
+0.1,                            !- Design Flow Rate {m3/s}
+Scheduled,                      !- Flow Control Type (Scheduled, FollowSupply, Other?)
+Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name
+,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
+,                               !- System Availability Manager Name
+,                               !- Minimum Zone Temperature Limit Schedule Name
+Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name
+FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
+
+\end{lstlisting}
+
 \subsection{AirLoopHVAC:ZoneSplitter}\label{airloophvaczonesplitter}
 
 The AirLoopHVAC:ZoneSplitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} object. The input contains only node connection information.
