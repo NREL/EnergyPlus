@@ -219,6 +219,47 @@ AirLoopHVAC:SupplyPath,
   Zone Supply Air Splitter;       ! Component 2 Name
 \end{lstlisting}
 
+\subsection{AirLoopHVAC:ExhaustSystem}\label{airloophvacexhaustsystem}
+
+The AirLoopHVAC:ExhaustSystem and ZoneHVAC:ExhaustControl objects are used to describe the way that the exhaust air streams are configured. These objects provide a way for the exhaust air streams from multiple zones to be rerouted and recombined to form a new central exhausts. The exhaust system is composed of a central exhaust fan and a zone mixer).
+
+\subsubsection{AirLoopHVAC:ExhaustSystem Input Fields}
+
+The AirLoopHVAC:ExhaustSystem will take the following input fields:
+
+\paragraph{Field: Name}
+
+The name of the exhaust system.
+
+\paragraph{Field: Availability Schedule}
+
+This is the availability manager list name for the exhaust system.
+
+\paragraph{Field: AirLoopHVAC:ZoneMixer Name}
+
+This is the name of the AirLoopHVAC:ZoneMixer object that connects the exhaust air streams from multiple zones. The zone mixer will have the inlet nodes for the exhaust system defined; and typically each inlet node must be the outlet node of a ZoneHVAC:ExhaustControl object.
+
+\paragraph{Field: Fan Object Type}
+
+This is the type of fan object for the central exhaust fan. The available choices are Fan:SystemModel or Fan:ComponentModel.
+
+\paragraph{Field: Fan Name}
+
+This is a required field for the name of the central exhaust fan.
+
+An example of the AirLoopHVAC:ExhaustSystem input object is like this:
+
+\begin{lstlisting}
+
+AirLoopHVAC:ExhaustSystem,
+Central Exhaust 1,            !- Name
+Exhaust Avail List,         !- Availability Manager List Name
+AirLoopExhaustMixer1,        !- AirLoopHVAC:ZoneMixer Name    
+Fan:SystemModel,            !- Fan Object Type
+CentralExhaustFan1;        !- Fan Name
+
+\end{lstlisting}
+
 \subsection{AirLoopHVAC:ZoneSplitter}\label{airloophvaczonesplitter}
 
 The AirLoopHVAC:ZoneSplitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} object. The input contains only node connection information.
@@ -251,7 +292,7 @@ AirLoopHVAC:ZoneSplitter,
 
 \subsection{AirLoopHVAC:ZoneMixer}\label{airloophvaczonemixer}
 
-The AirLoopHVAC:ZoneMixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component may be part of an air loop return path, an air loop exhaust system, or part of an induction terminal unit. When used as a return air mixer, this component must be listed in an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} object, and the inlets may be zone return air nodes or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} outlet nodes. When used as an exhaust air mixer, this component must be listed in an AirLoopHVAC:ExhaustSystem object, and the inlets may be zone exhaust air nodes. When used in an induction terminal unit (ref. \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}, and \hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}), one inlet node is the supply (primary) air inlet from the central air handler, and the second inlet node is the induced (secondary) air inlet. These node names should match equivalent node names in the terminal unit.
+The AirLoopHVAC:ZoneMixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component may be part of an air loop return path, an air loop exhaust system, or part of an induction terminal unit. When used as a return air mixer, this component must be listed in an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} object, and the inlets may be zone return air nodes or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} outlet nodes. When used as an exhaust air mixer, this component must be listed in an \hyperref[airloophvacexhaustsystem]{AirLoopHVAC:ExhaustSystem} object, and the inlets may be zone exhaust air nodes. When used in an induction terminal unit (ref. \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}, and \hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}), one inlet node is the supply (primary) air inlet from the central air handler, and the second inlet node is the induced (secondary) air inlet. These node names should match equivalent node names in the terminal unit.
 
 \subsubsection{Inputs}
 
