@@ -147,11 +147,6 @@ namespace VentilatedSlab {
     int constexpr SURControl = 6;  // Controls system using surface temperature !Phase2-A
     int constexpr DPTZControl = 7; // Controls system using dew-point temperature of zone!Phase2-A
 
-    int constexpr NoneOption = 0;
-    int constexpr BothOption = 1;
-    int constexpr HeatingOption = 2;
-    int constexpr CoolingOption = 3;
-
     void SimVentilatedSlab(EnergyPlusData &state,
                            std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
@@ -979,13 +974,13 @@ namespace VentilatedSlab {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(26));
                 if (SELECT_CASE_var == "HEATINGANDCOOLING") {
-                    state.dataVentilatedSlab->VentSlab(Item).CoilOption = BothOption;
+                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::Both;
                 } else if (SELECT_CASE_var == "HEATING") {
-                    state.dataVentilatedSlab->VentSlab(Item).CoilOption = HeatingOption;
+                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::Heating;
                 } else if (SELECT_CASE_var == "COOLING") {
-                    state.dataVentilatedSlab->VentSlab(Item).CoilOption = CoolingOption;
+                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::Cooling;
                 } else if (SELECT_CASE_var == "NONE") {
-                    state.dataVentilatedSlab->VentSlab(Item).CoilOption = NoneOption;
+                    state.dataVentilatedSlab->VentSlab(Item).coilOption = CoilType::None;
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(26) + "=\"" +
@@ -994,8 +989,8 @@ namespace VentilatedSlab {
                 }
             }
 
-            if (state.dataVentilatedSlab->VentSlab(Item).CoilOption == BothOption ||
-                state.dataVentilatedSlab->VentSlab(Item).CoilOption == HeatingOption) {
+            if (state.dataVentilatedSlab->VentSlab(Item).coilOption == CoilType::Both ||
+                state.dataVentilatedSlab->VentSlab(Item).coilOption == CoilType::Heating) {
                 // Heating coil information:
                 //        A27, \field Heating Coil Object Type
                 //             \type choice
@@ -1111,8 +1106,8 @@ namespace VentilatedSlab {
                 }
             }
 
-            if (state.dataVentilatedSlab->VentSlab(Item).CoilOption == BothOption ||
-                state.dataVentilatedSlab->VentSlab(Item).CoilOption == CoolingOption) {
+            if (state.dataVentilatedSlab->VentSlab(Item).coilOption == CoilType::Both ||
+                state.dataVentilatedSlab->VentSlab(Item).coilOption == CoilType::Cooling) {
                 // Cooling coil information (if one is present):
                 //        A30, \field Cooling Coil Object Type
                 //             \type choice
@@ -1244,8 +1239,8 @@ namespace VentilatedSlab {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).CoilOption);
-                if (SELECT_CASE_var == BothOption) { // 'HeatingAndCooling'
+                auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).coilOption);
+                if (SELECT_CASE_var == CoilType::Both) { // 'HeatingAndCooling'
                     // Add cooling coil to component sets array when present
                     SetUpCompSets(state,
                                   CurrentModuleObject,
@@ -1264,7 +1259,7 @@ namespace VentilatedSlab {
                                   "UNDEFINED",
                                   state.dataIPShortCut->cAlphaArgs(19));
 
-                } else if (SELECT_CASE_var == HeatingOption) { // 'Heating'
+                } else if (SELECT_CASE_var == CoilType::Heating) { // 'Heating'
                     // Add heating coil to component sets array when no cooling coil present
                     SetUpCompSets(state,
                                   CurrentModuleObject,
@@ -1274,7 +1269,7 @@ namespace VentilatedSlab {
                                   state.dataIPShortCut->cAlphaArgs(24),
                                   state.dataIPShortCut->cAlphaArgs(19));
 
-                } else if (SELECT_CASE_var == CoolingOption) { // 'Cooling'
+                } else if (SELECT_CASE_var == CoilType::Cooling) { // 'Cooling'
                     // Add cooling coil to component sets array when no heating coil present
                     SetUpCompSets(state,
                                   CurrentModuleObject,
@@ -1284,7 +1279,7 @@ namespace VentilatedSlab {
                                   state.dataIPShortCut->cAlphaArgs(24),
                                   state.dataIPShortCut->cAlphaArgs(19));
 
-                } else if (SELECT_CASE_var == NoneOption) {
+                } else if (SELECT_CASE_var == CoilType::None) {
 
                 } else {
                 }
@@ -2755,8 +2750,8 @@ namespace VentilatedSlab {
         static std::string const CurrentModuleObject("ZoneHVAC:VentilatedSlab");
 
         {
-            auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).CoilOption);
-            if (SELECT_CASE_var == BothOption) {
+            auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).coilOption);
+            if (SELECT_CASE_var == CoilType::Both) {
 
                 {
                     auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).HCoilType);
@@ -2814,7 +2809,7 @@ namespace VentilatedSlab {
                     }
                 }
 
-            } else if (SELECT_CASE_var == HeatingOption) {
+            } else if (SELECT_CASE_var == CoilType::Heating) {
 
                 {
                     auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).HCoilType);
@@ -2847,7 +2842,7 @@ namespace VentilatedSlab {
                     }
                 }
 
-            } else if (SELECT_CASE_var == CoolingOption) {
+            } else if (SELECT_CASE_var == CoilType::Cooling) {
 
                 {
                     auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).CCoilType);
@@ -2874,7 +2869,7 @@ namespace VentilatedSlab {
                     }
                 }
 
-            } else if (SELECT_CASE_var == NoneOption) {
+            } else if (SELECT_CASE_var == CoilType::None) {
             }
         }
 
