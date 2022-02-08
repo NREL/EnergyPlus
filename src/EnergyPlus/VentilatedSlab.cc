@@ -273,6 +273,9 @@ namespace VentilatedSlab {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         bool SteamMessageNeeded;
 
+        std::array<std::string_view, static_cast<int>(OutsideAirControlType::Num)> OutsideAirControlTypeNamesUC{
+            "VARIABLEPERCENT", "FIXEDTEMPERATURE", "FIXEDAMOUNT"};
+
         // Figure out how many Ventilated Slab Systems there are in the input file
 
         SteamMessageNeeded = true;
@@ -478,10 +481,11 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
             state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow = state.dataIPShortCut->rNumericArgs(3);
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(5));
-                if (SELECT_CASE_var == "VARIABLEPERCENT") {
-                    state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType = OutsideAirControlType::VariablePercent;
+            state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType =
+                static_cast<OutsideAirControlType>(getEnumerationValue(OutsideAirControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+
+            switch(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType){
+            case OutsideAirControlType::VariablePercent: {
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(6);
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
                         GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
@@ -496,8 +500,9 @@ namespace VentilatedSlab {
                                             state.dataIPShortCut->cAlphaArgs(7) + "\" values out of range [0,1].");
                         ErrorsFound = true;
                     }
-                } else if (SELECT_CASE_var == "FIXEDAMOUNT") {
-                    state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType = OutsideAirControlType::FixedOAControl;
+                    break;
+                }
+                case OutsideAirControlType::FixedOAControl: {
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedName = state.dataIPShortCut->cAlphaArgs(7);
                     state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr =
                         GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
@@ -512,8 +517,9 @@ namespace VentilatedSlab {
                                             state.dataIPShortCut->cAlphaArgs(7) + "\" values out of range (must be >=0).");
                         ErrorsFound = true;
                     }
-                } else if (SELECT_CASE_var == "FIXEDTEMPERATURE") {
-                    state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType = OutsideAirControlType::FixedTemperature;
+                    break;
+                }
+                case OutsideAirControlType::FixedTemperature: {
                     state.dataVentilatedSlab->VentSlab(Item).TempSchedName = state.dataIPShortCut->cAlphaArgs(7);
                     state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr =
                         GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
@@ -523,7 +529,9 @@ namespace VentilatedSlab {
                                             state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
                         ErrorsFound = true;
                     }
-                } else {
+                    break;
+                }
+                default: {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" +
                                         state.dataIPShortCut->cAlphaArgs(5) + "\".");
