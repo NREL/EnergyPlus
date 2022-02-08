@@ -52,6 +52,7 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -837,7 +838,8 @@ namespace ExhaustAirSystemManager {
             state.dataExhCtrlSystemMrg->GetInputFlag = false;
         }
 
-        // 2022-01: Step 2 and/or 3: initialize or sizing if needed:
+        // 2022-01: Step 2 and/or 3: initialize or sizing if needed
+        // 2022-02: done in input processing:
 
         // 2022-01: Step 4: run calc for all exhaust controls;
         for (ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
@@ -856,8 +858,9 @@ namespace ExhaustAirSystemManager {
         // just for posted here for temp reference, will remove later:
         // std::string const idf_objects = delimited_string({
         //    "ZoneHVAC:ExhaustControl,",
-        //    "    Zone1 Exhaust Control,           !-Name",
+        //    "    Zone1 Exhaust Control,          !-Name",
         //    "    HVACOperationSchd,              !- Availability Schedule Name",
+        //    "    Zone2,                          !- Zone Name",
         //    "    Zone2 Exhaust Node,             !- Inlet Node Name",
         //    "    Zone2 ExhaustSystem Node,       !- Outlet Node Name",
         //    "    0.1,                            !- Design Flow Rate {m3/s}",
@@ -972,17 +975,17 @@ namespace ExhaustAirSystemManager {
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
 
         // Set the Node Flow Control Variables from the Fan Control Variables? No need
-        // state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
-        // state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
 
-        //// these might also be useful to pass through (founnd in UpdateFan() in Fan.cc)
-        // if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        //    state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
-        //}
+        // these might also be useful to pass through (founnd in UpdateFan() in Fan.cc)
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+        }
 
-        // if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        //    state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
-        //}
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+        }
 
         // finer details:
         // In step 3, use the zone temperature, or the the exhaust node temperature for comparision?
