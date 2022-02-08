@@ -488,6 +488,7 @@ void EnergyPlusData::clear_state()
     this->dataResultsFramework->clear_state();
     this->dataRetAirPathMrg->clear_state();
     this->dataExhAirSystemMrg->clear_state();
+    this->dataExhCtrlSystemMrg->clear_state();
     this->dataRoomAirMod->clear_state();
     this->dataRoomAirModelMgr->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();
