@@ -405,23 +405,6 @@ namespace ExhaustAirSystemManager {
             ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
         }
 
-        // 2022-01-26: Either here or at the end, or blended in the code above, set up the output variables:
-        /* // some example code to set up outpput variables:
-            SetupOutputVariable(state,
-                                "Fan Unbalanced Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                Fan(FanNum).UnbalancedOutletMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                Fan(FanNum).FanName);
-            SetupOutputVariable(state,
-                                "Fan Balanced Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                Fan(FanNum).BalancedOutletMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                Fan(FanNum).FanName);
-        */
     }
 
     void InitExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
@@ -910,13 +893,7 @@ namespace ExhaustAirSystemManager {
         // if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
         if (FlowFrac < MinFlowFrac) {
             FlowFrac = MinFlowFrac;
-        } // else {
-        //
-        // }
-        // MassFlow = DesignFlowRate * FlowFrac;
-        // } else { // follow-supply
-        // 2022-01: Deal with the node or nodelist flow sum etc.
-        // }
+        } 
 
         // 3. If the zone temperature < min zone temp schedule value, set flow to min fraction, the method would follow 2, 2a, and 2b.
         // 2022-01: try to adapt from SimZoneExhaustFan() in Fan.cc, probably need to use actual flow rate determinations,
@@ -995,32 +972,14 @@ namespace ExhaustAirSystemManager {
 
     void SizeExhaustSystem(EnergyPlusData &state)
     {
-
         // variables playground:        
         // state.dataHeatBal->ZoneAirMassFlow.
         // state.dataHeatBal->Zone(1).
         // state.dataLoopNodes->Node(1).
         
         // Write fan sizing to eio report: example code in SizeFan() in Fan.cc:
-
-        /*
-        // Report fan, belt, motor, and VFD characteristics at design condition to .eio file
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Static Pressure Rise [Pa]", Fan(FanNum).DeltaPress);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Shaft Power [W]", Fan(FanNum).FanShaftPower);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Output Power [W]", Fan(FanNum).MotorMaxOutPwr);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Output Power [W]", Fan(FanNum).VFDMaxOutPwr);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Rated Power [W]", RatedPower);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Drive Ratio []", Fan(FanNum).PulleyDiaRatio);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Belt Output Torque [Nm]", Fan(FanNum).BeltMaxTorque);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Efficiency  []", Fan(FanNum).FanWheelEff);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Maximum Belt Efficiency []", Fan(FanNum).BeltMaxEff);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Belt Efficiency []", Fan(FanNum).BeltEff);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Maximum Motor Efficiency []", Fan(FanNum).MotorMaxEff);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Efficiency []", Fan(FanNum).MotEff);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Efficiency []", Fan(FanNum).VFDEff);
-        BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Combined Efficiency []", Fan(FanNum).FanEff);
-        */ 
+        //// Report fan, belt, motor, and VFD characteristics at design condition to .eio file
+        // BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
     }
 
     void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int & NodeNums)
