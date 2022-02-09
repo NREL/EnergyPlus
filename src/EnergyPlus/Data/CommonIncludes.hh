@@ -144,6 +144,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -252,7 +253,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
-#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>

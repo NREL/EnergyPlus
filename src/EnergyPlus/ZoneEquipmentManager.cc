@@ -83,6 +83,7 @@
 #include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
@@ -101,7 +102,6 @@
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
-#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
