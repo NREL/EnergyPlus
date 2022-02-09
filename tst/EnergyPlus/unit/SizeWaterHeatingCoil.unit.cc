@@ -579,8 +579,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
     SizeWaterCoil(*state, 1);
-    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
-    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .000094839, 0.000000001);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 87.53128, 0.01);
 
     state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
@@ -829,8 +829,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
     SizeWaterCoil(*state, 1);
-    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
-    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .000094839, 0.000000001);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 87.53128, 0.01);
 
     state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
@@ -1080,7 +1080,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
     SizeWaterCoil(*state, 1);
-    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .000094839, 0.000000001);
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 300.00, 0.01);
 
     state->dataLoopNodes->Node.deallocate();

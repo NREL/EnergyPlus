@@ -2517,7 +2517,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     EXPECT_EQ(DesZoneHeatLoad, 0.0);
     EXPECT_EQ(ZoneDesTemp, 17.0);
     EXPECT_EQ(ZoneDesHumRat, 0.008);
-    EXPECT_NEAR(DesCoilLoad, 120.5, 0.1);
+    EXPECT_NEAR(DesCoilLoad, 247.1, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)

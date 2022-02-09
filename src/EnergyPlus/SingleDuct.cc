@@ -3439,17 +3439,20 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                         this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
-            } else {// SingleDuctVAVReheat, and other NoReheat terminal unit types (shouldn't matter for NoReheat TUs)
+            } else { // SingleDuctVAVReheat, and other NoReheat terminal unit types (shouldn't matter for NoReheat TUs)
                 if (this->DamperHeatingAction == Action::Reverse) {
                     TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                         max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                             this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
+                } else if (this->DamperHeatingAction == Action::ReverseWithLimits) {
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+                        max(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
                 } else {
                     TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                         max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                             this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
                 }
-           }
+            }
         } else {
             if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
@@ -4842,7 +4845,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     }
 
     // Active cooling with fix for issue #5592
-    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
+    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad<QCoolFanOnMin - SmallLoad &&this->sd_airterminalInlet.AirMassFlowRateMaxAvail> 0.0 &&
         !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
         // check that it can meet the load
         FanOp = 1;
