@@ -8482,21 +8482,6 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
 
 void DefineSysNodeResetSetPointManager::calculate(EnergyPlusData &state)
 {
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Wooyoung Jung, Jeremy Lerond, and Jian Zhang, PNNL
-    //       DATE WRITTEN   Jan 2022
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Set a temperature setpoint at a user-defiend node based on the temperature at another user-specified (i.e., reference) node.
-    // The setpoint is determined using a linear relationship defined by the user. In general, the higher the reference temperature,
-    // the lower the setpoint.
-
-    // REFERENCE:
-    // Guanghua Wei, W. Dan Turner, David E. Claridge, and Mingsheng Liu. 2003. Single-Duct Constant Air Volume System Supply Air Temperature Reset:
-    // Using Return Air Temperature or Outside Air Temperature? Architectural Engineering Conference (AEI) 2003. Sep 17-20, Austin, TX.
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 SpAtLow;      // Setpoint at low reference value
     Real64 SpAtHigh;     // Setpoint at high reference value
