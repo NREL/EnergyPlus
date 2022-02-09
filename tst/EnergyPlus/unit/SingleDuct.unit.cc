@@ -2889,11 +2889,28 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_NoReheat_Sizing)
     state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow = 0.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
-    // constant volume TUs should have ZoneMinAirFracDes = 1 (now set correctly in GetSysInput)
-    EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
-    // if ZoneMinAirFracDes = 0, TermUnitSizing(1).AirVolFlow would = 0.5 (NonAirSysDesHeatVolFlow)
-    // since ZoneMinAirFracDes = 1, TermUnitSizing(1).AirVolFlow = hard sized value (i.e., 1.0)
-    EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow);
+    // MaxAirVolFlowRate hard sized at 1.0
+    EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
+    // TermUnitSizing(1).AirVolFlow should be NonAirSysDesHeatVolFlow (0.5) and does not matter for NoReheat TUs
+    EXPECT_EQ(0.5, state->dataSize->TermUnitSizing(1).AirVolFlow);
+    EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
+
+    // MaxAirVolFlowRate autosized
+    state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate = DataSizing::AutoSize;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow = 1.0;
+    state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
+    EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
+    // TermUnitSizing(1).AirVolFlow should be greater of DesHeatVolFlow (1.0) and NonAirSysDesHeatVolFlow (0.5)
+    EXPECT_EQ(0.5, state->dataSize->TermUnitSizing(1).AirVolFlow); // doesn't matter for NoReheat TUs
+    EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
+
+    state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate = DataSizing::AutoSize;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow = 0.25;
+    state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
+    // TermUnitSizing(1).AirVolFlow should be NonAirSysDesHeatVolFlow (0.5)
+    EXPECT_EQ(0.5, state->dataSize->TermUnitSizing(1).AirVolFlow);
+    // the TU will size to DesHeatVolFlow, DesHeatVolFlow < NonAirSysDesHeatVolFlow should never normally happen
+    EXPECT_EQ(0.25, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
@@ -2960,7 +2977,7 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
     state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow = 0.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
     // constant volume TUs should have ZoneMinAirFracDes = 1 (now set correctly in GetSysInput)
-    EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
+    EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     // if ZoneMinAirFracDes = 0, TermUnitSizing(1).AirVolFlow would = 0.5 (NonAirSysDesHeatVolFlow)
     // since ZoneMinAirFracDes = 1, TermUnitSizing(1).AirVolFlow = hard sized value (i.e., 1.0)
     EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow);

@@ -1195,7 +1195,7 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 1.0;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
@@ -1380,7 +1380,7 @@ void GetSysInput(EnergyPlusData &state)
                               cAlphaFields(4));
 
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 1.0;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
 
@@ -3428,16 +3428,28 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
         if (state.dataSize->ZoneSizingRunDone) {
+            // set air flow rate used to size heating coils
+            // ZoneTurndownMinAirFrac defaults to 1 for those TU types that do not use it
             if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSingleDuct->UserInputMaxHeatAirVolFlowRateSS,
                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                         this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
-            } else {
+            } else if (this->SysType_Num == SysType::SingleDuctConstVolReheat || this->SysType_Num == SysType::SingleDuctCBVAVReheat) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
-                        this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
-            }
+                        this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
+            } else {// SingleDuctVAVReheat, and other NoReheat terminal unit types (shouldn't matter for NoReheat TUs)
+                if (this->DamperHeatingAction == Action::Reverse) {
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+                        max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
+                            this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
+                } else {
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+                        max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
+                            this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
+                }
+           }
         } else {
             if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
