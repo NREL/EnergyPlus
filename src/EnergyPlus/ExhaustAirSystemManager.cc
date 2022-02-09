@@ -424,7 +424,7 @@ namespace ExhaustAirSystemManager {
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanPower * 1000.0;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanEnergy * 1000.0;
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Energy = fancomp.FanEnergy * 1000.0;
         }
 
         // 2022-01: Determine if there are some "iteration" or revisit step for the zone mixer and fan simulation
@@ -441,7 +441,7 @@ namespace ExhaustAirSystemManager {
         //
         // Using/Aliasing
         // using NodeInputManager::GetOnlySingleNode;
-        using namespace DataLoopNode;
+        // using namespace DataLoopNode;
 
         // Locals
         int PathNum;
