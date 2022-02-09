@@ -1245,51 +1245,52 @@ namespace VentilatedSlab {
                 }
             }
 
-            {
-                auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).coilOption);
-                if (SELECT_CASE_var == CoilType::Both) { // 'HeatingAndCooling'
-                    // Add cooling coil to component sets array when present
-                    SetUpCompSets(state,
-                                  CurrentModuleObject,
-                                  state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
-                                  state.dataIPShortCut->cAlphaArgs(30),
-                                  state.dataIPShortCut->cAlphaArgs(31),
-                                  state.dataIPShortCut->cAlphaArgs(24),
-                                  "UNDEFINED");
+            switch (state.dataVentilatedSlab->VentSlab(Item).coilOption) {
+            case CoilType::Both: { // 'HeatingAndCooling'
+                // Add cooling coil to component sets array when present
+                SetUpCompSets(state,
+                              CurrentModuleObject,
+                              state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
+                              state.dataIPShortCut->cAlphaArgs(30),
+                              state.dataIPShortCut->cAlphaArgs(31),
+                              state.dataIPShortCut->cAlphaArgs(24),
+                              "UNDEFINED");
 
-                    // Add heating coil to component sets array when cooling coil present
-                    SetUpCompSets(state,
-                                  CurrentModuleObject,
-                                  state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
-                                  state.dataIPShortCut->cAlphaArgs(27),
-                                  state.dataIPShortCut->cAlphaArgs(28),
-                                  "UNDEFINED",
-                                  state.dataIPShortCut->cAlphaArgs(19));
-
-                } else if (SELECT_CASE_var == CoilType::Heating) { // 'Heating'
-                    // Add heating coil to component sets array when no cooling coil present
-                    SetUpCompSets(state,
-                                  CurrentModuleObject,
-                                  state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
-                                  state.dataIPShortCut->cAlphaArgs(27),
-                                  state.dataIPShortCut->cAlphaArgs(28),
-                                  state.dataIPShortCut->cAlphaArgs(24),
-                                  state.dataIPShortCut->cAlphaArgs(19));
-
-                } else if (SELECT_CASE_var == CoilType::Cooling) { // 'Cooling'
-                    // Add cooling coil to component sets array when no heating coil present
-                    SetUpCompSets(state,
-                                  CurrentModuleObject,
-                                  state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
-                                  state.dataIPShortCut->cAlphaArgs(30),
-                                  state.dataIPShortCut->cAlphaArgs(31),
-                                  state.dataIPShortCut->cAlphaArgs(24),
-                                  state.dataIPShortCut->cAlphaArgs(19));
-
-                } else if (SELECT_CASE_var == CoilType::None) {
-
-                } else {
-                }
+                // Add heating coil to component sets array when cooling coil present
+                SetUpCompSets(state,
+                              CurrentModuleObject,
+                              state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
+                              state.dataIPShortCut->cAlphaArgs(27),
+                              state.dataIPShortCut->cAlphaArgs(28),
+                              "UNDEFINED",
+                              state.dataIPShortCut->cAlphaArgs(19));
+                break;
+            }
+            case CoilType::Heating: { // 'Heating'
+                // Add heating coil to component sets array when no cooling coil present
+                SetUpCompSets(state,
+                              CurrentModuleObject,
+                              state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
+                              state.dataIPShortCut->cAlphaArgs(27),
+                              state.dataIPShortCut->cAlphaArgs(28),
+                              state.dataIPShortCut->cAlphaArgs(24),
+                              state.dataIPShortCut->cAlphaArgs(19));
+                break;
+            }
+            case CoilType::Cooling: { // 'Cooling'
+                // Add cooling coil to component sets array when no heating coil present
+                SetUpCompSets(state,
+                              CurrentModuleObject,
+                              state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
+                              state.dataIPShortCut->cAlphaArgs(30),
+                              state.dataIPShortCut->cAlphaArgs(31),
+                              state.dataIPShortCut->cAlphaArgs(24),
+                              state.dataIPShortCut->cAlphaArgs(19));
+                break;
+            }
+            case CoilType::None:
+            default:
+                break;
             }
 
         } // ...loop over all of the ventilated slab found in the input file
@@ -2756,128 +2757,150 @@ namespace VentilatedSlab {
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         static std::string const CurrentModuleObject("ZoneHVAC:VentilatedSlab");
 
-        {
-            auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).coilOption);
-            if (SELECT_CASE_var == CoilType::Both) {
+        switch (state.dataVentilatedSlab->VentSlab(Item).coilOption) {
+        case CoilType::Both: {
 
-                {
-                    auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).hCoilType);
-
-                    if (SELECT_CASE_var1 == HeatingCoilType::Water) {
-                        CheckWaterCoilSchedule(state,
-                                               "Coil:Heating:Water",
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == HeatingCoilType::Steam) {
-                        CheckSteamCoilSchedule(state,
-                                               "Coil:Heating:Steam",
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == HeatingCoilType::Electric) {
-                        CheckHeatingCoilSchedule(state,
-                                                 "Coil:Heating:Electric",
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == HeatingCoilType::Gas) {
-                        CheckHeatingCoilSchedule(state,
-                                                 "Coil:Heating:Fuel",
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else {
-                    }
-                }
-
-                {
-                    auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).cCoilType);
-
-                    if (SELECT_CASE_var1 == CoolingCoilType::WaterCooling) {
-                        CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water",
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == CoolingCoilType::DetailedCooling) {
-                        CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water:DetailedGeometry",
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == CoolingCoilType::HXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule(state,
-                                                           "CoilSystem:Cooling:Water:HeatExchangerAssisted",
-                                                           state.dataVentilatedSlab->VentSlab(Item).CCoilName,
-                                                           state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
-                                                           state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
-                    } else {
-                    }
-                }
-
-            } else if (SELECT_CASE_var == CoilType::Heating) {
-
-                {
-                    auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).hCoilType);
-
-                    if (SELECT_CASE_var1 == HeatingCoilType::Water) {
-                        CheckWaterCoilSchedule(state,
-                                               "Coil:Heating:Water",
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == HeatingCoilType::Steam) {
-                        CheckSteamCoilSchedule(state,
-                                               "Coil:Heating:Steam",
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == HeatingCoilType::Electric) {
-                        CheckHeatingCoilSchedule(state,
-                                                 "Coil:Heating:Electric",
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == HeatingCoilType::Gas) {
-                        CheckHeatingCoilSchedule(state,
-                                                 "Coil:Heating:Fuel",
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilName,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
-                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-                    } else {
-                    }
-                }
-
-            } else if (SELECT_CASE_var == CoilType::Cooling) {
-
-                {
-                    auto const SELECT_CASE_var1(state.dataVentilatedSlab->VentSlab(Item).cCoilType);
-
-                    if (SELECT_CASE_var1 == CoolingCoilType::WaterCooling) {
-                        CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water",
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == CoolingCoilType::DetailedCooling) {
-                        CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water:DetailedGeometry",
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilName,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
-                                               state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == CoolingCoilType::HXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule(state,
-                                                           "CoilSystem:Cooling:Water:HeatExchangerAssisted",
-                                                           state.dataVentilatedSlab->VentSlab(Item).CCoilName,
-                                                           state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
-                                                           state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
-                    } else {
-                    }
-                }
-
-            } else if (SELECT_CASE_var == CoilType::None) {
+            switch (state.dataVentilatedSlab->VentSlab(Item).hCoilType) {
+            case HeatingCoilType::Water: {
+                CheckWaterCoilSchedule(state,
+                                       "Coil:Heating:Water",
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
             }
+            case HeatingCoilType::Steam: {
+                CheckSteamCoilSchedule(state,
+                                       "Coil:Heating:Steam",
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
+            }
+            case HeatingCoilType::Electric: {
+                CheckHeatingCoilSchedule(state,
+                                         "Coil:Heating:Electric",
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
+            }
+            case HeatingCoilType::Gas: {
+                CheckHeatingCoilSchedule(state,
+                                         "Coil:Heating:Fuel",
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
+            }
+            default:
+                break;
+            }
+
+            switch (state.dataVentilatedSlab->VentSlab(Item).cCoilType) {
+            case CoolingCoilType::WaterCooling: {
+                CheckWaterCoilSchedule(state,
+                                       "Coil:Cooling:Water",
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
+                break;
+            }
+            case CoolingCoilType::DetailedCooling: {
+                CheckWaterCoilSchedule(state,
+                                       "Coil:Cooling:Water:DetailedGeometry",
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
+                break;
+            }
+            case CoolingCoilType::HXAssisted: {
+                CheckHXAssistedCoolingCoilSchedule(state,
+                                                   "CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                                                   state.dataVentilatedSlab->VentSlab(Item).CCoilName,
+                                                   state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
+                                                   state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        case CoilType::Heating: {
+
+            switch (state.dataVentilatedSlab->VentSlab(Item).hCoilType) {
+            case HeatingCoilType::Water: {
+                CheckWaterCoilSchedule(state,
+                                       "Coil:Heating:Water",
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
+            }
+            case HeatingCoilType::Steam: {
+                CheckSteamCoilSchedule(state,
+                                       "Coil:Heating:Steam",
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
+            }
+            case HeatingCoilType::Electric: {
+                CheckHeatingCoilSchedule(state,
+                                         "Coil:Heating:Electric",
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
+            }
+            case HeatingCoilType::Gas: {
+                CheckHeatingCoilSchedule(state,
+                                         "Coil:Heating:Fuel",
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilName,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
+                                         state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        case CoilType::Cooling: {
+
+            switch (state.dataVentilatedSlab->VentSlab(Item).cCoilType) {
+            case CoolingCoilType::WaterCooling: {
+                CheckWaterCoilSchedule(state,
+                                       "Coil:Cooling:Water",
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
+                break;
+            }
+            case CoolingCoilType::DetailedCooling: {
+                CheckWaterCoilSchedule(state,
+                                       "Coil:Cooling:Water:DetailedGeometry",
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilName,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
+                                       state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
+                break;
+            }
+            case CoolingCoilType::HXAssisted: {
+                CheckHXAssistedCoolingCoilSchedule(state,
+                                                   "CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                                                   state.dataVentilatedSlab->VentSlab(Item).CCoilName,
+                                                   state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
+                                                   state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        case CoilType::None:
+        default:
+            break;
         }
 
         // initialize local variables
@@ -2901,28 +2924,40 @@ namespace VentilatedSlab {
         Toutdoor = state.dataLoopNodes->Node(OutsideAirNode).Temp;
 
         // Control Type Check
-        {
-            auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).controlType);
-            if (SELECT_CASE_var == ControlType::MAT) {
-                SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            } else if (SELECT_CASE_var == ControlType::MRT) {
-                SetPointTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
-            } else if (SELECT_CASE_var == ControlType::OPT) {
-                SetPointTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-            } else if (SELECT_CASE_var == ControlType::ODB) {
-                SetPointTemp = state.dataEnvrn->OutDryBulbTemp;
-            } else if (SELECT_CASE_var == ControlType::OWB) {
-                SetPointTemp = state.dataEnvrn->OutWetBulbTemp;
-            } else if (SELECT_CASE_var == ControlType::SUR) {
-                SetPointTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
-            } else if (SELECT_CASE_var == ControlType::DPTZ) {
-                SetPointTemp = PsyTdpFnWPb(
-                    state, state.dataHeatBalFanSys->ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), state.dataEnvrn->OutBaroPress);
-            } else {                // Should never get here
-                SetPointTemp = 0.0; // Suppress uninitialized warning
-                ShowSevereError(state, "Illegal control type in low temperature radiant system: " + state.dataVentilatedSlab->VentSlab(Item).Name);
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
+        switch (state.dataVentilatedSlab->VentSlab(Item).controlType) {
+        case ControlType::MAT: {
+            SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+            break;
+        }
+        case ControlType::MRT: {
+            SetPointTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+            break;
+        }
+        case ControlType::OPT: {
+            SetPointTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+            break;
+        }
+        case ControlType::ODB: {
+            SetPointTemp = state.dataEnvrn->OutDryBulbTemp;
+            break;
+        }
+        case ControlType::OWB: {
+            SetPointTemp = state.dataEnvrn->OutWetBulbTemp;
+            break;
+        }
+        case ControlType::SUR: {
+            SetPointTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
+            break;
+        } case ControlType::DPTZ: {
+            SetPointTemp = PsyTdpFnWPb(
+                state, state.dataHeatBalFanSys->ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), state.dataEnvrn->OutBaroPress);
+            break;
+        }
+        default: {              // Should never get here
+            SetPointTemp = 0.0; // Suppress uninitialized warning
+            ShowSevereError(state, "Illegal control type in low temperature radiant system: " + state.dataVentilatedSlab->VentSlab(Item).Name);
+            ShowFatalError(state, "Preceding condition causes termination.");
+        }
         }
 
         // Load Check
@@ -3078,146 +3113,152 @@ namespace VentilatedSlab {
 
                     OutletNode = FanOutletNode;
 
-                    {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
+                    switch (state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType) {
+                    case OutsideAirControlType::FixedOAControl: {
+                        // In this control type, the outdoor air flow rate is fixed to the maximum value
+                        // which is equal to the minimum value, regardless of all the other conditions.
+                        state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        break;
+                    }
+                    case OutsideAirControlType::VariablePercent: {
+                        // This algorithm is probably a bit simplistic in that it just bounces
+                        // back and forth between the maximum outside air and the minimum.  In
+                        // reality, a system *might* vary between the two based on the load in
+                        // the zone.  This simple flow control might cause some overcooling but
+                        // chances are that if there is a cooling load and the zone temperature
+                        // gets above the outside temperature that overcooling won't be significant.
+                        Tinlet = state.dataLoopNodes->Node(InletNode).Temp;
+                        Toutdoor = state.dataLoopNodes->Node(OutsideAirNode).Temp;
 
-                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
-                            // In this control type, the outdoor air flow rate is fixed to the maximum value
-                            // which is equal to the minimum value, regardless of all the other conditions.
+                        if (Tinlet >= Toutdoor) {
+
                             state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
-                            // This algorithm is probably a bit simplistic in that it just bounces
-                            // back and forth between the maximum outside air and the minimum.  In
-                            // reality, a system *might* vary between the two based on the load in
-                            // the zone.  This simple flow control might cause some overcooling but
-                            // chances are that if there is a cooling load and the zone temperature
-                            // gets above the outside temperature that overcooling won't be significant.
-                            Tinlet = state.dataLoopNodes->Node(InletNode).Temp;
-                            Toutdoor = state.dataLoopNodes->Node(OutsideAirNode).Temp;
+                        } else { // Tinlet < Toutdoor
 
-                            if (Tinlet >= Toutdoor) {
+                            MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                            state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        }
+                        break;
+                    }
+                    case OutsideAirControlType::FixedTemperature: {
+                        // This is basically the same algorithm as for the heating case...
+                        Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+                        MaxOAFrac = 1.0;
 
+                        if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
+                            // Desired temperature is between the inlet and outdoor temperatures
+                            // so vary the flow rate between no outside air and no recirculation air
+                            // then applying the maximum and minimum limits the user has scheduled
+                            // to make sure too much/little outside air is being introduced
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                max(state.dataVentilatedSlab->OAMassFlowRate, (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                min(state.dataVentilatedSlab->OAMassFlowRate, (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                        } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
+                            // Desired temperature is below both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
                                 state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-
-                            } else { // Tinlet < Toutdoor
-
-                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
                                 state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
                             }
-
-                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
-                            // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
-                            MaxOAFrac = 1.0;
-
-                            if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
+                        } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
+                            // Desired temperature is above both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
                                 state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
-                                // Desired temperature is between the inlet and outdoor temperatures
-                                // so vary the flow rate between no outside air and no recirculation air
-                                // then applying the maximum and minimum limits the user has scheduled
-                                // to make sure too much/little outside air is being introduced
-                                state.dataVentilatedSlab->OAMassFlowRate =
-                                    ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                                state.dataVentilatedSlab->OAMassFlowRate = max(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                                state.dataVentilatedSlab->OAMassFlowRate = min(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                            } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
-                                // Desired temperature is below both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
-                                // Desired temperature is above both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else {
-                                // It should NEVER get to this point, but just in case...
-                                ShowFatalError(state,
-                                               "Ventilated Slab simulation control: illogical condition for " +
-                                                   state.dataVentilatedSlab->VentSlab(Item).Name);
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
                             }
+                        } else {
+                            // It should NEVER get to this point, but just in case...
+                            ShowFatalError(state,
+                                           "Ventilated Slab simulation control: illogical condition for " +
+                                               state.dataVentilatedSlab->VentSlab(Item).Name);
                         }
+                        break;
+                    }
+                    default:
+                        break;
                     }
 
                     CalcVentilatedSlabComps(state, Item, FirstHVACIteration, QUnitOut);
 
                 } else { // Heating Coil present
 
-                    {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
-
-                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
-                            // In this control type, the outdoor air flow rate is fixed to the maximum value
-                            // which is equal to the minimum value, regardless of all the other conditions.
-                            if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
-                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
-                            } else {
-                                MaxOAFrac = 0.0;
-                            }
-                            MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
-                            state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-
-                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
-                            // In heating mode, the ouside air for "variable percent" control
-                            // is set to the minimum value
-
-                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-
-                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
-                            // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
-                            MaxOAFrac = 1.0;
-
-                            if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
-                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
-                                // Desired temperature is between the inlet and outdoor temperatures
-                                // so vary the flow rate between no outside air and no recirculation air
-                                // then applying the maximum and minimum limits the user has scheduled
-                                // to make sure too much/little outside air is being introduced
-                                state.dataVentilatedSlab->OAMassFlowRate =
-                                    ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                                state.dataVentilatedSlab->OAMassFlowRate = max(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                                state.dataVentilatedSlab->OAMassFlowRate = min(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                            } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
-                                // Desired temperature is below both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
-                                // Desired temperature is above both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else {
-                                // It should NEVER get to this point, but just in case...
-                                ShowFatalError(state,
-                                               "Ventilated Slab simulation control: illogical condition for " +
-                                                   state.dataVentilatedSlab->VentSlab(Item).Name);
-                            }
+                    switch (state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType) {
+                    case OutsideAirControlType::FixedOAControl: {
+                        // In this control type, the outdoor air flow rate is fixed to the maximum value
+                        // which is equal to the minimum value, regardless of all the other conditions.
+                        if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
+                            MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                        } else {
+                            MaxOAFrac = 0.0;
                         }
+                        MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
+                        state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        break;
+                    }
+                    case OutsideAirControlType::VariablePercent: {
+                        // In heating mode, the ouside air for "variable percent" control
+                        // is set to the minimum value
+
+                        state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        break;
+                    }
+                    case OutsideAirControlType::FixedTemperature: {
+                        // This is basically the same algorithm as for the heating case...
+                        Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+                        MaxOAFrac = 1.0;
+
+                        if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
+                            // Desired temperature is between the inlet and outdoor temperatures
+                            // so vary the flow rate between no outside air and no recirculation air
+                            // then applying the maximum and minimum limits the user has scheduled
+                            // to make sure too much/little outside air is being introduced
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                max(state.dataVentilatedSlab->OAMassFlowRate, (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                min(state.dataVentilatedSlab->OAMassFlowRate, (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                        } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
+                            // Desired temperature is below both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            }
+                        } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
+                            // Desired temperature is above both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            }
+                        } else {
+                            // It should NEVER get to this point, but just in case...
+                            ShowFatalError(state,
+                                           "Ventilated Slab simulation control: illogical condition for " +
+                                               state.dataVentilatedSlab->VentSlab(Item).Name);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
                     }
 
                     SimVentSlabOAMixer(state, Item);
@@ -3240,36 +3281,40 @@ namespace VentilatedSlab {
                         (state.dataLoopNodes->Node(OutletNode).MassFlowRate) * CpFan * (RadInTemp - state.dataLoopNodes->Node(FanOutletNode).Temp);
 
                     // Setup the coil configuration
-                    {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).hCoilType);
+                    switch (state.dataVentilatedSlab->VentSlab(Item).hCoilType) {
 
-                        if (SELECT_CASE_var == HeatingCoilType::Water) {
-                            // control water flow to obtain output matching QZnReq
+                    case HeatingCoilType::Water: {
+                        // control water flow to obtain output matching QZnReq
 
-                            ControlCompOutput(state,
-                                              state.dataVentilatedSlab->VentSlab(Item).Name,
-                                              cMO_VentilatedSlab,
-                                              Item,
-                                              FirstHVACIteration,
-                                              QZnReq,
-                                              ControlNode,
-                                              MaxWaterFlow,
-                                              MinWaterFlow,
-                                              0.001,
-                                              state.dataVentilatedSlab->VentSlab(Item).ControlCompTypeNum,
-                                              state.dataVentilatedSlab->VentSlab(Item).CompErrIndex,
-                                              _,
-                                              _,
-                                              _,
-                                              _,
-                                              _,
-                                              state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc);
+                        ControlCompOutput(state,
+                                          state.dataVentilatedSlab->VentSlab(Item).Name,
+                                          cMO_VentilatedSlab,
+                                          Item,
+                                          FirstHVACIteration,
+                                          QZnReq,
+                                          ControlNode,
+                                          MaxWaterFlow,
+                                          MinWaterFlow,
+                                          0.001,
+                                          state.dataVentilatedSlab->VentSlab(Item).ControlCompTypeNum,
+                                          state.dataVentilatedSlab->VentSlab(Item).CompErrIndex,
+                                          _,
+                                          _,
+                                          _,
+                                          _,
+                                          _,
+                                          state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc);
+                        break;
+                    }
+                    case HeatingCoilType::Gas:
+                    case HeatingCoilType::Electric:
+                    case HeatingCoilType::Steam: {
 
-                        } else if ((SELECT_CASE_var == HeatingCoilType::Gas) || (SELECT_CASE_var == HeatingCoilType::Electric) ||
-                                   (SELECT_CASE_var == HeatingCoilType::Steam)) {
-
-                            CalcVentilatedSlabComps(state, Item, FirstHVACIteration, QUnitOut);
-                        }
+                        CalcVentilatedSlabComps(state, Item, FirstHVACIteration, QUnitOut);
+                        break;
+                    }
+                    default:
+                        break;
                     }
 
                 } //  Coil/no coil block
@@ -3335,84 +3380,88 @@ namespace VentilatedSlab {
                     // If there are no coil, Slab In Node is assumed to be Fan Outlet Node
                     OutletNode = FanOutletNode;
 
-                    {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
+                    switch (state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType) {
 
-                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
-                            // In this control type, the outdoor air flow rate is fixed to the maximum value
-                            // which is equal to the minimum value, regardless of all the other conditions.
-                            if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
-                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
-                            } else {
-                                MaxOAFrac = 0.0;
-                            }
-                            MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
+                    case OutsideAirControlType::FixedOAControl: {
+                        // In this control type, the outdoor air flow rate is fixed to the maximum value
+                        // which is equal to the minimum value, regardless of all the other conditions.
+                        if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
+                            MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                        } else {
+                            MaxOAFrac = 0.0;
+                        }
+                        MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
+                        state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        break;
+                    }
+                    case OutsideAirControlType::VariablePercent: {
+                        // This algorithm is probably a bit simplistic in that it just bounces
+                        // back and forth between the maximum outside air and the minimum.  In
+                        // reality, a system *might* vary between the two based on the load in
+                        // the zone.  This simple flow control might cause some overcooling but
+                        // chances are that if there is a cooling load and the zone temperature
+                        // gets above the outside temperature that overcooling won't be significant.
+
+                        Tinlet = state.dataLoopNodes->Node(InletNode).Temp;
+                        Toutdoor = state.dataLoopNodes->Node(OutsideAirNode).Temp;
+
+                        if (Tinlet <= Toutdoor) {
+
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+
+                        } else { // Tinlet > Toutdoor
+
+                            MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
                             state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        }
+                        break;
+                    }
+                    case OutsideAirControlType::FixedTemperature: {
+                        // This is basically the same algorithm as for the heating case...
+                        Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+                        MaxOAFrac = 1.0;
 
-                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
-                            // This algorithm is probably a bit simplistic in that it just bounces
-                            // back and forth between the maximum outside air and the minimum.  In
-                            // reality, a system *might* vary between the two based on the load in
-                            // the zone.  This simple flow control might cause some overcooling but
-                            // chances are that if there is a cooling load and the zone temperature
-                            // gets above the outside temperature that overcooling won't be significant.
-
-                            Tinlet = state.dataLoopNodes->Node(InletNode).Temp;
-                            Toutdoor = state.dataLoopNodes->Node(OutsideAirNode).Temp;
-
-                            if (Tinlet <= Toutdoor) {
-
+                        if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
+                            // Desired temperature is between the inlet and outdoor temperatures
+                            // so vary the flow rate between no outside air and no recirculation air
+                            // then applying the maximum and minimum limits the user has scheduled
+                            // to make sure too much/little outside air is being introduced
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                max(state.dataVentilatedSlab->OAMassFlowRate, (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                min(state.dataVentilatedSlab->OAMassFlowRate, (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                        } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
+                            // Desired temperature is below both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
                                 state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-
-                            } else { // Tinlet > Toutdoor
-
-                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
                                 state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
                             }
-
-                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
-                            // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
-                            MaxOAFrac = 1.0;
-
-                            if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
+                        } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
+                            // Desired temperature is above both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
                                 state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
-                                // Desired temperature is between the inlet and outdoor temperatures
-                                // so vary the flow rate between no outside air and no recirculation air
-                                // then applying the maximum and minimum limits the user has scheduled
-                                // to make sure too much/little outside air is being introduced
-                                state.dataVentilatedSlab->OAMassFlowRate =
-                                    ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                                state.dataVentilatedSlab->OAMassFlowRate = max(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                                state.dataVentilatedSlab->OAMassFlowRate = min(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                            } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
-                                // Desired temperature is below both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
-                                // Desired temperature is above both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else {
-                                // It should NEVER get to this point, but just in case...
-                                ShowFatalError(state,
-                                               cMO_VentilatedSlab + " simulation control: illogical condition for " +
-                                                   state.dataVentilatedSlab->VentSlab(Item).Name);
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
                             }
+                        } else {
+                            // It should NEVER get to this point, but just in case...
+                            ShowFatalError(state,
+                                           cMO_VentilatedSlab + " simulation control: illogical condition for " +
+                                               state.dataVentilatedSlab->VentSlab(Item).Name);
                         }
+                        break;
+                    }
+                    default:
+                        break;
                     }
 
                     CalcVentilatedSlabComps(state, Item, FirstHVACIteration, QUnitOut);
@@ -3423,68 +3472,70 @@ namespace VentilatedSlab {
                     // fixed temperature will still try to vary the outside air amount to meet
                     // the desired mixed air temperature.
 
-                    {
-                        auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType);
+                    switch (state.dataVentilatedSlab->VentSlab(Item).outsideAirControlType) {
 
-                        if (SELECT_CASE_var == OutsideAirControlType::FixedOAControl) {
-                            // In this control type, the outdoor air flow rate is fixed to the maximum value
-                            // which is equal to the minimum value, regardless of all the other conditions.
-                            if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
-                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
-                            } else {
-                                MaxOAFrac = 0.0;
-                            }
-                            MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
-                            state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-
-                        } else if (SELECT_CASE_var == OutsideAirControlType::VariablePercent) {
-                            // A cooling coil is present so let it try to do the cooling...
-                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-
-                        } else if (SELECT_CASE_var == OutsideAirControlType::FixedTemperature) {
-                            // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
-
-                            MaxOAFrac = 1.0;
-
-                            if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
-                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
-                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                            } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
-                                // Desired temperature is between the inlet and outdoor temperatures
-                                // so vary the flow rate between no outside air and no recirculation air
-                                // then applying the maximum and minimum limits the user has scheduled
-                                // to make sure too much/little outside air is being introduced
-                                state.dataVentilatedSlab->OAMassFlowRate =
-                                    ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                                state.dataVentilatedSlab->OAMassFlowRate = max(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                                state.dataVentilatedSlab->OAMassFlowRate = min(state.dataVentilatedSlab->OAMassFlowRate,
-                                                                               (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
-                            } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
-                                // Desired temperature is below both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
-                                // Desired temperature is above both the inlet and outdoor temperatures
-                                // so use whichever flow rate (max or min) that will get closer
-                                if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                } else { // Toutdoor closer to Tdesired so use maximum outside air
-                                    state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
-                                }
-                            } else {
-                                // It should NEVER get to this point, but just in case...
-                                ShowFatalError(state,
-                                               cMO_VentilatedSlab + " simulation control: illogical condition for " +
-                                                   state.dataVentilatedSlab->VentSlab(Item).Name);
-                            }
+                    case OutsideAirControlType::FixedOAControl: {
+                        // In this control type, the outdoor air flow rate is fixed to the maximum value
+                        // which is equal to the minimum value, regardless of all the other conditions.
+                        if (state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate > 0.0) {
+                            MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                        } else {
+                            MaxOAFrac = 0.0;
                         }
+                        MaxOAFrac = min(1.0, max(0.0, MinOAFrac));
+                        state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        break;
+                    }
+                    case OutsideAirControlType::VariablePercent: {
+                        // A cooling coil is present so let it try to do the cooling...
+                        state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        break;
+                    }
+                    case OutsideAirControlType::FixedTemperature: {
+                        // This is basically the same algorithm as for the heating case...
+                        Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+
+                        MaxOAFrac = 1.0;
+
+                        if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (std::abs(MaxOAFrac - MinOAFrac) <= LowOAFracDiff) { // no difference in outside air fractions
+                            state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                        } else if (((Tdesired <= Tinlet) && (Tdesired >= Toutdoor)) || ((Tdesired >= Tinlet) && (Tdesired <= Toutdoor))) {
+                            // Desired temperature is between the inlet and outdoor temperatures
+                            // so vary the flow rate between no outside air and no recirculation air
+                            // then applying the maximum and minimum limits the user has scheduled
+                            // to make sure too much/little outside air is being introduced
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                ((Tdesired - Tinlet) / (Toutdoor - Tinlet)) * state.dataLoopNodes->Node(InletNode).MassFlowRate;
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                max(state.dataVentilatedSlab->OAMassFlowRate, (MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                            state.dataVentilatedSlab->OAMassFlowRate =
+                                min(state.dataVentilatedSlab->OAMassFlowRate, (MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate));
+                        } else if ((Tdesired < Tinlet) && (Tdesired < Toutdoor)) {
+                            // Desired temperature is below both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet < Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            }
+                        } else if ((Tdesired > Tinlet) && (Tdesired > Toutdoor)) {
+                            // Desired temperature is above both the inlet and outdoor temperatures
+                            // so use whichever flow rate (max or min) that will get closer
+                            if (Tinlet > Toutdoor) { // Tinlet closer to Tdesired so use minimum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            } else { // Toutdoor closer to Tdesired so use maximum outside air
+                                state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
+                            }
+                        } else {
+                            // It should NEVER get to this point, but just in case...
+                            ShowFatalError(state,
+                                           cMO_VentilatedSlab + " simulation control: illogical condition for " +
+                                               state.dataVentilatedSlab->VentSlab(Item).Name);
+                        }
+                        break;
+                    }
                     }
 
                     // control water flow to obtain output matching Low Setpoint Temperateure
@@ -3644,17 +3695,17 @@ namespace VentilatedSlab {
 
         if ((state.dataVentilatedSlab->VentSlab(Item).HCoilPresent) && (state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue >= 0.0)) {
 
-            {
-                auto const SELECT_CASE_var(state.dataVentilatedSlab->VentSlab(Item).hCoilType);
+            switch (state.dataVentilatedSlab->VentSlab(Item).hCoilType) {
 
-                if (SELECT_CASE_var == HeatingCoilType::Water) {
+            case HeatingCoilType::Water: {
 
                     SimulateWaterCoilComponents(state,
                                                 state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                 FirstHVACIteration,
                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
-
-                } else if (SELECT_CASE_var == HeatingCoilType::Steam) {
+                    break;
+                }
+                case HeatingCoilType::Steam: {
 
                     if (!state.dataVentilatedSlab->HCoilOn) {
                         QCoilReq = 0.0;
@@ -3673,8 +3724,10 @@ namespace VentilatedSlab {
                                                 FirstHVACIteration,
                                                 state.dataVentilatedSlab->VentSlab(Item).HCoil_Index,
                                                 QCoilReq);
-
-                } else if ((SELECT_CASE_var == HeatingCoilType::Electric) || (SELECT_CASE_var == HeatingCoilType::Gas)) {
+                    break;
+                }
+                case HeatingCoilType::Electric:
+                case HeatingCoilType::Gas: {
 
                     if (!state.dataVentilatedSlab->HCoilOn) {
                         QCoilReq = 0.0;
@@ -3693,7 +3746,10 @@ namespace VentilatedSlab {
                                                   FirstHVACIteration,
                                                   QCoilReq,
                                                   state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
+                    break;
                 }
+                default:
+                    break;
             }
         }
 
