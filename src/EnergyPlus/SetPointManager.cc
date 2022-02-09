@@ -5765,7 +5765,7 @@ void InitSetPointManagers(EnergyPlusData &state)
         }
 
         // System Node Reset Temperature and Humidity
-        for (SetPtMgrNum = 1;
+        for (int SetPtMgrNum = 1;
              SetPtMgrNum <= (state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs + state.dataSetPointManager->NumSystemNodeResetHumSetPtMgrs);
              ++SetPtMgrNum) {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
@@ -9785,7 +9785,7 @@ int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAi
     return MixedAirSPMNum;
 } // End of GetMixedAirNumWithCoilFreezingCheck(
 
-Real64 CalcSetPointLinInt(Real64 LowVal, Real64 HighVal, Real64 RefVal, Real64 SetptAtLowVal, Real64 SetptAtHighVal)
+Real64 CalcSetPointLinInt(Real64 const LowVal, Real64 const HighVal, Real64 const RefVal, Real64 const SetptAtLowVal, Real64 const SetptAtHighVal)
 {
     Real64 SetPt;
     if (LowVal < HighVal) {
