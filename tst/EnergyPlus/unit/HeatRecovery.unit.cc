@@ -70,10 +70,10 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
-#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/MixerComponent.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/MixerComponent.hh>
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
