@@ -916,7 +916,7 @@ namespace SetPointManager {
         int NumCtrlNodes = 0;
         std::string CtrlNodeListName;
         Array1D_int CtrlNodes;
-        Real64 SetPt = 0.0;       // current setpoint value
+        Real64 SetPt = 0.0; // current setpoint value
 
         void calculate(EnergyPlusData &state);
     };
