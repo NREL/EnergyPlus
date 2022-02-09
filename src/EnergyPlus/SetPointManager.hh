@@ -908,20 +908,15 @@ namespace SetPointManager {
     struct DefineSysNodeResetSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
     {
         // Members
-        Real64 SpAtLowRef;  // Setpoint at Low Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
-        Real64 SpAtHighRef; // Setpoint at High Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
-        Real64 LowRef;      // Low Reference Temperature or Humidity Ratio
-        Real64 HighRef;     // High Reference Temperature or Humidity Ratio
-        int RefNodeNum;     // Reference Node Number
-        int NumCtrlNodes;
+        Real64 SpAtLowRef = 0.0;  // Setpoint at Low Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
+        Real64 SpAtHighRef = 0.0; // Setpoint at High Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
+        Real64 LowRef = 0.0;      // Low Reference Temperature or Humidity Ratio
+        Real64 HighRef = 0.0;     // High Reference Temperature or Humidity Ratio
+        int RefNodeNum = 0;       // Reference Node Number
+        int NumCtrlNodes = 0;
         std::string CtrlNodeListName;
         Array1D_int CtrlNodes;
-        Real64 SetPt; // current setpoint value
-
-        // Default Constructor
-        DefineSysNodeResetSetPointManager() : SpAtLowRef(0.0), SpAtHighRef(0.0), LowRef(0.0), HighRef(0.0), RefNodeNum(0), NumCtrlNodes(0), SetPt(0.0)
-        {
-        }
+        Real64 SetPt = 0.0;       // current setpoint value
 
         void calculate(EnergyPlusData &state);
     };
