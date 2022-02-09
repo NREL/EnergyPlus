@@ -3536,6 +3536,8 @@ namespace VentilatedSlab {
                         }
                         break;
                     }
+                    default:
+                        break;
                     }
 
                     // control water flow to obtain output matching Low Setpoint Temperateure
