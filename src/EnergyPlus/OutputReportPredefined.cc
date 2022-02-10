@@ -115,7 +115,7 @@ namespace OutputReportPredefined {
         s->pdchMonthlyTotalPrecInRoofIrr = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation Used in Roof Irrigation [mm]");
         s->pdchMonthlyTotalPrecInRainCol = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation Used in Rain Collector [mm]");
         s->pdchMonthlyTotalIrrDep = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Roof Irrigation Depth [mm]");
-        s->pdchMonthlyTotalRainCol = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Rain Collection Volumn [m3]");
+        s->pdchMonthlyTotalRainCol = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Rain Collection Volume [m3]");
 
         s->pdstWthr = newPreDefSubTable(state, s->pdrClim, "Weather Statistics File");
         s->pdchWthrVal = newPreDefColumn(state, s->pdstWthr, "Value");
