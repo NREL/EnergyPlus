@@ -357,6 +357,11 @@ namespace ExhaustAirSystemManager {
                 }
 
                 thisExhSys.CentralFanIndex = centralFanIndex;
+
+                // sizing
+                if (thisExhSys.SizingFlag) {
+                    SizeExhaustSystem(state, exhSysNum);
+                }
             }
             state.dataZoneEquip->NumExhaustAirSystems = numExhaustSystems;
 
@@ -873,6 +878,10 @@ namespace ExhaustAirSystemManager {
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(exhSysNum);
 
+        if (!thisExhSys.SizingFlag) {
+            return;
+        }
+
         // mixer outlet sizing:
         Real64 outletFlowMaxAvail = 0.0;
         int inletNode_index = 0;
@@ -886,6 +895,9 @@ namespace ExhaustAirSystemManager {
         state.dataLoopNodes->Node(outletNode_index).MassFlowRateMaxAvail = outletFlowMaxAvail;
 
         // then central exhasut fan sizing here: 
+
+        // after evertyhing sized, set the sizing flag
+        thisExhSys.SizingFlag = false;
 
         // Sizing and write fan sizing to eio report: example code in SizeFan() in Fan.cc:
         // Report fan, belt, motor, and VFD characteristics at design condition to .eio file

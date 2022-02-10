@@ -81,6 +81,8 @@ namespace ExhaustAirSystemManager {
         std::string CentralFanName; // 2022-01: adding this seems to make the sim call easier
         int CentralFanIndex;
 
+        bool SizingFlag;
+
         // output variables
         Real64 centralFan_MassFlowRate;
         Real64 centralFan_VolumeFlowRate;
@@ -90,7 +92,7 @@ namespace ExhaustAirSystemManager {
         // Default Constructor
         ExhaustAir()
             : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanName(""), CentralFanIndex(0),
-              centralFan_MassFlowRate(0.0), centralFan_VolumeFlowRate(0.0), centralFan_Power(0.0), centralFan_Energy(0.0)
+              SizingFlag(true), centralFan_MassFlowRate(0.0), centralFan_VolumeFlowRate(0.0), centralFan_Power(0.0), centralFan_Energy(0.0)
         {
         }
     };
