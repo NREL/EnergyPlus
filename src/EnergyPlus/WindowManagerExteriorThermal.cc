@@ -293,7 +293,7 @@ namespace WindowManager {
                                         double &vt)
     {
         auto &surface(state.dataSurface->Surface(surfNum));
-        auto frameDivider(state.dataSurface->FrameDivider(state.dataSurface->Surface(surfNum).FrameDivider));
+        auto &frameDivider(state.dataSurface->FrameDivider(surface.FrameDivider));
 
         auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum, constrNum);
 

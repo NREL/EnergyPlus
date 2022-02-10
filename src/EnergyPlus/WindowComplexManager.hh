@@ -94,13 +94,13 @@ namespace WindowComplexManager {
     struct WindowStateIndex
     {
         // Members
-        int InitInc{0};      // Flag indicating initialization needed on Incoming basis
-        int IncBasisIndx{0}; // Index of basis list entry for Incoming basis
-        int CopyIncState{0}; // Pointer to state from which geometry can be copied (Incident)
-        int InitTrn{0};      // Flag indicating initialization needed on Outgoing basis
-        int TrnBasisIndx{0}; // Index of basis list entry for Outgoing basis
-        int CopyTrnState{0}; // Pointer to state from which geometry can be copied (Outgoing)
-        int Konst{0};        // Index of state descript in Construct array
+        int InitInc = 0;      // Flag indicating initialization needed on Incoming basis
+        int IncBasisIndx = 0; // Index of basis list entry for Incoming basis
+        int CopyIncState = 0; // Pointer to state from which geometry can be copied (Incident)
+        int InitTrn = 0;      // Flag indicating initialization needed on Outgoing basis
+        int TrnBasisIndx = 0; // Index of basis list entry for Outgoing basis
+        int CopyTrnState = 0; // Pointer to state from which geometry can be copied (Outgoing)
+        int Konst = 0;        // Index of state descript in Construct array
         // INTEGER  ::  ThermConst  !Index of state thermal description in Construct array
     };
 

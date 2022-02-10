@@ -6603,7 +6603,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int IOStat;                            // IO Status when calling get input subroutine
-        Array1D_string FrameDividerNames(3);   // Frame/Divider Alpha names
+        Array1D_string FrameDividerAlphas(3);   // Frame/Divider Alpha names
         int FrameDividerNum;                   // Counter to keep track of the frame/divider number
         int FrameDividerNumAlpha;              // Number of frame/divider alpha names being passed
         int FrameDividerNumProp;               // Number of frame/divider properties being passed
@@ -6624,7 +6624,7 @@ namespace HeatBalanceManager {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      Loop,
-                                                                     FrameDividerNames,
+                                                                     FrameDividerAlphas,
                                                                      FrameDividerNumAlpha,
                                                                      FrameDividerProps,
                                                                      FrameDividerNumProp,
@@ -6633,11 +6633,11 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, FrameDividerNames(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, FrameDividerAlphas(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
 
             // Load the frame/divider derived type from the input data.
             ++FrameDividerNum;
-            state.dataSurface->FrameDivider(FrameDividerNum).Name = FrameDividerNames(1);
+            state.dataSurface->FrameDivider(FrameDividerNum).Name = FrameDividerAlphas(1);
             state.dataSurface->FrameDivider(FrameDividerNum).FrameWidth = FrameDividerProps(1);
             state.dataSurface->FrameDivider(FrameDividerNum).FrameProjectionOut = FrameDividerProps(2);
             state.dataSurface->FrameDivider(FrameDividerNum).FrameProjectionIn = FrameDividerProps(3);
@@ -6650,15 +6650,15 @@ namespace HeatBalanceManager {
             state.dataSurface->FrameDivider(FrameDividerNum).FrameSolAbsorp = FrameDividerProps(6);
             state.dataSurface->FrameDivider(FrameDividerNum).FrameVisAbsorp = FrameDividerProps(7);
             state.dataSurface->FrameDivider(FrameDividerNum).FrameEmis = FrameDividerProps(8);
-            if (UtilityRoutines::SameString(FrameDividerNames(2), "DividedLite")) {
+            if (UtilityRoutines::SameString(FrameDividerAlphas(2), "DividedLite")) {
                 state.dataSurface->FrameDivider(FrameDividerNum).DividerType = DividedLite;
-            } else if (UtilityRoutines::SameString(FrameDividerNames(2), "Suspended")) {
+            } else if (UtilityRoutines::SameString(FrameDividerAlphas(2), "Suspended")) {
                 state.dataSurface->FrameDivider(FrameDividerNum).DividerType = Suspended;
             } else {
                 ShowWarningError(state,
-                                 state.dataHeatBalMgr->CurrentModuleObject + "=\"" + FrameDividerNames(1) + "\", Invalid " +
+                                 state.dataHeatBalMgr->CurrentModuleObject + "=\"" + FrameDividerAlphas(1) + "\", Invalid " +
                                      state.dataIPShortCut->cAlphaFieldNames(2));
-                ShowContinueError(state, "Entered=\"" + FrameDividerNames(2) + "\", must be DividedLite or Suspended.  Will be set to DividedLite.");
+                ShowContinueError(state, "Entered=\"" + FrameDividerAlphas(2) + "\", must be DividedLite or Suspended.  Will be set to DividedLite.");
                 state.dataSurface->FrameDivider(FrameDividerNum).DividerType = DividedLite;
             }
             state.dataSurface->FrameDivider(FrameDividerNum).DividerWidth = FrameDividerProps(9);
@@ -6679,11 +6679,8 @@ namespace HeatBalanceManager {
             state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
 
             // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductName
-            // state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType =
-            //     static_cast<DataSurfaces::NfrcProductOptions>(getEnumerationValue(static_cast<gsl::span<std::string_view>>(DataSurfaces::NfrcProductName),
-            //     static_cast<std::string_view>(FrameDividerNames(3))));
             for (unsigned int i = 0; i < DataSurfaces::NfrcProductName.size(); ++i) {
-                if (UtilityRoutines::SameString(DataSurfaces::NfrcProductName[i], FrameDividerNames(3))) {
+                if (UtilityRoutines::SameString(DataSurfaces::NfrcProductName[i], FrameDividerAlphas(3))) {
                     state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType = DataSurfaces::NfrcProductOptions(i);
                 }
             }
