@@ -4343,19 +4343,19 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "! Zone4,",
 
         "AirLoopHVAC:ZoneMixer,",
-        "    Mixer1,   !-Name," 
+        "    Mixer1,   !-Name,"
         "    Central_ExhFan_1_Inlet,     !-Outlet Node Name",
         "    Zone1 Exhaust Outlet Node,  !-Inlet 1 Node Name",
         "    Zone2 Exhaust Outlet Node;  !-Inlet 2 Node Name",
 
-        "AirLoopHVAC : ZoneMixer,",
+        "AirLoopHVAC:ZoneMixer,",
         "    Mixer2, !-Name",
         "    Central_ExhFan_2_Inlet, !-Outlet Node Name",
         "    Zone3 Exhaust Outlet Node, !-Inlet 1 Node Name",
-        "    Zone4 Exhaust Outlet Node; !-Inlet 2 Node Name", 
+        "    Zone4 Exhaust Outlet Node; !-Inlet 2 Node Name",
 
         "Fan:SystemModel,",
-        "    Central_Exhaust_Fan_1,   !- Name",
+        "    CentralExhaustFan1,   !- Name",
         "    ,                        !- Availability Schedule Name",
         "    Central_ExhFan_1_Inlet,  !- Air Inlet Node Name",
         "    Central_ExhFan_1_Outlet, !- Air Outlet Node Name",
@@ -4379,7 +4379,7 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    1;                       !- Number of Speeds",
 
         "Fan:SystemModel,",
-        "    Central_Exhaust_Fan_2,   !- Name",
+        "    CentralExhaustFan2,   !- Name",
         "    ,                        !- Availability Schedule Name",
         "    Central_ExhFan_2_Inlet,  !- Air Inlet Node Name",
         "    Central_ExhFan_2_Outlet, !- Air Outlet Node Name",
@@ -4572,16 +4572,41 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    Through: 12/31,          !- Field 1",
         "    For: AllDays,            !- Field 2",
         "    Until: 24:00, 0.2;       !- Field 3",
-            
+
+        "Schedule:Compact,",
+        "    Zone4Exh Exhaust Flow Frac Sched,             !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "    Zone4_MinZoneTempLimitSched,             !- Name",
+        "    ,                        !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00, 20;        !- Field 3",
+
+        "Schedule:Compact,",
+        "    Zone4Exh Min Exhaust Flow Frac Sched,             !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00, 0.2;       !- Field 3",
+
+        "Schedule:Compact,",
+        "    Zone4Exh_FlowBalancedSched,             !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00, 0.2;       !- Field 3",
+
         "ScheduleTypeLimits,",
         "    Fraction,                !- Name",
         "    0.0,                     !- Lower Limit Value",
         "    1.0,                     !- Upper Limit Value",
         "    CONTINUOUS;              !- Numeric Type",
     });
-
-    ASSERT_TRUE(process_idf(idf_objects));
-    ScheduleManager::ProcessScheduleInput(*state);
 
     // Preset some elements
     state->dataHeatBal->Zone.allocate(4);
@@ -4592,12 +4617,15 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
 
     state->dataSize->FinalZoneSizing.allocate(4);
 
-    //state->dataMixerComponent->MixerCond.allocate(2);
-    //state->dataMixerComponent->MixerCond(1).MixerName = "MIXER1";
-    //state->dataMixerComponent->MixerCond(2).MixerName = "MIXER2";
+    // state->dataMixerComponent->MixerCond.allocate(2);
+    // state->dataMixerComponent->MixerCond(1).MixerName = "MIXER1";
+    // state->dataMixerComponent->MixerCond(2).MixerName = "MIXER2";
 
-    //state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan1"));
-    //state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan2"));
+    // state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan1"));
+    // state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan2"));
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    ScheduleManager::ProcessScheduleInput(*state);
 
     // Call the processing codes
     ExhaustAirSystemManager::GetZoneExhaustControlInput(*state);
