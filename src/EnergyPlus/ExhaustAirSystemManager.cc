@@ -894,7 +894,7 @@ namespace ExhaustAirSystemManager {
         int outletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutletNode;
         state.dataLoopNodes->Node(outletNode_index).MassFlowRateMaxAvail = outletFlowMaxAvail;
 
-        // then central exhasut fan sizing here: 
+        // then central exhasut fan sizing here:
 
         // after evertyhing sized, set the sizing flag
         thisExhSys.SizingFlag = false;
