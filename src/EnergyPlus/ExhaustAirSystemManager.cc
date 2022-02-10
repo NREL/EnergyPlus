@@ -53,6 +53,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -417,7 +418,7 @@ namespace ExhaustAirSystemManager {
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate =
                 state.dataLoopNodes->Node(outletNode_Num).MassFlowRate /
-                1.29; // temporaility use 1.29, can calculate using T and HR by calling Pschro functions.
+                state.dataEnvrn->StdRhoAir; // temporaility use Std, can calculate using T and HR by calling Pschro functions.
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power =
                 state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->fanPower();
@@ -868,10 +869,26 @@ namespace ExhaustAirSystemManager {
         // 2022-01-27: fan coil module used the fan inlet temperature as the comparision value.
     }
 
-    void SizeExhaustSystem(EnergyPlusData &state)
+    void SizeExhaustSystem(EnergyPlusData &state, int exhSysNum)
     {
+        auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(exhSysNum);
+
+        // mixer outlet sizing:
+        Real64 outletFlowMaxAvail = 0.0;
+        int inletNode_index = 0;
+        for (int i = 1; i <= state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).NumInletNodes; ++i) {
+            inletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).InletNode(i);
+            outletFlowMaxAvail += state.dataLoopNodes->Node(inletNode_index).MassFlowRateMaxAvail;
+        }
+
+        // 2022-02: mixer outlet actually have a variable named OutletMassFlowRateMaxAvail, which could also be a way to do it
+        int outletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutletNode;
+        state.dataLoopNodes->Node(outletNode_index).MassFlowRateMaxAvail = outletFlowMaxAvail;
+
+        // then central exhasut fan sizing here: 
+
         // Sizing and write fan sizing to eio report: example code in SizeFan() in Fan.cc:
-        //// Report fan, belt, motor, and VFD characteristics at design condition to .eio file
+        // Report fan, belt, motor, and VFD characteristics at design condition to .eio file
         // BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
     }
 
