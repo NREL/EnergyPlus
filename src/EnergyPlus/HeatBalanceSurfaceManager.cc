@@ -681,7 +681,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
 
     // set up for EIO <FenestrationAssembly> output
-    if (state.dataHeatBal->TotFrameDivider > 0) {
+    if (state.dataHeatBal->TotFrameDivider > 0 && state.dataGeneral->Constructions) {
         print(state.files.eio,
               "{}\n",
               "! <FenestrationAssembly>,Construction Name,Frame and Divider Name,NFRC Product Type,"
@@ -810,17 +810,19 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtAssembly, 3);
 
                     // output EIO <FenestrationAssembly> for each unique combination of construction and frame/divider
-                    constructionAndFrame = state.dataConstruction->Construct(curCons).Name + state.dataSurface->FrameDivider(frameDivNum).Name;
-                    if (std::find(uniqueConstFrame.begin(), uniqueConstFrame.end(), constructionAndFrame) == uniqueConstFrame.end()) {
-                        uniqueConstFrame.push_back(constructionAndFrame);
-                        print(state.files.eio,
-                              FenestrationAssemblyFormat,
-                              state.dataConstruction->Construct(curCons).Name,
-                              state.dataSurface->FrameDivider(frameDivNum).Name,
-                              NFRCname,
-                              uValueAssembly,
-                              shgcAssembly,
-                              vtAssembly);
+                    if (state.dataGeneral->Constructions) {
+                        constructionAndFrame = state.dataConstruction->Construct(curCons).Name + state.dataSurface->FrameDivider(frameDivNum).Name;
+                        if (std::find(uniqueConstFrame.begin(), uniqueConstFrame.end(), constructionAndFrame) == uniqueConstFrame.end()) {
+                            uniqueConstFrame.push_back(constructionAndFrame);
+                            print(state.files.eio,
+                                  FenestrationAssemblyFormat,
+                                  state.dataConstruction->Construct(curCons).Name,
+                                  state.dataSurface->FrameDivider(frameDivNum).Name,
+                                  NFRCname,
+                                  uValueAssembly,
+                                  shgcAssembly,
+                                  vtAssembly);
+                        }
                     }
                 }
                 windowAreaWMult = windowArea * mult;
@@ -903,30 +905,32 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, constructionName, stateAssemblySHGC, 3);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, constructionName, stateAssemblyVT, 3);
 
-                        if (!fenestrationShadedStateHeaderShown) {
-                            print(state.files.eio,
-                                    "{}\n",
-                                    "! <FenestrationShadedState>,Construction Name,Glass U-Factor {W/m2-K},"
-                                    "Glass SHGC, Glass Visible Transmittance, Frame and Divider Name,NFRC Product Type,"
-                                    "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
-                            fenestrationShadedStateHeaderShown = true;
-                        }
+                        if (state.dataGeneral->Constructions) {
+                            if (!fenestrationShadedStateHeaderShown) {
+                                print(state.files.eio,
+                                        "{}\n",
+                                        "! <FenestrationShadedState>,Construction Name,Glass U-Factor {W/m2-K},"
+                                        "Glass SHGC, Glass Visible Transmittance, Frame and Divider Name,NFRC Product Type,"
+                                        "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+                                fenestrationShadedStateHeaderShown = true;
+                            }
 
-                        shdConstructionAndFrame = constructionName + state.dataSurface->FrameDivider(frameDivNum).Name;
-                        if (std::find(uniqueShdConstFrame.begin(), uniqueShdConstFrame.end(), shdConstructionAndFrame) ==
-                            uniqueShdConstFrame.end()) {
-                            uniqueShdConstFrame.push_back(shdConstructionAndFrame);
-                            print(state.files.eio,
-                                    FenestrationShadedStateFormat,
-                                    constructionName,
-                                    stateUValue,
-                                    stateSHGC,
-                                    state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
-                                    state.dataSurface->FrameDivider(frameDivNum).Name,
-                                    NFRCname,
-                                    stateAssemblyUValue,
-                                    stateAssemblySHGC,
-                                    stateAssemblyVT);
+                            shdConstructionAndFrame = constructionName + state.dataSurface->FrameDivider(frameDivNum).Name;
+                            if (std::find(uniqueShdConstFrame.begin(), uniqueShdConstFrame.end(), shdConstructionAndFrame) ==
+                                uniqueShdConstFrame.end()) {
+                                uniqueShdConstFrame.push_back(shdConstructionAndFrame);
+                                print(state.files.eio,
+                                        FenestrationShadedStateFormat,
+                                        constructionName,
+                                        stateUValue,
+                                        stateSHGC,
+                                        state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                        state.dataSurface->FrameDivider(frameDivNum).Name,
+                                        NFRCname,
+                                        stateAssemblyUValue,
+                                        stateAssemblySHGC,
+                                        stateAssemblyVT);
+                            }
                         }
                     }
                 }
