@@ -257,6 +257,14 @@ namespace ExhaustAirSystemManager {
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
+                                            "Central Exhaust Fan Outlet Air Volume Flow Rate",
+                                            OutputProcessor::Unit::m3_s,
+                                            thisExhSys.centralFan_VolumeFlowRate,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisExhSys.Name);
+
+                        SetupOutputVariable(state,
                                             "Central Exhaust Fan Power",
                                             OutputProcessor::Unit::W,
                                             thisExhSys.centralFan_Power,
@@ -306,6 +314,14 @@ namespace ExhaustAirSystemManager {
                                                 "Central Exhaust Fan Outlet Air Mass Flow Rate",
                                                 OutputProcessor::Unit::kg_s,
                                                 thisExhSys.centralFan_MassFlowRate,
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
+                                                thisExhSys.Name);
+
+                            SetupOutputVariable(state,
+                                                "Central Exhaust Fan Outlet Air Volume Flow Rate",
+                                                OutputProcessor::Unit::m3_s,
+                                                thisExhSys.centralFan_VolumeFlowRate,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
                                                 thisExhSys.Name);
@@ -387,15 +403,21 @@ namespace ExhaustAirSystemManager {
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
+        int outletNode_Num = 0;
+
         if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
             state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(state, _, _, _, _);
 
             // Update report variables
-            int outletNode_Num =
-                state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->outletNodeNum;
+            outletNode_Num = state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->outletNodeNum;
+
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate =
                 state.dataLoopNodes->Node(outletNode_Num).MassFlowRate;
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate =
+                state.dataLoopNodes->Node(outletNode_Num).MassFlowRate /
+                1.29; // temporaility use 1.29, can calculate using T and HR by calling Pschro functions.
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power =
                 state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->fanPower();
@@ -418,6 +440,9 @@ namespace ExhaustAirSystemManager {
             auto &fancomp = state.dataFans->Fan(state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex);
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate =
+                fancomp.OutletAirMassFlowRate / fancomp.RhoAirStdInit;
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanPower * 1000.0;
 
