@@ -2517,7 +2517,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     EXPECT_EQ(DesZoneHeatLoad, 0.0);
     EXPECT_EQ(ZoneDesTemp, 17.0);
     EXPECT_EQ(ZoneDesHumRat, 0.008);
-    EXPECT_NEAR(DesCoilLoad, 247.1, 0.1);
+    EXPECT_NEAR(DesCoilLoad, 120.5, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
@@ -2891,8 +2891,8 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_NoReheat_Sizing)
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
     // MaxAirVolFlowRate hard sized at 1.0
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
-    // TermUnitSizing(1).AirVolFlow should be NonAirSysDesHeatVolFlow (0.5) and does not matter for NoReheat TUs
-    EXPECT_EQ(0.5, state->dataSize->TermUnitSizing(1).AirVolFlow);
+    // TermUnitSizing(1).AirVolFlow should be greater of DesHeatVolFlow (1.0) and NonAirSysDesHeatVolFlow (0.5)
+    EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow);
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
 
     // MaxAirVolFlowRate autosized
@@ -2901,7 +2901,7 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_NoReheat_Sizing)
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     // TermUnitSizing(1).AirVolFlow should be greater of DesHeatVolFlow (1.0) and NonAirSysDesHeatVolFlow (0.5)
-    EXPECT_EQ(0.5, state->dataSize->TermUnitSizing(1).AirVolFlow); // doesn't matter for NoReheat TUs
+    EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow); // doesn't matter for NoReheat TUs
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
 
     state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate = DataSizing::AutoSize;
