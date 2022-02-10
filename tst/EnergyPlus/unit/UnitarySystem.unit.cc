@@ -14741,10 +14741,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
     EXPECT_NEAR(LatOutput, -1531, 0.1);
-    Real64 fanHeat = state->dataFans->Fan(thisSys->m_FanIndex).PowerLossToAir;
-    Real64 heatCoilOutput = state->dataHeatingCoils->HeatingCoil(thisSys->m_HeatingCoilIndex).HeatingCoilRate;
-    Real64 coilSensible = SenOutput - fanHeat - heatCoilOutput;
-    Real64 calcCoilSHR = coilSensible / (coilSensible + LatOutput);
+    Real64 calcCoilSHR = SenOutput / (SenOutput + LatOutput);
     EXPECT_NEAR(calcCoilSHR, thisSys->CoilSHR, 0.001);
 
     // OperatingMode 3 with mode ratio < 1
@@ -14780,10 +14777,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->CoilSHR, 0.5266, 0.001);
     EXPECT_NEAR(SenOutput, -397.032, 0.1);
     EXPECT_NEAR(LatOutput, -338.8, 0.1);
-    fanHeat = state->dataFans->Fan(thisSys->m_FanIndex).PowerLossToAir;
-    heatCoilOutput = state->dataHeatingCoils->HeatingCoil(thisSys->m_HeatingCoilIndex).HeatingCoilRate;
-    coilSensible = SenOutput - fanHeat - heatCoilOutput;
-    calcCoilSHR = coilSensible / (coilSensible + LatOutput);
+    calcCoilSHR = SenOutput / (SenOutput + LatOutput);
     EXPECT_NEAR(calcCoilSHR, thisSys->CoilSHR, 0.001);
 
     // OperatingMode 2
@@ -14810,10 +14804,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->CoilSHR, 0.98246, 0.001);
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
     EXPECT_NEAR(LatOutput, -1077.6, 0.1);
-    fanHeat = state->dataFans->Fan(thisSys->m_FanIndex).PowerLossToAir;
-    heatCoilOutput = state->dataHeatingCoils->HeatingCoil(thisSys->m_HeatingCoilIndex).HeatingCoilRate;
-    coilSensible = SenOutput - fanHeat - heatCoilOutput;
-    calcCoilSHR = coilSensible / (coilSensible + LatOutput);
+    calcCoilSHR = SenOutput / (SenOutput + LatOutput);
     EXPECT_NEAR(calcCoilSHR, thisSys->CoilSHR, 0.001);
 }
 
