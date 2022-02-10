@@ -337,88 +337,6 @@ TEST_F(EnergyPlusFixture, test_getIGU)
     EXPECT_NEAR(igu.getWidth(), 10., 0.01);
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_GetWindowAssemblyNfrcForReport)
-{
-    // set up for using CWCEHeatTransferFactory
-    int numSurf = 1;
-    state->dataSurface->Surface.allocate(numSurf);
-    state->dataSurface->SurfaceWindow.allocate(numSurf);
-    state->dataSurface->SurfWinShadingFlag.allocate(numSurf);
-    state->dataSurface->SurfWinActiveShadedConstruction.allocate(numSurf);
-    state->dataSurface->SurfWinShadingFlag(numSurf) = DataSurfaces::WinShadingType::NoShade;
-
-    int numFramDiv = 1;
-    state->dataSurface->FrameDivider.allocate(numFramDiv);
-    state->dataSurface->FrameDivider(numFramDiv).Name = "frame";
-    state->dataSurface->Surface(numSurf).FrameDivider = numFramDiv;
-
-    int numCons = 1;
-    state->dataConstruction->Construct.allocate(numCons);
-    state->dataSurface->Surface(numSurf).Construction = numCons;
-    int numLayers = 3;
-    state->dataConstruction->Construct(numCons).LayerPoint.allocate(numLayers);
-    int materialOutside = 1;
-    int materialGap = 2;
-    int materialInside = 3;
-    state->dataConstruction->Construct(numCons).TotLayers = numLayers;
-    state->dataConstruction->Construct(numCons).LayerPoint(1) = materialOutside;
-    state->dataConstruction->Construct(numCons).LayerPoint(2) = materialGap;
-    state->dataConstruction->Construct(numCons).LayerPoint(3) = materialInside;
-    state->dataConstruction->Construct(numCons).AbsDiff.allocate(2);
-    int numMaterials = materialInside;
-    state->dataMaterial->Material.allocate(numMaterials);
-
-    state->dataMaterial->Material(materialOutside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
-    state->dataMaterial->Material(materialOutside).Name = "Glass_1042_LayerAvg - 01";
-    state->dataMaterial->Material(materialOutside).GlassSpectralDataPtr = 0;
-    state->dataMaterial->Material(materialOutside).Thickness = 0.03180;
-    state->dataMaterial->Material(materialOutside).Trans = 0.451708;
-    state->dataMaterial->Material(materialOutside).ReflectSolBeamFront = 0.3592343;
-    state->dataMaterial->Material(materialOutside).ReflectSolBeamBack = 0.3968858;
-    state->dataMaterial->Material(materialOutside).TransVis = 0.714001;
-    state->dataMaterial->Material(materialOutside).ReflectVisBeamFront = 0.207224;
-    state->dataMaterial->Material(materialOutside).ReflectVisBeamBack = 147697;
-    state->dataMaterial->Material(materialOutside).TransThermal = 0.;
-    state->dataMaterial->Material(materialOutside).AbsorpThermalFront = 0.84;
-    state->dataMaterial->Material(materialOutside).AbsorpThermalBack = 0.046578;
-    state->dataMaterial->Material(materialOutside).Conductivity = 1.0;
-
-    state->dataMaterial->Material(materialGap).Group = DataHeatBalance::MaterialGroup::WindowGas;
-    state->dataMaterial->Material(materialGap).Name = "Gap_1_W_0_0127-01";
-    state->dataMaterial->Material(materialGap).GlassSpectralDataPtr = 0;
-    state->dataMaterial->Material(materialGap).Thickness = 0.0127;
-    state->dataMaterial->Material(materialGap).GasType.allocate(5);
-    state->dataMaterial->Material(materialGap).GasType(1) = 1;
-
-    state->dataMaterial->Material(materialInside).Group = DataHeatBalance::MaterialGroup::WindowGlass;
-    state->dataMaterial->Material(materialOutside).Name = "Glass_103_LayerAvg-01";
-    state->dataMaterial->Material(materialOutside).GlassSpectralDataPtr = 0;
-    state->dataMaterial->Material(materialOutside).Thickness = 0.005715;
-    state->dataMaterial->Material(materialOutside).Trans = 0.770675;
-    state->dataMaterial->Material(materialOutside).ReflectSolBeamFront = 0.06997562;
-    state->dataMaterial->Material(materialOutside).ReflectSolBeamBack = 0.07023712;
-    state->dataMaterial->Material(materialOutside).TransVis = 0.883647;
-    state->dataMaterial->Material(materialOutside).ReflectVisBeamFront = 0.080395;
-    state->dataMaterial->Material(materialOutside).ReflectVisBeamBack = 0.080395;
-    state->dataMaterial->Material(materialOutside).TransThermal = 0.;
-    state->dataMaterial->Material(materialOutside).AbsorpThermalFront = 0.84;
-    state->dataMaterial->Material(materialOutside).AbsorpThermalBack = 0.84;
-    state->dataMaterial->Material(materialOutside).Conductivity = 1.0;
-
-    state->dataWindowManager->clear_state();
-    state->dataWindowManager->LayerNum.allocate(1);
-    state->dataWindowManager->inExtWindowModel = CWindowModel::WindowModelFactory(*state, "");
-    state->dataWindowManager->inExtWindowModel->setExternalLibraryModel(WindowsModel::BuiltIn);
-
-    double uValueRep{0.1};
-    double shgcRep{0.1};
-    double vtRep{0.1};
-
-    // despite extensive set up, I could not get this working so decided to use IDF approach.
-
-    GetWindowAssemblyNfrcForReport(*state, numSurf, numCons, 3.0, 1.5, DataSurfaces::NfrcVisionType::DualVertical, uValueRep, shgcRep, vtRep);
-}
-
 TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
 {
     std::string const idf_objects = delimited_string({
@@ -813,5 +731,19 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
 
     EXPECT_NEAR(uValueRep, 3.24, 0.01);
     EXPECT_NEAR(shgcRep, 0.029, 0.001);
+    EXPECT_NEAR(vtRep, 0.0, 0.1);
+
+    GetWindowAssemblyNfrcForReport(
+        *state, windowSurfNum, constructNum, 1.0, 0.5, DataSurfaces::NfrcVisionType::DualHorizontal, uValueRep, shgcRep, vtRep);
+
+    EXPECT_NEAR(uValueRep, 3.07, 0.01);
+    EXPECT_NEAR(shgcRep, 0.024, 0.001);
+    EXPECT_NEAR(vtRep, 0.0, 0.1);
+
+    GetWindowAssemblyNfrcForReport(
+        *state, windowSurfNum, constructNum, 1.0, 0.5, DataSurfaces::NfrcVisionType::Single, uValueRep, shgcRep, vtRep);
+
+    EXPECT_NEAR(uValueRep, 3.11, 0.01);
+    EXPECT_NEAR(shgcRep, 0.021, 0.001);
     EXPECT_NEAR(vtRep, 0.0, 0.1);
 }
