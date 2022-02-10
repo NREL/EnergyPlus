@@ -106,8 +106,6 @@ namespace ExhaustAirSystemManager {
 
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration)
     {
-        // Date: Jan 2022
-
         // Locals
         int ExhaustAirSystemNum;
 
@@ -127,11 +125,6 @@ namespace ExhaustAirSystemManager {
     {
         // 2022-01-11: before setting up a seperate set of files for exhaust systems (which will be done later
         // use this function to develop the input processing function of exhaust systems
-
-        // Date:    Jan 2022
-
-        // using NodeInputManager::GetOnlySingleNode;
-        // using namespace DataLoopNode;
 
         // Locals
         int PathNum;
@@ -376,16 +369,10 @@ namespace ExhaustAirSystemManager {
 
     void InitExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
     {
-        // Date: Jan 2022
     }
 
     void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum, bool FirstHVACIteration)
     {
-        // Date: Jan 2022
-
-        // Using/Aliasing
-        // using MixerComponent::SimAirMixer;
-
         // 2022-01: Simulate Zone Air Mixer
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
@@ -460,16 +447,11 @@ namespace ExhaustAirSystemManager {
 
     void ReportExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
     {
-        // Date: Jan 2022
     }
 
     void GetZoneExhaustControlInput(EnergyPlusData &state)
     {
         // This function is for the ZoneExhaust Control input processing;
-        //
-        // Using/Aliasing
-        // using NodeInputManager::GetOnlySingleNode;
-        // using namespace DataLoopNode;
 
         // Locals
         int PathNum;
@@ -705,8 +687,7 @@ namespace ExhaustAirSystemManager {
 
                 // 2022-01-27: Need an additional check per IORef:
                 // This input field must be blank when the zone air flow balance is enforced. If user specifies a schedule and zone air flow balance
-                // is
-                //     enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.
+                // is enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.
 
                 thisExhCtrl.BalancedExhFracScheduleNum = balancedExhFracScheduleNum;
             }
@@ -726,8 +707,6 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration)
     {
-        // 2022-01: calling steps:
-
         // Locals
         int ExhaustControlNum;
 
