@@ -147,7 +147,7 @@ namespace ExhaustAirSystemManager {
 
     void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration);
 
-    void SizeExhaustSystem(EnergyPlusData &state);
+    void SizeExhaustSystem(EnergyPlusData &state, int exhSysNum);
 
     void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int &NodeNums);
 
