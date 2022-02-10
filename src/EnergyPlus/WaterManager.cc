@@ -679,6 +679,7 @@ namespace WaterManager {
 
             if (NumIrrigation == 1) {
                 state.dataWaterData->AnyIrrigationInModel = true;
+                state.dataWaterData->UsePrecipitation = false;
                 state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
@@ -701,6 +702,10 @@ namespace WaterManager {
                         ShowSevereError(state, "Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
                     }
+                }
+
+                if (cAlphaArgs(3) == "YES") {
+                    state.dataWaterData->UsePrecipitation = true;
                 }
 
                 // If we later add a designannualirrigation and a nominalannualirrigation variable (for scaling) those
