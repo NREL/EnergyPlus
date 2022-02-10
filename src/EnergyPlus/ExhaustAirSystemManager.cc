@@ -198,14 +198,13 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.AvailScheduleNum = availSchNum;
 
                 std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "airloophvac_zonemixer_name");
-                int zoneMixerNum = 0;
                 int zoneMixerIndex = 0;
                 bool zoneMixerErrFound = false;
                 EnergyPlus::MixerComponent::GetZoneMixerIndex(state, zoneMixerName, zoneMixerIndex, zoneMixerErrFound, thisExhSys.Name);
 
                 if (!zoneMixerErrFound) {
                     // With the correct MixerNum Initialize
-                    EnergyPlus::MixerComponent::InitAirMixer(state, zoneMixerNum); // Initialize all Mixer related parameters
+                    EnergyPlus::MixerComponent::InitAirMixer(state, zoneMixerIndex); // Initialize all Mixer related parameters
 
                     // See if need to do the zone mixer's CheckEquipName() function
                     ValidateComponent(state, "AirLoopHVAC:ZoneMixer", zoneMixerName, IsNotOK, "AirLoopHVAC:ExhaustSystem");
