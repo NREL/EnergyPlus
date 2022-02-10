@@ -129,8 +129,8 @@ namespace ExhaustAirSystemManager {
 
         // Date:    Jan 2022
 
-        using NodeInputManager::GetOnlySingleNode;
-        using namespace DataLoopNode;
+        // using NodeInputManager::GetOnlySingleNode;
+        // using namespace DataLoopNode;
 
         // Locals
         int PathNum;
@@ -362,15 +362,14 @@ namespace ExhaustAirSystemManager {
         // Date: Jan 2022
 
         // Using/Aliasing
-        using MixerComponent::SimAirMixer;
+        // using MixerComponent::SimAirMixer;
 
-        // For DataZoneEquipment::AirLoopHVACZone::Mixer: // 'AirLoopHVAC:ZoneMixer'
         // 2022-01: Simulate Zone Air Mixer
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-            SimAirMixer(state,
-                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
-                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+            EnergyPlus::MixerComponent::SimAirMixer(state,
+                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
+                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
         } else {
             // 2022-02: Give a warning that the current model does not work with AirflowNetwork for now
         }
@@ -408,10 +407,10 @@ namespace ExhaustAirSystemManager {
         } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             // 2022-01: Component model fan
             // 2022-01: use a simpler call instead (checkout SimAirServingZones.cc)
-            Fans::SimulateFanComponents(state,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
-                                        FirstHVACIteration,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex); //,
+            EnergyPlus::Fans::SimulateFanComponents(state,
+                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
+                                                    FirstHVACIteration,
+                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex); //,
             // FanSpeedRatio, // ZoneCompTurnFansOn, // ZoneCompTurnFansOff);
 
             // Update output variables
