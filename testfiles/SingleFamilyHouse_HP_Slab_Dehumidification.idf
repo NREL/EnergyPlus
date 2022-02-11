@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.6;
+  Version,22.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1570,10 +1570,6 @@
     Until: 24:00,0;          !- Field 3
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:CONSTANT ===========
-
-  Schedule:Constant,DWWaterTempSchedule,Temperature,48.8888888888889;
-
-  Schedule:Constant,CWWaterTempSchedule,Temperature,48.8888888888889;
 
   Schedule:Constant,SinkSensSchedule,Fraction,0.687777777777778;
 
@@ -4374,14 +4370,14 @@
     Domestic Hot Water,      !- End-Use Subcategory
     1.6219189818e-06,        !- Peak Flow Rate {m3/s}
     ClothesWasher,           !- Flow Rate Fraction Schedule Name
-    CWWaterTempSchedule;     !- Target Temperature Schedule Name
+    ;                        !- Target Temperature Schedule Name
 
   WaterUse:Equipment,
     Dishwasher_unit1,        !- Name
     Domestic Hot Water,      !- End-Use Subcategory
     6.36685353e-07,          !- Peak Flow Rate {m3/s}
     Dishwasher,              !- Flow Rate Fraction Schedule Name
-    DWWaterTempSchedule;     !- Target Temperature Schedule Name
+    ;                        !- Target Temperature Schedule Name
 
   WaterUse:Equipment,
     Sinks_unit1,             !- Name

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -123,9 +123,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 21.2;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.09;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -138,9 +138,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
 
     CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 18.8;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.33;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;

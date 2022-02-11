@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.6;
+  Version,22.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -874,13 +874,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,22.0;       !- Field 3
-
-  Schedule:Compact,
-    SHW TARGET TEMP SCHED,   !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     SHW SUPPLY TEMP SCHED,   !- Name
@@ -55211,7 +55204,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     G SW Apartment,          !- Zone Name
@@ -55223,7 +55216,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     G NW Apartment,          !- Zone Name
@@ -55235,7 +55228,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     G NE Apartment,          !- Zone Name
@@ -55247,7 +55240,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     G N1 Apartment,          !- Zone Name
@@ -55259,7 +55252,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     G N2 Apartment,          !- Zone Name
@@ -55271,7 +55264,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     G S1 Apartment,          !- Zone Name
@@ -55283,7 +55276,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     G S2 Apartment,          !- Zone Name
@@ -55295,7 +55288,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 SW Apartment,         !- Zone Name
@@ -55307,7 +55300,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 NW Apartment,         !- Zone Name
@@ -55319,7 +55312,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 SE Apartment,         !- Zone Name
@@ -55331,7 +55324,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 NE Apartment,         !- Zone Name
@@ -55343,7 +55336,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 N1 Apartment,         !- Zone Name
@@ -55355,7 +55348,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 N2 Apartment,         !- Zone Name
@@ -55367,7 +55360,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 S1 Apartment,         !- Zone Name
@@ -55379,7 +55372,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F2 S2 Apartment,         !- Zone Name
@@ -55391,7 +55384,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 SW Apartment,         !- Zone Name
@@ -55403,7 +55396,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 NW Apartment,         !- Zone Name
@@ -55415,7 +55408,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 SE Apartment,         !- Zone Name
@@ -55427,7 +55420,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 NE Apartment,         !- Zone Name
@@ -55439,7 +55432,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 N1 Apartment,         !- Zone Name
@@ -55451,7 +55444,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 N2 Apartment,         !- Zone Name
@@ -55463,7 +55456,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 S1 Apartment,         !- Zone Name
@@ -55475,7 +55468,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F3 S2 Apartment,         !- Zone Name
@@ -55487,7 +55480,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 SW Apartment,         !- Zone Name
@@ -55499,7 +55492,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 NW Apartment,         !- Zone Name
@@ -55511,7 +55504,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 SE Apartment,         !- Zone Name
@@ -55523,7 +55516,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 NE Apartment,         !- Zone Name
@@ -55535,7 +55528,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 N1 Apartment,         !- Zone Name
@@ -55547,7 +55540,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 N2 Apartment,         !- Zone Name
@@ -55559,7 +55552,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 S1 Apartment,         !- Zone Name
@@ -55571,7 +55564,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F4 S2 Apartment,         !- Zone Name
@@ -55583,7 +55576,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M SW Apartment,          !- Zone Name
@@ -55595,7 +55588,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M NW Apartment,          !- Zone Name
@@ -55607,7 +55600,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M SE Apartment,          !- Zone Name
@@ -55619,7 +55612,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M NE Apartment,          !- Zone Name
@@ -55631,7 +55624,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M N1 Apartment,          !- Zone Name
@@ -55643,7 +55636,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M N2 Apartment,          !- Zone Name
@@ -55655,7 +55648,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M S1 Apartment,          !- Zone Name
@@ -55667,7 +55660,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     M S2 Apartment,          !- Zone Name
@@ -55679,7 +55672,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 SW Apartment,         !- Zone Name
@@ -55691,7 +55684,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 NW Apartment,         !- Zone Name
@@ -55703,7 +55696,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 SE Apartment,         !- Zone Name
@@ -55715,7 +55708,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 NE Apartment,         !- Zone Name
@@ -55727,7 +55720,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 N1 Apartment,         !- Zone Name
@@ -55739,7 +55732,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 N2 Apartment,         !- Zone Name
@@ -55751,7 +55744,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 S1 Apartment,         !- Zone Name
@@ -55763,7 +55756,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F6 S2 Apartment,         !- Zone Name
@@ -55775,7 +55768,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 SW Apartment,         !- Zone Name
@@ -55787,7 +55780,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 NW Apartment,         !- Zone Name
@@ -55799,7 +55792,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 SE Apartment,         !- Zone Name
@@ -55811,7 +55804,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 NE Apartment,         !- Zone Name
@@ -55823,7 +55816,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 N1 Apartment,         !- Zone Name
@@ -55835,7 +55828,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 N2 Apartment,         !- Zone Name
@@ -55847,7 +55840,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 S1 Apartment,         !- Zone Name
@@ -55859,7 +55852,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F7 S2 Apartment,         !- Zone Name
@@ -55871,7 +55864,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 SW Apartment,         !- Zone Name
@@ -55883,7 +55876,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 NW Apartment,         !- Zone Name
@@ -55895,7 +55888,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 SE Apartment,         !- Zone Name
@@ -55907,7 +55900,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 NE Apartment,         !- Zone Name
@@ -55919,7 +55912,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 N1 Apartment,         !- Zone Name
@@ -55931,7 +55924,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 N2 Apartment,         !- Zone Name
@@ -55943,7 +55936,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 S1 Apartment,         !- Zone Name
@@ -55955,7 +55948,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F8 S2 Apartment,         !- Zone Name
@@ -55967,7 +55960,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 SW Apartment,         !- Zone Name
@@ -55979,7 +55972,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 NW Apartment,         !- Zone Name
@@ -55991,7 +55984,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 SE Apartment,         !- Zone Name
@@ -56003,7 +55996,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 NE Apartment,         !- Zone Name
@@ -56015,7 +56008,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 N1 Apartment,         !- Zone Name
@@ -56027,7 +56020,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 N2 Apartment,         !- Zone Name
@@ -56039,7 +56032,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 S1 Apartment,         !- Zone Name
@@ -56051,7 +56044,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     F9 S2 Apartment,         !- Zone Name
@@ -56063,7 +56056,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T SW Apartment,          !- Zone Name
@@ -56075,7 +56068,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T NW Apartment,          !- Zone Name
@@ -56087,7 +56080,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T SE Apartment,          !- Zone Name
@@ -56099,7 +56092,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T NE Apartment,          !- Zone Name
@@ -56111,7 +56104,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T N1 Apartment,          !- Zone Name
@@ -56123,7 +56116,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T N2 Apartment,          !- Zone Name
@@ -56135,7 +56128,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T S1 Apartment,          !- Zone Name
@@ -56147,7 +56140,7 @@
     WaterUse,                !- End-Use Subcategory
     3.66e-06,                !- Peak Flow Rate {m3/s}
     APT_DHW_SCH,             !- Flow Rate Fraction Schedule Name
-    SHW Target Temp Sched,   !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     SHW Supply Temp Sched,   !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     T S2 Apartment,          !- Zone Name

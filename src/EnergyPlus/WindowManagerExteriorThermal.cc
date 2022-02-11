@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -339,10 +339,10 @@ namespace WindowManager {
 
         auto matGroup = material->Group;
 
-        if BITF_TEST_ANY (BITF(matGroup),
+        if (BITF_TEST_ANY(BITF(matGroup),
                           BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
                               BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
-                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
+                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade))) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex, m_SurfNum);
         } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
