@@ -53,12 +53,18 @@
 
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include <cassert>
+
+#define bounds_check(exp, msg) assert(((void)msg, exp))
+
 namespace EnergyPlus {
 
 template <typename T> struct EPVector : private std::vector<T>
 {
     using std::vector<T>::size;
+#ifdef NDEBUG
     using std::vector<T>::operator[];
+#endif
     using std::vector<T>::empty;
     using std::vector<T>::begin;
     using std::vector<T>::end;
@@ -71,6 +77,20 @@ template <typename T> struct EPVector : private std::vector<T>
 
     using value_type = T;
     using size_type = typename std::vector<T>::size_type;
+
+#ifndef NDEBUG
+    [[nodiscard]] T &operator[](std::size_t n)
+    {
+        bounds_check(n < size(), "Index out of bounds");
+        return std::vector<T>::operator[](n);
+    }
+
+    [[nodiscard]] const T &operator[](std::size_t n) const
+    {
+        bounds_check(n < size(), "Index out of bounds");
+        return std::vector<T>::operator[](n);
+    }
+#endif
 
     [[nodiscard]] T &operator()(std::size_t n)
     {
