@@ -5,8 +5,8 @@
 ! Highlights:              Illustrates use of SetpointManager:SystemNodeResetTemperature and Humidity objects:
 !                          - Supply Air Temp Manager 1 uses a SetpointManager:SystemNodeResetTemperature to control the
 !                            air loop's supply air temperature setpoint based on the return plenum air temperature.
-!                          - Hot Water Loop Setpoint Manager and Central Boiler Setpoint Manager use a 
-!                            SetpointManager:SystemNodeResetTemperature objects to control a plant temperature setpoint 
+!                          - Hot Water Loop Setpoint Manager and Central Boiler Setpoint Manager use a
+!                            SetpointManager:SystemNodeResetTemperature objects to control a plant temperature setpoint
 !                            based on outdoor air.
 !                          - DOAS Dehumidification Setpoint Manager uses a SetpointManager:SystemNodeResetHumidity to
 !                            control the air loop's maximum humidity setpoint based on the return air humidity ratio.
@@ -168,7 +168,22 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Run Period 2,            !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -1957,17 +1972,6 @@
     Until: 24:00,4;          !- Field 9
 
   Schedule:Compact,
-    Min OA Sched,            !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays,           !- Field 2
-    Until: 6:00,0.02,        !- Field 3
-    Until: 20:00,1.0,        !- Field 5
-    Until: 24:00,0.02,       !- Field 7
-    For: AllOtherDays,       !- Field 9
-    Until: 24:00,0.02;       !- Field 10
-
-  Schedule:Compact,
     FanAvailSched,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
@@ -2038,20 +2042,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
-    OA Cooling Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,11.5;       !- Field 3
-
-  Schedule:Compact,
-    OA Heating Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,4.5;        !- Field 3
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -2639,7 +2629,7 @@
     0.002,                   !- Controller Convergence Tolerance {deltaC}
     autosize,                !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}
-    
+
   SetpointManager:SystemNodeReset:Temperature,
     Supply Air Temp Manager 1,        !- Name
     Temperature,                      !- Control Variable
@@ -3675,21 +3665,21 @@
   Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
 
   Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-  
+
   Output:Variable,Plenum-1 Out Node,System Node Temperature,hourly;
-  
+
   Output:Variable,Central Boiler Outlet Node,System Node Temperature,hourly;
-  
+
   Output:Variable,Central Boiler Outlet Node,System Node Setpoint Temperature,hourly;
-  
+
   Output:Variable,Outside Air Inlet Node 1,System Node Temperature,hourly;
-  
+
   Output:Variable,Plenum-1 Out Node,System Node Humidity Ratio,hourly;
-  
+
   Output:Variable,DOAS Cooling Coil Outlet,System Node Humidity Ratio,hourly;
-  
+
   Output:Variable,DOAS Cooling Coil Outlet,System Node Setpoint Maximum Humidity Ratio,hourly;
-  
+
   Output:Variable,FanAvailSched,Schedule Value,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
