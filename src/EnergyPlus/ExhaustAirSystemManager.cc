@@ -334,7 +334,6 @@ namespace ExhaustAirSystemManager {
 
                 thisExhSys.CentralFanIndex = centralFanIndex;
 
-
                 // std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
                 // int availSchNum = EnergyPlus::ScheduleManager::GetScheduleIndex(state, availSchName);
                 if (availSchNum > 0) {
