@@ -64,11 +64,11 @@ namespace WaterManager {
 
     void ManageWater(EnergyPlusData &state);
 
-    void ManageWaterInits(EnergyPlusData &state, int const SysTimestepLoop = 0);
+    void ManageWaterInits(EnergyPlusData &state);
 
     void GetWaterManagerInput(EnergyPlusData &state);
 
-    void UpdatePrecipitation(EnergyPlusData &state, int const SysTimestepLoop = 0);
+    void UpdatePrecipitation(EnergyPlusData &state);
 
     void UpdateIrrigation(EnergyPlusData &state);
 

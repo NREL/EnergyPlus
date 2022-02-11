@@ -85,6 +85,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -2296,17 +2297,32 @@ namespace WeatherManager {
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
         if (state.dataEnvrn->RunPeriodEnvironment) {
-            int EndYear = state.dataEnvrn->EndYear;
-            int CurrentYear = state.dataEnvrn->Year;
-            // only report for the last year
-            if (CurrentYear == EndYear) {
-                int month = state.dataEnvrn->Month;
-                state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1] += state.dataEnvrn->LiquidPrecipitation * 1000.0;
-                if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
-                    state.dataWaterData->RainFall.numRainyHoursInWeather[month - 1] += 1;
-                }
+            int month = state.dataEnvrn->Month;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1] += state.dataEnvrn->LiquidPrecipitation * 1000.0;
+            if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
+                state.dataWaterData->RainFall.numRainyHoursInWeather[month - 1] += 1;
             }
         }
+
+        // if site precipitation not arround, throw warning
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::Invalid) {
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                "Please be aware that precipitation depth in the .epw weather file is used in the rainfall related calculation including "
+                "RainCollector and Roof Irrigation as "
+                "the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. "
+                "Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.",
+                state.dataWaterData->PrecipInPlaceOfScheWarnIdx);
+            if ((state.dataEnvrn->LiquidPrecipitation == 0) && (state.dataEnvrn->IsRain)) {
+                state.dataEnvrn->LiquidPrecipitation = 1.5 / 1000.0;
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm",
+                                               state.dataWaterData->PrecipOverwrittenByRainFlag);
+            }
+        }
+
+        WaterManager::UpdatePrecipitation(state);
+
         state.dataEnvrn->TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 

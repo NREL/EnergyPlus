@@ -219,7 +219,7 @@ namespace DataWater {
         Real64 HorizArea; // area of surfaces in the vertical normal direction
         Real64 VdotAvail;
         Real64 VolCollected;
-        std::array<Real64, 12> VolCollectedMonthly = {0.0};
+        std::array<Real64, 12> VolCollectedMonthly = {0.0}; // Monthly rain water collected in mm;
         Real64 MeanHeight;
 
         // Default Constructor
@@ -275,9 +275,9 @@ namespace DataWater {
         // calculated and from elsewhere.
         Real64 CurrentRate;
         Real64 CurrentAmount;
-        std::array<Real64, 12> MonthlyTotalPrecInRainCol = {0.0}; // Monthly total rain in rain collector
-        std::array<Real64, 12> MonthlyTotalPrecInRoofIrr = {0.0}; // Monthly total rain in roof irrigation
-        std::array<Real64, 12> MonthlyTotalPrecInWeather = {0.0}; // Monthly total rain in weather file
+        std::array<Real64, 12> MonthlyTotalPrecInRainCol = {0.0}; // Monthly total rain in rain collector [mm]
+        std::array<Real64, 12> MonthlyTotalPrecInRoofIrr = {0.0}; // Monthly total rain in roof irrigation [mm]
+        std::array<Real64, 12> MonthlyTotalPrecInWeather = {0.0}; // Monthly total rain in weather file [mm]
         std::array<int, 12> numRainyHoursInWeather = {0};         // Monthly number of rainy hours
 
         // Default Constructor
@@ -322,6 +322,9 @@ struct DataWaterData : BaseGlobalStruct
     bool AnyWaterSystemsInModel = false;    // control flag set true if any water systems
     bool WaterSystemGetInputCalled = false; // set true once input data gotten.
     bool AnyIrrigationInModel = false;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
+    bool UsePrecipitation = false;          // whether to include the rain fall amount in the actual irrigation amount
+    int PrecipInPlaceOfScheWarnIdx = 0;     // recurring warning index when precipitation in epw is used as site:precipitation is not defined
+    int PrecipOverwrittenByRainFlag = 0;    // recurring warning index when the rain flag is on but the liquidprecipitation = 0
 
     void clear_state() override
     {
@@ -337,6 +340,9 @@ struct DataWaterData : BaseGlobalStruct
         AnyWaterSystemsInModel = false;
         WaterSystemGetInputCalled = false;
         AnyIrrigationInModel = false;
+        UsePrecipitation = false;
+        PrecipInPlaceOfScheWarnIdx = 0;
+        PrecipOverwrittenByRainFlag = 0;
     }
 };
 

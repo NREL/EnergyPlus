@@ -145,13 +145,11 @@ namespace WaterManager {
         } // tank loop
     }
 
-    void ManageWaterInits(EnergyPlusData &state, int const SysTimestepLoop)
+    void ManageWaterInits(EnergyPlusData &state)
     {
         if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
         UpdateWaterManager(state);
-
-        UpdatePrecipitation(state, SysTimestepLoop);
         UpdateIrrigation(state);
     }
 
@@ -933,9 +931,8 @@ namespace WaterManager {
         } // my one time flag block
     }
 
-    void UpdatePrecipitation(EnergyPlusData &state, int const SysTimestepLoop)
+    void UpdatePrecipitation(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   August 2006
@@ -945,7 +942,6 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of precipitation
 
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
         Real64 schedRate;
@@ -960,42 +956,42 @@ namespace WaterManager {
                 ScaleFactor = 0.0;
             }
             state.dataWaterData->RainFall.CurrentRate = schedRate * ScaleFactor / DataGlobalConstants::SecInHour; // convert to m/s
-            state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
         } else {
             // placeholder: add EP checks for out of range precipitation value later -- yujie
             // when there's no site:precipitation but non-zero epw precipitation, uset the epw precipitation as the CurrentRate
             if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
-                ShowWarningMessage(state,
-                                   "Please be aware that precipitation depth in the .epw weather file is used in the RainCollector calculation as "
-                                   "the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. "
-                                   "Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
                 // LiquidPrecipitation is for a certain timestep in an hour, the rate = depth / seconds in a timestep
                 state.dataWaterData->RainFall.CurrentRate =
                     state.dataEnvrn->LiquidPrecipitation / (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
             } else {
-                // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
-                if (state.dataEnvrn->IsRain) {
-                    ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
-                    state.dataWaterData->RainFall.CurrentRate = (1.5 / 1000.0) / DataGlobalConstants::SecInHour;
-                    state.dataWaterData->RainFall.CurrentAmount =
-                        state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
-                } else {
-                    state.dataWaterData->RainFall.CurrentRate = 0.0;
-                    state.dataWaterData->RainFall.CurrentAmount = 0.0;
-                }
+                state.dataWaterData->RainFall.CurrentRate = 0.0;
             }
         }
-        state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
-        int EndYear = state.dataEnvrn->EndYear;
-        int CurrentYear = state.dataEnvrn->Year;
-        // only report for the last year
-        if (CurrentYear == EndYear) {
-            int month = state.dataEnvrn->Month;
-            // change unit back to mm in the reporting in monthly rain amount used in rain collector
-            if ((SysTimestepLoop == 0) && (state.dataWaterData->RainFall.CurrentAmount > 0.0)) {
-                state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
-            }
+        state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
+        state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
+        int month = state.dataEnvrn->Month;
+        // change unit back to mm in the reporting in monthly rain amount used in rain collector
+        if ((state.dataWaterData->RainFall.CurrentAmount > 0.0) && (state.dataEnvrn->RunPeriodEnvironment)) {
+            state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
         }
+        if (!state.dataGlobal->WarmupFlag) {
+            state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
+        }
+
+        // debug print
+//        if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
+//            fmt::print("{} {}-{} liquidPrec={}, curAmt={}, acc={}, ref={}, TimeStepSys={}, n_timestep={}\n",
+//                       state.dataEnvrn->CurMnDy,
+//                       state.dataGlobal->HourOfDay,
+//                       state.dataGlobal->TimeStep,
+//                       state.dataEnvrn->LiquidPrecipitation,
+//                       state.dataWaterData->RainFall.CurrentAmount,
+//                       state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1],
+//                       state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1],
+//                       TimeStepSys,
+//                       state.dataGlobal->NumOfTimeStepInHour);
+//        }
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
@@ -1512,14 +1508,9 @@ namespace WaterManager {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
-            int EndYear = state.dataEnvrn->EndYear;
-            int CurrentYear = state.dataEnvrn->Year;
-            // only report for the last year
-            if (CurrentYear == EndYear) {
-                int month = state.dataEnvrn->Month;
-                state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] +=
-                    state.dataWaterData->RainCollector(RainColNum).VolCollected;
-            }
+            int month = state.dataEnvrn->Month;
+            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] +=
+                state.dataWaterData->RainCollector(RainColNum).VolCollected;
         }
     }
 

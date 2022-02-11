@@ -909,45 +909,8 @@ namespace EcoRoofManager {
         }
 
         // NEXT Add Precipitation to surface soil moisture variable (if a schedule exists)
-        if (!state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->CurrentPrecipitation = 0.0; // first initialize to zero
-        }
-        state.dataEcoRoofMgr->CurrentPrecipitation = 0.0; // first initialize to zero
-        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
-            state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
-            Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
-            if (!state.dataGlobal->WarmupFlag) {
-                state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
-            }
-        } else {
-            if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
-                ShowWarningMessage(state,
-                                   "Please be aware that precipitation depth in the .epw weather file is used in the RoofIrrigation calculation as "
-                                   "the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. "
-                                   "Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
-                state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation; //  units of m
-                // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
-            } else {
-                if (state.dataEnvrn->IsRain) {
-                    ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
-                    state.dataEcoRoofMgr->CurrentPrecipitation = (1.5 / 1000.0); //  units of m
-                } else {
-                    state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation; //  units of m
-                }
-            }
-            Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
-            if (!state.dataGlobal->WarmupFlag) {
-                state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
-                // aggregate to monthly for reporting
-                int EndYear = state.dataEnvrn->EndYear;
-                int CurrentYear = state.dataEnvrn->Year;
-                // only report for the last year
-                if (CurrentYear == EndYear) {
-                    int month = state.dataEnvrn->Month;
-                    state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
-                }
-            }
-        }
+        // the code updating precipitation is moved to UpdatePrecipitation
+        Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
 
         // NEXT Add Irrigation to surface soil moisture variable (if a schedule exists)
         state.dataEcoRoofMgr->CurrentIrrigation = 0.0; // first initialize to zero
@@ -979,13 +942,8 @@ namespace EcoRoofManager {
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
             // aggregate to monthly for reporting
-            int EndYear = state.dataEnvrn->EndYear;
-            int CurrentYear = state.dataEnvrn->Year;
-            // only report for the last year
-            if (CurrentYear == EndYear) {
-                int month = state.dataEnvrn->Month;
-                state.dataEcoRoofMgr->MonthlyIrrigation[month - 1] += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
-            }
+            int month = state.dataEnvrn->Month;
+            state.dataEcoRoofMgr->MonthlyIrrigation[month - 1] += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
         }
 
         // Note: If soil top layer gets a massive influx of rain &/or irrigation some of
