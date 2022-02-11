@@ -433,7 +433,7 @@ namespace ExhaustAirSystemManager {
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate =
-                fancomp.OutletAirMassFlowRate / fancomp.RhoAirStdInit;
+                fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir; // fancomp.RhoAirStdInit;
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanPower * 1000.0;
 
