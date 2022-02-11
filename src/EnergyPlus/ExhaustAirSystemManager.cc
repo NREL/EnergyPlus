@@ -371,6 +371,7 @@ namespace ExhaustAirSystemManager {
 
     void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum, bool FirstHVACIteration)
     {
+        auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
         // 2022-01: Simulate Zone Air Mixer
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
@@ -379,6 +380,14 @@ namespace ExhaustAirSystemManager {
                                                     state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
         } else {
             // 2022-02: Give a warning that the current model does not work with AirflowNetwork for now
+        }
+
+        Real64 mixerFlow_Prior = 0.0;
+        int outletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutletNode;
+        mixerFlow_Prior = state.dataLoopNodes->Node(outletNode_index).MassFlowRate;
+        if (mixerFlow_Prior == 0.0) {
+            // No flow coming out from the exhaust controls;
+            // fan should be cut off now;
         }
 
         // 2022-01-26: One additional step here might be to consider the avaiability schedule of the exhasut system
@@ -441,6 +450,17 @@ namespace ExhaustAirSystemManager {
         }
 
         // 2022-01: Determine if there are some "iteration" or revisit step for the zone mixer and fan simulation
+        Real64 mixerFlow_Posterior = 0.0;
+        mixerFlow_Posterior = state.dataLoopNodes->Node(outletNode_index).MassFlowRate;
+        if (mixerFlow_Posterior == 0.0) {
+            // fan flow is nearly zero and should be considered off
+
+        }
+        if ((mixerFlow_Prior - mixerFlow_Posterior > 1e-6) || ((mixerFlow_Prior - mixerFlow_Posterior < -1e-6))) {
+            // calculate a ratio
+            // use the map information to pick up zone exhaust control branches to simulation again:
+
+        }
     }
 
     void ReportExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
