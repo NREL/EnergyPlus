@@ -2785,7 +2785,7 @@ namespace ScheduleManager {
         // Hourly Value
         int thisHour;
         if (state.dataScheduleMgr->Schedule(ScheduleIndex).UseDaylightSaving) {
-            thisHour = ThisHour + state.dataEnvrn->DSTIndicator;
+            thisHour = ThisHour + state.dataEnvrn->DSTIndicator; // Should we subtract instead of add?
         } else {
             thisHour = ThisHour;
         }
