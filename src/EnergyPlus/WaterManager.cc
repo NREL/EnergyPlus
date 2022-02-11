@@ -968,7 +968,10 @@ namespace WaterManager {
             }
         }
         state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
-        state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
+        // follow develop branch behavior
+        if (state.dataGlobal->TimeStep > 1) {
+            state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
+        }
         int month = state.dataEnvrn->Month;
         // change unit back to mm in the reporting in monthly rain amount used in rain collector
         if ((state.dataWaterData->RainFall.CurrentAmount > 0.0) && (state.dataEnvrn->RunPeriodEnvironment)) {
@@ -979,19 +982,6 @@ namespace WaterManager {
             state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
         }
 
-        // debug print
-//        if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
-//            fmt::print("{} {}-{} liquidPrec={}, curAmt={}, acc={}, ref={}, TimeStepSys={}, n_timestep={}\n",
-//                       state.dataEnvrn->CurMnDy,
-//                       state.dataGlobal->HourOfDay,
-//                       state.dataGlobal->TimeStep,
-//                       state.dataEnvrn->LiquidPrecipitation,
-//                       state.dataWaterData->RainFall.CurrentAmount,
-//                       state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1],
-//                       state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1],
-//                       TimeStepSys,
-//                       state.dataGlobal->NumOfTimeStepInHour);
-//        }
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
