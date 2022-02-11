@@ -3843,14 +3843,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                        ObjectIsNotParent);
 
         setpointManager.CtrlNodeListName = cAlphaArgs(4);
-        if (setpointManager.SpAtLowRef < setpointManager.SpAtHighRef) {
-            ShowWarningError(state, format("{}: {}=\"{}\", invalid setpoints.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+        if (setpointManager.HighRef < setpointManager.LowRef) {
+            ShowWarningError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state,
                               format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
                                      cNumericFieldNames(1),
-                                     setpointManager.SpAtLowRef,
+                                     setpointManager.LowRef,
                                      cNumericFieldNames(2),
-                                     setpointManager.SpAtHighRef));
+                                     setpointManager.HighRef));
         }
 
         NodeListError = false;
@@ -3965,14 +3965,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                        ObjectIsNotParent);
 
         setpointManager.CtrlNodeListName = cAlphaArgs(4);
-        if (setpointManager.SpAtLowRef < setpointManager.SpAtHighRef) {
-            ShowWarningError(state, format("{}: {}=\"{}\", invalid setpoints.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+        if (setpointManager.HighRef < setpointManager.LowRef) {
+            ShowWarningError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state,
                               format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
                                      cNumericFieldNames(1),
-                                     setpointManager.SpAtLowRef,
+                                     setpointManager.LowRef,
                                      cNumericFieldNames(2),
-                                     setpointManager.SpAtHighRef));
+                                     setpointManager.HighRef));
         }
 
         NodeListError = false;
