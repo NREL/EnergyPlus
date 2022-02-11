@@ -1754,22 +1754,23 @@ The type of variable that will be controlled. There are three key choices for th
   \item Temperature
   \item MaximumTemperature
   \item MinimumTemperature
+\end{itemize}
 
 \paragraph{Field: Setpoint at Low Reference Temperature}\label{field-setpoint-at-low-reference-temperature}
 
-The temperature setpoint in \(^{o}\)C at the low reference temperature for the reset rule.
+The temperature setpoint in \si{\degreeCelsius} at the low reference temperature for the reset rule.
 
 \paragraph{Field: Setpoint at High Reference Temperature}\label{field-setpoint-at-high-reference-temperature}
 
-The temperature setpoint in \(^{o}\)C at the high reference temperature for the reset rule.
+The temperature setpoint in \si{\degreeCelsius} at the high reference temperature for the reset rule.
 
 \paragraph{Field: Low Reference Temperature}\label{field-low-reference-temperature}
 
-The low reference temperature in \(^{o}\)C for the reset rule. When the reference temperature is lower than this value, the temperature setpoint is at its maximum.
+The low reference temperature in \si{\degreeCelsius} for the reset rule. When the reference temperature is lower than this value, the temperature setpoint is at its maximum.
 
 \paragraph{Field: High Reference Temperature}\label{field-high-reference-temperature}
 
-The high reference temperature in \(^{o}\)C for the reset rule. When the reference temperature is higher than this value, the temperature setpoint is at its minimum.
+The high reference temperature in \si{\degreeCelsius} for the reset rule. When the reference temperature is higher than this value, the temperature setpoint is at its minimum.
 
 \paragraph{Field: Reference Node Name}\label{field-reference-node-name-2}
 
@@ -1779,7 +1780,7 @@ The name of a reference system node which will be used as a reference to determi
 
 The name of a \hyperref[nodelist]{NodeList} object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
 
-Below are examples, showing the inputs for SetpointManager:SystemNodeReset:Temperature.
+Below is an example, showing the inputs for SetpointManager:SystemNodeReset:Temperature.
 
 \begin{lstlisting}
 
@@ -1813,6 +1814,7 @@ The type of variable that will be controlled. There are three key choices for th
   \item HumidityRatio
   \item MaximumHumidityRatio
   \item MinimumHumidityRatio
+\end{itemize}
 
 \paragraph{Field: Setpoint at Low Reference Humidity Ratio}\label{field-setpoint-at-low-reference-humidity-ratio}
 
@@ -1838,7 +1840,7 @@ The name of a reference system node which will be used as a reference to determi
 
 The name of a \hyperref[nodelist]{NodeList} object containing the names of the HVAC system nodes or the HVAC System Node Name for which temperature setpoints will be established by this setpoint manager.
 
-Below are examples, showing the inputs for SetpointManager:SystemNodeReset:Humidity.
+Below is an example, showing the inputs for SetpointManager:SystemNodeReset:Humidity.
 
 \begin{lstlisting}
 
