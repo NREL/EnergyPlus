@@ -54,7 +54,7 @@
 
 int main(int argc, const char *argv[])
 {
-    EnergyPlus::EnergyPlusData *state = reinterpret_cast<EnergyPlus::EnergyPlusData*>(stateNew());
+    EnergyPlus::EnergyPlusData *state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(stateNew());
     // these need to be set early to be used in help and version output messaging
     // this was pulled from EnergyPlusPgm.cc and needs to be removed once the release is done
     Array1D_int value(8);
