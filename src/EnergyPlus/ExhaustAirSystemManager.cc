@@ -76,10 +76,7 @@ namespace EnergyPlus {
 
 namespace ExhaustAirSystemManager {
     // Module containing the routines dealing with the AirLoopHVAC:ExhaustSystem
-    // Date: January 2022
 
-    // PURPOSE OF THIS MODULE:
-    // To manage the exhaust air system.
     struct MixerBranchZone
     {
         int mixerInletNodeNum;
@@ -133,9 +130,6 @@ namespace ExhaustAirSystemManager {
         int NumNums;
         int IOStat;
         int Counter;
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool ErrorsFound( false );
-        ////////////////////////////////////////////////////////////////////////////////////
         bool IsNotOK; // Flag to verify name
 
         bool ErrorsFound = false;
@@ -175,21 +169,6 @@ namespace ExhaustAirSystemManager {
                 auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(exhSysNum);
                 thisExhSys.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
-
-                std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
-                int availSchNum = ScheduleManager::GetScheduleIndex(state, availSchName);
-                if (availSchNum > 0) {
-                    // normal conditions
-                } else if (availSchNum == 0) {
-                    // blank or anything like that, treat as always avaialabe
-                } else {
-                    availSchNum = 0;
-                    // a regular warning
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "Avaiability Schedule Name =" + availSchName + "not found.");
-                    // ErrorsFound = true;
-                }
-                thisExhSys.AvailScheduleNum = availSchNum;
 
                 std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "airloophvac_zonemixer_name");
                 int zoneMixerIndex = 0;
@@ -233,6 +212,7 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.CentralFanTypeNum = centralFanTypeNum;
 
                 std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
+                int availSchNum = 0;
                 int centralFanIndex = -1; // zero based
                 if (centralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                     // 2022-02-04: This type is zero indexed.
@@ -241,6 +221,7 @@ namespace ExhaustAirSystemManager {
 
                     centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
                     if (centralFanIndex >= 0) {
+                        availSchNum = state.dataHVACFan->fanObjs[centralFanIndex]->availSchedIndex;
                         // normal index
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Outlet Air Mass Flow Rate",
@@ -304,6 +285,8 @@ namespace ExhaustAirSystemManager {
                             // EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag, ObjexxFCL::Optional_string_const());
                             EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag);
 
+                            availSchNum = state.dataFans->Fan(centralFanIndex).AvailSchedPtrNum;
+
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Outlet Air Mass Flow Rate",
                                                 OutputProcessor::Unit::kg_s,
@@ -350,6 +333,22 @@ namespace ExhaustAirSystemManager {
                 }
 
                 thisExhSys.CentralFanIndex = centralFanIndex;
+
+
+                // std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
+                // int availSchNum = EnergyPlus::ScheduleManager::GetScheduleIndex(state, availSchName);
+                if (availSchNum > 0) {
+                    // normal conditions
+                } else if (availSchNum == 0) {
+                    // blank or anything like that, treat as always avaialabe
+                } else { // = -1 // not found a match
+                    availSchNum = 0;
+                    // a regular warning
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                    ShowContinueError(state, "Could not find a match for Central Exhaust Fan's Avaiability Schedule.");
+                    ShowContinueError(state, "It will be treated as always available.");
+                }
+                thisExhSys.AvailScheduleNum = availSchNum;
 
                 // sizing
                 if (thisExhSys.SizingFlag) {
