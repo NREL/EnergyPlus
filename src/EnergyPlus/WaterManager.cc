@@ -967,7 +967,8 @@ namespace WaterManager {
                 state.dataWaterData->RainFall.CurrentRate = 0.0;
             }
         }
-        state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
+        state.dataWaterData->RainFall.CurrentAmount =
+            state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
         // follow develop branch behavior
         if (state.dataGlobal->TimeStep > 1) {
             state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
@@ -981,7 +982,6 @@ namespace WaterManager {
             state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
             state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
         }
-
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
