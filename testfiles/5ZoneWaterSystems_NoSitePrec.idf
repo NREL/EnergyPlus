@@ -159,17 +159,20 @@
     10,                      !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-! RunPeriod,
-!   1,                      !- Begin Month
-!   1,                       !- Begin Day Of Month
-!    12,                      !- End Month
-!    31,                      !- End Day Of Month
-!    Tuesday,                 !- Day Of Week For Start Day
-!    Yes,                     !- Use WeatherFile Holidays/Special Days
-!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-!    No,                      !- Apply Weekend Holiday Rule
-!    Yes,                     !- Use WeatherFile Rain Indicators
-!    Yes;                     !- Use WeatherFile Snow Indicators
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -183,7 +186,7 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No,                      !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 

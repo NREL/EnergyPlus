@@ -98,7 +98,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -252,15 +252,10 @@
 
   Site:GroundTemperature:BuildingSurface,19.00,20.01,20.07,20.12,20.17,20.23,20.28,20.31,20.30,20.30,20.29,20.27;
 
-  Site:Precipitation,
-    ScheduleAndDesignLevel,  !- Precipitation Model Type
-    1,                       !- Design Level for Total Annual Precipitation {m/yr}
-    precipitationMiami,      !- Precipitation Rates Schedule Name
-    1;                       !- Average Total Annual Precipitation {m/yr}
-
   RoofIrrigation,
     SmartSchedule,           !- Irrigation Model Type
-    IRRIGATIONSCHD;          !- Irrigation Rate Schedule Name
+    IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name
+    Yes;                     !- Use Precipitation
 
   Material,
     Wood 6inch,              !- Name
