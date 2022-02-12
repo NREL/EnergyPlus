@@ -45,8 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::DataVectorTypes::Vector Unit Tests
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -70,7 +68,6 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Basic)
     EXPECT_EQ(3, v(3));
     EXPECT_EQ(4, v(4));
 #ifndef NDEBUG
-    ASSERT_DEATH(v[4] = 5, ".*");
-    //ASSERT_EXIT(v[4] = 5, testing::ExitedWithCode(3), ".*");
+    ASSERT_THROW(v[4] = 5, std::out_of_range);
 #endif // !NDEBUG
 }
