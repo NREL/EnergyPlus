@@ -234,6 +234,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
     state->dataEnvrn->Year = 2000;
     state->dataEnvrn->EndYear = 2000;
     state->dataEnvrn->Month = 1;
+    state->dataGlobal->TimeStep = 2;
 
     // Without site:precipitation, use epw "LiquidPrecipitation"
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Invalid;
