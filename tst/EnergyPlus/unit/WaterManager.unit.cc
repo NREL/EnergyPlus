@@ -81,6 +81,8 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     WaterManager::GetWaterManagerInput(*state);
     state->dataEnvrn->Year = 2000;
     state->dataEnvrn->EndYear = 2000;
+    state->dataEnvrn->Month = 1;
+    state->dataGlobal->TimeStep = 2;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
@@ -117,6 +119,8 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataEnvrn->Year = 2000;
     state->dataEnvrn->EndYear = 2000;
+    state->dataEnvrn->Month = 1;
+    state->dataGlobal->TimeStep = 2;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 2.0;
 
@@ -156,6 +160,8 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     WaterManager::GetWaterManagerInput(*state);
     state->dataEnvrn->Year = 2000;
     state->dataEnvrn->EndYear = 2000;
+    state->dataEnvrn->Month = 1;
+    state->dataGlobal->TimeStep = 2;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 

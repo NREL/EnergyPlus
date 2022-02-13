@@ -943,7 +943,7 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
             // aggregate to monthly for reporting
             int month = state.dataEnvrn->Month;
-            state.dataEcoRoofMgr->MonthlyIrrigation[month - 1] += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
+            state.dataEcoRoofMgr->MonthlyIrrigation.at(month - 1) += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
         }
 
         // Note: If soil top layer gets a massive influx of rain &/or irrigation some of

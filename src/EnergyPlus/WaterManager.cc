@@ -976,11 +976,11 @@ namespace WaterManager {
         int month = state.dataEnvrn->Month;
         // change unit back to mm in the reporting in monthly rain amount used in rain collector
         if ((state.dataWaterData->RainFall.CurrentAmount > 0.0) && (state.dataEnvrn->RunPeriodEnvironment)) {
-            state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
         }
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr.at(month - 1) += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
         }
     }
 
@@ -1499,7 +1499,7 @@ namespace WaterManager {
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
             int month = state.dataEnvrn->Month;
-            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] +=
+            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly.at(month - 1) +=
                 state.dataWaterData->RainCollector(RainColNum).VolCollected;
         }
     }

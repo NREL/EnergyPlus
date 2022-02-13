@@ -2298,9 +2298,9 @@ namespace WeatherManager {
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
         if (state.dataEnvrn->RunPeriodEnvironment) {
             int month = state.dataEnvrn->Month;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1] += state.dataEnvrn->LiquidPrecipitation * 1000.0;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather.at(month - 1) += state.dataEnvrn->LiquidPrecipitation * 1000.0;
             if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
-                state.dataWaterData->RainFall.numRainyHoursInWeather[month - 1] += 1;
+                state.dataWaterData->RainFall.numRainyHoursInWeather.at(month - 1) += 1;
             }
         }
 
