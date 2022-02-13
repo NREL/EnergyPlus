@@ -69,5 +69,6 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Basic)
     EXPECT_EQ(4, v(4));
 #ifndef NDEBUG
     ASSERT_THROW(v[4] = 5, std::out_of_range);
+    ASSERT_THROW(v(5) = 5, std::out_of_range);
 #endif // !NDEBUG
 }
