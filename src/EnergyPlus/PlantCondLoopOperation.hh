@@ -60,10 +60,7 @@ namespace EnergyPlus {
 namespace PlantCondLoopOperation {
 
     void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                     int const LoopNum,                             // PlantLoop data structure loop counter
-                                     const DataPlant::LoopSideLocation LoopSideNum, // PlantLoop data structure LoopSide counter
-                                     int const BranchNum,                           // PlantLoop data structure branch counter
-                                     int const CompNum,                             // PlantLoop data structure component counter
+                                     PlantLocation const &plantLoc, // PlantLoop data structure Location struct
                                      Real64 &LoopDemand,
                                      Real64 &RemLoopDemand,
                                      bool const FirstHVACIteration,
@@ -83,11 +80,11 @@ namespace PlantCondLoopOperation {
     );
 
     void FindDeltaTempRangeInput(EnergyPlusData &state,
-                                 std::string &CurrentModuleObject, // for ease in renaming
-                                 int const NumSchemes,             // May be set here and passed on
-                                 int const LoopNum,                // May be set here and passed on
-                                 int const SchemeNum,              // May be set here and passed on
-                                 bool &ErrorsFound                 // May be set here and passed on
+                                 DataLoopNode::ConnectionObjectType const CurrentModuleObject, // for ease in renaming
+                                 int const NumSchemes,                                         // May be set here and passed on
+                                 int const LoopNum,                                            // May be set here and passed on
+                                 int const SchemeNum,                                          // May be set here and passed on
+                                 bool &ErrorsFound                                             // May be set here and passed on
     );
 
     void LoadEquipList(EnergyPlusData &state,
@@ -131,26 +128,17 @@ namespace PlantCondLoopOperation {
     );
 
     void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
-                                       int const LoopNum,                             // component topology
-                                       const DataPlant::LoopSideLocation LoopSideNum, // component topology
-                                       int const BranchNum,                           // component topology
-                                       int const CompNum,                             // component topology
-                                       Real64 &ChangeInLoad                           // positive magnitude of load change
+                                       PlantLocation const &plantLoc, // component topology
+                                       Real64 &ChangeInLoad           // positive magnitude of load change
     );
 
     void FindCompSPLoad(EnergyPlusData &state,
-                        int const LoopNum,
-                        const DataPlant::LoopSideLocation LoopSideNum,
-                        int const BranchNum,
-                        int const CompNum,
+                        PlantLocation const &plantLoc,
                         int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
     );
 
     void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
-                                        int const LoopNum,
-                                        const DataPlant::LoopSideLocation LoopSideNum,
-                                        int const BranchNum,
-                                        int const CompNum,
+                                        PlantLocation const &plantLoc,
                                         int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
                                         int const CurSchemePtr,
                                         Real64 const LoopDemand,
@@ -170,18 +158,10 @@ namespace PlantCondLoopOperation {
 
     void SetupPlantEMSActuators(EnergyPlusData &state);
 
-    void ActivateEMSControls(EnergyPlusData &state,
-                             int const LoopNum,
-                             const DataPlant::LoopSideLocation LoopSideNum,
-                             int const BranchNum,
-                             int const CompNum,
-                             bool &LoopShutDownFlag);
+    void ActivateEMSControls(EnergyPlusData &state, PlantLocation const &plantLoc, bool &LoopShutDownFlag);
 
     void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
-                                         int const LoopNum,
-                                         const DataPlant::LoopSideLocation LoopSideNum,
-                                         int const BranchNum,
-                                         int const CompNum,
+                                         PlantLocation const &plantLoc,
                                          Real64 &ChangeInLoad // positive magnitude of load change
     );
 

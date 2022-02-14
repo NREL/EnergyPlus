@@ -85,7 +85,7 @@ namespace DataRoomAirModel {
         "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
 
     // Parameters to indicate air temperature coupling scheme
-    enum class CouplingScheme : int
+    enum class CouplingScheme
     {
         Invalid = -1,
         Direct,
@@ -97,15 +97,15 @@ namespace DataRoomAirModel {
     enum class AirNodeType
     {
         Invalid = -1,
-        InletAirNode,              // air node at inlet (for Mundt and Rees&Haves Models)
-        FloorAirNode,              // air node at floor (for Mundt and Rees&Haves Models)
-        ControlAirNode,            // air node at control point (for Mundt Model)
-        CeilingAirNode,            // air node at ceiling (for Mundt Model)
-        MundtRoomAirNode,          // air node for vertical walls (for Mundt Model)
-        ReturnAirNode,             // air node for return (for Mundt and Rees&Haves Models)
-        AirflowNetworkRoomAirNode, // air node for airflow network based room air model
-        PlumeAirNode,              // air node for plume load (for Rees&Haves Model)
-        RoomAirNode,               // air node for vertical walls (for Rees&Haves Model)
+        InletAir,              // air node at inlet (for Mundt and Rees&Haves Models)
+        FloorAir,              // air node at floor (for Mundt and Rees&Haves Models)
+        ControlAir,            // air node at control point (for Mundt Model)
+        CeilingAir,            // air node at ceiling (for Mundt Model)
+        MundtRoomAir,          // air node for vertical walls (for Mundt Model)
+        ReturnAir,             // air node for return (for Mundt and Rees&Haves Models)
+        AirflowNetworkRoomAir, // air node for airflow network based room air model
+        PlumeAir,              // air node for plume load (for Rees&Haves Model)
+        RoomAir,               // air node for vertical walls (for Rees&Haves Model)
         Num
     };
 
@@ -113,11 +113,11 @@ namespace DataRoomAirModel {
     enum class UserDefinedPatternMode
     {
         Invalid = -1,
-        OutdoorDryBulbMode,  // by outdoor air bulb.
-        SensibleCoolingMode, // by sensible cooling load
-        SensibleHeatingMode, // by sensible heating load
-        ZoneAirTempMode,     // by zone air temperature
-        DeltaOutdoorZone,    // by difference between zone and outdoor
+        OutdoorDryBulb,   // by outdoor air bulb.
+        SensibleCooling,  // by sensible cooling load
+        SensibleHeating,  // by sensible heating load
+        ZoneAirTemp,      // by zone air temperature
+        DeltaOutdoorZone, // by difference between zone and outdoor
         Num
     };
 
@@ -125,10 +125,10 @@ namespace DataRoomAirModel {
     enum class UserDefinedPatternType
     {
         Invalid = -1,
-        ConstGradTempPattern,  // constant gradient in vertical direction
-        TwoGradInterpPattern,  // two gradient interpolation
-        NonDimenHeightPattern, // non-dimensionalized height
-        SurfMapTempPattern,    // arbitrary surface mappings
+        ConstGradTemp,  // constant gradient in vertical direction
+        TwoGradInterp,  // two gradient interpolation
+        NonDimenHeight, // non-dimensionalized height
+        SurfMapTemp,    // arbitrary surface mappings
         Num
     };
 

@@ -35,8 +35,11 @@ if(ENABLE_PCH)
   target_precompile_headers(
     cpp_pch_files
     INTERFACE
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/DataGlobalConstants.hh"
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/DataGlobals.hh"
     "${PROJECT_SOURCE_DIR}/src/EnergyPlus/Data/EnergyPlusData.hh"
     "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array.functions.hh"
+    "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh"
     "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json.hpp"
     )
 endif()
@@ -267,8 +270,8 @@ target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
 
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6)
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6/include)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP/include)
 
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING

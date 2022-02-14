@@ -173,22 +173,18 @@ namespace Humidifiers {
         thisHum.ControlHumidifier(state, WaterAddNeeded);
 
         // call the correct humidifier calculation routine
-        {
-            auto const SELECT_CASE_var(thisHum.HumType);
-
-            if (SELECT_CASE_var == HumidType::Electric) { // 'HUMIDIFIER:STEAM:ELECTRIC'
-
-                thisHum.CalcElecSteamHumidifier(state, WaterAddNeeded);
-
-            } else if (SELECT_CASE_var == HumidType::Gas) { // 'HUMIDIFIER:STEAM:GAS'
-
-                thisHum.CalcGasSteamHumidifier(state, WaterAddNeeded);
-
-            } else {
-                ShowSevereError(state, format("SimHumidifier: Invalid Humidifier Type Code={}", thisHum.HumType));
-                ShowContinueError(state, "...Component Name=[" + std::string{CompName} + "].");
-                ShowFatalError(state, "Preceding Condition causes termination.");
-            }
+        switch (thisHum.HumType) {
+        case HumidType::Electric: { // 'HUMIDIFIER:STEAM:ELECTRIC'
+            thisHum.CalcElecSteamHumidifier(state, WaterAddNeeded);
+        } break;
+        case HumidType::Gas: { // 'HUMIDIFIER:STEAM:GAS'
+            thisHum.CalcGasSteamHumidifier(state, WaterAddNeeded);
+        } break;
+        default: {
+            ShowSevereError(state, format("SimHumidifier: Invalid Humidifier Type Code={}", thisHum.HumType));
+            ShowContinueError(state, "...Component Name=[" + std::string{CompName} + "].");
+            ShowFatalError(state, "Preceding Condition causes termination.");
+        } break;
         }
 
         thisHum.UpdateReportWaterSystem(state);
@@ -312,19 +308,19 @@ namespace Humidifiers {
             Humidifier(HumNum).AirInNode = GetOnlySingleNode(state,
                                                              Alphas(3),
                                                              ErrorsFound,
-                                                             CurrentModuleObject,
+                                                             DataLoopNode::ConnectionObjectType::HumidifierSteamElectric,
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Air,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                             DataLoopNode::ConnectionType::Inlet,
                                                              NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
                                                               Alphas(4),
                                                               ErrorsFound,
-                                                              CurrentModuleObject,
+                                                              DataLoopNode::ConnectionObjectType::HumidifierSteamElectric,
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                              DataLoopNode::ConnectionType::Outlet,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -383,19 +379,19 @@ namespace Humidifiers {
             Humidifier(HumNum).AirInNode = GetOnlySingleNode(state,
                                                              Alphas(4),
                                                              ErrorsFound,
-                                                             CurrentModuleObject,
+                                                             DataLoopNode::ConnectionObjectType::HumidifierSteamGas,
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Air,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                             DataLoopNode::ConnectionType::Inlet,
                                                              NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
                                                               Alphas(5),
                                                               ErrorsFound,
-                                                              CurrentModuleObject,
+                                                              DataLoopNode::ConnectionObjectType::HumidifierSteamGas,
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                              DataLoopNode::ConnectionType::Outlet,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");

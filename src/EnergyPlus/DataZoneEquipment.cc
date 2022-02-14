@@ -109,7 +109,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::SetUpCompSets;
-    using NodeInputManager::CheckUniqueNodes;
+    using NodeInputManager::CheckUniqueNodeNames;
+    using NodeInputManager::CheckUniqueNodeNumbers;
     using NodeInputManager::EndUniqueNodeCheck;
     using NodeInputManager::GetNodeNums;
     using NodeInputManager::GetOnlySingleNode;
@@ -306,22 +307,23 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName = AlphArray(2); // the name of the list containing all the zone eq.
         InletNodeListName = AlphArray(3);
         ExhaustNodeListName = AlphArray(4);
-        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode = GetOnlySingleNode(state,
-                                                                                             AlphArray(5),
-                                                                                             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             AlphArray(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsNotParent); // all zone air state variables are
+        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode =
+            GetOnlySingleNode(state,
+                              AlphArray(5),
+                              state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                              DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
+                              AlphArray(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::ZoneNode,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent); // all zone air state variables are
         if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
             ShowContinueError(state, cAlphaFields(5) + " must be present.");
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         } else {
             UniqueNodeError = false;
-            CheckUniqueNodes(state, cAlphaFields(5), "NodeName", UniqueNodeError, AlphArray(5), _, AlphArray(1));
+            CheckUniqueNodeNames(state, cAlphaFields(5), UniqueNodeError, AlphArray(5), AlphArray(1));
             if (UniqueNodeError) {
                 // ShowContinueError(state,  "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -675,9 +677,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    "ZoneHVAC:EquipmentConnections",
+                    DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::ZoneInlet,
+                    DataLoopNode::ConnectionType::ZoneInlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -693,13 +695,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 "Zone Air Inlet Nodes",
-                                 "NodeNumber",
-                                 UniqueNodeError,
-                                 _,
-                                 NodeNums(NodeNum),
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                CheckUniqueNodeNumbers(state,
+                                       "Zone Air Inlet Nodes",
+                                       UniqueNodeError,
+                                       NodeNums(NodeNum),
+                                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
@@ -727,9 +727,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    "ZoneHVAC:EquipmentConnections",
+                    DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::ZoneExhaust,
+                    DataLoopNode::ConnectionType::ZoneExhaust,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -741,13 +741,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 "Zone Air Exhaust Nodes",
-                                 "NodeNumber",
-                                 UniqueNodeError,
-                                 _,
-                                 NodeNums(NodeNum),
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                CheckUniqueNodeNumbers(state,
+                                       "Zone Air Exhaust Nodes",
+                                       UniqueNodeError,
+                                       NodeNums(NodeNum),
+                                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
                     // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -767,9 +765,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    "ZoneHVAC:EquipmentConnections",
+                    DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::ZoneReturn,
+                    DataLoopNode::ConnectionType::ZoneReturn,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -794,13 +792,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 "Zone Return Air Nodes",
-                                 "NodeNumber",
-                                 UniqueNodeError,
-                                 _,
-                                 NodeNums(NodeNum),
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                CheckUniqueNodeNumbers(state,
+                                       "Zone Return Air Nodes",
+                                       UniqueNodeError,
+                                       NodeNums(NodeNum),
+                                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
                     // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -820,9 +816,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    "ZoneHVAC:EquipmentConnections",
+                    DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::Sensor,
+                    DataLoopNode::ConnectionType::Sensor,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -923,10 +919,10 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->SupplyAirPath(PathNum).InletNodeNum = GetOnlySingleNode(state,
                                                                                      AlphArray(2),
                                                                                      state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                                                     CurrentModuleObject,
+                                                                                     DataLoopNode::ConnectionObjectType::AirLoopHVACSupplyPath,
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                                     DataLoopNode::ConnectionType::Inlet,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsParent);
 
@@ -955,7 +951,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
+                    (AirLoopHVACZone)getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter));
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->SupplyAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
@@ -993,10 +989,10 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state,
                                                                                       AlphArray(2),
                                                                                       state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                                                      CurrentModuleObject,
+                                                                                      DataLoopNode::ConnectionObjectType::AirLoopHVACReturnPath,
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                                      DataLoopNode::ConnectionType::Outlet,
                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent);
 

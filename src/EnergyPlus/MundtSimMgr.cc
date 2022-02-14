@@ -293,12 +293,12 @@ namespace MundtSimMgr {
                         }
 
                         // count air nodes connected to walls in each zone
-                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::MundtRoomAirNode) {
+                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::MundtRoomAir) {
                             ++RoomNodesCount;
                         }
 
                         // count floors in each zone
-                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::FloorAirNode) {
+                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::FloorAir) {
                             FloorSurfCount += count(state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).SurfMask);
                         }
                     }
@@ -496,25 +496,30 @@ namespace MundtSimMgr {
         // set up air node ID
         state.dataMundtSimMgr->NumRoomNodes = 0;
         for (NodeNum = 1; NodeNum <= state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneNum); ++NodeNum) {
-            {
-                auto const SELECT_CASE_var(state.dataMundtSimMgr->LineNode(NodeNum, state.dataMundtSimMgr->MundtZoneNum).ClassType);
-                if (SELECT_CASE_var == AirNodeType::InletAirNode) { // inlet
-                    state.dataMundtSimMgr->SupplyNodeID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::FloorAirNode) { // floor
-                    state.dataMundtSimMgr->MundtFootAirID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::ControlAirNode) { // thermostat
-                    state.dataMundtSimMgr->TstatNodeID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::CeilingAirNode) { // ceiling
-                    state.dataMundtSimMgr->MundtCeilAirID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::MundtRoomAirNode) { // wall
-                    ++state.dataMundtSimMgr->NumRoomNodes;
-                    state.dataMundtSimMgr->RoomNodeIDs(state.dataMundtSimMgr->NumRoomNodes) = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::ReturnAirNode) { // return
-                    state.dataMundtSimMgr->ReturnNodeID = NodeNum;
-                } else {
-                    ShowSevereError(state, "SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
-                    ErrorsFound = true;
-                }
+            switch (state.dataMundtSimMgr->LineNode(NodeNum, state.dataMundtSimMgr->MundtZoneNum).ClassType) {
+            case AirNodeType::InletAir: { // inlet
+                state.dataMundtSimMgr->SupplyNodeID = NodeNum;
+            } break;
+            case AirNodeType::FloorAir: { // floor
+                state.dataMundtSimMgr->MundtFootAirID = NodeNum;
+            } break;
+            case AirNodeType::ControlAir: { // thermostat
+                state.dataMundtSimMgr->TstatNodeID = NodeNum;
+            } break;
+            case AirNodeType::CeilingAir: { // ceiling
+                state.dataMundtSimMgr->MundtCeilAirID = NodeNum;
+            } break;
+            case AirNodeType::MundtRoomAir: { // wall
+                ++state.dataMundtSimMgr->NumRoomNodes;
+                state.dataMundtSimMgr->RoomNodeIDs(state.dataMundtSimMgr->NumRoomNodes) = NodeNum;
+            } break;
+            case AirNodeType::ReturnAir: { // return
+                state.dataMundtSimMgr->ReturnNodeID = NodeNum;
+            } break;
+            default: {
+                ShowSevereError(state, "SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
+                ErrorsFound = true;
+            } break;
             }
         }
 

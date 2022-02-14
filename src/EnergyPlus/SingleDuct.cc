@@ -437,10 +437,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -448,10 +448,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -561,10 +561,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(9),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(9));
@@ -581,11 +581,11 @@ void GetSysInput(EnergyPlusData &state)
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ControllerOffset = 0.001;
         }
         if (UtilityRoutines::SameString(Alphas(10), "Reverse")) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::ReverseAction;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::Reverse;
         } else if (UtilityRoutines::SameString(Alphas(10), "Normal")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::Normal;
         } else if (UtilityRoutines::SameString(Alphas(10), "ReverseWithLimits")) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::ReverseActionWithLimits;
+            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::ReverseWithLimits;
         } else {
             ShowSevereError(state, cAlphaFields(10) + " = " + Alphas(10) + " not found.");
             ShowContinueError(state,
@@ -675,7 +675,7 @@ void GetSysInput(EnergyPlusData &state)
 
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFractionDuringReheat = Numbers(8);
 
-        if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction != Action::ReverseActionWithLimits) {
+        if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction != Action::ReverseWithLimits) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRateDuringReheat > 0.0) {
                 ShowWarningError(state, "Since " + cAlphaFields(10) + " = " + Alphas(10) + ", input for " + cNumericFields(7) + " will be ignored.");
                 ShowContinueError(state,
@@ -845,10 +845,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -856,10 +856,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -883,17 +883,7 @@ void GetSysInput(EnergyPlusData &state)
         // electric or gas reheat.
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Gas ||
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Electric) {
-            //          IF(.NOT. lAlphaBlanks(5)) THEN
-            //            CALL ShowWarningError(state, 'In '//TRIM(sd_airterminal(SysNum)%SysType)//' = ' //TRIM(sd_airterminal(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is not needed and will be ignored.')
-            //            CALL ShowContinueError(state, '  It is used for hot water and steam reheat coils only.')
-            //          END IF
         } else {
-            //          IF(lAlphaBlanks(5)) THEN
-            //            CALL ShowSevereError(state, 'In '//TRIM(sd_airterminal(SysNum)%SysType)//' = ' //TRIM(sd_airterminal(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is undefined.')
-            //            ErrorsFound=.TRUE.
-            //          ELSE
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -907,8 +897,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                //                              DataLoopNode::NodeFluidType::Steam,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             } else {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -922,8 +910,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                GetOnlySingleNode(state, Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
-                //                              DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             }
             //  END IF
         }
@@ -931,10 +917,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(7),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(7));
@@ -951,7 +937,7 @@ void GetSysInput(EnergyPlusData &state)
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ControllerOffset = 0.001;
         }
 
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::ReverseAction;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::Reverse;
 
         // Register component set data
         TestCompSet(state,
@@ -1155,10 +1141,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(3));
@@ -1166,10 +1152,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(4));
@@ -1177,17 +1163,7 @@ void GetSysInput(EnergyPlusData &state)
         // electric or gas reheat.
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Gas ||
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Electric) {
-            //          IF(.NOT. lAlphaBlanks(5)) THEN
-            //            CALL ShowWarningError(state, 'In '//TRIM(Sys(SysNum)%SysType)//' = ' // TRIM(Sys(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is not needed and will be ignored.')
-            //            CALL ShowContinueError(state, '  It is used for hot water reheat coils only.')
-            //          END IF
         } else {
-            //          IF(lAlphaBlanks(5)) THEN
-            //            CALL ShowSevereError(state, 'In '//TRIM(Sys(SysNum)%SysType)//' = ' // TRIM(Sys(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is undefined.')
-            //            ErrorsFound=.TRUE.
-            //          END IF
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -1201,8 +1177,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                 GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                //                               DataLoopNode::NodeFluidType::Steam,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             } else {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -1216,8 +1190,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                 GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                //                               DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             }
         }
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
@@ -1225,7 +1197,7 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingActionNotUsed;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxReheatSteamVolFlow = Numbers(2);
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatSteamVolFlow = Numbers(3);
@@ -1388,10 +1360,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -1399,10 +1371,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -1410,7 +1382,7 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MaxAirVolFlowRate = Numbers(1);
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracDes = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingActionNotUsed;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
 
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode = 0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
@@ -1590,10 +1562,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -1601,10 +1573,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -1685,7 +1657,7 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatWaterVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatSteamVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ControllerOffset = 0.000001;
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingActionNotUsed;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
 
         // Register component set data
         TestCompSet(state,
@@ -1852,10 +1824,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -1863,10 +1835,10 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -1895,7 +1867,7 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatWaterVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).MinReheatSteamVolFlow = 0.0;
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ControllerOffset = 0.000001;
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingActionNotUsed;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
 
         // Register component set data
         TestCompSet(state,
@@ -2295,7 +2267,7 @@ void GetSysInput(EnergyPlusData &state)
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ControllerOffset <= 0.0) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ControllerOffset = 0.001;
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingActionNotUsed;
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperHeatingAction = Action::HeatingNotUsed;
 
         // Register component set data
         TestCompSet(state,
@@ -2537,27 +2509,14 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             (this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
             // setup plant topology indices for plant fed heating coils
             errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    this->ReheatName,
-                                    this->ReheatComp_PlantType,
-                                    this->HWLoopNum,
-                                    this->HWLoopSide,
-                                    this->HWBranchIndex,
-                                    this->HWCompIndex,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+            ScanPlantLoopsForObject(state, this->ReheatName, this->ReheatComp_PlantType, this->HWplantLoc, errFlag, _, _, _, _, _);
 
             if (errFlag) {
                 ShowContinueError(state, "Reference Unit=\"" + this->SysName + "\", type=" + this->sysType);
                 ShowFatalError(state, "InitSys: Program terminated for previous conditions.");
             }
 
-            this->ReheatCoilOutletNode =
-                state.dataPlnt->PlantLoop(this->HWLoopNum).LoopSide(this->HWLoopSide).Branch(this->HWBranchIndex).Comp(this->HWCompIndex).NodeNumOut;
+            this->ReheatCoilOutletNode = DataPlant::CompData::getPlantComponent(state, this->HWplantLoc).NodeNumOut;
 
             this->PlantLoopScanFlag = false;
         } else {
@@ -2627,11 +2586,11 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
         state.dataLoopNodes->Node(InletNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
         this->MassFlowDiff = 1.0e-10 * this->AirMassFlowRateMax;
 
-        if (this->HWLoopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
+        if (this->HWplantLoc.loopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
                                    DataGlobalConstants::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
                                    RoutineName);
         } else {
             rho = 1000.0;
@@ -2672,25 +2631,9 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
         }
         if ((this->ReheatControlNode > 0) && !this->PlantLoopScanFlag) {
             if (this->ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
-                InitComponentNodes(state,
-                                   this->MinReheatSteamFlow,
-                                   this->MaxReheatSteamFlow,
-                                   this->ReheatControlNode,
-                                   this->ReheatCoilOutletNode,
-                                   this->HWLoopNum,
-                                   this->HWLoopSide,
-                                   this->HWBranchIndex,
-                                   this->HWCompIndex);
+                InitComponentNodes(state, this->MinReheatSteamFlow, this->MaxReheatSteamFlow, this->ReheatControlNode, this->ReheatCoilOutletNode);
             } else {
-                InitComponentNodes(state,
-                                   this->MinReheatWaterFlow,
-                                   this->MaxReheatWaterFlow,
-                                   this->ReheatControlNode,
-                                   this->ReheatCoilOutletNode,
-                                   this->HWLoopNum,
-                                   this->HWLoopSide,
-                                   this->HWBranchIndex,
-                                   this->HWCompIndex);
+                InitComponentNodes(state, this->MinReheatWaterFlow, this->MaxReheatWaterFlow, this->ReheatControlNode, this->ReheatCoilOutletNode);
             }
         }
         // Find air loop associated with terminal unit
@@ -3293,7 +3236,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         this->ZoneMinAirFracDes = min(1.0, SafeDivide(this->ZoneFixedMinAir, this->MaxAirVolFlowRate));
     }
 
-    if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
+    if (this->DamperHeatingAction == Action::ReverseWithLimits) {
         if (state.dataSize->ZoneSizingRunDone) {
             if (state.dataSize->CurTermUnitSizingNum > 0) {
                 // if zone sizing run done, set the design max reheat air flow to the value from the design calcs
@@ -3466,7 +3409,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         // zero the ReverseActioWithLimits inputs
         this->MaxAirVolFlowRateDuringReheat = max(this->MaxAirVolFlowRateDuringReheat, 0.0);
         this->MaxAirVolFractionDuringReheat = max(this->MaxAirVolFractionDuringReheat, 0.0);
-    } else if (this->DamperHeatingAction == Action::ReverseAction) {
+    } else if (this->DamperHeatingAction == Action::Reverse) {
         // for ReverseAction, max reheat flow is equal to the maximum. Report it.
         if (this->ZoneFloorArea > 0.0) {
             BaseSizer::reportSizerOutput(state,
@@ -3502,9 +3445,9 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             } else if (this->SysType_Num == SysType::SingleDuctConstVolReheat || this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
             } else {
-                if (this->DamperHeatingAction == Action::ReverseAction) {
+                if (this->DamperHeatingAction == Action::Reverse) {
                     TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
-                } else if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
+                } else if (this->DamperHeatingAction == Action::ReverseWithLimits) {
                     TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                         max(this->MaxAirVolFlowRateDuringReheat, (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac));
                 } else {
@@ -3515,13 +3458,13 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         }
 
         if (TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow > SmallAirVolFlow) {
-            if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
+            if (this->DamperHeatingAction == Action::ReverseWithLimits) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult =
                     min(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFlowRate) /
                     TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult =
                     TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult;
-            } else if (this->DamperHeatingAction == Action::ReverseAction) {
+            } else if (this->DamperHeatingAction == Action::Reverse) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult =
                     this->MaxAirVolFlowRate / TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult =
@@ -3600,15 +3543,15 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                         if (state.dataSingleDuct->DesCoilLoadSS >= SmallLoad) {
 
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
                                                    RoutineName);
 
                             Cp = GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
                             MaxReheatWaterVolFlowDes =
@@ -4054,9 +3997,9 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         state.dataSingleDuct->QZoneMax2SDAT = QToHeatSetPt;
 
         // fill dual-max reheat flow limit, if any
-        if (this->DamperHeatingAction == Action::ReverseAction) {
+        if (this->DamperHeatingAction == Action::Reverse) {
             state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT = this->AirMassFlowRateMax;
-        } else if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
+        } else if (this->DamperHeatingAction == Action::ReverseWithLimits) {
             state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT = this->AirMassFlowDuringReheatMax;
         } else if (this->DamperHeatingAction == Action::Normal) {
             state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT = this->ZoneMinAirFrac * this->AirMassFlowRateMax;
@@ -4104,210 +4047,204 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         this->UpdateSys(state);
 
         // Now do the heating coil calculation for each heating coil type
-        {
-            auto const SELECT_CASE_var(this->ReheatComp_Num); // Reverse damper option is working only for water coils for now.
-
+        switch (this->ReheatComp_Num) { // Reverse damper option is working only for water coils for now.
             // hot water heating coil
-            if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
-                // Determine the load required to pass to the Component controller
-                // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
-                // and is working as-is, temperature setpoints are maintained as expected.
-                QZnReq = state.dataSingleDuct->QZoneMax2SDAT + MassFlow * CpAirAvg * state.dataSingleDuct->ZoneTempSDAT;
+        case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+            // Determine the load required to pass to the Component controller
+            // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
+            // and is working as-is, temperature setpoints are maintained as expected.
+            QZnReq = state.dataSingleDuct->QZoneMax2SDAT + MassFlow * CpAirAvg * state.dataSingleDuct->ZoneTempSDAT;
 
-                // Initialize hot water flow rate to zero.
-                DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
-                // On the first HVAC iteration the system values are given to the controller, but after that
-                // the demand limits are in place and there needs to be feedback to the Zone Equipment
-                if (FirstHVACIteration) {
-                    MaxFlowWater = this->MaxReheatWaterFlow;
-                    MinFlowWater = this->MinReheatWaterFlow;
-                } else {
-                    WaterControlNode = this->ReheatControlNode;
-                    MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
-                    MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
-                }
+            // Initialize hot water flow rate to zero.
+            DummyMdot = 0.0;
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            // On the first HVAC iteration the system values are given to the controller, but after that
+            // the demand limits are in place and there needs to be feedback to the Zone Equipment
+            if (FirstHVACIteration) {
+                MaxFlowWater = this->MaxReheatWaterFlow;
+                MinFlowWater = this->MinReheatWaterFlow;
+            } else {
+                WaterControlNode = this->ReheatControlNode;
+                MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
+                MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
+            }
 
-                // Simulate the reheat coil at constant air flow. Control by varying the
-                // hot water flow rate.
-                // FB use QActualHeating, change ControlCompOutput to use new
-                ControlCompOutput(state,
-                                  this->ReheatName,
-                                  this->ReheatComp,
-                                  this->ReheatComp_Index,
-                                  FirstHVACIteration,
-                                  QZnReq,
-                                  this->ReheatControlNode,
-                                  MaxFlowWater,
-                                  MinFlowWater,
-                                  this->ControllerOffset,
-                                  this->ControlCompTypeNum,
-                                  this->CompErrIndex,
-                                  _,
-                                  SysOutletNode,
-                                  MassFlow,
-                                  _,
-                                  _,
-                                  this->HWLoopNum,
-                                  this->HWLoopSide,
-                                  this->HWBranchIndex);
+            // Simulate the reheat coil at constant air flow. Control by varying the
+            // hot water flow rate.
+            // FB use QActualHeating, change ControlCompOutput to use new
+            ControlCompOutput(state,
+                              this->ReheatName,
+                              this->ReheatComp,
+                              this->ReheatComp_Index,
+                              FirstHVACIteration,
+                              QZnReq,
+                              this->ReheatControlNode,
+                              MaxFlowWater,
+                              MinFlowWater,
+                              this->ControllerOffset,
+                              this->ControlCompTypeNum,
+                              this->CompErrIndex,
+                              _,
+                              SysOutletNode,
+                              MassFlow,
+                              _,
+                              _,
+                              this->HWplantLoc);
 
-                // If reverse action damper and the hot water flow is at maximum, simulate the
-                // hot water coil with fixed (maximum) hot water flow but allow the air flow to
-                // vary up to the maximum (air damper opens to try to meet zone load)
-                if (this->DamperHeatingAction == Action::ReverseAction || this->DamperHeatingAction == Action::ReverseActionWithLimits) {
-                    if (state.dataLoopNodes->Node(this->ReheatControlNode).MassFlowRate == MaxFlowWater) {
-                        // fill limits for air flow for controller
-                        state.dataSingleDuct->MinAirMassFlowRevActSVAV = this->AirMassFlowRateMax * this->ZoneMinAirFrac;
-                        state.dataSingleDuct->MinAirMassFlowRevActSVAV =
-                            min(state.dataSingleDuct->MinAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
-                        state.dataSingleDuct->MinAirMassFlowRevActSVAV =
-                            max(state.dataSingleDuct->MinAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
+            // If reverse action damper and the hot water flow is at maximum, simulate the
+            // hot water coil with fixed (maximum) hot water flow but allow the air flow to
+            // vary up to the maximum (air damper opens to try to meet zone load)
+            if (this->DamperHeatingAction == Action::Reverse || this->DamperHeatingAction == Action::ReverseWithLimits) {
+                if (state.dataLoopNodes->Node(this->ReheatControlNode).MassFlowRate == MaxFlowWater) {
+                    // fill limits for air flow for controller
+                    state.dataSingleDuct->MinAirMassFlowRevActSVAV = this->AirMassFlowRateMax * this->ZoneMinAirFrac;
+                    state.dataSingleDuct->MinAirMassFlowRevActSVAV =
+                        min(state.dataSingleDuct->MinAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
+                    state.dataSingleDuct->MinAirMassFlowRevActSVAV =
+                        max(state.dataSingleDuct->MinAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
 
-                        state.dataSingleDuct->MaxAirMassFlowRevActSVAV = this->AirMassFlowRateMax;
-                        state.dataSingleDuct->MaxAirMassFlowRevActSVAV =
-                            min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT);
-                        state.dataSingleDuct->MaxAirMassFlowRevActSVAV =
-                            max(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, state.dataSingleDuct->MinAirMassFlowRevActSVAV);
-                        state.dataSingleDuct->MaxAirMassFlowRevActSVAV =
-                            min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
+                    state.dataSingleDuct->MaxAirMassFlowRevActSVAV = this->AirMassFlowRateMax;
+                    state.dataSingleDuct->MaxAirMassFlowRevActSVAV =
+                        min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, state.dataSingleDuct->MaxDeviceAirMassFlowReheatSDAT);
+                    state.dataSingleDuct->MaxAirMassFlowRevActSVAV =
+                        max(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, state.dataSingleDuct->MinAirMassFlowRevActSVAV);
+                    state.dataSingleDuct->MaxAirMassFlowRevActSVAV =
+                        min(state.dataSingleDuct->MaxAirMassFlowRevActSVAV, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
-                        state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRateMaxAvail =
-                            state.dataSingleDuct->MaxAirMassFlowRevActSVAV; // suspect, check how/if used in ControlCompOutput
+                    state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRateMaxAvail =
+                        state.dataSingleDuct->MaxAirMassFlowRevActSVAV; // suspect, check how/if used in ControlCompOutput
+                    ControlCompOutput(state,
+                                      this->ReheatName,
+                                      this->ReheatComp,
+                                      this->ReheatComp_Index,
+                                      FirstHVACIteration,
+                                      state.dataSingleDuct->QZoneMax2SDAT,
+                                      this->OutletNodeNum,
+                                      state.dataSingleDuct->MaxAirMassFlowRevActSVAV,
+                                      state.dataSingleDuct->MinAirMassFlowRevActSVAV,
+                                      this->ControllerOffset,
+                                      this->ControlCompTypeNum,
+                                      this->CompErrIndex,
+                                      ZoneNodeNum,
+                                      SysOutletNode); // why not QZnReq  ?
+                    // air flow controller, not on plant, don't pass plant topology info
+                    // reset terminal unit inlet air mass flow to new value.
+                    state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRateMaxAvail = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
+                    MassFlow = state.dataLoopNodes->Node(SysOutletNode).MassFlowRate;
+
+                    //         ! look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
+                    //         ! equipment iteration. If detected, set flow rate to previous value and recalc HW flow.
+                    if (((std::abs(MassFlow - this->MassFlow2) < this->MassFlowDiff) ||
+                         (std::abs(MassFlow - this->MassFlow3) < this->MassFlowDiff)) &&
+                        (std::abs(MassFlow - this->MassFlow1) >= this->MassFlowDiff)) {
+                        if (MassFlow > 0.0) MassFlow = this->MassFlow1;
+                        this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
+                        this->UpdateSys(state);
+
+                        // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
+                        // and is working as-is, temperature setpoints are maintained as expected.
+                        QZnReq = state.dataSingleDuct->QZoneMax2SDAT + MassFlow * CpAirAvg * state.dataSingleDuct->ZoneTempSDAT;
                         ControlCompOutput(state,
                                           this->ReheatName,
                                           this->ReheatComp,
                                           this->ReheatComp_Index,
                                           FirstHVACIteration,
-                                          state.dataSingleDuct->QZoneMax2SDAT,
-                                          this->OutletNodeNum,
-                                          state.dataSingleDuct->MaxAirMassFlowRevActSVAV,
-                                          state.dataSingleDuct->MinAirMassFlowRevActSVAV,
+                                          QZnReq,
+                                          this->ReheatControlNode,
+                                          MaxFlowWater,
+                                          MinFlowWater,
                                           this->ControllerOffset,
                                           this->ControlCompTypeNum,
                                           this->CompErrIndex,
-                                          ZoneNodeNum,
-                                          SysOutletNode); // why not QZnReq  ?
-                        // air flow controller, not on plant, don't pass plant topology info
-                        // reset terminal unit inlet air mass flow to new value.
-                        state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRateMaxAvail = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
-                        MassFlow = state.dataLoopNodes->Node(SysOutletNode).MassFlowRate;
+                                          _,
+                                          SysOutletNode,
+                                          MassFlow,
+                                          _,
+                                          _,
+                                          this->HWplantLoc);
+                    }
 
-                        //         ! look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
-                        //         ! equipment iteration. If detected, set flow rate to previous value and recalc HW flow.
-                        if (((std::abs(MassFlow - this->MassFlow2) < this->MassFlowDiff) ||
-                             (std::abs(MassFlow - this->MassFlow3) < this->MassFlowDiff)) &&
-                            (std::abs(MassFlow - this->MassFlow1) >= this->MassFlowDiff)) {
-                            if (MassFlow > 0.0) MassFlow = this->MassFlow1;
-                            this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-                            this->UpdateSys(state);
+                    this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
+                    // reset OA report variable
+                    this->UpdateSys(state);
+                } // IF (Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate .EQ. MaxFlowWater) THEN
+            }     // IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction) THEN
 
-                            // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
-                            // and is working as-is, temperature setpoints are maintained as expected.
-                            QZnReq = state.dataSingleDuct->QZoneMax2SDAT + MassFlow * CpAirAvg * state.dataSingleDuct->ZoneTempSDAT;
-                            ControlCompOutput(state,
-                                              this->ReheatName,
-                                              this->ReheatComp,
-                                              this->ReheatComp_Index,
-                                              FirstHVACIteration,
-                                              QZnReq,
-                                              this->ReheatControlNode,
-                                              MaxFlowWater,
-                                              MinFlowWater,
-                                              this->ControllerOffset,
-                                              this->ControlCompTypeNum,
-                                              this->CompErrIndex,
-                                              _,
-                                              SysOutletNode,
-                                              MassFlow,
-                                              _,
-                                              _,
-                                              this->HWLoopNum,
-                                              this->HWLoopSide,
-                                              this->HWBranchIndex);
-                        }
-
-                        this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-                        // reset OA report variable
-                        this->UpdateSys(state);
-                    } // IF (Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate .EQ. MaxFlowWater) THEN
-                }     // IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction) THEN
-
-                // Recalculate the Damper Position.
-                if (MassFlow == 0.0) {
-                    this->DamperPosition = 0.0;
-                    this->ZoneMinAirFracReport = 0.0;
-                } else if ((MassFlow > 0.0) && (MassFlow < this->AirMassFlowRateMax)) {
-                    this->DamperPosition = MassFlow / this->AirMassFlowRateMax;
-                    this->ZoneMinAirFracReport = this->ZoneMinAirFrac;
-                } else if (MassFlow == this->AirMassFlowRateMax) {
-                    this->DamperPosition = 1.0;
-                    this->ZoneMinAirFracReport = this->ZoneMinAirFrac;
-                }
-
-            } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QZoneMax2SDAT -
-                         MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
-
-                // Simulate reheat coil for the VAV system
-                SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QZoneMax2SDAT -
-                         MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
-
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QZoneMax2SDAT -
-                         MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
-
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index, QHeatingDelivered);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
-                                                                   // I no reheat is defined then assume that the damper is the only component.
-                // If something else is there that is not a reheat coil or a blank then give the error message
-
-            } else {
-                ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+            // Recalculate the Damper Position.
+            if (MassFlow == 0.0) {
+                this->DamperPosition = 0.0;
+                this->ZoneMinAirFracReport = 0.0;
+            } else if ((MassFlow > 0.0) && (MassFlow < this->AirMassFlowRateMax)) {
+                this->DamperPosition = MassFlow / this->AirMassFlowRateMax;
+                this->ZoneMinAirFracReport = this->ZoneMinAirFrac;
+            } else if (MassFlow == this->AirMassFlowRateMax) {
+                this->DamperPosition = 1.0;
+                this->ZoneMinAirFracReport = this->ZoneMinAirFrac;
             }
+        } break;
+        case HeatingCoilType::SteamAirHeating: { // ! COIL:STEAM:AIRHEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq =
+                state.dataSingleDuct->QZoneMax2SDAT - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
+
+            // Simulate reheat coil for the VAV system
+            SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
+        } break;
+        case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq =
+                state.dataSingleDuct->QZoneMax2SDAT - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
+
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::Gas: { // COIL:GAS:HEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq =
+                state.dataSingleDuct->QZoneMax2SDAT - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
+
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index, QHeatingDelivered);
+        } break;
+        case HeatingCoilType::None: { // blank
+                                      // I no reheat is defined then assume that the damper is the only component.
+            // If something else is there that is not a reheat coil or a blank then give the error message
+        } break;
+        default: {
+            ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+        } break;
         }
 
         // the COIL is OFF the properties are calculated for this special case.
     } else {
-        {
-            auto const SELECT_CASE_var(this->ReheatComp_Num);
-
-            if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
-                // Simulate reheat coil for the Const Volume system
-                DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
-                // call the reheat coil with the NO FLOW condition to make sure that the Node values
-                // are passed through to the coil outlet correctly
-                SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
-                // Simulate reheat coil for the VAV system
-                SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
-                                                                   // If no reheat is defined then assume that the damper is the only component.
-                // If something else is that is not a reheat coil or a blank then give the error message
-
-            } else {
-                ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
-            }
+        switch (this->ReheatComp_Num) {
+        case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+            // Simulate reheat coil for the Const Volume system
+            DummyMdot = 0.0;
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            // call the reheat coil with the NO FLOW condition to make sure that the Node values
+            // are passed through to the coil outlet correctly
+            SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
+            // Simulate reheat coil for the VAV system
+            SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
+        } break;
+        case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::Gas: { // COIL:GAS:HEATING
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::None: { // blank
+                                      // If no reheat is defined then assume that the damper is the only component.
+                                      // If something else is that is not a reheat coil or a blank then give the error message
+        } break;
+        default: {
+            ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+        } break;
         }
     }
 
@@ -4566,185 +4503,179 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
 
         this->UpdateSys(state);
 
-        {
-            auto const SELECT_CASE_var(this->ReheatComp_Num);
+        switch (this->ReheatComp_Num) {        // hot water heating coil
+        case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+            // Determine the load required to pass to the Component controller
+            // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
+            // and is working as-is, temperature setpoints are maintained as expected.
+            QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV + MassFlow * CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
+            if (QZnReq < SmallLoad) QZnReq = 0.0;
 
-            // hot water heating coil
-            if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
-                // Determine the load required to pass to the Component controller
-                // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
-                // and is working as-is, temperature setpoints are maintained as expected.
-                QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV + MassFlow * CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
-                if (QZnReq < SmallLoad) QZnReq = 0.0;
-
-                // Initialize hot water flow rate to zero.
-                // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
-                DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
-                // On the first HVAC iteration the system values are given to the controller, but after that
-                // the demand limits are in place and there needs to be feedback to the Zone Equipment
-                if (FirstHVACIteration) {
-                    MaxFlowWater = this->MaxReheatWaterFlow;
-                    MinFlowWater = this->MinReheatWaterFlow;
-                } else {
-                    WaterControlNode = this->ReheatControlNode;
-                    MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
-                    MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
-                }
-
-                // Simulate the reheat coil at constant air flow. Control by varying the
-                // hot water flow rate.
-                ControlCompOutput(state,
-                                  this->ReheatName,
-                                  this->ReheatComp,
-                                  this->ReheatComp_Index,
-                                  FirstHVACIteration,
-                                  QZnReq,
-                                  this->ReheatControlNode,
-                                  MaxFlowWater,
-                                  MinFlowWater,
-                                  this->ControllerOffset,
-                                  this->ControlCompTypeNum,
-                                  this->CompErrIndex,
-                                  _,
-                                  SysOutletNode,
-                                  MassFlow,
-                                  _,
-                                  _,
-                                  this->HWLoopNum,
-                                  this->HWLoopSide,
-                                  this->HWBranchIndex);
-
-                // If reverse action damper and the hot water flow is at maximum, simulate the
-                // hot water coil with fixed (maximum) hot water flow but allow the air flow to
-                // vary up to the maximum (air damper opens to try to meet zone load).
-                if (this->DamperHeatingAction == Action::ReverseAction) {
-                    if (state.dataLoopNodes->Node(this->ReheatControlNode).MassFlowRate == this->MaxReheatWaterFlow) {
-                        ControlCompOutput(state,
-                                          this->ReheatName,
-                                          this->ReheatComp,
-                                          this->ReheatComp_Index,
-                                          FirstHVACIteration,
-                                          state.dataSingleDuct->QZoneMax2SCBVAV,
-                                          this->OutletNodeNum,
-                                          this->sd_airterminalInlet.AirMassFlowRateMaxAvail,
-                                          this->sd_airterminalInlet.AirMassFlowRateMinAvail,
-                                          this->ControllerOffset,
-                                          this->ControlCompTypeNum,
-                                          this->CompErrIndex,
-                                          ZoneNodeNum,
-                                          SysOutletNode);
-                        //                                   ! air flow controller, not on plant, don't pass plant topology info
-
-                        // reset terminal unit inlet air mass flow to new value.
-                        MassFlow = state.dataLoopNodes->Node(SysOutletNode).MassFlowRate;
-                        this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-                        this->UpdateSys(state);
-                    }
-                    // look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
-                    // equipment iteration. If detected, set flow rate to previous value and recalc HW flow.
-                    if (((std::abs(MassFlow - this->MassFlow2) < this->MassFlowDiff) ||
-                         (std::abs(MassFlow - this->MassFlow3) < this->MassFlowDiff)) &&
-                        (std::abs(MassFlow - this->MassFlow1) >= this->MassFlowDiff)) {
-                        MassFlow = this->MassFlow1;
-                        this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-                        this->UpdateSys(state);
-                        ControlCompOutput(state,
-                                          this->ReheatName,
-                                          this->ReheatComp,
-                                          this->ReheatComp_Index,
-                                          FirstHVACIteration,
-                                          QZnReq,
-                                          this->ReheatControlNode,
-                                          MaxFlowWater,
-                                          MinFlowWater,
-                                          this->ControllerOffset,
-                                          this->ControlCompTypeNum,
-                                          this->CompErrIndex,
-                                          _,
-                                          SysOutletNode,
-                                          MassFlow,
-                                          _,
-                                          _,
-                                          this->HWLoopNum,
-                                          this->HWLoopSide,
-                                          this->HWBranchIndex);
-                    }
-                    // recalculate damper position
-                    if (this->AirMassFlowRateMax == 0.0) {
-                        this->DamperPosition = 0.0;
-                    } else {
-                        this->DamperPosition = MassFlow / this->AirMassFlowRateMax;
-                    }
-                }
-            } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV -
-                         MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
-                if (QZnReq < SmallLoad) QZnReq = 0.0;
-
-                // Simulate reheat coil for the VAV system
-                SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
-                // Determine the load required to pass to the Component controller
-                QSupplyAir = MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
-                QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV - QSupplyAir;
-                if (QZnReq < SmallLoad) QZnReq = 0.0;
-
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV -
-                         MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
-                if (QZnReq < SmallLoad) QZnReq = 0.0;
-
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
-                                                                   // If no reheat is defined then assume that the damper is the only component.
-                // If something else is there that is not a reheat coil then give the error message below.
-
+            // Initialize hot water flow rate to zero.
+            // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
+            DummyMdot = 0.0;
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
+            // On the first HVAC iteration the system values are given to the controller, but after that
+            // the demand limits are in place and there needs to be feedback to the Zone Equipment
+            if (FirstHVACIteration) {
+                MaxFlowWater = this->MaxReheatWaterFlow;
+                MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+                WaterControlNode = this->ReheatControlNode;
+                MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
+                MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
+
+            // Simulate the reheat coil at constant air flow. Control by varying the
+            // hot water flow rate.
+            ControlCompOutput(state,
+                              this->ReheatName,
+                              this->ReheatComp,
+                              this->ReheatComp_Index,
+                              FirstHVACIteration,
+                              QZnReq,
+                              this->ReheatControlNode,
+                              MaxFlowWater,
+                              MinFlowWater,
+                              this->ControllerOffset,
+                              this->ControlCompTypeNum,
+                              this->CompErrIndex,
+                              _,
+                              SysOutletNode,
+                              MassFlow,
+                              _,
+                              _,
+                              this->HWplantLoc);
+
+            // If reverse action damper and the hot water flow is at maximum, simulate the
+            // hot water coil with fixed (maximum) hot water flow but allow the air flow to
+            // vary up to the maximum (air damper opens to try to meet zone load).
+            if (this->DamperHeatingAction == Action::Reverse) {
+                if (state.dataLoopNodes->Node(this->ReheatControlNode).MassFlowRate == this->MaxReheatWaterFlow) {
+                    ControlCompOutput(state,
+                                      this->ReheatName,
+                                      this->ReheatComp,
+                                      this->ReheatComp_Index,
+                                      FirstHVACIteration,
+                                      state.dataSingleDuct->QZoneMax2SCBVAV,
+                                      this->OutletNodeNum,
+                                      this->sd_airterminalInlet.AirMassFlowRateMaxAvail,
+                                      this->sd_airterminalInlet.AirMassFlowRateMinAvail,
+                                      this->ControllerOffset,
+                                      this->ControlCompTypeNum,
+                                      this->CompErrIndex,
+                                      ZoneNodeNum,
+                                      SysOutletNode);
+                    //                                   ! air flow controller, not on plant, don't pass plant topology info
+
+                    // reset terminal unit inlet air mass flow to new value.
+                    MassFlow = state.dataLoopNodes->Node(SysOutletNode).MassFlowRate;
+                    this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
+                    this->UpdateSys(state);
+                }
+                // look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
+                // equipment iteration. If detected, set flow rate to previous value and recalc HW flow.
+                if (((std::abs(MassFlow - this->MassFlow2) < this->MassFlowDiff) || (std::abs(MassFlow - this->MassFlow3) < this->MassFlowDiff)) &&
+                    (std::abs(MassFlow - this->MassFlow1) >= this->MassFlowDiff)) {
+                    MassFlow = this->MassFlow1;
+                    this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
+                    this->UpdateSys(state);
+                    ControlCompOutput(state,
+                                      this->ReheatName,
+                                      this->ReheatComp,
+                                      this->ReheatComp_Index,
+                                      FirstHVACIteration,
+                                      QZnReq,
+                                      this->ReheatControlNode,
+                                      MaxFlowWater,
+                                      MinFlowWater,
+                                      this->ControllerOffset,
+                                      this->ControlCompTypeNum,
+                                      this->CompErrIndex,
+                                      _,
+                                      SysOutletNode,
+                                      MassFlow,
+                                      _,
+                                      _,
+                                      this->HWplantLoc);
+                }
+                // recalculate damper position
+                if (this->AirMassFlowRateMax == 0.0) {
+                    this->DamperPosition = 0.0;
+                } else {
+                    this->DamperPosition = MassFlow / this->AirMassFlowRateMax;
+                }
+            }
+        } break;
+        case HeatingCoilType::SteamAirHeating: { // ! COIL:STEAM:AIRHEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV -
+                     MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
+            if (QZnReq < SmallLoad) QZnReq = 0.0;
+
+            // Simulate reheat coil for the VAV system
+            SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
+        } break;
+        case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
+            // Determine the load required to pass to the Component controller
+            QSupplyAir = MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
+            QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV - QSupplyAir;
+            if (QZnReq < SmallLoad) QZnReq = 0.0;
+
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::Gas: { // COIL:GAS:HEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq = state.dataSingleDuct->QZoneMax2SCBVAV -
+                     MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
+            if (QZnReq < SmallLoad) QZnReq = 0.0;
+
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::None: { // blank
+                                      // If no reheat is defined then assume that the damper is the only component.
+            // If something else is there that is not a reheat coil then give the error message below.
+        } break;
+        default: {
+            ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+        } break;
         }
 
         // the COIL is OFF the properties are calculated for this special case.
     } else {
-        {
-            auto const SELECT_CASE_var(this->ReheatComp_Num);
+        switch (this->ReheatComp_Num) {
+        case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+            // Simulate reheat coil for the Const Volume system
+            // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
+            // Initialize hot water flow rate to zero.
+            DummyMdot = 0.0;
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
 
-            if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
-                // Simulate reheat coil for the Const Volume system
-                // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
-                // Initialize hot water flow rate to zero.
-                DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
-
-                // call the reheat coil with the NO FLOW condition to make sure that the Node values
-                // are passed through to the coil outlet correctly
-                SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
-                // Simulate reheat coil for the VAV system
-                SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
-                                                                   // If no reheat is defined then assume that the damper is the only component.
-                                                                   // If something else is there that is not a reheat coil then give the error message
-
-            } else {
-                ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
-            }
+            // call the reheat coil with the NO FLOW condition to make sure that the Node values
+            // are passed through to the coil outlet correctly
+            SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
+            // Simulate reheat coil for the VAV system
+            SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
+        } break;
+        case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::Gas: { // COIL:GAS:HEATING
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::None: { // blank
+                                      // If no reheat is defined then assume that the damper is the only component.
+                                      // If something else is there that is not a reheat coil then give the error message
+        } break;
+        default: {
+            ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+        } break;
         }
     }
     // push the flow rate history
@@ -5302,107 +5233,107 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     // system scheduled OFF then not operational and shut the system down.
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
 
-        {
-            auto const SELECT_CASE_var(this->ReheatComp_Num);
+        switch (this->ReheatComp_Num) {
+        case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq = state.dataSingleDuct->QMax2SCV + MassFlow * CpAir * state.dataSingleDuct->ZoneTempSCV;
 
-            if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QMax2SCV + MassFlow * CpAir * state.dataSingleDuct->ZoneTempSCV;
+            // Before Iterating through the Reheat Coil and Controller set the flags for the
+            // Do Loop to initialized conditions.
+            // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
+            // Initialize hot water flow rate to zero.
+            DummyMdot = 0.0;
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
 
-                // Before Iterating through the Reheat Coil and Controller set the flags for the
-                // Do Loop to initialized conditions.
-                // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
-                // Initialize hot water flow rate to zero.
-                DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
-
-                // On the first HVAC iteration the system values are given to the controller, but after that
-                // the demand limits are in place and there needs to be feedback to the Zone Equipment
-                if (FirstHVACIteration) {
-                    MaxFlowWater = this->MaxReheatWaterFlow;
-                    MinFlowWater = this->MinReheatWaterFlow;
-                } else {
-                    WaterControlNode = this->ReheatControlNode;
-                    MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
-                    MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
-                }
-
-                // Simulate reheat coil for the Const Volume system
-                // Set Converged to True & when controller is not converged it will set to False.
-                ControlCompOutput(state,
-                                  this->ReheatName,
-                                  this->ReheatComp,
-                                  this->ReheatComp_Index,
-                                  FirstHVACIteration,
-                                  QZnReq,
-                                  this->ReheatControlNode,
-                                  MaxFlowWater,
-                                  MinFlowWater,
-                                  this->ControllerOffset,
-                                  this->ControlCompTypeNum,
-                                  this->CompErrIndex,
-                                  _,
-                                  this->ReheatAirOutletNode,
-                                  MassFlow,
-                                  _,
-                                  _,
-                                  this->HWLoopNum,
-                                  this->HWLoopSide,
-                                  this->HWBranchIndex);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:STEAMAIRHEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QMax2SCV - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV);
-
-                // Simulate reheat coil for the VAV system
-                SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
-            } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QMax2SCV - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV);
-
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
-                // Determine the load required to pass to the Component controller
-                QZnReq = state.dataSingleDuct->QMax2SCV - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV);
-
-                // Simulate reheat coil for the VAV system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
+            // On the first HVAC iteration the system values are given to the controller, but after that
+            // the demand limits are in place and there needs to be feedback to the Zone Equipment
+            if (FirstHVACIteration) {
+                MaxFlowWater = this->MaxReheatWaterFlow;
+                MinFlowWater = this->MinReheatWaterFlow;
             } else {
-                ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+                WaterControlNode = this->ReheatControlNode;
+                MaxFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMaxAvail;
+                MinFlowWater = state.dataLoopNodes->Node(WaterControlNode).MassFlowRateMinAvail;
             }
+
+            // Simulate reheat coil for the Const Volume system
+            // Set Converged to True & when controller is not converged it will set to False.
+            ControlCompOutput(state,
+                              this->ReheatName,
+                              this->ReheatComp,
+                              this->ReheatComp_Index,
+                              FirstHVACIteration,
+                              QZnReq,
+                              this->ReheatControlNode,
+                              MaxFlowWater,
+                              MinFlowWater,
+                              this->ControllerOffset,
+                              this->ControlCompTypeNum,
+                              this->CompErrIndex,
+                              _,
+                              this->ReheatAirOutletNode,
+                              MassFlow,
+                              _,
+                              _,
+                              this->HWplantLoc);
+
+        } break;
+        case HeatingCoilType::SteamAirHeating: { // COIL:STEAM:STEAMAIRHEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq = state.dataSingleDuct->QMax2SCV - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV);
+
+            // Simulate reheat coil for the VAV system
+            SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
+        } break;
+        case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq = state.dataSingleDuct->QMax2SCV - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV);
+
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
+
+        } break;
+        case HeatingCoilType::Gas: { // COIL:GAS:HEATING
+            // Determine the load required to pass to the Component controller
+            QZnReq = state.dataSingleDuct->QMax2SCV - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV);
+
+            // Simulate reheat coil for the VAV system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
+        } break;
+        default: {
+            ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+        } break;
         }
 
         // the COIL is OFF the properties are calculated for this special case.
     } else {
-        {
-            auto const SELECT_CASE_var(this->ReheatComp_Num);
+        switch (this->ReheatComp_Num) {
+        case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+            // Simulate reheat coil for the Const Volume system
+            // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
+            // Initialize hot water flow rate to zero.
+            DummyMdot = 0.0;
+            SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
 
-            if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
-                // Simulate reheat coil for the Const Volume system
-                // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
-                // Initialize hot water flow rate to zero.
-                DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
-
-                // call the reheat coil with the NO FLOW condition to make sure that the Node values
-                // are passed through to the coil outlet correctly
-                SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
-                // Simulate reheat coil for the Const Volume system
-                SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
-                // Simulate reheat coil for the Const Volume system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-
-            } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
-                // Simulate reheat coil for the Const Volume system
-                SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-            } else {
-                ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
-            }
+            // call the reheat coil with the NO FLOW condition to make sure that the Node values
+            // are passed through to the coil outlet correctly
+            SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
+            // Simulate reheat coil for the Const Volume system
+            SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
+        } break;
+        case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
+            // Simulate reheat coil for the Const Volume system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
+        } break;
+        case HeatingCoilType::Gas: { // COIL:GAS:HEATING
+            // Simulate reheat coil for the Const Volume system
+            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
+        } break;
+        default: {
+            ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+        } break;
         }
     }
 }
@@ -5499,42 +5430,31 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
         state.dataLoopNodes->Node(FanOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMaxAvail;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMinAvail;
     }
-    {
-        auto const SELECT_CASE_var(this->ReheatComp_Num);
-        if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
-            mdot = HWFlow;
-            if (this->HWLoopNum > 0) {
-                SetComponentFlowRate(state,
-                                     mdot,
-                                     this->ReheatControlNode,
-                                     this->ReheatCoilOutletNode,
-                                     this->HWLoopNum,
-                                     this->HWLoopSide,
-                                     this->HWBranchIndex,
-                                     this->HWCompIndex);
-            }
-
-            SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-        } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // HW Flow is steam mass flow here
-            mdot = HWFlow;
-            if (this->HWLoopNum > 0) {
-                SetComponentFlowRate(state,
-                                     mdot,
-                                     this->ReheatControlNode,
-                                     this->ReheatCoilOutletNode,
-                                     this->HWLoopNum,
-                                     this->HWLoopSide,
-                                     this->HWBranchIndex,
-                                     this->HWCompIndex);
-            }
-            SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, HCoilReq);
-        } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
-            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, HCoilReq, this->ReheatComp_Index);
-        } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
-            SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, HCoilReq, this->ReheatComp_Index);
-        } else {
-            ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+    switch (this->ReheatComp_Num) {
+    case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
+        mdot = HWFlow;
+        if (this->HWplantLoc.loopNum > 0) {
+            SetComponentFlowRate(state, mdot, this->ReheatControlNode, this->ReheatCoilOutletNode, this->HWplantLoc);
         }
+
+        SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
+    } break;
+    case HeatingCoilType::SteamAirHeating: { // HW Flow is steam mass flow here
+        mdot = HWFlow;
+        if (this->HWplantLoc.loopNum > 0) {
+            SetComponentFlowRate(state, mdot, this->ReheatControlNode, this->ReheatCoilOutletNode, this->HWplantLoc);
+        }
+        SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, HCoilReq);
+    } break;
+    case HeatingCoilType::Electric: { // COIL:ELECTRIC:HEATING
+        SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, HCoilReq, this->ReheatComp_Index);
+    } break;
+    case HeatingCoilType::Gas: { // COIL:GAS:HEATING
+        SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, HCoilReq, this->ReheatComp_Index);
+    } break;
+    default: {
+        ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
+    } break;
     }
 
     LoadMet = AirMassFlow * CpAirZn * (state.dataLoopNodes->Node(HCOutNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
@@ -5965,7 +5885,7 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
                                std::string const &SDSName,
                                int &SDSIndex,
                                bool &ErrorsFound,
-                               Optional_string_const ThisObjectType,
+                               std::string_view const ThisObjectType,
                                Optional_int DamperInletNode, // Damper inlet node number
                                Optional_int DamperOutletNode // Damper outlet node number
 )
@@ -5988,8 +5908,8 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
 
     SDSIndex = UtilityRoutines::FindItemInList(SDSName, state.dataSingleDuct->sd_airterminal, &SingleDuctAirTerminal::SysName);
     if (SDSIndex == 0) {
-        if (present(ThisObjectType)) {
-            ShowSevereError(state, ThisObjectType() + ", GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName);
+        if (!ThisObjectType.empty()) {
+            ShowSevereError(state, fmt::format("{}, GetHVACSingleDuctSysIndex: Single duct system not found={}", ThisObjectType, SDSName));
         } else {
             ShowSevereError(state, "GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName);
         }
@@ -5997,7 +5917,11 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
     } else {
         if ((state.dataSingleDuct->sd_airterminal(SDSIndex).SysType_Num != SysType::SingleDuctConstVolReheat) &&
             (state.dataSingleDuct->sd_airterminal(SDSIndex).SysType_Num != SysType::SingleDuctVAVReheat)) {
-            ShowSevereError(state, ThisObjectType() + ", GetHVACSingleDuctSysIndex: Could not find allowed types=" + SDSName);
+            if (!ThisObjectType.empty()) {
+                ShowSevereError(state, fmt::format("{}, GetHVACSingleDuctSysIndex: Could not find allowed types={}", ThisObjectType, SDSName));
+            } else {
+                ShowSevereError(state, "GetHVACSingleDuctSysIndex: Could not find allowed types=" + SDSName);
+            }
             ShowContinueError(state, "The allowed types are: AirTerminal:SingleDuct:ConstantVolume:Reheat and AirTerminal:SingleDuct:VAV:Reheat");
             ErrorsFound = true;
         }
@@ -6137,34 +6061,35 @@ void GetATMixers(EnergyPlusData &state)
         ValidateComponent(
             state, state.dataIPShortCut->cAlphaArgs(2), state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitName, errFlag, cCurrentModuleObject);
 
-        state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = GetOnlySingleNode(state,
-                                                                                         state.dataIPShortCut->cAlphaArgs(4),
-                                                                                         ErrorsFound,
-                                                                                         cCurrentModuleObject,
-                                                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         NodeInputManager::CompFluidStream::Primary,
-                                                                                         ObjectIsNotParent,
-                                                                                         state.dataIPShortCut->cAlphaFieldNames(4));
+        state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctMixer,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent,
+                              state.dataIPShortCut->cAlphaFieldNames(4));
 
         state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = GetOnlySingleNode(state,
                                                                                    state.dataIPShortCut->cAlphaArgs(5),
                                                                                    ErrorsFound,
-                                                                                   cCurrentModuleObject,
+                                                                                   DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctMixer,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                    ObjectIsNotParent,
                                                                                    state.dataIPShortCut->cAlphaFieldNames(5));
         state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = GetOnlySingleNode(state,
                                                                                    state.dataIPShortCut->cAlphaArgs(6),
                                                                                    ErrorsFound,
-                                                                                   cCurrentModuleObject,
+                                                                                   DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctMixer,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                    ObjectIsNotParent,
                                                                                    state.dataIPShortCut->cAlphaFieldNames(6));

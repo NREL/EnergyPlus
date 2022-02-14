@@ -321,20 +321,20 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(4),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(5),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
@@ -346,10 +346,10 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(6),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -358,10 +358,10 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(7),
                                                     ErrorsFound,
-                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroCHP,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -688,8 +688,8 @@ void MicroCHPDataStruct::simulate(EnergyPlusData &state,
     // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions
 
     PlantUtilities::UpdateComponentHeatRecoverySide(state,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
+                                                    this->CWPlantLoc.loopNum,
+                                                    this->CWPlantLoc.loopSideNum,
                                                     DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->PlantInletNodeID,
                                                     this->PlantOutletNodeID,
@@ -705,24 +705,24 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
     static constexpr std::string_view RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                    state.dataLoopNodes->Node(this->PlantInletNodeID).Temp,
-                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
     if (this->A42Model.InternalFlowControl) { // got a curve
         this->PlantMassFlowRateMax =
             2.0 * CurveManager::CurveValue(
                       state, this->A42Model.WaterFlowCurveID, this->A42Model.MaxElecPower, state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
-    } else if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Supply) {
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate > 0.0) {
-            this->PlantMassFlowRateMax = state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate;
-        } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum > 0) {
-            this->PlantMassFlowRateMax = state.dataSize->PlantSizData(this->CWLoopNum).DesVolFlowRate * rho;
+    } else if (this->CWPlantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
+        if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).MaxMassFlowRate > 0.0) {
+            this->PlantMassFlowRateMax = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).MaxMassFlowRate;
+        } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum > 0) {
+            this->PlantMassFlowRateMax = state.dataSize->PlantSizData(this->CWPlantLoc.loopNum).DesVolFlowRate * rho;
         } else {
             this->PlantMassFlowRateMax = 2.0;
         }
 
-    } else if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+    } else if (this->CWPlantLoc.loopSideNum == DataPlant::LoopSideLocation::Demand) {
         this->PlantMassFlowRateMax = 2.0; // would like to use plant loop max but not ready yet
     }
 
@@ -786,8 +786,8 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
         this->A42Model.QdotSkin = 0.0;
         this->A42Model.QdotConvZone = 0.0;
         this->A42Model.QdotRadZone = 0.0;
-        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::OperatingMode::OpModeOff;
-        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CurrentOpMode = DataGenerators::OperatingMode::OpModeOff;
+        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::OperatingMode::Off;
+        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CurrentOpMode = DataGenerators::OperatingMode::Off;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown = 0.0;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp = 0.0;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).HasBeenOn = false;
@@ -799,15 +799,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
 
         state.dataGenerator->FuelSupply(this->FuelSupplyID).QskinLoss = 0.0;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->PlantMassFlowRateMax,
-                                           this->PlantInletNodeID,
-                                           this->PlantOutletNodeID,
-                                           this->CWLoopNum,
-                                           this->CWLoopSideNum,
-                                           this->CWBranchNum,
-                                           this->CWCompNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->PlantMassFlowRateMax, this->PlantInletNodeID, this->PlantOutletNodeID);
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
@@ -830,8 +822,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
     if (!this->A42Model.InternalFlowControl) {
 
         Real64 mdot = this->PlantMassFlowRateMax;
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
+        PlantUtilities::SetComponentFlowRate(state, mdot, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
         this->PlantMassFlowRate = mdot;
     }
 }
@@ -907,189 +898,55 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     Real64 Qgross = 0.0;
     Real64 ThermEff = 0.0;
 
-    {
-        auto const SELECT_CASE_var(CurrentOpMode);
+    switch (CurrentOpMode) {
+    case DataGenerators::OperatingMode::Off: { // same as standby in model spec but no Pnet standby electicity losses.
 
-        if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeOff) { // same as standby in model spec but no Pnet standby electicity losses.
+        Qgenss = 0.0;
+        MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
+        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
+        Pnetss = 0.0;
+        Pstandby = 0.0;
+        Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;
+        ElecEff = 0.0;
+        ThermEff = 0.0;
+        Qgross = 0.0;
+        NdotFuel = 0.0;
+        MdotFuel = 0.0;
+        MdotAir = 0.0;
 
-            Qgenss = 0.0;
-            MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-            TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
-            Pnetss = 0.0;
+        MdotCW = 0.0;
+        PlantUtilities::SetComponentFlowRate(state, MdotCW, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
+        this->PlantMassFlowRate = MdotCW;
+    } break;
+    case DataGenerators::OperatingMode::Standby: {
+        Qgenss = 0.0;
+        MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
+        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
+        Pnetss = 0.0;
+        Pstandby = this->A42Model.Pstandby * (1.0 - PLRforSubtimestepShutDown);
+        Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;
+        ElecEff = 0.0;
+        ThermEff = 0.0;
+        Qgross = 0.0;
+        NdotFuel = 0.0;
+        MdotFuel = 0.0;
+        MdotAir = 0.0;
+
+        MdotCW = 0.0;
+        PlantUtilities::SetComponentFlowRate(state, MdotCW, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
+        this->PlantMassFlowRate = MdotCW;
+    } break;
+    case DataGenerators::OperatingMode::WarmUp: {
+        if (this->A42Model.WarmUpByTimeDelay) {
+            // Internal combustion engine.  This is just like normal  operation but no net power yet.
+            Pnetss = MyElectricLoad; // W
             Pstandby = 0.0;
             Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;
-            ElecEff = 0.0;
-            ThermEff = 0.0;
-            Qgross = 0.0;
-            NdotFuel = 0.0;
-            MdotFuel = 0.0;
-            MdotAir = 0.0;
-
-            MdotCW = 0.0;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 MdotCW,
-                                                 this->PlantInletNodeID,
-                                                 this->PlantOutletNodeID,
-                                                 this->CWLoopNum,
-                                                 this->CWLoopSideNum,
-                                                 this->CWBranchNum,
-                                                 this->CWCompNum);
-            this->PlantMassFlowRate = MdotCW;
-
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeStandby) {
-            Qgenss = 0.0;
-            MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-            TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
-            Pnetss = 0.0;
-            Pstandby = this->A42Model.Pstandby * (1.0 - PLRforSubtimestepShutDown);
-            Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;
-            ElecEff = 0.0;
-            ThermEff = 0.0;
-            Qgross = 0.0;
-            NdotFuel = 0.0;
-            MdotFuel = 0.0;
-            MdotAir = 0.0;
-
-            MdotCW = 0.0;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 MdotCW,
-                                                 this->PlantInletNodeID,
-                                                 this->PlantOutletNodeID,
-                                                 this->CWLoopNum,
-                                                 this->CWLoopSideNum,
-                                                 this->CWBranchNum,
-                                                 this->CWCompNum);
-            this->PlantMassFlowRate = MdotCW;
-
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeWarmUp) {
-
-            if (this->A42Model.WarmUpByTimeDelay) {
-                // Internal combustion engine.  This is just like normal  operation but no net power yet.
-                Pnetss = MyElectricLoad; // W
-                Pstandby = 0.0;
-                Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;
-                TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
-                MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-                if (this->A42Model.InternalFlowControl) {
-                    MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
-                }
-                ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
-                ElecEff = max(0.0, ElecEff); // protect against bad curve result
-
-                if (ElecEff > 0.0) {           // trap divide by bad thing
-                    Qgross = Pnetss / ElecEff; // W
-                } else {
-                    Qgross = 0.0;
-                }
-                ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
-                ThermEff = max(0.0, ThermEff); // protect against bad curve result
-
-                Qgenss = ThermEff * Qgross; // W
-
-                MdotFuel = Qgross / (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0) *
-                           state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-                //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
-
-                bool ConstrainedIncreasingNdot(false);
-                bool ConstrainedDecreasingNdot(false);
-                Real64 MdotFuelAllowed = 0.0;
-
-                GeneratorDynamicsManager::ManageGeneratorFuelFlow(state,
-                                                                  GeneratorType::MicroCHP,
-                                                                  this->Name,
-                                                                  this->DynamicsControlID,
-                                                                  RunFlag,
-                                                                  MdotFuel,
-                                                                  MdotFuelAllowed,
-                                                                  ConstrainedIncreasingNdot,
-                                                                  ConstrainedDecreasingNdot);
-
-                if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
-                    MdotFuel = MdotFuelAllowed;
-                    NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-                    Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
-
-                    for (int i = 1; i <= 20; ++i) { // iterating here  could add use of seach method
-                        Pnetss = Qgross * ElecEff;
-                        if (this->A42Model.InternalFlowControl) {
-                            MdotCW =
-                                GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
-                        }
-                        ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
-                        ElecEff = max(0.0, ElecEff); // protect against bad curve result
-                    }
-
-                    ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
-                    ThermEff = max(0.0, ThermEff); // protect against bad curve result
-                    Qgenss = ThermEff * Qgross;    // W
-                }
-                Pnetss = 0.0; // no actually power produced here.
-                NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-                MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuel);
-                MdotAir = max(0.0, MdotAir); // protect against bad curve result
-
-            } else if (this->A42Model.WarmUpByEngineTemp) {
-                // Stirling engine mode warm up
-                //   find MdotFuelMax
-                Real64 Pmax = this->A42Model.MaxElecPower;
-                Pstandby = 0.0;
-                Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;          // could be here with part load in cool down
-                TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
-                MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-                ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pmax, MdotCW, TcwIn);
-                ElecEff = max(0.0, ElecEff); // protect against bad curve result
-                if (ElecEff > 0.0) {         // trap divide by bad thing
-                    Qgross = Pmax / ElecEff; // W
-                } else {
-                    Qgross = 0.0;
-                }
-                NdotFuel = Qgross / (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
-                //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
-                Real64 MdotFuelMax = NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-
-                Real64 MdotFuelWarmup;
-                if (Teng > thisAmbientTemp) {
-                    MdotFuelWarmup =
-                        MdotFuelMax + this->A42Model.kf * MdotFuelMax * ((this->A42Model.TnomEngOp - thisAmbientTemp) / (Teng - thisAmbientTemp));
-                    // check that numerical answer didn't blow up beyond limit, and reset if it did
-                    if (MdotFuelWarmup > this->A42Model.Rfuelwarmup * MdotFuelMax) {
-                        MdotFuelWarmup = this->A42Model.Rfuelwarmup * MdotFuelMax;
-                    }
-                } else { // equal would divide by zero
-                    MdotFuelWarmup = this->A42Model.Rfuelwarmup * MdotFuelMax;
-                }
-
-                if (this->A42Model.TnomEngOp > thisAmbientTemp) {
-                    Pnetss = Pmax * this->A42Model.kp * ((Teng - thisAmbientTemp) / (this->A42Model.TnomEngOp - thisAmbientTemp));
-                } else { // equal would divide by zero
-                    Pnetss = Pmax;
-                }
-
-                MdotFuel = MdotFuelWarmup;
-                NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-                MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuelWarmup);
-                MdotAir = max(0.0, MdotAir); // protect against bad curve result
-                Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
-                ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
-                Qgenss = ThermEff * Qgross; // W
-            }
-            NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
-
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeNormal) {
-            if (PLRforSubtimestepStartUp < 1.0) {
-                if (RunFlagElectCenter) Pnetss = MyElectricLoad; // W
-                if (RunFlagPlant) Pnetss = AllowedLoad;
-            } else {
-                Pnetss = AllowedLoad;
-            }
-            Pstandby = 0.0;
-            Pcooler = 0.0;
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
             MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
             if (this->A42Model.InternalFlowControl) {
                 MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
             }
-
             ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
             ElecEff = max(0.0, ElecEff); // protect against bad curve result
 
@@ -1098,10 +955,11 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             } else {
                 Qgross = 0.0;
             }
-
             ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
             ThermEff = max(0.0, ThermEff); // protect against bad curve result
-            Qgenss = ThermEff * Qgross;    // W
+
+            Qgenss = ThermEff * Qgross; // W
+
             MdotFuel = Qgross / (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0) *
                        state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
             //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
@@ -1125,7 +983,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                 NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
                 Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
 
-                for (int i = 1; i <= 20; ++i) { // iterating here,  could add use of seach method error signal
+                for (int i = 1; i <= 20; ++i) { // iterating here  could add use of seach method
                     Pnetss = Qgross * ElecEff;
                     if (this->A42Model.InternalFlowControl) {
                         MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
@@ -1138,38 +996,154 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                 ThermEff = max(0.0, ThermEff); // protect against bad curve result
                 Qgenss = ThermEff * Qgross;    // W
             }
-
+            Pnetss = 0.0; // no actually power produced here.
             NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
             MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuel);
             MdotAir = max(0.0, MdotAir); // protect against bad curve result
-            if (PLRforSubtimestepStartUp < 1.0) {
-                Pnetss = AllowedLoad;
-            }
 
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeCoolDown) {
-
-            Pnetss = 0.0;
+        } else if (this->A42Model.WarmUpByEngineTemp) {
+            // Stirling engine mode warm up
+            //   find MdotFuelMax
+            Real64 Pmax = this->A42Model.MaxElecPower;
             Pstandby = 0.0;
-            Pcooler = this->A42Model.PcoolDown;
+            Pcooler = this->A42Model.PcoolDown * PLRforSubtimestepShutDown;          // could be here with part load in cool down
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
             MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
-            if (this->A42Model.InternalFlowControl) {
-                MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
+            ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pmax, MdotCW, TcwIn);
+            ElecEff = max(0.0, ElecEff); // protect against bad curve result
+            if (ElecEff > 0.0) {         // trap divide by bad thing
+                Qgross = Pmax / ElecEff; // W
+            } else {
+                Qgross = 0.0;
             }
-            NdotFuel = 0.0;
-            MdotFuel = 0.0;
-            MdotAir = 0.0;
-            ElecEff = 0.0;
-            ThermEff = 0.0;
-            Qgross = 0.0;
-            Qgenss = 0.0;
+            NdotFuel = Qgross / (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
+            //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
+            Real64 MdotFuelMax = NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
+
+            Real64 MdotFuelWarmup;
+            if (Teng > thisAmbientTemp) {
+                MdotFuelWarmup =
+                    MdotFuelMax + this->A42Model.kf * MdotFuelMax * ((this->A42Model.TnomEngOp - thisAmbientTemp) / (Teng - thisAmbientTemp));
+                // check that numerical answer didn't blow up beyond limit, and reset if it did
+                if (MdotFuelWarmup > this->A42Model.Rfuelwarmup * MdotFuelMax) {
+                    MdotFuelWarmup = this->A42Model.Rfuelwarmup * MdotFuelMax;
+                }
+            } else { // equal would divide by zero
+                MdotFuelWarmup = this->A42Model.Rfuelwarmup * MdotFuelMax;
+            }
+
+            if (this->A42Model.TnomEngOp > thisAmbientTemp) {
+                Pnetss = Pmax * this->A42Model.kp * ((Teng - thisAmbientTemp) / (this->A42Model.TnomEngOp - thisAmbientTemp));
+            } else { // equal would divide by zero
+                Pnetss = Pmax;
+            }
+
+            MdotFuel = MdotFuelWarmup;
+            NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
+            MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuelWarmup);
+            MdotAir = max(0.0, MdotAir); // protect against bad curve result
+            Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
+            ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
+            Qgenss = ThermEff * Qgross; // W
         }
+        NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
+    } break;
+    case DataGenerators::OperatingMode::Normal: {
+        if (PLRforSubtimestepStartUp < 1.0) {
+            if (RunFlagElectCenter) Pnetss = MyElectricLoad; // W
+            if (RunFlagPlant) Pnetss = AllowedLoad;
+        } else {
+            Pnetss = AllowedLoad;
+        }
+        Pstandby = 0.0;
+        Pcooler = 0.0;
+        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
+        MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
+        if (this->A42Model.InternalFlowControl) {
+            MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
+        }
+
+        ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
+        ElecEff = max(0.0, ElecEff); // protect against bad curve result
+
+        if (ElecEff > 0.0) {           // trap divide by bad thing
+            Qgross = Pnetss / ElecEff; // W
+        } else {
+            Qgross = 0.0;
+        }
+
+        ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
+        ThermEff = max(0.0, ThermEff); // protect against bad curve result
+        Qgenss = ThermEff * Qgross;    // W
+        MdotFuel = Qgross / (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0) *
+                   state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
+        //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
+
+        bool ConstrainedIncreasingNdot(false);
+        bool ConstrainedDecreasingNdot(false);
+        Real64 MdotFuelAllowed = 0.0;
+
+        GeneratorDynamicsManager::ManageGeneratorFuelFlow(state,
+                                                          GeneratorType::MicroCHP,
+                                                          this->Name,
+                                                          this->DynamicsControlID,
+                                                          RunFlag,
+                                                          MdotFuel,
+                                                          MdotFuelAllowed,
+                                                          ConstrainedIncreasingNdot,
+                                                          ConstrainedDecreasingNdot);
+
+        if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
+            MdotFuel = MdotFuelAllowed;
+            NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
+            Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
+
+            for (int i = 1; i <= 20; ++i) { // iterating here,  could add use of seach method error signal
+                Pnetss = Qgross * ElecEff;
+                if (this->A42Model.InternalFlowControl) {
+                    MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
+                }
+                ElecEff = CurveManager::CurveValue(state, this->A42Model.ElecEffCurveID, Pnetss, MdotCW, TcwIn);
+                ElecEff = max(0.0, ElecEff); // protect against bad curve result
+            }
+
+            ThermEff = CurveManager::CurveValue(state, this->A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
+            ThermEff = max(0.0, ThermEff); // protect against bad curve result
+            Qgenss = ThermEff * Qgross;    // W
+        }
+
+        NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
+        MdotAir = CurveManager::CurveValue(state, this->A42Model.AirFlowCurveID, MdotFuel);
+        MdotAir = max(0.0, MdotAir); // protect against bad curve result
+        if (PLRforSubtimestepStartUp < 1.0) {
+            Pnetss = AllowedLoad;
+        }
+    } break;
+    case DataGenerators::OperatingMode::CoolDown: {
+        Pnetss = 0.0;
+        Pstandby = 0.0;
+        Pcooler = this->A42Model.PcoolDown;
+        TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
+        MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
+        if (this->A42Model.InternalFlowControl) {
+            MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
+        }
+        NdotFuel = 0.0;
+        MdotFuel = 0.0;
+        MdotAir = 0.0;
+        ElecEff = 0.0;
+        ThermEff = 0.0;
+        Qgross = 0.0;
+        Qgenss = 0.0;
+    } break;
+    default:
+        break;
     }
 
     for (int i = 1; i <= 20; ++i) { // sequential search with exit criteria
         // calculate new value for engine temperature
         // for Stirling in warmup, need to include dependency of Qgness on Teng
-        if ((this->A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OperatingMode::OpModeWarmUp)) {
+        if ((this->A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OperatingMode::WarmUp)) {
 
             Real64 Pmax = this->A42Model.MaxElecPower;
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
@@ -1217,8 +1191,11 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
         Teng = FuncDetermineEngineTemp(
             TcwOut, this->A42Model.MCeng, this->A42Model.UAhx, this->A42Model.UAskin, thisAmbientTemp, Qgenss, this->A42Model.TengLast, dt);
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, TcwIn, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                           TcwIn,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
 
         TcwOut =
             FuncDetermineCoolantWaterExitTemp(TcwIn, this->A42Model.MCcw, this->A42Model.UAhx, MdotCW * Cp, Teng, this->A42Model.TempCWOutLast, dt);
@@ -1432,9 +1409,9 @@ void MicroCHPDataStruct::CalcUpdateHeatRecovery(EnergyPlusData &state) const
     state.dataLoopNodes->Node(this->PlantOutletNodeID).Temp = this->A42Model.TcwOut;
 
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                        this->A42Model.TcwIn,
-                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
     state.dataLoopNodes->Node(this->PlantOutletNodeID).Enthalpy = this->A42Model.TcwOut * Cp;
@@ -1467,9 +1444,9 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
     this->A42Model.QdotHX = this->A42Model.UAhx * (this->A42Model.Teng - this->A42Model.TcwOut);                           //  heat recovered rate (W)
 
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                        this->A42Model.TcwIn,
-                                                       state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
     this->A42Model.QdotHR = this->PlantMassFlowRate * Cp * (this->A42Model.TcwOut - this->A42Model.TcwIn);
@@ -1525,19 +1502,8 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
     if (this->MyPlantScanFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::Generator_MicroCHP,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::Generator_MicroCHP, this->CWPlantLoc, errFlag, _, _, _, _, _);
 
             if (errFlag) {
                 ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
@@ -1545,12 +1511,8 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
 
             if (!this->A42Model.InternalFlowControl) {
                 // IF this is on the supply side and not internal flow control then reset flow priority to lower
-                if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Supply) {
-                    state.dataPlnt->PlantLoop(this->CWLoopNum)
-                        .LoopSide(this->CWLoopSideNum)
-                        .Branch(this->CWBranchNum)
-                        .Comp(this->CWCompNum)
-                        .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                if (this->CWPlantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
+                    DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                 }
             }
 

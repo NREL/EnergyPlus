@@ -942,6 +942,7 @@ namespace Furnaces {
         std::string IHPCoilName;       // IHP cooling coil name
         int IHPCoilIndex(0);           // IHP cooling coil id
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        DataLoopNode::ConnectionObjectType currentModuleObjectType;
 
         state.dataFurnaces->GetFurnaceInputFlag = false;
         MaxNumbers = 0;
@@ -1017,10 +1018,12 @@ namespace Furnaces {
             //       Will still have 2 differently named objects for the user, but read in with 1 DO loop.
             if (HeatOnlyNum <= NumHeatOnly) {
                 CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryFurnaceHeatOnly;
                 FurnaceType_Num = Furnace_HeatOnly;
                 GetObjectNum = HeatOnlyNum;
             } else {
                 CurrentModuleObject = "AirLoopHVAC:UnitaryHeatOnly";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatOnly;
                 FurnaceType_Num = UnitarySys_HeatOnly;
                 GetObjectNum = HeatOnlyNum - NumHeatOnly;
             }
@@ -1060,19 +1063,19 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
                                                                                             Alphas(3),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject,
+                                                                                            currentModuleObjectType,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
                                                                                              Alphas(4),
                                                                                              ErrorsFound,
-                                                                                             CurrentModuleObject,
+                                                                                             currentModuleObjectType,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
@@ -1182,7 +1185,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1637,10 +1640,12 @@ namespace Furnaces {
             //      Will still have 2 differently named objects for the user, but read in with 1 DO loop.
             if (HeatCoolNum <= NumHeatCool) {
                 CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatCool";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryFurnaceHeatCool;
                 FurnaceType_Num = Furnace_HeatCool;
                 GetObjectNum = HeatCoolNum;
             } else {
                 CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatCool;
                 FurnaceType_Num = UnitarySys_HeatCool;
                 GetObjectNum = HeatCoolNum - NumHeatCool;
             }
@@ -1680,19 +1685,19 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
                                                                                             Alphas(3),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject,
+                                                                                            currentModuleObjectType,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
                                                                                              Alphas(4),
                                                                                              ErrorsFound,
-                                                                                             CurrentModuleObject,
+                                                                                             currentModuleObjectType,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
@@ -1802,7 +1807,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2094,12 +2099,7 @@ namespace Furnaces {
                 } else { // mine data from DX cooling coil
 
                     // Get DX cooling coil index
-                    GetDXCoilIndex(state,
-                                   CoolingCoilName,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                   IsNotOK,
-                                   ObjexxFCL::Optional_string_const(),
-                                   ObjexxFCL::Optional_bool_const());
+                    GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3041,25 +3041,27 @@ namespace Furnaces {
                 }
             }
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
-                                                                                            Alphas(3),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            Alphas(1),
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
-                                                                                             Alphas(4),
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             Alphas(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -3158,7 +3160,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3233,12 +3235,7 @@ namespace Furnaces {
 
                 } else { // mine data from DX heating coil
 
-                    GetDXCoilIndex(state,
-                                   HeatingCoilName,
-                                   state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                   IsNotOK,
-                                   ObjexxFCL::Optional_string_const(),
-                                   ObjexxFCL::Optional_bool_const());
+                    GetDXCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, "...occurs " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3327,12 +3324,7 @@ namespace Furnaces {
 
                     // Get the cooling coil node numbers
                     errFlag = false;
-                    GetDXCoilIndex(state,
-                                   CoolingCoilName,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                   errFlag,
-                                   ObjexxFCL::Optional_string_const(),
-                                   ObjexxFCL::Optional_bool_const());
+                    GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, errFlag);
                     CoolingCoilInletNode = GetDXCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = GetDXCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
@@ -4055,25 +4047,27 @@ namespace Furnaces {
                 }
             }
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
-                                                                                            Alphas(3),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            Alphas(1),
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpWaterToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
-                                                                                             Alphas(4),
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             Alphas(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpWaterToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -4167,7 +4161,7 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     errFlag = false;
-                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -4515,15 +4509,16 @@ namespace Furnaces {
             if (lAlphaBlanks(14)) {
                 state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = 0;
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = GetOnlySingleNode(state,
-                                                                                             Alphas(14),
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             Alphas(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsNotParent);
+                state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum =
+                    GetOnlySingleNode(state,
+                                      Alphas(14),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpWaterToAir,
+                                      Alphas(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::OutsideAirReference,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
                 // need better verification.
                 if (!CheckOutAirNodeNumber(state, state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum)) {
                     ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
@@ -5384,10 +5379,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
                                             DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNum,
+                                            state.dataFurnaces->Furnace(FurnaceNum).plantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5401,9 +5393,9 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= rho;
                     }
@@ -5413,10 +5405,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
                                             DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNum,
+                                            state.dataFurnaces->Furnace(FurnaceNum).plantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5435,11 +5424,8 @@ namespace Furnaces {
                     }
                 }
                 // fill outlet node for coil
-                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum)
-                                                                             .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSide)
-                                                                             .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNum)
-                                                                             .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNum)
-                                                                             .NodeNumOut;
+                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).plantLoc).NodeNumOut;
                 state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
                 state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
@@ -5458,10 +5444,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
                                             DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp,
+                                            state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5475,9 +5458,9 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= rho;
                     }
@@ -5486,10 +5469,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
                                             DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp,
+                                            state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5509,11 +5489,7 @@ namespace Furnaces {
                 }
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode =
-                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp)
-                        .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp)
-                        .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp)
-                        .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp)
-                        .NodeNumOut;
+                    DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc).NodeNumOut;
                 state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
                 state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
@@ -5559,9 +5535,9 @@ namespace Furnaces {
                             state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -5587,11 +5563,7 @@ namespace Furnaces {
                                    0.0,
                                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                   state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                   state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                   state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                   state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode);
             }
             if (state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode > 0) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
@@ -5605,9 +5577,9 @@ namespace Furnaces {
                             state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidName,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -5630,11 +5602,7 @@ namespace Furnaces {
                                        0.0,
                                        state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow,
                                        state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
-                                       state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                       state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                       state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                       state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                       state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                       state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode);
                 }
             }
             state.dataFurnaces->MyEnvrnFlag(FurnaceNum) = false;
@@ -5886,10 +5854,7 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc);
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
@@ -5908,10 +5873,7 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -5937,10 +5899,7 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc);
 
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(state,
@@ -5959,10 +5918,7 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -10425,15 +10381,12 @@ namespace Furnaces {
         Real64 HotWaterMdot;    // actual hot water mass flow rate
         std::array<Real64, 4> Par;
         int SolFlag;
-        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName;                   // name of heating coil
-        int CoilTypeNum(0);                                                            // heating coil type number
-        int HeatingCoilIndex(0);                                                       // heating coil index
-        int CoilControlNode(0);                                                        // control node for hot water and steam heating coils
-        int CoilOutletNode(0);                                                         // air outlet node of the heatiing coils
-        int LoopNum(0);                                                                // plant loop number
-        DataPlant::LoopSideLocation LoopSideNum(DataPlant::LoopSideLocation::Invalid); // plant loop side number
-        int BranchNum(0);                                                              // plant branch number
-        int CompNum(0);                                                                // Numeric Equivalent for Supplemental Heat Coil Type
+        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
+        int CoilTypeNum(0);                                          // heating coil type number
+        int HeatingCoilIndex(0);                                     // heating coil index
+        int CoilControlNode(0);                                      // control node for hot water and steam heating coils
+        int CoilOutletNode(0);                                       // air outlet node of the heatiing coils
+        PlantLocation plantLoc{};                                    // plant loop location
 
         QActual = 0.0;
 
@@ -10443,10 +10396,7 @@ namespace Furnaces {
             CoilControlNode = state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode;
             CoilOutletNode = state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode;
             CoilTypeNum = state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num;
-            LoopNum = state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp;
-            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp;
-            BranchNum = state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp;
-            CompNum = state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp;
+            plantLoc = state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc;
             MaxHotWaterFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow;
         } else {
             HeatingCoilName = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName;
@@ -10454,10 +10404,7 @@ namespace Furnaces {
             CoilControlNode = state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode;
             CoilOutletNode = state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode;
             CoilTypeNum = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num;
-            LoopNum = state.dataFurnaces->Furnace(FurnaceNum).LoopNum;
-            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).LoopSide;
-            BranchNum = state.dataFurnaces->Furnace(FurnaceNum).BranchNum;
-            CompNum = state.dataFurnaces->Furnace(FurnaceNum).CompNum;
+            plantLoc = state.dataFurnaces->Furnace(FurnaceNum).plantLoc;
             MaxHotWaterFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow;
         }
 
@@ -10469,7 +10416,7 @@ namespace Furnaces {
                     state, HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingWater) {
                 if (QCoilLoad > SmallLoad) {
-                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
                     SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
 
                     if (QActual > (QCoilLoad + SmallLoad)) {
@@ -10531,18 +10478,18 @@ namespace Furnaces {
                     }
                 } else {
                     mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
                 }
                 // simulate the hot water heating coil
                 SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                 if (QCoilLoad > SmallLoad) {
-                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
                     // simulate the steam heating coil
                     SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 } else {
                     mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
                     // simulate the steam heating coil
                     SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 }
@@ -10598,10 +10545,7 @@ namespace Furnaces {
                                  mdot,
                                  state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                  state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                 state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                 state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                 state.dataFurnaces->Furnace(FurnaceNum).plantLoc);
             SimulateWaterCoilComponents(state,
                                         state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
                                         FirstHVACIteration,
@@ -10614,10 +10558,7 @@ namespace Furnaces {
                                  mdot,
                                  state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                  state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                 state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                 state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                 state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc);
             // simulate the hot water supplemental heating coil
             SimulateWaterCoilComponents(state,
                                         state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
