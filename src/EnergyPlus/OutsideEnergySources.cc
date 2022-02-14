@@ -521,21 +521,13 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                                                                       state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                                                       RoutineName);
 
-            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                          this->InletTemp,
-                                                                          1.0,
-                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                                          RoutineName);
-            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                           this->InletTemp,
-                                                                           0.0,
-                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                                           RoutineName);
+            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
+                state, state.dataPlnt->PlantLoop(LoopNum).FluidName, SatTemp, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
+                state, state.dataPlnt->PlantLoop(LoopNum).FluidName, SatTemp, 0.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
             Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
-            Real64 SteamMdot= MyLoad / LatentHeatSteam;
+            Real64 SteamMdot = MyLoad / LatentHeatSteam;
 
             PlantUtilities::SetComponentFlowRate(state, SteamMdot, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 

@@ -587,18 +587,15 @@ namespace ExteriorEnergyUse {
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Water")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::WaterUse;
             FuelTypeString = "Water";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Steam")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::SteamUse;
-            FuelTypeString = "Steam";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictCooling")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictCoolUse;
             FuelTypeString = "DistrictCooling";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeating")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatUse;
-            FuelTypeString = "DistrictHeating";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeatingSteam")) {
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeating:Water")) {
+            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatWaterUse;
+            FuelTypeString = "DistrictHeating:Water";
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeating:Steam")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatSteamUse;
-            FuelTypeString = "DistrictHeatingSteam";
+            FuelTypeString = "DistrictHeating:Steam";
         } else {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + CurrentName + "\".");
             ShowFatalError(state, "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha);
