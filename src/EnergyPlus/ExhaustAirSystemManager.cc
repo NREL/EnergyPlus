@@ -98,6 +98,7 @@ namespace ExhaustAirSystemManager {
     std::vector<MixerBranchZone> mixerToZoneTable;
     // map might be aa better choice:
     std::map<int, int> mixerBranchMap;
+    std::map<int, int> mixerIndexMap;
 
     bool mappingDone = false;
 
@@ -452,14 +453,31 @@ namespace ExhaustAirSystemManager {
         // 2022-01: Determine if there are some "iteration" or revisit step for the zone mixer and fan simulation
         Real64 mixerFlow_Posterior = 0.0;
         mixerFlow_Posterior = state.dataLoopNodes->Node(outletNode_index).MassFlowRate;
-        if (mixerFlow_Posterior == 0.0) {
+        if (mixerFlow_Posterior < 1e-6) {
             // fan flow is nearly zero and should be considered off
-
+            // but this still can use the ratio
+        }
+        if (mixerFlow_Prior < 1e-6) {
+            // this is the case where the fan flow should be resetted to zeros and not run the ratio
         }
         if ((mixerFlow_Prior - mixerFlow_Posterior > 1e-6) || ((mixerFlow_Prior - mixerFlow_Posterior < -1e-6))) {
             // calculate a ratio
+            Real64 flowRatio = mixerFlow_Posterior / mixerFlow_Prior;
             // use the map information to pick up zone exhaust control branches to simulation again:
+            // get the mixer inlet node index
+            int zoneMixerIndex = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex;
+            int numInletLegs = state.dataMixerComponent->MixerCond(zoneMixerIndex).NumInletNodes;
+            for (int i = 1; i <= numInletLegs; ++i) {
+                int exhLegIndex = mixerIndexMap[state.dataMixerComponent->MixerCond(zoneMixerIndex).InletNode(i)];
+                CalcZoneHVACExhaustControl(state, exhLegIndex, FirstHVACIteration, flowRatio);
+            }
 
+            // Now simulate the mixer again to update the flow
+            EnergyPlus::MixerComponent::SimAirMixer(state,
+                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
+                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+
+            // if the adjustment matches, then no need to run fan simulation again.
         }
     }
 
@@ -561,6 +579,7 @@ namespace ExhaustAirSystemManager {
                     mixerToZoneTable.emplace_back(MixerBranchZone{outletNodeNum, inletNodeNum, zoneNum, true});
                     // map could be a better solution:
                     mixerBranchMap.emplace(outletNodeNum, zoneNum);
+                    mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
                 }
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
@@ -739,13 +758,13 @@ namespace ExhaustAirSystemManager {
 
         // 2022-01: Step 4: run calc for all exhaust controls;
         for (ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
-            CalcZoneHVACExhaustControl(state, ExhaustControlNum, FirstHVACIteration);
+            CalcZoneHVACExhaustControl(state, ExhaustControlNum, FirstHVACIteration, _);
         }
 
         // 2022-01: Step 5: report results
     }
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration)
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio)
     {
         // 2022-01: Calculate a zonehvac exhaust control system
         // basically, based on the incoming node information, as well as the input parameters
@@ -771,76 +790,88 @@ namespace ExhaustAirSystemManager {
         int InletNode = thisExhCtrl.InletNodeNum;
         int OutletNode = thisExhCtrl.OutletNodeNum;
         Real64 MassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        Real64 Tin = state.dataLoopNodes->Node(InletNode).Temp;
-        Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
-        // RhoAir = RhoAirStdInit;
+        Real64 Tin = state.dataLoopNodes->Node(InletNode).Temp; // zone temeprature be better? maybe not
+        // Real64 Tin = state.dataHeatBal->Zone(thisExhCtrl.ZoneNum).ZoneMeasuredTemperature;
+        // Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
 
-        // Availability schedule:
-        if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
-            // state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
-            MassFlow = 0.0;
-            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+        if (present(FlowRatio)) {
+            // reset of airlfow rate by ratio
+            // but still need to deal with the min fractions?
+            state.dataLoopNodes->Node(InletNode).MassFlowRate *= FlowRatio;
         } else {
-            // set inlet and outlet flows to zero}
-        }
 
-        Real64 DesignFlowRate = thisExhCtrl.DesignExhaustFlowRate;
-        Real64 FlowFrac = 0.0;
-        if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
-            FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
-        }
-        Real64 MinFlowFrac = 0.0;
-        if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
-            MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
-        }
-        // 2022-01-27: Need to be refined more based on the schedule availability as well
-        if (FlowFrac < MinFlowFrac) {
-            FlowFrac = MinFlowFrac;
-        }
+            // Availability schedule:
+            if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
+                // state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
+                MassFlow = 0.0;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+            } else {
+                // set inlet and outlet flows to zero}
+            }
 
-        bool runExhaust = true;
-        if (thisExhCtrl.AvailScheduleNum == 0 || (thisExhCtrl.AvailScheduleNum > 0 && EnergyPlus::ScheduleManager::GetCurrentScheduleValue(
-                                                                                          state, thisExhCtrl.AvailScheduleNum) > 0.0)) { // available
-            if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
-                if (Tin >= EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
-                    runExhaust = true;
+            Real64 DesignFlowRate = thisExhCtrl.DesignExhaustFlowRate;
+            Real64 FlowFrac = 0.0;
+            if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
+                FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
+            }
+            Real64 MinFlowFrac = 0.0;
+            if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
+                MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
+            }
+            // 2022-01-27: Need to be refined more based on the schedule availability as well
+            if (FlowFrac < MinFlowFrac) {
+                FlowFrac = MinFlowFrac;
+            }
+
+            bool runExhaust = true;
+            if (thisExhCtrl.AvailScheduleNum == 0 ||
+                (thisExhCtrl.AvailScheduleNum > 0 &&
+                 EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) > 0.0)) { // available
+                if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
+                    if (Tin >= EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
+                        runExhaust = true;
+                    } else {
+                        runExhaust = false;
+                        FlowFrac = MinFlowFrac;
+                    }
                 } else {
-                    runExhaust = false;
-                    FlowFrac = MinFlowFrac;
+                    runExhaust = true;
+                    // flow not changed
                 }
             } else {
-                runExhaust = true;
-                // flow not changed
+                runExhaust = false;
+                FlowFrac = 0.0; // or directly set flow rate to zero.
             }
-        } else {
-            runExhaust = false;
-            FlowFrac = 0.0; // or directly set flow rate to zero.
-        }
 
-        if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
-            MassFlow = DesignFlowRate * FlowFrac;
-        } else { // follow-supply
-            Real64 supplyFlowRate = 0.0;
-            int numOfSuppNodes = thisExhCtrl.SuppNodeNums.size();
-            for (int i = 1; i <= numOfSuppNodes; ++i) {
-                supplyFlowRate += state.dataLoopNodes->Node(thisExhCtrl.SuppNodeNums(i)).MassFlowRate;
+            if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
+                MassFlow = DesignFlowRate * FlowFrac;
+            } else { // follow-supply
+                Real64 supplyFlowRate = 0.0;
+                int numOfSuppNodes = thisExhCtrl.SuppNodeNums.size();
+                for (int i = 1; i <= numOfSuppNodes; ++i) {
+                    supplyFlowRate += state.dataLoopNodes->Node(thisExhCtrl.SuppNodeNums(i)).MassFlowRate;
+                }
+                MassFlow = supplyFlowRate * FlowFrac;
             }
-            MassFlow = supplyFlowRate * FlowFrac;
+
+            // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
+            // from UpdateFan() in Fan.cc
+            state.dataHVACGlobal->UnbalExhMassFlow = MassFlow; // Fan(FanNum).InletAirMassFlowRate;
+            if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
+                state.dataHVACGlobal->BalancedExhMassFlow =
+                    state.dataHVACGlobal->UnbalExhMassFlow *
+                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.BalancedExhFracScheduleNum);
+                state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
+            } else {
+                state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
+            }
+
+            // Set the inlet conditions of the exhaust control (A good summary Step 0)
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = MassFlow;
         }
 
-        // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
-        // from UpdateFan() in Fan.cc
-        state.dataHVACGlobal->UnbalExhMassFlow = MassFlow; // Fan(FanNum).InletAirMassFlowRate;
-        if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
-            state.dataHVACGlobal->BalancedExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow * EnergyPlus::ScheduleManager::GetCurrentScheduleValue(
-                                                                                                     state, thisExhCtrl.BalancedExhFracScheduleNum);
-            state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
-        } else {
-            state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
-        }
+        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
 
-        // Set the outlet conditions of the exhaust control (A good summary Step 0)
-        state.dataLoopNodes->Node(OutletNode).MassFlowRate = MassFlow;
         state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
         state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
         state.dataLoopNodes->Node(OutletNode).Enthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;

@@ -133,7 +133,7 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration);
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio);
 
     void SizeExhaustSystem(EnergyPlusData &state, int exhSysNum);
 
