@@ -137,3 +137,5 @@ Three rows are added to the Weather Statistics File reporting table:
 - Annual Total Precipitation [mm]
 - Max Hourly Precipitation [mm]	
 - The month in which max hourly precipitation occurs
+
+See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
