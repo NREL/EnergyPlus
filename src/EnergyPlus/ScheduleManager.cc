@@ -1651,9 +1651,9 @@ namespace ScheduleManager {
 
             if (lAlphaBlanks(6)) Alphas(6) = "NO";
             if ((Alphas(6)) == "YES") {
-                    state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = true;
-                } else if ((Alphas(6)) == "NO") {
-                    state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = false;
+                state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = true;
+            } else if ((Alphas(6)) == "NO") {
+                state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = false;
             }
 
             // is it a sub-hourly schedule or not?
@@ -2789,7 +2789,7 @@ namespace ScheduleManager {
         } else {
             thisHour = ThisHour;
         }
-        
+
         int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
         int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
         int thisHolidayIndex = state.dataEnvrn->HolidayIndex;
