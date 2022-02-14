@@ -78,25 +78,25 @@ namespace EnergyPlus {
 namespace ExhaustAirSystemManager {
     // Module containing the routines dealing with the AirLoopHVAC:ExhaustSystem
 
-    struct MixerBranchZone
-    {
-        int mixerInletNodeNum;
-        int zoneExhaustNodeNum;
-        int zoneNum;
-        bool collected;
+    //struct MixerBranchZone
+    //{
+    //    int mixerInletNodeNum;
+    //    int zoneExhaustNodeNum;
+    //    int zoneNum;
+    //    bool collected;
 
-        // default constructor
-        // Question: why the constructor skipped the first element std::string Name?
-        MixerBranchZone() : mixerInletNodeNum(0), zoneExhaustNodeNum(0), zoneNum(0), collected(false)
-        {
-        }
+    //    // default constructor
+    //    // Question: why the constructor skipped the first element std::string Name?
+    //    MixerBranchZone() : mixerInletNodeNum(0), zoneExhaustNodeNum(0), zoneNum(0), collected(false)
+    //    {
+    //    }
 
-        MixerBranchZone(int a, int b, int c, bool d) : mixerInletNodeNum(a), zoneExhaustNodeNum(b), zoneNum(c), collected(d)
-        {
-        }
-    };
+    //    MixerBranchZone(int a, int b, int c, bool d) : mixerInletNodeNum(a), zoneExhaustNodeNum(b), zoneNum(c), collected(d)
+    //    {
+    //    }
+    //};
 
-    std::vector<MixerBranchZone> mixerToZoneTable;
+    //std::vector<MixerBranchZone> mixerToZoneTable;
     // map might be aa better choice:
     std::map<int, int> mixerBranchMap;
     std::map<int, int> mixerIndexMap;
@@ -805,7 +805,7 @@ namespace ExhaustAirSystemManager {
         // Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
 
         if (present(FlowRatio)) {
-            // reset of airlfow rate by ratio
+            // adjustment of airlfow rate by ratio
             // but still need to deal with the min fractions?
             state.dataLoopNodes->Node(InletNode).MassFlowRate *= FlowRatio;
         } else {
