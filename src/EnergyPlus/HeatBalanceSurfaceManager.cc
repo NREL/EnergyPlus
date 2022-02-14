@@ -5743,6 +5743,13 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             // Total Shortwave Radiation Absorbed on Inside of Surface[W]
             state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) * surface.Area;
 
+            if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
+                state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
+                    -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
+                      state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
+                      state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum));
+            }
+            
             // inside face conduction updates
             state.dataHeatBalSurf->SurfOpaqInsFaceCond(surfNum) = state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) * surface.Area;
             state.dataHeatBalSurf->SurfOpaqInsFaceCondEnergy(surfNum) =
@@ -6826,7 +6833,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         if (state.dataHeatBal->AnyKiva) {
             for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
                 state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) =
-                    kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv; // TODO: Use average radiant temp? Trad?
+                    kivaSurf.second.results.Trad - DataGlobalConstants::KelvinConv;
             }
         }
 
