@@ -3847,9 +3847,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ShowWarningError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state,
                               format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
-                                     cNumericFieldNames(1),
+                                     cNumericFieldNames(3),
                                      setpointManager.LowRef,
-                                     cNumericFieldNames(2),
+                                     cNumericFieldNames(4),
                                      setpointManager.HighRef));
         }
 
@@ -3969,9 +3969,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ShowWarningError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state,
                               format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
-                                     cNumericFieldNames(1),
+                                     cNumericFieldNames(3),
                                      setpointManager.LowRef,
-                                     cNumericFieldNames(2),
+                                     cNumericFieldNames(4),
                                      setpointManager.HighRef));
         }
 
