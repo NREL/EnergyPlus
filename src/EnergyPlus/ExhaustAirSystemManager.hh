@@ -139,6 +139,8 @@ namespace ExhaustAirSystemManager {
 
     void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int &NodeNums);
 
+    void UpdateZoneExhaustControl(EnergyPlusData &state);
+
     void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound);
 
 } // namespace ExhaustAirSystemManager

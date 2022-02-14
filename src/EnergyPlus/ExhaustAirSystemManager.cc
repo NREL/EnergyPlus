@@ -118,6 +118,9 @@ namespace ExhaustAirSystemManager {
         for (ExhaustAirSystemNum = 1; ExhaustAirSystemNum <= state.dataZoneEquip->NumExhaustAirSystems; ++ExhaustAirSystemNum) {
             CalcExhaustAirSystem(state, ExhaustAirSystemNum, FirstHVACIteration);
         }
+
+        // After this, update the exhaust flows according to zone grouping:
+        UpdateZoneExhaustControl(state);
     }
 
     void GetExhaustAirSystemInput(EnergyPlusData &state)
@@ -960,6 +963,17 @@ namespace ExhaustAirSystemManager {
         }
 
         thisExhCtrl.DesignExhaustFlowRate = designFlow;
+    }
+
+    void UpdateZoneExhaustControl(EnergyPlusData &state)
+    {
+        // For each zone, update the total exhaust flow that need to be used in ZoneEqupmentManager.cc: 
+        // state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExh +=
+        //    (state.dataHVACGlobal->UnbalExhMassFlow +
+        //     state.dataHVACGlobal->BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
+        //                                                 // state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExhBalanced
+        // += state.dataHVACGlobal->BalancedExhMassFlow;
+
     }
 
     void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound)
