@@ -51,6 +51,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -288,6 +289,15 @@ namespace ExhaustAirSystemManager {
 
                             availSchNum = state.dataFans->Fan(centralFanIndex).AvailSchedPtrNum;
 
+                            EnergyPlus::BranchNodeConnections::SetUpCompSets(
+                                state,
+                                cCurrentModuleObject,
+                                thisExhSys.Name,
+                                centralFanType,
+                                centralFanName,
+                                state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).InletNodeNum),
+                                state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).OutletNodeNum));
+
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Outlet Air Mass Flow Rate",
                                                 OutputProcessor::Unit::kg_s,
@@ -460,7 +470,7 @@ namespace ExhaustAirSystemManager {
         if (mixerFlow_Prior < 1e-6) {
             // this is the case where the fan flow should be resetted to zeros and not run the ratio
         }
-        if ((mixerFlow_Prior - mixerFlow_Posterior > 1e-6) || ((mixerFlow_Prior - mixerFlow_Posterior < -1e-6))) {
+        if ((mixerFlow_Prior - mixerFlow_Posterior > 1e-6) || (mixerFlow_Prior - mixerFlow_Posterior < -1e-6)) {
             // calculate a ratio
             Real64 flowRatio = mixerFlow_Posterior / mixerFlow_Prior;
             // use the map information to pick up zone exhaust control branches to simulation again:
