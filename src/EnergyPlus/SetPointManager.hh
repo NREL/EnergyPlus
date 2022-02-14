@@ -167,6 +167,8 @@ namespace SetPointManager {
         SPBase() : CtrlTypeMode(CtrlVarType::Invalid)
         {
         }
+
+        Real64 calcSetPointLinInt(Real64 LowVal, Real64 HighVal, Real64 RefVal, Real64 SetptAtLowVal, Real64 SetptAtHighVal);
     };
 
     struct DataSetPointManager : SPBase // Derived type for all Setpoint Managers
@@ -962,8 +964,6 @@ namespace SetPointManager {
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);
 
     int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int MixedAirNode);
-
-    Real64 CalcSetPointLinInt(Real64 LowVal, Real64 HighVal, Real64 RefVal, Real64 SetptAtLowVal, Real64 SetptAtHighVal);
 
 } // namespace SetPointManager
 

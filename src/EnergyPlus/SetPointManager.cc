@@ -6152,7 +6152,7 @@ void DefineOutsideAirSetPointManager::calculate(EnergyPlusData &state)
         SetTempAtOutHigh = this->OutHighSetPt1;
     }
 
-    this->SetPt = CalcSetPointLinInt(OutLowTemp, OutHighTemp, state.dataEnvrn->OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
+    this->SetPt = this->calcSetPointLinInt(OutLowTemp, OutHighTemp, state.dataEnvrn->OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
 }
 
 void DefineSZReheatSetPointManager::calculate(EnergyPlusData &state)
@@ -8520,7 +8520,26 @@ void DefineSysNodeResetSetPointManager::calculate(EnergyPlusData &state)
     LowRefVal = this->LowRef;
     HighRefVal = this->HighRef;
 
-    this->SetPt = CalcSetPointLinInt(LowRefVal, HighRefVal, RefValue, SpAtLow, SpAtHigh);
+    this->SetPt = this->calcSetPointLinInt(LowRefVal, HighRefVal, RefValue, SpAtLow, SpAtHigh);
+}
+
+Real64
+SPBase::calcSetPointLinInt(Real64 const LowVal, Real64 const HighVal, Real64 const RefVal, Real64 const SetptAtLowVal, Real64 const SetptAtHighVal)
+{
+    Real64 SetPt;
+    if (LowVal < HighVal) {
+        if (RefVal <= LowVal) {
+            SetPt = SetptAtLowVal;
+        } else if (RefVal >= HighVal) {
+            SetPt = SetptAtHighVal;
+        } else {
+            SetPt = SetptAtLowVal - ((RefVal - LowVal) / (HighVal - LowVal)) * (SetptAtLowVal - SetptAtHighVal);
+        }
+
+    } else {
+        SetPt = 0.5 * (SetptAtLowVal + SetptAtHighVal);
+    }
+    return SetPt;
 }
 
 void UpdateSetPointManagers(EnergyPlusData &state)
@@ -9769,23 +9788,5 @@ int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAi
 
     return MixedAirSPMNum;
 } // End of GetMixedAirNumWithCoilFreezingCheck(
-
-Real64 CalcSetPointLinInt(Real64 const LowVal, Real64 const HighVal, Real64 const RefVal, Real64 const SetptAtLowVal, Real64 const SetptAtHighVal)
-{
-    Real64 SetPt;
-    if (LowVal < HighVal) {
-        if (RefVal <= LowVal) {
-            SetPt = SetptAtLowVal;
-        } else if (RefVal >= HighVal) {
-            SetPt = SetptAtHighVal;
-        } else {
-            SetPt = SetptAtLowVal - ((RefVal - LowVal) / (HighVal - LowVal)) * (SetptAtLowVal - SetptAtHighVal);
-        }
-
-    } else {
-        SetPt = 0.5 * (SetptAtLowVal + SetptAtHighVal);
-    }
-    return SetPt;
-}
 
 } // namespace EnergyPlus::SetPointManager
