@@ -3503,14 +3503,12 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ResourceTypeString = "Condensate";
                     } else if (SELECT_CASE_var == "ENERGYTRANSFER") {
                         ResourceTypeString = "EnergyTransfer";
-                    } else if (SELECT_CASE_var == "STEAM") {
-                        ResourceTypeString = "Steam";
                     } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
                         ResourceTypeString = "DistrictCooling";
-                    } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                        ResourceTypeString = "DistrictHeating";
-                    } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
-                        ResourceTypeString = "DistrictHeatingSteam";
+                    } else if (SELECT_CASE_var == "DISTRICTHEATING:WATER") {
+                        ResourceTypeString = "DistrictHeating:Water";
+                    } else if (SELECT_CASE_var == "DISTRICTHEATING:STEAM") {
+                        ResourceTypeString = "DistrictHeating:Steam";
                     } else if (SELECT_CASE_var == "ELECTRICITYPRODUCEDONSITE") {
                         ResourceTypeString = "ElectricityProduced";
                     } else if (SELECT_CASE_var == "SOLARWATERHEATING") {

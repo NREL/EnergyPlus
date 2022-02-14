@@ -1684,17 +1684,14 @@ namespace OutputProcessor {
             } else if (meterType == "ENERGYTRANSFER" || meterType == "ENERGYXFER" || meterType == "XFER") {
                 OutResourceType = "EnergyTransfer";
 
-            } else if (meterType == "STEAM") {
-                OutResourceType = "Steam";
-
             } else if (meterType == "DISTRICTCOOLING") {
                 OutResourceType = "DistrictCooling";
 
-            } else if (meterType == "DISTRICTHEATING") {
-                OutResourceType = "DistrictHeating";
+            } else if (meterType == "DISTRICTHEATING:WATER") {
+                OutResourceType = "DistrictHeating:Water";
 
-            } else if (meterType == "DISTRICTHEATINGSTEAM") {
-                OutResourceType = "DistrictHeatingSteam";
+            } else if (meterType == "DISTRICTHEATING:STEAM") {
+                OutResourceType = "DistrictHeating:Steam";
 
             } else if (meterType == "ELECTRICITYPRODUCED") {
                 OutResourceType = "ElectricityProduced";
@@ -8124,8 +8121,8 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
                                                 {"Electricity:Facility",
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
-                                                 "DistrictHeating:Facility",
-                                                 "DistrictHeatingSteam:Facility",
+                                                 "DistrictHeating:Water:Facility",
+                                                 "DistrictHeating:Steam:Facility",
                                                  "NaturalGas:Facility",
                                                  "GASOLINE:Facility",
                                                  "COAL:Facility",

@@ -138,7 +138,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   April 1998
     //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-    //                      June 2021, Dareum Nam, Add DistrictHeatingSteam
+    //                      June 2021, Dareum Nam, Add DistrictHeating:Steam
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -147,9 +147,9 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     // are initialized. Output variables are set up.
 
     // GET NUMBER OF ALL EQUIPMENT TYPES
-    int const NumDistrictUnitsHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeating");
+    int const NumDistrictUnitsHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeating:Water");
     int const NumDistrictUnitsCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictCooling");
-    int const NumDistrictUnitsHeatSteam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeatingSteam");
+    int const NumDistrictUnitsHeatSteam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeating:Steam");
     state.dataOutsideEnergySrcs->NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool + NumDistrictUnitsHeatSteam;
 
     if (allocated(state.dataOutsideEnergySrcs->EnergySource)) return;
@@ -169,8 +169,8 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
         DataLoopNode::ConnectionObjectType objType;
         int thisIndex;
         if (EnergySourceNum <= NumDistrictUnitsHeat) {
-            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating";
-            objType = DataLoopNode::ConnectionObjectType::DistrictHeating;
+            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating:Water";
+            objType = DataLoopNode::ConnectionObjectType::DistrictHeatingWater;
             nodeNames = "Hot Water Nodes";
             EnergyType = DataPlant::PlantEquipmentType::PurchHotWater;
             heatIndex++;
@@ -183,7 +183,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
             coolIndex++;
             thisIndex = coolIndex;
         } else { // EnergySourceNum > NumDistrictUnitsHeat + NumDistrictUnitsCool
-            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeatingSteam";
+            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating:Steam";
             objType = DataLoopNode::ConnectionObjectType::DistrictHeatingSteam;
             nodeNames = "Steam Nodes";
             EnergyType = DataPlant::PlantEquipmentType::PurchSteam;
@@ -311,7 +311,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    October 1998
     //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-    //                      June 2021, Dareum Nam, Add DistrictHeatingSteam
+    //                      June 2021, Dareum Nam, Add DistrictHeating:Steam
     //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -354,7 +354,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Daeho Kang
     //       DATE WRITTEN   April 2014
-    //       MODIFIED       June 2021, Dareum Nam, Add DistrictHeatingSteam
+    //       MODIFIED       June 2021, Dareum Nam, Add DistrictHeating:Steam
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -368,9 +368,9 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
     if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         typeName = "Cooling";
     } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchHotWater) {
-        typeName = "Heating";
+        typeName = "Heating:Water";
     } else { // DataPlant::PlantEquipmentType::PurchSteam
-        typeName = "HeatingSteam";
+        typeName = "Heating:Steam";
     }
 
     int const PltSizNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
@@ -576,7 +576,7 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
         heatingOrCooling = "Cooling";
         typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater)];
     } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) {
-        hotOrChilled = "Steam ";
+        hotOrChilled = "";
         reportVarPrefix = "District Heating Steam ";
         heatingOrCooling = "Heating";
         typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::PurchSteam)];

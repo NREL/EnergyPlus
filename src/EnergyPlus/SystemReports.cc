@@ -4086,10 +4086,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
 
         if (CompLoadFlag) state.dataSysRpts->SysHCCompHTNG(AirLoopNum) += std::abs(CompLoad);
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
-            (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
+            (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingWater)) {
             state.dataSysRpts->SysHCCompH2OHOT(AirLoopNum) += CompEnergy;
-        } else if ((EnergyType == DataGlobalConstants::ResourceType::Steam) ||
-                   (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingSteam)) {
+        } else if (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingSteam) {
             state.dataSysRpts->SysHCCompSteam(AirLoopNum) += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             state.dataSysRpts->SysHCCompElec(AirLoopNum) += CompEnergy;
@@ -4119,13 +4118,12 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
             }
         }
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
-            (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
+            (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingWater)) {
             state.dataSysRpts->SysHCCompH2OHOT(AirLoopNum) += CompEnergy;
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
             state.dataSysRpts->SysCCCompH2OCOLD(AirLoopNum) += CompEnergy;
-        } else if ((EnergyType == DataGlobalConstants::ResourceType::Steam) ||
-                   (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingSteam)) {
+        } else if (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingSteam) {
             state.dataSysRpts->SysHCCompSteam(AirLoopNum) += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {
@@ -4287,12 +4285,12 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
             }
         }
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
-            (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
+            (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingWater)) {
             state.dataSysRpts->SysHCCompH2OHOT(AirLoopNum) += CompEnergy;
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
             state.dataSysRpts->SysCCCompH2OCOLD(AirLoopNum) += CompEnergy;
-        } else if ((EnergyType == DataGlobalConstants::ResourceType::Steam) || (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
+        } else if (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingSteam) {
             state.dataSysRpts->SysHCCompSteam(AirLoopNum) += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {
