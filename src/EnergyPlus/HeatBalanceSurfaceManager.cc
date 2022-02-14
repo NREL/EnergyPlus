@@ -5754,7 +5754,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                       state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
                       state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum));
             }
-            
+
             // inside face conduction updates
             state.dataHeatBalSurf->SurfOpaqInsFaceCond(surfNum) = state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) * surface.Area;
             state.dataHeatBalSurf->SurfOpaqInsFaceCondEnergy(surfNum) =
@@ -6837,8 +6837,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
         if (state.dataHeatBal->AnyKiva) {
             for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
-                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) =
-                    kivaSurf.second.results.Trad - DataGlobalConstants::KelvinConv;
+                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - DataGlobalConstants::KelvinConv;
             }
         }
 
