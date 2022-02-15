@@ -342,7 +342,7 @@ namespace ExhaustAirSystemManager {
     {
     }
 
-    void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum, bool FirstHVACIteration)
+    void CalcExhaustAirSystem(EnergyPlusData &state, int const ExhaustAirSystemNum, bool FirstHVACIteration)
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
 
@@ -693,7 +693,7 @@ namespace ExhaustAirSystemManager {
         // report results if needed
     }
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio)
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 
@@ -805,7 +805,7 @@ namespace ExhaustAirSystemManager {
         }
     }
 
-    void SizeExhaustSystem(EnergyPlusData &state, int exhSysNum)
+    void SizeExhaustSystem(EnergyPlusData &state, int const exhSysNum)
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(exhSysNum);
 
@@ -840,7 +840,7 @@ namespace ExhaustAirSystemManager {
         // BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
     }
 
-    void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int &NodeNums)
+    void SizeExhaustControlFlow(EnergyPlusData &state, int const zoneExhCtrlNum, Array1D_int &NodeNums)
     {
         auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(zoneExhCtrlNum);
 

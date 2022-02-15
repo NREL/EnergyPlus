@@ -127,7 +127,7 @@ namespace ExhaustAirSystemManager {
 
     void InitExhaustAirSystem(int &ExhaustAirSystemNum); // maybe unused
 
-    void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum, bool FirstHVACIteration);
+    void CalcExhaustAirSystem(EnergyPlusData &state, int const ExhaustAirSystemNum, bool FirstHVACIteration);
 
     void ReportExhaustAirSystem(int &ExhaustAirSystemNum); // may condiser reactivate this for the exhaust system
 
@@ -135,11 +135,12 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio);
+    void
+    CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio);
 
-    void SizeExhaustSystem(EnergyPlusData &state, int exhSysNum);
+    void SizeExhaustSystem(EnergyPlusData &state, int const exhSysNum);
 
-    void SizeExhaustControlFlow(EnergyPlusData &state, int zoneExhCtrlNum, Array1D_int &NodeNums);
+    void SizeExhaustControlFlow(EnergyPlusData &state, int const zoneExhCtrlNum, Array1D_int &NodeNums);
 
     void UpdateZoneExhaustControl(EnergyPlusData &state);
 
