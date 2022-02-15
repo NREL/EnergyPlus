@@ -832,7 +832,6 @@ TEST_F(EnergyPlusFixture, ScheduleFileColumnSeparator)
                                                       "  8760,                    !- Number of Hours of Data",
                                                       "  Space,                   !- Column Separator",
                                                       "  No;                      !- Interpolate to Timestep"});
-    // Enter N4 and A6 fields here? (based on what is now defined in the IDD)
 
     ASSERT_TRUE(process_idf(idf_objects));
 }
