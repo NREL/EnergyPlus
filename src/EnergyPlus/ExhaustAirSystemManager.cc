@@ -589,7 +589,7 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.OutletNodeNum = outletNodeNum;
 
                 if (!mappingDone) {
-                    mixerToZoneTable.emplace_back(MixerBranchZone{outletNodeNum, inletNodeNum, zoneNum, true});
+                    // mixerToZoneTable.emplace_back(MixerBranchZone{outletNodeNum, inletNodeNum, zoneNum, true});
                     // map could be a better solution:
                     mixerBranchMap.emplace(outletNodeNum, zoneNum);
                     mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
