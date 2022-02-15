@@ -688,14 +688,14 @@ void GatherForPredefinedReport(EnergyPlusData &state)
               "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
     }
     static constexpr std::string_view FenestrationAssemblyFormat("FenestrationAssembly,{},{},{},{:.3R},{:.3R},{:.3R}\n");
-    std::vector<std::string> uniqueConstFrame;
-    std::string constructionAndFrame;
+    std::vector<std::pair<int, int>> uniqConsFrame;
+    std::pair<int, int> consAndFrame;
 
     // set up for EIO <FenestrationShadedState> output
     bool fenestrationShadedStateHeaderShown(false);
     static constexpr std::string_view FenestrationShadedStateFormat("FenestrationShadedState,{},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{:.3R}\n");
-    std::vector<std::string> uniqueShdConstFrame;
-    std::string shdConstructionAndFrame;
+    std::vector<std::pair<int, int>> uniqShdConsFrame;
+    std::pair<int, int> shdConsAndFrame;
 
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         zonePt = Surface(iSurf).Zone;
@@ -811,9 +811,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                     // output EIO <FenestrationAssembly> for each unique combination of construction and frame/divider
                     if (state.dataGeneral->Constructions) {
-                        constructionAndFrame = state.dataConstruction->Construct(curCons).Name + state.dataSurface->FrameDivider(frameDivNum).Name;
-                        if (std::find(uniqueConstFrame.begin(), uniqueConstFrame.end(), constructionAndFrame) == uniqueConstFrame.end()) {
-                            uniqueConstFrame.push_back(constructionAndFrame);
+                        consAndFrame = std::make_pair(curCons, frameDivNum);
+                        if (std::find(uniqConsFrame.begin(), uniqConsFrame.end(), consAndFrame) == uniqConsFrame.end()) {
+                            uniqConsFrame.push_back(consAndFrame);
                             print(state.files.eio,
                                   FenestrationAssemblyFormat,
                                   state.dataConstruction->Construct(curCons).Name,
@@ -908,10 +908,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                 fenestrationShadedStateHeaderShown = true;
                             }
 
-                            shdConstructionAndFrame = constructionName + state.dataSurface->FrameDivider(frameDivNum).Name;
-                            if (std::find(uniqueShdConstFrame.begin(), uniqueShdConstFrame.end(), shdConstructionAndFrame) ==
-                                uniqueShdConstFrame.end()) {
-                                uniqueShdConstFrame.push_back(shdConstructionAndFrame);
+                            shdConsAndFrame = std::make_pair(stateConstrNum, frameDivNum);
+                            if (std::find(uniqShdConsFrame.begin(), uniqShdConsFrame.end(), shdConsAndFrame) == uniqShdConsFrame.end()) {
+                                uniqShdConsFrame.push_back(shdConsAndFrame);
                                 print(state.files.eio,
                                       FenestrationShadedStateFormat,
                                       constructionName,
