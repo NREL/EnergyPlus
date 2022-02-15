@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -71,7 +72,7 @@
 // #include <EnergyPlus/ReturnAirPathManager.hh> //2022-01-14: replace with exhaust system
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/ZonePlenum.hh> //2022-01-14: may not needed for this exhaust system
+// #include <EnergyPlus/ZonePlenum.hh> //2022-01-14: may not needed for this exhaust system
 
 namespace EnergyPlus {
 
@@ -803,8 +804,8 @@ namespace ExhaustAirSystemManager {
         int InletNode = thisExhCtrl.InletNodeNum;
         int OutletNode = thisExhCtrl.OutletNodeNum;
         Real64 MassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        Real64 Tin = state.dataLoopNodes->Node(InletNode).Temp; // zone temeprature be better? maybe not
-        // Real64 Tin = state.dataHeatBal->Zone(thisExhCtrl.ZoneNum).ZoneMeasuredTemperature;
+        // Real64 Tin = state.dataLoopNodes->Node(InletNode).Temp; // zone temeprature be better? maybe not
+        Real64 Tin = state.dataHeatBalFanSys->ZT(thisExhCtrl.ZoneNum);
         // Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
 
         if (present(FlowRatio)) {
@@ -942,6 +943,12 @@ namespace ExhaustAirSystemManager {
         state.dataLoopNodes->Node(outletNode_index).MassFlowRateMaxAvail = outletFlowMaxAvail;
 
         // then central exhasut fan sizing here:
+        if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+            // state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->m_maxAirMassFlowRate; // 2022-02-15: too bac this is a private member class 
+            // so may need add a public set function in HVACFan.cc to set the max flow rate value for the hvac fan.
+        } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
+            state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate = outletFlowMaxAvail;
+        }
 
         // after evertyhing sized, set the sizing flag
         thisExhSys.SizingFlag = false;
