@@ -101,6 +101,7 @@ set(test_src
     ElectricPowerServiceManager.unit.cc
     EvaporativeCoolers.unit.cc
     EvaporativeFluidCoolers.unit.cc
+    ExhaustSystem.unit.cc
     ExteriorEnergyUse.unit.cc
     FanCoilUnits.unit.cc
     Fans.unit.cc
