@@ -94,12 +94,13 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, 3));
 }
 
-
 TEST_F(EnergyPlusFixture, MultiplePluginVariableObjects)
 {
-    std::string const idf_objects = ("PythonPlugin:Variables, Variables1, VariableA;  PythonPlugin:Variables, Variables2, VariableB;");
+    std::string const idf_objects =
+        ("PythonPlugin:Variables, Variables1, VariableA, VariableB;  PythonPlugin:Variables, Variables2, VariableA, VariableC;");
     ASSERT_TRUE(process_idf(idf_objects));
     PluginManagement::PluginManager p{*this->state};
-
+    EXPECT_EQ(p.maxGlobalVariableIndex, 2);
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** Found duplicate variable name in PythonPLugin:Variables objects, ignoring: \"VariableA\"\n"));
 }
 } // namespace EnergyPlus
