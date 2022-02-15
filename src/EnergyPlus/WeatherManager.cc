@@ -2304,14 +2304,11 @@ namespace WeatherManager {
             }
         }
 
-        // if site precipitation not arround, throw warning
-        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::Invalid) {
+        // if using epw precipitation, throw warning
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
             ShowRecurringWarningErrorAtEnd(
                 state,
-                "Please be aware that precipitation depth in the .epw weather file is used in the rainfall related calculation including "
-                "RainCollector and Roof Irrigation as "
-                "the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. "
-                "Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.",
+                "Precipitation depth in .epw is used as Site:Precipitation is not present. Please make sure this .epw field has valid data.",
                 state.dataWaterData->PrecipInPlaceOfScheWarnIdx);
             if ((state.dataEnvrn->LiquidPrecipitation == 0) && (state.dataEnvrn->IsRain)) {
                 state.dataEnvrn->LiquidPrecipitation = 1.5 / 1000.0;

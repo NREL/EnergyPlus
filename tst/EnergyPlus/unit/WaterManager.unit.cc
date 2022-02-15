@@ -53,7 +53,9 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -131,7 +133,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
 
     // without site:precipitation, use epw "LiquidPrecipitation"
     state->dataEnvrn->LiquidPrecipitation = 0.5;
-    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Invalid;
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::None;
     WaterManager::UpdatePrecipitation(*state);
     ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / (3600 / state->dataGlobal->NumOfTimeStepInHour));
     // when "LiquidPrecipitation" is 0, rainfall rate is 0
@@ -172,6 +174,68 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
 
     Real64 CurrentRate = state->dataWaterData->RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
+}
+
+TEST_F(EnergyPlusFixture, WaterManager_RainIrrigationMode) {
+
+    std::string idf_objects = delimited_string({
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.0;                     !- Average Total Annual Precipitation {m/yr}",
+
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
+
+        "RoofIrrigation,",
+        "SmartSchedule,           !- Irrigation Model Type",
+        "IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name",
+        "Yes,                     !- Use Precipitation",
+        "100;                     !- Irrigation Maximum Saturation Threshold",
+
+        "Schedule:Compact,",
+        "IRRIGATIONSCHD,          !- Name",
+        "Any Number,              !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: Alldays,            !- Field 2",
+        "Until: 07:00,0.0,        !- Field 3",
+        "Until: 09:00,0.00242,    !- Field 4",
+        "Until: 24:00,0.0;        !- Field 5",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    WaterManager::GetWaterManagerInput(*state);
+
+    // when rain schedule design is present, use the design schedule
+    ASSERT_EQ(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::RainSchedDesign);
+
+    idf_objects = delimited_string({
+        "RoofIrrigation,",
+        "SmartSchedule,           !- Irrigation Model Type",
+        "IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name",
+        "Yes,                     !- Use Precipitation",
+        "100;                     !- Irrigation Maximum Saturation Threshold",
+
+        "Schedule:Compact,",
+        "IRRIGATIONSCHD,          !- Name",
+        "Any Number,              !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: Alldays,            !- Field 2",
+        "Until: 07:00,0.0,        !- Field 3",
+        "Until: 09:00,0.00242,    !- Field 4",
+        "Until: 24:00,0.0;        !- Field 5",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->dataWaterManager->MyOneTimeFlag = true;
+    state->dataWaterData->WaterSystemGetInputCalled = false;
+    WaterManager::GetWaterManagerInput(*state);
+
+    // no site:precipitation, use epw schedule
+    ASSERT_EQ(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::EPWPrecipitation);
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_Fill)

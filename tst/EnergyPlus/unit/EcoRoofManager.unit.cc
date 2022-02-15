@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
     state->dataGlobal->TimeStep = 2;
 
     // Without site:precipitation, use epw "LiquidPrecipitation"
-    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Invalid;
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::None;
     state->dataEnvrn->LiquidPrecipitation = 0.005;
     WaterManager::UpdatePrecipitation(*state);
     ASSERT_EQ(state->dataEcoRoofMgr->CurrentPrecipitation, 0.005);

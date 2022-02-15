@@ -70,8 +70,15 @@ namespace DataWater {
 
     enum class RainfallMode
     {
-        Invalid = -1,
+        None = -1,
         RainSchedDesign, // mode of Rainfall determination is Scheduled Design
+        EPWPrecipitation,
+        Num
+    };
+
+    enum class IrrigationMode
+    {
+        Invalid = -1,
         IrrSchedDesign,  // mode of Irrigation determination is Scheduled Design
         IrrSmartSched,   // mode of irrigation
         Num
@@ -282,7 +289,7 @@ namespace DataWater {
 
         // Default Constructor
         SiteRainFallDataStruct()
-            : ModeID(RainfallMode::Invalid), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
+            : ModeID(RainfallMode::None), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
         {
         }
     };
@@ -290,14 +297,14 @@ namespace DataWater {
     struct IrrigationDataStruct
     {
         // Members
-        RainfallMode ModeID; // type of irrigation modeling
+        IrrigationMode ModeID; // type of irrigation modeling
         int IrrSchedID;
         Real64 ScheduledAmount;
         Real64 ActualAmount;
         Real64 IrrigationThreshold; // percent at which no irrigation happens (smart schedule)
 
         // Default Constructor
-        IrrigationDataStruct() : ModeID(RainfallMode::Invalid), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
+        IrrigationDataStruct() : ModeID(IrrigationMode::Invalid), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
         {
         }
     };

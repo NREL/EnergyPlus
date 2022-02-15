@@ -189,6 +189,9 @@ namespace WaterManager {
         int NumIrrigation;
         int Dummy;
 
+        // initialize rainfall model
+        state.dataWaterData->RainFall.ModeID = DataWater::RainfallMode::None;
+
         if ((state.dataWaterManager->MyOneTimeFlag) && (!(state.dataWaterData->WaterSystemGetInputCalled))) { // big block for entire subroutine
 
             cCurrentModuleObject = "WaterUse:Storage";
@@ -382,6 +385,10 @@ namespace WaterManager {
                     state.dataWaterData->RainCollector.allocate(state.dataWaterData->NumRainCollectors);
                 // allow extensible reference to surfaces.
                 state.dataWaterData->AnyWaterSystemsInModel = true;
+
+                if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::None) {
+                    state.dataWaterData->RainFall.ModeID = DataWater::RainfallMode::EPWPrecipitation;
+                }
 
                 for (Item = 1; Item <= state.dataWaterData->NumRainCollectors; ++Item) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -681,21 +688,24 @@ namespace WaterManager {
                 state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
-                    state.dataWaterData->Irrigation.ModeID = DataWater::RainfallMode::IrrSchedDesign;
+                    state.dataWaterData->Irrigation.ModeID = DataWater::IrrigationMode::IrrSchedDesign;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(1), "SmartSchedule")) {
-                    state.dataWaterData->Irrigation.ModeID = DataWater::RainfallMode::IrrSmartSched;
+                    state.dataWaterData->Irrigation.ModeID = DataWater::IrrigationMode::IrrSmartSched;
                 } else {
                     ShowSevereError(state, "Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule");
                     ErrorsFound = true;
                 }
+                if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::None) {
+                    state.dataWaterData->RainFall.ModeID = DataWater::RainfallMode::EPWPrecipitation;
+                }
                 state.dataWaterData->Irrigation.IrrSchedID = GetScheduleIndex(state, cAlphaArgs(2));
                 if ((state.dataWaterData->Irrigation.IrrSchedID == 0) &&
-                    ((state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) ||
-                     state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched)) {
+                    ((state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign) ||
+                     state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSmartSched)) {
                     ShowSevereError(state, "Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
                 } else if ((state.dataWaterData->Irrigation.IrrSchedID == 0) &&
-                           (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign)) {
+                           (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign)) {
                     if (!CheckScheduleValueMinMax(state, state.dataWaterData->Irrigation.IrrSchedID, ">=", 0.0)) {
                         ShowSevereError(state, "Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
@@ -709,7 +719,7 @@ namespace WaterManager {
                 // If we later add a designannualirrigation and a nominalannualirrigation variable (for scaling) those
                 // would be assigned here... as with the Rainfall...
                 state.dataWaterData->Irrigation.IrrigationThreshold = 0.4;
-                if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched && NumNumbers > 0) {
+                if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSmartSched && NumNumbers > 0) {
                     if (rNumericArgs(1) > 100.0 || rNumericArgs(1) < 0.0) {
                         ShowSevereError(state, "Irrigation threshold for " + cCurrentModuleObject + " object has values > 100 or < 0.");
                         ErrorsFound = true;
@@ -970,18 +980,17 @@ namespace WaterManager {
         state.dataWaterData->RainFall.CurrentAmount =
             state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
         // follow develop branch behavior
-        if (state.dataGlobal->TimeStep > 1) {
+        if ((state.dataGlobal->TimeStep > 1) && !(state.dataGlobal->KickOffSimulation)) {
             state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
         }
-        int month = state.dataEnvrn->Month;
-        // change unit back to mm in the reporting in monthly rain amount used in rain collector
-        if ((state.dataWaterData->RainFall.CurrentAmount > 0.0) && (state.dataEnvrn->RunPeriodEnvironment)) {
-            state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
-        }
-        if (!state.dataGlobal->WarmupFlag) {
-            state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr.at(month - 1) += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
-        }
+        // fixme: debug print
+//        fmt::print("{} {}-{} schedRate={}, curAmt={}, curPrec={}\n",
+//                   state.dataEnvrn->CurMnDy,
+//                   state.dataGlobal->HourOfDay,
+//                   state.dataGlobal->TimeStep,
+//                   schedRate,
+//                   state.dataWaterData->RainFall.CurrentAmount,
+//                   state.dataEcoRoofMgr->CurrentPrecipitation);
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
@@ -1003,12 +1012,12 @@ namespace WaterManager {
 
         state.dataWaterData->Irrigation.ScheduledAmount = 0.0;
 
-        if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) {
+        if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign) {
             schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount =
                 schedRate * (TimeStepSys * DataGlobalConstants::SecInHour) / DataGlobalConstants::SecInHour; // convert to m/timestep
 
-        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched) {
+        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSmartSched) {
             schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount =
                 schedRate * (TimeStepSys * DataGlobalConstants::SecInHour) / DataGlobalConstants::SecInHour; // convert to m/timestep
@@ -1483,6 +1492,12 @@ namespace WaterManager {
 
             VdotAvail = state.dataWaterData->RainFall.CurrentRate * state.dataWaterData->RainCollector(RainColNum).HorizArea * (1.0 - LossFactor);
 
+            int month = state.dataEnvrn->Month;
+            // change unit back to mm in the reporting in monthly rain amount used in rain collector
+            if (state.dataEnvrn->RunPeriodEnvironment) {
+                state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+            }
+
             if (VdotAvail > state.dataWaterData->RainCollector(RainColNum).MaxCollectRate) {
                 VdotAvail = state.dataWaterData->RainCollector(RainColNum).MaxCollectRate;
             }
@@ -1498,7 +1513,6 @@ namespace WaterManager {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
-            int month = state.dataEnvrn->Month;
             state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly.at(month - 1) +=
                 state.dataWaterData->RainCollector(RainColNum).VolCollected;
         }

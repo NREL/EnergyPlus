@@ -910,12 +910,25 @@ namespace EcoRoofManager {
 
         // NEXT Add Precipitation to surface soil moisture variable (if a schedule exists)
         // the code updating precipitation is moved to UpdatePrecipitation
+        // fixme: debug print
+//        fmt::print("{} {}-{} curAmt={}, curPrec={}\n",
+//                   state.dataEnvrn->CurMnDy,
+//                   state.dataGlobal->HourOfDay,
+//                   state.dataGlobal->TimeStep,
+//                   state.dataWaterData->RainFall.CurrentAmount,
+//                   state.dataEcoRoofMgr->CurrentPrecipitation);
         Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
+
+        int month = state.dataEnvrn->Month;
+        if (state.dataEnvrn->RunPeriodEnvironment) {
+            state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr.at(month - 1) += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
+        }
 
         // NEXT Add Irrigation to surface soil moisture variable (if a schedule exists)
         state.dataEcoRoofMgr->CurrentIrrigation = 0.0; // first initialize to zero
         state.dataWaterData->Irrigation.ActualAmount = 0.0;
-        if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) {
+        if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign) {
             state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
             if (state.dataWaterData->UsePrecipitation) {
                 state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation + state.dataEcoRoofMgr->CurrentPrecipitation;
@@ -923,7 +936,7 @@ namespace EcoRoofManager {
                 state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
             }
             //    elseif (Irrigation%ModeID ==IrrSmartSched .and. moisture .lt. 0.4d0*MoistureMax) then
-        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched &&
+        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSmartSched &&
                    Moisture < state.dataWaterData->Irrigation.IrrigationThreshold * MoistureMax) {
             // Smart schedule only irrigates when scheduled AND the soil is less than 40% saturated
             state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
@@ -932,13 +945,25 @@ namespace EcoRoofManager {
             } else {
                 state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
             }
-        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::Invalid) {
-            // no schedule, irrigation is just the rain amount
-            state.dataEcoRoofMgr->CurrentIrrigation = state.dataEcoRoofMgr->CurrentPrecipitation; // units of m
-            state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
+        } else { // no schedule
+            if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
+                // irrigation is just the rain amount
+                state.dataEcoRoofMgr->CurrentIrrigation = state.dataEcoRoofMgr->CurrentPrecipitation; // units of m
+                state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
+            }
         }
 
         Moisture += state.dataEcoRoofMgr->CurrentIrrigation / state.dataEcoRoofMgr->TopDepth; // irrigation in (m)/timestep put into top layer
+// fixme: debug print
+//        fmt::print("{} {}-{} Moisture={}, evap={}, CurPrec={}, CurIrri={}\n",
+//                   state.dataEnvrn->CurMnDy,
+//                   state.dataGlobal->HourOfDay,
+//                   state.dataGlobal->TimeStep,
+//                   Moisture,
+//                   (Vfluxg)*state.dataGlobal->MinutesPerTimeStep,
+//                   state.dataEcoRoofMgr->CurrentPrecipitation,
+//                   state.dataEcoRoofMgr->CurrentIrrigation);
+
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
             // aggregate to monthly for reporting
