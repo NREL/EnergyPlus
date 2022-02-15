@@ -781,50 +781,26 @@ namespace ExhaustAirSystemManager {
 
     void CalcZoneHVACExhaustControl(EnergyPlusData &state, int &ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio)
     {
-        // 2022-01: Calculate a zonehvac exhaust control system
-        // basically, based on the incoming node information, as well as the input parameters
-        // determine the outlet node values and possible other state variable (if any)
-
-        // std::string const idf_objects = delimited_string({
-        //    "ZoneHVAC:ExhaustControl,",
-        //    "    Zone1 Exhaust Control,          !-Name",
-        //    "    HVACOperationSchd,              !- Availability Schedule Name",
-        //    "    Zone2,                          !- Zone Name",
-        //    "    Zone2 Exhaust Node,             !- Inlet Node Name",
-        //    "    Zone2 ExhaustSystem Node,       !- Outlet Node Name",
-        //    "    0.1,                            !- Design Flow Rate {m3/s}",
-        //    "    Scheduled,                      !- Flow Control Type (Scheduled, FollowSupply, Other?)",
-        //    "    Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name",
-        //    "    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)",
-        //    "    ,                               !- Minimum Zone Temperature Limit Schedule Name",
-        //    "    Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name",
-        //    "    FlowBalancedSched;        !-Balanced Exhaust Fraction Schedule Name",
-        //});
+        // Calculate a zonehvac exhaust control system
 
         auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(ZoneHVACExhaustControlNum);
         int InletNode = thisExhCtrl.InletNodeNum;
         int OutletNode = thisExhCtrl.OutletNodeNum;
         Real64 MassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        // Real64 Tin = state.dataLoopNodes->Node(InletNode).Temp; // zone temeprature be better? maybe not
         Real64 Tin = state.dataHeatBalFanSys->ZT(thisExhCtrl.ZoneNum);
-        // Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
 
         if (present(FlowRatio)) {
             thisExhCtrl.BalancedFlow *= FlowRatio;
             thisExhCtrl.UnbalancedFlow *= FlowRatio;
 
-            // adjustment of airlfow rate by ratio
-            // but still need to deal with the min fractions?
             state.dataLoopNodes->Node(InletNode).MassFlowRate *= FlowRatio;
         } else {
-
             // Availability schedule:
             if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
-                // state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
                 MassFlow = 0.0;
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             } else {
-                // set inlet and outlet flows to zero}
+                //
             }
 
             Real64 DesignFlowRate = thisExhCtrl.DesignExhaustFlowRate;
@@ -832,11 +808,12 @@ namespace ExhaustAirSystemManager {
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
             }
+
             Real64 MinFlowFrac = 0.0;
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
             }
-            // 2022-01-27: Need to be refined more based on the schedule availability as well
+
             if (FlowFrac < MinFlowFrac) {
                 FlowFrac = MinFlowFrac;
             }
@@ -858,7 +835,7 @@ namespace ExhaustAirSystemManager {
                 }
             } else {
                 runExhaust = false;
-                FlowFrac = 0.0; // or directly set flow rate to zero.
+                FlowFrac = 0.0; // directly set flow rate to zero.
             }
 
             if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
@@ -872,9 +849,6 @@ namespace ExhaustAirSystemManager {
                 MassFlow = supplyFlowRate * FlowFrac;
             }
 
-            // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
-            // from UpdateFan() in Fan.cc
-            // state.dataHVACGlobal->UnbalExhMassFlow = MassFlow; // Fan(FanNum).InletAirMassFlowRate;
             if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
                 thisExhCtrl.BalancedFlow = // state.dataHVACGlobal->BalancedExhMassFlow =
                     MassFlow *             // state.dataHVACGlobal->UnbalExhMassFlow *
@@ -883,11 +857,10 @@ namespace ExhaustAirSystemManager {
                     MassFlow -                // = state.dataHVACGlobal->UnbalExhMassFlow -
                     thisExhCtrl.BalancedFlow; // state.dataHVACGlobal->BalancedExhMassFlow;
             } else {
-                // state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
                 thisExhCtrl.BalancedFlow = 0.0;
                 thisExhCtrl.UnbalancedFlow = MassFlow;
             }
-            // 2022-02-15: May need to take the above section out so it will deal with reassignment case as well.
+
             state.dataLoopNodes->Node(InletNode).MassFlowRate = MassFlow;
         }
 
@@ -900,15 +873,15 @@ namespace ExhaustAirSystemManager {
         state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
         state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
 
-        // 2022-02: Just some test code to explore node elements; may not be necessary but may not do harm either:
+        // More node elements
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
 
-        // Set the Node Flow Control Variables from the Fan Control Variables? No need
+        // Set the Node Flow Control Variables from the Fan Control Variables
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
 
-        // these might also be useful to pass through (founnd in UpdateFan() in Fan.cc)
+        // these might also be useful to pass through
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
         }
@@ -916,11 +889,6 @@ namespace ExhaustAirSystemManager {
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
         }
-
-        // finer details:
-        // In step 3, use the zone temperature, or the the exhaust node temperature for comparision?
-        // since there is an exhasut node temperature calculation in EnergyPlus considering the radiation details.
-        // 2022-01-27: fan coil module used the fan inlet temperature as the comparision value.
     }
 
     void SizeExhaustSystem(EnergyPlusData &state, int exhSysNum)
@@ -939,14 +907,12 @@ namespace ExhaustAirSystemManager {
             outletFlowMaxAvail += state.dataLoopNodes->Node(inletNode_index).MassFlowRateMaxAvail;
         }
 
-        // 2022-02: mixer outlet actually have a variable named OutletMassFlowRateMaxAvail, which could also be a way to do it
+        // mixer outlet considered OutletMassFlowRateMaxAvail?
         int outletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutletNode;
         state.dataLoopNodes->Node(outletNode_index).MassFlowRateMaxAvail = outletFlowMaxAvail;
 
         // then central exhasut fan sizing here:
         if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            // state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->m_maxAirMassFlowRate; // 2022-02-15: too bac this is a private member class
-            // so may need add a public set function in HVACFan.cc to set the max flow rate value for the hvac fan.
             state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
         } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate =
@@ -957,7 +923,6 @@ namespace ExhaustAirSystemManager {
         thisExhSys.SizingFlag = false;
 
         // Sizing and write fan sizing to eio report: example code in SizeFan() in Fan.cc:
-        // Report fan, belt, motor, and VFD characteristics at design condition to .eio file
         // BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
     }
 
@@ -969,7 +934,6 @@ namespace ExhaustAirSystemManager {
 
         if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
             // size based on supply nodelist flow
-            // for (auto instance = NodeNums.begin(); instance != NodeNums.end(); ++instance) {
             for (int i = 1; i <= NodeNums.size(); ++i) {
                 designFlow += state.dataLoopNodes->Node(NodeNums(i)).MassFlowRateMax;
             }
@@ -983,30 +947,18 @@ namespace ExhaustAirSystemManager {
 
     void UpdateZoneExhaustControl(EnergyPlusData &state)
     {
-        // For each zone, update the total exhaust flow that need to be used in ZoneEqupmentManager.cc:
-        // state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExh +=
-        //    (state.dataHVACGlobal->UnbalExhMassFlow +
-        //     state.dataHVACGlobal->BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
-        //                                                 // state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExhBalanced
-        // += state.dataHVACGlobal->BalancedExhMassFlow;
-
         for (int i = 1; state.dataZoneEquip->NumZoneExhaustControls; ++i) {
             int controlledZoneNum = state.dataZoneEquip->ZoneExhaustControlSystem(i).ControlledZoneNum;
             state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneExh +=
                 state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow + state.dataZoneEquip->ZoneExhaustControlSystem(i).UnbalancedFlow;
             state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneExhBalanced += state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow;
         }
-        // 2022-02-15: is zoneNum just the same as "ControlledZoneNum": they seems to be different on Line 3119 ZoneEquipxxx.cc:
-        //       ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
     }
 
     void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound)
     {
-        // 2022-02: trying to check a node to see if it is truely a supply node
-        //          for a nodelist, need a call loop to check each node in the list
-        // SUBROUTINE INFORMATION:
-        // This subroutine checks that the supply node number matches the air inlet node number of some zone or airloop hvac systems
-        // Refer to some exapmle code in CheckForSensorAndSetPointNode() or CheckActuatorNode() in WaterCoils.cc
+        // Trying to check a node to see if it is truely a supply node
+        // for a nodelist, need a call loop to check each node in the list
     }
 
 } // namespace ExhaustAirSystemManager

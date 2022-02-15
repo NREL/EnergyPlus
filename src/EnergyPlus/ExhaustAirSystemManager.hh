@@ -64,12 +64,11 @@ namespace ExhaustAirSystemManager {
         // Members
         std::string Name;
 
-        // 2022-01-20: Exhaust system has only two definite components, so now easier to specify
         int AvailScheduleNum;
         std::string ZoneMixerName;
         int ZoneMixerIndex;
         int CentralFanTypeNum;
-        std::string CentralFanName; // 2022-01: adding this to make the sim call easier
+        std::string CentralFanName;
         int CentralFanIndex;
 
         bool SizingFlag;
@@ -102,7 +101,7 @@ namespace ExhaustAirSystemManager {
         int OutletNodeNum;
 
         Real64 DesignExhaustFlowRate;
-        int FlowControlTypeNum; // for now define 0 = Scheduled; 1 = Follow-supply
+        int FlowControlTypeNum;
         int ExhaustFlowFractionScheduleNum;
         int SupplyNodeOrNodelistNum;
         int MinZoneTempLimitScheduleNum;
