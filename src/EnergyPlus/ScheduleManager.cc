@@ -1649,7 +1649,7 @@ namespace ScheduleManager {
                 FileIntervalInterpolated = true;
             }
 
-            if (lAlphaBlanks(6)) Alphas(6) = "NO";
+            if (lAlphaBlanks(6)) Alphas(6) = "YES";
             if ((Alphas(6)) == "YES") {
                 state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = true;
             } else if ((Alphas(6)) == "NO") {

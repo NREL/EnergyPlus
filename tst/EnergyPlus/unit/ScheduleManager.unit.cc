@@ -1396,51 +1396,59 @@ TEST_F(EnergyPlusFixture, ScheduleFileDSTtoggleOptionTest)
         " ",
     });
 
-    ASSERT_TRUE(
-        process_idf(idf_objects)); // This will process the provided idf chunk within the test fixture (must pass this step in order to proceed)
+    // This will process the provided idf chunk within the test fixture (must pass this step in order to proceed)
+    ASSERT_TRUE(process_idf(idf_objects));
 
-    // Test that each option sets UseDaylightSaving correctly on the each schedule:
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataGlobal->TimeStep = 1; // Checking to see if omitting this is OK here
+    state->dataEnvrn->DayOfWeek = 1; // Sunday
+    state->dataEnvrn->DayOfWeekTomorrow = 2; // Monday
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataGlobal->HourOfDay = 24;
 
     // Test 1 condition
+    // "YES" Adjusts schedule for daylight savings
     const int sch1idx = GetScheduleIndex(*state, "TEST1"); // Index of the IDF schedule object identified and stored into schdl1idx variable
     ScheduleManager::ScheduleData &sch1 =
         state->dataScheduleMgr->Schedule(sch1idx); // sch1 reference initialized that points to the specific schedule of interest
-    ASSERT_TRUE(sch1.UseDaylightSaving);           // Checks that the member variable got set correctly.
-
-    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're in daylight savings
-
-    // state->dataGlobal->TimeStep = 1; // Checking to see if omitting this is OK here
-
-    state->dataGlobal->HourOfDay = 24;
-
-    // ScheduleManager::LookUpScheduleValue(*state, sch1idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
-
-    EXPECT_EQ(ScheduleManager::LookUpScheduleValue(*state, sch1idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1);
+    EXPECT_TRUE(sch1.UseDaylightSaving);           // Checks that the member variable got set correctly.
+    
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch1idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch1idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
 
     // Test 2 condition
+    // "NO" Does not adjust for daylight savings
     const int sch2idx = GetScheduleIndex(*state, "TEST2");
     ScheduleManager::ScheduleData &sch2 = state->dataScheduleMgr->Schedule(sch2idx);
-    ASSERT_FALSE(sch2.UseDaylightSaving);
+    EXPECT_FALSE(sch2.UseDaylightSaving);
 
-    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're not including daylight savings
-
-    EXPECT_EQ(ScheduleManager::LookUpScheduleValue(*state, sch2idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0);
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch2idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch2idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
 
     // Test 3 condition
+    // Default: "YES", changes schedule for daylight savings
     const int sch3idx = GetScheduleIndex(*state, "TEST3");
     ScheduleManager::ScheduleData &sch3 = state->dataScheduleMgr->Schedule(sch3idx);
-    ASSERT_FALSE(sch3.UseDaylightSaving);
+    EXPECT_TRUE(sch3.UseDaylightSaving);
 
-    state->dataEnvrn->DSTIndicator = 0;
-
-    EXPECT_EQ(ScheduleManager::LookUpScheduleValue(*state, sch3idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0);
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch3idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch3idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
 
     // Test 4 condition
+    // Default: "YES", changes schedule for daylight savings
     const int sch4idx = GetScheduleIndex(*state, "TEST4");                           // Index of the IDF schedule object identified
     ScheduleManager::ScheduleData &sch4 = state->dataScheduleMgr->Schedule(sch4idx); // sch1 object initialized of type ScheduleData
-    ASSERT_FALSE(sch4.UseDaylightSaving);                                            // Checks that the member variable got set correctly.
+    EXPECT_TRUE(sch4.UseDaylightSaving);                                            // Checks that the member variable got set correctly.
 
-    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're not including daylight savings
-
-    EXPECT_EQ(ScheduleManager::LookUpScheduleValue(*state, sch4idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0);
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch4idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch4idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
 }
