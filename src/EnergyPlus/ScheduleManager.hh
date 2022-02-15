@@ -348,7 +348,7 @@ struct ScheduleManagerData : BaseGlobalStruct
     int NumSchedules = 0;
 
     // Logical Variables for Module
-    bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
+    bool ScheduleInputProcessed = false;       // This is false until the Schedule Input has been processed.
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
     // Object Data
