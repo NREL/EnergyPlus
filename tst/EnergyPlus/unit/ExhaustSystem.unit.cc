@@ -159,17 +159,15 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    1;                       !- Number of Speeds",
 
         "AirLoopHVAC:ExhaustSystem,",
-        "    Central Exhaust 1,     !-Name Exhaust Avail List",
-        // "    Omni_Sched,            !-Availability Manager List Name",
-        "    Mixer1,  !-AirLoopHVAC:ZoneMixer Name",
+        "    Central Exhaust 1,     !-Name",
+        "    Mixer1,                !-AirLoopHVAC:ZoneMixer Name",
         "    Fan:SystemModel,       !-Fan Object Type",
         "    CentralExhaustFan1;    !-Fan Name",
 
         "AirLoopHVAC:ExhaustSystem,",
-        "    Central Exhaust 2,     !-Name Exhaust Avail List",
-        // "    Omni_Sched,            !-Availability Manager List Name",
-        "    Mixer2,  !-AirLoopHVAC:ZoneMixer Name",
-        "    Fan:SystemModel,    !-Fan Object Type",
+        "    Central Exhaust 2,     !-Name",
+        "    Mixer2,                !-AirLoopHVAC:ZoneMixer Name",
+        "    Fan:SystemModel,       !-Fan Object Type",
         "    CentralExhaustFan2;    !-Fan Name",
 
         "ZoneHVAC:ExhaustControl,",
