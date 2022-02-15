@@ -112,15 +112,13 @@ Fan:SystemModel,
 
 AirLoopHVAC:ExhaustSystem,
     ExhaustSystem1,          !- Name
-    ,                        !- Availability Schedule Name
-    ZoneExhMixer1,           !- AirLoopHVAC:ZoneMixer Name
+    ZoneExhMixer1,           !- Zone Mixer Name
     Fan:SystemModel,         !- Fan Object Type
     Central_Exhaust_Fan_1;   !- Fan Name
 
 AirLoopHVAC:ExhaustSystem,
     ExhaustSystem2,          !- Name
-    ,                        !- Availability Schedule Name
-    ZoneExhMixer2,           !- AirLoopHVAC:ZoneMixer Name
+    ZoneExhMixer2,           !- Zone Mixer Name
     Fan:SystemModel,         !- Fan Object Type
     Central_Exhaust_Fan_2;   !- Fan Name
 
