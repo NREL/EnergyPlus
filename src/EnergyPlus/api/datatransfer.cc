@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
@@ -742,7 +741,7 @@ int minutes(EnergyPlusState state)
     Real64 currentTimeVal = currentTime(state);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     Real64 fractionalHoursIntoTheDay = currentTimeVal - double(thisState->dataGlobal->HourOfDay - 1);
-    Real64 fractionalMinutesIntoTheDay = fractionalHoursIntoTheDay * 60.0;
+    Real64 fractionalMinutesIntoTheDay = std::round(fractionalHoursIntoTheDay * 60.0);
     return (int)(fractionalMinutesIntoTheDay);
 }
 

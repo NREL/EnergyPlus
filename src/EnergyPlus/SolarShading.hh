@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -337,22 +337,6 @@ namespace SolarShading {
 
 struct SolarShadingData : BaseGlobalStruct
 {
-
-    Real64 const SmallIncrement = 1.0e-10; // Small increment added for shading/sunlit area calculations.
-    Real64 const HCMULT = 100000.0;        // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
-                                    // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
-                                    // to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
-    Real64 const sqHCMULT = (HCMULT * HCMULT);        // Square of HCMult used in Homogeneous coordinates
-    Real64 const sqHCMULT_fac = (0.5 / sqHCMULT);     // ( 0.5 / sqHCMULT ) factor
-    Real64 const kHCMULT = (1.0 / (HCMULT * HCMULT)); // half of inverse square of HCMult used in Homogeneous coordinates
-
-    // Parameters for use with the variable OverlapStatus...
-    int const NoOverlap = 1;
-    int const FirstSurfWithinSecond = 2;
-    int const SecondSurfWithinFirst = 3;
-    int const PartialOverlap = 4;
-    int const TooManyVertices = 5;
-    int const TooManyFigures = 6;
     Array1D_string const cOverLapStatus;
     int MaxHCV = 15;             // Maximum number of HC vertices
                                  // (needs to be based on maxnumvertices)
@@ -481,8 +465,8 @@ struct SolarShadingData : BaseGlobalStruct
     Array1D<Real64> XVert;
     Array1D<Real64> YVert;
     Array1D<Real64> ZVert;
-    Array1D<Real64> AbsBeamWin;                                                               // Glass layer beam solar absorptance of a window
-    Array1D<Real64> AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
+    Array1D<Real64> SurfWinAbsBeam;                                                               // Glass layer beam solar absorptance of a window
+    Array1D<Real64> SurfWinAbsBeamEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
     Array1D<Real64> SurfWinExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident *
                                                 // ExtBeamAbsByShad
     Array1D<Real64> SurfWinIntBeamAbsByShadFac; // Like SurfWinExtBeamAbsByShadFac, but for interior beam radiation.
@@ -618,8 +602,8 @@ struct SolarShadingData : BaseGlobalStruct
         this->XVert.deallocate();
         this->YVert.deallocate();
         this->ZVert.deallocate();
-        this->AbsBeamWin.deallocate();
-        this->AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->SurfWinAbsBeam.deallocate();
+        this->SurfWinAbsBeamEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1);
         this->SurfWinExtBeamAbsByShadFac.deallocate();
         this->SurfWinIntBeamAbsByShadFac.deallocate();
         this->SurfWinTransBmSolar.deallocate();

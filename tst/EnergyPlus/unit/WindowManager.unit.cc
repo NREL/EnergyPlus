@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -578,15 +578,15 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0;
 
-    state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
+    state->dataHeatBalSurf->SurfQdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->SurfQdotConvOutPerArea.allocate(3);
-    state->dataHeatBalSurf->QConvOutReport.allocate(3);
-    state->dataHeatBalSurf->QdotRadOutRep.allocate(3);
-    state->dataHeatBalSurf->QdotRadOutRepPerArea.allocate(3);
-    state->dataHeatBalSurf->QRadOutReport.allocate(3);
+    state->dataHeatBalSurf->SurfQConvOutReport.allocate(3);
+    state->dataHeatBalSurf->SurfQdotRadOutRep.allocate(3);
+    state->dataHeatBalSurf->SurfQdotRadOutRepPerArea.allocate(3);
+    state->dataHeatBalSurf->SurfQRadOutReport.allocate(3);
     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
-    state->dataHeatBalSurf->QAirExtReport.allocate(3);
-    state->dataHeatBalSurf->QHeatEmiReport.allocate(3);
+    state->dataHeatBalSurf->SurfQAirExtReport.allocate(3);
+    state->dataHeatBalSurf->SurfQHeatEmiReport.allocate(3);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
@@ -2846,7 +2846,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 *
                          (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
-    EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2), 3);
+    EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->SurfQHeatEmiReport(surfNum2), 3);
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)

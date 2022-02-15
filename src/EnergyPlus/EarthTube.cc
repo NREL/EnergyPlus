@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -134,7 +134,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     using ScheduleManager::GetScheduleValuesForDay;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const EarthTubeTempLimit(100.0); // degrees Celsius
+    Real64 constexpr EarthTubeTempLimit(100.0); // degrees Celsius
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlpha;

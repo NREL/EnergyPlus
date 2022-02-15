@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,27 +131,27 @@ void ManageZoneContaminanUpdates(EnergyPlusData &state,
 
     if (!state.dataContaminantBalance->Contaminant.SimulateContaminants) return;
 
-    {
-        auto const SELECT_CASE_var(UpdateType);
-
-        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
-            InitZoneContSetPoints(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
-            PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
-            CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
-            RevertZoneTimestepHistories(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
-            PushZoneTimestepHistories(state);
-
-        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
-            PushSystemTimestepHistories(state);
-        }
+    switch (UpdateType) {
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints: {
+        InitZoneContSetPoints(state);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep: {
+        PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep: {
+        CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories: {
+        RevertZoneTimestepHistories(state);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories: {
+        PushZoneTimestepHistories(state);
+    } break;
+    case DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories: {
+        PushSystemTimestepHistories(state);
+    } break;
+    default:
+        break;
     }
 }
 
@@ -363,9 +363,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -510,9 +509,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (ZonePtr > 0)
             SetupZoneInternalGain(state,
                                   ZonePtr,
-                                  "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                                   nullptr,
                                   nullptr,
                                   nullptr,
@@ -629,9 +627,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -755,9 +752,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -882,9 +878,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -990,9 +985,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -1100,9 +1094,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name,
-                              IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                              DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
                               nullptr,
                               nullptr,
@@ -1366,7 +1359,6 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     // Using/Aliasing
     using InternalHeatGains::SumAllInternalCO2Gains;
     using InternalHeatGains::SumAllInternalCO2GainsExceptPeople; // Added for hybrid model
-    using InternalHeatGains::SumAllInternalGenericContamGains;
     using InternalHeatGains::SumInternalCO2GainsByTypes;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1651,11 +1643,12 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     // CO2 gain
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-            SumAllInternalCO2Gains(state, Loop, state.dataContaminantBalance->ZoneCO2Gain(Loop));
+            state.dataContaminantBalance->ZoneCO2Gain(Loop) = SumAllInternalCO2Gains(state, Loop);
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                SumAllInternalCO2GainsExceptPeople(state, Loop, state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop));
+                state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop) = SumAllInternalCO2GainsExceptPeople(state, Loop);
             }
-            SumInternalCO2GainsByTypes(state, Loop, Array1D_int(1, IntGainTypeOf_People), state.dataContaminantBalance->ZoneCO2GainFromPeople(Loop));
+            std::array<DataHeatBalance::IntGainType, 1> IntGainPeopleArray = {DataHeatBalance::IntGainType::People};
+            state.dataContaminantBalance->ZoneCO2GainFromPeople(Loop) = SumInternalCO2GainsByTypes(state, Loop, IntGainPeopleArray);
         }
     }
 
@@ -1997,26 +1990,29 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // smooth the changes using the zone air capacitance.  Positive values of CO2 Load means that
                 // this amount of CO2 must be added to the zone to reach the setpoint.  Negative values represent
                 // the amount of CO2 that must be removed by the system.
-                {
-                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                    if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
-                        LoadToCO2SetPoint = ((11.0 / 6.0) * C + A) * ZoneAirCO2SetPoint -
-                                            (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
-                                                      (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
-                                                      (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum)));
-                        // Exact solution
-                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-                        if (A == 0.0) { // B=0
-                            LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) - B;
-                        } else {
-                            LoadToCO2SetPoint =
-                                A * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum) * std::exp(min(700.0, -A / C))) /
-                                    (1.0 - std::exp(min(700.0, -A / C))) -
-                                B;
-                        }
-                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-                        LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) + A * ZoneAirCO2SetPoint - B;
+                switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
+                case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+                    LoadToCO2SetPoint = ((11.0 / 6.0) * C + A) * ZoneAirCO2SetPoint -
+                                        (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
+                                                  (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
+                                                  (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum)));
+                    // Exact solution
+                } break;
+                case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+                    if (A == 0.0) { // B=0
+                        LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) - B;
+                    } else {
+                        LoadToCO2SetPoint =
+                            A * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum) * std::exp(min(700.0, -A / C))) /
+                                (1.0 - std::exp(min(700.0, -A / C))) -
+                            B;
                     }
+                } break;
+                case DataHeatBalance::SolutionAlgo::EulerMethod: {
+                    LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) + A * ZoneAirCO2SetPoint - B;
+                } break;
+                default:
+                    break;
                 }
                 if (ZoneAirCO2SetPoint > state.dataContaminantBalance->OutdoorCO2 && LoadToCO2SetPoint < 0.0) {
                     state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP =
@@ -2127,26 +2123,28 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // smooth the changes using the zone air capacitance.  Positive values of GC Load means that
                 // this amount of GC must be added to the zone to reach the setpoint.  Negative values represent
                 // the amount of GC that must be removed by the system.
-                {
-                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                    if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
-                        LoadToGCSetPoint = ((11.0 / 6.0) * C + A) * ZoneAirGCSetPoint -
-                                           (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
-                                                     (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
-                                                     (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum)));
-                        // Exact solution
-                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-                        if (A == 0.0) { // B=0
-                            LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) - B;
-                        } else {
-                            LoadToGCSetPoint =
-                                A * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum) * std::exp(min(700.0, -A / C))) /
-                                    (1.0 - std::exp(min(700.0, -A / C))) -
-                                B;
-                        }
-                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-                        LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) + A * ZoneAirGCSetPoint - B;
+                switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
+                case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+                    LoadToGCSetPoint = ((11.0 / 6.0) * C + A) * ZoneAirGCSetPoint -
+                                       (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
+                                                 (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
+                                                 (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum)));
+                    // Exact solution
+                } break;
+                case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+                    if (A == 0.0) { // B=0
+                        LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) - B;
+                    } else {
+                        LoadToGCSetPoint = A * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum) * std::exp(min(700.0, -A / C))) /
+                                               (1.0 - std::exp(min(700.0, -A / C))) -
+                                           B;
                     }
+                } break;
+                case DataHeatBalance::SolutionAlgo::EulerMethod: {
+                    LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) + A * ZoneAirGCSetPoint - B;
+                } break;
+                default:
+                    break;
                 }
                 if (ZoneAirGCSetPoint > state.dataContaminantBalance->OutdoorGC && LoadToGCSetPoint < 0.0) {
                     state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP =
@@ -2756,25 +2754,28 @@ void CorrectZoneContaminants(EnergyPlusData &state,
 
             // Use a 3rd order derivative to predict final zone CO2 and
             // smooth the changes using the zone air capacitance.
-            {
-                auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
+            switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
+            case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+                state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) =
+                    (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
+                              (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
+                              (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum))) /
+                    ((11.0 / 6.0) * C + A);
+                // Exact solution
+            } break;
+            case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+                if (A == 0.0) { // B=0
+                    state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = state.dataContaminantBalance->ZoneCO21(ZoneNum) + B / C;
+                } else {
                     state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) =
-                        (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
-                                  (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
-                                  (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum))) /
-                        ((11.0 / 6.0) * C + A);
-                    // Exact solution
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-                    if (A == 0.0) { // B=0
-                        state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = state.dataContaminantBalance->ZoneCO21(ZoneNum) + B / C;
-                    } else {
-                        state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) =
-                            (state.dataContaminantBalance->ZoneCO21(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
-                    }
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-                    state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = (C * state.dataContaminantBalance->ZoneCO21(ZoneNum) + B) / (C + A);
+                        (state.dataContaminantBalance->ZoneCO21(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
                 }
+            } break;
+            case DataHeatBalance::SolutionAlgo::EulerMethod: {
+                state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = (C * state.dataContaminantBalance->ZoneCO21(ZoneNum) + B) / (C + A);
+            } break;
+            default:
+                break;
             }
 
             // Set the CO2 to zero if the zone has been large sinks
@@ -2830,25 +2831,28 @@ void CorrectZoneContaminants(EnergyPlusData &state,
 
             // Use a 3rd order derivative to predict final zone generic contaminant and
             // smooth the changes using the zone air capacitance.
-            {
-                auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
+            switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
+            case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+                state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) =
+                    (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
+                              (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
+                              (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum))) /
+                    ((11.0 / 6.0) * C + A);
+                // Exact solution
+            } break;
+            case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+                if (A == 0.0) { // B=0
+                    state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = state.dataContaminantBalance->ZoneGC1(ZoneNum) + B / C;
+                } else {
                     state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) =
-                        (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
-                                  (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
-                                  (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum))) /
-                        ((11.0 / 6.0) * C + A);
-                    // Exact solution
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
-                    if (A == 0.0) { // B=0
-                        state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = state.dataContaminantBalance->ZoneGC1(ZoneNum) + B / C;
-                    } else {
-                        state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) =
-                            (state.dataContaminantBalance->ZoneGC1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
-                    }
-                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
-                    state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = (C * state.dataContaminantBalance->ZoneGC1(ZoneNum) + B) / (C + A);
+                        (state.dataContaminantBalance->ZoneGC1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
                 }
+            } break;
+            case DataHeatBalance::SolutionAlgo::EulerMethod: {
+                state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = (C * state.dataContaminantBalance->ZoneGC1(ZoneNum) + B) / (C + A);
+            } break;
+            default:
+                break;
             }
 
             // Set the generic contaminant to zero if the zone has been large sinks

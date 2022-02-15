@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -402,7 +402,7 @@ namespace RoomAirModelManager {
 
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::ConstGradTemp;
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTstat = state.dataIPShortCut->rNumericArgs(2);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTleaving = state.dataIPShortCut->rNumericArgs(3);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).DeltaTexhaust = state.dataIPShortCut->rNumericArgs(4);
@@ -424,7 +424,7 @@ namespace RoomAirModelManager {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterp;
             state.dataRoomAirMod->RoomAirPattern(thisPattern).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).PatrnID = state.dataIPShortCut->rNumericArgs(1);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.TstatHeight = state.dataIPShortCut->rNumericArgs(2);
@@ -435,19 +435,19 @@ namespace RoomAirModelManager {
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "OutdoorDryBulbTemperature")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode;
+                    DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulb;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneDryBulbTemperature")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode;
+                    DataRoomAirModel::UserDefinedPatternMode::ZoneAirTemp;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneAndOutdoorTemperatureDifference")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleCoolingLoad")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode;
+                    DataRoomAirModel::UserDefinedPatternMode::SensibleCooling;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleHeatingLoad")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
-                    DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode;
+                    DataRoomAirModel::UserDefinedPatternMode::SensibleHeating;
             } else {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
@@ -469,9 +469,9 @@ namespace RoomAirModelManager {
             if ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.UpperBoundTempScale ==
                  state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.LowerBoundTempScale) &&
                 ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) ||
+                  DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulb) ||
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode) ||
+                  DataRoomAirModel::UserDefinedPatternMode::ZoneAirTemp) ||
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
                   DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone))) {
                 // throw error, will cause divide by zero when used for scaling
@@ -481,9 +481,9 @@ namespace RoomAirModelManager {
             if ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient ==
                  state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient) &&
                 ((state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) ||
+                  DataRoomAirModel::UserDefinedPatternMode::SensibleCooling) ||
                  (state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode ==
-                  DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode))) {
+                  DataRoomAirModel::UserDefinedPatternMode::SensibleHeating))) {
                 // throw error, will cause divide by zero when used for scaling
                 ShowSevereError(state, "Error in load scale in " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -493,7 +493,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternNDHeightObject;
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumNonDimensionalHeight; ++ObjNum) {
             thisPattern = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp + ObjNum;
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeight;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -545,7 +545,7 @@ namespace RoomAirModelManager {
         for (ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumSurfaceMapping; ++ObjNum) {
             thisPattern = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp +
                           state.dataRoomAirMod->NumNonDimensionalHeight + ObjNum;
-            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern;
+            state.dataRoomAirMod->RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTemp;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -727,17 +727,17 @@ namespace RoomAirModelManager {
             {
                 auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
                 if (nodeType == "INLET") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAir;
                 } else if (nodeType == "FLOOR") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::FloorAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::FloorAir;
                 } else if (nodeType == "CONTROL") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ControlAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ControlAir;
                 } else if (nodeType == "CEILING") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::CeilingAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::CeilingAir;
                 } else if (nodeType == "MUNDTROOM") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::MundtRoomAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::MundtRoomAir;
                 } else if (nodeType == "RETURN") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAir;
                 } else {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
@@ -1090,17 +1090,17 @@ namespace RoomAirModelManager {
 
             // Third Alpha is a string: JET or RECIRCULATION
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Jet")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Jet;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Jet;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Recirculation")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Recirculation;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Recirculation;
             } else {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Invalid;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Invalid;
             }
 
             for (Loop2 = 1; Loop2 <= state.dataHeatBal->TotPeople; ++Loop2) {
                 if (state.dataHeatBal->People(Loop2).ZonePtr != state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) continue;
                 if (state.dataHeatBal->People(Loop2).Fanger) {
-                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::VComfort_Invalid) {
+                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::Invalid) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
                                             "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
@@ -1366,8 +1366,6 @@ namespace RoomAirModelManager {
         // Use input processor to get input from idf file
 
         // Using/Aliasing
-        using DataHeatBalance::NumZoneIntGainDeviceTypes;
-        using DataHeatBalance::ZoneIntGainDeviceTypes;
         using DataHVACGlobals::NumZoneHVACTerminalTypes;
         using DataHVACGlobals::ZoneHVACTerminalTypes;
         using InternalHeatGains::GetInternalGainDeviceIndex;
@@ -1683,10 +1681,11 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasIntGainsAssigned = true;
                         int numGainsFound = 0;
                         for (gainsLoop = 1; gainsLoop <= numInputGains; ++gainsLoop) {
-                            TypeNum = UtilityRoutines::FindItemInList(
-                                state.dataIPShortCut->cAlphaArgs(gainsLoop * 2), ZoneIntGainDeviceTypes, NumZoneIntGainDeviceTypes);
-                            if (TypeNum > 0) {
-                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum = TypeNum;
+                            TypeNum = getEnumerationValue(DataHeatBalance::IntGainTypeNamesUC,
+                                                          UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(gainsLoop * 2)));
+                            if (TypeNum >= 0) {
+                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type =
+                                    static_cast<DataHeatBalance::IntGainType>(TypeNum);
                             } else {
                                 ShowSevereError(state,
                                                 "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2) +
@@ -1706,7 +1705,7 @@ namespace RoomAirModelManager {
                                 int intGainIndex = GetInternalGainDeviceIndex(
                                     state,
                                     spaceNum,
-                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum,
+                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type,
                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Name);
                                 if (intGainIndex >= 0) {
                                     gainFound = true;
@@ -1866,14 +1865,16 @@ namespace RoomAirModelManager {
                          ++gainsLoop) {
                         if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).FractionCheck) continue;
                         SumFraction = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsFractions(gainsLoop);
-                        TypeNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum;
+                        TypeNum =
+                            static_cast<int>(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type);
                         Name = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Name;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).FractionCheck = true;
                         for (RAFNNum = 1; RAFNNum <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++RAFNNum) {
                             for (GainNum = 1; GainNum <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).NumIntGains;
                                  ++GainNum) {
                                 if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).FractionCheck) continue;
-                                if (TypeNum == state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).TypeOfNum &&
+                                if (TypeNum == static_cast<int>(
+                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).Type) &&
                                     UtilityRoutines::SameString(
                                         Name, state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).Name)) {
                                     SumFraction += state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGainsFractions(GainNum);
@@ -1957,7 +1958,7 @@ namespace RoomAirModelManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BaseDischargeCoef(0.62);
+        Real64 constexpr BaseDischargeCoef(0.62);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

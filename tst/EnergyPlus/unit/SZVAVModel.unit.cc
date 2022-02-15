@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -210,19 +210,19 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.LowSpeedHeatFanRatio = 0.5;
     thisUnit.CoolCoilFluidInletNode = 0;
     thisUnit.CoolCoilFluidOutletNodeNum = 0;
-    thisUnit.CoolCoilLoopNum = 0;
-    thisUnit.CoolCoilLoopSide = 0;
-    thisUnit.CoolCoilBranchNum = 0;
-    thisUnit.CoolCoilCompNum = 0;
+    thisUnit.CoolCoilPlantLoc.loopNum = 0;
+    thisUnit.CoolCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
+    thisUnit.CoolCoilPlantLoc.branchNum = 0;
+    thisUnit.CoolCoilPlantLoc.compNum = 0;
 
     thisUnit.DesignMaxOutletTemp = 30.0;
     thisUnit.MaxHeatAirMassFlow = 0.2;
     thisUnit.HeatCoilFluidInletNode = 0;
     thisUnit.HeatCoilFluidOutletNodeNum = 0;
-    thisUnit.HeatCoilLoopNum = 0;
-    thisUnit.HeatCoilLoopSide = 0;
-    thisUnit.HeatCoilBranchNum = 0;
-    thisUnit.HeatCoilCompNum = 0;
+    thisUnit.HeatCoilPlantLoc.loopNum = 0;
+    thisUnit.HeatCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
+    thisUnit.HeatCoilPlantLoc.branchNum = 0;
+    thisUnit.HeatCoilPlantLoc.compNum = 0;
 
     thisUnit.ControlZoneNum = 1;
 
@@ -282,7 +282,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool HXUnitOn = false;
     int AirLoopNum = 1;
     Real64 PLR = 0.0;
-    int CompressorOnFlag = 1;
+    DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::On;
     state->dataGlobal->BeginEnvrnFlag = true;
 
     auto &SZVAVModel(thisUnit);
@@ -498,7 +498,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int CompressorOnFlag(0);
+    CompressorOperation CompressorOnFlag(CompressorOperation::Off);
     int AirLoopNum(0);
     bool FirstHVACIteration(false);
     bool ErrorsFound(false);
@@ -694,22 +694,21 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-    CWCoil.WaterLoopNum = 1;
-    CWCoil.WaterLoopSide = 1;
-    CWCoil.WaterLoopBranchNum = 1;
-    CWCoil.WaterLoopCompNum = 1;
+    CWCoil.WaterPlantLoc.loopNum = 1;
+    CWCoil.WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    CWCoil.WaterPlantLoc.branchNum = 1;
+    CWCoil.WaterPlantLoc.compNum = 1;
     // electric heating coil
     auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
     state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
     state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-        loop.LoopSide.allocate(2);
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -719,10 +718,10 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     CWLoop.FluidName = "ChilledWater";
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
-    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -762,7 +761,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     OnOffAirFlowRatio = 1.0;
     HXUnitOn = false;
     AirLoopNum = 0;
-    CompressorOnFlag = 0;
+    CompressorOnFlag = CompressorOperation::Off;
     FirstHVACIteration = true;
     auto &SZVAVModel(state->dataFanCoilUnits->FanCoil(FanCoilNum));
 

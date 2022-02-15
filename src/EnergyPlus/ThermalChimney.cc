@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -153,7 +153,7 @@ namespace ThermalChimney {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
+        Real64 constexpr FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
@@ -659,7 +659,7 @@ namespace ThermalChimney {
 
         using ScheduleManager::GetCurrentScheduleValue;
 
-        int const NTC(15); // Number of subregions in thermal chimney air channel for FINITE DIFFERENCE
+        int constexpr NTC(15); // Number of subregions in thermal chimney air channel for FINITE DIFFERENCE
 
         // To be obtained from other modules and subroutines
         Real64 SurfTempAbsorberWall;     // Absorber wall surface temperature (K)

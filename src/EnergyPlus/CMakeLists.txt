@@ -463,7 +463,6 @@ set(SRC
     Plant/Component.hh
     Plant/ConnectedLoopData.hh
     Plant/Connection.hh
-    Plant/DataPlant.cc
     Plant/DataPlant.hh
     Plant/Enums.hh
     Plant/EquipAndOperations.hh

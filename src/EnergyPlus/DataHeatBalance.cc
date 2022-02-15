@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,151 +93,6 @@ using DataSurfaces::MaxSlatAngs;
 using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;
-
-Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
-                                            {"PEOPLE",
-                                             "LIGHTS",
-                                             "ELECTRICEQUIPMENT",
-                                             "GASEQUIPMENT",
-                                             "HOTWATEREQUIPMENT",
-                                             "STEAMEQUIPMENT",
-                                             "OTHEREQUIPMENT",
-                                             "ZONEBASEBOARD:OUTDOORTEMPERATURECONTROLLED",
-                                             "ZONECONTAMINANTSOURCEANDSINK:CARBONDIOXIDE",
-                                             "WATERUSE:EQUIPMENT",
-                                             "DAYLIGHTINGDEVICE:TUBULAR",
-                                             "WATERHEATER:MIXED",
-                                             "WATERHEATER:STRATIFIED",
-                                             "THERMALSTORAGE:CHILLEDWATER:MIXED",
-                                             "THERMALSTORAGE:CHILLEDWATER:STRATIFIED",
-                                             "GENERATOR:FUELCELL",
-                                             "GENERATOR:MICROCHP",
-                                             "ELECTRICLOADCENTER:TRANSFORMER",
-                                             "ELECTRICLOADCENTER:INVERTER:SIMPLE",
-                                             "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER",
-                                             "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE",
-                                             "ELECTRICLOADCENTER:STORAGE:LIIONNMCBATTERY",
-                                             "ELECTRICLOADCENTER:STORAGE:BATTERY",
-                                             "ELECTRICLOADCENTER:STORAGE:SIMPLE",
-                                             "PIPE:INDOOR",
-                                             "REFRIGERATION:CASE",
-                                             "REFRIGERATION:COMPRESSORRACK",
-                                             "REFRIGERATION:SYSTEM:CONDENSER:AIRCOOLED",
-                                             "REFRIGERATION:TRANSCRITICALSYSTEM:GASCOOLER:AIRCOOLED",
-                                             "REFRIGERATION:SYSTEM:SUCTIONPIPE",
-                                             "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPEMT",
-                                             "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPELT",
-                                             "REFRIGERATION:SECONDARYSYSTEM:RECEIVER",
-                                             "REFRIGERATION:SECONDARYSYSTEM:PIPE",
-                                             "REFRIGERATION:WALKIN",
-                                             "PUMP:VARIABLESPEED",
-                                             "PUMP:CONSTANTSPEED",
-                                             "PUMP:VARIABLESPEED:CONDENSATE",
-                                             "HEADEREDPUMPS:VARIABLESPEED",
-                                             "HEADEREDPUMPS:CONSTANTSPEED",
-                                             "ZONECONTAMINANTSOURCEANDSINK:GENERICCONTAMINANT",
-                                             "PLANTCOMPONENT:USERDEFINED",
-                                             "COIL:USERDEFINED",
-                                             "ZONEHVAC:FORCEDAIR:USERDEFINED",
-                                             "AIRTERMINAL:SINGLEDUCT:USERDEFINED",
-                                             "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
-                                             "ELECTRICEQUIPMENT:ITE:AIRCOOLED",
-                                             "COIL:COOLING:DX:SINGLESPEED",
-                                             "COIL:HEATING:DX:SINGLESPEED",
-                                             "COIL:COOLING:DX:TWOSPEED",
-                                             "COIL:COOLING:DX:MULTISPEED",
-                                             "COIL:HEATING:DX:MULTISPEED",
-                                             "ELECTRICLOADCENTER:STORAGE:CONVERTER",
-                                             "FAN:SYSTEMMODEL"});
-
-Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
-                                              {"People",
-                                               "Lights",
-                                               "ElectricEquipment",
-                                               "GasEquipment",
-                                               "HotWaterEquipment",
-                                               "SteamEquipment",
-                                               "OtherEquipment",
-                                               "ZoneBaseboard:OutdoorTemperatureControlled",
-                                               "ZoneContaminantSourceAndSink:CarbonDioxide",
-                                               "WaterUse:Equipment",
-                                               "DaylightingDevice:Tubular",
-                                               "WaterHeater:Mixed",
-                                               "WaterHeater:Stratified",
-                                               "ThermalStorage:ChilledWater:Mixed",
-                                               "ThermalStorage:ChilledWater:Stratified",
-                                               "Generator:FuelCell",
-                                               "Generator:MicroCHP",
-                                               "ElectricLoadCenter:Transformer",
-                                               "ElectricLoadCenter:Inverter:Simple",
-                                               "ElectricLoadCenter:Inverter:FunctionOfPower",
-                                               "ElectricLoadCenter:Inverter:LookUpTable",
-                                               "ElectricLoadCenter:Storage:LiIonNMCBattery",
-                                               "ElectricLoadCenter:Storage:Battery",
-                                               "ElectricLoadCenter:Storage:Simple",
-                                               "Pipe:Indoor",
-                                               "Refrigeration:Case",
-                                               "Refrigeration:CompressorRack",
-                                               "Refrigeration:System:Condenser:AirCooled",
-                                               "Refrigeration:TranscriticalSystem:GasCooler:AirCooled",
-                                               "Refrigeration:System:SuctionPipe",
-                                               "Refrigeration:TranscriticalSystem:SuctionPipeMT",
-                                               "Refrigeration:TranscriticalSystem:SuctionPipeLT",
-                                               "Refrigeration:SecondarySystem:Receiver",
-                                               "Refrigeration:SecondarySystem:Pipe",
-                                               "Refrigeration:WalkIn",
-                                               "Pump:VariableSpeed",
-                                               "Pump:ConstantSpeed",
-                                               "Pump:VariableSpeed:Condensate",
-                                               "HeaderedPumps:VariableSpeed",
-                                               "HeaderedPumps:ConstantSpeed",
-                                               "ZoneContaminantSourceAndSink:GenericContaminant",
-                                               "PlantComponent:UserDefined",
-                                               "Coil:UserDefined",
-                                               "ZoneHVAC:ForcedAir:UserDefined",
-                                               "AirTerminal:SingleDuct:UserDefined",
-                                               "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                                               "ElectricEquipment:ITE:AirCooled",
-                                               "Coil:Cooling:DX:SingleSpeed",
-                                               "Coil:Heating:DX:SingleSpeed",
-                                               "Coil:Cooling:DX:TwoSpeed",
-                                               "Coil:Cooling:DX:MultiSpeed",
-                                               "Coil:Heating:DX:MultiSpeed",
-                                               "ElectricLoadCenter:Storage:Converter",
-                                               "Fan:SystemModel"});
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCon(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsVis(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCp(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0,
-         0.0,      0.0,     0.0,     0.0,     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0, 0.0},
-        {3, 10})); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
-
-// Gas specific heat ratios.  Used for gasses in low pressure
-Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
 // Functions
 
@@ -425,12 +280,14 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         case DataHeatBalance::MaterialGroup::GapEquivalentLayer:
             state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             break;
-        case DataHeatBalance::MaterialGroup::Unassigned:
+        case DataHeatBalance::MaterialGroup::Invalid:
         case DataHeatBalance::MaterialGroup::Air:
         case DataHeatBalance::MaterialGroup::RegularMaterial:
         case DataHeatBalance::MaterialGroup::EcoRoof:
         case DataHeatBalance::MaterialGroup::IRTMaterial:
             break; // Purposely not doing anything
+        default:
+            assert(false);
         }
     }
 
@@ -1115,7 +972,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // without Theta and Phi.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Small(1.E-9); // Small Number used to approximate zero
+    Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
 
     // FUNCTION PARAMETER DEFINITIONS:
     int ScNum;                        // Index to screen data
@@ -1386,23 +1243,28 @@ std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness const Roughn
     std::string cRoughness; // Character representation of Roughness
 
     // Select the correct Number for the associated ascii name for the roughness type
-    {
-        auto const SELECT_CASE_var(Roughness);
-        if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::VeryRough) {
-            cRoughness = "VeryRough";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::Rough) {
-            cRoughness = "Rough";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::MediumRough) {
-            cRoughness = "MediumRough";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::MediumSmooth) {
-            cRoughness = "MediumSmooth";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::Smooth) {
-            cRoughness = "Smooth";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::VerySmooth) {
-            cRoughness = "VerySmooth";
-        } else {
-            cRoughness = "";
-        }
+    switch (Roughness) {
+    case DataSurfaces::SurfaceRoughness::VeryRough: {
+        cRoughness = "VeryRough";
+    } break;
+    case DataSurfaces::SurfaceRoughness::Rough: {
+        cRoughness = "Rough";
+    } break;
+    case DataSurfaces::SurfaceRoughness::MediumRough: {
+        cRoughness = "MediumRough";
+    } break;
+    case DataSurfaces::SurfaceRoughness::MediumSmooth: {
+        cRoughness = "MediumSmooth";
+    } break;
+    case DataSurfaces::SurfaceRoughness::Smooth: {
+        cRoughness = "Smooth";
+    } break;
+    case DataSurfaces::SurfaceRoughness::VerySmooth: {
+        cRoughness = "VerySmooth";
+    } break;
+    default: {
+        cRoughness = "";
+    } break;
     }
 
     return cRoughness;
@@ -1456,20 +1318,20 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
         } else {
             if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
                 // use companion surface in adjacent zone
-                {
-                    auto const SELECT_CASE_var1(state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class);
-                    if ((SELECT_CASE_var1 == SurfaceClass::Wall) ||
-                        (SELECT_CASE_var1 == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                        outsideFilm = 0.1197548;
-                    } else if (SELECT_CASE_var1 ==
-                               SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                        outsideFilm = 0.1620212;
-                    } else if (SELECT_CASE_var1 ==
-                               SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                        outsideFilm = 0.1074271;
-                    } else {
-                        outsideFilm = 0.0810106; // All semi-exterior surfaces
-                    }
+                switch (state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class) {
+                case SurfaceClass::Wall:
+                case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                    outsideFilm = 0.1197548;
+                } break;
+                case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                    outsideFilm = 0.1620212;
+                } break;
+                case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                    outsideFilm = 0.1074271;
+                } break;
+                default: {
+                    outsideFilm = 0.0810106; // All semi-exterior surfaces
+                } break;
                 }
             } else {
                 outsideFilm = 0.0810106; // All semi-exterior surfaces
@@ -1478,19 +1340,21 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
     }
     // interior conditions
     if (state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction) > 0.0) {
-        {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).Class);
-            if ((SELECT_CASE_var == SurfaceClass::Wall) ||
-                (SELECT_CASE_var == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                insideFilm = 0.1197548;
-            } else if (SELECT_CASE_var == SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                insideFilm = 0.1620212;
-            } else if (SELECT_CASE_var == SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                insideFilm = 0.1074271;
-            } else {
-                insideFilm = 0.0;
-                outsideFilm = 0.0;
-            }
+        switch (state.dataSurface->Surface(numSurf).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+            insideFilm = 0.1197548;
+        } break;
+        case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+            insideFilm = 0.1620212;
+        } break;
+        case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+            insideFilm = 0.1074271;
+        } break;
+        default: {
+            insideFilm = 0.0;
+            outsideFilm = 0.0;
+        } break;
         }
         NominalUwithConvCoeffs =
             1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction)) + outsideFilm);

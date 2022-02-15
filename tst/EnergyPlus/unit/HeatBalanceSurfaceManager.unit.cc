@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     EXPECT_TRUE(ErrorFlag);
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(10.0 * 1.0 * (state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state->dataSurface->SurfOutDryBulbTemp(SurfNum)),
-              state->dataHeatBalSurf->QAirExtReport(SurfNum));
+              state->dataHeatBalSurf->SurfQAirExtReport(SurfNum));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf)
@@ -331,7 +331,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
 
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(1).HeatTransSurf = true;
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::CTF;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(1).Construction = 1;
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
@@ -355,11 +355,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     UpdateThermalHistories(*state); // First check to see if it is calculating the user location temperature properly
 
     EXPECT_EQ(12.5, state->dataHeatBalSurf->SurfTempUserLoc(1));
-    EXPECT_EQ(0.0, state->dataHeatBalSurf->TuserHist(1, 3));
+    EXPECT_EQ(0.0, state->dataHeatBalSurf->SurfTuserHist(1, 3));
 
     UpdateThermalHistories(*state);
 
-    EXPECT_EQ(12.5, state->dataHeatBalSurf->TuserHist(1, 3)); // Now check to see that it is shifting the temperature history properly
+    EXPECT_EQ(12.5, state->dataHeatBalSurf->SurfTuserHist(1, 3)); // Now check to see that it is shifting the temperature history properly
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfAirRefT)
@@ -1999,7 +1999,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(1).HeatTransSurf = true;
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::CTF;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(1).Construction = 1;
 
@@ -2589,13 +2589,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     state->dataSurface->SurfOutWetBulbTemp(1) = 6.66143784594778;
     state->dataSurface->SurfOutDryBulbTemp(1) = 7.2;
 
-    // If Rain Flag = on, GetQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
+    // If Rain Flag = on, GetSurfQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
     state->dataEnvrn->IsRain = true;
     Real64 ExpectedQconvPerArea1 = -1000 * (6.71793958923051 - 6.66143784594778);
 
     EXPECT_NEAR(ExpectedQconvPerArea1, GetQdotConvOutPerArea(*state, 1), 0.01);
 
-    // Otherwise, GetQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
+    // Otherwise, GetSurfQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
     state->dataEnvrn->IsRain = false;
     state->dataHeatBalSurf->SurfHcExt(1) = 5.65361106051348;
     Real64 ExpectedQconvPerArea2 = -5.65361106051348 * (6.71793958923051 - 7.2);
@@ -2814,7 +2814,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->totDaylightingControls = state->dataGlobal->NumOfZones;
     state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
     state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
