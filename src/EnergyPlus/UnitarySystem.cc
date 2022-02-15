@@ -12570,8 +12570,10 @@ namespace UnitarySystems {
                     PartLoadFrac = 1.0;
                     mdot = this->MaxCoolCoilFluidFlow;
                 }
-                PlantUtilities::SetComponentFlowRate(
-                    state, mdot, this->CoolCoilFluidInletNode, this->CoolCoilFluidOutletNodeNum, this->CoolCoilPlantLoc);
+                if (this->CoolCoilPlantLoc.loopNum > 0) {
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdot, this->CoolCoilFluidInletNode, this->CoolCoilFluidOutletNodeNum, this->CoolCoilPlantLoc);
+                }
 
                 WaterCoils::SimulateWaterCoilComponents(
                     state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
