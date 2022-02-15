@@ -590,6 +590,18 @@ namespace ExhaustAirSystemManager {
                                                                   // supplyNodeOrNodelistName);
                 thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
                 // Verify these nodes are indeed supply nodes:
+                bool nodeNotFound = false;
+                if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
+                    for (int i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
+                        CheckForSupplyNode(state, thisExhCtrl.SuppNodeNums(i), nodeNotFound);
+                        if (nodeNotFound) {
+                            // May need to bump to a severe warning message
+                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                            ShowContinueError(state, "Node or NodeList Name =" + supplyNodeOrNodelistName + ". Must all be supply node(s).");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
 
                 // Deal with design exhaust auto size here;
                 if (thisExhCtrl.DesignExhaustFlowRate == EnergyPlus::DataSizing::AutoSize) {
