@@ -740,8 +740,7 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     EXPECT_NEAR(shgcRep, 0.024, 0.001);
     EXPECT_NEAR(vtRep, 0.0, 0.1);
 
-    GetWindowAssemblyNfrcForReport(
-        *state, windowSurfNum, constructNum, 1.0, 0.5, DataSurfaces::NfrcVisionType::Single, uValueRep, shgcRep, vtRep);
+    GetWindowAssemblyNfrcForReport(*state, windowSurfNum, constructNum, 1.0, 0.5, DataSurfaces::NfrcVisionType::Single, uValueRep, shgcRep, vtRep);
 
     EXPECT_NEAR(uValueRep, 3.11, 0.01);
     EXPECT_NEAR(shgcRep, 0.021, 0.001);
