@@ -56,8 +56,8 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -79,7 +79,7 @@ namespace EnergyPlus {
 namespace ExhaustAirSystemManager {
     // Module containing the routines dealing with the AirLoopHVAC:ExhaustSystem
 
-    //struct MixerBranchZone
+    // struct MixerBranchZone
     //{
     //    int mixerInletNodeNum;
     //    int zoneExhaustNodeNum;
@@ -97,7 +97,7 @@ namespace ExhaustAirSystemManager {
     //    }
     //};
 
-    //std::vector<MixerBranchZone> mixerToZoneTable;
+    // std::vector<MixerBranchZone> mixerToZoneTable;
     // map might be aa better choice:
     std::map<int, int> mixerBranchMap;
     std::map<int, int> mixerIndexMap;
@@ -558,7 +558,8 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.ZoneName = zoneName;
                 int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 thisExhCtrl.ZoneNum = zoneNum;
-                // 2022-01: need to make sure zoneNum is greater than zero.
+
+                thisExhCtrl.ControlledZoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
 
                 // These two nodes are required inputs:
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
@@ -876,7 +877,7 @@ namespace ExhaustAirSystemManager {
             // state.dataHVACGlobal->UnbalExhMassFlow = MassFlow; // Fan(FanNum).InletAirMassFlowRate;
             if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
                 thisExhCtrl.BalancedFlow = // state.dataHVACGlobal->BalancedExhMassFlow =
-                    MassFlow * //state.dataHVACGlobal->UnbalExhMassFlow *
+                    MassFlow *             // state.dataHVACGlobal->UnbalExhMassFlow *
                     EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.BalancedExhFracScheduleNum);
                 thisExhCtrl.UnbalancedFlow =  // state.dataHVACGlobal->UnbalExhMassFlow =
                     MassFlow -                // = state.dataHVACGlobal->UnbalExhMassFlow -
@@ -944,7 +945,7 @@ namespace ExhaustAirSystemManager {
 
         // then central exhasut fan sizing here:
         if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            // state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->m_maxAirMassFlowRate; // 2022-02-15: too bac this is a private member class 
+            // state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->m_maxAirMassFlowRate; // 2022-02-15: too bac this is a private member class
             // so may need add a public set function in HVACFan.cc to set the max flow rate value for the hvac fan.
         } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate = outletFlowMaxAvail;
@@ -980,7 +981,7 @@ namespace ExhaustAirSystemManager {
 
     void UpdateZoneExhaustControl(EnergyPlusData &state)
     {
-        // For each zone, update the total exhaust flow that need to be used in ZoneEqupmentManager.cc: 
+        // For each zone, update the total exhaust flow that need to be used in ZoneEqupmentManager.cc:
         // state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExh +=
         //    (state.dataHVACGlobal->UnbalExhMassFlow +
         //     state.dataHVACGlobal->BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
@@ -988,10 +989,10 @@ namespace ExhaustAirSystemManager {
         // += state.dataHVACGlobal->BalancedExhMassFlow;
 
         for (int i = 1; state.dataZoneEquip->NumZoneExhaustControls; ++i) {
-            int zoneNum = state.dataZoneEquip->ZoneExhaustControlSystem(i).ZoneNum;
-            state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneExh +=
+            int controlledZoneNum = state.dataZoneEquip->ZoneExhaustControlSystem(i).ControlledZoneNum;
+            state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneExh +=
                 state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow + state.dataZoneEquip->ZoneExhaustControlSystem(i).UnbalancedFlow;
-            state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneExhBalanced += state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow;
+            state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneExhBalanced += state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow;
         }
         // 2022-02-15: is zoneNum just the same as "ControlledZoneNum": they seems to be different on Line 3119 ZoneEquipxxx.cc:
         //       ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;

@@ -96,6 +96,7 @@ namespace ExhaustAirSystemManager {
 
         std::string ZoneName;
         int ZoneNum;
+        int ControlledZoneNum;
 
         int InletNodeNum;
         int OutletNodeNum;
@@ -114,9 +115,9 @@ namespace ExhaustAirSystemManager {
 
         // default constructor
         ZoneExhaustControl()
-            : AvailScheduleNum(0), ZoneName(""), ZoneNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlTypeNum(0),
-              ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0), MinExhFlowFracScheduleNum(0),
-              BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
+            : AvailScheduleNum(0), ZoneName(""), ZoneNum(0), ControlledZoneNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0),
+              FlowControlTypeNum(0), ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0),
+              MinExhFlowFracScheduleNum(0), BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
         {
         }
     };
