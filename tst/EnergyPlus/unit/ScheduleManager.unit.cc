@@ -1330,7 +1330,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap)
 
 TEST_F(EnergyPlusFixture, ScheduleFileDSTtoggleOptionTest)
 {
-    // P. Shrestha - February 2022
+    // P. Shrestha and N. Merket - February 2022
 
     // Create this file with test data in it. This test will fail until you do that.
 

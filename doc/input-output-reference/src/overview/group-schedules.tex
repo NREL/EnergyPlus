@@ -542,6 +542,26 @@ Schedule:File,
   60;                 !- Minutes per Item
 \end{lstlisting}
 
+\paragraph{Field: Adjust Schedule for Daylight Savings}\label{adjust-schedule-for-daylight-savings-1}
+
+This field represents the flag that indicates whether or not to include daylight savings time together with the CSV file provided in the Schedule:File object. This indicator is defaulted to "`Yes"' if no input is provided, meaning that daylight savings will be applied, while changing this flag to "`No"' will not apply daylight savings to the schedule. 
+
+Here is an IDF example:
+
+\begin{lstlisting}
+	Schedule:File,
+	TestName,	!- Name
+	Any Number,	!- Schedule Type Limits Name
+	schedulefile.csv, !- File Name
+	2,		!- Column Number
+	1,		!- Rows to Skip at Top
+	8760,		!- Number of Hours of Data
+	Comma,		!- Column Separator
+	No,		!- Interpolate to Timestep
+	60,		!- Minutes per Item
+	No;		!- Flag to Adjust Schedule for Daylight Savings
+\end{lstlisting}
+
 \subsubsection{Outputs}\label{outputs-031}
 
 An optional report can be used to gain the values described in the previous Schedule objects. This is a condensed reporting that illustrates the full range of schedule values -- in the style of input: DaySchedule, WeekSchedule, Annual Schedule.
