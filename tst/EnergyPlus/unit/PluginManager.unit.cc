@@ -93,4 +93,13 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(*state, trendVarIndex, 2), 0.001);
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, 3));
 }
+
+
+TEST_F(EnergyPlusFixture, MultiplePluginVariableObjects)
+{
+    std::string const idf_objects = ("PythonPlugin:Variables, Variables1, VariableA;  PythonPlugin:Variables, Variables2, VariableB;");
+    ASSERT_TRUE(process_idf(idf_objects));
+    PluginManagement::PluginManager p{*this->state};
+
+}
 } // namespace EnergyPlus
