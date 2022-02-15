@@ -947,8 +947,10 @@ namespace ExhaustAirSystemManager {
         if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             // state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->m_maxAirMassFlowRate; // 2022-02-15: too bac this is a private member class
             // so may need add a public set function in HVACFan.cc to set the max flow rate value for the hvac fan.
+            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
         } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
-            state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate = outletFlowMaxAvail;
+            state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate =
+                outletFlowMaxAvail * state.dataFans->Fan(thisExhSys.CentralFanIndex).FanSizingFactor;
         }
 
         // after evertyhing sized, set the sizing flag
