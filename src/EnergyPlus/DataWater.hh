@@ -70,7 +70,8 @@ namespace DataWater {
 
     enum class RainfallMode
     {
-        None = -1,
+        Invalid = -1,
+        None,
         RainSchedDesign, // mode of Rainfall determination is Scheduled Design
         EPWPrecipitation,
         Num
