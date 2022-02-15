@@ -977,9 +977,13 @@ namespace ExhaustAirSystemManager {
         //                                                 // state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExhBalanced
         // += state.dataHVACGlobal->BalancedExhMassFlow;
 
-        for (int i = 1;; ++i) {
+        for (int i = 1; state.dataZoneEquip->NumZoneExhaustControls; ++i) {
+            int zoneNum = state.dataZoneEquip->ZoneExhaustControlSystem(i).ZoneNum;
+            state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneExh +=
+                state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow + state.dataZoneEquip->ZoneExhaustControlSystem(i).UnbalancedFlow;
+            state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneExhBalanced += state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow;
         }
-
+        // 2022-02-15: is zoneNum just the same as "ControlledZoneNum"?
     }
 
     void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound)
