@@ -320,11 +320,6 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
         this->myRespFactors =
             GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
         this->gFunctionsExist = true;
-
-        if (!this->myRespFactors) {
-            errorsFound = true;
-            ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
-        }
     }
 
     // no g-functions in the input file, so they need to be calculated
@@ -348,11 +343,6 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             // Response factors come from array object
             this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
                 state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
-
-            if (!this->myRespFactors) {
-                errorsFound = true;
-                ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
-            }
         } else {
             if (j.find("vertical_well_locations") == j.end()) {
                 // No ResponseFactors, GHEArray, or SingleBH object are referenced
@@ -369,14 +359,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                 if (!var.at("ghe_vertical_single_object_name").empty()) {
                     std::shared_ptr<GLHEVertSingle> tempBHptr =
                         GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name").get<std::string>()));
-                    if (tempBHptr) {
-                        tempVectOfBHObjects.push_back(tempBHptr);
-                    } else {
-                        errorsFound = true;
-                        std::string const tmpName = var.at("ghe_vertical_single_object_name").get<std::string>();
-                        ShowSevereError(state, "Borehole= " + tmpName + " not found.");
-                        break;
-                    }
+                    tempVectOfBHObjects.push_back(tempBHptr);
                 } else {
                     break;
                 }
@@ -589,6 +572,10 @@ std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string c
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Properties, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
@@ -604,6 +591,10 @@ std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string c
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Single, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
@@ -619,6 +610,10 @@ std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string c
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Array, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
@@ -634,6 +629,10 @@ std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, st
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:ResponseFactors, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
