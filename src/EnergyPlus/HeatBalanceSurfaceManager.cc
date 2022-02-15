@@ -887,15 +887,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         double stateAssemblySHGC{0.0};
                         double stateAssemblyVT{0.0};
 
-                        GetWindowAssemblyNfrcForReport(state,
-                                                        iSurf,
-                                                        stateConstrNum,
-                                                        windowWidth,
-                                                        windowHeight,
-                                                        vision,
-                                                        stateAssemblyUValue,
-                                                        stateAssemblySHGC,
-                                                        stateAssemblyVT);
+                        GetWindowAssemblyNfrcForReport(
+                            state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
 
                         std::string_view NFRCname =
                             DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
@@ -908,10 +901,10 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         if (state.dataGeneral->Constructions) {
                             if (!fenestrationShadedStateHeaderShown) {
                                 print(state.files.eio,
-                                        "{}\n",
-                                        "! <FenestrationShadedState>,Construction Name,Glass U-Factor {W/m2-K},"
-                                        "Glass SHGC, Glass Visible Transmittance, Frame and Divider Name,NFRC Product Type,"
-                                        "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+                                      "{}\n",
+                                      "! <FenestrationShadedState>,Construction Name,Glass U-Factor {W/m2-K},"
+                                      "Glass SHGC, Glass Visible Transmittance, Frame and Divider Name,NFRC Product Type,"
+                                      "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
                                 fenestrationShadedStateHeaderShown = true;
                             }
 
@@ -920,16 +913,16 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                 uniqueShdConstFrame.end()) {
                                 uniqueShdConstFrame.push_back(shdConstructionAndFrame);
                                 print(state.files.eio,
-                                        FenestrationShadedStateFormat,
-                                        constructionName,
-                                        stateUValue,
-                                        stateSHGC,
-                                        state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
-                                        state.dataSurface->FrameDivider(frameDivNum).Name,
-                                        NFRCname,
-                                        stateAssemblyUValue,
-                                        stateAssemblySHGC,
-                                        stateAssemblyVT);
+                                      FenestrationShadedStateFormat,
+                                      constructionName,
+                                      stateUValue,
+                                      stateSHGC,
+                                      state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                      state.dataSurface->FrameDivider(frameDivNum).Name,
+                                      NFRCname,
+                                      stateAssemblyUValue,
+                                      stateAssemblySHGC,
+                                      stateAssemblyVT);
                             }
                         }
                     }

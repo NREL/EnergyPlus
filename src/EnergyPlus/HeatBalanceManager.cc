@@ -6603,7 +6603,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int IOStat;                            // IO Status when calling get input subroutine
-        Array1D_string FrameDividerAlphas(3);   // Frame/Divider Alpha names
+        Array1D_string FrameDividerAlphas(3);  // Frame/Divider Alpha names
         int FrameDividerNum;                   // Counter to keep track of the frame/divider number
         int FrameDividerNumAlpha;              // Number of frame/divider alpha names being passed
         int FrameDividerNumProp;               // Number of frame/divider properties being passed
