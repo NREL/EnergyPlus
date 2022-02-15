@@ -11311,7 +11311,7 @@ Suspended,                                   !- Divider Type
   FenestrationSurface:Detailed,
     W_GuestRoom309_312_5_0_0_0_0,  !- Name
     Window,                  !- Surface Type
-    Window Res Fixed,        !- Construction Name
+    DoubleLow-eAir_Avg-01,   !- Construction Name
     W_GuestRoom309_312_5_0_0,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
@@ -11326,11 +11326,11 @@ Suspended,                                   !- Divider Type
   FenestrationSurface:Detailed,
     W_GuestRoom309_312_5_0_0_0_1,  !- Name
     Window,                  !- Surface Type
-    Window Res Fixed,        !- Construction Name
+    DoubleLow-eAir_Avg-01,   !- Construction Name
     W_GuestRoom309_312_5_0_0,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Frame and Divider Name
+    Wood_02-FrameAndDiv,     !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
     38.0360,0.0488,8.1896,  !- X,Y,Z ==> Vertex 1 {m}
@@ -11341,11 +11341,11 @@ Suspended,                                   !- Divider Type
   FenestrationSurface:Detailed,
     W_GuestRoom309_312_5_0_0_0_2,  !- Name
     Window,                  !- Surface Type
-    Window Res Fixed,        !- Construction Name
+    DoubleLow-eAir_Avg-01,   !- Construction Name
     W_GuestRoom309_312_5_0_0,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Frame and Divider Name
+    Aluminum_03-FrameAndDiv, !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
     41.9990,0.0488,8.1896,  !- X,Y,Z ==> Vertex 1 {m}
@@ -11356,11 +11356,11 @@ Suspended,                                   !- Divider Type
   FenestrationSurface:Detailed,
     W_GuestRoom309_312_5_0_0_0_3,  !- Name
     Window,                  !- Surface Type
-    Window Res Fixed,        !- Construction Name
+    DoubleLow-eAir_Avg-01,   !- Construction Name
     W_GuestRoom309_312_5_0_0,!- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Frame and Divider Name
+    AluminumBreak_04-FrameAndDiv, !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
     45.9610,0.0488,8.1896,  !- X,Y,Z ==> Vertex 1 {m}
@@ -11371,11 +11371,11 @@ Suspended,                                   !- Divider Type
   FenestrationSurface:Detailed,
     W_GuestRoom313_5_0_0_0_0,!- Name
     Window,                  !- Surface Type
-    Window Res Fixed,        !- Construction Name
+    DoubleLow-eAir_Avg-01,   !- Construction Name
     W_GuestRoom313_5_0_0,    !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     AutoCalculate,           !- View Factor to Ground
-    ,                        !- Frame and Divider Name
+    Wood-Divider-07-FrameAndDiv, !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
     49.9230,0.0488,8.1896,  !- X,Y,Z ==> Vertex 1 {m}
