@@ -107,6 +107,8 @@ namespace ExhaustAirSystemManager {
         int MinZoneTempLimitScheduleNum;
         int MinExhFlowFracScheduleNum;
         int BalancedExhFracScheduleNum;
+        Real64 BalancedFlow;
+        Real64 UnbalancedFlow;
 
         Array1D_int SuppNodeNums;
 
@@ -114,8 +116,7 @@ namespace ExhaustAirSystemManager {
         ZoneExhaustControl()
             : AvailScheduleNum(0), ZoneName(""), ZoneNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlTypeNum(0),
               ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0), MinExhFlowFracScheduleNum(0),
-              BalancedExhFracScheduleNum(0)
-        {
+              BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
         }
     };
 

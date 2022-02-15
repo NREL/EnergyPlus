@@ -869,17 +869,20 @@ namespace ExhaustAirSystemManager {
 
             // 4. balanced exhaust fraction // 2022-01: Here seems to be an example fo how fan zone exhaust use it:
             // from UpdateFan() in Fan.cc
-            state.dataHVACGlobal->UnbalExhMassFlow = MassFlow; // Fan(FanNum).InletAirMassFlowRate;
+            // state.dataHVACGlobal->UnbalExhMassFlow = MassFlow; // Fan(FanNum).InletAirMassFlowRate;
             if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
-                state.dataHVACGlobal->BalancedExhMassFlow =
-                    state.dataHVACGlobal->UnbalExhMassFlow *
+                thisExhCtrl.BalancedFlow = // state.dataHVACGlobal->BalancedExhMassFlow =
+                    MassFlow * //state.dataHVACGlobal->UnbalExhMassFlow *
                     EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.BalancedExhFracScheduleNum);
-                state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
+                thisExhCtrl.UnbalancedFlow =  // state.dataHVACGlobal->UnbalExhMassFlow =
+                    MassFlow -                // = state.dataHVACGlobal->UnbalExhMassFlow -
+                    thisExhCtrl.BalancedFlow; // state.dataHVACGlobal->BalancedExhMassFlow;
             } else {
-                state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
+                // state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
+                thisExhCtrl.BalancedFlow = 0.0;
+                thisExhCtrl.UnbalancedFlow = MassFlow;
             }
-
-            // Set the inlet conditions of the exhaust control (A good summary Step 0)
+            // 2022-02-15: May need to take the above section out so it will deal with reassignment case as well.
             state.dataLoopNodes->Node(InletNode).MassFlowRate = MassFlow;
         }
 
@@ -973,6 +976,9 @@ namespace ExhaustAirSystemManager {
         //     state.dataHVACGlobal->BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
         //                                                 // state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneExhBalanced
         // += state.dataHVACGlobal->BalancedExhMassFlow;
+
+        for (int i = 1;; ++i) {
+        }
 
     }
 
