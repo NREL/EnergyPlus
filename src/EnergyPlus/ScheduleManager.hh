@@ -349,7 +349,6 @@ struct ScheduleManagerData : BaseGlobalStruct
 
     // Logical Variables for Module
     bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
-    bool ScheduleDSTSFileWarningIssued = false;
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
     // Object Data
@@ -373,7 +372,6 @@ struct ScheduleManagerData : BaseGlobalStruct
         NumSchedules = 0;
 
         ScheduleInputProcessed = false;
-        ScheduleDSTSFileWarningIssued = false;
         ScheduleFileShadingProcessed = false;
 
         ScheduleType.clear(); // Allowed Schedule Types
