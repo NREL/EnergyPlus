@@ -145,11 +145,11 @@ namespace ExhaustAirSystemManager {
                 std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_mixer_name");
                 int zoneMixerIndex = 0;
                 bool zoneMixerErrFound = false;
-                EnergyPlus::MixerComponent::GetZoneMixerIndex(state, zoneMixerName, zoneMixerIndex, zoneMixerErrFound, thisExhSys.Name);
+                MixerComponent::GetZoneMixerIndex(state, zoneMixerName, zoneMixerIndex, zoneMixerErrFound, thisExhSys.Name);
 
                 if (!zoneMixerErrFound) {
                     // With the correct MixerNum Initialize
-                    EnergyPlus::MixerComponent::InitAirMixer(state, zoneMixerIndex); // Initialize all Mixer related parameters
+                    MixerComponent::InitAirMixer(state, zoneMixerIndex); // Initialize all Mixer related parameters
 
                     // See if need to do the zone mixer's CheckEquipName() function
                     ValidateComponent(state, "AirLoopHVAC:ZoneMixer", zoneMixerName, IsNotOK, "AirLoopHVAC:ExhaustSystem");
@@ -237,7 +237,7 @@ namespace ExhaustAirSystemManager {
                     // This type's fan index starting from 1.
                     bool isNotOK(false);
                     int fanType_Num_Check(0);
-                    EnergyPlus::Fans::GetFanType(state, centralFanName, fanType_Num_Check, isNotOK, cCurrentModuleObject, thisExhSys.Name);
+                    Fans::GetFanType(state, centralFanName, fanType_Num_Check, isNotOK, cCurrentModuleObject, thisExhSys.Name);
 
                     if (isNotOK) {
                         ShowSevereError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
@@ -250,18 +250,17 @@ namespace ExhaustAirSystemManager {
                             ErrorsFound = true;
                         } else { // mine data from fan object
                             bool errFlag(false);
-                            EnergyPlus::Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag);
+                            Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag);
 
                             availSchNum = state.dataFans->Fan(centralFanIndex).AvailSchedPtrNum;
 
-                            EnergyPlus::BranchNodeConnections::SetUpCompSets(
-                                state,
-                                cCurrentModuleObject,
-                                thisExhSys.Name,
-                                centralFanType,
-                                centralFanName,
-                                state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).InletNodeNum),
-                                state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).OutletNodeNum));
+                            BranchNodeConnections::SetUpCompSets(state,
+                                                                 cCurrentModuleObject,
+                                                                 thisExhSys.Name,
+                                                                 centralFanType,
+                                                                 centralFanName,
+                                                                 state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).InletNodeNum),
+                                                                 state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).OutletNodeNum));
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Outlet Air Mass Flow Rate",
@@ -349,9 +348,9 @@ namespace ExhaustAirSystemManager {
 
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-            EnergyPlus::MixerComponent::SimAirMixer(state,
-                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
-                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+            MixerComponent::SimAirMixer(state,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
         } else {
             // Give a warning that the current model does not work with AirflowNetwork for now
         }
@@ -394,10 +393,10 @@ namespace ExhaustAirSystemManager {
                 DataGlobalConstants::SecInHour;
 
         } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
-            EnergyPlus::Fans::SimulateFanComponents(state,
-                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
-                                                    FirstHVACIteration,
-                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex); //,
+            Fans::SimulateFanComponents(state,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
+                                        FirstHVACIteration,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex); //,
             // FanSpeedRatio, // ZoneCompTurnFansOn, // ZoneCompTurnFansOff);
 
             // Update output variables
@@ -434,9 +433,9 @@ namespace ExhaustAirSystemManager {
             }
 
             // Simulate the mixer again to update the flow
-            EnergyPlus::MixerComponent::SimAirMixer(state,
-                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
-                                                    state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+            MixerComponent::SimAirMixer(state,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
+                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
 
             // if the adjustment matches, then no need to run fan simulation again.
         }
@@ -508,30 +507,28 @@ namespace ExhaustAirSystemManager {
 
                 // These two nodes are required inputs:
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
-                int inletNodeNum =
-                    EnergyPlus::NodeInputManager::GetOnlySingleNode(state,
-                                                                    inletNodeName,
-                                                                    ErrorsFound,
-                                                                    EnergyPlus::DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
-                                                                    thisExhCtrl.Name,
-                                                                    EnergyPlus::DataLoopNode::NodeFluidType::Air,
-                                                                    EnergyPlus::DataLoopNode::ConnectionType::Inlet,
-                                                                    EnergyPlus::NodeInputManager::CompFluidStream::Primary,
-                                                                    EnergyPlus::DataLoopNode::ObjectIsParent);
+                int inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                       inletNodeName,
+                                                                       ErrorsFound,
+                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                                       thisExhCtrl.Name,
+                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                       DataLoopNode::ConnectionType::Inlet,
+                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                       DataLoopNode::ObjectIsParent);
                 thisExhCtrl.InletNodeNum = inletNodeNum;
 
                 std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
 
-                int outletNodeNum =
-                    EnergyPlus::NodeInputManager::GetOnlySingleNode(state,
-                                                                    outletNodeName,
-                                                                    ErrorsFound,
-                                                                    EnergyPlus::DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
-                                                                    thisExhCtrl.Name,
-                                                                    EnergyPlus::DataLoopNode::NodeFluidType::Air,
-                                                                    EnergyPlus::DataLoopNode::ConnectionType::Outlet,
-                                                                    EnergyPlus::NodeInputManager::CompFluidStream::Primary,
-                                                                    EnergyPlus::DataLoopNode::ObjectIsParent);
+                int outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                        outletNodeName,
+                                                                        ErrorsFound,
+                                                                        DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                                        thisExhCtrl.Name,
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::ConnectionType::Outlet,
+                                                                        NodeInputManager::CompFluidStream::Primary,
+                                                                        DataLoopNode::ObjectIsParent);
                 thisExhCtrl.OutletNodeNum = outletNodeNum;
 
                 if (!mappingDone) {
@@ -574,20 +571,19 @@ namespace ExhaustAirSystemManager {
 
                 ip->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
                 thisExhCtrl.SuppNodeNums.dimension(NumParams, 0);
-                EnergyPlus::NodeInputManager::GetNodeNums(
-                    state,
-                    supplyNodeOrNodelistName,
-                    NumNodes,
-                    thisExhCtrl.SuppNodeNums,
-                    NodeListError,
-                    EnergyPlus::DataLoopNode::NodeFluidType::Air,
-                    EnergyPlus::DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // maybe zone inlets?
-                    thisExhCtrl.Name,
-                    EnergyPlus::DataLoopNode::ConnectionType::Sensor,
-                    EnergyPlus::NodeInputManager::CompFluidStream::Primary,
-                    EnergyPlus::DataLoopNode::ObjectIsNotParent); // ,
-                                                                  // _,
-                                                                  // supplyNodeOrNodelistName);
+                NodeInputManager::GetNodeNums(state,
+                                              supplyNodeOrNodelistName,
+                                              NumNodes,
+                                              thisExhCtrl.SuppNodeNums,
+                                              NodeListError,
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl, // maybe zone inlets?
+                                              thisExhCtrl.Name,
+                                              DataLoopNode::ConnectionType::Sensor,
+                                              NodeInputManager::CompFluidStream::Primary,
+                                              DataLoopNode::ObjectIsNotParent); // ,
+                                                                                // _,
+                                                                                // supplyNodeOrNodelistName);
                 thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
                 // Verify these nodes are indeed supply nodes:
                 bool nodeNotFound = false;
@@ -604,7 +600,7 @@ namespace ExhaustAirSystemManager {
                 }
 
                 // Deal with design exhaust auto size here;
-                if (thisExhCtrl.DesignExhaustFlowRate == EnergyPlus::DataSizing::AutoSize) {
+                if (thisExhCtrl.DesignExhaustFlowRate == DataSizing::AutoSize) {
                     SizeExhaustControlFlow(state, exhCtrlNum, thisExhCtrl.SuppNodeNums);
                 }
 
@@ -714,7 +710,7 @@ namespace ExhaustAirSystemManager {
             state.dataLoopNodes->Node(InletNode).MassFlowRate *= FlowRatio;
         } else {
             // Availability schedule:
-            if (EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
                 MassFlow = 0.0;
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             } else {
@@ -724,12 +720,12 @@ namespace ExhaustAirSystemManager {
             Real64 DesignFlowRate = thisExhCtrl.DesignExhaustFlowRate;
             Real64 FlowFrac = 0.0;
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
-                FlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
+                FlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
             }
 
             Real64 MinFlowFrac = 0.0;
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
-                MinFlowFrac = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
+                MinFlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
             }
 
             if (FlowFrac < MinFlowFrac) {
@@ -739,9 +735,9 @@ namespace ExhaustAirSystemManager {
             bool runExhaust = true;
             if (thisExhCtrl.AvailScheduleNum == 0 ||
                 (thisExhCtrl.AvailScheduleNum > 0 &&
-                 EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) > 0.0)) { // available
+                 ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) > 0.0)) { // available
                 if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
-                    if (Tin >= EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
+                    if (Tin >= ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
                         runExhaust = true;
                     } else {
                         runExhaust = false;
@@ -770,7 +766,7 @@ namespace ExhaustAirSystemManager {
             if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
                 thisExhCtrl.BalancedFlow = // state.dataHVACGlobal->BalancedExhMassFlow =
                     MassFlow *             // state.dataHVACGlobal->UnbalExhMassFlow *
-                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.BalancedExhFracScheduleNum);
+                    ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.BalancedExhFracScheduleNum);
                 thisExhCtrl.UnbalancedFlow =  // state.dataHVACGlobal->UnbalExhMassFlow =
                     MassFlow -                // = state.dataHVACGlobal->UnbalExhMassFlow -
                     thisExhCtrl.BalancedFlow; // state.dataHVACGlobal->BalancedExhMassFlow;
