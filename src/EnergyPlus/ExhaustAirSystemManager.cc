@@ -808,6 +808,9 @@ namespace ExhaustAirSystemManager {
         // Real64 HRin = state.dataLoopNodes->Node(InletNode).HumRat;
 
         if (present(FlowRatio)) {
+            thisExhCtrl.BalancedFlow *= FlowRatio;
+            thisExhCtrl.UnbalancedFlow *= FlowRatio;
+
             // adjustment of airlfow rate by ratio
             // but still need to deal with the min fractions?
             state.dataLoopNodes->Node(InletNode).MassFlowRate *= FlowRatio;
@@ -983,7 +986,8 @@ namespace ExhaustAirSystemManager {
                 state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow + state.dataZoneEquip->ZoneExhaustControlSystem(i).UnbalancedFlow;
             state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneExhBalanced += state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow;
         }
-        // 2022-02-15: is zoneNum just the same as "ControlledZoneNum"?
+        // 2022-02-15: is zoneNum just the same as "ControlledZoneNum": they seems to be different on Line 3119 ZoneEquipxxx.cc:
+        //       ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
     }
 
     void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound)
