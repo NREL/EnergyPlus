@@ -454,16 +454,16 @@ namespace UnitarySystems {
             // need to move to better location and save thisObjectIndex and thisObjectType in struct
             // this->m_EquipCompNum is by parent type, not total UnitarySystems
             // e.g., PTAC = 1,2,3; PTHP = 1,2; PTWSHP = 1,2,3,4; UnitarySystems = 9 total
-            int thisObjectType = 0;
+            DataZoneEquipment::ZoneEquip thisObjectType = DataZoneEquipment::ZoneEquip::Invalid;
             switch (this->m_sysType) {
             case SysType::PackagedAC:
-                thisObjectType = DataZoneEquipment::PkgTermACAirToAir_Num;
+                thisObjectType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
                 break;
             case SysType::PackagedHP:
-                thisObjectType = DataZoneEquipment::PkgTermHPAirToAir_Num;
+                thisObjectType = DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir;
                 break;
             case SysType::PackagedWSHP:
-                thisObjectType = DataZoneEquipment::PkgTermHPWaterToAir_Num;
+                thisObjectType = DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir;
                 break;
             default:
                 break;
@@ -2108,7 +2108,7 @@ namespace UnitarySystems {
                     this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
                 }
             }
-            if (this->m_NoCoolHeatSAFMethod <= DataSizing::SupplyAirFlowRate && this->m_ControlType == ControlType::CCMASHRAE) {
+            if (this->m_NoCoolHeatSAFMethod <= DataSizing::SupplyAirFlowRate && this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                 if (this->m_MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
                     state.dataSize->DataConstantUsedForSizing = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
@@ -2995,7 +2995,7 @@ namespace UnitarySystems {
             PrintFlag = true;
         }
 
-        if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != ControlType::CCMASHRAE) {
+        if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != UnitarySysCtrlType::CCMASHRAE) {
 
             TempSize = this->DesignMaxOutletTemp;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
@@ -3134,7 +3134,7 @@ namespace UnitarySystems {
         // should only report for those that allow SZVAV inputs, e.g., control type == CCMASHRAE
         PrintFlag = true;
 
-        if (this->m_ControlType == ControlType::CCMASHRAE) {
+        if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
 
             SizingDesRunThisSys = false;
             state.dataSize->DataZoneUsedForSizing = this->ControlZoneNum;
@@ -3174,7 +3174,7 @@ namespace UnitarySystems {
             state.dataSize->DataZoneUsedForSizing = 0;
 
             // check that MaxNoCoolHeatAirVolFlow is less than both MaxCoolAirVolFlow and MaxHeatAirVolFlow
-            if (this->m_ControlType == ControlType::CCMASHRAE) {
+            if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                 if (this->m_MaxNoCoolHeatAirVolFlow >= this->m_MaxCoolAirVolFlow || this->m_MaxNoCoolHeatAirVolFlow >= this->m_MaxHeatAirVolFlow) {
                     ShowSevereError(state, this->UnitType + " = " + this->Name);
                     ShowContinueError(
@@ -6631,7 +6631,7 @@ namespace UnitarySystems {
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
             this->m_NoCoolHeatSAFMethod = DataSizing::None;
-            if (this->m_ControlType == ControlType::CCMASHRAE) {
+            if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                 if (loc_m_NoCoolHeatSAFMethod_SAFlow == -99999.0) { // no load air flow is autosized
                     this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
                     this->m_RequestAutoSize = true;
@@ -6985,7 +6985,7 @@ namespace UnitarySystems {
             this->DesignMaxOutletTemp = loc_DesignMaxOutletTemp;
         } else {
             // PTHP has a field for max outlet temp for supplmental heater and max outlet temp for SZVAV
-            if (this->m_ControlType == ControlType::CCMASHRAE) {
+            if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                 this->DesignMaxOutletTemp = loc_DesignMaxOutletTemp;
             } else {
                 this->DesignMaxOutletTemp = input_data.maximum_supply_air_temperature_from_supplemental_heater;
@@ -7701,7 +7701,7 @@ namespace UnitarySystems {
                     thisSys.m_sysType = sysTypeNum;
                     // TODO: figure out another way to set this next variable
                     // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
-                    thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+                    thisSys.m_LastMode = HeatingMode;
                     thisSys.processInputSpec(state, original_input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                     if (sysNum == -1) {
@@ -12570,16 +12570,8 @@ namespace UnitarySystems {
                     PartLoadFrac = 1.0;
                     mdot = this->MaxCoolCoilFluidFlow;
                 }
-                if (this->CoolCoilLoopNum > 0) {
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         mdot,
-                                                         this->CoolCoilFluidInletNode,
-                                                         this->CoolCoilFluidOutletNodeNum,
-                                                         this->CoolCoilLoopNum,
-                                                         this->CoolCoilLoopSide,
-                                                         this->CoolCoilBranchNum,
-                                                         this->CoolCoilCompNum);
-                }
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, this->CoolCoilFluidInletNode, this->CoolCoilFluidOutletNodeNum, this->CoolCoilPlantLoc);
 
                 WaterCoils::SimulateWaterCoilComponents(
                     state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);

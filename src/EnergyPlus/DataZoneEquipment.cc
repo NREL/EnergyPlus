@@ -527,13 +527,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" || SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER" ||
                                SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP" || SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP") {
                         if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER") {
-                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermACAirToAir_Num;
+                            thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
                         } else if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") {
-                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermHPAirToAir_Num;
+                            thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir;
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
+                            thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
                         } else if (SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP") {
-                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermHPWaterToAir_Num;
+                            thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir;
                         } else {
                             ShowFatalError(state, "Developer Error in GetZoneEquipmentData");
                         }

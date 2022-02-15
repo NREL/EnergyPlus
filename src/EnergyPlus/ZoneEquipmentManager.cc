@@ -3169,7 +3169,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             ZoneEquipTypeNum = state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipTypeEnum;
 
             // TODO: need a way to set ParentIndex for other than UnitarySystem so ZoneCompNum is correct when using ParentIndex
-            if (ZoneEquipTypeNum == PkgTermACAirToAir_Num || ZoneEquipTypeNum == PkgTermHPAirToAir_Num) {
+            if (ZoneEquipTypeNum == ZoneEquip::PkgTermACAirToAir || ZoneEquipTypeNum == ZoneEquip::PkgTermHPAirToAir) {
                 ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).ParentIndex(EquipPtr);
             } else {
                 ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr);
@@ -3263,10 +3263,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                             LatOutputProvided,
                             state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::PkgTermHPAirToAir: // 'ZoneHVAC:PackagedTerminalHeatPump'
-            case ZoneEquip::PkgTermACAirToAir: // 'ZoneHVAC:PackagedTerminalAirConditioner'
+            case ZoneEquip::PkgTermHPAirToAir:   // 'ZoneHVAC:PackagedTerminalHeatPump'
+            case ZoneEquip::PkgTermACAirToAir:   // 'ZoneHVAC:PackagedTerminalAirConditioner'
             case ZoneEquip::PkgTermHPWaterToAir: // 'ZoneHVAC:WaterToAirHeatPump'
-            case ZoneEquip::ZoneUnitarySys: { // 'AirloopHVAC:UnitarySystem'
+            case ZoneEquip::ZoneUnitarySys: {    // 'AirloopHVAC:UnitarySystem'
                 int AirLoopNum = 0;
                 bool HeatingActive = false;
                 bool CoolingActive = false;

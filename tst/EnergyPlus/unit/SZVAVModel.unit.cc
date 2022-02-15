@@ -187,11 +187,11 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     int zoneNodeNum = NodeInputManager::GetOnlySingleNode(*state,
                                                           "ZoneNode",
                                                           errFlag,
-                                                          "PTUnit",
+                                                          DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalAirConditioner,
                                                           "PTUnit",
                                                           DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                          NodeInputManager::compFluidStream::Primary,
+                                                          DataLoopNode::ConnectionType::Inlet,
+                                                          NodeInputManager::CompFluidStream::Primary,
                                                           DataLoopNode::ObjectIsNotParent);
 
     state->dataLoopNodes->Node(thisUnit.AirInNode).Temp = 21.0;

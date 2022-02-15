@@ -238,10 +238,10 @@ namespace UnitarySystems {
 
         UnitarySysInputSpec original_input_specs;
         int m_UnitarySysNum = -1;
-        SysType m_sysType = SysType::Unassigned;
+        SysType m_sysType = SysType::Invalid;
         bool m_ThisSysInputShouldBeGotten = true;
         int m_SysAvailSchedPtr = 0; // Pointer to the availability schedule
-        ControlType m_ControlType = ControlType::None;
+        UnitarySysCtrlType m_ControlType = UnitarySysCtrlType::None;
         DehumCtrlType m_DehumidControlType_Num = DehumCtrlType::None;
         bool m_Humidistat = false;
         bool m_ValidASHRAECoolCoil = false;
@@ -285,7 +285,7 @@ namespace UnitarySystems {
         Real64 m_DesignCoolingCapacity = 0.0;
         Real64 m_MaxCoolAirVolFlow = 0.0;
         int m_CondenserNodeNum = 0;
-        DataHeatBalance::RefrigCondenserType m_CondenserType = DataHeatBalance::RefrigCondenserType::Unassigned;
+        DataHeatBalance::RefrigCondenserType m_CondenserType = DataHeatBalance::RefrigCondenserType::Invalid;
         int m_CoolingCoilIndex = 0;
         bool m_HeatPump = false;
         int m_ActualDXCoilIndexForHXAssisted = 0;
@@ -314,7 +314,7 @@ namespace UnitarySystems {
         int m_CoolingCapMethod = 0;
         int m_HeatingCapMethod = 0;
         Real64 m_MaxNoCoolHeatAirVolFlow = 0.0;
-        UseCompFlow m_AirFlowControl = UseCompFlow::FlowNotYetSet;
+        UseCompFlow m_AirFlowControl = UseCompFlow::Invalid;
         bool m_CoolingCoilUpstream = true;
         Real64 m_MaxOATSuppHeat = 0.0;
         Real64 m_MinOATCompressorCooling = 0.0;
@@ -351,15 +351,8 @@ namespace UnitarySystems {
         bool m_MySetPointCheckFlag = true;
         bool m_MySizingCheckFlag = true;
         bool m_InitHeatPump = false; // Heat pump initialization flag (for error reporting)
-
-        int m_HRLoopNum = 0;
-        int m_HRLoopSideNum = 0;
-        int m_HRBranchNum = 0;
-        int m_HRCompNum = 0;
-        int m_SuppCoilLoopNum = 0;
-        int m_SuppCoilLoopSide = 0;
-        int m_SuppCoilBranchNum = 0;
-        int m_SuppCoilCompNum = 0;
+        PlantLocation m_HRPlantLoc;
+        PlantLocation m_SuppCoilPlantLoc;
         int m_SuppCoilFluidOutletNodeNum = 0;
 
         Real64 m_WSHPRuntimeFrac = 0.0;
@@ -509,15 +502,9 @@ namespace UnitarySystems {
         int CoolCoilInletNodeNum = 0;          // Cooling coil air inlet node number
         int CoolCoilOutletNodeNum = 0;         // Cooling coil air outlet node number
         int CoolCoilFluidOutletNodeNum = 0;    // Cooling coil fluid outlet node number (from Plant Loop data)
-        int CoolCoilLoopNum = 0;               // Plant loop num of chilled water coil
-        int CoolCoilLoopSide = 0;              // Supply side or demand side
-        int CoolCoilBranchNum = 0;             // Branch of number of the cooling coil in the plant loop
-        int CoolCoilCompNum = 0;               // Comp num of the cooling coil in the plant loop
+        PlantLocation CoolCoilPlantLoc;        // Location of the cooling coil in the plant loop
         int CoolCoilFluidInletNode = 0;        // Cooling coil fluid inlet node
-        int HeatCoilLoopNum = 0;               // Plant loop num of hot water or steam coil
-        int HeatCoilLoopSide = 0;              // Supply side or demand side
-        int HeatCoilBranchNum = 0;             // Branch of number of the heating coil in the plant loop
-        int HeatCoilCompNum = 0;               // Comp num of the heating coil in the plant loop
+        PlantLocation HeatCoilPlantLoc;        // Location of the heating coil in the plant loop
         int HeatCoilFluidInletNode = 0;        // Heating coil fluid inlet node
         int HeatCoilFluidOutletNodeNum = 0;    // Heating coil fluid outlet node number (from Plant Loop data)
         int HeatCoilInletNodeNum = 0;          // Heating coil air inlet node number
@@ -1001,6 +988,8 @@ struct UnitarySystemsData : BaseGlobalStruct
     Real64 MoistureLoad = 0.0;        // Dehumidification Load (W)
     Real64 CompOnMassFlow = 0.0;      // Supply air mass flow rate w/ compressor ON [kg/s]
     Real64 CompOffMassFlow = 0.0;     // Supply air mass flow rate w/ compressor OFF [kg/s]
+    Real64 OACompOnMassFlow = 0.0;    // OA mass flow rate w/ compressor ON [kg/s]
+    Real64 OACompOffMassFlow = 0.0;   // OA mass flow rate w/ compressor OFF [kg/s]
 
     Real64 CompOnFlowRatio = 0.0;       // fan flow ratio when coil on
     Real64 CompOffFlowRatio = 0.0;      // fan flow ratio when coil off

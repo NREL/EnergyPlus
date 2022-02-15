@@ -934,8 +934,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     thisSys.MaxNoCoolHeatAirMassFlow = PrimaryAirMassFlowRate;
     thisSys.m_NoHeatCoolSpeedRatio = 1.0;
     thisSys.m_NoCoolHeatOutAirMassFlow = PrimaryAirMassFlowRate;
-    thisSys.m_AirFlowControl = UnitarySystems::UnitarySys::UseCompFlow::UseCompressorOnFlow;
-    thisSys.m_LastMode = state->dataUnitarySystems->HeatingMode;
+    thisSys.m_AirFlowControl = UnitarySystems::UnitarySys::UseCompFlow::On;
+    thisSys.m_LastMode = UnitarySystems::HeatingMode;
 
     // initialized to false
     ASSERT_FALSE(state->dataUnitarySystems->HeatingLoad);
