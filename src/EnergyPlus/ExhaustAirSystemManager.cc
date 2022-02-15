@@ -176,7 +176,7 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
-                std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "airloophvac_zonemixer_name");
+                std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_mixer_name");
                 int zoneMixerIndex = 0;
                 bool zoneMixerErrFound = false;
                 EnergyPlus::MixerComponent::GetZoneMixerIndex(state, zoneMixerName, zoneMixerIndex, zoneMixerErrFound, thisExhSys.Name);
