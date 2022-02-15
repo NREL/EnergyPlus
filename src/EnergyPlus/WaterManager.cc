@@ -984,13 +984,13 @@ namespace WaterManager {
             state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
         }
         // fixme: debug print
-//        fmt::print("{} {}-{} schedRate={}, curAmt={}, curPrec={}\n",
-//                   state.dataEnvrn->CurMnDy,
-//                   state.dataGlobal->HourOfDay,
-//                   state.dataGlobal->TimeStep,
-//                   schedRate,
-//                   state.dataWaterData->RainFall.CurrentAmount,
-//                   state.dataEcoRoofMgr->CurrentPrecipitation);
+        //        fmt::print("{} {}-{} schedRate={}, curAmt={}, curPrec={}\n",
+        //                   state.dataEnvrn->CurMnDy,
+        //                   state.dataGlobal->HourOfDay,
+        //                   state.dataGlobal->TimeStep,
+        //                   schedRate,
+        //                   state.dataWaterData->RainFall.CurrentAmount,
+        //                   state.dataEcoRoofMgr->CurrentPrecipitation);
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
