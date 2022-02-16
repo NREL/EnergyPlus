@@ -1649,10 +1649,9 @@ namespace ScheduleManager {
                 FileIntervalInterpolated = true;
             }
 
-            if (lAlphaBlanks(6)) Alphas(6) = "YES";
-            if ((Alphas(6)) == "YES") {
-                state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = true;
-            } else if ((Alphas(6)) == "NO") {
+            
+            state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = true;
+            if ((Alphas(6)) == "NO") {
                 state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = false;
             }
 
@@ -2765,12 +2764,7 @@ namespace ScheduleManager {
         //  so, current date, but maybe TimeStep added
 
         // Hourly Value
-        int thisHour;
-        if (state.dataScheduleMgr->Schedule(ScheduleIndex).UseDaylightSaving) {
-            thisHour = ThisHour + state.dataEnvrn->DSTIndicator;
-        } else {
-            thisHour = ThisHour;
-        }
+        int thisHour = ThisHour + state.dataEnvrn->DSTIndicator * state.dataScheduleMgr->Schedule(ScheduleIndex).UseDaylightSaving;
 
         int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
         int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
