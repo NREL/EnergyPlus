@@ -6610,7 +6610,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> FrameDividerProps(23); // Temporary array to transfer frame/divider properties
         int Loop;
 
-        constexpr std::array<std::string_view,2> DividerTypesUC = {"DIVIDEDLITE", "SUSPENDED"};
+        constexpr std::array<std::string_view, 2> DividerTypesUC = {"DIVIDEDLITE", "SUSPENDED"};
 
         state.dataHeatBalMgr->CurrentModuleObject = "WindowProperty:FrameAndDivider";
         state.dataHeatBal->TotFrameDivider =
@@ -6701,8 +6701,7 @@ namespace HeatBalanceManager {
             if (frameDivider.DividerWidth > 0.0 && (frameDivider.HorDividers == 0 && frameDivider.VertDividers == 0)) {
                 ShowWarningError(state,
                                  state.dataHeatBalMgr->CurrentModuleObject + ": In FrameAndDivider " + frameDivider.Name + ' ' +
-                                     state.dataIPShortCut->cNumericFieldNames(9) +
-                                     " > 0 ");
+                                     state.dataIPShortCut->cNumericFieldNames(9) + " > 0 ");
                 ShowContinueError(state,
                                   "...but " + state.dataIPShortCut->cNumericFieldNames(10) + " = 0 and " +
                                       state.dataIPShortCut->cNumericFieldNames(11) + " = 0.");
@@ -6713,9 +6712,8 @@ namespace HeatBalanceManager {
             if (frameDivider.InsideSillDepth < state.dataSurface->FrameDivider(FrameDividerNum).InsideReveal) {
                 ShowWarningError(state,
                                  state.dataHeatBalMgr->CurrentModuleObject + ": In FrameAndDivider " + frameDivider.Name + ' ' +
-                                     state.dataIPShortCut->cNumericFieldNames(20) +
-                                     " is less than " + state.dataIPShortCut->cNumericFieldNames(22) + "; it will be set to " +
-                                     state.dataIPShortCut->cNumericFieldNames(22) + '.');
+                                     state.dataIPShortCut->cNumericFieldNames(20) + " is less than " + state.dataIPShortCut->cNumericFieldNames(22) +
+                                     "; it will be set to " + state.dataIPShortCut->cNumericFieldNames(22) + '.');
                 frameDivider.InsideSillDepth = state.dataSurface->FrameDivider(FrameDividerNum).InsideReveal;
             }
 
