@@ -797,18 +797,34 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 
     SurfNum = 1;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, true);
     EXPECT_NEAR(RadTemp, 16.6, 0.1);
 
     SurfNum = 2;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, true);
     EXPECT_NEAR(RadTemp, 16.1, 0.1);
 
     SurfNum = 3;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, true);
     EXPECT_NEAR(RadTemp, 14.0, 0.1);
+
+    // set AverageWithSurface to false for Kiva surfaces
+    SurfNum = 1;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 13.1, 0.1);
+
+    SurfNum = 2;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 17.1, 0.1);
+
+    SurfNum = 3;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 18.0, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)

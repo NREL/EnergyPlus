@@ -5748,6 +5748,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             // Total Shortwave Radiation Absorbed on Inside of Surface[W]
             state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) * surface.Area;
 
+            // Inside face conduction calculation for Kiva surfaces
             if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
                 state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
                     -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
