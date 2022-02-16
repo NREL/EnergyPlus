@@ -898,7 +898,7 @@ namespace DataSurfaces {
         "DoorTransom",    "TropicalAwning",   "TubularDaylightingDevice",
         "VerticalSlider"};
 
-        constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNameUC = {
+    constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNameUC = {
         "CASEMENTDOUBLE", "CASEMENTSINGLE",   "DUALACTION",
         "FIXED",          "GARAGE",           "GREENHOUSE",
         "HINGEDESCAPE",   "HORIZONTALSLIDER", "JAL",
