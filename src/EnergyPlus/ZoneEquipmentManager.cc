@@ -3627,9 +3627,9 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
     } // end of the Supply Air Path DO Loop
 
-    EnergyPlus::ExhaustAirSystemManager::SimZoneHVACExhaustControls(state, FirstHVACIteration);
+    ExhaustAirSystemManager::SimZoneHVACExhaustControls(state);
 
-    EnergyPlus::ExhaustAirSystemManager::SimExhaustAirSystem(state, FirstHVACIteration);
+    ExhaustAirSystemManager::SimExhaustAirSystem(state, FirstHVACIteration);
 
     CalcZoneMassBalance(state, FirstHVACIteration);
 

@@ -107,12 +107,6 @@ namespace ExhaustAirSystemManager {
     void GetExhaustAirSystemInput(EnergyPlusData &state)
     {
         // Locals
-        int PathNum;
-        int CompNum;
-        int NumAlphas;
-        int NumNums;
-        int IOStat;
-        int Counter;
         bool IsNotOK; // Flag to verify name
 
         bool ErrorsFound = false;
@@ -346,7 +340,7 @@ namespace ExhaustAirSystemManager {
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
 
-        std::string RoutineName = "CalExhaustAirSystem";
+        std::string RoutineName = "CalExhaustAirSystem: ";
         std::string cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
         bool ErrorsFound = false;
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
@@ -374,12 +368,12 @@ namespace ExhaustAirSystemManager {
             // fan should be cut off now;
         }
 
-        Real64 FanAirVolFlow = 1.0; // This should be something like a design or rate fan flow rate
-        Real64 FanSpeedRatio = 1.0; //  Node(InletNode).MassFlowRate / (FanAirVolFlow * state.dataEnvrn->StdRhoAir);
+        // Real64 FanAirVolFlow = 1.0; // This should be something like a design or rate fan flow rate
+        // Real64 FanSpeedRatio = 1.0; //  Node(InletNode).MassFlowRate / (FanAirVolFlow * state.dataEnvrn->StdRhoAir);
 
         // Constant fan and variable flow calculation AND variable fan
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
+        // auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+        // auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         int outletNode_Num = 0;
 
@@ -446,7 +440,7 @@ namespace ExhaustAirSystemManager {
             int numInletLegs = state.dataMixerComponent->MixerCond(zoneMixerIndex).NumInletNodes;
             for (int i = 1; i <= numInletLegs; ++i) {
                 int exhLegIndex = mixerIndexMap[state.dataMixerComponent->MixerCond(zoneMixerIndex).InletNode(i)];
-                CalcZoneHVACExhaustControl(state, exhLegIndex, FirstHVACIteration, flowRatio);
+                CalcZoneHVACExhaustControl(state, exhLegIndex, flowRatio);
             }
 
             // Simulate the mixer again to update the flow
@@ -467,16 +461,11 @@ namespace ExhaustAirSystemManager {
         // This function is for the ZoneExhaust Control input processing;
 
         // Locals
-        int PathNum;
-        int CompNum;
         int NumAlphas;
         int NumNums;
-        int IOStat;
-        int Counter;
-        bool IsNotOK; // Flag to verify name
         bool ErrorsFound = false;
 
-        // 2022-01-13: Use the json helper to process input
+        // Use the json helper to process input
         constexpr const char *RoutineName("GetZoneExhaustControlInput: ");
         std::string cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
         auto &ip = state.dataInputProcessing->inputProcessor;
@@ -605,10 +594,9 @@ namespace ExhaustAirSystemManager {
                 // Verify these nodes are indeed supply nodes:
                 bool nodeNotFound = false;
                 if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
-                    for (int i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
+                    for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
                         CheckForSupplyNode(state, thisExhCtrl.SuppNodeNums(i), nodeNotFound);
                         if (nodeNotFound) {
-                            // May need to bump to a severe warning message
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                             ShowContinueError(state, "Node or NodeList Name =" + supplyNodeOrNodelistName + ". Must all be supply node(s).");
                             ErrorsFound = true;
@@ -693,7 +681,7 @@ namespace ExhaustAirSystemManager {
         }
     }
 
-    void SimZoneHVACExhaustControls(EnergyPlusData &state, bool FirstHVACIteration)
+    void SimZoneHVACExhaustControls(EnergyPlusData &state)
     {
         // Locals
         int ExhaustControlNum;
@@ -704,14 +692,14 @@ namespace ExhaustAirSystemManager {
         }
 
         for (ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
-            CalcZoneHVACExhaustControl(state, ExhaustControlNum, FirstHVACIteration, _);
+            CalcZoneHVACExhaustControl(state, ExhaustControlNum, _);
         }
 
         // report results if needed
     }
 
     void
-    CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio)
+    CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Optional<bool const> FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 
@@ -834,7 +822,7 @@ namespace ExhaustAirSystemManager {
         // mixer outlet sizing:
         Real64 outletFlowMaxAvail = 0.0;
         int inletNode_index = 0;
-        for (int i = 1; i <= state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).NumInletNodes; ++i) {
+        for (size_t i = 1; i <= state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).NumInletNodes; ++i) {
             inletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).InletNode(i);
             outletFlowMaxAvail += state.dataLoopNodes->Node(inletNode_index).MassFlowRateMaxAvail;
         }
@@ -866,7 +854,7 @@ namespace ExhaustAirSystemManager {
 
         if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
             // size based on supply nodelist flow
-            for (int i = 1; i <= NodeNums.size(); ++i) {
+            for (size_t i = 1; i <= NodeNums.size(); ++i) {
                 designFlow += state.dataLoopNodes->Node(NodeNums(i)).MassFlowRateMax;
             }
         } else { // scheduled etc.
@@ -879,7 +867,7 @@ namespace ExhaustAirSystemManager {
 
     void UpdateZoneExhaustControl(EnergyPlusData &state)
     {
-        for (int i = 1; state.dataZoneEquip->NumZoneExhaustControls; ++i) {
+        for (size_t i = 1; state.dataZoneEquip->NumZoneExhaustControls; ++i) {
             int controlledZoneNum = state.dataZoneEquip->ZoneExhaustControlSystem(i).ControlledZoneNum;
             state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneExh +=
                 state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow + state.dataZoneEquip->ZoneExhaustControlSystem(i).UnbalancedFlow;
