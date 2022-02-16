@@ -2098,12 +2098,12 @@ namespace WindowComplexManager {
         return DayPos;
     }
 
-    Vector WorldVectFromW6(EnergyPlusData &state,
-                           Real64 const Theta, // Polar angle in W6 Coords
-                           Real64 const Phi,   // Azimuthal angle in W6 Coords
-                           const RayIdentificationType RadType,  // Type of radiation: Front_Incident, etc.
-                           Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
-                           Real64 const Alpha  // Surface azimuth, radians, world coordinate system
+    Vector WorldVectFromW6([[maybe_unused]] EnergyPlusData &state,
+                           Real64 const Theta,                  // Polar angle in W6 Coords
+                           Real64 const Phi,                    // Azimuthal angle in W6 Coords
+                           const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                           Real64 const Gamma,                  // Surface tilt angle, radians, world coordinate system
+                           Real64 const Alpha                   // Surface azimuth, radians, world coordinate system
     )
     {
 
@@ -2312,13 +2312,13 @@ namespace WindowComplexManager {
         return RayIndex;
     }
 
-    void W6CoordsFromWorldVect(EnergyPlusData &state,
-                               Vector const &RayVect, // Ray vector direction in world CS
-                               const RayIdentificationType RadType,     // Type of radiation: Front_Incident, etc.
-                               Real64 const Gamma,    // Surface tilt angle, world coordinate system
-                               Real64 const Alpha,    // Surface azimuth, world coordinate system
-                               Real64 &Theta,         // Polar angle in W6 Coords
-                               Real64 &Phi            // Azimuthal angle in W6 Coords
+    void W6CoordsFromWorldVect([[maybe_unused]] EnergyPlusData &state,
+                               Vector const &RayVect,               // Ray vector direction in world CS
+                               const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                               Real64 const Gamma,                  // Surface tilt angle, world coordinate system
+                               Real64 const Alpha,                  // Surface azimuth, world coordinate system
+                               Real64 &Theta,                       // Polar angle in W6 Coords
+                               Real64 &Phi                          // Azimuthal angle in W6 Coords
     )
     {
 
