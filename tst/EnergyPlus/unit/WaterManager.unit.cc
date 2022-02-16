@@ -210,7 +210,7 @@ TEST_F(EnergyPlusFixture, WaterManager_RainIrrigationMode) {
     WaterManager::GetWaterManagerInput(*state);
 
     // when rain schedule design is present, use the design schedule
-    ASSERT_EQ(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::RainSchedDesign);
+    EXPECT_TRUE(compare_enums(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::RainSchedDesign));
 
     idf_objects = delimited_string({
         "RoofIrrigation,",
@@ -235,7 +235,7 @@ TEST_F(EnergyPlusFixture, WaterManager_RainIrrigationMode) {
     WaterManager::GetWaterManagerInput(*state);
 
     // no site:precipitation, use epw schedule
-    ASSERT_EQ(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::EPWPrecipitation);
+    EXPECT_TRUE(compare_enums(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::EPWPrecipitation));
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_Fill)
