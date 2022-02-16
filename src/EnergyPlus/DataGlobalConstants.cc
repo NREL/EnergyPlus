@@ -120,13 +120,16 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
         } else if (SELECT_CASE_var == "ENERGYTRANSFER") {
             return ResourceType::EnergyTransfer;
 
+        } else if (SELECT_CASE_var == "STEAM") {
+            return ResourceType::Steam;
+
         } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
             return ResourceType::DistrictCooling;
 
-        } else if (SELECT_CASE_var == "DISTRICTHEATING:WATER") {
-            return ResourceType::DistrictHeatingWater;
+        } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+            return ResourceType::DistrictHeating;
 
-        } else if (SELECT_CASE_var == "DISTRICTHEATING:STEAM") {
+        } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
             return ResourceType::DistrictHeatingSteam;
 
         } else if (SELECT_CASE_var == "ELECTRICITYPRODUCED") {
@@ -277,14 +280,17 @@ std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
     case ResourceType::EnergyTransfer: {
         return "EnergyTransfer";
     } break;
+    case ResourceType::Steam: {
+        return "Steam";
+    } break;
     case ResourceType::DistrictCooling: {
         return "DistrictCooling";
     } break;
-    case ResourceType::DistrictHeatingWater: {
-        return "DistrictHeating:Water";
+    case ResourceType::DistrictHeating: {
+        return "DistrictHeating";
     } break;
     case ResourceType::DistrictHeatingSteam: {
-        return "DistrictHeating:Steam";
+        return "DistrictHeatingSteam";
     } break;
     case ResourceType::ElectricityProduced: {
         return "ElectricityProduced";

@@ -2846,7 +2846,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     // the following should be kept consistent with the assumptions in the pollution calculation routines
     ort->efficiencyDistrictCooling = 3.0;
     ort->efficiencyDistrictHeating = 0.3;
-    ort->sourceFactorDistrictHeatingSteam = 0.74;
+    ort->efficiencyDistrictHeatingSteam = 0.74;
 
     //  TotalSourceEnergyUse = (gatherTotalsSource(1) & !total source from electricity
     //                  +  gatherTotalsSource(2)   & !natural gas
@@ -8241,7 +8241,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             totalSourceEnergyUse =
                 (totalSourceEnergyUse + ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
                  ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating +
-                 ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam + ort->gatherTotalsBEPS(15) * ort->sourceFactorDistrictHeatingSteam) /
+                 ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam + ort->gatherTotalsBEPS(15) * ort->efficiencyDistrictHeatingSteam) /
                 largeConversionFactor; // district cooling | district heating | steam | district heating steam
 
             // now determine "net" source from purchased and surplus sold (still in J)

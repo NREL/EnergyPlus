@@ -4035,8 +4035,8 @@ void LEEDtariffReporting(EnergyPlusData &state)
 
     if (state.dataEconTariff->numTariff > 0) {
         distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
-        distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:WATER:FACILITY");
-        distHeatSteamFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:STEAM:FACILITY");
+        distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:FACILITY");
+        distHeatSteamFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGSTEAM:FACILITY");
         elecTotalEne = 0.0;
         gasTotalEne = 0.0;
         distCoolTotalEne = 0.0;
@@ -4110,7 +4110,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity", elecTariffNames);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
         if (distCoolTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
-        if (distHeatTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Water", distHeatTariffNames);
+        if (distHeatTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating", distHeatTariffNames);
         if (distHeatSteamTotalEne != 0)
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Steam", distHeatSteamTariffNames);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Other", othrTariffNames);
@@ -4146,13 +4146,13 @@ void LEEDtariffReporting(EnergyPlusData &state)
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
         }
         if (distHeatTotalEne != 0) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Water", distHeatTotalCost / distHeatTotalEne, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating Water", format("{}", convEneStrings(distHeatUnits)));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", format("{}", convEneStrings(distHeatUnits)));
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEtsDemUnt,
-                             "District Heating Water",
+                             "District Heating",
                              format("{}{}", convDemStrings(distHeatUnits), demWindowStrings(distHeatDemWindowUnits)));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating Water", distHeatTotalCost, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
         }
         if (distHeatSteamTotalEne != 0) {
             PreDefTableEntry(
@@ -4163,7 +4163,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
                              state.dataOutRptPredefined->pdchLeedEtsDemUnt,
                              "District Heating Steam",
                              format("{}{}", convDemStrings(distHeatSteamUnits), demWindowStrings(distHeatSteamDemWindowUnits)));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating Steam", distHeatSteamTotalCost, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatSteamTotalCost, 2);
         }
         // save the total costs for later to compute process fraction
         state.dataOutRptPredefined->LEEDelecCostTotal = elecTotalCost;

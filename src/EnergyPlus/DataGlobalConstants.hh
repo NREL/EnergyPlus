@@ -93,9 +93,9 @@ namespace DataGlobalConstants {
         Propane,
         Water,
         EnergyTransfer,
+        Steam,
         DistrictCooling,
-        DistrictHeatingWater,
-        DistrictHeatingSteam,
+        DistrictHeating,
         ElectricityProduced,
         ElectricityPurchased,
         ElectricitySurplusSold,
@@ -129,6 +129,7 @@ namespace DataGlobalConstants {
         Condensate,
         OtherFuel1,
         OtherFuel2,
+        DistrictHeatingSteam,
         Num
     };
 
@@ -221,9 +222,9 @@ struct DataGlobalConstantsData : BaseGlobalStruct
                                                                        DataGlobalConstants::ResourceType::Propane,
                                                                        DataGlobalConstants::ResourceType::Water,
                                                                        DataGlobalConstants::ResourceType::EnergyTransfer,
+                                                                       DataGlobalConstants::ResourceType::Steam,
                                                                        DataGlobalConstants::ResourceType::DistrictCooling,
-                                                                       DataGlobalConstants::ResourceType::DistrictHeatingWater,
-                                                                       DataGlobalConstants::ResourceType::DistrictHeatingSteam,
+                                                                       DataGlobalConstants::ResourceType::DistrictHeating,
                                                                        DataGlobalConstants::ResourceType::ElectricityProduced,
                                                                        DataGlobalConstants::ResourceType::ElectricityPurchased,
                                                                        DataGlobalConstants::ResourceType::ElectricitySurplusSold,
@@ -256,7 +257,8 @@ struct DataGlobalConstantsData : BaseGlobalStruct
                                                                        DataGlobalConstants::ResourceType::WellWater,
                                                                        DataGlobalConstants::ResourceType::Condensate,
                                                                        DataGlobalConstants::ResourceType::OtherFuel1,
-                                                                       DataGlobalConstants::ResourceType::OtherFuel2};
+                                                                       DataGlobalConstants::ResourceType::OtherFuel2,
+                                                                       DataGlobalConstants::ResourceType::DistrictHeatingSteam};
 
     void clear_state() override
     {
