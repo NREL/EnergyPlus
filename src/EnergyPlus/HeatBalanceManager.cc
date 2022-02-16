@@ -6689,6 +6689,7 @@ namespace HeatBalanceManager {
             for (unsigned int i = 0; i < DataSurfaces::NfrcProductNameUC.size(); ++i) {
                 if (DataSurfaces::NfrcProductNameUC[i] == FrameDividerAlphas(3)) {
                     frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions(i);
+                    break;
                 }
             }
 
