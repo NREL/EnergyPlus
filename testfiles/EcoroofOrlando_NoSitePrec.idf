@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! EcoroofOrlando.idf
+! EcoroofOrlando_NoSitePrec.idf
 ! Basic file description: 10 zone, 2 story building
 ! Highlights: Eco-Roof
 ! Simulation Location/Run: ORLANDO FL USA TMY--12841, 2 design days, 1 run periods,
