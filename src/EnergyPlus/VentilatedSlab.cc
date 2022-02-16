@@ -3646,7 +3646,7 @@ namespace VentilatedSlab {
 
         // METHODOLOGY EMPLOYED:
         // Simply calls the different components in order.  Only slight wrinkles
-        // here are that the ventilatd slab system has it's own outside air mixed and
+        // here are that the ventilated slab system has it's own outside air mixed and
         // that a cooling coil must be present in order to call a cooling coil
         // simulation.  Other than that, the subroutine is very straightforward.
 
