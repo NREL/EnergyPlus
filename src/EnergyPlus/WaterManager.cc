@@ -979,18 +979,7 @@ namespace WaterManager {
         }
         state.dataWaterData->RainFall.CurrentAmount =
             state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
-        // follow develop branch behavior
-        if ((state.dataGlobal->TimeStep > 1) && !(state.dataGlobal->KickOffSimulation)) {
-            state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
-        }
-        // fixme: debug print
-        //        fmt::print("{} {}-{} schedRate={}, curAmt={}, curPrec={}\n",
-        //                   state.dataEnvrn->CurMnDy,
-        //                   state.dataGlobal->HourOfDay,
-        //                   state.dataGlobal->TimeStep,
-        //                   schedRate,
-        //                   state.dataWaterData->RainFall.CurrentAmount,
-        //                   state.dataEcoRoofMgr->CurrentPrecipitation);
+        state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
     }
 
     void UpdateIrrigation(EnergyPlusData &state)

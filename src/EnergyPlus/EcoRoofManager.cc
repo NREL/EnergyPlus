@@ -909,14 +909,6 @@ namespace EcoRoofManager {
         }
 
         // NEXT Add Precipitation to surface soil moisture variable (if a schedule exists)
-        // the code updating precipitation is moved to UpdatePrecipitation
-        // fixme: debug print
-        //        fmt::print("{} {}-{} curAmt={}, curPrec={}\n",
-        //                   state.dataEnvrn->CurMnDy,
-        //                   state.dataGlobal->HourOfDay,
-        //                   state.dataGlobal->TimeStep,
-        //                   state.dataWaterData->RainFall.CurrentAmount,
-        //                   state.dataEcoRoofMgr->CurrentPrecipitation);
         Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
 
         int month = state.dataEnvrn->Month;
@@ -954,15 +946,6 @@ namespace EcoRoofManager {
         }
 
         Moisture += state.dataEcoRoofMgr->CurrentIrrigation / state.dataEcoRoofMgr->TopDepth; // irrigation in (m)/timestep put into top layer
-                                                                                              // fixme: debug print
-        //        fmt::print("{} {}-{} Moisture={}, evap={}, CurPrec={}, CurIrri={}\n",
-        //                   state.dataEnvrn->CurMnDy,
-        //                   state.dataGlobal->HourOfDay,
-        //                   state.dataGlobal->TimeStep,
-        //                   Moisture,
-        //                   (Vfluxg)*state.dataGlobal->MinutesPerTimeStep,
-        //                   state.dataEcoRoofMgr->CurrentPrecipitation,
-        //                   state.dataEcoRoofMgr->CurrentIrrigation);
 
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
