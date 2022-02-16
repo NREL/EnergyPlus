@@ -346,6 +346,9 @@ namespace ExhaustAirSystemManager {
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
 
+        std::string RoutineName = "CalExhaustAirSystem";
+        std::string cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
+        bool ErrorsFound = false;
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
             MixerComponent::SimAirMixer(state,
@@ -353,6 +356,14 @@ namespace ExhaustAirSystemManager {
                                         state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
         } else {
             // Give a warning that the current model does not work with AirflowNetwork for now
+            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+            ShowContinueError(state,
+                              "AirloopHVAC:ExhaustSystem currently does not work with AirflowNetwork.");
+            ErrorsFound = true;
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "Errors found conducting CalcExhasutAirSystem(). Preceding condition(s) causes termination.");
         }
 
         Real64 mixerFlow_Prior = 0.0;
@@ -424,6 +435,12 @@ namespace ExhaustAirSystemManager {
         if ((mixerFlow_Prior - mixerFlow_Posterior > 1e-6) || (mixerFlow_Prior - mixerFlow_Posterior < -1e-6)) {
             // calculate a ratio
             Real64 flowRatio = mixerFlow_Posterior / mixerFlow_Prior;
+            if (flowRatio > 1.0) {
+                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                ShowContinueError(state, "Requested flow rate is lower than the exhasut fan flow rate.");
+                ShowContinueError(state, "Will scale up the requested flow rate to meet fan flow rate.");
+            }
+
             // get the mixer inlet node index
             int zoneMixerIndex = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex;
             int numInletLegs = state.dataMixerComponent->MixerCond(zoneMixerIndex).NumInletNodes;
@@ -592,7 +609,7 @@ namespace ExhaustAirSystemManager {
                         CheckForSupplyNode(state, thisExhCtrl.SuppNodeNums(i), nodeNotFound);
                         if (nodeNotFound) {
                             // May need to bump to a severe warning message
-                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                             ShowContinueError(state, "Node or NodeList Name =" + supplyNodeOrNodelistName + ". Must all be supply node(s).");
                             ErrorsFound = true;
                         }
@@ -693,7 +710,8 @@ namespace ExhaustAirSystemManager {
         // report results if needed
     }
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio)
+    void
+    CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, bool FirstHVACIteration, Optional<bool const> FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 
