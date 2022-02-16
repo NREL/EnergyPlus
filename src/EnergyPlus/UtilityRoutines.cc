@@ -537,12 +537,14 @@ namespace UtilityRoutines {
 
         } else {
             if (AllowSteamAndDistrict) {
-                if (SELECT_CASE_var == "DISTRICTHEATING:WATER") {
-                    FuelTypeOutput = "DistrictHeating:Water";
+                if (SELECT_CASE_var == "STEAM") {
+                    FuelTypeOutput = "Steam";
+                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+                    FuelTypeOutput = "DistrictHeating";
                 } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
                     FuelTypeOutput = "DistrictCooling";
-                } else if (SELECT_CASE_var == "DISTRICTHEATING:STEAM") {
-                    FuelTypeOutput = "DistrictHeating:Steam";
+                } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
+                    FuelTypeOutput = "DistrictHeatingSteam";
                 } else {
                     FuelTypeErrorsFound = true;
                 }

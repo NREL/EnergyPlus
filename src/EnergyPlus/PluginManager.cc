@@ -257,12 +257,14 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     sResourceType = "Condensate";
                 } else if (resourceType == "ENERGYTRANSFER") {
                     sResourceType = "EnergyTransfer";
+                } else if (resourceType == "STEAM") {
+                    sResourceType = "Steam";
                 } else if (resourceType == "DISTRICTCOOLING") {
                     sResourceType = "DistrictCooling";
-                } else if (resourceType == "DISTRICTHEATING:WATER") {
-                    sResourceType = "DistrictHeating:Water";
-                } else if (resourceType == "DISTRICTHEATING:STEAM") {
-                    sResourceType = "DistrictHeating:Steam";
+                } else if (resourceType == "DISTRICTHEATING") {
+                    sResourceType = "DistrictHeating";
+                } else if (resourceType == "DISTRICTHEATINGSTEAM") {
+                    sResourceType = "DistrictHeatingSteam";
                 } else if (resourceType == "ELECTRICITYPRODUCEDONSITE") {
                     sResourceType = "ElectricityProduced";
                 } else if (resourceType == "SOLARWATERHEATING") {

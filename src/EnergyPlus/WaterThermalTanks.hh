@@ -214,9 +214,10 @@ namespace WaterThermalTanks {
         FuelOilNo1,
         FuelOilNo2,
         Propane,
+        Steam,
         OtherFuel1,
         OtherFuel2,
-        DistrictHeatingWater,
+        DistrictHeating,
         DistrictHeatingSteam,
         Num
     };
@@ -229,10 +230,11 @@ namespace WaterThermalTanks {
                                                                                       "FuelOilNo1",
                                                                                       "FuelOilNo2",
                                                                                       "Propane",
+                                                                                      "Steam",
                                                                                       "OtherFuel1",
                                                                                       "OtherFuel2",
-                                                                                      "DistrictHeating:Water",
-                                                                                      "DistrictHeating:Steam"};
+                                                                                      "DistrictHeating",
+                                                                                      "DistrictHeatingSteam"};
 
     constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNamesUC{"ELECTRICITY",
                                                                                         "NATURALGAS",
@@ -242,10 +244,11 @@ namespace WaterThermalTanks {
                                                                                         "FUELOILNO1",
                                                                                         "FUELOILNO2",
                                                                                         "PROPANE",
+                                                                                        "STEAM",
                                                                                         "OTHERFUEL1",
                                                                                         "OTHERFUEL2",
-                                                                                        "DISTRICTHEATING:WATER",
-                                                                                        "DISTRICTHEATING:STEAM"};
+                                                                                        "DISTRICTHEATING",
+                                                                                        "DISTRICTHEATINGSTEAM"};
 
     struct StratifiedNodeData
     {

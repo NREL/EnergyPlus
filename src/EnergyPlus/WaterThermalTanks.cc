@@ -10975,9 +10975,10 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         case Fuel::FuelOilNo1:
         case Fuel::FuelOilNo2:
         case Fuel::Propane:
+        case Fuel::Steam:
         case Fuel::OtherFuel1:
         case Fuel::OtherFuel2:
-        case Fuel::DistrictHeatingWater:
+        case Fuel::DistrictHeating:
         case Fuel::DistrictHeatingSteam:
             FuelTypeIsLikeGas = true;
             break;
@@ -11697,9 +11698,10 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             case Fuel::FuelOilNo1:
             case Fuel::FuelOilNo2:
             case Fuel::Propane:
+            case Fuel::Steam:
             case Fuel::OtherFuel1:
             case Fuel::OtherFuel2:
-            case Fuel::DistrictHeatingWater:
+            case Fuel::DistrictHeating:
             case Fuel::DistrictHeatingSteam:
                 FuelTypeIsLikeGas = true;
                 break;
