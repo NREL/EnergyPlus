@@ -80,8 +80,8 @@ namespace DataWater {
     enum class IrrigationMode
     {
         Invalid = -1,
-        IrrSchedDesign,  // mode of Irrigation determination is Scheduled Design
-        IrrSmartSched,   // mode of irrigation
+        IrrSchedDesign, // mode of Irrigation determination is Scheduled Design
+        IrrSmartSched,  // mode of irrigation
         Num
     };
 
