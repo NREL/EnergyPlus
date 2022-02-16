@@ -197,9 +197,17 @@ namespace ExhaustAirSystemManager {
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
-                                            "Central Exhaust Fan Outlet Air Volume Flow Rate",
+                                            "Central Exhaust Fan Outlet Air Volume Flow Rate Standard",
                                             OutputProcessor::Unit::m3_s,
-                                            thisExhSys.centralFan_VolumeFlowRate,
+                                            thisExhSys.centralFan_VolumeFlowRate_Std,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisExhSys.Name);
+
+                        SetupOutputVariable(state,
+                                            "Central Exhaust Fan Outlet Air Volume Flow Rate Current",
+                                            OutputProcessor::Unit::m3_s,
+                                            thisExhSys.centralFan_VolumeFlowRate_Cur,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
                                             thisExhSys.Name);
@@ -265,9 +273,17 @@ namespace ExhaustAirSystemManager {
                                                 thisExhSys.Name);
 
                             SetupOutputVariable(state,
-                                                "Central Exhaust Fan Outlet Air Volume Flow Rate",
+                                                "Central Exhaust Fan Outlet Air Volume Flow Rate Standard",
                                                 OutputProcessor::Unit::m3_s,
-                                                thisExhSys.centralFan_VolumeFlowRate,
+                                                thisExhSys.centralFan_VolumeFlowRate_Std,
+                                                OutputProcessor::SOVTimeStepType::System,
+                                                OutputProcessor::SOVStoreType::Average,
+                                                thisExhSys.Name);
+
+                            SetupOutputVariable(state,
+                                                "Central Exhaust Fan Outlet Air Volume Flow Rate Current",
+                                                OutputProcessor::Unit::m3_s,
+                                                thisExhSys.centralFan_VolumeFlowRate_Cur,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
                                                 thisExhSys.Name);
@@ -351,8 +367,7 @@ namespace ExhaustAirSystemManager {
         } else {
             // Give a warning that the current model does not work with AirflowNetwork for now
             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-            ShowContinueError(state,
-                              "AirloopHVAC:ExhaustSystem currently does not work with AirflowNetwork.");
+            ShowContinueError(state, "AirloopHVAC:ExhaustSystem currently does not work with AirflowNetwork.");
             ErrorsFound = true;
         }
 
@@ -387,8 +402,11 @@ namespace ExhaustAirSystemManager {
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate =
                 state.dataLoopNodes->Node(outletNode_Num).MassFlowRate;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate =
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Std =
                 state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Cur =
+                state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power =
                 state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->fanPower();
@@ -409,8 +427,13 @@ namespace ExhaustAirSystemManager {
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate =
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Std =
                 fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
+
+            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Cur =
+                fancomp.OutletAirMassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
+
+            state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
             state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanPower * 1000.0;
 
@@ -698,8 +721,7 @@ namespace ExhaustAirSystemManager {
         // report results if needed
     }
 
-    void
-    CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Optional<bool const> FlowRatio)
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Optional<bool const> FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 
