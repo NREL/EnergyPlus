@@ -898,6 +898,16 @@ namespace DataSurfaces {
         "DoorTransom",    "TropicalAwning",   "TubularDaylightingDevice",
         "VerticalSlider"};
 
+        constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNameUC = {
+        "CASEMENTDOUBLE", "CASEMENTSINGLE",   "DUALACTION",
+        "FIXED",          "GARAGE",           "GREENHOUSE",
+        "HINGEDESCAPE",   "HORIZONTALSLIDER", "JAL",
+        "PIVOTED",        "PROJECTINGSINGLE", "PROJECTINGDUAL",
+        "DOORSIDELITE",   "SKYLIGHT",         "SLIDINGPATIODOOR",
+        "CURTAINWALL",    "SPANDRELPANEL",    "SIDEHINGEDDOOR",
+        "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
+        "VERTICALSLIDER"};
+
     constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
         // width in meters from Table 4-3 of NFRC 100-2020
         1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
