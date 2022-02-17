@@ -189,10 +189,9 @@ namespace WaterManager {
         int NumIrrigation;
         int Dummy;
 
-        // initialize rainfall model
-        state.dataWaterData->RainFall.ModeID = DataWater::RainfallMode::None;
-
         if ((state.dataWaterManager->MyOneTimeFlag) && (!(state.dataWaterData->WaterSystemGetInputCalled))) { // big block for entire subroutine
+            // initialize rainfall model
+            state.dataWaterData->RainFall.ModeID = DataWater::RainfallMode::None;
 
             cCurrentModuleObject = "WaterUse:Storage";
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
@@ -963,6 +962,10 @@ namespace WaterManager {
         state.dataWaterData->RainFall.CurrentAmount =
             state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
         state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
+            int month = state.dataEnvrn->Month;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInSitePrec.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+        }
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
@@ -1658,6 +1661,15 @@ namespace WaterManager {
                                                      state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[i]);
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchMonthlyTotalHrRain, Months[i], state.dataWaterData->RainFall.numRainyHoursInWeather[i]);
+        }
+        // report site:precipitation
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
+            for (int i = 0; i < 12; i++) {
+                OutputReportPredefined::PreDefTableEntry(state,
+                                                         state.dataOutRptPredefined->pdchMonthlyTotalPrecInSitePrec,
+                                                         Months[i],
+                                                         state.dataWaterData->RainFall.MonthlyTotalPrecInSitePrec[i]);
+            }
         }
         // report rain collector
         if (state.dataWaterData->NumWaterStorageTanks > 0) {
