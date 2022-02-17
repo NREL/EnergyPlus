@@ -929,8 +929,7 @@ namespace EcoRoofManager {
             state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
         } else { // no schedule
             if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
-                // irrigation is just the rain amount
-                state.dataEcoRoofMgr->CurrentIrrigation = state.dataEcoRoofMgr->CurrentPrecipitation; // units of m
+                state.dataEcoRoofMgr->CurrentIrrigation = 0; // units of m
                 state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
             }
         }
