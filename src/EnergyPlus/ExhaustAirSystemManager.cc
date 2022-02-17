@@ -164,6 +164,7 @@ namespace ExhaustAirSystemManager {
 
                 std::string centralFanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
                 int centralFanTypeNum = 0;
+                // getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
 
                 if (UtilityRoutines::SameString(centralFanType, "Fan:SystemModel")) {
                     centralFanTypeNum = DataHVACGlobals::FanType_SystemModelObject;
@@ -442,14 +443,15 @@ namespace ExhaustAirSystemManager {
 
         Real64 mixerFlow_Posterior = 0.0;
         mixerFlow_Posterior = state.dataLoopNodes->Node(outletNode_index).MassFlowRate;
-        if (mixerFlow_Posterior < 1e-6) {
+        if (mixerFlow_Posterior < DataHVACGlobals::SmallMassFlow) {
             // fan flow is nearly zero and should be considered off
             // but this still can use the ratio
         }
-        if (mixerFlow_Prior < 1e-6) {
+        if (mixerFlow_Prior < DataHVACGlobals::SmallMassFlow) {
             // this is the case where the fan flow should be resetted to zeros and not run the ratio
         }
-        if ((mixerFlow_Prior - mixerFlow_Posterior > 1e-6) || (mixerFlow_Prior - mixerFlow_Posterior < -1e-6)) {
+        if ((mixerFlow_Prior - mixerFlow_Posterior > DataHVACGlobals::SmallMassFlow) ||
+            (mixerFlow_Prior - mixerFlow_Posterior < -DataHVACGlobals::SmallMassFlow)) {
             // calculate a ratio
             Real64 flowRatio = mixerFlow_Posterior / mixerFlow_Prior;
             if (flowRatio > 1.0) {
