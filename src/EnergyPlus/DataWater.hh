@@ -329,8 +329,6 @@ struct DataWaterData : BaseGlobalStruct
     bool AnyWaterSystemsInModel = false;    // control flag set true if any water systems
     bool WaterSystemGetInputCalled = false; // set true once input data gotten.
     bool AnyIrrigationInModel = false;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
-    bool UsePrecipitation = false;          // whether to include the rain fall amount in the actual irrigation amount
-    int PrecipInPlaceOfScheWarnIdx = 0;     // recurring warning index when precipitation in epw is used as site:precipitation is not defined
     int PrecipOverwrittenByRainFlag = 0;    // recurring warning index when the rain flag is on but the liquidprecipitation = 0
 
     void clear_state() override
@@ -347,8 +345,6 @@ struct DataWaterData : BaseGlobalStruct
         AnyWaterSystemsInModel = false;
         WaterSystemGetInputCalled = false;
         AnyIrrigationInModel = false;
-        UsePrecipitation = false;
-        PrecipInPlaceOfScheWarnIdx = 0;
         PrecipOverwrittenByRainFlag = 0;
     }
 };
