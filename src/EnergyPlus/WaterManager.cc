@@ -683,7 +683,6 @@ namespace WaterManager {
 
             if (NumIrrigation == 1) {
                 state.dataWaterData->AnyIrrigationInModel = true;
-                state.dataWaterData->UsePrecipitation = false;
                 state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
@@ -728,6 +727,13 @@ namespace WaterManager {
                 }
 
             } // NumIrrigation ==1
+
+            if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "Precipitation depth from the weather file will be used. Please make sure this .epw field has valid data. "
+                                               "Site:Precipitation may be used to override the weather file data.",
+                                               state.dataWaterData->PrecipInPlaceOfScheWarnIdx);
+            }
 
             state.dataWaterData->AnyWaterSystemsInModel = true;
             state.dataWaterData->WaterSystemGetInputCalled = true;

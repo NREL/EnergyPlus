@@ -2319,14 +2319,11 @@ namespace WeatherManager {
 
         // if using epw precipitation, throw warning
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
-            ShowRecurringWarningErrorAtEnd(
-                state,
-                "Precipitation depth in .epw is used as Site:Precipitation is not present. Please make sure this .epw field has valid data.",
-                state.dataWaterData->PrecipInPlaceOfScheWarnIdx);
             if ((state.dataEnvrn->LiquidPrecipitation == 0) && (state.dataEnvrn->IsRain)) {
                 state.dataEnvrn->LiquidPrecipitation = 1.5 / 1000.0;
                 ShowRecurringWarningErrorAtEnd(state,
-                                               "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm",
+                                               "Rain flag is on but precipitation depth in the weather file is missing or zero. Setting "
+                                               "precipitation depth to 1.5 mm for this hour.",
                                                state.dataWaterData->PrecipOverwrittenByRainFlag);
             }
         }
