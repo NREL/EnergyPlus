@@ -97,7 +97,6 @@ Begin Window Window1
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   True
-      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   1
       TabPanelIndex   =   0
@@ -142,7 +141,6 @@ Begin Window Window1
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   False
-      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   2
       TabPanelIndex   =   0
@@ -187,7 +185,6 @@ Begin Window Window1
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False
-      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   3
       TabPanelIndex   =   0
@@ -414,7 +411,6 @@ Begin Window Window1
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False
-      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   15
       TabPanelIndex   =   0
@@ -559,7 +555,6 @@ Begin Window Window1
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   True
-      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   19
       TabPanelIndex   =   0
@@ -891,9 +886,13 @@ End
 		  dim fileName as String
 		  dim s as String =""
 		  dim t as String =""
-		  dim u as string = ""
+		  dim u as String = ""
+		  dim v as String = ""
 		  dim newVersionWithDashes as String
 		  dim oldVersionWithDashes as String
+		  Var strParts() as String
+		  dim sortVersion as String
+		  Var allSortVersions() as String
 		  
 		  #if TargetMacOS
 		    transFolder = app.ExecutableFile.Parent.Parent.Parent.Parent
@@ -915,19 +914,35 @@ End
 		      '1234567890123456789012345678901
 		      ' this is the original line that did not work well with Linux because of use of the extension
 		      'if fileName.Left(12).Lowercase = "transition-v" and filename.right(4).Lowercase = ".exe" then
+		      
+		      ' to fix #9193 which is the lack of support for version numbers in the form 22.1.0
+		      'Transition-V9-6-0-to-V22-1-0.exe
+		      
 		      if fileName.Left(12).Lowercase = "transition-v" then
-		        oldVersionWithDashes = fileName.mid(13,5)
-		        newVersionWithDashes = fileName.mid(23,5)
+		        strParts = fileName.Split("V")
+		        oldVersionWithDashes = strParts(1)
+		        oldVersionWithDashes = oldVersionWithDashes.Replace("-to-","")
+		        newVersionWithDashes = strParts(2)
+		        newVersionWithDashes = newVersionWithDashes.Replace(".exe","")
+		        ' old way of doing this
+		        ' oldVersionWithDashes = fileName.mid(13,5)
+		        ' newVersionWithDashes = fileName.mid(23,5)
+		        sortVersion = newVersionWithDashes
+		        if sortVersion.mid(2,1) = "-" then
+		          sortVersion = "0" + sortVersion
+		        end if
 		        if newVersionWithDashes <> "" then
 		          AllOldVersions.Append  oldVersionWithDashes.ReplaceAll("-",".")
 		          AllNewVersions.Append  newVersionWithDashes.ReplaceAll("-",".")
 		          TransitionApps.Append f
+		          allSortVersions.Append sortVersion
 		        end if
 		      end if
 		    next i
 		  end if
 		  'sort the arrays (usually sorted already but just in case)
-		  AllNewVersions.SortWith(TransitionApps,AllOldVersions)
+		  'AllNewVersions.SortWith(TransitionApps,AllOldVersions)
+		  allSortVersions.SortWith(AllNewVersions,TransitionApps,AllOldVersions)
 		  
 		  ' THE FOLLOWING IS TO HELP DEBUG THE LIST OF TRANSITION EXE FILES
 		  'display the list
@@ -937,9 +952,13 @@ End
 		  'for i = 0 to TransitionApps.Ubound
 		  't = t + TransitionApps(i).name + EndOfLine
 		  'next i
-		  'MsgBox "Application program location:" + EndOfLine + "  " + transFolder.AbsolutePath + EndOfLine + EndOfLine + "Number of files: "  _
+		  'for i = 0 to TransitionApps.Ubound
+		  'v = v + allSortVersions(i) + EndOfLine
+		  'next i
+		  'MsgBox "Application program location:" + EndOfLine + "  " + transFolder.NativePath + EndOfLine + EndOfLine + "Number of files: "  _
 		  '+ str(numFiles) + EndOfLine + EndOfLine + "Versions found: " + EndOfLine + s +  EndOfLine + "Transition Programs:" _
-		  '+ EndOfLine + t + endofline + "All files: " + EndOfLine + u + EndOfLine
+		  '+ EndOfLine + "AllSortVersions" + EndOfLine + v + EndOfLine
+		  '+ EndOfLine + t + EndOfline + "All files: " + EndOfLine + u + EndOfLine _
 		  
 		  
 		  
@@ -1181,8 +1200,8 @@ End
 	#tag Event
 		Sub Action()
 		  dim t as String
-		  t = "IDF Version Updater - Version 0.13" + EndOfLine+ EndOfLine
-		  t = t + "Copyright (c) 2011-2015 GARD Analytics, All rights reserved." + EndOfLine+ EndOfLine
+		  t = "IDF Version Updater - Version 0.15" + EndOfLine+ EndOfLine
+		  t = t + "Copyright (c) 2011-2022 GARD Analytics, All rights reserved." + EndOfLine+ EndOfLine
 		  t = t + "NOTICE: The U.S. Government is granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to reproduce, prepare derivativeworks, and perform publicly and display publicly. Beginning five (5) years after permission to assert copyright is granted, subject to two possible five year renewals, the U.S. Government is granted for itself and others acting on its behalf a paid-up, non-exclusive,irrevocable worldwide license in this data to reproduce, prepare derivative works, distribute copies to the public,perform publicly and display publicly,and to permit others to do so." + EndOfLine+ EndOfLine
 		  t = t + "TRADEMARKS: EnergyPlus, DOE-2.1E, DOE-2, and DOE are trademarks of the US Department of Energy." + EndOfLine+ EndOfLine
 		  t = t + "DISCLAIMER OF WARRANTY AND LIMITATION OF LIABILITY: THIS SOFTWARE IS PROVIDED 'AS IS' WITHOUT WARRANTY OF ANY KIND. NEITHER GARD ANALYTICS, THE DEPARTMENT OF ENERGY, THE US GOVERNMENT, THEIR LICENSORS, OR ANY PERSON OR ORGANIZATION ACTING ON BEHALF OF ANY OF THEM:" + EndOfLine+ EndOfLine
