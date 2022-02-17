@@ -106,7 +106,8 @@ jobs:
       run: |
         set -x
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} -DPython_ROOT_DIR=${{ env.RUNNER_TOOL_CACHE }}/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.arch }}/ \
+              -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
               ../
 
