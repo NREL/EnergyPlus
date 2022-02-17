@@ -81,8 +81,8 @@ namespace ExhaustAirSystemManager {
         Real64 centralFan_Energy;
 
         // Output acc variable for heat rejection outputs
-        Real64 exhTotalHVACReliefHeatLoss; // exhstate.dataHeatBal->SysTotalHVACReliefHeatLoss
-        Real64 exhTotalHVACRejectHeatLoss; // state.dataHeatBal->SysTotalHVACRejectHeatLoss
+        Real64 exhTotalHVACReliefHeatLoss; // feed to state.dataHeatBal->SysTotalHVACReliefHeatLoss
+        Real64 exhTotalHVACRejectHeatLoss; // feed to state.dataHeatBal->SysTotalHVACRejectHeatLoss
 
         // Default Constructor
         ExhaustAir()
