@@ -362,9 +362,7 @@ namespace ExhaustAirSystemManager {
         bool ErrorsFound = false;
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
               state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-            MixerComponent::SimAirMixer(state,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+            MixerComponent::SimAirMixer(state, thisExhSys.ZoneMixerName, thisExhSys.ZoneMixerIndex);
         } else {
             // Give a warning that the current model does not work with AirflowNetwork for now
             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
@@ -393,28 +391,25 @@ namespace ExhaustAirSystemManager {
 
         int outletNode_Num = 0;
 
-        if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+        if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->simulate(state, _, _, _, _);
+            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _, _, _);
 
             // Update report variables
-            outletNode_Num = state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->outletNodeNum;
+            outletNode_Num = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->outletNodeNum;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate =
-                state.dataLoopNodes->Node(outletNode_Num).MassFlowRate;
+            thisExhSys.centralFan_MassFlowRate = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Std =
-                state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
+            thisExhSys.centralFan_VolumeFlowRate_Std = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Cur =
+            thisExhSys.centralFan_VolumeFlowRate_Cur =
                 state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power =
+            thisExhSys.centralFan_Power =
                 state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->fanPower();
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Energy =
-                state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power * state.dataHVACGlobal->TimeStepSys *
-                DataGlobalConstants::SecInHour;
+            thisExhSys.centralFan_Energy = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power *
+                                           state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             Fans::SimulateFanComponents(state,
@@ -424,21 +419,17 @@ namespace ExhaustAirSystemManager {
             // FanSpeedRatio, // ZoneCompTurnFansOn, // ZoneCompTurnFansOff);
 
             // Update output variables
-            auto &fancomp = state.dataFans->Fan(state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex);
+            auto &fancomp = state.dataFans->Fan(thisExhSys.CentralFanIndex);
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
+            thisExhSys.centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Std =
-                fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
+            thisExhSys.centralFan_VolumeFlowRate_Std = fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_VolumeFlowRate_Cur =
-                fancomp.OutletAirMassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
+            thisExhSys.centralFan_VolumeFlowRate_Cur = fancomp.OutletAirMassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
-            state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
+            thisExhSys.centralFan_Power = fancomp.FanPower * 1000.0;
 
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power = fancomp.FanPower * 1000.0;
-
-            state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Energy = fancomp.FanEnergy * 1000.0;
+            thisExhSys.centralFan_Energy = fancomp.FanEnergy * 1000.0;
         }
 
         Real64 mixerFlow_Posterior = 0.0;
@@ -461,17 +452,14 @@ namespace ExhaustAirSystemManager {
             }
 
             // get the mixer inlet node index
-            int zoneMixerIndex = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex;
-            int numInletLegs = state.dataMixerComponent->MixerCond(zoneMixerIndex).NumInletNodes;
-            for (int i = 1; i <= numInletLegs; ++i) {
+            int zoneMixerIndex = thisExhSys.ZoneMixerIndex;
+            for (int i = 1; i <= state.dataMixerComponent->MixerCond(zoneMixerIndex).NumInletNodes; ++i) {
                 int exhLegIndex = mixerIndexMap[state.dataMixerComponent->MixerCond(zoneMixerIndex).InletNode(i)];
                 CalcZoneHVACExhaustControl(state, exhLegIndex, flowRatio);
             }
 
             // Simulate the mixer again to update the flow
-            MixerComponent::SimAirMixer(state,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerName,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).ZoneMixerIndex);
+            MixerComponent::SimAirMixer(state, thisExhSys.ZoneMixerName, thisExhSys.ZoneMixerIndex);
 
             // if the adjustment matches, then no need to run fan simulation again.
         }
