@@ -725,10 +725,9 @@ namespace WaterManager {
             } // NumIrrigation ==1
 
             if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
-                ShowWarningError(
-                    state,
-                    "Precipitation depth from the weather file will be used. Please make sure this .epw field has valid data. "
-                    "Site:Precipitation may be used to override the weather file data.");
+                ShowWarningError(state,
+                                 "Precipitation depth from the weather file will be used. Please make sure this .epw field has valid data. "
+                                 "Site:Precipitation may be used to override the weather file data.");
             }
 
             state.dataWaterData->AnyWaterSystemsInModel = true;
