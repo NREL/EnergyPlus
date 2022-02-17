@@ -176,7 +176,8 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
 }
 
-TEST_F(EnergyPlusFixture, WaterManager_RainIrrigationMode) {
+TEST_F(EnergyPlusFixture, WaterManager_RainIrrigationMode)
+{
 
     std::string idf_objects = delimited_string({
         "Site:Precipitation,",
