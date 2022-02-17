@@ -3,7 +3,6 @@ Begin Window Window1
    BackColor       =   &cFFFFFF00
    Backdrop        =   0
    CloseButton     =   True
-   Compatibility   =   ""
    Composite       =   False
    Frame           =   0
    FullScreen      =   False
@@ -11,7 +10,7 @@ Begin Window Window1
    HasBackColor    =   False
    Height          =   200
    ImplicitInstance=   True
-   LiveResize      =   True
+   LiveResize      =   "True"
    MacProcID       =   0
    MaxHeight       =   200
    MaximizeButton  =   False
@@ -63,6 +62,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   47
+      Transparent     =   True
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -97,7 +97,7 @@ Begin Window Window1
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   True
-      MenuValue       =   0
+      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   1
       TabPanelIndex   =   0
@@ -107,6 +107,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   14
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -141,7 +142,7 @@ Begin Window Window1
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   False
-      MenuValue       =   0
+      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   2
       TabPanelIndex   =   0
@@ -151,6 +152,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   153
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -185,7 +187,7 @@ Begin Window Window1
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False
-      MenuValue       =   0
+      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   3
       TabPanelIndex   =   0
@@ -195,6 +197,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   153
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -227,6 +230,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   83
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -254,6 +258,7 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   10
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "New Version"
       TextAlign       =   1
       TextColor       =   &c00000000
@@ -288,6 +293,7 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   12
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "-->"
       TextAlign       =   1
       TextColor       =   &c00000000
@@ -338,6 +344,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   107
+      Transparent     =   True
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -365,6 +372,7 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   14
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Current Version"
       TextAlign       =   1
       TextColor       =   &c00000000
@@ -406,7 +414,7 @@ Begin Window Window1
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False
-      MenuValue       =   0
+      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   15
       TabPanelIndex   =   0
@@ -416,6 +424,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   153
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -448,6 +457,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   107
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -480,6 +490,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   104
+      Transparent     =   True
       Underline       =   False
       Visible         =   True
       Width           =   71
@@ -506,6 +517,7 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   18
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Processing"
       TextAlign       =   0
       TextColor       =   &c0000FF00
@@ -547,7 +559,7 @@ Begin Window Window1
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   True
-      MenuValue       =   0
+      MenuValue       =   "0"
       Scope           =   0
       TabIndex        =   19
       TabPanelIndex   =   0
@@ -557,6 +569,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   7
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -669,7 +682,7 @@ End
 		        end if
 		      end if
 		      'delete the Transition.audit file
-		      auditSource = new FolderItem(dirOfTransApp.AbsolutePath + "Transition.audit")
+		      auditSource = new FolderItem(dirOfTransApp.NativePath + "Transition.audit")
 		      if auditSource.Exists then
 		        auditSource.Delete
 		      end if
@@ -682,11 +695,11 @@ End
 		        'for windows
 		        #if TargetWin32
 		          cmdLine = "CD /D " ' this changes the directory and drive - must end with a space
-		          cmdLine = cmdLine + chr(34) + dirOfTransApp.AbsolutePath + chr(34) 'change to the directory of the transition app because needs to find IDD files in that location - use shellpath to eliminate spaces
+		          cmdLine = cmdLine + chr(34) + dirOfTransApp.NativePath + chr(34) 'change to the directory of the transition app because needs to find IDD files in that location - use shellpath to eliminate spaces
 		          cmdLine = cmdLine + " && " 'this is DOS function that joins to commands on the same line and only does the second if the first was successful - need spaces before and after
 		          cmdLine = cmdLine + TransitionApps(iVer).name 'this is the name of the Transition program
 		          cmdLine = cmdLine + " " ' leave a space before the argument
-		          cmdLine = cmdLine + chr(34) + origFile.AbsolutePath + chr(34) 'pass the name of the file to be transitioned as an argument
+		          cmdLine = cmdLine + chr(34) + origFile.NativePath + chr(34) 'pass the name of the file to be transitioned as an argument
 		        #else
 		          'for Linux and MacOS assuming using Bash shell
 		          cmdLine = "cd " ' this changes the directory and drive - must end with a space
@@ -759,7 +772,7 @@ End
 		      
 		      'show summary message
 		      if showSummary then
-		        MsgBox "Completed transition of:" + EndOfLine + EndOfLine + origFile.AbsolutePath + EndOfLine + EndOfLine + "From " + inOrigVersion + " to " + inFinalVersion
+		        MsgBox "Completed transition of:" + EndOfLine + EndOfLine + origFile.NativePath + EndOfLine + EndOfLine + "From " + inOrigVersion + " to " + inFinalVersion
 		      end if
 		    elseif origFile.Exists and origVerIndx=notFound then
 		      ' the file has no VERSION object at all.
@@ -1058,9 +1071,9 @@ End
 		  dlg.filter = idfType  + idmType + lstType
 		  f = dlg.ShowModal()
 		  if f<>nil then
-		    txtFileName.Text = f.AbsolutePath
+		    txtFileName.Text = f.NativePath
 		    txtFileName.Enabled = True
-		    if extensionOnly(f.AbsolutePath) <> "LST" then 'IDF or IDM files are processed
+		    if extensionOnly(f.NativePath) <> "LST" then 'IDF or IDM files are processed
 		      curVersion =  getCurrentFileVersion(f)
 		      if curVersion<>"" then
 		        txtCurrentVersion.Text = curVersion
@@ -1068,7 +1081,7 @@ End
 		        pmnuNewVersion.Enabled = True
 		        call FillLaterVersions(curVersion)
 		        'enable the View Audit button if exists.
-		        auditFile = new FolderItem(fileNameWithoutExtension(f.AbsolutePath) + "_transition.audit" )
+		        auditFile = new FolderItem(fileNameWithoutExtension(f.NativePath) + "_transition.audit" )
 		        if auditFile.Exists then
 		          cmdViewAudit.Enabled = True
 		        else
