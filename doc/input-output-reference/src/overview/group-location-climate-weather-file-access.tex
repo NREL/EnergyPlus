@@ -1360,7 +1360,7 @@ Alpha field indicates whether horizontal insulation is present. Options include 
 
 \paragraph{Field: Horizontal Insulation Material Name}\label{field-horizontal-insulation-material-name}
 
-This alpha field is the name of a material object representing the horizontal slab insulation. It should be noted that the material listed here cannot be a "no mass" material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if horizontal insulation is present.
+This alpha field is the name of a material object representing the horizontal slab insulation. It should be noted that the material listed here cannot be a ``no mass'' material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if horizontal insulation is present.
 
 \paragraph{Field: Horizontal Insulation Extents}\label{field-horizontal-insulation-extents}
 
@@ -1376,7 +1376,7 @@ Alpha field indicates whether vertical insulation is present. Options include ``
 
 \paragraph{Field: Vertical Insulation Name}\label{field-vertical-insulation-name}
 
-This alpha field is the name of a material object representing the vertical slab insulation. It should be noted that the material listed here cannot be a "no mass" material  (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if vertical insulation is present.
+This alpha field is the name of a material object representing the vertical slab insulation. It should be noted that the material listed here cannot be a ``no mass'' material  (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if vertical insulation is present.
 
 \paragraph{Field: Vertical Insulation Depth}\label{field-vertical-insulation-depth}
 
@@ -1570,7 +1570,7 @@ Alpha field indicates whether horizontal insulation is present. Options include 
 
 \paragraph{Field: Horizontal Insulation Name}\label{field-horizontal-insulation-name}
 
-This alpha field is the name of a material object representing the horizontal underfloor basement insulation. It should be noted that the material listed here cannot be a "no mass" material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if horizontal insulation is present.
+This alpha field is the name of a material object representing the horizontal underfloor basement insulation. It should be noted that the material listed here cannot be a ``no mass'' material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if horizontal insulation is present.
 
 \paragraph{Field: Horizontal Insulation Extents}\label{field-horizontal-insulation-extents-1}
 
@@ -1827,14 +1827,14 @@ Schedule, or SmartSchedule. Up till version 9.6, the schedule objects are
 necessary to describe the rates of roof irrigation. For newer versions, if the
 schedule is not defined, precipitation depth in the weather input .epw will be
 used instead. A flag ``Use Precipitation'' is added in RoofIrrigation input. When
-this flag is "Yes", the actual irrigation amount will count both the irrigation
+this flag is ``Yes'', the actual irrigation amount will count both the irrigation
 from the pipes and the rainfall. Otherwise, it will only consider the
 irrigation from pipes. When rainfall data in the weather file is used, a
 warning message will be displayed. Please make sure the precipitation in the
 .epw is accurate. This \href{table by the State Climate Extreme
 Committee}{https://www.ncdc.noaa.gov/extremes/scec/records/all/maxp} could be a
 reference for sanity check of extreme values in the precipitation data. The
-tabular report "Monthly Precipitation Summary" provides a monthly summary of
+tabular report ``Monthly Precipitation Summary'' provides a monthly summary of
 rainfall in the weather file and the amount used in the roof irrigation.
 
 \subsubsection{Inputs}\label{inputs-23-002}
@@ -1849,7 +1849,7 @@ Name of a schedule defined elsewhere that describes the rate of irrigation. The 
 
 \paragraph{Field: Use Precipitation}\label{field-use-precipitation}
 
-Use Precipitation is a Yes/No choice field. If it is set to "Yes", then the
+Use Precipitation is a Yes/No choice field. If it is set to ``Yes'', then the
 actual irrigation amount will include the rainfall quantity. Otherwise, it
 will only count the irrigation from the pipes. The default is not to include
 rainfall as part of the irrigation.
