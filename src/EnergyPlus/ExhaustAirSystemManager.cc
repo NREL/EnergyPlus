@@ -714,6 +714,8 @@ namespace ExhaustAirSystemManager {
         auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(ZoneHVACExhaustControlNum);
         int InletNode = thisExhCtrl.InletNodeNum;
         int OutletNode = thisExhCtrl.OutletNodeNum;
+        auto &thisExhInlet = state.dataLoopNodes->Node(InletNode);
+        auto &thisExhOutlet = state.dataLoopNodes->Node(OutletNode);
         Real64 MassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         Real64 Tin = state.dataHeatBalFanSys->ZT(thisExhCtrl.ZoneNum);
 
@@ -721,12 +723,12 @@ namespace ExhaustAirSystemManager {
             thisExhCtrl.BalancedFlow *= FlowRatio;
             thisExhCtrl.UnbalancedFlow *= FlowRatio;
 
-            state.dataLoopNodes->Node(InletNode).MassFlowRate *= FlowRatio;
+            thisExhInlet.MassFlowRate *= FlowRatio;
         } else {
             // Availability schedule:
             if (ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
                 MassFlow = 0.0;
-                state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+                thisExhInlet.MassFlowRate = 0.0;
             } else {
                 //
             }
@@ -789,33 +791,33 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.UnbalancedFlow = MassFlow;
             }
 
-            state.dataLoopNodes->Node(InletNode).MassFlowRate = MassFlow;
+            thisExhInlet.MassFlowRate = MassFlow;
         }
 
-        state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        thisExhOutlet.MassFlowRate = thisExhInlet.MassFlowRate;
 
-        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
-        state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-        state.dataLoopNodes->Node(OutletNode).Enthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
+        thisExhOutlet.Temp = thisExhInlet.Temp;
+        thisExhOutlet.HumRat = thisExhInlet.HumRat;
+        thisExhOutlet.Enthalpy = thisExhInlet.Enthalpy;
         // Set the outlet nodes for properties that just pass through & not used
-        state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
-        state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+        thisExhOutlet.Quality = thisExhInlet.Quality;
+        thisExhOutlet.Press = thisExhInlet.Press;
 
         // More node elements
-        state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
-        state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
+        thisExhOutlet.MassFlowRateMax = thisExhInlet.MassFlowRateMax;
+        thisExhOutlet.MassFlowRateMaxAvail = thisExhInlet.MassFlowRateMaxAvail;
 
         // Set the Node Flow Control Variables from the Fan Control Variables
-        state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
+        thisExhOutlet.MassFlowRateMaxAvail = thisExhInlet.MassFlowRateMaxAvail;
+        thisExhOutlet.MassFlowRateMinAvail = thisExhInlet.MassFlowRateMinAvail;
 
         // these might also be useful to pass through
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+            thisExhOutlet.CO2 = thisExhInlet.CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+            thisExhOutlet.GenContam = thisExhInlet.GenContam;
         }
     }
 
