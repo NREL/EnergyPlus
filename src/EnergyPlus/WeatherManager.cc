@@ -480,14 +480,14 @@ namespace WeatherManager {
                                 state.dataWaterData->RainFall.CurrentRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                "Site:Precipitation");
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Precipitation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataWaterData->RainFall.CurrentAmount,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                "Site:Precipitation");
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Ground Reflected Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
