@@ -1826,10 +1826,7 @@ irrigation in meters per hour. These schedules can be one of two types:
 Schedule, or SmartSchedule. Up till version 9.6, the schedule objects are
 necessary to describe the rates of roof irrigation. For newer versions, if the
 schedule is not defined, precipitation depth in the weather input .epw will be
-used instead. A flag ``Use Precipitation'' is added in RoofIrrigation input. When
-this flag is ``Yes'', the actual irrigation amount will count both the irrigation
-from the pipes and the rainfall. Otherwise, it will only consider the
-irrigation from pipes. When rainfall data in the weather file is used, a
+used instead. When rainfall data in the weather file is used, a
 warning message will be displayed. Please make sure the precipitation in the
 .epw is accurate. This \href{table by the State Climate Extreme
 Committee}{https://www.ncdc.noaa.gov/extremes/scec/records/all/maxp} could be a
@@ -1846,13 +1843,6 @@ Choose irrigation modeling options. Available options are \textbf{Schedule} and 
 \paragraph{Field: Irrigation Rate Schedule Name}\label{field-irrigation-rate-schedule-name}
 
 Name of a schedule defined elsewhere that describes the rate of irrigation. The values in this schedule are the average rate of irrigation in meters per hour.
-
-\paragraph{Field: Use Precipitation}\label{field-use-precipitation}
-
-Use Precipitation is a Yes/No choice field. If it is set to ``Yes'', then the
-actual irrigation amount will include the rainfall quantity. Otherwise, it
-will only count the irrigation from the pipes. The default is not to include
-rainfall as part of the irrigation.
 
 \paragraph{Field: Irrigation Maximum Saturation Threshold}\label{field-irrigation-maximum-saturation-threshold}
 
