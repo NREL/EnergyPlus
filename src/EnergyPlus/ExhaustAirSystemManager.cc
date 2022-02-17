@@ -88,16 +88,13 @@ namespace ExhaustAirSystemManager {
 
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration)
     {
-        // Locals
-        int ExhaustAirSystemNum;
-
         // Obtains and Allocates Mixer related parameters from input file
         if (state.dataExhAirSystemMrg->GetInputFlag) { // First time subroutine has been entered
             GetExhaustAirSystemInput(state);
             state.dataExhAirSystemMrg->GetInputFlag = false;
         }
 
-        for (ExhaustAirSystemNum = 1; ExhaustAirSystemNum <= state.dataZoneEquip->NumExhaustAirSystems; ++ExhaustAirSystemNum) {
+        for (int ExhaustAirSystemNum = 1; ExhaustAirSystemNum <= state.dataZoneEquip->NumExhaustAirSystems; ++ExhaustAirSystemNum) {
             CalcExhaustAirSystem(state, ExhaustAirSystemNum, FirstHVACIteration);
         }
 
@@ -109,14 +106,13 @@ namespace ExhaustAirSystemManager {
     {
         // Locals
         bool IsNotOK; // Flag to verify name
-
         bool ErrorsFound = false;
 
         if (allocated(state.dataZoneEquip->ExhaustAirSystem)) {
             return;
         }
 
-        constexpr const char *RoutineName("GetExhaustAirSystemInput: ");
+        constexpr std::string_view RoutineName("GetExhaustAirSystemInput: ");
         std::string cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
@@ -149,15 +145,15 @@ namespace ExhaustAirSystemManager {
                     // See if need to do the zone mixer's CheckEquipName() function
                     ValidateComponent(state, "AirLoopHVAC:ZoneMixer", zoneMixerName, IsNotOK, "AirLoopHVAC:ExhaustSystem");
                     if (IsNotOK) {
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                        ShowContinueError(state, "ZoneMixer Name =" + zoneMixerName + " mismatch or not found.");
+                        ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
+                        ShowContinueError(state, format("ZoneMixer Name ={} mismatch or not found.", zoneMixerName));
                         ErrorsFound = true;
                     } else {
                         // normal conditions
                     }
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "ZoneMixer Name =" + zoneMixerName + "not found.");
+                    ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
+                    ShowContinueError(state, format("Zone Mixer Name ={} not found.", zoneMixerName));
                     ErrorsFound = true;
                 }
                 thisExhSys.ZoneMixerName = zoneMixerName;
@@ -172,9 +168,9 @@ namespace ExhaustAirSystemManager {
                 } else if (UtilityRoutines::SameString(centralFanType, "Fan:ComponentModel")) {
                     centralFanTypeNum = DataHVACGlobals::FanType_ComponentModel;
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "Fan Type =" + centralFanType + "not supported; ");
-                    ShowContinueError(state, "it needs to be either Fan:SystemModel or Fan:ComponentModel.");
+                    ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
+                    ShowContinueError(state, format("Fan Type ={} is not supported.", centralFanType));
+                    ShowContinueError(state, "It needs to be either a Fan:SystemModel or a Fan:ComponentModel type.");
                     ErrorsFound = true;
                 }
                 thisExhSys.CentralFanTypeNum = centralFanTypeNum;
@@ -233,8 +229,8 @@ namespace ExhaustAirSystemManager {
                     } else {
                         centralFanIndex = -1;
                         // here a severe error message is needed
-                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                        ShowContinueError(state, "Fan Name =" + centralFanName + "not found.");
+                        ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
+                        ShowContinueError(state, format("Fan Name ={} not found.", centralFanName));
                         ErrorsFound = true;
                     }
                 } else if (centralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
@@ -244,13 +240,13 @@ namespace ExhaustAirSystemManager {
                     Fans::GetFanType(state, centralFanName, fanType_Num_Check, isNotOK, cCurrentModuleObject, thisExhSys.Name);
 
                     if (isNotOK) {
-                        ShowSevereError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
+                        ShowSevereError(state, format("Occurs in {} = {}.", cCurrentModuleObject, thisExhSys.Name));
                         ErrorsFound = true;
                     } else {
                         isNotOK = false;
                         ValidateComponent(state, centralFanType, centralFanName, isNotOK, cCurrentModuleObject);
                         if (isNotOK) {
-                            ShowSevereError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
+                            ShowSevereError(state, format("Occurs in {} = {}.", cCurrentModuleObject, thisExhSys.Name));
                             ErrorsFound = true;
                         } else { // mine data from fan object
                             bool errFlag(false);
@@ -307,15 +303,15 @@ namespace ExhaustAirSystemManager {
                                                 thisExhSys.Name);
 
                             if (errFlag) {
-                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisExhSys.Name);
+                                ShowContinueError(state, format("Occurs in {} = {}.", cCurrentModuleObject, thisExhSys.Name));
                                 ErrorsFound = true;
                             }
                         }
                     }
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "Fan Type =" + centralFanType + "not supported; ");
-                    ShowContinueError(state, "it needs to be either Fan:SystemModel or Fan:ComponentModel.");
+                    ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
+                    ShowContinueError(state, format("Fan Type ={} is not supported.", centralFanType));
+                    ShowContinueError(state, "It needs to be either a Fan:SystemModel or a Fan:ComponentModel type.");
                     ErrorsFound = true;
                 }
 
@@ -328,7 +324,7 @@ namespace ExhaustAirSystemManager {
                 } else { // no match
                     availSchNum = 0;
                     // a regular warning
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
                     ShowContinueError(state, "Could not find a match for Central Exhaust Fan's Avaiability Schedule.");
                     ShowContinueError(state, "It will be treated as always available.");
                 }
@@ -358,7 +354,7 @@ namespace ExhaustAirSystemManager {
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
 
-        std::string RoutineName = "CalExhaustAirSystem: ";
+        constexpr std::string_view RoutineName = "CalExhaustAirSystem: ";
         std::string cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
         bool ErrorsFound = false;
         if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
@@ -366,7 +362,7 @@ namespace ExhaustAirSystemManager {
             MixerComponent::SimAirMixer(state, thisExhSys.ZoneMixerName, thisExhSys.ZoneMixerIndex);
         } else {
             // Give a warning that the current model does not work with AirflowNetwork for now
-            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+            ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
             ShowContinueError(state, "AirloopHVAC:ExhaustSystem currently does not work with AirflowNetwork.");
             ErrorsFound = true;
         }
@@ -448,7 +444,7 @@ namespace ExhaustAirSystemManager {
             // calculate a ratio
             Real64 flowRatio = mixerFlow_Posterior / mixerFlow_Prior;
             if (flowRatio > 1.0) {
-                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
                 ShowContinueError(state, "Requested flow rate is lower than the exhasut fan flow rate.");
                 ShowContinueError(state, "Will scale up the requested flow rate to meet fan flow rate.");
             }
@@ -481,7 +477,7 @@ namespace ExhaustAirSystemManager {
         bool ErrorsFound = false;
 
         // Use the json helper to process input
-        constexpr const char *RoutineName("GetZoneExhaustControlInput: ");
+        constexpr std::string_view RoutineName("GetZoneExhaustControlInput: ");
         std::string cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
@@ -514,8 +510,8 @@ namespace ExhaustAirSystemManager {
                 } else {
                     availSchNum = 0;
                     // a regular warning
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
-                    ShowContinueError(state, "Avaiability Manager Name = " + availSchName + "not found.");
+                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                    ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
                 }
                 thisExhCtrl.AvailScheduleNum = availSchNum;
 
@@ -577,8 +573,8 @@ namespace ExhaustAirSystemManager {
                 } else {
                     exhaustFlowFractionScheduleNum = 0;
                     // a regular warning
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
-                    ShowContinueError(state, "Schedule Name =" + exhaustFlowFractionScheduleName + "not found.");
+                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                    ShowContinueError(state, format("Schedule Name = {} not found.", exhaustFlowFractionScheduleName));
                 }
                 thisExhCtrl.ExhaustFlowFractionScheduleNum = exhaustFlowFractionScheduleNum;
 
@@ -612,8 +608,8 @@ namespace ExhaustAirSystemManager {
                     for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
                         CheckForSupplyNode(state, thisExhCtrl.SuppNodeNums(i), nodeNotFound);
                         if (nodeNotFound) {
-                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
-                            ShowContinueError(state, "Node or NodeList Name =" + supplyNodeOrNodelistName + ". Must all be supply node(s).");
+                            ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                            ShowContinueError(state, format("Node or NodeList Name ={}. Must all be supply nodes.", supplyNodeOrNodelistName));
                             ErrorsFound = true;
                         }
                     }
@@ -636,8 +632,8 @@ namespace ExhaustAirSystemManager {
                 } else {
                     minZoneTempLimitScheduleNum = 0;
                     // a regular warning
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
-                    ShowContinueError(state, "Schedule Name =" + minZoneTempLimitScheduleName + "not found.");
+                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                    ShowContinueError(state, format("Schedule Name ={} not found.", minZoneTempLimitScheduleName));
                 }
                 thisExhCtrl.MinZoneTempLimitScheduleNum = minZoneTempLimitScheduleNum;
 
@@ -654,8 +650,8 @@ namespace ExhaustAirSystemManager {
                 } else {
                     minExhFlowFracScheduleNum = 0;
                     // a regular warning
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
-                    ShowContinueError(state, "Schedule Name =" + minExhFlowFracScheduleName + "not found.");
+                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                    ShowContinueError(state, format("Schedule Name ={} not found.", minExhFlowFracScheduleName));
                 }
                 thisExhCtrl.MinExhFlowFracScheduleNum = minExhFlowFracScheduleNum;
 
@@ -672,8 +668,8 @@ namespace ExhaustAirSystemManager {
                 } else {
                     balancedExhFracScheduleNum = 0;
                     // a regular warning
-                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
-                    ShowContinueError(state, "Schedule Name =" + balancedExhFracScheduleName + "not found.");
+                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                    ShowContinueError(state, format("Schedule Name ={} not found.", balancedExhFracScheduleName));
                 }
 
                 // Maybe an additional check per IORef:
