@@ -186,7 +186,7 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
@@ -4413,6 +4413,12 @@
   Output:Variable,*,Water Use Equipment Drain Water Temperature,timestep;
 
   Output:Variable,*,Water System Rainwater Collector Volume,timestep;
+
+  Output:Variable,*,Site Precipitation Rate,timestep;
+
+  Output:Variable,*,Site Precipitation Depth,timestep;
+
+  Output:Variable,*,Liquid Precipitation Depth,timestep;
 
   Output:Variable,*,Water System Storage Tank Overflow Volume Flow Rate,timestep;
 
