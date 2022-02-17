@@ -51,6 +51,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -843,17 +844,30 @@ namespace ExhaustAirSystemManager {
 
         // then central exhasut fan sizing here:
         if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
+            if (state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate == DataSizing::AutoSize) {
+                state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
+            }
+            BaseSizer::reportSizerOutput(state,
+                                         "FAN:SYSTEMMODEL",
+                                         state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->name,
+                                         "Design Fan Airflow [m3/s]",
+                                         state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate);
         } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
-            state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate =
-                outletFlowMaxAvail * state.dataFans->Fan(thisExhSys.CentralFanIndex).FanSizingFactor;
+            if (state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate == DataSizing::AutoSize) {
+                state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate =
+                    outletFlowMaxAvail * state.dataFans->Fan(thisExhSys.CentralFanIndex).FanSizingFactor;
+            }
+            BaseSizer::reportSizerOutput(state,
+                                         state.dataFans->Fan(thisExhSys.CentralFanIndex).FanType,
+                                         state.dataFans->Fan(thisExhSys.CentralFanIndex).FanName,
+                                         "Design Fan Airflow [m3/s]",
+                                         state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate);
+        } else {
+            //
         }
 
         // after evertyhing sized, set the sizing flag
         thisExhSys.SizingFlag = false;
-
-        // Sizing and write fan sizing to eio report: example code in SizeFan() in Fan.cc:
-        // BaseSizer::reportSizerOutput(state, Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
     }
 
     void SizeExhaustControlFlow(EnergyPlusData &state, int const zoneExhCtrlNum, Array1D_int &NodeNums)
