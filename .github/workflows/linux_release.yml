@@ -21,6 +21,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set up Python ${{ env.PYTHON_VERSION }}
+      id: setup-python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ env.PYTHON_VERSION }}
@@ -51,7 +52,7 @@ jobs:
       shell: bash
       run: |
         cmake -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ env.PYTHON_VERSION }} -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" -DENABLE_PCH:BOOL=OFF \
               ../
 

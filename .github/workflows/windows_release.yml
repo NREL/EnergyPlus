@@ -35,6 +35,7 @@ jobs:
 
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v2
+      id: setup-python
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         architecture: ${{ matrix.arch }}
@@ -105,7 +106,7 @@ jobs:
       run: |
         set -x
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ env.PYTHON_VERSION }} -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
               ../
 
