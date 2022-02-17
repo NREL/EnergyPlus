@@ -80,11 +80,15 @@ namespace ExhaustAirSystemManager {
         Real64 centralFan_Power;
         Real64 centralFan_Energy;
 
+        // Output acc variable for heat rejection outputs
+        Real64 exhTotalHVACReliefHeatLoss; // exhstate.dataHeatBal->SysTotalHVACReliefHeatLoss
+        Real64 exhTotalHVACRejectHeatLoss; // state.dataHeatBal->SysTotalHVACRejectHeatLoss
+
         // Default Constructor
         ExhaustAir()
             : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanName(""), CentralFanIndex(0),
               SizingFlag(true), centralFan_MassFlowRate(0.0), centralFan_VolumeFlowRate_Std(0.0), centralFan_VolumeFlowRate_Cur(0.0),
-              centralFan_Power(0.0), centralFan_Energy(0.0)
+              centralFan_Power(0.0), centralFan_Energy(0.0), exhTotalHVACReliefHeatLoss(0.0), exhTotalHVACRejectHeatLoss(0.0)
         {
         }
     };

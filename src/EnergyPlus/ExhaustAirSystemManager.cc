@@ -428,6 +428,11 @@ namespace ExhaustAirSystemManager {
 
             thisExhSys.centralFan_Energy = fancomp.FanEnergy * 1000.0;
         }
+        thisExhSys.exhTotalHVACReliefHeatLoss = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate *
+                                                (state.dataLoopNodes->Node(outletNode_Num).Enthalpy - state.dataEnvrn->OutEnthalpy);
+
+        thisExhSys.exhTotalHVACRejectHeatLoss = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate *
+                                                (state.dataLoopNodes->Node(outletNode_Num).Enthalpy - state.dataEnvrn->OutEnthalpy);
 
         Real64 mixerFlow_Posterior = 0.0;
         mixerFlow_Posterior = state.dataLoopNodes->Node(outletNode_index).MassFlowRate;
