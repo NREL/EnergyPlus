@@ -67,7 +67,7 @@ jobs:
     - name: Build Package
       working-directory: ./build
       shell: bash
-      run: cmake --build . --target package -j 2
+      run: cmake --build . --target package -j 3
 
     - name: Upload Tarball to release
       uses: svenstaro/upload-release-action@v2
