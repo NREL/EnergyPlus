@@ -6293,10 +6293,10 @@ namespace WindowManager {
         Real64 Bfac;
         Real64 Dfac;
         Real64 Efac;
-        DataSurfaces::FrameDividerType DivType;   // Divider type
-        Real64 DivCon;     // Divider conductance (W/m2-K)
-        Real64 DivEmisIn;  // Inside divider emissivity
-        Real64 DivEmisOut; // Outside divider emissivity
+        DataSurfaces::FrameDividerType DivType; // Divider type
+        Real64 DivCon;                          // Divider conductance (W/m2-K)
+        Real64 DivEmisIn;                       // Inside divider emissivity
+        Real64 DivEmisOut;                      // Outside divider emissivity
 
         Real64 ProjCorrFrOut; // Outside correction factor for absorbed radiation
         //   for frame with outside projection
