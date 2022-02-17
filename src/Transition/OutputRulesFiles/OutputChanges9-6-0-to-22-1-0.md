@@ -128,9 +128,8 @@ A tabular report of precipitation related variables was added to the
 Climatic Data Summary section. It summarizes the following quantities
 - Monthly Total Precipitation in mm from the weather file
 - Monthly Total Hours of Rain in mm from the weather file
-- Monthly Total Precipitation Used in Roof Irrigation in mm
+- Monthly Total Precipitation in Site:Precipitation [mm]
 - Monthly Total Roof Irrigation Depth in mm
-- Monthly Total Precipitation Used in Rain Collector in mm
 - Monthly Total Rain Collection Volume in m3
 
 Three rows are added to the Weather Statistics File reporting table:
