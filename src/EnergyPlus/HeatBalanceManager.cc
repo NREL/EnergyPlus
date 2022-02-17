@@ -6610,8 +6610,6 @@ namespace HeatBalanceManager {
         Array1D<Real64> FrameDividerProps(23); // Temporary array to transfer frame/divider properties
         int Loop;
 
-        constexpr std::array<std::string_view, 2> DividerTypesUC = {"DIVIDEDLITE", "SUSPENDED"};
-
         state.dataHeatBalMgr->CurrentModuleObject = "WindowProperty:FrameAndDivider";
         state.dataHeatBal->TotFrameDivider =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
@@ -6654,8 +6652,9 @@ namespace HeatBalanceManager {
             frameDivider.FrameVisAbsorp = FrameDividerProps(7);
             frameDivider.FrameEmis = FrameDividerProps(8);
 
-            int currentDividerType = getEnumerationValue(DividerTypesUC, FrameDividerAlphas(2));
-            if (currentDividerType == -1) {
+            DataSurfaces::FrameDividerType currentDividerType =
+                DataSurfaces::FrameDividerType(getEnumerationValue(DataSurfaces::FrameDividerTypeNamesUC, FrameDividerAlphas(2)));
+            if (currentDividerType == DataSurfaces::FrameDividerType::Invalid) {
                 ShowWarningError(state,
                                  fmt::format("{}={}, Invalid {}",
                                              state.dataHeatBalMgr->CurrentModuleObject,
@@ -6664,7 +6663,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(
                     state,
                     fmt::format("Entered={}, must be DividedLite or Suspended.  Will be set to DividedLite.", std::quoted(FrameDividerAlphas(2))));
-                frameDivider.DividerType = DividedLite;
+                frameDivider.DividerType = DataSurfaces::FrameDividerType::DividedLite;
             } else {
                 frameDivider.DividerType = currentDividerType;
             }
@@ -6674,7 +6673,7 @@ namespace HeatBalanceManager {
             frameDivider.VertDividers = FrameDividerProps(11);
             frameDivider.DividerProjectionOut = FrameDividerProps(12);
             frameDivider.DividerProjectionIn = FrameDividerProps(13);
-            if (frameDivider.DividerWidth == 0.0 || frameDivider.DividerType == Suspended) {
+            if (frameDivider.DividerWidth == 0.0 || frameDivider.DividerType == DataSurfaces::FrameDividerType::Suspended) {
                 frameDivider.DividerProjectionOut = 0.0;
                 frameDivider.DividerProjectionIn = 0.0;
             }
@@ -6683,14 +6682,12 @@ namespace HeatBalanceManager {
             frameDivider.DividerSolAbsorp = FrameDividerProps(16);
             frameDivider.DividerVisAbsorp = FrameDividerProps(17);
             frameDivider.DividerEmis = FrameDividerProps(18);
-            frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
 
             // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductName
-            for (unsigned int i = 0; i < DataSurfaces::NfrcProductNameUC.size(); ++i) {
-                if (DataSurfaces::NfrcProductNameUC[i] == FrameDividerAlphas(3)) {
-                    frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions(i);
-                    break;
-                }
+            frameDivider.NfrcProductType =
+                DataSurfaces::NfrcProductOptions(getEnumerationValue(DataSurfaces::NfrcProductNamesUC, FrameDividerAlphas(3)));
+            if (frameDivider.NfrcProductType == DataSurfaces::NfrcProductOptions::Invalid) {
+                frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
             }
 
             frameDivider.OutsideRevealSolAbs = FrameDividerProps(19);
@@ -7648,9 +7645,9 @@ namespace HeatBalanceManager {
                         state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
                     }
                     if (UtilityRoutines::SameString(DividerType(IGlSys), "DividedLite")) {
-                        state.dataSurface->FrameDivider(FrDivNum).DividerType = DividedLite;
+                        state.dataSurface->FrameDivider(FrDivNum).DividerType = DataSurfaces::FrameDividerType::DividedLite;
                     } else if (UtilityRoutines::SameString(DividerType(IGlSys), "Suspended")) {
-                        state.dataSurface->FrameDivider(FrDivNum).DividerType = Suspended;
+                        state.dataSurface->FrameDivider(FrDivNum).DividerType = DataSurfaces::FrameDividerType::Suspended;
                     }
                     state.dataSurface->FrameDivider(FrDivNum).DividerWidth = DividerWidth(IGlSys);
                     state.dataSurface->FrameDivider(FrDivNum).HorDividers = HorDividers(IGlSys);

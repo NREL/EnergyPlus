@@ -787,7 +787,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                     // report the selected NRFC product type (specific sizes) and the NFRC rating for the assembly (glass + frame + divider)
                     std::string_view NFRCname =
-                        DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
@@ -891,7 +891,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                             state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
 
                         std::string_view NFRCname =
-                            DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                            DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
 
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, constructionName, stateAssemblyUValue, 3);
@@ -3276,7 +3276,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         // DivProjIn will be zero in this case.)
                         if (DivArea > 0.0) {                                                         // Solar absorbed by window divider
                             Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                            if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                            if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                                 // Suspended (between-glass) divider; account for effect glass on outside of divider
                                 // (note that outside and inside projection for this type of divider are both zero)
                                 int MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(1); // Outer glass layer material number
@@ -3791,7 +3791,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {                     // Window has dividers
                     Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum);    // Window divider thermal absorptance
                     Real64 DividerSolAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                    if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {          // Suspended divider; account for inside glass
+                    if (state.dataSurface->SurfWinDividerType(SurfNum) ==
+                        DataSurfaces::FrameDividerType::Suspended) { // Suspended divider; account for inside glass
                         Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                             state.dataConstruction->Construct(ConstrNum).TotLayers);   // Glass layer material number
                         Real64 TransGl = state.dataMaterial->Material(MatNumGl).Trans; // Glass layer solar transmittance, reflectance, absorptance
@@ -4022,7 +4023,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                 Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
                 // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
-                if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended)
+                if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended)
                     DividerThermAbs = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     // Interior shade or blind in place
@@ -4199,7 +4200,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                                 (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum));
                     if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                         Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                        if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                        if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                             // Suspended (between-glass) divider: account for glass on inside of divider
                             Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                                 state.dataConstruction->Construct(ConstrNum).TotLayers); // Glass material number
