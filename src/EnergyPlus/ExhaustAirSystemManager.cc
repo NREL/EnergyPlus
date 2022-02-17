@@ -405,17 +405,13 @@ namespace ExhaustAirSystemManager {
             thisExhSys.centralFan_VolumeFlowRate_Cur =
                 state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
-            thisExhSys.centralFan_Power =
-                state.dataHVACFan->fanObjs[state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex]->fanPower();
+            thisExhSys.centralFan_Power = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->fanPower();
 
-            thisExhSys.centralFan_Energy = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).centralFan_Power *
-                                           state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisExhSys.centralFan_Energy = thisExhSys.centralFan_Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
-        } else if (state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
-            Fans::SimulateFanComponents(state,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanName,
-                                        FirstHVACIteration,
-                                        state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum).CentralFanIndex); //,
+        } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
+            Fans::SimulateFanComponents(state, thisExhSys.CentralFanName, FirstHVACIteration,
+                                        thisExhSys.CentralFanIndex); //,
             // FanSpeedRatio, // ZoneCompTurnFansOn, // ZoneCompTurnFansOff);
 
             // Update output variables
