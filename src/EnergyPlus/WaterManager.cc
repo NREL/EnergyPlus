@@ -1468,10 +1468,6 @@ namespace WaterManager {
             VdotAvail = state.dataWaterData->RainFall.CurrentRate * state.dataWaterData->RainCollector(RainColNum).HorizArea * (1.0 - LossFactor);
 
             int month = state.dataEnvrn->Month;
-            // change unit back to mm in the reporting in monthly rain amount used in rain collector
-            if (state.dataEnvrn->RunPeriodEnvironment) {
-                state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
-            }
 
             if (VdotAvail > state.dataWaterData->RainCollector(RainColNum).MaxCollectRate) {
                 VdotAvail = state.dataWaterData->RainCollector(RainColNum).MaxCollectRate;
@@ -1674,10 +1670,6 @@ namespace WaterManager {
         // report rain collector
         if (state.dataWaterData->NumWaterStorageTanks > 0) {
             for (int i = 0; i < 12; i++) {
-                OutputReportPredefined::PreDefTableEntry(state,
-                                                         state.dataOutRptPredefined->pdchMonthlyTotalPrecInRainCol,
-                                                         Months[i],
-                                                         state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[i]);
                 Real64 accVolCollectedMonthly = 0.0;
                 for (int Item = 1; Item <= state.dataWaterData->NumRainCollectors; Item++) {
                     accVolCollectedMonthly += state.dataWaterData->RainCollector(Item).VolCollectedMonthly[i];
@@ -1690,10 +1682,6 @@ namespace WaterManager {
         for (auto const &c : state.dataConstruction->Construct) {
             if (c.TypeIsEcoRoof) {
                 for (int i = 0; i < 12; i++) {
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr,
-                                                             Months[i],
-                                                             state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
                     OutputReportPredefined::PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
                 }

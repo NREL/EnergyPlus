@@ -911,10 +911,8 @@ namespace EcoRoofManager {
         // NEXT Add Precipitation to surface soil moisture variable (if a schedule exists)
         Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
 
-        int month = state.dataEnvrn->Month;
         if (state.dataEnvrn->RunPeriodEnvironment) {
             state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr.at(month - 1) += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
         }
 
         // NEXT Add Irrigation to surface soil moisture variable (if a schedule exists)
