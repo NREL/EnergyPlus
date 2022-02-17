@@ -862,12 +862,12 @@ namespace ExhaustAirSystemManager {
                                          state.dataFans->Fan(thisExhSys.CentralFanIndex).FanType,
                                          state.dataFans->Fan(thisExhSys.CentralFanIndex).FanName,
                                          "Design Fan Airflow [m3/s]",
-                                         state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate);
+                                         state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate / state.dataEnvrn->StdRhoAir);
         } else {
             //
         }
 
-        // after evertyhing sized, set the sizing flag
+        // after evertyhing sized, set the sizing flag to be false
         thisExhSys.SizingFlag = false;
     }
 
