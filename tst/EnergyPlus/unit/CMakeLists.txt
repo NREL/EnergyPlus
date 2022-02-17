@@ -256,7 +256,6 @@ set(test_dependencies energyplusapi)
 
 if(LINK_WITH_PYTHON)
   add_definitions("-DLINK_WITH_PYTHON")
-  find_package(PythonLibs 3 REQUIRED)
   include_directories(${Python_INCLUDE_DIRS})
   if(CMAKE_HOST_UNIX)
     list(APPEND test_src api/datatransfer.unit.cc)
