@@ -254,8 +254,7 @@
 
   RoofIrrigation,
     SmartSchedule,           !- Irrigation Model Type
-    IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name
-    Yes;                     !- Use Precipitation
+    IRRIGATIONSCHD;          !- Irrigation Rate Schedule Name
 
   Material,
     Wood 6inch,              !- Name

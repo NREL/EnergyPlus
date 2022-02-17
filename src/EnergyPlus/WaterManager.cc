@@ -710,10 +710,6 @@ namespace WaterManager {
                     }
                 }
 
-                if (cAlphaArgs(3) == "YES") {
-                    state.dataWaterData->UsePrecipitation = true;
-                }
-
                 // If we later add a designannualirrigation and a nominalannualirrigation variable (for scaling) those
                 // would be assigned here... as with the Rainfall...
                 state.dataWaterData->Irrigation.IrrigationThreshold = 0.4;

@@ -113,30 +113,6 @@ TEST_F(EnergyPlusFixture, EcoRoof_CalculateEcoRoofSolarTest)
     EXPECT_NEAR(resultf1, expectedf1, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, EcoRoofManager_UpdatePrecipitationFlag)
-{
-    std::string const idf_objects = delimited_string({
-        "RoofIrrigation,",
-        "SmartSchedule,           !- Irrigation Model Type",
-        "IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name",
-        "Yes,                     !- Use Precipitation",
-        "100;                     !- Irrigation Maximum Saturation Threshold",
-
-        "Schedule:Compact,",
-        "IRRIGATIONSCHD,          !- Name",
-        "Any Number,              !- Schedule Type Limits Name",
-        "Through: 12/31,          !- Field 1",
-        "For: Alldays,            !- Field 2",
-        "Until: 07:00,0.0,        !- Field 3",
-        "Until: 09:00,0.00242,    !- Field 4",
-        "Until: 24:00,0.0;        !- Field 5",
-    });
-    ASSERT_TRUE(process_idf(idf_objects));
-    WaterManager::GetWaterManagerInput(*state);
-
-    ASSERT_EQ(state->dataWaterData->UsePrecipitation, true);
-}
-
 TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
 {
     // with site:precipitation
@@ -194,7 +170,6 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
         "RoofIrrigation,",
         "SmartSchedule,           !- Irrigation Model Type",
         "IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name",
-        "Yes,                     !- Use Precipitation",
         "100;                     !- Irrigation Maximum Saturation Threshold",
 
         "Schedule:Compact,",
@@ -242,12 +217,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
     WaterManager::UpdatePrecipitation(*state);
     ASSERT_EQ(state->dataEcoRoofMgr->CurrentPrecipitation, 0.005);
 
-    state->dataWaterData->UsePrecipitation = true;
-
-    EcoRoofManager::UpdateSoilProps(
-        *state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
-    ASSERT_EQ(state->dataWaterData->Irrigation.ActualAmount, state->dataEcoRoofMgr->CurrentIrrigation + state->dataEcoRoofMgr->CurrentPrecipitation);
-    state->dataWaterData->UsePrecipitation = false;
+    // fixme: rewrite testcase
     EcoRoofManager::UpdateSoilProps(
         *state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
     ASSERT_EQ(state->dataWaterData->Irrigation.ActualAmount, state->dataEcoRoofMgr->CurrentIrrigation);

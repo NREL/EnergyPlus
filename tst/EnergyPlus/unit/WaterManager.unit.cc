@@ -176,69 +176,6 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
 }
 
-TEST_F(EnergyPlusFixture, WaterManager_RainIrrigationMode)
-{
-
-    std::string idf_objects = delimited_string({
-        "Site:Precipitation,",
-        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
-        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
-        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
-        "0.0;                     !- Average Total Annual Precipitation {m/yr}",
-
-        "Schedule:Constant,",
-        "PrecipitationSchd,",
-        ",",
-        "1;",
-
-        "RoofIrrigation,",
-        "SmartSchedule,           !- Irrigation Model Type",
-        "IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name",
-        "Yes,                     !- Use Precipitation",
-        "100;                     !- Irrigation Maximum Saturation Threshold",
-
-        "Schedule:Compact,",
-        "IRRIGATIONSCHD,          !- Name",
-        "Any Number,              !- Schedule Type Limits Name",
-        "Through: 12/31,          !- Field 1",
-        "For: Alldays,            !- Field 2",
-        "Until: 07:00,0.0,        !- Field 3",
-        "Until: 09:00,0.00242,    !- Field 4",
-        "Until: 24:00,0.0;        !- Field 5",
-    });
-
-    ASSERT_TRUE(process_idf(idf_objects));
-    WaterManager::GetWaterManagerInput(*state);
-
-    // when rain schedule design is present, use the design schedule
-    EXPECT_TRUE(compare_enums(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::RainSchedDesign));
-
-    idf_objects = delimited_string({
-        "RoofIrrigation,",
-        "SmartSchedule,           !- Irrigation Model Type",
-        "IRRIGATIONSCHD,          !- Irrigation Rate Schedule Name",
-        "Yes,                     !- Use Precipitation",
-        "100;                     !- Irrigation Maximum Saturation Threshold",
-
-        "Schedule:Compact,",
-        "IRRIGATIONSCHD,          !- Name",
-        "Any Number,              !- Schedule Type Limits Name",
-        "Through: 12/31,          !- Field 1",
-        "For: Alldays,            !- Field 2",
-        "Until: 07:00,0.0,        !- Field 3",
-        "Until: 09:00,0.00242,    !- Field 4",
-        "Until: 24:00,0.0;        !- Field 5",
-    });
-
-    ASSERT_TRUE(process_idf(idf_objects));
-    state->dataWaterManager->MyOneTimeFlag = true;
-    state->dataWaterData->WaterSystemGetInputCalled = false;
-    WaterManager::GetWaterManagerInput(*state);
-
-    // no site:precipitation, use epw schedule
-    EXPECT_TRUE(compare_enums(state->dataWaterData->RainFall.ModeID, DataWater::RainfallMode::EPWPrecipitation));
-}
-
 TEST_F(EnergyPlusFixture, WaterManager_Fill)
 {
     // Test for #6435 : When using a Valve from a well, it should keep on filling until it hits the ValveOffCapacity instead of stopping after
