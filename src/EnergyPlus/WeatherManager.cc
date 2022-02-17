@@ -468,12 +468,26 @@ namespace WeatherManager {
                                 OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
-                                "Site Precipitation Depth",
+                                "Liquid Precipitation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEnvrn->LiquidPrecipitation,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
+            SetupOutputVariable(state,
+                                "Site Precipitation Rate",
+                                OutputProcessor::Unit::m_s,
+                                state.dataWaterData->RainFall.CurrentRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Site:Precipitation");
+            SetupOutputVariable(state,
+                                "Site Precipitation Depth",
+                                OutputProcessor::Unit::m,
+                                state.dataWaterData->RainFall.CurrentAmount,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site:Precipitation");
             SetupOutputVariable(state,
                                 "Site Ground Reflected Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
@@ -694,7 +708,6 @@ namespace WeatherManager {
                                  state.dataEnvrn->EMSWindDirOverrideOn,
                                  state.dataEnvrn->EMSWindDirOverrideValue);
             }
-
             state.dataWeatherManager->GetEnvironmentFirstCall = false;
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.

@@ -834,23 +834,6 @@ namespace WaterManager {
                                     state.dataWaterData->WaterStorage(Item).Name);
             }
 
-            if (state.dataWaterData->NumSiteRainFall == 1) { // CurrentModuleObject='Site:Precipitation'
-                SetupOutputVariable(state,
-                                    "Site Precipitation Rate",
-                                    OutputProcessor::Unit::m_s,
-                                    state.dataWaterData->RainFall.CurrentRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    "Site:Precipitation");
-                SetupOutputVariable(state,
-                                    "Site Precipitation Depth",
-                                    OutputProcessor::Unit::m,
-                                    state.dataWaterData->RainFall.CurrentAmount,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site:Precipitation");
-            }
-
             if (NumIrrigation == 1) { // CurrentModuleObject='RoofIrrigation'
                 SetupOutputVariable(state,
                                     "Water System Roof Irrigation Scheduled Depth",
