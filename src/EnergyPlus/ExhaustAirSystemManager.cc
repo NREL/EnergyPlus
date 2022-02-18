@@ -402,10 +402,10 @@ namespace ExhaustAirSystemManager {
             thisExhSys.centralFan_VolumeFlowRate_Std = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
 
             RhoAirCurrent = EnergyPlus::Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                                                                 state.dataEnvrn->OutBaroPress,
-                                                                                 state.dataLoopNodes->Node(outletNode_Num).Temp,
-                                                                                 state.dataLoopNodes->Node(outletNode_Num).HumRat);
-            if (RhoAirCurrent == 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
+                                                                          state.dataEnvrn->OutBaroPress,
+                                                                          state.dataLoopNodes->Node(outletNode_Num).Temp,
+                                                                          state.dataLoopNodes->Node(outletNode_Num).HumRat);
+            if (RhoAirCurrent <= 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
             thisExhSys.centralFan_VolumeFlowRate_Cur = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / RhoAirCurrent;
             // state.dataLoopNodes->MoreNodeInfo(outletNode_Num).VolFlowRateCrntRho;
             // state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
@@ -432,7 +432,7 @@ namespace ExhaustAirSystemManager {
                                                                           state.dataEnvrn->OutBaroPress,
                                                                           state.dataLoopNodes->Node(outletNode_Num).Temp,
                                                                           state.dataLoopNodes->Node(outletNode_Num).HumRat);
-            if (RhoAirCurrent == 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
+            if (RhoAirCurrent <= 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
             thisExhSys.centralFan_VolumeFlowRate_Cur = fancomp.OutletAirMassFlowRate / RhoAirCurrent;
             // state.dataLoopNodes->MoreNodeInfo(outletNode_Num).VolFlowRateCrntRho;
             // state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
