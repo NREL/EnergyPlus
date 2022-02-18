@@ -164,12 +164,13 @@ namespace ScheduleManager {
         Real64 MinValue;                        // Minimum value for this schedule
         Real64 CurrentValue;                    // For Reporting
         bool EMSActuatedOn;                     // indicates if EMS computed
-        Real64 EMSValue;
+        Real64 EMSValue;                        // EMS value
+        bool UseDaylightSaving;                 // Toggles between daylight saving option to be inclused as "No" or "Yes" (default)
 
         // Default Constructor
         ScheduleData()
             : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
-              EMSActuatedOn(false), EMSValue(0.0)
+              EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
         {
         }
     };
@@ -347,8 +348,7 @@ struct ScheduleManagerData : BaseGlobalStruct
     int NumSchedules = 0;
 
     // Logical Variables for Module
-    bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
-    bool ScheduleDSTSFileWarningIssued = false;
+    bool ScheduleInputProcessed = false;       // This is false until the Schedule Input has been processed.
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
     // Object Data
@@ -372,7 +372,6 @@ struct ScheduleManagerData : BaseGlobalStruct
         NumSchedules = 0;
 
         ScheduleInputProcessed = false;
-        ScheduleDSTSFileWarningIssued = false;
         ScheduleFileShadingProcessed = false;
 
         ScheduleType.clear(); // Allowed Schedule Types

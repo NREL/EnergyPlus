@@ -1649,6 +1649,11 @@ namespace ScheduleManager {
                 FileIntervalInterpolated = true;
             }
 
+            state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = true;
+            if ((Alphas(6)) == "NO") {
+                state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = false;
+            }
+
             // is it a sub-hourly schedule or not?
             MinutesPerItem = 60;
             if (NumNumbers > 3) {
@@ -2633,24 +2638,6 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (!state.dataScheduleMgr->ScheduleDSTSFileWarningIssued) {
-            if (state.dataEnvrn->DSTIndicator == 1) {
-                if (state.dataScheduleMgr->Schedule(ScheduleIndex).SchType == SchedType::ScheduleInput_file) {
-                    ShowWarningError(state,
-                                     "GetCurrentScheduleValue: Schedule=\"" + state.dataScheduleMgr->Schedule(ScheduleIndex).Name +
-                                         "\" is a Schedule:File");
-                    ShowContinueError(state, "...Use of Schedule:File when DaylightSavingTime is in effect is not recommended.");
-                    ShowContinueError(state, "...1) Remove RunperiodControl:DaylightSavingTime object or remove DST period from Weather File.");
-                    ShowContinueError(state, "...2) Configure other schedules and Schedule:File to account for occupant behavior during DST.");
-                    ShowContinueError(state, "...   If you have already done this, you can ignore this message.");
-                    ShowContinueError(state,
-                                      "...When active, DaylightSavingTime will shift all scheduled items by one hour, retaining the same day type as "
-                                      "the original.");
-                    state.dataScheduleMgr->ScheduleDSTSFileWarningIssued = true;
-                }
-            }
-        }
-
         // Checking if valid index is passed is necessary
         if (ScheduleIndex == -1) {
             return 1.0;
@@ -2776,7 +2763,8 @@ namespace ScheduleManager {
         //  so, current date, but maybe TimeStep added
 
         // Hourly Value
-        int thisHour = ThisHour + state.dataEnvrn->DSTIndicator;
+        int thisHour = ThisHour + state.dataEnvrn->DSTIndicator * state.dataScheduleMgr->Schedule(ScheduleIndex).UseDaylightSaving;
+
         int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
         int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
         int thisHolidayIndex = state.dataEnvrn->HolidayIndex;
