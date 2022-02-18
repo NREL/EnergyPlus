@@ -578,6 +578,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             ShowSevereError(state, sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
         }
+        std::set<std::string> uniqueNames;
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
@@ -585,7 +586,14 @@ PluginManager::PluginManager(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
             auto const vars = fields.at("global_py_vars");
             for (const auto &var : vars) {
-                this->addGlobalVariable(state, var.at("variable_name").get<std::string>());
+                std::string const varNameToAdd = var.at("variable_name").get<std::string>();
+                if (uniqueNames.find(varNameToAdd) == uniqueNames.end()) {
+                    this->addGlobalVariable(state, varNameToAdd);
+                    uniqueNames.insert(varNameToAdd);
+                } else {
+                    ShowWarningMessage(state,
+                                       format("Found duplicate variable name in PythonPLugin:Variables objects, ignoring: \"{}\"", varNameToAdd));
+                }
             }
         }
     }
