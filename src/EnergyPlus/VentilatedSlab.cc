@@ -239,13 +239,16 @@ namespace VentilatedSlab {
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const MeanAirTemperature("MeanAirTemperature");
-        static std::string const MeanRadiantTemperature("MeanRadiantTemperature");
-        static std::string const OperativeTemperature("OperativeTemperature");
-        static std::string const OutsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
-        static std::string const OutsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
-        static std::string const SlabSurfaceTemperature("SurfaceTemperature");
-        static std::string const SlabSurfaceDewPointTemperature("ZoneAirDewPointTemperature");
+        constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> ControlTypeNamesCC{
+            "MeanAirTemperature",
+            "MeanRadiantTemperature",
+            "OperativeTemperature",
+            "OutdoorDryBulbTemperature",
+            "OutdoorWetBulbTemperature",
+            "SurfaceTemperature",
+            "ZoneAirDewPointTemperature",
+        };
+
         static std::string const CurrentModuleObject("ZoneHVAC:VentilatedSlab");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -599,21 +602,10 @@ namespace VentilatedSlab {
             }
 
             // Process the temperature control type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), OutsideAirDryBulbTemperature)) {
-                ventSlab.controlType = ControlType::OutdoorDryBulbTemp;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), OutsideAirWetBulbTemperature)) {
-                ventSlab.controlType = ControlType::OutdoorWetBulbTemp;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), OperativeTemperature)) {
-                ventSlab.controlType = ControlType::OperativeTemp;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), MeanAirTemperature)) {
-                ventSlab.controlType = ControlType::MeanAirTemp;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), MeanRadiantTemperature)) {
-                ventSlab.controlType = ControlType::MeanRadTemp;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), SlabSurfaceTemperature)) {
-                ventSlab.controlType = ControlType::SurfaceTemp;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), SlabSurfaceDewPointTemperature)) {
-                ventSlab.controlType = ControlType::DewPointTemp;
-            } else {
+            ventSlab.controlType = static_cast<ControlType>(
+                getEnumerationValue(ControlTypeNamesCC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+
+            if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(state,
                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(9) + "\".");
