@@ -954,14 +954,12 @@ namespace WaterManager {
             // when there's no site:precipitation but non-zero epw precipitation, uset the epw precipitation as the CurrentRate
             if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
                 // LiquidPrecipitation is for a certain timestep in an hour, the rate = depth / seconds in a timestep
-                state.dataWaterData->RainFall.CurrentRate =
-                    state.dataEnvrn->LiquidPrecipitation / state.dataGlobal->TimeStepZoneSec;
+                state.dataWaterData->RainFall.CurrentRate = state.dataEnvrn->LiquidPrecipitation / state.dataGlobal->TimeStepZoneSec;
             } else {
                 state.dataWaterData->RainFall.CurrentRate = 0.0;
             }
         }
-        state.dataWaterData->RainFall.CurrentAmount =
-            state.dataWaterData->RainFall.CurrentRate * state.dataGlobal->TimeStepZoneSec;
+        state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * state.dataGlobal->TimeStepZoneSec;
         state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
             int month = state.dataEnvrn->Month;
