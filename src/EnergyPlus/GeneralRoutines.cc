@@ -71,6 +71,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
@@ -1986,6 +1987,11 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // fourPipeInduction units
             if (FourPipeInductionUnitHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
+        }
+        if (!FoundZoneMixer(Count1)) { // could be as child on other items
+            // Exhaust Systems
+            if (ExhaustAirSystemManager::ExhaustSystemHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName))
+                FoundZoneMixer(Count1) = true;
         }
     }
     FoundNames.deallocate();

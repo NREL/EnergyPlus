@@ -909,6 +909,30 @@ namespace ExhaustAirSystemManager {
         // for a nodelist, need a call loop to check each node in the list
     }
 
+    bool ExhaustSystemHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
+    {
+        // Given a mixer name, this routine determines if that mixer is found on Exhaust Systems.
+
+        // Return value
+        bool YesNo; // True if found
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int ItemNum;
+
+        if (state.dataExhAirSystemMrg->GetInputFlag) {
+            GetExhaustAirSystemInput(state);
+            state.dataExhAirSystemMrg->GetInputFlag = false;
+        }
+
+        YesNo = false;
+        if (state.dataZoneEquip->NumExhaustAirSystems > 0) {
+            ItemNum = UtilityRoutines::FindItemInList(CompName, state.dataZoneEquip->ExhaustAirSystem, &ExhaustAir::ZoneMixerName);
+            if (ItemNum > 0) YesNo = true;
+        }
+
+        return YesNo;
+    }
+
 } // namespace ExhaustAirSystemManager
 
 } // namespace EnergyPlus

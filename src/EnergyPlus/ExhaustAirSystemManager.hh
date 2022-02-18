@@ -151,6 +151,7 @@ namespace ExhaustAirSystemManager {
 
     void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound);
 
+    bool ExhaustSystemHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 } // namespace ExhaustAirSystemManager
 
 struct ExhaustAirSystemMgr : BaseGlobalStruct
