@@ -204,6 +204,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -425,6 +426,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     // as possible and contain all "simulation" code in other modules and files.
 
     state.dataGlobal->eplusRunningViaAPI = true;
+    state.dataPluginManager->eplusRunningViaAPI = true;
 
     // clean out any stdin, stderr, stdout flags from a prior call
     if (!std::cin.good()) std::cin.clear();

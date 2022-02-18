@@ -241,6 +241,8 @@ struct PluginManagerData : BaseGlobalStruct
     std::vector<Real64> globalVariableValues;
     bool fullyReady = false;
     bool apiErrorFlag = false;
+    bool eplusRunningViaAPI = false;
+
     std::vector<std::string> const objectsToFind = {
         "PythonPlugin:OutputVariable", "PythonPlugin:SearchPaths", "PythonPlugin:Instance", "PythonPlugin:Variables", "PythonPlugin:TrendVariable"};
     void clear_state() override
@@ -256,8 +258,10 @@ struct PluginManagerData : BaseGlobalStruct
         plugins.clear();
         fullyReady = false;
         apiErrorFlag = false;
-        auto *p = pluginManager.release();
-        delete p;
+        if (!eplusRunningViaAPI) {
+            auto *p = pluginManager.release();
+            delete p;
+        }
 #endif
     }
 };
