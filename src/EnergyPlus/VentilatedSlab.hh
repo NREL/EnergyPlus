@@ -105,13 +105,13 @@ namespace VentilatedSlab {
     enum class ControlType
     {
         Invalid = -1,
-        MAT,  // Controls system using mean air temperature
-        MRT,  // Controls system using mean radiant temperature
-        OPT,  // Controls system using operative temperature
-        ODB,  // Controls system using outside air dry-bulb temperature
-        OWB,  // Controls system using outside air wet-bulb temperature
-        SUR,  // Controls system using surface temperature !Phase2-A
-        DPTZ, // Controls system using dew-point temperature of zone!Phase2-A
+        MeanAirTemp,  // Controls system using mean air temperature
+        MeanRadTemp,  // Controls system using mean radiant temperature
+        OperativeTemp,  // Controls system using operative temperature
+        OutdoorDryBulbTemp,  // Controls system using outside air dry-bulb temperature
+        OutdoorWetBulbTemp,  // Controls system using outside air wet-bulb temperature
+        SurfaceTemp,  // Controls system using surface temperature !Phase2-A
+        DewPointTemp, // Controls system using dew-point temperature of zone!Phase2-A
         Num
     };
 
