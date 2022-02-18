@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Jumps</TITLE>
+<html><head><link rel="stylesheet" href="../styles.css"></head>
+<body onkeydown="keydown(event)" onblur="needPause()" onload="startGame()">
+<div class="topnav" id="myTopnav"></div><div class="main">
+
+<h2>"Jumps"</h2>
+
+<p>Max result: <span id="hiscore">0</span>.</p>
+<canvas id="myCanvas" width="500" height="400" onmousedown="mousedown(event)" onmouseup="accelerate(0.05)">
+Your browser does not support the HTML5 canvas tag.</canvas></div>
+
+<script type="text/javascript" src="../accordion.js"></script>
+<script>
+var ctx;
+var width = 500;
+var height = 300;
+var obstacles = [];
+var bX, bY, vX, vY;
+var gravity;
+var time;
+var interval;
+var hiscore = 0;
+var paused = 0;
+var finished = 0;
+
+const bR=15;
+const minGap = 50;
+const maxGap = 200;
+
+function startGame()
+{
+	ctx = document.getElementById("myCanvas").getContext("2d");
+	ctx.lineCap="round";
+	vX = 0;	bX = bR;
+	vY = 0;	bY = height/2;
+	gravity = 0.05;	time = 0;
+	paused = 0;		finished = 0;
+	obstacles = [];
+	hiscore = localStorage.getItem("hiscoreJumps");
+	if(!hiscore)	hiscore = 0;
+	document.getElementById("hiscore").innerHTML = hiscore;
+	ctx.clearRect(0, 0, width, height);
+	interval = setInterval(updateCanvas, 20);
+}
+
+function finish(score)	// game over
+{
+	finished = 1;	draw();
+	ctx.font="40px Arial";
+	ctx.fillStyle = 'black';
+	ctx.fillText("GAME OVER", width/4, height/2);
+	if(score > hiscore)
+	{	hiscore = score;
+		localStorage.setItem("hiscoreJumps", hiscore);	}
+	document.getElementById("hiscore").innerHTML = hiscore;
+	clearInterval(interval);
+}
+
+function updateCanvas()
+{
+	if(paused)	{	draw();	return;	}
+	// check crashes
+	for(var i = 0; i < obstacles.length; i += 1)
+		if(crash(obstacles[i]))	{	finish(time);	return;	}
+	time = time + 1;
+	if(time%100==0)	// new obstacle(s)
+	{
+		if(Math.random()<0.5)	// one obstacle
+		{
+			var y1 = Math.floor(Math.random()*(maxGap-minGap)+minGap);
+			var y2 = height - Math.floor(Math.random()*(maxGap-minGap)+minGap);
+			if(y2<y1)	{	var y=y1;	y1=y2;	y2=y;	}
+			if(y2<y1+bR)	{	y2 += bR;	y1 -= bR;	}
+			obstacles.push([width,y1,y2]);
+		}
+		else	// 2 obstacles (one hole)
+		{
+			var gap = Math.floor(Math.random()*(maxGap-minGap)+minGap);
+			var y0 = Math.floor(Math.random()*height);
+			var y1 = y0-gap/2, y2 = y0+gap/2;
+			if(y1 > bR/2)
+				obstacles.push([width,0,y1]);
+			if(y2 < height-bR/2)
+				obstacles.push([width,y2,height]);
+		}
+	}
+	// move ball
+	bX += vX;	bY += vY;	vY += gravity;
+	// check boundaries
+	if(bX < bR)	{	bX = bR;	vX = 0;	}
+	if(bX > width-bR)	{	bX = width-bR;	vX = 0;	}
+	if(bY < bR)	{	bY = bR;	vY = 0;	}
+	if(bY > height-bR)	{	bY = height-bR;	vY = 0;	}
+	// move obstacles
+	for (var i = 0;i < obstacles.length; i += 1)	obstacles[i][0] -= 1;
+	// draw it
+	draw();
+}
+
+function draw()
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cwidth/width;
+	ctx.clearRect(0, 0, cwidth, cheight);
+	ctx.strokeStyle = 'black';
+	ctx.strokeRect(0, 0, s*width, s*height);
+
+	ctx.font="12px Arial";	// score
+	text = "SCORE: " + time;
+	ctx.fillStyle = 'black';
+	ctx.fillText(text, 2*bR*s, bR*s);
+
+	var x = bX*s, y = bY*s, r = bR*s;	// ball
+	var grd=ctx.createRadialGradient(x-0.3*r,y-r/5,r/10,x,y,r);
+	grd.addColorStop(0,"white");
+	grd.addColorStop(1,"red");
+	ctx.beginPath();	ctx.fillStyle = grd;
+	ctx.arc(x, y, r, 0, 2*Math.PI);	ctx.fill();
+
+	ctx.fillStyle = 'green';	// obstacles
+	for (var i = 0;i < obstacles.length; i += 1)
+	{
+		var o = obstacles[i];
+		ctx.fillRect((o[0]-bR/10)*s, o[1]*s, bR/5*s, (o[2]-o[1])*s);
+	}
+
+	if(cheight > s*height)	// buttons
+	{
+		var dh = cheight - s*height, b = dh/10;
+		var y0 = b+s*height, x0 = s*width/3;
+
+		if(gravity<0)		// button Up
+		{
+			ctx.fillStyle = 'lightblue';
+			ctx.fillRect(b, y0, x0-2*b, dh-2*b);
+		}
+		ctx.strokeStyle = 'blue';
+		ctx.strokeRect(b, y0, x0-2*b, dh-2*b);
+		ctx.beginPath();	ctx.fillStyle = 'blue';
+		ctx.moveTo(x0/4,y0-b+3*dh/4);
+		ctx.lineTo(3*x0/4,y0-b+3*dh/4);
+		ctx.lineTo(x0/2,y0-b+dh/4);	ctx.fill();
+
+		if(finished)		// button New
+		{
+			ctx.strokeStyle = 'red';
+			ctx.strokeRect(b+x0, y0, x0-2*b, dh-2*b);
+			ctx.beginPath();	ctx.fillStyle = 'red';
+			ctx.moveTo(x0+x0/4,y0-b+dh/4);
+			ctx.lineTo(x0+x0/4,y0-b+3*dh/4);
+			ctx.lineTo(x0+x0/2,y0-b+dh/2);	ctx.fill();
+			ctx.moveTo(x0+x0/2,y0-b+dh/4);
+			ctx.lineTo(x0+x0/2,y0-b+3*dh/4);
+			ctx.lineTo(x0+3*x0/4,y0-b+dh/2);	ctx.fill();
+		}
+		else				// button Pause
+		{
+			if(paused)
+			{
+				ctx.fillStyle = 'pink';
+				ctx.fillRect(b+x0, y0, x0-2*b, dh-2*b);
+			}
+			ctx.strokeStyle = 'red';
+			ctx.strokeRect(b+x0, y0, x0-2*b, dh-2*b);
+			ctx.beginPath();	ctx.fillStyle = 'red';
+			ctx.rect(x0+x0/4,y0-b+dh/4,x0/8,dh/2);
+			ctx.rect(x0+5*x0/8,y0-b+dh/4,x0/8,dh/2);
+			ctx.fill();
+		}
+
+		if(gravity>0.05)		// button Down
+		{
+			ctx.fillStyle = 'palegreen';
+			ctx.fillRect(2*x0+b, y0, x0-2*b, dh-2*b);
+		}
+		ctx.strokeStyle = 'green';
+		ctx.strokeRect(2*x0+b, y0, x0-2*b, dh-2*b);
+		ctx.beginPath();	ctx.fillStyle = 'green';
+		ctx.moveTo(2*x0+x0/4,y0-b+dh/4);
+		ctx.lineTo(2*x0+3*x0/4,y0-b+dh/4);
+		ctx.lineTo(2*x0+x0/2,y0-b+3*dh/4);	ctx.fill();
+	}
+}
+
+function crash(o)	// return 1 if crash on an obstacle
+{
+	const xx = o[0], y1 = o[1], y2 = o[2];
+	if((bX-xx)*(bX-xx)+(bY-y1)*(bY-y1)<=bR*bR)	return 1;
+	if((bX-xx)*(bX-xx)+(bY-y2)*(bY-y2)<=bR*bR)	return 1;
+	if(Math.abs(bX-xx)<=bR && bY>y1 && bY<y2)	return 1;
+	return 0;
+}
+
+function accelerate(n)
+{
+	gravity = n;
+}
+
+function keydown(event)	// key is pressed
+{
+	if(event.key == 'ArrowUp' || event.key == ' ')	gravity = -0.2;
+	else if(event.key == 'ArrowDown')	gravity = 0.2;
+	else	gravity = 0.05;
+}
+
+function mousedown(event)	// mouse button is pressed (default Up)
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cwidth/width;
+	if(event.offsetY>s*height && event.offsetX>cwidth*2/3)
+		gravity = 0.2;
+	else if(event.offsetY>s*height && event.offsetX>cwidth/3)
+	{
+		if(finished)	startGame();
+		else	paused = 1-paused;
+	}
+	else	gravity = -0.2;
+}
+
+function pause()	// useless
+{
+	paused = 1-paused;
+}
+</script>
+</body>
+</html> 

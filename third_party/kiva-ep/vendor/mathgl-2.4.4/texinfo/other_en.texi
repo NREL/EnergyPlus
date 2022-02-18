@@ -1,0 +1,565 @@
+@c ------------------------------------------------------------------
+@chapter Other classes
+@nav{}
+
+There are few end-user classes: @code{mglGraph} (see @ref{MathGL core}), @code{mglWindow} and @code{mglGLUT} (see @ref{Widget classes}), @code{mglData} (see @ref{Data processing}), @code{mglParse} (see @ref{MGL scripts}). Exactly these classes I recommend to use in most of user programs. All methods in all of these classes are inline and have exact C/Fortran analogue functions. This give compiler independent binary libraries for MathGL.
+
+However, sometimes you may need to extend MathGL by writing yours own plotting functions or handling yours own data structures. In these cases you may need to use low-level API. This chapter describes it.
+
+@fig{classes, Class diagram for MathGL}
+
+The internal structure of MathGL is rather complicated. There are C++ classes @code{mglBase}, @code{mglCanvas}, ... for drawing primitives and positioning the plot (blue ones in the figure). There is a layer of C functions, which include interface for most important methods of these classes. Also most of plotting functions are implemented as C functions. After it, there are ``inline'' front-end classes which are created for user convenience (yellow ones in the figure). Also there are widgets for FLTK and Qt libraries (green ones in the figure).
+
+Below I show how this internal classes can be used.
+
+@menu
+* mglBase class::
+* mglDataA class::
+* mglColor class::
+* mglPoint class::
+@end menu
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglBase class, mglDataA class, , Other classes
+@section Define new kind of plot (mglBase class)
+@nav{}
+
+Basically most of new kinds of plot can be created using just MathGL primitives (see @ref{Primitives}). However the usage of @code{mglBase} methods can give you higher speed of drawing and better control of plot settings. 
+
+All plotting functions should use a pointer to @code{mglBase} class (or @code{HMGL} type in C functions) due to compatibility issues. Exactly such type of pointers are used in front-end classes (@code{mglGraph, mglWindow}) and in widgets (@code{QMathGL, Fl_MathGL}).
+
+MathGL tries to remember all vertexes and all primitives and plot creation stage, and to use them for making final picture by demand. Basically for making plot, you need to add vertexes by @code{AddPnt()} function, which return index for new vertex, and call one of primitive drawing function (like @code{mark_plot(), arrow_plot(), line_plot(), trig_plot(), quad_plot(), text_plot()}), using vertex indexes as argument(s). @code{AddPnt()} function use 2 mreal numbers for color specification. First one is positioning in textures -- integer part is texture index, fractional part is relative coordinate in the texture. Second number is like a transparency of plot (or second coordinate in the 2D texture).
+
+I don't want to put here detailed description of @code{mglBase} class. It was rather well documented in @code{mgl2/base.h} file. I just show and example of its usage on the base of circle drawing.
+
+First, we should prototype new function @code{circle()} as C function.
+@verbatim
+#ifdef __cplusplus
+extern "C" {
+#endif
+void circle(HMGL gr, mreal x, mreal y, mreal z, mreal r, const char *stl, const char *opt);
+#ifdef __cplusplus
+}
+#endif
+@end verbatim
+This is done for generating compiler independent binary. Because only C-functions have standard naming mechanism, the same for any compilers.
+
+Now, we create a C++ file and put the code of function. I'll write it line by line and try to comment all important points.
+@verbatim
+void circle(HMGL gr, mreal x, mreal y, mreal z, mreal r, const char *stl, const char *opt)
+{
+@end verbatim
+First, we need to check all input arguments and send warnings if something is wrong. In our case it is negative value of @var{r} argument. We just send warning, since it is not critical situation -- other plot still can be drawn.
+@verbatim
+  if(r<=0)  { gr->SetWarn(mglWarnNeg,"Circle"); return; }
+@end verbatim
+Next step is creating a group. Group keep some general setting for plot (like options) and useful for export in 3d files.
+@verbatim
+  static int cgid=1;  gr->StartGroup("Circle",cgid++);
+@end verbatim
+Now let apply options. Options are rather useful things, generally, which allow one easily redefine axis range(s), transparency and other settings (see @ref{Command options}).
+@verbatim
+  gr->SaveState(opt);
+@end verbatim
+I use global setting for determining the number of points in circle approximation. Note, that user can change @code{MeshNum} by options easily.
+@verbatim
+  const int n = gr->MeshNum>1?gr->MeshNum : 41;
+@end verbatim
+Let try to determine plot specific flags. MathGL functions expect that most of flags will be sent in string. In our case it is symbol @samp{@@} which set to draw filled circle instead of border only (last will be default). Note, you have to handle @code{NULL} as string pointer.
+@verbatim
+  bool fill = mglchr(stl,'@');
+@end verbatim
+Now, time for coloring. I use palette mechanism because circle have few colors: one for filling and another for border. @code{SetPenPal()} function parse input string and write resulting texture index in @var{pal}. Function return the character for marker, which can be specified in string @var{str}. Marker will be plotted at the center of circle. I'll show on next sample how you can use color schemes (smooth colors) too.
+@verbatim
+  long pal=0;
+  char mk=gr->SetPenPal(stl,&pal);
+@end verbatim
+Next step, is determining colors for filling and for border. First one for filling.
+@verbatim
+  mreal c=gr->NextColor(pal), d;
+@end verbatim
+Second one for border. I use black color (call @code{gr->AddTexture('k')}) if second color is not specified.
+@verbatim
+  mreal k=(gr->GetNumPal(pal)>1)?gr->NextColor(pal):gr->AddTexture('k');
+@end verbatim
+If user want draw only border (@code{fill=false}) then I use first color for border.
+@verbatim
+  if(!fill) k=c;
+@end verbatim
+Now we should reserve space for vertexes. This functions need @code{n} for border, @code{n+1} for filling and @code{1} for marker. So, maximal number of vertexes is @code{2*n+2}. Note, that such reservation is not required for normal work but can sufficiently speed up the plotting.
+@verbatim
+  gr->Reserve(2*n+2);
+@end verbatim
+We've done with setup and ready to start drawing. First, we need to add vertex(es). Let define NAN as normals, since I don't want handle lighting for this plot,
+@verbatim
+  mglPoint q(NAN,NAN);
+@end verbatim
+and start adding vertexes. First one for central point of filling. I use @code{-1} if I don't need this point. The arguments of @code{AddPnt()} function is: @code{mglPoint(x,y,z)} -- coordinate of vertex, @code{c} -- vertex color, @code{q} -- normal at vertex, @code{-1} -- vertex transparency (@code{-1} for default), @code{3} bitwise flag which show that coordinates will be scaled (@code{0x1}) and will not be cutted (@code{0x2}).
+@verbatim
+  long n0,n1,n2,m1,m2,i;
+  n0 = fill ? gr->AddPnt(mglPoint(x,y,z),c,q,-1,3):-1;
+@end verbatim
+Similar for marker, but we use different color @var{k}.
+@verbatim
+  n2 = mk ? gr->AddPnt(mglPoint(x,y,z),k,q,-1,3):-1;
+@end verbatim
+Draw marker.
+@verbatim
+  if(mk)  gr->mark_plot(n2,mk);
+@end verbatim
+Time for drawing circle itself. I use @code{-1} for @var{m1}, @var{n1} as sign that primitives shouldn't be drawn for first point @code{i=0}.
+@verbatim
+  for(i=0,m1=n1=-1;i<n;i++)
+  {
+@end verbatim
+Each function should check @code{Stop} variable and return if it is non-zero. It is done for interrupting drawing for system which don't support multi-threading.
+@verbatim
+    if(gr->Stop)  return;
+@end verbatim
+Let find coordinates of vertex.
+@verbatim
+    mreal t = i*2*M_PI/(n-1.);
+    mglPoint p(x+r*cos(t), y+r*sin(t), z);
+@end verbatim
+Save previous vertex and add next one
+@verbatim
+    n2 = n1;  n1 = gr->AddPnt(p,c,q,-1,3);
+@end verbatim
+and copy it for border but with different color. Such copying is much faster than adding new vertex using @code{AddPnt()}.
+@verbatim
+    m2 = m1;  m1 = gr->CopyNtoC(n1,k);
+@end verbatim
+Now draw triangle for filling internal part
+@verbatim
+    if(fill)  gr->trig_plot(n0,n1,n2);
+@end verbatim
+and draw line for border.
+@verbatim
+    gr->line_plot(m1,m2);
+  }
+@end verbatim
+Drawing is done. Let close group and return.
+@verbatim
+  gr->EndGroup();
+}
+@end verbatim
+
+Another sample I want to show is exactly the same function but with smooth coloring using color scheme. So, I'll add comments only in the place of difference.
+
+@verbatim
+void circle_cs(HMGL gr, mreal x, mreal y, mreal z, mreal r, const char *stl, const char *opt)
+{
+@end verbatim
+In this case let allow negative radius too. Formally it is not the problem for plotting (formulas the same) and this allow us to handle all color range.
+@verbatim
+//if(r<=0)  { gr->SetWarn(mglWarnNeg,"Circle"); return; }
+
+  static int cgid=1;  gr->StartGroup("CircleCS",cgid++);
+  gr->SaveState(opt);
+  const int n = gr->MeshNum>1?gr->MeshNum : 41;
+  bool fill = mglchr(stl,'@');
+@end verbatim
+Here is main difference. We need to create texture for color scheme specified by user
+@verbatim
+  long ss = gr->AddTexture(stl);
+@end verbatim
+But we need also get marker and color for it (if filling is enabled). Let suppose that marker and color is specified after @samp{:}. This is standard delimiter which stop color scheme entering. So, just lets find it and use for setting pen.
+@verbatim
+  const char *pen=0;
+  if(stl) pen = strchr(stl,':');
+  if(pen) pen++;
+@end verbatim
+The substring is placed in @var{pen} and it will be used as line style.
+@verbatim
+  long pal=0;
+  char mk=gr->SetPenPal(pen,&pal);
+@end verbatim
+Next step, is determining colors for filling and for border. First one for filling.
+@verbatim
+  mreal c=gr->GetC(ss,r);
+@end verbatim
+Second one for border.
+@verbatim
+  mreal k=gr->NextColor(pal);
+@end verbatim
+The rest part is the same as in previous function.
+@verbatim
+  if(!fill) k=c;
+
+  gr->Reserve(2*n+2);
+  mglPoint q(NAN,NAN);
+  long n0,n1,n2,m1,m2,i;
+  n0 = fill ? gr->AddPnt(mglPoint(x,y,z),c,q,-1,3):-1;
+  n2 = mk ? gr->AddPnt(mglPoint(x,y,z),k,q,-1,3):-1;
+  if(mk)  gr->mark_plot(n2,mk);
+  for(i=0,m1=n1=-1;i<n;i++)
+  {
+    if(gr->Stop)  return;
+    mreal t = i*2*M_PI/(n-1.);
+    mglPoint p(x+r*cos(t), y+r*sin(t), z);
+    n2 = n1;  n1 = gr->AddPnt(p,c,q,-1,3);
+    m2 = m1;  m1 = gr->CopyNtoC(n1,k);
+    if(fill)  gr->trig_plot(n0,n1,n2);
+    gr->line_plot(m1,m2);
+  }
+  gr->EndGroup();
+}
+@end verbatim
+
+The last thing which we can do is derive our own class with new plotting functions. Good idea is to derive it from @code{mglGraph} (if you don't need extended window), or from @code{mglWindow} (if you need to extend window). So, in our case it will be
+@verbatim
+class MyGraph : public mglGraph
+{
+public:
+  inline void Circle(mglPoint p, mreal r, const char *stl="", const char *opt="")
+  { circle(p.x,p.y,p.z, r, stl, opt); }
+  inline void CircleCS(mglPoint p, mreal r, const char *stl="", const char *opt="")
+  { circle_cs(p.x,p.y,p.z, r, stl, opt); }
+};
+@end verbatim
+Note, that I use @code{inline} modifier for using the same binary code with different compilers. 
+
+So, the complete sample will be
+@verbatim
+#include <mgl2/mgl.h>
+//---------------------------------------------------------
+#ifdef __cplusplus
+extern "C" {
+#endif
+void circle(HMGL gr, mreal x, mreal y, mreal z, mreal r, const char *stl, const char *opt);
+void circle_cs(HMGL gr, mreal x, mreal y, mreal z, mreal r, const char *stl, const char *opt);
+#ifdef __cplusplus
+}
+#endif
+//---------------------------------------------------------
+class MyGraph : public mglGraph
+{
+public:
+  inline void CircleCF(mglPoint p, mreal r, const char *stl="", const char *opt="")
+  { circle(p.x,p.y,p.z, r, stl, opt); }
+  inline void CircleCS(mglPoint p, mreal r, const char *stl="", const char *opt="")
+  { circle_cs(p.x,p.y,p.z, r, stl, opt); }
+};
+//---------------------------------------------------------
+void circle(HMGL gr, mreal x, mreal y, mreal z, mreal r, const char *stl, const char *opt)
+{
+  if(r<=0)  { gr->SetWarn(mglWarnNeg,"Circle"); return; }
+  static int cgid=1;  gr->StartGroup("Circle",cgid++);
+  gr->SaveState(opt);
+  const int n = gr->MeshNum>1?gr->MeshNum : 41;
+  bool fill = mglchr(stl,'@');
+  long pal=0;
+  char mk=gr->SetPenPal(stl,&pal);
+  mreal c=gr->NextColor(pal), d;
+  mreal k=(gr->GetNumPal(pal)>1)?gr->NextColor(pal):gr->AddTexture('k');
+  if(!fill) k=c;
+  gr->Reserve(2*n+2);
+  mglPoint q(NAN,NAN);
+  long n0,n1,n2,m1,m2,i;
+  n0 = fill ? gr->AddPnt(mglPoint(x,y,z),c,q,-1,3):-1;
+  n2 = mk ? gr->AddPnt(mglPoint(x,y,z),k,q,-1,3):-1;
+  if(mk)  gr->mark_plot(n2,mk);
+  for(i=0,m1=n1=-1;i<n;i++)
+  {
+    if(gr->Stop)  return;
+    mreal t = i*2*M_PI/(n-1.);
+    mglPoint p(x+r*cos(t), y+r*sin(t), z);
+    n2 = n1;  n1 = gr->AddPnt(p,c,q,-1,3);
+    m2 = m1;  m1 = gr->CopyNtoC(n1,k);
+    if(fill)  gr->trig_plot(n0,n1,n2);
+    gr->line_plot(m1,m2);
+  }
+  gr->EndGroup();
+}
+//---------------------------------------------------------
+void circle_cs(HMGL gr, mreal x, mreal y, mreal z, mreal r, const char *stl, const char *opt)
+{
+  static int cgid=1;  gr->StartGroup("CircleCS",cgid++);
+  gr->SaveState(opt);
+  const int n = gr->MeshNum>1?gr->MeshNum : 41;
+  bool fill = mglchr(stl,'@');
+  long ss = gr->AddTexture(stl);
+  const char *pen=0;
+  if(stl) pen = strchr(stl,':');
+  if(pen) pen++;
+  long pal=0;
+  char mk=gr->SetPenPal(pen,&pal);
+  mreal c=gr->GetC(ss,r);
+  mreal k=gr->NextColor(pal);
+  if(!fill) k=c;
+
+  gr->Reserve(2*n+2);
+  mglPoint q(NAN,NAN);
+  long n0,n1,n2,m1,m2,i;
+  n0 = fill ? gr->AddPnt(mglPoint(x,y,z),c,q,-1,3):-1;
+  n2 = mk ? gr->AddPnt(mglPoint(x,y,z),k,q,-1,3):-1;
+  if(mk)  gr->mark_plot(n2,mk);
+  for(i=0,m1=n1=-1;i<n;i++)
+  {
+    if(gr->Stop)  return;
+    mreal t = i*2*M_PI/(n-1.);
+    mglPoint p(x+r*cos(t), y+r*sin(t), z);
+    n2 = n1;  n1 = gr->AddPnt(p,c,q,-1,3);
+    m2 = m1;  m1 = gr->CopyNtoC(n1,k);
+    if(fill)  gr->trig_plot(n0,n1,n2);
+    gr->line_plot(m1,m2);
+  }
+  gr->EndGroup();
+}
+//---------------------------------------------------------
+int main()
+{
+  MyGraph gr;
+  gr.Box();
+  // first let draw circles with fixed colors
+  for(int i=0;i<10;i++)
+    gr.CircleCF(mglPoint(2*mgl_rnd()-1, 2*mgl_rnd()-1), mgl_rnd());
+  // now let draw circles with color scheme
+  for(int i=0;i<10;i++)
+    gr.CircleCS(mglPoint(2*mgl_rnd()-1, 2*mgl_rnd()-1), 2*mgl_rnd()-1);
+}
+@end verbatim
+
+
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglDataA class, mglColor class, mglBase class, Other classes
+@section User defined types (mglDataA class)
+@nav{}
+
+@code{mglData} class have abstract predecessor class @code{mglDataA}. Exactly the pointers to @code{mglDataA} instances are used in all plotting functions and some of data processing functions. This was done for taking possibility to define yours own class, which will handle yours own data (for example, complex numbers, or differently organized data). And this new class will be almost the same as @code{mglData} for plotting purposes.
+
+However, the most of data processing functions will be slower as if you used @code{mglData} instance. This is more or less understandable -- I don't know how data in yours particular class will be organized, and couldn't optimize the these functions generally.
+
+There are few virtual functions which must be provided in derived classes. This functions give:
+@itemize @bullet
+@item
+the sizes of the data (@code{GetNx}, @code{GetNy}, @code{GetNz}),
+@item
+give data value and numerical derivatives for selected cell (@code{v}, @code{dvx}, @code{dvy}, @code{dvz}),
+@item
+give maximal and minimal values (@code{Maximal}, @code{Minimal}) -- you can use provided functions (like @code{mgl_data_max} and @code{mgl_data_min}), but yours own realization can be more efficient,
+@item
+give access to all element as in single array (@code{vthr}) -- you need this only if you want using MathGL's data processing functions.
+@end itemize
+
+Let me, for example define class @code{mglComplex} which will handle complex number and draw its amplitude or phase, depending on flag @var{use_abs}:
+@verbatim
+#include <complex>
+#include <mgl2/mgl.h>
+#define dual std::complex<double>
+class mglComplex : public mglDataA
+{
+public:
+  long nx;      ///< number of points in 1st dimensions ('x' dimension)
+  long ny;      ///< number of points in 2nd dimensions ('y' dimension)
+  long nz;      ///< number of points in 3d dimensions ('z' dimension)
+  dual *a;      ///< data array
+  bool use_abs; ///< flag to use abs() or arg()
+
+  inline mglComplex(long xx=1,long yy=1,long zz=1)
+  { a=0;  use_abs=true; Create(xx,yy,zz); }
+  virtual ~mglComplex()  { if(a)  delete []a; }
+
+  /// Get sizes
+  inline long GetNx() const { return nx;  }
+  inline long GetNy() const { return ny;  }
+  inline long GetNz() const { return nz;  }
+  /// Create or recreate the array with specified size and fill it by zero
+  inline void Create(long mx,long my=1,long mz=1)
+  { nx=mx;  ny=my;  nz=mz;  if(a) delete []a;
+  a = new dual[nx*ny*nz]; }
+  /// Get maximal value of the data
+  inline mreal Maximal() const  { return mgl_data_max(this);  }
+  /// Get minimal value of the data
+  inline mreal Minimal() const  { return mgl_data_min(this);  }
+
+protected:
+  inline mreal v(long i,long j=0,long k=0) const
+  { return use_abs ? abs(a[i+nx*(j+ny*k)]) : arg(a[i+nx*(j+ny*k)]);  }
+  inline mreal vthr(long i) const
+  { return use_abs ? abs(a[i]) : arg(a[i]);  }
+  inline mreal dvx(long i,long j=0,long k=0) const
+  { long i0=i+nx*(j+ny*k);
+    std::complex<double> res=i>0? (i<nx-1? (a[i0+1]-a[i0-1])/2.:a[i0]-a[i0-1]) : a[i0+1]-a[i0];
+    return use_abs? abs(res) : arg(res);  }
+  inline mreal dvy(long i,long j=0,long k=0) const
+  { long i0=i+nx*(j+ny*k);
+    std::complex<double> res=j>0? (j<ny-1? (a[i0+nx]-a[i0-nx])/2.:a[i0]-a[i0-nx]) : a[i0+nx]-a[i0];
+    return use_abs? abs(res) : arg(res);  }
+  inline mreal dvz(long i,long j=0,long k=0) const
+  { long i0=i+nx*(j+ny*k), n=nx*ny;
+    std::complex<double> res=k>0? (k<nz-1? (a[i0+n]-a[i0-n])/2.:a[i0]-a[i0-n]) : a[i0+n]-a[i0];
+    return use_abs? abs(res) : arg(res);  }
+};
+int main()
+{
+  mglComplex dat(20);
+  for(long i=0;i<20;i++)
+    dat.a[i] = 3*exp(-0.05*(i-10)*(i-10))*dual(cos(M_PI*i*0.3), sin(M_PI*i*0.3));
+  mglGraph gr;
+  gr.SetRange('y', -M_PI, M_PI);  gr.Box();
+
+  gr.Plot(dat,"r","legend 'abs'");
+  dat.use_abs=false;
+  gr.Plot(dat,"b","legend 'arg'");
+  gr.Legend();
+  gr.WritePNG("complex.png");
+  return 0;
+}
+@end verbatim
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglColor class, mglPoint class, mglDataA class, Other classes
+@section mglColor class
+@nav{}
+@cindex mglColor
+
+Structure for working with colors. This structure is defined in @code{#include <mgl2/type.h>}.
+
+There are two ways to set the color in MathGL. First one is using of mreal values of red, green and blue channels for precise color definition. The second way is the using of character id. There are a set of characters specifying frequently used colors. Normally capital letter gives more dark color than lowercase one. @xref{Line styles}.
+
+@deftypecv {Parameter} mglColor @code{mreal} {r, g, b, a}
+Reg, green and blue component of color.
+@end deftypecv
+
+@deftypemethod mglColor @code{} mglColor (@code{mreal} R, @code{mreal} G, @code{mreal} B, @code{mreal} A=@code{1})
+Constructor sets the color by mreal values of Red, Green, Blue and Alpha channels. These values should be in interval [0,1].
+@end deftypemethod
+@deftypemethod mglColor @code{} mglColor (@code{char} c=@code{'k'}, @code{mreal} bright=@code{1})
+Constructor sets the color from character id. The black color is used by default. Parameter @var{br} set additional ``lightness'' of color.
+@end deftypemethod
+@deftypemethod mglColor @code{void} Set (@code{mreal} R, @code{mreal} G, @code{mreal} B, @code{mreal} A=@code{1})
+Sets color from values of Red, Green, Blue and Alpha channels. These values should be in interval [0,1].
+@end deftypemethod
+@deftypemethod mglColor @code{void} Set (@code{mglColor} c, @code{mreal} bright=@code{1})
+Sets color as ``lighted'' version of color @var{c}.
+@end deftypemethod
+@deftypemethod mglColor @code{void} Set (@code{char} p, @code{mreal} bright=@code{1})
+Sets color from symbolic id.
+@end deftypemethod
+@deftypemethod mglColor @code{bool} Valid ()
+Checks correctness of the color.
+@end deftypemethod
+@deftypemethod mglColor @code{mreal} Norm ()
+Gets maximal of spectral component.
+@end deftypemethod
+@deftypemethod mglColor @code{bool} operator== (@code{const mglColor &}c)
+@deftypemethodx mglColor @code{bool} operator!= (@code{const mglColor &}c)
+Compare with another color
+@end deftypemethod
+
+@deftypemethod mglColor @code{bool} operator*= (@code{mreal} v)
+Multiplies color components by number @var{v}.
+@end deftypemethod
+
+@deftypemethod mglColor @code{bool} operator+= (@code{const mglColor &}c)
+Adds color @var{c} component by component.
+@end deftypemethod
+
+@deftypemethod mglColor @code{bool} operator-= (@code{const mglColor &}c)
+Subtracts color @var{c} component by component.
+@end deftypemethod
+
+
+@deftypefn {Library Function} {mglColor} operator+ (@code{const mglColor &}a, @code{const mglColor &}b)
+Adds colors by its RGB values.
+@end deftypefn
+@deftypefn {Library Function} @code{mglColor} operator- (@code{const mglColor &}a, @code{const mglColor &}b)
+Subtracts colors by its RGB values.
+@end deftypefn
+@deftypefn {Library Function} @code{mglColor} operator* (@code{const mglColor &}a, @code{mreal} b)
+@deftypefnx {Library Function} @code{mglColor} operator* (@code{mreal} a, @code{const mglColor &}b)
+Multiplies color by number.
+@end deftypefn
+@deftypefn {Library Function} @code{mglColor} operator/ (@code{const mglColor &}a, @code{mreal} b)
+Divide color by number.
+@end deftypefn
+@deftypefn {Library Function} @code{mglColor} operator! (@code{const mglColor &}a)
+Return inverted color.
+@end deftypefn
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglPoint class, , mglColor class, Other classes
+@section mglPoint class
+@nav{}
+@cindex mglPoint
+
+Structure describes point in space. This structure is defined in @code{#include <mgl2/type.h>}
+
+@deftypecv {Parameter} mglPoint @code{mreal} {x, y, z, c}
+Point coordinates @{x,y,z@} and one extra value @var{c} used for amplitude, transparency and so on. By default all values are zero.
+@end deftypecv
+
+@deftypemethod mglPoint @code{} mglPoint (@code{mreal} X=@code{0}, @code{mreal} Y=@code{0}, @code{mreal} Z=@code{0}, @code{mreal} C=@code{0})
+Constructor sets the color by mreal values of Red, Green, Blue and Alpha channels. These values should be in interval [0,1].
+@end deftypemethod
+
+@deftypemethod mglPoint @code{bool} IsNAN ()
+Returns @code{true} if point contain NAN values.
+@end deftypemethod
+@deftypemethod mglPoint @code{mreal} norm ()
+Returns the norm @math{\sqrt@{x^2+y^2+z^2@}} of vector.
+@end deftypemethod
+@deftypemethod mglPoint @code{void} Normalize ()
+Normalizes vector to be unit vector.
+@end deftypemethod
+@deftypemethod mglPoint @code{mreal} val (@code{int} i)
+Returns point component: @var{x} for @var{i}=0, @var{y} for @var{i}=1, @var{z} for @var{i}=2, @var{c} for @var{i}=3.
+@end deftypemethod
+
+
+@deftypefn {Library Function} @code{mglPoint} operator+ (@code{const mglPoint &}a, @code{const mglPoint &}b)
+Point of summation (summation of vectors).
+@end deftypefn
+@deftypefn {Library Function} @code{mglPoint} operator- (@code{const mglPoint &}a, @code{const mglPoint &}b)
+Point of difference (difference of vectors).
+@end deftypefn
+@deftypefn {Library Function} @code{mglPoint} operator* (@code{mreal} a, @code{const mglPoint &}b)
+@deftypefnx {Library Function} @code{mglPoint} operator* (@code{const mglPoint &}a, @code{mreal} b)
+Multiplies (scale) points by number.
+@end deftypefn
+@deftypefn {Library Function} @code{mglPoint} operator/ (@code{const mglPoint &}a, @code{mreal} b)
+Multiplies (scale) points by number 1/b.
+@end deftypefn
+@deftypefn {Library Function} @code{mreal} operator* (@code{const mglPoint &}a, @code{const mglPoint &}b)
+Scalar product of vectors.
+@end deftypefn
+
+@deftypefn {Library Function} @code{mglPoint} operator/ (@code{const mglPoint &}a, @code{const mglPoint &}b)
+Return vector of element-by-element product.
+@end deftypefn
+
+@deftypefn {Library Function} @code{mglPoint} operator^ (@code{const mglPoint &}a, @code{const mglPoint &}b)
+Cross-product of vectors.
+@end deftypefn
+@deftypefn {Library Function} @code{mglPoint} operator& (@code{const mglPoint &}a, @code{const mglPoint &}b)
+The part of @var{a} which is perpendicular to vector @var{b}.
+@end deftypefn
+@deftypefn {Library Function} @code{mglPoint} operator| (@code{const mglPoint &}a, @code{const mglPoint &}b)
+The part of @var{a} which is parallel to vector @var{b}.
+@end deftypefn
+
+@deftypefn {Library Function} @code{mglPoint} operator! (@code{const mglPoint &}a)
+Return vector perpendicular to vector @var{a}.
+@end deftypefn
+@deftypefn {Library Function} @code{mreal} mgl_norm (@code{const mglPoint &}a)
+Return the norm sqrt(|@var{a}|^2) of vector @var{a}.
+@end deftypefn
+
+@deftypefn {Library Function} @code{bool} operator== (@code{const mglPoint &}a, @code{const mglPoint &}b)
+Return true if points are the same.
+@end deftypefn
+@deftypefn {Library Function} @code{bool} operator!= (@code{const mglPoint &}a, @code{const mglPoint &}b)
+Return true if points are different.
+@end deftypefn
+
+@external{}
+

@@ -1,0 +1,57 @@
+2.4.2.1	Released 31 March 2018
+2.4.2	Released 21 March 2018
+2.4.1	Released 20 July 2017
+2.4 	Released 17 May 2017
+2.3.5.1	Released 30 May 2015
+2.3.5	Released 16 May 2015
+2.3.4	Released 11 February 2015
+2.3.3	Released 01 June 2015
+2.3.2	Released 2 February 2015
+2.3.1	Released 21 October 2014
+2.3 	Released 7 August 2014
+2.2.2.1	Released 19 March 2014
+2.2.2	Released 10 March 2014
+2.2.1	Released 22 January 2014
+2.2 	Released 11 November 2013
+2.1.3.1	Released 8 May 2013
+2.1.3	Released 2 May 2013
+2.1.2	Released 28 January 2013
+2.1.1	Released 24 December 2012
+2.1 	Released 13 December 2012
+2.0.3	Released 27 July 2012
+2.0.2	Released 24 May 2012
+2.0.1	Released 23 May 2012
+2.0 	Released 12 April 2012
+2.0.b	Released 23 August 2011
+
+1.11.3	Released 23 November 2012
+1.11.2	Released 30 May 2011
+1.11.1	Released 28 March 2011
+1.11	Released 8 November 2010
+1.10.2.1 Released 27 March 2010
+1.10.2	Released 22 March 2010
+1.10.1	Released 8 March 2010
+1.10	Released 28 December 2009
+1.9 	Released 8 July 2009
+1.8.1	Released 4 March 2009
+1.8 	Released 27 November 2008
+1.7 	Released 5 June 2008
+1.6.2	Released 5 April 2008
+1.6.1	Released 2 April 2008
+1.6 	Released 17 March 2008
+1.5 	Released 11 January 2008
+1.4.3.1	Released 24 December 2008
+1.4.3	Released 18 December 2008
+1.4.2	Released 27 November 2007
+1.4.1	Released 14 November 2007
+1.4 	Released 30 October 2007
+1.3 	Released 15 October 2007
+1.2.2	Released 26 September 2007
+1.2.1	Released 14 September 2007
+1.2 	Released 10 September 2007
+1.1 	Released 23 May 2007
+1.0 	Released 2 April 2007
+
+0.9		Last beta version of the MathGL library. Released 2 March 2007
+0.8.1	Released 19 February 2007
+0.8.0	First public release (24 January 2007)

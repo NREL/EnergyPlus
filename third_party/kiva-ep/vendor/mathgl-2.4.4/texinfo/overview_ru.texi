@@ -1,0 +1,252 @@
+@chapter Обзор MathGL
+@nav{}
+
+@cindex Обзор MathGL
+
+MathGL это ...
+@itemize @bullet
+@item
+библиотека для создания высококачественной научной графики под Linux и Windows;
+@item
+библиотека для быстрого обработки и отображения больших массивов данных;
+@item
+библиотека для работы в оконном и консольном режимах;
+@item
+библиотека с большим набором базовых типов графиков.
+@end itemize
+
+@menu
+* What is MathGL?::
+* MathGL features::
+* Installation::
+* Quick guide::
+* Changes from v.1::
+* Utilities::
+* Thanks::
+@end menu
+
+@external{}
+@node What is MathGL?, MathGL features, , Overview
+@section Что такое MathGL?
+@nav{}
+
+Код для создания качественной научной графики на различных платформах. Код для быстрой обработки и отображения больших массивов данных. Код для работы в графическом и консольном режимах и легкого интегрирования в другие программы. Код с большим обновляемым набором графиков и инструментами обработки данных. Именно такого кода мне не хватало в последние годы при работе на персональных компьютерах и на кластерах. И именно такой код я постарался создать в библиотеке MathGL.
+
+На данный момент (версия @value{VERSION}) MathGL это более 50 основных типов графиков для одно-, двух- и трехмерных массивов, возможность экспорта в растровые и векторные (EPS или SVG) файлы, интерфейс для OpenGL и возможность запуска в консольном режиме, функции для обработки данных и даже простейший командный (интерпретируемый) язык MGL для упрощения построения графиков. Кроме того, есть несколько типов прозрачности, гладкое освещение, векторные шрифты, TeX-ие команды в надписях, произвольные криволинейные системы координат и прочие полезные мелочи (см. раздел pictures на @uref{http://mathgl.sf.net/, домашней странице}). Ну, и, естественно, полная переносимость библиотеки и ее свободное распространение под лицензией GPL v.2.0 или более поздней.
+
+@external{}
+@node MathGL features, Installation, What is MathGL?, Overview
+@section Возможности MathGL
+@nav{}
+
+Библиотека MathGL позволяет строить широкий класс графиков, включая:
+@itemize @bullet
+@item
+рисование одномерных массивов (Plot, Area, Bars, Step, Stem, Torus, Chart, Error, Tube, Mark, @pxref{1D plotting});
+
+@item
+рисование двумерных массивов (Mesh, Surf, Dens, Cont, ContF, Boxs, Axial, Fall, Belt, Tile, @pxref{2D plotting});
+
+@item
+рисование трехмерных массивов (Surf3, Dens3, Cont3, ContF3, Cloud-like, @pxref{3D plotting});
+
+@item
+рисование нескольких связанных массивов: векторные поля Vect, линии тока Flow, точечное отображение Map, поверхности с прозрачностью или цветом, определяемым другим массивом SurfA, SurfC, Surf3A, Surf3C (@pxref{Dual plotting});
+
+@item
+и другие (см. @pxref{MathGL core}).
+@end itemize
+
+Фактически, я постарался реализовать все известные мне типы научных графиков. Список графиков постоянно пополняется, и если Вам нужен какой-то новый вариант, пишите на @email{mathgl.abalakin@@gmail.com, e-mail}, и в новой версии библиотеки этот график появится.
+
+Я постарался сделать графики максимально красивыми -- поверхности могут быть прозрачными и освещены произвольно расположенными источниками света (максимальное их количество 10). Большинство функций рисования имеет два варианта: простой для быстрого построения картинки и более сложный для детальной настройки отображения, включающего в том числе возможность параметрического задания всех массивов. Получившееся изображение можно сохранить в растровом формате PNG, JPEG, GIF, TGA или BMP; в векторном EPS, SVG или TeX формате, или в 3D формате OBJ, OFF, STL, или в PRC формате, который может быть конвертирован U3D.
+
+Все надписи выводятся векторным шрифтом, что обеспечивает их хорошую масштабируемость и переносимость. Текст может содержать команды для большинства ТеХ-их символов, изменения положения (верхний и нижний индексы) и стиля шрифта внутри строки текста (@pxref{Font styles}). Текст меток поворачивается вместе с осями. На график можно вывести описание кривых (легенду) и поместить надпись в произвольную точку экрана или пустить ее вдоль кривой. Поддерживаются произвольные кодировки текста (с помощью стандартной функции @code{setlocale()}) и текст в кодировке UTF-16.
+
+Для представления данных используется специальный класс mglData (@pxref{Data processing}). Помимо безопасного создания и удаления массивов, он включает функции по их обработке (дифференцированию, интегрированию, сглаживанию, интерполяции и т.д.) и чтению текстового файла с автоматическим определением размеров данных. Класс mglData позволяет работать с массивами размерности вплоть до 3 (массивы, зависящие от трех независимых индексов @math{a_@{ijk@}}). Использование массивов с большим числом размерностей нецелесообразно, поскольку я не представляю, как их можно отобразить на экране. Заполнение или изменение значений массива можно выполнить как вручную, так и по формуле, заданной текстовой строкой.
+
+Для @emph{быстрого} вычисления значения выражения, заданного текстовой строкой (@pxref{Textual formulas}). Он основан на компиляции строки в древоподобную структуру при создании экземпляра класса. На этапе вычисления происходит быстрый обход дерева с выдачей результата для конкретных значений переменных. Помимо изменения значений массива данных, текстовые формулы используются для рисования в @emph{произвольной} криволинейной системе координат. Набор таких координат ограничивается только фантазией пользователя, а не фиксированным числом (типа полярной, параболической, цилиндрической и т.д.).
+
+@external{}
+@node Installation, Quick guide, MathGL features, Overview
+@section Установка MathGL
+@nav{}
+
+Установка библиотеки возможна 4-мя способами.
+@enumerate
+@item
+Скомпилировать библиотеку непосредственно из исходных файлов. С библиотекой поставляется файлы для системы сборки CMake. Для его запуска достаточно в командной строке выполнить 3 команды: сначала @code{cmake .} дважды, далее @code{make} и, наконец, с правами суперпользователя @code{make install}. Иногда после компиляции библиотеки может потребоваться обновление списка библиотека в системе -- выполните команду @code{ldconfig} с правами суперпользователя.
+
+Есть несколько дополнительных опций, которые по умолчанию отключены. К их числу относятся: @code{enable-fltk, enable-glut, enable-qt4, enable-qt5} для поддержки FLTK, GLUT и/или Qt окон; @code{enable-jpeg, enable-gif, enable-hdf5} для поддержки соответствующих форматов; @code{enable-all} для включения всех возможностей. Для использования типа @code{double} для внутреннего хранения данных используйте опцию @code{enable-double}. Для создания интерфейсов к другим языкам (кроме С/Фортран/MGL) используйте опции @code{enable-python, enable-octave} или @code{enable-all-swig} для всех поддерживаемых языков. Вы можете воспользоваться WYSIWYG утилитой (@code{cmake-gui}) для просмотра и изменения всех опций, или выполнить @code{cmake -D enable-all=on -D enable-all-widgets=on -D enable-all-swig=on .} в командной строке для включения всех опций.
+
+При сборке с помощью MinGW необходимо дополнительно установить опцию сборки @code{-fopenmp} (т.е. @code{CMAKE_EXE_LINKER_FLAGS:STRING='-fopenmp'} и @code{CMAKE_SHARED_LINKER_FLAGS:STRING='-fopenmp'}) если включена поддержка OpenMP (@code{enable-openmp=ON}).
+
+
+@item
+Использовать предварительно скомпилированные файлы -- с библиотекой поставляются файлы для MinGW (платформа Win32). В скомпилированной версии достаточно распаковать заголовочные файлы в папку с заголовочными файлами и библиотеку libmgl.a в папку с библиотеками. По умолчанию, скомпилированная версия включают поддержку GSL (www.gsl.org), PNG, GIF и JPEG. Соответственно, при сборке программы эти библиотеки должны быть установлены (их можно найти на @uref{http://gnuwin32.sourceforge.net/packages.html}).
+@item
+Установить из стандартных пакетов (RPM, deb, DevPak и пр.).
+@end enumerate
+
+Последнюю версию (которая может быть не стабильна) можно загрузить с  sourceforge.net SVN с помощью команды
+@verbatim
+svn checkout http://svn.code.sf.net/p/mathgl/code/mathgl-2x mathgl-code
+@end verbatim
+
+@strong{ВАЖНО!} MathGL использует набор defines, определяемых на этапе конфигурирования библиотеки. Это @code{MGL_SYS_NAN, MGL_HAVE_TYPEOF, MGL_HAVE_PTHREAD, MGL_HAVE_ATTRIBUTE, MGL_HAVE_C99_COMPLEX, MGL_HAVE_RVAL}. Они могут отличаться при использовании бинарников скомпилированных другим компилятором (например при использовании скомпилированных MinGW бинарников в VisualStudio). Я специально устанавливаю их в @code{0} для компиляторов Borland и Microsoft из соображений совместимости. Кроме того, настройки по умолчанию подходят для компиляторов GNU (gcc, mingw) и clang. Однако, для прочих компиляторов может потребоваться ручная установка defines в @code{0} в файле @code{include/mgl2/config.h} если вы используете предварительно скомпилированные файлы.
+
+
+@c TODO Translate it!
+
+@c ------------------------------------------------------------------
+@external{}
+@node  Quick guide, Changes from v.1, Installation, Overview
+@section Quick guide
+@nav{}
+
+There are 3 steps to prepare the plot in MathGL: (1) prepare data to be plotted, (2) setup plot, (3) plot data. Let me show this on the example of surface plotting.
+
+First we need the data. MathGL use its own class @code{mglData} to handle data arrays (see @ref{Data processing}). This class give ability to handle data arrays by more or less format independent way. So, create it
+@verbatim
+    int main()
+    {
+        mglData dat(30,40);	// data to for plotting
+        for(long i=0;i<30;i++)   for(long j=0;j<40;j++)
+            dat.a[i+30*j] = 1/(1+(i-15)*(i-15)/225.+(j-20)*(j-20)/400.);
+@end verbatim
+Here I create matrix 30*40 and initialize it by formula. Note, that I use @code{long} type for indexes @var{i}, @var{j} because data arrays can be really large and @code{long} type will automatically provide proper indexing.
+
+Next step is setup of the plot. The only setup I need is axis rotation and lighting.
+@verbatim
+        mglGraph gr;		// class for plot drawing
+        gr.Rotate(50,60);	// rotate axis
+        gr.Light(true);		// enable lighting
+@end verbatim
+
+Everything is ready. And surface can be plotted.
+@verbatim
+        gr.Surf(dat);		// plot surface
+@end verbatim
+Basically plot is done. But I decide to add yellow (@samp{y} color, see @ref{Color styles}) contour lines on the surface. To do it I can just add:
+@verbatim
+        gr.Cont(dat,"y");	// plot yellow contour lines
+@end verbatim
+This demonstrate one of base MathGL concept (see, @ref{General concepts}) -- ``new drawing never clears things drawn already''. So, you can just consequently call different plotting functions to obtain ``combined'' plot. For example, if one need to draw axis then he can just call one more plotting function
+@verbatim
+        gr.Axis();			// draw axis
+@end verbatim
+
+Now picture is ready and we can save it in a file.
+@verbatim
+        gr.WriteFrame("sample.png");	// save it
+    }
+@end verbatim
+
+To compile your program, you need to specify the linker option @code{-lmgl}.
+
+This is enough for a compilation of console program or with external (non-MathGL) window library. If you want to use FLTK or Qt windows provided by MathGL then you need to add the option @code{-lmgl-wnd}.
+
+При использовании фортрана необходимо также включить библиотеку @code{-lstdc++}. Кроме того, если библиотека была собрана с опцией @code{enable-double=ON} (по умолчанию в версии 2.1 и более поздних), то все вещественные числа должны быть типа real*8. Это можно включить по умолчанию опцией @code{-fdefault-real-8}.
+
+@c ------------------------------------------------------------------
+@external{}
+@node  Changes from v.1, Utilities, Quick guide, Overview
+@section Changes from v.1.*
+@nav{}
+
+There are a lot of changes for v.2. Here I denote only main of them.
+@itemize @bullet
+@item
+mglGraph class is single plotter class instead of mglGraphZB, mglGraphPS and so on.
+@item
+Text style and text color positions are swapped. I.e. text style @samp{r:C} give red centered text, but not roman dark cyan text as for v.1.*.
+@item
+ColumnPlot() indexing is reverted.
+@item
+Move most of arguments of plotting functions into the string parameter and/or options.
+@item
+``Bright'' colors (like @{b8@}) can be used in color schemes and line styles.
+@item
+Intensively use pthread internally for parallelization of drawing and data processing.
+@item
+Add tick labels rotation and skipping. Add ticks in time/date format.
+@item
+New kinds of plots (Tape(), Label(), Cones(), ContV()). Extend existing plots. New primitives (Circle(), Ellipse(), Rhomb(), ...). New plot positioning (MultiPlot(), GridPlot())
+@item
+Improve MGL scripts. Add 'ask' command and allow string concatenation from different lines.
+@item
+Export to LaTeX and to 3D formats (OBJ, OFF, STL).
+@item
+Add pipes support in utilities (@code{mglconv, mglview}).
+@end itemize
+
+@c ------------------------------------------------------------------
+@external{}
+@node  Utilities, Thanks, Changes from v.1, Overview
+@section Utilities for parsing MGL
+@nav{}
+
+MathGL library provides several tools for parsing MGL scripts. There is tools saving it to bitmap or vectorial images (@code{mglconv}). Tool @code{mglview} show MGL script and allow to rotate and setup the image. Another feature of @code{mglview} is loading *.mgld files (see @code{ExportMGLD()}) for quick viewing 3d pictures.
+
+Both tools have similar set of arguments. They can be name of script file or options. You can use @samp{-} as script name for using standard input (i.e. pipes). Options are:
+@itemize
+@item @strong{-1} @var{str}
+set @var{str} as argument $1 for script;
+@item ...
+...
+@item @strong{-9} @var{str}
+set @var{str} as argument $9 for script;
+@item @strong{-L} @var{loc}
+set locale to @var{loc};
+@item @strong{-s} @var{fname}
+set MGL script for setting up the plot;
+@item @strong{-h}
+print help message.
+@end itemize
+Additionally @code{mglconv} have following options:
+@itemize
+@item @strong{-A} @var{val}
+add @var{val} into the list of animation parameters;
+@item @strong{-C} @var{v1}:@var{v2}[:@var{dv}]
+add values from @var{v1} ot @var{v2} with step @var{dv} (default is 1) into the list of animation parameters;
+@item @strong{-o} @var{name}
+set output file name;
+@item @strong{-n}
+disable default output (script should save results by itself);
+@item @strong{-S} @var{val}
+set set scaling factor for @ref{setsize};
+@item @strong{-q} @var{val}
+set @ref{quality} for output (val=0...9).
+@end itemize
+
+Also you can create animated GIF file or a set of JPEG files with names @samp{frameNNNN.jpg} (here @samp{NNNN} is frame index). Values of the parameter @code{$0} for making animation can be specified inside the script by comment @code{##a val} for each value @code{val} (one comment for one value) or by option(s) @samp{-A val}. Also you can specify a cycle for animation by comment @code{##c v1 v2 dv} or by option @code{-C v1:v2:dv}. In the case of found/specified animation parameters, tool will execute script several times -- once for each value of @code{$0}.
+
+
+MathGL also provide another simple tool @code{mgl.cgi} which parse MGL script from CGI request and send back produced PNG file. Usually this program should be placed in @code{/usr/lib/cgi-bin/}. But you need to put this program by yourself due to possible security issues and difference of Apache server settings.
+
+@c ------------------------------------------------------------------
+@external{}
+@node Thanks, , Utilities, Overview
+@section Благодарности
+@nav{}
+
+
+@itemize @bullet
+@item
+Моя специальная благодарность моей жене за терпение во время написания библиотеки.
+@item
+Я благодарен моим соавторам Д. Кулагину и М. Видассову за помощь в разработке MathGL.
+@item
+Я благодарен Diego Sejas Viscarra за разработку mgltex, вклад в генерацию фракталов и продуктивные предложения и обсуждения.
+@item
+Я благодарен D. Eftaxiopoulos, D. Haley, В. Липатову и С. Плису за создание бинарных пакетов для Linux.
+@item
+Я благодарен С. Скобелеву, К. Михайленко, М. Вейсману, A. Прохорову, A. Короткевичу, В. Онучину, С. Плису, Р. Киселеву, A. Иванову, Н. Троицкому and В. Липатову за продуктивные предложения и обсуждения.
+@item
+Я благодарен спонсорам М. Вейсману (@url{http://www.jiht.ru/about/structure.php?set_filter_structure=Y&structure_UF_DEPARTMENT=241&filter=Y&set_filter=Y, ОИВТ РАН}) и A. Прохорову (@url{www.datadvance.net, DATADVANCE}).
+@end itemize
+
+Javascript интерфейс был разработан при поддержке компании @url{www.datadvance.net, DATADVANCE}.
+
+
+@external{}

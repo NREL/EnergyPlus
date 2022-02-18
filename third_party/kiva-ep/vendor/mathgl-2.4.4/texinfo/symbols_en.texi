@@ -1,0 +1,806 @@
+@nav{}
+
+This appendix contain the full list of symbols (characters) used by MathGL for setting up plot. Also it contain sections for full list of hot-keys supported by mglview tool and by UDAV program.
+
+@menu
+* Symbols for styles::
+* Hot-keys for mglview::
+* Hot-keys for UDAV::
+@end menu
+
+@c ------------------------------------------------------------------
+@external{}
+@node Symbols for styles, Hot-keys for mglview, , Symbols and hot-keys
+@section Symbols for styles
+@nav{}
+
+Below is full list of all characters (symbols) which MathGL use for setting up the plot.
+
+@table @samp
+@item space ' '
+empty line style (see @ref{Line styles});
+
+empty color in @ref{chart}.
+
+@item !
+set to use new color from palette for each point (not for each curve, as default) in @ref{1D plotting};
+
+set to disable ticks tuning in @ref{axis} and @ref{colorbar};
+
+set to draw @ref{grid} lines at subticks coordinates too;
+
+define complex variable/expression in MGL script if placed at beginning.
+
+@item #
+set to use solid marks (see @ref{Line styles}) or solid @ref{error} boxes;
+
+set to draw wired plot for @ref{axial}, @ref{surf3}, @ref{surf3a}, @ref{surf3c}, @ref{triplot}, @ref{quadplot}, @ref{area}, @ref{region}, @ref{bars}, @ref{barh}, @ref{tube}, @ref{tape}, @ref{cone}, @ref{boxs} and draw boundary only for @ref{circle}, @ref{ellipse}, @ref{rhomb};
+
+set to draw also mesh lines for @ref{surf}, @ref{surfc}, @ref{surfa}, @ref{dens}, @ref{densx}, @ref{densy}, @ref{densz}, @ref{dens3}, or boundary for @ref{chart}, @ref{facex}, @ref{facey}, @ref{facez}, @ref{rect};
+
+set to draw boundary and box for @ref{legend}, @ref{title}, or grid lines for @ref{table};
+
+set to draw grid for @ref{radar};
+
+set to start flow threads and pipes from edges only for @ref{flow}, @ref{pipe};
+
+set to use whole are for axis range in @ref{subplot}, @ref{inplot};
+
+change text color inside a string (see @ref{Font styles});
+
+start comment in @ref{MGL scripts} or in @ref{Command options}.
+
+@item $
+denote parameter of @ref{MGL scripts}.
+
+@item %
+set color scheme along 2 coordinates @ref{Color scheme};
+
+operation in @ref{Textual formulas}.
+
+@item &
+
+set to pass long integer number in tick template @ref{xtick}, @ref{ytick}, @ref{ztick}, @ref{ctick};
+
+specifier of drawing user-defined symbols as mark (see @ref{Line styles});
+
+operation in @ref{Textual formulas}.
+
+@item @quoteright{}
+denote string in @ref{MGL scripts} or in @ref{Command options}.
+
+@item *
+one of marks (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme});
+
+set to start flow threads from 2d array inside data (see @ref{flow});
+
+operation in @ref{Textual formulas}.
+
+@item +
+one of marks (see @ref{Line styles}) or kind of @ref{error} boxes;
+
+one of mask for face filling (see @ref{Color scheme});
+
+set to print @samp{+} for positive numbers in @ref{axis}, @ref{label}, @ref{table};
+
+operation of increasing last character value in MGL strings;
+
+operation in @ref{Textual formulas}.
+
+@item ,
+separator for color positions (see @ref{Color styles}) or items in a list
+
+concatenation of MGL string with another string or numerical value.
+
+@item -
+solid line style (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme});
+
+place entries horizontally in @ref{legend};
+
+set to use usual @samp{-} for negative numbers in @ref{axis}, @ref{label}, @ref{table};
+
+operation in @ref{Textual formulas}.
+
+@item .
+one of marks (see @ref{Line styles}) or kind of @ref{error} boxes;
+
+set to draw hachures instead of arrows for @ref{vect}, @ref{vect3};
+
+set to use dots instead of faces for @ref{cloud}, @ref{torus}, @ref{axial}, @ref{surf3}, @ref{surf3a}, @ref{surf3c}, @ref{surf}, @ref{surfa}, @ref{surfc}, @ref{dens}, @ref{map};
+
+delimiter of fractional parts for numbers.
+
+@item /
+operation in @ref{Textual formulas}.
+
+@item :
+line dashing style (see @ref{Line styles});
+
+stop color scheme parsing (see @ref{Color scheme});
+
+range operation in @ref{MGL scripts};
+
+style for @ref{axis};
+
+separator of commands in @ref{MGL scripts}.
+
+@item ;
+line dashing style (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme});
+
+start of an option in @ref{MGL scripts} or in @ref{Command options};
+
+separator of equations in @ref{ode};
+
+separator of labels in @ref{iris}.
+
+@item <
+one of marks (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme});
+
+style of @ref{subplot} and @ref{inplot};
+
+set position of @ref{colorbar};
+
+style of @ref{vect}, @ref{vect3};
+
+align left in @ref{bars}, @ref{barh}, @ref{boxplot}, @ref{cones}, @ref{candle}, @ref{ohlc};
+
+operation in @ref{Textual formulas}.
+
+
+@item >
+one of marks (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme});
+
+style of @ref{subplot} and @ref{inplot};
+
+set position of @ref{colorbar};
+
+style of @ref{vect}, @ref{vect3};
+
+align right in @ref{bars}, @ref{barh}, @ref{boxplot}, @ref{cones}, @ref{candle}, @ref{ohlc};
+
+operation in @ref{Textual formulas}.
+
+@item =
+line dashing style (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme});
+
+set to use equidistant columns for @ref{table};
+
+set to use color gradient for @ref{vect}, @ref{vect3};
+
+operation in @ref{Textual formulas}.
+
+@item @@
+set to draw box around text for @ref{text} and similar functions;
+
+set to draw boundary and fill it for @ref{circle}, @ref{ellipse}, @ref{rhomb};
+
+set to fill faces for @ref{box};
+
+set to draw large semitransparent mark instead of error box for @ref{error};
+
+set to draw edges for @ref{cone};
+
+set to draw filled boxes for @ref{boxs};
+
+reduce text size inside a string (see @ref{Font styles});
+
+operation in @ref{Textual formulas}.
+
+@item ^
+one of marks (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme});
+
+style of @ref{subplot} and @ref{inplot};
+
+set position of @ref{colorbar};
+
+set outer position for @ref{legend};
+
+inverse default position for @ref{axis};
+
+switch to upper index inside a string (see @ref{Font styles});
+
+align center in @ref{bars}, @ref{barh}, @ref{boxplot}, @ref{cones}, @ref{candle}, @ref{ohlc};
+
+operation in @ref{Textual formulas}.
+
+@item _
+empty arrow style (see @ref{Line styles});
+
+disable drawing of tick labels for @ref{axis};
+
+style of @ref{subplot} and @ref{inplot};
+
+set position of @ref{colorbar};
+
+set to draw contours at bottom for @ref{cont}, @ref{contf}, @ref{contd}, @ref{contv}, @ref{tricont};
+
+switch to lower index inside a string (see @ref{Font styles}).
+
+@item []
+contain symbols excluded from color scheme parsing (see @ref{Color scheme});
+
+operation of getting n-th character from MGL string.
+
+@item @{@}
+contain extended specification of color (see @ref{Color styles}), dashing (see @ref{Line styles}) or mask (see @ref{Color scheme});
+
+denote special operation in @ref{MGL scripts};
+
+denote 'meta-symbol' for LaTeX like string parsing (see @ref{Font styles}).
+
+@item |
+line dashing style (see @ref{Line styles});
+
+set to use sharp color scheme (see @ref{Color scheme});
+
+set to limit width by subplot width for @ref{table};
+
+delimiter in @ref{list} command;
+
+operation in @ref{Textual formulas}.
+
+@item \
+string continuation symbol on next line for @ref{MGL scripts}.
+
+@item ~
+disable drawing of tick labels for @ref{axis} and @ref{colorbar};
+
+disable first segment in @ref{lamerey};
+
+reduce number of segments in @ref{plot} and @ref{tens};
+
+one of mask for face filling (see @ref{Color scheme}).
+
+@item 0,1,2,3,4,5,6,7,8,9
+line width (see @ref{Line styles});
+
+brightness of a color (see @ref{Color styles});
+
+precision of numbers in @ref{axis}, @ref{label}, @ref{table};
+
+kind of smoothing (for digits 1,3,5) in @ref{smooth};
+
+digits for a value.
+
+@item 4,6,8
+set to draw square, hex- or octo-pyramids instead of cones in @ref{cone}, @ref{cones}.
+
+@item A,B,C,D,E,F,a,b,c,d,e,f
+can be hex-digit for color specification if placed inside @{@} (see @ref{Color styles}).
+
+@item A
+arrow style (see @ref{Line styles});
+
+set to use absolute position in whole picture for @ref{text}, @ref{colorbar}, @ref{legend}.
+
+@item a
+set to use absolute position in subplot for @ref{text};
+
+style of @ref{plot}, @ref{radar}, @ref{tens}, @ref{area}, @ref{region} to draw segments between points outside of axis range;
+
+style of @ref{bars}, @ref{barh}, @ref{cones}.
+
+@item B
+dark blue color (see @ref{Color styles}).
+
+@item b
+blue color (see @ref{Color styles});
+
+bold font face if placed after @samp{:} (see @ref{Font styles}).
+
+@item C
+dark cyan color (see @ref{Color styles});
+
+align text to center if placed after @samp{:} (see @ref{Font styles}).
+
+@item c
+cyan color (see @ref{Color styles});
+
+name of color axis;
+
+cosine transform for @ref{transform}.
+
+@item D
+arrow style (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme}).
+
+@item d
+one of marks (see @ref{Line styles}) or kind of @ref{error} boxes;
+
+one of mask for face filling (see @ref{Color scheme});
+
+start hex-dash description if placed inside @{@} (see @ref{Line styles}).
+
+@item E
+dark green-yellow color (see @ref{Color styles}).
+
+@item e
+green-yellow color (see @ref{Color styles}).
+
+@item F
+
+set fixed bar widths in @ref{bars}, @ref{barh};
+
+set LaTeX-like format for numbers in @ref{axis}, @ref{label}, @ref{table}.
+
+@item f
+style of @ref{bars}, @ref{barh};
+
+style of @ref{vect}, @ref{vect3};
+
+set fixed format for numbers in @ref{axis}, @ref{label}, @ref{table};
+
+Fourier transform for @ref{transform}.
+
+@item G
+dark green color (see @ref{Color styles}).
+
+@item g
+green color (see @ref{Color styles}).
+
+@item H
+dark gray color (see @ref{Color styles}).
+
+@item h
+gray color (see @ref{Color styles});
+
+Hankel transform for @ref{transform}.
+
+@item I
+arrow style (see @ref{Line styles});
+
+set @ref{colorbar} position near boundary.
+
+@item i
+line dashing style (see @ref{Line styles});
+
+italic font face if placed after @samp{:} (see @ref{Font styles}).
+
+set to use inverse values for @ref{cloud}, @ref{pipe}, @ref{dew};
+
+set to fill only area with y1<y<y2 for @ref{region};
+
+inverse Fourier transform for @ref{transform}, @ref{transforma}, @ref{fourier}.
+
+@item j
+line dashing style (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme}).
+
+@item K
+arrow style (see @ref{Line styles}).
+
+@item k
+black color (see @ref{Color styles}).
+
+@item L
+dark green-blue color (see @ref{Color styles});
+
+align text to left if placed after @samp{:} (see @ref{Font styles}).
+
+@item l
+green-blue color (see @ref{Color styles}).
+
+@item M
+dark magenta color (see @ref{Color styles}).
+
+@item m
+magenta color (see @ref{Color styles}).
+
+@item N
+dark sky-blue color (see @ref{Color styles}).
+
+@item n
+sky-blue color (see @ref{Color styles}).
+
+@item O
+arrow style (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme}).
+
+@item o
+one of marks (see @ref{Line styles}) or kind of @ref{error} boxes;
+
+one of mask for face filling (see @ref{Color scheme});
+
+over-line text if placed after @samp{:} (see @ref{Font styles}).
+
+@item P
+dark purple color (see @ref{Color styles}).
+
+@item p
+purple color (see @ref{Color styles}).
+
+@item Q
+dark orange or brown color (see @ref{Color styles}).
+
+@item q
+orange color (see @ref{Color styles}).
+
+@item R
+dark red color (see @ref{Color styles});
+
+align text to right if placed after @samp{:} (see @ref{Font styles}).
+
+@item r
+red color (see @ref{Color styles}).
+
+@item S
+arrow style (see @ref{Line styles});
+
+one of mask for face filling (see @ref{Color scheme}).
+
+@item s
+one of marks (see @ref{Line styles}) or kind of @ref{error} boxes;
+
+one of mask for face filling (see @ref{Color scheme});
+
+start hex-mask description if placed inside @{@} (see @ref{Color scheme});
+
+sine transform for @ref{transform}.
+
+@item t
+draw tubes instead of cones in @ref{cone}, @ref{cones};
+
+@item T
+arrow style (see @ref{Line styles});
+
+place text under the curve for @ref{text}, @ref{cont}, @ref{cont3}.
+
+@item t
+set to draw text labels for @ref{cont}, @ref{cont3};
+
+name of t-axis (one of ternary axis);
+
+variable in @ref{Textual formulas}, which usually is varied in range [0,1].
+
+@item U
+dark blue-violet color (see @ref{Color styles});
+
+disable rotation of tick labels for @ref{axis}.
+
+@item u
+blue-violet color (see @ref{Color styles});
+
+under-line text if placed after @samp{:} (see @ref{Font styles});
+
+name of u-axis (one of ternary axis);
+
+variable in @ref{Textual formulas}, which usually denote array itself.
+
+@item V
+arrow style (see @ref{Line styles});
+
+place text centering on vertical direction for @ref{text}.
+
+@item v
+one of marks (see @ref{Line styles});
+
+set to draw vectors on flow threads for @ref{flow} and on segments for @ref{lamerey}.
+
+@item W
+bright gray color (see @ref{Color styles}).
+
+@item w
+white color (see @ref{Color styles});
+
+wired text if placed after @samp{:} (see @ref{Font styles});
+
+name of w-axis (one of ternary axis);
+
+@item X
+arrow style (see @ref{Line styles}).
+
+@item x
+
+name of x-axis or x-direction or 1st dimension of a data array;
+
+start hex-color description if placed inside @{@} (see @ref{Color styles});
+
+one of marks (see @ref{Line styles}) or kind of @ref{error} boxes;
+
+tiles orientation perpendicular to x-axis in @ref{tile}, @ref{tiles};
+
+style of @ref{tape}.
+
+@item Y
+dark yellow or gold color (see @ref{Color styles}).
+
+@item y
+yellow color (see @ref{Color styles});
+
+name of y-axis or y-direction or 2nd dimension of a data array;
+
+tiles orientation perpendicular to y-axis in @ref{tile}, @ref{tiles}.
+
+@item z
+
+name of z-axis or z-direction or 3d dimension of a data array;
+
+style of @ref{tape}.
+
+@end table
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Hot-keys for mglview, Hot-keys for UDAV, Symbols for styles, Symbols and hot-keys
+@section Hot-keys for mglview
+@nav{}
+
+@multitable @columnfractions .3 .7
+@headitem Key @tab Description
+@item @key{Ctrl-P}
+@tab Open printer dialog and print graphics.
+
+@item @key{Ctrl-W}
+@tab Close window.
+
+@item @key{Ctrl-T}
+@tab Switch on/off transparency for the graphics.
+
+@item @key{Ctrl-L}
+@tab Switch on/off additional lightning for the graphics.
+
+@item @key{Ctrl-Space}
+@tab Restore default graphics rotation, zoom and perspective.
+
+@item @key{F5}
+@tab Execute script and redraw graphics.
+
+@item @key{F6}
+@tab Change canvas size to fill whole region.
+
+@item @key{F7}
+@tab Stop drawing and script execution.
+
+@item @key{Ctrl-F5}
+@tab Run slideshow. If no parameter specified then the dialog with slideshow options will appear.
+
+@item @key{Ctrl-Comma}, @key{Ctrl-Period}
+@tab Show next/previous slide. If no parameter specified then the dialog with slideshow options will appear.
+
+
+@item @key{Ctrl-Shift-G}
+@tab Copy graphics to clipboard.
+
+
+
+@item @key{Alt-P}
+@tab Export as semitransparent PNG.
+
+@item @key{Alt-F}
+@tab Export as solid PNG.
+
+@item @key{Alt-J}
+@tab Export as JPEG.
+
+@item @key{Alt-E}
+@tab Export as vector EPS.
+
+@item @key{Alt-S}
+@tab Export as vector SVG.
+
+@item @key{Alt-L}
+@tab Export as LaTeX/Tikz image.
+
+@item @key{Alt-M}
+@tab Export as MGLD.
+
+@item @key{Alt-D}
+@tab Export as PRC/PDF.
+
+@item @key{Alt-O}
+@tab Export as OBJ.
+
+@c @item @key{Alt-X}
+@c @tab Export as X3D.
+@end multitable
+
+@c ------------------------------------------------------------------
+@external{}
+@node Hot-keys for UDAV, , Hot-keys for mglview, Symbols and hot-keys
+@section Hot-keys for UDAV
+@nav{}
+
+@multitable @columnfractions .3 .7
+@headitem Key @tab Description
+@item @key{Ctrl-N}
+@tab Create new window with empty script. Note, all scripts share variables. So, second window can be used to see some additional information of existed variables.
+
+@item @key{Ctrl-O}
+@tab Open and execute/show script or data from file. You may switch off automatic exection in UDAV properties
+
+@item @key{Ctrl-S}
+@tab Save script to a file.
+
+@item @key{Ctrl-P}
+@tab Open printer dialog and print graphics.
+
+@item @key{Ctrl-Z}
+@tab Undo changes in script editor.
+
+@item @key{Ctrl-Shift-Z}
+@tab Redo changes in script editor.
+
+@item @key{Ctrl-X}
+@tab Cut selected text into clipboard.
+
+@item @key{Ctrl-C}
+@tab Copy selected text into clipboard.
+
+@item @key{Ctrl-V}
+@tab Paste selected text from clipboard.
+
+@item @key{Ctrl-A}
+@tab Select all text in editor.
+
+@item @key{Ctrl-F}
+@tab Show dialog for text finding.
+
+@item @key{F3}
+@tab Find next occurrence of the text.
+
+
+@item @key{Win-C} or @key{Meta-C}
+@tab Show dialog for new command and put it into the script.
+
+@item @key{Win-F} or @key{Meta-F}
+@tab Insert last fitted formula with found coefficients.
+
+@item @key{Win-S} or @key{Meta-S}
+@tab Show dialog for styles and put it into the script. Styles define the plot view (color scheme, marks, dashing and so on).
+
+@item @key{Win-O} or @key{Meta-O}
+@tab Show dialog for options and put it into the script. Options are used for additional setup the plot.
+
+@item @key{Win-N} or @key{Meta-N}
+@tab Replace selected expression by its numerical value.
+
+@item @key{Win-P} or @key{Meta-P}
+@tab Select file and insert its file name into the script.
+
+@item @key{Win-G} or @key{Meta-G}
+@tab Show dialog for plot setup and put resulting code into the script. This dialog setup axis, labels, lighting and other general things.
+
+
+
+@item @key{Ctrl-Shift-O}
+@tab Load data from file. Data will be deleted only at exit but UDAV will not ask to save it.
+
+@item @key{Ctrl-Shift-S}
+@tab Save data to a file.
+
+@item @key{Ctrl-Shift-C}
+@tab Copy range of numbers to clipboard.
+
+@item @key{Ctrl-Shift-V}
+@tab Paste range of numbers from clipboard.
+
+@item @key{Ctrl-Shift-N}
+@tab Recreate the data with new sizes and fill it by zeros.
+
+@item @key{Ctrl-Shift-R}
+@tab Resize (interpolate) the data to specified sizes.
+
+@item @key{Ctrl-Shift-T}
+@tab Transform data along dimension(s).
+
+@item @key{Ctrl-Shift-M}
+@tab Make another data.
+
+@item @key{Ctrl-Shift-H}
+@tab Find histogram of data.
+
+
+
+@item @key{Ctrl-T}
+@tab Switch on/off transparency for the graphics.
+
+@item @key{Ctrl-L}
+@tab Switch on/off additional lightning for the graphics.
+
+@item @key{Ctrl-G}
+@tab Switch on/off grid of absolute coordinates.
+
+@item @key{Ctrl-Space}
+@tab Restore default graphics rotation, zoom and perspective.
+
+@item @key{F5}
+@tab Execute script and redraw graphics.
+
+@item @key{F6}
+@tab Change canvas size to fill whole region.
+
+@item @key{F7}
+@tab Stop script execution and drawing.
+
+@item @key{F8}
+@tab Show/hide tool window with list of hidden plots.
+
+@item @key{F9}
+@tab Restore status for 'once' command and reload data.
+
+@item @key{Ctrl-F5}
+@tab Run slideshow. If no parameter specified then the dialog with slideshow options will appear.
+
+@item @key{Ctrl-Comma}, @key{Ctrl-Period}
+@tab Show next/previous slide. If no parameter specified then the dialog with slideshow options will appear.
+
+@item @key{Ctrl-W}
+@tab Open dialog with slideshow options.
+
+@item @key{Ctrl-Shift-G}
+@tab Copy graphics to clipboard.
+
+
+@item @key{F1}
+@tab Show help on MGL commands
+
+@item @key{F2}
+@tab Show/hide tool window with messages and information.
+
+@item @key{F4}
+@tab Show/hide calculator which evaluate and help to type textual formulas. Textual formulas may contain data variables too.
+
+
+@item @key{Meta-Shift-Up}, @key{Meta-Shift-Down}
+@tab Change view angle @math{\theta}.
+
+@item @key{Meta-Shift-Left}, @key{Meta-Shift-Right}
+@tab Change view angle @math{\phi}.
+
+@item @key{Alt-Minus}, @key{Alt-Equal}
+@tab Zoom in/out whole image.
+
+@item @key{Alt-Up}, @key{Alt-Down}, @key{Alt-Right}, @key{Alt-Left}
+@tab Shift whole image.
+
+@item @key{Alt-P}
+@tab Export as semitransparent PNG.
+
+@item @key{Alt-F}
+@tab Export as solid PNG.
+
+@item @key{Alt-J}
+@tab Export as JPEG.
+
+@item @key{Alt-E}
+@tab Export as vector EPS.
+
+@item @key{Alt-S}
+@tab Export as vector SVG.
+
+@item @key{Alt-L}
+@tab Export as LaTeX/Tikz image.
+
+@item @key{Alt-M}
+@tab Export as MGLD.
+
+@item @key{Alt-D}
+@tab Export as PRC/PDF.
+
+@item @key{Alt-O}
+@tab Export as OBJ.
+
+@c @item @key{Alt-X}
+@c @tab Export as X3D.
+
+@end multitable
+
+@external{}

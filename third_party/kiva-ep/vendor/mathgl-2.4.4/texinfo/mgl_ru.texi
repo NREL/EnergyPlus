@@ -1,0 +1,107 @@
+\input texinfo
+@documentencoding UTF-8
+@documentlanguage ru
+
+@setfilename mgl_ru.info
+@documentencoding UTF-8
+@include version.texi
+@settitle Язык MGL для версии @value{VERSION}
+@syncodeindex pg cp
+
+@copying
+Это документация для MathGL (версии @value{VERSION}) -- библиотеки классов и функций для построения научной графики. Пожалуйста сообщайте о любых ошибках в этом руководстве на @email{mathgl.abalakin@@gmail.org}.
+
+@include copyright.texi
+@end copying
+
+@dircategory MathGL documentation system
+@direntry
+* MathGL: (mathgl). The library for scientific graphics.
+@end direntry
+
+@titlepage
+@title Язык MGL
+@subtitle версия @value{VERSION}
+@author А.А. Балакин (@uref{http://mathgl.sourceforge.net/})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top Язык MGL
+
+Это документация для языка MGL (версии @value{VERSION}). Пожалуйста сообщайте о любых ошибках в этом руководстве на @email{mathgl.abalakin@@gmail.org}. Дополнительную информацию о MGL и MathGL можно найти на домашней странице проекта @uref{http://mathgl.sourceforge.net/}.
+
+@include copyright.texi
+
+@end ifnottex
+
+@menu
+@c * Overview::
+* MGL scripts::
+* General concepts::
+* MathGL core::
+* Data processing::
+* Examples::
+* All samples::
+* Symbols and hot-keys::
+* Copying This Manual::
+* Index::
+@end menu
+
+@macro external {}
+@end macro
+@macro nav {}
+@end macro
+
+@macro fig {fname,text}
+@center @image{\fname\, 11cm, , \text\, png}
+@end macro
+@macro pfig {fname,text}
+@center @image{png/\fname\, 11cm, , \text\, png}
+@end macro
+
+@macro sref {arg}
+См. @ref{\arg\}, для примеров кода и графика.
+@end macro
+@set UDAV
+
+@c @node Overview, Examples, , Top
+@c @include overview_ru.texi
+
+@node MGL scripts, General concepts, , Top
+@include parse_ru.texi
+
+@node General concepts, MathGL core, MGL scripts, Top
+@include concept_ru.texi
+
+@node MathGL core, Data processing, General concepts, Top
+@include core_ru.texi
+
+@node Data processing, Examples, MathGL core, Top
+@include data_ru.texi
+
+@node Examples, All samples, Data processing, Top
+@include ex_mgl_ru.texi
+
+@node All samples, Symbols and hot-keys, Examples, Top
+@include samples.texi
+
+@node Symbols and hot-keys, Copying This Manual, All samples, Top
+@appendix Symbols and hot-keys
+@include symbols_ru.texi
+
+@node Copying This Manual, Index, Symbols and hot-keys, Top
+@appendix GNU Free Documentation License
+@include fdl.texi
+
+@node Index, , Copying This Manual, Top
+@unnumbered Index
+
+@printindex cp
+
+@bye

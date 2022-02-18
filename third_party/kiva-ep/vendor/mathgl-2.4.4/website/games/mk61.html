@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<title>Эмулятор МК-61</title>
+<style type="text/css">
+.boxa {
+	text-align: center;
+	display: inline-block;
+	vertical-align: top;
+	width: 410px;
+/*	width: 33%;
+	min-width: 410px;*/
+}
+</style>
+
+<link rel="stylesheet" href="../styles.css"></head><body onload="init()" onunload="save()">
+<div class="topnav" id="myTopnav"></div><div class="main">
+
+
+<!--
+http://www.t-z-n.ru/archives/km1.pdf
+http://zetcode.com/db/mysqlc/
+https://www.w3schools.com/howto/howto_css_tooltip.asp
+-->
+
+
+<h2>PocketMK &ndash; эмулятор калькулятора МК-61</h2>
+
+<div class="boxa"><table>
+<tr style="background:#fff;"><td>T:</td><td><input type="text" style="background:none;color:gray;width:350px" id="regT" value="0" readonly/></td></tr>
+<tr style="background:#fff;"><td>Z:</td><td><input type="text" style="background:none;color:gray;width:350px" id="regZ" value="0" readonly/></td></tr>
+<tr style="background:#fff;"><td>Y:</td><td><input type="text" style="background:none;color:gray;width:350px" id="regY" value="0" readonly/></td></tr>
+<tr><td>X:</td><td><input type="text" style="background:none;width:350px" id="regX" value="0" readonly></td></tr></table>
+
+<div style="float: left">
+<input type="radio" id="degR" onclick="degree(0)" checked> rad</input>
+<input type="radio" id="degG" onclick="degree(1)"> grad</input>
+<input type="radio" id="degD" onclick="degree(2)"> deg</input></div>
+<div style="float: right">
+<button onclick="step()" style="width:55px;height:30px;border-radius:10px;font-size:11pt">Step</button>
+<button onclick="run()" style="width:55px;height:30px;border-radius:10px;font-size:11pt" id="butRun">Run</button>
+&emsp;</div>
+<br><br>
+
+<!--<p id="status">Status:</p>-->
+<table><tr style="background:#fff;">
+<td><button id="button0" onclick="press(0)"></button></td>
+<td><button id="button1" onclick="press(1)"></button></td>
+<td><button id="button2" onclick="press(2)"></button></td>
+<td><button id="button3" onclick="press(3)"></button></td>
+<td><button id="button4" onclick="press(4)"></button></td>
+<td><button id="button5" onclick="press(5)"></button></td></tr><tr style="background:#fff;">
+<td><button id="button6" onclick="press(6)"></button></td>
+<td><button id="button7" onclick="press(7)"></button></td>
+<td><button id="button8" onclick="press(8)"></button></td>
+<td><button id="button9" onclick="press(9)"></button></td>
+<td><button id="button10" onclick="press(10)"></button></td>
+<td><button id="button11" onclick="press(11)"></button></td></tr><tr style="background:#fff;">
+<td><button id="button12" onclick="press(12)"></button></td>
+<td><button id="button13" onclick="press(13)"></button></td>
+<td><button id="button14" onclick="press(14)"></button></td>
+<td><button id="button15" onclick="press(15)"></button></td>
+<td><button id="button16" onclick="press(16)"></button></td>
+<td><button id="button17" onclick="press(17)"></button></td></tr><tr style="background:#fff;">
+<td><button id="button18" onclick="press(18)"></button></td>
+<td><button id="button19" onclick="press(19)"></button></td>
+<td><button id="button20" onclick="press(20)"></button></td>
+<td><button id="button21" onclick="press(21)"></button></td>
+<td><button id="button22" onclick="press(22)"></button></td>
+<td><button id="button23" onclick="press(23)"></button></td></tr><tr style="background:#fff;">
+<td><button id="button24" onclick="press(24)"></button></td>
+<td><button id="button25" onclick="press(25)"></button></td>
+<td><button id="button26" onclick="press(26)"></button></td>
+<td><button id="button27" onclick="press(27)"></button></td>
+<td><button id="button28" onclick="press(28)"></button></td>
+<td><button id="button29" onclick="press(29)"></button></button></td></tr>
+</table></div>
+
+<div class="boxa">
+<button class="accordion">Картинка</button><div class="panel">
+<canvas id="myCanvas" width="400" height="300" style="border:1px solid #000000;">
+Your browser does not support the HTML5 canvas tag.</canvas><br>
+
+<button onclick="setColor(0)" style="background-color:#00f;width:60px">0</button>
+<button onclick="setColor(1)" style="background-color:#08f;width:60px">1</button>
+<button onclick="setColor(2)" style="background-color:#0ff;width:60px">2</button>
+<button onclick="setColor(3)" style="background-color:#0f8;width:60px">3</button>
+<button onclick="setColor(4)" style="background-color:#0f0;width:60px">4</button>
+<button onclick="setColor(5)" style="background-color:#8f0;width:60px">5</button>
+<button onclick="setColor(6)" style="background-color:#ff0;width:60px">6</button>
+<button onclick="setColor(7)" style="background-color:#f80;width:60px">7</button>
+<button onclick="setColor(8)" style="background-color:#f00;width:60px">8</button>
+<button onclick="setColor(9)" style="background-color:#f08;width:60px">9</button>
+<button onclick="setColor(10)" style="background-color:#f0f;width:60px">10</button>
+<button onclick="setColor(11)" style="background-color:#80f;width:60px">11</button>
+<button onclick="setColor(12)" style="background-color:#00a;width:60px">12</button>
+<button onclick="setColor(13)" style="background-color:#05a;width:60px">13</button>
+<button onclick="setColor(14)" style="background-color:#0aa;width:60px">14</button>
+<button onclick="setColor(15)" style="background-color:#0a5;width:60px">15</button>
+<button onclick="setColor(16)" style="background-color:#0a0;width:60px">16</button>
+<button onclick="setColor(17)" style="background-color:#5a0;width:60px">17</button>
+<button onclick="setColor(18)" style="background-color:#aa0;width:60px">18</button>
+<button onclick="setColor(19)" style="background-color:#a50;width:60px">19</button>
+<button onclick="setColor(20)" style="background-color:#a00;width:60px">20</button>
+<button onclick="setColor(21)" style="background-color:#a05;width:60px">21</button>
+<button onclick="setColor(22)" style="background-color:#a0a;width:60px">22</button>
+<button onclick="setColor(23)" style="background-color:#50a;width:60px">23</button>
+<button onclick="setColor(24)" style="background-color:#fff;width:60px">24</button>
+<button onclick="setColor(25)" style="background-color:#ccc;width:60px">25</button>
+<button onclick="setColor(26)" style="background-color:#999;width:60px">26</button>
+<button onclick="setColor(27)" style="background-color:#666;width:60px">27</button>
+<button onclick="setColor(28)" style="background-color:#333;width:60px">28</button>
+<button onclick="setColor(29)" style="background-color:#000;width:60px">29</button>
+
+</div></div>
+
+<div class="boxa">
+<button class="accordion">Регистры</button>
+<div class="panel" id="reg" style="text-align: left;"></div></div>
+
+<button class="accordion">Программа</button>
+<!-- TODO Save/Load script -->
+<div class="panel" id="myProg">
+<table><tr style="background:#fff;">
+<td><button style = "width:55px;height:35px;border-radius:10px;font-size:15pt;" onclick="posDec()">&larr;</button></td>
+<td><button style = "width:55px;height:35px;border-radius:10px;font-size:15pt;" onclick="posDwn()">&darr;</button></td>
+<td><button style = "width:55px;height:35px;border-radius:10px;font-size:15pt;" onclick="posIns()">Ins</button></td>
+<td><button style = "width:55px;height:35px;border-radius:10px;font-size:15pt;" onclick="posDel()">Del</button></td>
+<td><button style = "width:55px;height:35px;border-radius:10px;font-size:15pt;" onclick="posUp()">&uarr;</button></td>
+<td><button style = "width:55px;height:35px;border-radius:10px;font-size:15pt;" onclick="posInc()">&rarr;</button></button></td></tr>
+</table>
+
+<input type="checkbox" id="prg" onclick="prgON = 1-prgON;">Ввод программы</input>
+<table id="prog"></table>
+</div>
+
+<button class="accordion">Краткое описание</button>
+<!-- TODO Save/Load script -->
+<div class="panel">
+<p><b>PocketMK</b> &ndash; эмулятор семейства популярнейших советских программируемых калькуляторов БЗ-34...МК-61. Основное отличие эмулятора состоит в использовании незадействованных адресов команд, позволивших добавить еще один регистр <code>F</code>, команды для специальных функций (<code>x!, sinh, cosh, tanh, asinh, acosh, atanh, erf, J0, J1, Y0, Y1</code>), команды добавления к регистру (<code>M+</code>) и команды вывода графики в растровое изображение размером 400&times;300 точек. Имеется два основных режима работы: режим калькулятора, режим редактирования программы (включается галочкой в панели "Программа").</p>
+<p>PocketMK использует обратную польскую форму записи. Например, для вычисления выражения 2+3*(6+7) надо выполнить следующие действия:
+<code>2 B&uarr; 3 B&uarr; 6 B&uarr; 7 + * +</code> или более просто <code>6 B&uarr; 7 + 3 * 2 +</code>. Использование функций аналогично. Например, вычислим синус от угла 37 градусов 30 минут. Сначала превратим минуты в десятичную дробь: 37.5. Переключив PocketMK в режим <i>deg</i> (переключатель находится в верхнем левом углу в режиме калькулятора), вводим это число последовательным нажатием клавиш <code>3 7 . 5</code> и берем от него синус, нажав клавиши <code>F sin</code>. На индикаторе читаем значение синуса: 0.6087614290087207. Если нужно ввести большое число, можно воспользоваться командой ввода порядка <code>EE</code>. При этом для отрицательных порядков за ней следует ввести команду <code>&pm;</code>. Например,
+<code>1 . 7 8 EE 5 3</code> дает 1.78e53, <code>2 . 5 6 EE &pm; 7</code> дает 2.56e-7, <code>3 &pm; EE 6</code> дает -3e6</p>
+
+<h3>Внешний вид</h3>
+<p>PocketMK имеет два режима работы: режим калькулятора (по умолчанию) и режим ввода программы. В режиме калькулятора PocketMK работает в интерактивном режиме &ndash; любая нажатая клавиша сразу же выполняется. Вверху находятся кнопки переключения ввода углов, содержимое стека {X,Y,Z,T} и кнопки управления программой. В средней части располагается клавиатура, вид которой зависит от состояния функциональных клавиш «F» и «K». Внизу находятся кнопки панели инструментов и панель меню.</p>
+<p>Кнопки переключения ввода углов имеют следующее значение: <i>deg</i> &ndash; углы считаются в градусах (период sin(x) равен 360), <i>grad</i> &ndash; углы считаются в градах (период sin(x) равен 400), <i>rad</i> &ndash; углы считаются в радианах (период sin(x) равен 2&pi;).</p>
+<p>Окно отображения стека расположено сверху посередине. «Главный» регистр X выделен цветом, поскольку именно с ним выполняются все основные операции &ndash; сложение, вычитание, умножение и деление, вычисление функций, запись и считывание регистров, операции условного перехода. Остальные регистры стека являются скорее «дополнительными» и выводятся серым цветом.</p>
+<p>Кнопки управления выполнением программы позволяют выполнить программу пошагово (<i>Step</i>) и запустить программу на автоматическое выполнение с текущей программной позиции (<i>Run</i>). Для остановки программы (например, в случае зацикливания) служит кнопка <i>Stop</i>, заменяющая кнопку <i>Run</i> при запуске программы.</p>
+<p>Клавиатура отображается в режиме калькулятора и в режиме редактирования программы. Ее вид зависит от нажатия функциональных клавиш «F» и «K», располагающихся в левой верхней части клавиатуры. Для удобства пользователя цвета кнопок изменяются вместе с изменением их функциональности. Кроме того, графические команды выделены зеленым цветом, а команды обращения к регистрам фиолетовым. 
+Часть кнопок имеет смысл только при выполнении программы (команды перехода, остановки программы и т.д., выделенные желтым). Действие остальных команд одинаково «полезно» в любом режиме. Отличие состоит в том, что в режиме калькулятора команды выполняются сразу, а в режиме ввода программы они записываются в программную память.</p>
+
+<h3>Регистры, стек и операции</h3>
+<p>PocketMK хранит числа в специальных переменных &ndash; регистрах. Каждый регистр памяти имеет свое обозначение в виде цифры или буквы. Шестнадцать из них обозначаются числами от 0 до 9 и начальными буквами латинского алфавита (A, B, C, D, E, F). По сути эти регистры являются обычными переменными, обращение к которым возможно произвольным образом. Еще четыре регистра образуют стек и обозначаются латинскими буквами (X, Y, Z, T). Прямой доступ возможен только к одному регистру из них &ndash; регистру X. Остальные регистры участвуют в вычислениях и доступны только с помощью команд работы со стеком. Последний из регистров (называемый B или X1) хранит информацию о предыдущем значении регистра X и может быть только прочитан с помощью команды <code>Bx</code>. Часто в описаниях программ перед регистром ставят букву R (например, RA &ndash; регистр А), чтобы отличать регистр от буквы. Регистры  X, Y, Z, T отображаются на экране калькулятора. Регистры 0,1,...,F можно посмотреть в панели «Регистры». </p>
+<p>При вводе в калькулятор число заносится в регистр X. Прочитать число в регистрах  0,1,...,F можно с помощью кнопки <code>MR</code> (от английского «memory read»). Например, команда <code>MRA</code> впишет число из регистра A в регистр Х. Аналогично команда <code>MSA</code> (от английского «memory save») запишет число из регистра Х в регистр А. Команда <code>M+A</code> прибавит число из регистра Х к числу, хранящемуся в регистре А. Команда <code>M+</code> отсутствовала в МК-61 и была введена для удобства работы и программирования различных статистических приложений.</p>
+<p>Каждая операция калькулятором выполняется либо над одним числом, находящимся в регистре X (операция одноместная: <code>x<sup>2</sup>, sin, erf</code> и т.д.), либо над двумя числами, одно из которых находится в регистре X, а другое - в регистре Y. Отличительной особенностью этого калькулятора является то, что операция, которую следует производить с двумя числами, выполняется <b>после</b> ввода двух чисел &ndash; используется так называемая польская или постфиксная запись выражений.</p>
+<p>Числа, над которыми нужно совершить ту или иную арифметическую операцию, должны находиться в двух регистрах &ndash; X и Y. В регистр Y можно попасть только из регистра X. Делается это нажатием клавиши <code>B&uarr;</code>. При этом в регистре X остается копия числа. Затем в регистр X записывается второе число, причем первое число стирается. В случае вычитания уменьшаемое должно находиться в Y, а вычитаемое &ndash; в X. При делении в Y должно находиться делимое, в X &ndash; делитель. После ввода числа в оба регистра, можно нажать клавишу выбранной операции. Результат ее будет помещен в регистр X. То, что было прежде в регистре Y, не сохранится. Здесь следует обратить внимание на то, что если в регистре X находился результат операции, то ввод нового числа в регистр X автоматически передвигает старое содержимое регистра X в регистр Y. Исключением являются операции очистки регистра <code>Cx</code> и операция <code>B&uarr;</code>.</p>
+<p>Наконец, в таблице приведено состояние стека до и после применения различных операций:</p>
+<table style="border: 1px solid black;">
+<tr><th>Операция</th><th>Стек до</th><th>Стек после</th></tr>
+<tr><td>Ввод числа <i>r</i> из регистра или числа &pi;</td><td><code>b x y z t</code></td><td><code>b r x y z</code></td></tr>
+<tr><td>Ввод числа <i>n</i> после <code>Сх, B&uarr;</code></td><td><code>b x y z t</code></td><td><code>b n y z t</code></td></tr>
+<tr><td>Ввод числа <i>n</i> после других операций</td><td><code>b x y z t</code></td><td><code>b n x y z</code></td></tr>
+<tr><td>Команда <code>Cx</code></td><td><code>b x y z t</code></td><td><code>b 0 y z t</code></td></tr>
+<tr><td>Команда <code>B&uarr;</code></td><td><code>b x y z t</code></td><td><code>b x x y z</code></td></tr>
+<tr><td>Команда <code>Bx</code></td><td><code>b x y z t</code></td><td><code>b b x y z</code></td></tr>
+<tr><td>Команда <code>&harr;</code></td><td><code>b x y z t</code></td><td><code>x y x z t</code></td></tr>
+<tr><td>Команда <code>&#8635;</code></td><td><code>b x y z t</code></td><td><code>x y z t x</code></td></tr>
+<tr><td>Вычисление функции f(x)</td><td><code>b x y z t</code></td><td><code>x f y z t</code></td></tr>
+<tr><td>Двуместная операция g</td><td><code>b x y z t</code></td><td><code>x g z t t</code></td></tr>
+<tr><td>Команда <code>B&darr;</code></td><td><code>b x y z t</code></td><td><code>x y z t t</code></td></tr>
+</table>
+
+<h3>Программирование</h3>
+<p>Составим теперь простую программу вычисления площади круга. Формула для вычисления площади круга известна: S=&pi;D<sup>2</sup>/4, где D &ndash; диаметр круга. Константа &pi; уже есть в калькуляторе. Величину D необходимо вручную ввести с клавиатуры (оно будет помещено в регистр X). Пусть D = 3. Для ручного расчета нужно нажать клавиши: <code>x<sup>2</sup> F pi * 4 /</code>. На индикаторе читаем результат: 7.0685834705770345. Те же клавиши и в той же последовательности нужно будет нажать, когда мы станем вводить в калькулятор программу для вычисления площади круга.</p>
+<p>Программа располагается в калькуляторе в виде отдельных команд, каждая из которых занимает свою ячейку программной памяти (некоторые управляющие &ndash; две ячейки &ndash; команда и адрес). Всего таких ячеек 160. Им присвоены номера, называемые адресами &ndash; от #00 до #F9. В силу совместимости с МК-61 нумерация сделана так, что первая цифра шестнадцатеричная, а вторая всего лишь десятичная. Например, адрес <code>#F9 = 0xF*10+9 = 159</code>. Такая вот смесь &#9786; !</p>
+
+<p>Чтобы ввести программу в калькулятор, надо перевести его в состояние, называемое режимом редактирования программы. В режиме редактирования PocketMK нажатие клавиш приводит к вводу команды в программную память вместо ее непосредственного выполнения. Для перехода в режим редактирования программы следует раскрыть панель программа и поставить галочку напротив <code>Ввод программы</code>. Стрелки в этой панели перемещают курсор (текущий адрес), кнопки <i>Ins</i> и <i>Del</i> добавляют и удаляют текущую/последнюю ячейку программы. Адрес первой команды в строке указывается перед двоеточием. Текущая позиция курсора выделена голубым. Курсор не показывается если он находится за последней командой (калькулятор готов к добавлению новой команды).</p>
+<p>Нажимаем <code>x<sup>2</sup></code> и в программе появляется <code>x<sup>2</sup></code>. Ее появление в таблице означает, что команда занесена в программную память. Одновременно прямоугольник сместился вправо &ndash; счетчик адресов увеличился на 1. Далее нажимаем <code>F &pi;</code> и в программе появляется <code>&pi;</code> (модификатор <code>F</code> в программе всегда опускается) и т.д. Таким образом вводятся все команды. Для останова работы калькулятора по программе необходимо ввести специальную команду: <code>stop</code> (клавиши <code>F stop</code>).</p>
+<p>Чтобы проверить работу программы вернемся в режим калькулятора (сняв галочку), введем диаметр круга и запустим программу кнопкой <i>Run</i>. На мгновение мигнет индикатор <i>Stop</i> вместо <i>Run</i> и программа выдаст ответ. Кнопка <i>Stop</i> предназначена для останова программы (например, в бесконечном цикле). Для пошагового исполнения программы (в целях отладки или в качестве одного из способов ввода чисел) можно воспользоваться кнопкой <i>Step</i>. Ее действие полностью аналогично <i>Run</i>, но будет исполнена только текущая команда.</p>
+<p>Следует отметить, что в отличие от калькулятора MK-61, переход в начало программы осуществляется автоматически, если курсор не виден (ожидается добавление новой команды). Кроме того, программа автоматически останавливается при достижении конца введенных команд (команда <code>stop</code> в конце программы не обязательна).</p>
+
+<h4>Команды перехода</h4>
+<p>Для безусловного перехода на адрес программы используется клавиша <code>go</code> (аналог команды <code>БП</code> &ndash; безусловный переход). После команды следует указать адрес перехода. Например, для того, чтобы перейти на адрес 60, надо нажать клавиши: <code>go 6 0</code>. Эта команда работает только в программном режиме и занимает две ячейки памяти: первая ячейка &ndash; код команды перехода, вторая &ndash; адрес перехода. Отмечу, что для совместимости с программами МК&ndash;61 пришлось ввести «странную» систему адресов. Всего ячеек 160 с адресами &ndash; от 00 до F9. При этом адрес состоит их двух цифр: первая цифра шестнадцатеричная, а вторая десятичная. Например, адрес <code>#F9 = 0xF*10+9 = 159</code>.</p>
+<p>Чтобы вызвать подпрограмму, используется команда <code>sub</code> (аналог команды <code>ПП</code> &ndash; переход на подпрограмму). Так же, как и в команде безусловного перехода, необходимо указать адрес, с которого начинается подпрограмма. Команда возврата из подпрограммы &ndash; <code>ret</code> (аналог команды <code>В/О</code>). Подпрограммы могут вкладываться друг в друга.</p>
+<p>Также есть специальные команды, которые изменяют порядок выполнения программы в зависимости от содержимого регистра X. Это команды <code>x&lt;0, x&ge;0, x=0, x&ne;0</code>. Если условие выполняется, то управление передается на команду, следующую за командой условия (напомним, что команда условия занимает 2 ячейки &ndash; команда и адрес), в противном случае &ndash; управление передастся на указанный адрес. Например, с адреса 20 мы введем строку: <code>F x<0 25</code>, тогда если содержимое регистра X будет меньше нуля, то программа продолжится с адреса 22, а если ноль и больше, то с адреса 25.</p>
+<p>Для организации циклов предусмотрены специальные команды <code>L0, L1, L2, L3</code>. После ввода этих команд также необходимо указать адрес перехода. Каждая команда ассоциирована с регистрами от 0 до 3, соответственно. После выполнения команды происходит вычитание единицы из этого регистра и сравнение результата с нулем. Если результат равен нулю, то программа продолжит свое выполнение со следующего адреса. Иначе &ndash; перейдет на указанный адрес перехода. Напишем программу вычисления факториала. Сначала перейдем в режим программирования с помощью меню или панели управления. Затем вводим программу: <code>MS0 1 MR0 * L0 02</code>. После ввода программы переходим в режим калькулятора, вводим число вводится с клавиатуры и нажимаем кнопку <i>Run</i>. В результате в регистре X появляется факториал числа. Можно проверить вычисленное значение нажав <code>&harr; K x!</code>.</p>
+</div>
+
+<button class="accordion">Подробное описание команд</button>
+<!-- TODO Save/Load script -->
+<div class="panel">
+<p>Все команды PocketMK имеют уникальный номер в диапазоне 0...255. Полный список команд с указанием их кодов можно найти в таблице. Здесь номер строки дает старший разряд, номер столбца &ndash; младший разряд номера команды. Например, команда <code>|x|</code> имеет номер 0x31.</p>
+<table>
+<tr><td></td><td>x0</td><td>x1</td><td>x2</td><td>x3</td><td>x4</td><td>x5</td><td>x6</td><td>x7</td><td>x8</td><td>x9</td><td>xA</td><td>xB</td><td>xC</td><td>xD</td><td>xE</td><td>xF</td></tr>
+<tr><td>x00</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>.</td><td>&pm;</td><td>EE</td><td>Cx</td><td>B&uarr;</td><td>Bx</td></tr>
+<tr><td>x10</td><td>+</td><td>&ndash;</td><td>*</td><td>/</td><td>&harr;</td><td>10<sup>x</sup></td><td>e<sup>x</sup></td><td>lg</td><td>ln</td><td>asin</td><td>acos</td><td>atan</td><td>sin</td><td>cos</td><td>tan</td><td style="background:yellow">Y<sub>0</sub></td></tr>
+<tr><td>x20</td><td>&pi;</td><td>sqrt</td><td>x<sup>2</sup></td><td>1/x</td><td>x<sup>y</sup></td><td>&#8635;</td><td style="background:yellow">B&darr;</td><td style="background:yellow">sh</td><td style="background:yellow">ch</td><td style="background:yellow">th</td><td style="background:yellow">erf</td><td style="background:yellow">x!</td><td style="background:yellow">asinh</td><td style="background:yellow">acosh</td><td style="background:yellow">atanh</td><td style="background:yellow">Y<sub>1</sub></td></tr>
+<tr><td>x30</td><td style="background:lime">col</td><td>|x|</td><td>sign</td><td style="background:lime">cls</td><td>[x]</td><td>{x}</td><td>max</td><td>and</td><td>or</td><td>xor</td><td>not</td><td>rnd</td><td style="background:lime">pnt</td><td style="background:lime">line</td><td style="background:lime">rect</td><td style="background:lime">arc</td></tr>
+<tr><td>x40</td><td>MS0</td><td>MS1</td><td>MS2</td><td>MS3</td><td>MS4</td><td>MS5</td><td>MS6</td><td>MS7</td><td>MS8</td><td>MS9</td><td>MSA</td><td>MSB</td><td>MSC</td><td>MSD</td><td>MSE</td><td style="background:yellow">MSF</td></tr>
+<tr><td>x50</td><td>stop</td><td>go</td><td>ret</td><td>sub</td><td>nop</td><td style="background:yellow">J<sub>0</sub></td><td style="background:yellow">J<sub>1</sub></td><td>x&ne;0</td><td>L2</td><td>x&ge;0</td><td>L3</td><td>L1</td><td>x&lt;0</td><td>L0</td><td>x=0</td><td style="background:yellow">wait</td></tr>
+<tr><td>x60</td><td>MR0</td><td>MR1</td><td>MR2</td><td>MR3</td><td>MR4</td><td>MR5</td><td>MR6</td><td>MR7</td><td>MR8</td><td>MR9</td><td>MRA</td><td>MRB</td><td>MRC</td><td>MRD</td><td>MRE</td><td style="background:yellow">MRF</td></tr>
+<tr><td>x70</td><td>Kx&ne;00</td><td>Kx&ne;01</td><td>Kx&ne;02</td><td>Kx&ne;03</td><td>Kx&ne;04</td><td>Kx&ne;05</td><td>Kx&ne;06</td><td>Kx&ne;07</td><td>Kx&ne;08</td><td>Kx&ne;09</td><td>Kx&ne;0A</td><td>Kx&ne;0B</td><td>Kx&ne;0C</td><td>Kx&ne;0D</td><td>Kx&ne;0E</td><td style="background:yellow">Kx&ne;0F</td></tr>
+<tr><td>x80</td><td>Kgo0</td><td>Kgo1</td><td>Kgo2</td><td>Kgo3</td><td>Kgo4</td><td>Kgo5</td><td>Kgo6</td><td>Kgo7</td><td>Kgo8</td><td>Kgo9</td><td>KgoA</td><td>KgoB</td><td>KgoC</td><td>KgoD</td><td>KgoE</td><td style="background:yellow">KgoF</td></tr>
+<tr><td>x90</td><td>Kx&ge;00</td><td>Kx&ge;01</td><td>Kx&ge;02</td><td>Kx&ge;03</td><td>Kx&ge;04</td><td>Kx&ge;05</td><td>Kx&ge;06</td><td>Kx&ge;07</td><td>Kx&ge;08</td><td>Kx&ge;09</td><td>Kx&ge;0A</td><td>Kx&ge;0B</td><td>Kx&ge;0C</td><td>Kx&ge;0D</td><td>Kx&ge;0E</td><td style="background:yellow">Kx&ge;0F</td></tr>
+<tr><td>xA0</td><td>Ksub0</td><td>Ksub1</td><td>Ksub2</td><td>Ksub3</td><td>Ksub4</td><td>Ksub5</td><td>Ksub6</td><td>Ksub7</td><td>Ksub8</td><td>Ksub9</td><td>KsubA</td><td>KsubB</td><td>KsubC</td><td>KsubD</td><td>KsubE</td><td style="background:yellow">KsubF</td></tr>
+<tr><td>xB0</td><td>KMS0</td><td>KMS1</td><td>KMS2</td><td>KMS3</td><td>KMS4</td><td>KMS5</td><td>KMS6</td><td>KMS7</td><td>KMS8</td><td>KMS9</td><td>KMSA</td><td>KMSB</td><td>KMSC</td><td>KMSD</td><td>KMSE</td><td style="background:yellow">KMSF</td></tr>
+<tr><td>xC0</td><td>Kx&lt;00</td><td>Kx&lt;01</td><td>Kx&lt;02</td><td>Kx&lt;03</td><td>Kx&lt;04</td><td>Kx&lt;05</td><td>Kx&lt;06</td><td>Kx&lt;07</td><td>Kx&lt;08</td><td>Kx&lt;09</td><td>Kx&lt;0A</td><td>Kx&lt;0B</td><td>Kx&lt;0C</td><td>Kx&lt;0D</td><td>Kx&lt;0E</td><td style="background:yellow">Kx&lt;0F</td></tr>
+<tr><td>xD0</td><td>KMR0</td><td>KMR1</td><td>KMR2</td><td>KMR3</td><td>KMR4</td><td>KMR5</td><td>KMR6</td><td>KMR7</td><td>KMR8</td><td>KMR9</td><td>KMRA</td><td>KMRB</td><td>KMRC</td><td>KMRD</td><td>KMRE</td><td style="background:yellow">KMRF</td></tr>
+<tr><td>xE0</td><td>Kx=00</td><td>Kx=01</td><td>Kx=02</td><td>Kx=03</td><td>Kx=04</td><td>Kx=05</td><td>Kx=06</td><td>Kx=07</td><td>Kx=08</td><td>Kx=09</td><td>Kx=0A</td><td>Kx=0B</td><td>Kx=0C</td><td>Kx=0D</td><td>Kx=0E</td><td style="background:yellow">Kx=0F</td></tr>
+<tr><td>xF0</td><td style="background:yellow">M+0</td><td style="background:yellow">M+1</td><td style="background:yellow">M+2</td><td style="background:yellow">M+3</td><td style="background:yellow">M+4</td><td style="background:yellow">M+5</td><td style="background:yellow">M+6</td><td style="background:yellow">M+7</td><td style="background:yellow">M+8</td><td style="background:yellow">M+9</td><td style="background:yellow">M+A</td><td style="background:yellow">M+B</td><td style="background:yellow">M+C</td><td style="background:yellow">M+D</td><td style="background:yellow">M+E</td><td style="background:yellow">M+F</td></tr>
+</table>
+<p>В целом система команд основана на системе команд популярных советских микрокалькуляторов БЗ-34 или МК-61. Так что практически любая программа с МК-61 (не использующая недокументированные возможности) будет работать и на PocketMK. Однако, есть и несколько отличий. PocketMK использует фортрановские символьные обозначения функций: <code>asin</code> для арксинуса, <code>tan</code> вместо <code>tg</code> для тангенса и т.д. Кроме того, имеется различное начертание ряда команд с более устоявшимся англоязычным обозначением:</p>
+<table style="border: 1px solid black;">
+<tr><th>PocketMK</th><th>БЗ-34</th><th>MK-61</th></tr>
+<tr><td><code>MR</code></td><td><code>ИП</code></td><td><code>П&rarr;X</code></td></tr>
+<tr><td><code>MS</code></td><td><code>П</code></td><td><code>Х&rarr;П</code></td></tr>
+<tr><td><code>rnd</code></td><td><code></code></td><td><code>КСЧ</code></td></tr>
+<tr><td><code>sign</code></td><td><code></code></td><td><code>КЗН</code></td></tr>
+<tr><td><code>stop</code></td><td><code>С/П</code></td><td><code>С/П</code></td></tr>
+<tr><td><code>ret</code></td><td><code>В/О</code></td><td><code>В/О</code></td></tr>
+<tr><td><code>go</code></td><td><code>БП</code></td><td><code>БП</code></td></tr>
+<tr><td><code>sub</code></td><td><code>ПП</code></td><td><code>ПП</code></td></tr>
+</table>
+<p>В  PocketMK добавлен ряд команд (выделены цветом в таблице):<ol>
+<li> графических (<code>pnt, line, rect, arc, col, cls</code>) для рисования точки (х,у), линии в точку (х,у), прямоугольника из текущей до точки (х,у), дуги из текущей до точки (х,у), задания цвета (можно задавать и вручную выбором из палитры) и очистки экрана;</li>
+<li> спец. функций (erf(x), sinh(x), cosh(x), tanh(x), asinh(x), atanh(x), x! = Г(x+1), j0(x), y0(x), j1(x), y1(x));</li>
+<li> прибавления регистра Х к числу в указанном регистре (команда <code>М+</code>);</li>
+<li> удаления числа из стека (команда <code>B&darr;</code>).</li></ol></p>
+<p><b>Удалены</b> редко использующиеся (по крайней мере автором) команды по преобразованию углов в минуты, секунды и обратно. Операция <code>x<sup>y</sup></code> теперь стала настоящей двуместной операцией (содержимое регистра Y не сохраняется).</p>
+<p>В нормальном виде клавиатура содержит довольно ограниченный набор часто используемых кнопок. Доступ к большинству научных функций и управляющих команд возможен после нажатия клавиш F, K или обоих сразу (для графических команд). </p>
+
+<h3>Ввод числа</h3>
+<p>Ввод числа осуществляется командами <code>0 1 2 3 4 5 6 7 8 9 . &pm; EE</code>. Команды <code>0 1 2 3 4 5 6 7 8 9 .</code> вводят непосредственно цифры мантиссы или порядка. Команда <code>&pm;</code> меняет знак числа в регистре Х, если введена до команды <code>EE</code> или знак порядка, если после. Команда <code>EE</code> указывает, что дальнейший ввод относится к вводу порядка. Нажатие любой другой клавиши (кроме функциональных <code>F</code> или <code>K</code>) прерывает ввод числа. При вводе нового числа предыдущее значение регистра Х поднимается вверх по стеку, если перед этим не была выполнена одна из команд <code>Cx</code> или <code>B&uarr;</code>.</p>
+<p><i><b>Важно!</b> Команда <code>EE</code> превращает 0 в 1 (при этом в стеке меняется только значение регистра Х, остальные регистры стека сохраняют свои значения). Эта недокументированная особенность советских калькуляторов часто использовалась в программах.</i></p>
+<p><i><b>Совет!</b> Команда <code>EE</code> изменяет порядок любого числа в регистре Х. Поэтому для быстрого умножения числа на 10<sup>n</sup> в программе можно воспользоваться кодом <code>EE n</code>, занимающим всего две ячейки памяти при n=1...9.</i></p>
+
+<h3>Команды работы со стеком</h3>
+<p>К этой группе относятся команды <code>Cx B&uarr; &harr; Bx &#8635; B&darr;</code>. Напомним, что PocketMK использует стек из 4х регистров (X,Y,Z,T) и регистр B для хранения предыдущего значения Х. Исходное значение стека будем считать равным <code>b x y z t</code>.</p>
+<table style="border: 1px solid black;">
+<tr><td><code>Cx</code></td><td>Обнуляет регистр Х. Ввод числа после этой команды не изменяет содержимое стека.</td></tr>
+<tr><td><code>B&uarr;</code></td><td>Поднимает число Х вверх. Стек изменяется следующим образом <code>b x x y z</code>. Ввод числа после этой команды не изменяет содержимое стека.</td></tr>
+<tr><td><code>&harr;</code></td><td>Меняет содержимое регистров X и Y местами. Стек изменяется следующим образом <code>x y x z t</code>.</td></tr>
+<tr><td><code>Bx</code></td><td>Возвращает значение регистра Вх в Х. Стек изменяется следующим образом <code>b b x y z</code>.</td></tr>
+<tr><td><code>&#8635;</code></td><td>Вращает содержимое стека. Стек изменяется следующим образом <code>x y z t x</code>.</td></tr>
+<tr><td><code>B&darr;</code></td><td>Удаляет содержимое регистра Х со сдвигом стека вниз. Стек изменяется следующим образом <code>x y z t t</code>.</td></tr>
+</table>
+
+<h3>Двуместные операции</h3>
+<p>Операции выполняются над числами в регистрах X и Y. При этом содержимое регистра Y теряется, а регистры Z и T смещаются вниз. Значение регистра Х заносится в регистр В. Стек <code>b x y z t</code> изменяется следующим образом <code>x g z t t</code>, где <i>g</i> &ndash; результат операции. Рассмотрим команды подробнее.</p>
+<table style="border: 1px solid black;">
+<tr><td><code>+</code></td><td>Сложение чисел X=Y + X.</td></tr>
+<tr><td><code>&ndash;</code></td><td>Разность чисел X=Y &ndash; X.</td></tr>
+<tr><td><code>*</code></td><td>Умножение чисел X=Y * X.</td></tr>
+<tr><td><code>/</code></td><td>Деление чисел X=Y / X.</td></tr>
+<tr><td><code>x<sup>y</sup></code></td><td>Возведение в степень X=X<sup>Y</sup>.</td></tr>
+<tr><td><code>and</code></td><td>Побитовое И. Дробная часть чисел отбрасывается.</td></tr>
+<tr><td><code>or</code></td><td>Побитовое ИЛИ. Дробная часть чисел отбрасывается.</td></tr>
+<tr><td><code>xor</code></td><td>Побитовое Исключающее ИЛИ. Дробная часть чисел отбрасывается.</td></tr>
+<tr><td><code>max</code></td><td>Максимальное из чисел X и Y.</td></tr>
+</table>
+
+<h3>Математические функции</h3>
+<p>Вызов функции относится к одноместным операциям, не затрагивающим содержимое регистров Y, Z, T. Значение аргумента всегда заносится в регистр В. Результат действия функции помещается в регистр Х. Для обратных функций на советских калькуляторах использовались обозначения f(x)<sup>-1</sup> (например, sin<sup>-1</sup>), в PocketMK они заменены на стандартные компьютерные обозначения с добавление буквы a перед именем функции (например, asin).</p>
+<table style="border: 1px solid black;">
+<tr><td><code>10<sup>x</sup></code></td><td>Возведение в степень 10<sup>x</sup> = exp(x*log(10)).</td></tr>
+<tr><td><code>e<sup>x</sup></code></td><td>Экспонента e<sup>x</sup> = exp(x), где e = 2.718281828459.</td></tr>
+<tr><td><code>lg</code></td><td>Десятичный логарифм lg(x)=ln(x)/ln(10), lg(10<sup>x</sup>)=x.</td></tr>
+<tr><td><code>ln</code></td><td>Натуральный логарифм, ln(exp(x))=x.</td></tr>
+<tr><td><code>sin</code></td><td>Синус sin(x), вычисляется в зависимости от выбора <i>deg|grd|rad</i>.</td></tr>
+<tr><td><code>cos</code></td><td>Косинус cos(x), вычисляется в зависимости от выбора <i>deg|grd|rad</i>.</td></tr>
+<tr><td><code>tan</code></td><td>Тангенс tan(x)=sin(x)/cos(x), вычисляется в зависимости от выбора <i>deg|grd|rad</i>.</td></tr>
+<tr><td><code>asin</code></td><td>Арксинус asin(sin(x))=x, вычисляется в зависимости от выбора <i>deg|grd|rad</i>.</td></tr>
+<tr><td><code>acos</code></td><td>Арккосинус acos(cos(x))=|x|, вычисляется в зависимости от выбора <i>deg|grd|rad</i>.</td></tr>
+<tr><td><code>atan</code></td><td>Арктангенс atan(tan(x))=x, вычисляется в зависимости от выбора <i>deg|grd|rad</i>.</td></tr>
+<tr><td><code>sh</code></td><td>Гиперболический синус sh(x) = (e<sup>x</sup> &ndash; e<sup>-x</sup>)/2.</td></tr>
+<tr><td><code>ch</code></td><td>Гиперболический косинус ch(x)=(e<sup>x</sup> + e<sup>-x</sup>)/2.</td></tr>
+<tr><td><code>th</code></td><td>Гиперболический тангенс th(x)=sh(x)/ch(x).</td></tr>
+<tr><td><code>ash</code></td><td>Гиперболический арксинус ash(sh(x))=x.</td></tr>
+<tr><td><code>ach</code></td><td>Гиперболический арккосинус ach(ch(x))=|x|.</td></tr>
+<tr><td><code>ath</code></td><td>Гиперболический арктангенс ath(th(x))=x.</td></tr>
+<tr><td>&radic;<SPAN STYLE='text-decoration:overline'>x</SPAN></td><td>Корень квадратный sqrt(x<sup>2</sup>) = |x|.</td></tr>
+<tr><td><code>x<sup>2</sup></code></td><td>Квадрат числа.</td></tr>
+<tr><td><code>1/x</code></td><td> </td></tr>
+<tr><td><code>erf</code></td><td>Интеграл вероятности erf(x) = &int;exp(-x<sup>2</sup>)dx.</td></tr>
+<tr><td><code>x!</code></td><td>Факториал x!=Г(x+1), Г(x) &ndash; гамма функция.</td></tr>
+<tr><td><code>J<sub>0</sub></code></td><td>Функция Бесселя J<sub>0</sub>.</td></tr>
+<tr><td><code>J<sub>1</sub></code></td><td>Функция Бесселя J<sub>1</sub>.</td></tr>
+<tr><td><code>Y<sub>0</sub></code></td><td>Функция Бесселя Y<sub>0</sub>.</td></tr>
+<tr><td><code>Y<sub>1</sub></code></td><td>Функция Бесселя Y<sub>1</sub>.</td></tr>
+<tr><td><code>|x|</code></td><td>Абсолютное значение |x| = {x для x&ge;0; &ndash;x для x&lt;0} </td></tr>
+<tr><td><code>sign</code></td><td>Знак числа: 1 для x&gt;0, 0 для x=0, -1 для x&lt;0.</td></tr>
+<tr><td><code>[x]</code></td><td>Целая часть числа.</td></tr>
+<tr><td><code>{x}</code></td><td>Дробная часть числа.</td></tr>
+<tr><td><code>rnd</code></td><td>Случайное число. В отличии от МК-61 не зависит от числа X. <i>Из соображений совместимости, случайное число не изменяет стек (как в случае с <code>&pi;</code>)</i>.</td></tr>
+<tr><td><code>not</code></td><td>Побитовое отрицание. Дробная часть чисел отбрасывается.</td></tr>
+</table>
+
+<h3>Работа с регистрами</h3>
+<p></p>
+<p></p>
+<p></p>
+<p>Для работы с регистрами предназначены три группы команд. 
+<ol>
+	<li>Команды <code>MS</code>N записывают  значение регистра Х в регистр N. Значение регистра Х не изменяется.</li>
+	<li>Команды <code>M+</code>N прибавляют значение регистра Х к числу в регистре N и записывают результат в регистр N. Значение регистра Х не изменяется.</li>
+	<li>Команды <code>MR</code>N присваивают регистру X значение из регистра N. Стек <code>b x y z t</code> изменяется следующим образом <code>b n x y z</code>, где <i>n</i> &ndash; значение в регистре N.</li>
+	<li>Немножко в стороне стоит команда <code>&pi;</code>. Ее действие полностью аналогично командам <code>MR</code>N, но в регистр Х записывается число &pi;=3.141592653589793.</li>
+</ol>
+Каждая из команд присвоения регистру имеет отдельный уникальный номер. Это сделано для совместимости с программами для МК-61.</p>
+<p><i><b>Совет!</b> Ввод небольшого числа данных (до 16 чисел) в программу удобно выполнять с помощью заполнения регистров памяти перед запуском программы.</i></p>
+<p><i><b>Совет!</b> Ввод данных в программу можно выполнять с помощью кнопки <i>Step</i>. Кусок соответствующей программы будет выглядеть следующим образом: <code>MS1 MS2 MS3 ...</code>. Идея состоит в пошаговом исполнении программы, когда число в регистре Х меняется пользователем на каждом шаге.</i></p>
+<p><i><b>Совет!</b> Часто программы используют константы (или типичные начальные условия). Их можно сохранить вместе с программой если пометить соответствующие регистры при сохранении.</i></p>
+<p><i><b>Совет!</b> Иногда удобней (особенно в играх) загрузить программу с заполненными регистрами заново, чем вводить цифры вручную.</i></p>
+
+<h3>Управление программой</h3>
+<p>Эта группа команд осуществляет управление выполнением программы. Как правило, команды из этой группы требуют 2 ячейки памяти: одна ячейка под саму команду, а вторая ячейка на адрес перехода для этой команды.</p>
+<table style="border: 1px solid black;">
+<tr><td><code>stop</code></td><td>Останавливает выполнение программы.</td></tr>
+<tr><td><code>wait</code></td><td>Приостанавливает выполнение программы на 1 секунду. Удобно использовать в динамических играх.</td></tr>
+<tr><td><code>nop</code></td><td>Не выполняет никаких действий.</td></tr>
+<tr><td><code>go</code></td><td>Безусловный переход на адрес перехода.</td></tr>
+<tr><td><code>sub</code></td><td>Вызов подпрограммы с адреса перехода.</td></tr>
+<tr><td><code>ret</code></td><td>Возврат из подпрограммы. При пустом стеке возврата происходит возврат на нулевой адрес (начало программы).</td></tr>
+<tr><td><code>x&ne;0</code></td><td>Если условие X&ne;0 выполнено, выполняется команда, следующая после адреса перехода, в противном случае производится переход по адресу перехода.</td></tr>
+<tr><td><code>x&lt;0</code></td><td>Если условие X&lt;0 выполнено, выполняется команда, следующая после адреса перехода, в противном случае производится переход по адресу перехода.</td></tr>
+<tr><td><code>x=0</code></td><td>Если условие X=0 выполнено, выполняется команда, следующая после адреса перехода, в противном случае производится переход по адресу перехода.</td></tr>
+<tr><td><code>x&ge;0</code></td><td>Если условие X&ge;0 выполнено, выполняется команда, следующая после адреса перехода, в противном случае производится переход по адресу перехода.</td></tr>
+<tr><td><code>L0</code></td><td>После выполнения команды происходит вычитание единицы из регистра 0. Если результат R0&le;0, то продолжится выполнение со следующего адреса. Иначе &ndash; перейдет на указанный адрес перехода.</td></tr>
+<tr><td><code>L1</code></td><td>После выполнения команды происходит вычитание единицы из регистра 1. Если результат R1&le;0, то продолжится выполнение со следующего адреса. Иначе &ndash; перейдет на указанный адрес перехода.</td></tr>
+<tr><td><code>L2</code></td><td>После выполнения команды происходит вычитание единицы из регистра 2. Если результат R2&le;0, то продолжится выполнение со следующего адреса. Иначе &ndash; перейдет на указанный адрес перехода.</td></tr>
+<tr><td><code>L3</code></td><td>После выполнения команды происходит вычитание единицы из регистра 3. Если результат R3&le;0, то продолжится выполнение со следующего адреса. Иначе &ndash; перейдет на указанный адрес перехода.</td></tr>
+</table>
+<p><i><b>Совет!</b> Для быстрого возврата на нулевой адрес можно использовать команду <code>ret</code>. Это работает, если стек возвратов пустой (не выполняется подпрограмма в данный момент).</i></p>
+<p><i><b>Совет!</b> Использование команды <code>wait</code> и переключателя <i>deg|grd|rad</i> позволяет создавать динамические программы. Идея состоит в том, что функция <code>cos</code> выдает различные значения в зависимости от положения переключателя. Например, следующий код <code>wait MR9 cos sign</code> будет ожидать реакции пользователя 1 секунду и возвращать -1, 0, 1 для переключателя <i>deg|grd|rad</i> соответственно, если <code>R9=100</code>.</i></p>
+
+<h3>Косвенная адресация</h3>
+<p>Команды косвенной адресации начинаются с нажатия кнопки K и всегда занимают одну ячейку памяти. После нажатия <code>K</code> вводится одна из команд <code>MS, MR, go, sub, x&lt;0, x&ge;0, x=0, x&ne;0</code> и номер регистра. На клавиатуре команды косвенной адресации выделены фиолетовым цветом. При косвенной адресации (индексации) в командах <code>KMS</code> и <code>KMR</code> запись и считывание числа производится из регистра с номером равным остатку от деления на 16 числа в указанном регистре. Переход по адресу в командах <code>Kgo, Ksub, Kx&lt;0, Kx&ge;0, Kx=0, Kx&ne;0</code> производится по остатку от деления содержимого регистра на 160.</p>
+<p>Перед выполнением действия значение регистра модифицируется. Если номер регистра 0, 1, 2, 3, то его значение уменьшается на единицу. Если номер регистра равен 4, 5, 6, то значение регистра увеличивается на единицу. Остальные регистры не изменяются. </p>
+<p>Например, команда <code>KMS0</code> поместит значение регистра X в регистр, номер которого указан в регистре 0, но меньший на 1. Команда <code>KMR4</code> поместит в регистр X значение регистра, указанного в регистре 4, но больший на 1. Команда <code>Kgo9</code> переведет работу программы на адрес, указанный в регистре 9. Аналогично переход на подпрограмму, адрес которой указан в регистре B, выполняется командой <code>KsubB</code>. Команда <code>Kx=0A</code> аналогична команде <code>x=0 XX</code>, но адрес перехода XX указывается в регистре A, и команда занимает одну ячейку памяти. </p>
+<p>Следует обратить внимание, что если в регистр поместить дробное число, а затем к этому регистру применить команду косвенного вызова, то от помещенного числа будет отброшена дробная часть. Например, поместив число 12.34567 в регистр 9 и выполнив команду <code>KMR9</code>, в регистре 9 останется число 12. Эта «недокументированная» особенность в программах БЗ-34 часто использовалась для отделения целой части числа и была сохранена в PocketMK.</p>
+
+<h3>Графические команды</h3>
+<p>В PocketMK добавлены 6 графических команд: <code>cls, col, pnt, line, rect, arc</code>. Графический вывод производится в растровую картинку размером 400*300 с началом координат в левом нижнем углу. Все точки вне этих границ игнорируются.</p>
+
+<h3>Обработка ошибок</h3>
+<p>В ходе расчетов могут возникать ошибочные ситуации (например, деление на 0, извлечение корня из отрицательно числа и т.д.). В этом случае на экране показывается сообщение NaN или Infinity. Работа программы автоматически останавливается при возникновении ошибочной ситуации.</p>
+
+<h3>Советы</h3>
+<ul>
+<li> Команда <code>EE</code> изменяет порядок любого числа в регистре Х. Поэтому для быстрого умножения числа на 10<sup>n</sup> в программе можно воспользоваться кодом <code>EE n</code>, занимающим всего две ячейки памяти при n=1...9.</li>
+<li> Ввод небольшого числа данных (до 16 чисел) в программу удобно выполнять с помощью заполнения регистров памяти перед запуском программы.</li>
+<li> Ввод данных в программу можно выполнять с помощью кнопки <i>Step</i>. Кусок соответствующей программы будет выглядеть следующим образом: <code>MS1 MS2 MS3 ...</code>. Идея состоит в пошаговом исполнении программы, когда число в регистре Х меняется пользователем на каждом шаге.</li>
+<li> Часто программы используют константы (или типичные начальные условия). Их можно сохранить вместе с программой если пометить соответствующие регистры при сохранении.</li>
+<li> Иногда удобней (особенно в играх) загрузить программу с заполненными регистрами заново, чем вводить цифры вручную.</li>
+<li> Для быстрого возврата на нулевой адрес можно использовать команду <code>ret</code>. Это работает, если стек возвратов пустой (не выполняется подпрограмма в данный момент).</li>
+<li> Использование команды <code>wait</code> и переключателя <i>deg|grd|rad</i> позволяет создавать динамические программы. Идея состоит в том, что функция <code>cos</code> выдает различные значения в зависимости от положения переключателя. Например, следующий код <code>wait MR9 cos sign</code> будет ожидать реакции пользователя 1 секунду и возвращать -1, 0, 1 для переключателя <i>deg|grd|rad</i> соответственно, если <code>R9=100</code>.</li>
+</ul>
+
+</div>
+
+
+</div>
+<script type="text/javascript" src="../accordion.js"></script>
+<script type="text/javascript" src="mk61.js"></script>
+</body>
+</html> 

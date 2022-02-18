@@ -1,0 +1,22 @@
+set(MGL_HAVE_QT5 1)
+
+macro(find_qt5_libs qt5_lib_req qt5_lib_add)
+	foreach(mgl_qt5_lib ${ARGN})
+		find_package(Qt5${mgl_qt5_lib} QUIET)
+		if(NOT Qt5${mgl_qt5_lib}_FOUND)
+			if(${qt5_lib_req})
+				message(SEND_ERROR "Couldn't find Qt5 ${mgl_qt5_lib} library.")
+			endif(${qt5_lib_req})
+		else(NOT Qt5${mgl_qt5_lib}_FOUND)
+			if(${qt5_lib_add})
+				set(MGL_QT5_LIBS ${MGL_QT5_LIBS} Qt5::${mgl_qt5_lib})
+			endif(${qt5_lib_add})
+		endif(NOT Qt5${mgl_qt5_lib}_FOUND)
+	endforeach(mgl_qt5_lib)
+endmacro(find_qt5_libs qt5_lib_req)
+
+find_qt5_libs(ON ON Core Gui Widgets PrintSupport OpenGL)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)

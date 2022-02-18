@@ -1,0 +1,18 @@
+# - Config file for the MathGL package
+# It defines the following variables
+ 
+set(MathGL2_INCLUDE_DIRS "@MathGL_INSTALL_INCLUDE_DIR@")
+set(MathGL2_LIBRARIES_DIRS "@MathGL_INSTALL_LIB_DIR@")
+set(MathGL2_HAVE_QT5 "@enable-qt5@")
+set(MathGL2_HAVE_QT4 "@enable-qt4@")
+set(MathGL2_HAVE_WX "@enable-wx@")
+set(MathGL2_HAVE_FLTK "@enable-fltk@")
+set(MathGL2_HAVE_GLUT "@enable-glut@")
+
+# Compute paths
+get_filename_component(MathGL2_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET mgl AND NOT MathGL_BINARY_DIR)
+  include("${MathGL2_CMAKE_DIR}/MathGLTargets.cmake")
+endif()

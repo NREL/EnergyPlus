@@ -1,0 +1,727 @@
+
+@c ------------------------------------------------------------------
+@chapter ``Оконные'' классы
+@nav{}
+@cindex mglWnd
+@cindex mglGLUT
+@cindex Fl_MathGL
+@cindex QMathGL
+@cindex window
+@cindex widgets
+
+Есть целый набор ``оконных'' классов для создания окон с графикой MathGL: @code{mglWnd} и @code{mglGLUT} для окон целиком, @code{Fl_MathGL} и @code{QMathGL} для виджетов. Все эти классы позволяют пользователю просмотривать, вращать, экспортировать рисунок. Большинство из них (кроме @code{mglGLUT}) имеют панель инструментов для упрощения изменения графика. Все оконные классы имеют схожий набор функций. Ниже приведен список классов с краткими комментариями.
+
+Для рисования можно использовать: указатель @code{NULL} если планируется обновлять график вручную, глобальную функцию типа @code{int draw(@code{HMGL} gr, @code{void *}p)} или @code{int draw(@code{mglGraph *}gr)}, или экземпляр класса, производного от @ref{mglDraw class}. Этот класс определен в @code{#include <mgl2/wnd.h>} и имеет 2 основных виртуальных метода:
+@verbatim
+class mglDraw
+{
+public:
+    virtual int Draw(mglGraph *) { return 0; };
+    virtual void Reload() {};
+};
+@end verbatim
+Вам следует наследовать свой класс от @code{mglDraw} и определить один или оба метода.
+
+Непосредственно окна можно создать используя один из следующих классов (см. @ref{Using MathGL window} для примеров).
+
+
+@deftypefn {Конструктор класса @code{mglFLTK}} {} mglFLTK (@code{const char *}title=@code{"MathGL"})
+@deftypefnx {Конструктор класса @code{mglFLTK}} {} mglFLTK (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title=@code{"MathGL"}, @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p)=0)
+@deftypefnx {Конструктор класса @code{mglFLTK}} {} mglFLTK (@code{int} (*draw)(@code{mglGraph *}gr), @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Конструктор класса @code{mglFLTK}} {} mglFLTK (@code{mglDraw *}draw, @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Функция С} @code{HMGL} mgl_create_graph_fltk (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title, @code{void *}par, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p))
+
+Создает FLTK окно для вывода графика. Параметр @var{draw} -- указатель (имя) функции рисования. Есть возможность создания нескольких кадров вначале (требует больше памяти) и их быстрая анимации в дальнейшем. В этом случае функция @var{draw} должна возвращать число кадров или ноль для рисования по запросу. Замечу, что @var{draw} может быть равна @code{NULL} для отображения статической (текущей) картинки. Параметр @var{title} задает заголовок окна. Параметр @var{par} содержит указатель на данные, передаваемые функции рисования @var{draw}. FLTK окна обеспечивают быстрое рисование и хорошо поддерживают многопоточность.
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{int} RunThr ()
+@deftypefnx {Функция С} @code{int} mgl_fltk_thr ()
+Запускает цикл обработки сообщений в отдельном потоке. В данный момент работает только для окон FLTK.
+@end deftypefn
+
+
+@deftypefn {Конструктор класса @code{mglQT}} {} mglQT (@code{const char *}title=@code{"MathGL"})
+@deftypefnx {Конструктор класса @code{mglQT}} {} mglQT (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title=@code{"MathGL"}, @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p)=0)
+@deftypefnx {Конструктор класса @code{mglQT}} {} mglQT (@code{int} (*draw)(@code{mglGraph *}gr), @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Конструктор класса @code{mglQT}} {} mglQT (@code{mglDraw *}draw, @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Функция С} @code{HMGL} mgl_create_graph_qt (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title, @code{void *}par, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p))
+
+Создает Qt окно для вывода графика. Параметр @var{draw} -- указатель (имя) функции рисования. Есть возможность создания нескольких кадров вначале (требует больше памяти) и их быстрая анимации в дальнейшем. В этом случае функция @var{draw} должна возвращать число кадров или ноль для рисования по запросу. Замечу, что @var{draw} может быть равна @code{NULL} для отображения статической (текущей) картинки. Параметр @var{title} задает заголовок окна. Параметр @var{par} содержит указатель на данные, передаваемые функции рисования @var{draw}.
+@end deftypefn
+
+
+@deftypefn {Конструктор класса @code{mglGLUT}} {} mglGLUT (@code{const char *}title=@code{"MathGL"})
+@deftypefnx {Конструктор класса @code{mglGLUT}} {} mglGLUT (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title=@code{"MathGL"}, @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p)=0)
+@deftypefnx {Конструктор класса @code{mglGLUT}} {} mglGLUT (@code{int} (*draw)(@code{mglGraph *}gr), @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Конструктор класса @code{mglGLUT}} {} mglGLUT (@code{mglDraw *}draw, @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Функция С} @code{HMGL} mgl_create_graph_glut (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title, @code{void *}par, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p))
+
+Создает окно для вывода графика. Параметр @var{draw} -- указатель (имя) функции рисования. Есть возможность создания нескольких кадров вначале (требует больше памяти) и их быстрая анимации в дальнейшем. В этом случае функция @var{draw} должна возвращать число кадров или ноль для рисования по запросу. Замечу, что @var{draw} может быть равна @code{NULL} для отображения статической (текущей) картинки. Параметр @var{title} задает заголовок окна. Параметр @var{par} содержит указатель на данные, передаваемые функции рисования @var{draw}. Параметр @var{kind} может иметь следующие значения: @samp{0} -- использовать окно FLTK, @samp{1} -- использовать окно Qt.
+
+В окне просмотра можно использовать клавиши: 'a', 'd', 'w', 's' для вращения; ',', '.' для просмотра предыдущего и следующего кадров; 'r' для переключения прозрачности; 'f' для переключения оспещенности; 'x' для закрытия окна.
+@end deftypefn
+
+
+
+@menu
+* mglWnd class::
+* mglDraw class::
+* Fl_MathGL class::
+* QMathGL class::
+* wxMathGL class::
+@end menu
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglWnd class, Fl_MathGL class, , Widget classes
+@section Класс mglWnd
+@nav{}
+@cindex mglWnd
+@cindex window
+@c @cindex mglDraw
+
+Это абстрактный класс производный от класса mglGraph (см. @ref{MathGL core}). Он определен в @code{#include <mgl2/wnd.h>}. Класс содержит методы для создания и управления окном, содержащим графику MathGL. Производные от него классы существует отдельно для каждой библиотеки виджетов: @code{mglQT} в @code{#include <mgl2/qt.h>}, @code{mglFLTK} в @code{#include <mgl2/fltk.h>}.
+
+@deftypefn {Метод класса @code{mglWnd}} @code{int} Run ()
+@deftypefnx {Функция С} @code{int} mgl_qt_run ()
+@deftypefnx {Функция С} @code{int} mgl_fltk_run ()
+Запускает цикл обработки сообщений. Обычно эта функция должна вызываться в отдельном потоке или последней функцией в @code{main()}.
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{void} SetDrawFunc (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{void *}p)=@code{NULL})
+@deftypefnx {Метод класса @code{mglWnd}} @code{void} SetDrawFunc (@code{int} (*draw)(@code{mglGraph *}gr))
+@deftypefnx {Метод класса @code{mglWnd}} @code{void} SetDrawFunc (@code{mglDraw *}obj)
+@deftypefnx {Функция С} @code{void} mgl_wnd_set_func (@code{HMGL} gr, @code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{void *}par, @code{void} (*reload)(@code{void *}p))
+Устанавливает функцию, которая будет вызвана при перерисовке (@var{draw}) и при повторной загрузке данных (@var{reload}), или объект @var{obj} класса, производного от @code{mglDraw}.
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{void} SetClickFunc (@code{void} (*func)(@code{HMGL} gr, @code{void *}p))
+@deftypefnx {Функция С} @code{void} mgl_set_click_func (@code{void} (*func)(@code{HMGL} gr, @code{void *}p))
+Устанавливает функцию, которая будет вызвана при щелчке мышью.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void} SetMutex(@code{pthread_mutex_t *}mutex)
+@deftypefnx {C function} @code{void} mgl_wnd_set_mutex(@code{HMGL} gr, @code{pthread_mutex_t *}mutex)
+Устанавливает внешний mutex для блокировки/разблокировки внешних вычислений с помощью меню или кнопок окна. Функция вызывается автоматически при использовании @ref{mglDraw class}.
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{void} ToggleAlpha ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_toggle_alpha (@code{HMGL} gr)
+Включает/выключает прозрачность, но не перекрывает ее включение в пользовательской функции рисования.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} ToggleLight ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_toggle_light (@code{HMGL} gr)
+Включает/выключает освещение, но не перекрывает его включение в пользовательской функции рисования.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} ToggleRotate ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_toggle_rotate (@code{HMGL} gr)
+Включает/выключает вращение мышкой. Нажатая левая кнопка используется для вращения, средняя для сдвига, правая для приближения/перспективы.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} ToggleZoom ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_toggle_zoom (@code{HMGL} gr)
+Включает/выключает приближение мышкой. Выделите прямоугольную область и она будет приближена.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} ToggleNo ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_toggle_no (@code{HMGL} gr)
+Выключает вращение и приближение мышкой, а также восстанавливает исходный вид графика.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} Update ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_update (@code{HMGL} gr)
+Обновляет содержимое окна. Функция полезна при ручном обновлении содержимого, пока долгий расчет идет в параллельном потоке.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} ReLoad ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_reload (@code{HMGL} gr)
+Перегружает данные и обновляет рисунок. Функция также обновляет число кадров, которое создает функция рисования.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} Adjust ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_adjust (@code{HMGL} gr)
+Подгоняет размер рисунка под размер окна.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} NextFrame ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_next_frame (@code{HMGL} gr)
+Показывает следующий кадр, если он есть.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} PrevFrame ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_prev_frame (@code{HMGL} gr)
+Показывает предыдущий кадр, если он есть.
+@end deftypefn
+@deftypefn {Метод класса @code{mglWnd}} @code{void} Animation ()
+@deftypefnx {Функция С} @code{void} mgl_wnd_animation (@code{HMGL} gr)
+Запускает/останавливает анимацию кадров.
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{void} SetDelay (@code{double} dt)
+@deftypefnx {Функция С} @code{void} mgl_wnd_set_delay (@code{HMGL} gr, @code{double} dt)
+Задает задержку при анимации в секундах. По умолчанию интервал -- 1 секунда.
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{double} GetDelay ()
+@deftypefnx {Функция С} @code{double} mgl_wnd_get_delay (@code{HMGL} gr)
+Возвращает задержку при анимации в секундах.
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{void} Setup (@code{bool} clfupd=@code{true}, @code{bool} showpos=@code{false})
+@deftypefnx {Функция С} @code{void} mgl_setup_window (@code{HMGL} gr, @code{bool} clfupd, @code{bool} showpos)
+Включает/выключает:
+@itemize @bullet
+@item
+очистку рисунка перед Update();
+@item
+показ позиции щелчка мыши на рисунке.
+@end itemize
+@end deftypefn
+
+@deftypefn {Метод класса @code{mglWnd}} @code{mglPoint} LastMousePos ()
+@deftypefnx {Функция С} @code{void} mgl_get_last_mouse_pos (@code{HMGL} gr, @code{mreal *}x, @code{mreal *}y, @code{mreal *}z)
+Возвращает положение щелчка мыши.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void *} Widget ()
+@deftypefnx {C function} @code{void *} mgl_fltk_widget (@code{HMGL} gr)
+@deftypefnx {C function} @code{void *} mgl_qt_widget (@code{HMGL} gr)
+Возвращает указатель на виджет (@ref{Fl_MathGL class} or @ref{QMathGL class}), используемый для рисования.
+@end deftypefn
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglDraw class, Fl_MathGL class, mglWnd class, Widget classes
+@section mglDraw class
+@nav{}
+@cindex mglDraw
+
+This class provide base functionality for callback drawing and running calculation in separate thread. It is defined in @code{#include <mgl2/wnd.h>}. You should make inherited class and implement virtual functions if you need it.
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{int} Draw (@code{mglGraph *}gr)
+This is callback drawing function, which will be called when any redrawing is required for the window. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. 
+@end deftypefn
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{void} Reload ()
+This is callback function, which will be called if user press menu or toolbutton to reload data. 
+@end deftypefn
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{void} Click ()
+This is callback function, which will be called if user click mouse. 
+@end deftypefn
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{void} Calc ()
+This is callback function, which will be called if user start calculations in separate thread by calling @code{mglDraw::Run()} function. It should periodically call @code{mglDraw::Check()} function to check if calculations should be paused. 
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Run ()
+Runs @code{mglDraw::Calc()} function in separate thread. It also initialize @code{mglDraw::thr} variable and unlock @code{mglDraw::mutex}. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Cancel ()
+Cancels thread with calculations. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Pause ()
+Pauses thread with calculations by locking @code{mglDraw::mutex}. You should call @code{mglDraw::Continue()} to continue calculations. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Continue ()
+Continues calculations by unlocking @code{mglDraw::mutex}. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Continue ()
+Checks if calculations should be paused and pause it. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@c ------------------------------------------------------------------
+@external{}
+@node Fl_MathGL class, QMathGL class, mglDraw class, Widget classes
+@section Класс Fl_MathGL
+@nav{}
+@cindex Fl_MathGL
+@cindex widgets
+
+Класс реализует элемент интерфейса FLTK для отображения графики MathGL. Он определен в @code{#include <mgl2/Fl_MathGL.h>}.
+
+@fig{fltk, Пример окна FLTK с графикой MathGL.}
+
+@deftypemethod Fl_MathGL @code{void} set_draw (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p))
+@deftypemethodx Fl_MathGL @code{void} set_draw (@code{int} (*draw)(@code{mglGraph *}gr))
+@deftypemethodx Fl_MathGL @code{void} set_draw (@code{mglDraw *}draw)
+Устанавливает функцию рисования как глобальную функцию или как функцию член класса, производного от @code{mglDraw}. Поддерживается список графиков (кадров), так что можно вначале их нарисовать (требует довольно много памяти), а потом достаточно быстро отображать. Функция должна возвращать положительное число создаваемых кадров или ноль для непосредственного рисования. Параметр @var{par} содержит указатель на данные пользователя, передаваемый функции рисования @var{draw}.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{mglDraw *}get_class ()
+Указатель на экземпляр класса @code{mglDraw} или @code{NULL} если отсутствует.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} update ()
+Обновляет (перерисовывает) график.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_angle (@code{mreal} t, @code{mreal} p)
+Задает углы для дополнительного вращения графика.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_flag (@code{int} f)
+Задает битовые флаги для: 1 - прозрачности, 2 - освещения.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_state (@code{bool} z, @code{bool} r)
+Задает флаги обработки движений мыши: @var{z}=@code{true} -- разрешает приближение выделения, @var{r}=@code{true} разрешает вращение/сдвиг/приближение/перспективу.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_zoom (@code{mreal} X1, @code{mreal} Y1, @code{mreal} X2, @code{mreal} Y2)
+Задает область приближения.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} get_zoom (@code{mreal *}X1, @code{mreal *}Y1, @code{mreal *}X2, @code{mreal *}Y2)
+Возвращает область приближения.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_popup (@code{const Fl_Menu_Item *}pmenu, @code{Fl_Widget *}w, @code{void *}v)
+Задает указатель на всплывающее меню.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_graph (@code{mglCanvas *}gr)
+@deftypemethodx Fl_MathGL @code{void} set_graph (@code{mglGraph *}gr)
+Задает экземпляр класс для рисования вместо встроеного. Fl_MathGL автоматически удалит его при удалении виджета и при новом вызове @code{set_graph()}.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{mglGraph *} get_graph ()
+Возвращает указатель на объект, строящий графики.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_show_warn (@code{bool} val)
+Флаг показа окна с сообщениями после выполнения скрипта.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} stop (@code{bool} stop=@code{true})
+Запрос на остановку рисования.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_handle_key (@code{bool} val)
+Вкл/выкл обработку нажатий клавиш (как в mglview, по умолчанию выкл).
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{int} get_last_id ()
+Вернуть id последнего выделенного объекта.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{bool} running ()
+Проверяет выполняется ли сейчас скрипт или нет.
+@end deftypemethod
+
+@deftypecv {Widget option} Fl_MathGL @code{Fl_Valuator *} tet_val
+Указатель на внешний элемент управления для изменения угла tet.
+@end deftypecv
+@deftypecv {Widget option} Fl_MathGL @code{Fl_Valuator *} phi_val
+Указатель на внешний элемент управления для изменения угла phi.
+@end deftypecv
+
+@c ------------------------------------------------------------------
+@external{}
+@node QMathGL class, wxMathGL class, Fl_MathGL class, Widget classes
+@section Класс QMathGL
+@nav{}
+@cindex QMathGL
+@cindex widgets
+
+Класс реализует элемент интерфейса Qt для отображения графики MathGL. Он определен в @code{#include <mgl2/qt.h>}.
+
+@fig{qt, Пример окна Qt с графикой MathGL.}
+
+@deftypemethod QMathGL @code{void} setDraw (@code{mglDraw *}dr)
+Задает функцию рисования из класса производного от @code{mglDraw}.
+@end deftypemethod
+@deftypemethod QMathGL @code{void} setDraw (@code{int (*}draw@code{)(mglBase *}gr, @code{void *}p@code{)}, @code{void *}par=@code{NULL})
+@deftypemethodx QMathGL @code{void} setDraw (@code{int (*}draw@code{)(mglGraph *}gr@code{)})
+Задает функцию рисования @var{draw}. Поддерживается список графиков (кадров), так что можно вначале их нарисовать (требует довольно много памяти), а потом достаточно быстро отображать. Функция должна возвращать положительное число создаваемых кадров или ноль для непосредственного рисования. Параметр @var{par} содержит указатель на данные пользователя, передаваемый функции рисования @var{draw}.
+@end deftypemethod
+
+@deftypemethod QMathGL @code{void} setGraph (@code{mglCanvas *}gr)
+@deftypemethodx QMathGL @code{void} setGraph (@code{mglGraph *}gr)
+Устанавливает указатель на внешний экземпляр класса для рисования (вместо встроенного). Отмечу, что QMathGL автоматически удалит этот объект при удалении элемента интерфейса или при новом вызове @code{setGraph()}.
+@end deftypemethod
+@deftypemethod QMathGL @code{HMGL} getGraph ()
+Возвращает указатель на объект, строящий графики.
+@end deftypemethod
+
+@deftypemethod QMathGL @code{void} setPopup (@code{QMenu *}p)
+Задает указатель на всплывающее меню.
+@end deftypemethod
+@deftypemethod QMathGL @code{void} setSize (@code{int} w, @code{int} h)
+Задает размеры элемента управления и картинки.
+@end deftypemethod
+@deftypemethod QMathGL @code{double} getRatio ()
+Возвращает соотношение сторон рисунка.
+@end deftypemethod
+
+@deftypemethod QMathGL @code{int} getPer ()
+Возвращает величину перспективы в процентах.
+@end deftypemethod
+@deftypemethod QMathGL @code{int} getPhi ()
+Возвращает величину угла Phi в градусах.
+@end deftypemethod
+@deftypemethod QMathGL @code{int} getTet ()
+Возвращает величину угла Theta в градусах.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getAlpha ()
+Возвращает состояние переключателя прозрачности.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getLight ()
+Возвращает состояние переключателя освещения.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getZoom ()
+Возвращает состояние переключателя приближения мышью.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getRotate ()
+Возвращает состояние переключателя вращения мышью.
+@end deftypemethod
+
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} refresh ()
+Перерисовывает (обновляет) элемент управления без вызова функции рисования.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} update ()
+Обновляет рисунок путем вызова функции рисования.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} copy ()
+Копирует график в буфер обмена.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} copyClickCoor ()
+Копирует координаты щелчка мышью (как текст).
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} print ()
+Печатает текущий рисунок.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} stop ()
+Посылает сигнал остановки рисования.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} adjust ()
+Подгоняет размер картинки под размер окна.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} nextSlide ()
+Показывает следующий кадр.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} prevSlide ()
+Показывает предыдущий кадр.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} animation (@code{bool} st=@code{true})
+Запускает анимацию.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} setPer (@code{int} val)
+Задает величину перспективы.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setPhi (@code{int} val)
+Задает величину угла Phi.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setTet (@code{int} val)
+Задает величину угла Theta.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setAlpha (@code{bool} val)
+Включает/выключает прозрачность.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setLight (@code{bool} val)
+Включает/выключает освещение.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setGrid (@code{bool} val)
+Включает/выключает рисование сетки абсолютных координат на графике.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setZoom (@code{bool} val)
+Включает/выключает приближение мышью.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setRotate (@code{bool} val)
+Включает/выключает вращение мышью.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} zoomIn ()
+Приблиажет график.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} zoomOut ()
+Отдаляет график.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftLeft ()
+Сдвигает график влево.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftRight ()
+Сдвигает график вправо.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftUp  ()
+Сдвигает график вверх.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftDown ()
+Сдвигает график вниз.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} restore ()
+Восстанавливает приближение и поворот графика в значения по умолчанию.
+@end deftypefn
+@c @deftypefn {Slot on @code{QMathGL}} @code{void} reload ()
+@c Обновляет данные и перерисовывает график.
+@c @end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportPNG (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в PNG файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportPNGs (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в PNG файл без прозрачности.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportJPG (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в JPEG файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportBPS (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в растровый EPS файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportEPS (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный EPS файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportSVG (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный SVG файл.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportGIF (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в GIF файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportTEX (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный LaTeX/Tikz файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportTGA (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в TGA файл.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportXYZ (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный XYZ/XYZL/XYZF файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportOBJ (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный OBJ/MTL файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportSTL (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный STL файл.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportOFF (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный OFF файл.
+@end deftypefn
+@c @deftypefn {Slot on @code{QMathGL}} @code{void} exportX3D (@code{QString} fname=@code{""})
+@c Сохраняет текущий рисунок в векторный X3D файл.
+@c @end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} setUsePrimitives (@code{bool} use)
+Разрешает использовать список примитивов для кадров. Это позволяет вращать/масштабировать кадры, но требует значительно больше памяти. По умолчанию разрешено (=@code{true}).
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setMGLFont (@code{QString} path)
+Восстанавливает (@var{path}=@code{""}) или загружает файлы шрифтов.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} about ()
+Показывает информацию о программе.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} aboutQt ()
+Показывает информацию о версии Qt.
+@end deftypefn
+
+@deftypefn {Signal on @code{QMathGL}} @code{void} phiChanged (@code{int} val)
+Угол Phi изменен.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} tetChanged (@code{int} val)
+Угол Tet изменен.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} perChanged (@code{int} val)
+Перспектива изменена.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} alphaChanged (@code{bool} val)
+Прозрачность изменена.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} lightChanged (@code{bool} val)
+Освещение изменено.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} gridChanged (@code{bool} val)
+Рисование сетки изменено.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} zoomChanged (@code{bool} val)
+Режим приближения мышью изменен.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} rotateChanged (@code{bool} val)
+Режим вращения мышью изменен.
+@end deftypefn
+
+@deftypefn {Signal on @code{QMathGL}} @code{void} mouseClick (@code{mreal} x, @code{mreal} y, @code{mreal} z)
+Был щелчок мышью в точке @{x,y,z@}.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} frameChanged (@code{int} val)
+Требуется новый кадр для отображения.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} showWarn (@code{QString} warn)
+Есть предупреждения.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} posChanged (@code{QString} pos)
+Положение щелчка мышью изменилось.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} objChanged (@code{int} id)
+Изменился id объекта на графике (из-за щелчка мышью).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} refreshData ()
+Данные могли измениться (рисование завершено).
+@end deftypefn
+
+
+@deftypecv {QMathGL option} QMathGL @code{QString} appName
+Имя приложения для окон сообщений.
+@end deftypecv
+@deftypecv {QMathGL option} QMathGL @code{bool} autoResize
+Разрешить изменять размер рисунка (по умолчанию false).
+@end deftypecv
+
+@external{}
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node wxMathGL class, , QMathGL class, Widget classes
+@section Класс wxMathGL
+@nav{}
+@cindex wxMathGL
+@cindex widgets
+
+Класс реализует элемент интерфейса WX для отображения графики MathGL. Он определен в @code{#include <mgl2/wx.h>}.
+
+@deftypemethod wxMathGL @code{void} SetDraw (@code{mglDraw *}dr)
+Задает функцию рисования из класса производного от @code{mglDraw}.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetDraw (@code{int (*}draw@code{)(mglBase *}gr, @code{void *}p@code{)}, @code{void *}par=@code{NULL})
+@deftypemethodx wxMathGL @code{void} SetDraw (@code{int (*}draw@code{)(mglGraph *}gr@code{)})
+Задает функцию рисования @var{draw}. Поддерживается список графиков (кадров), так что можно вначале их нарисовать (требует довольно много памяти), а потом достаточно быстро отображать. Функция должна возвращать положительное число создаваемых кадров или ноль для непосредственного рисования. Параметр @var{par} содержит указатель на данные пользователя, передаваемый функции рисования @var{draw}.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} SetGraph (@code{mglCanvas *}gr)
+@deftypemethodx wxMathGL @code{void} SetGraph (@code{mglGraph *}gr)
+Устанавливает указатель на внешний экземпляр класса для рисования (вместо встроенного). Отмечу, что wxMathGL автоматически удалит этот объект при удалении элемента интерфейса или при новом вызове @code{setGraph()}.
+@end deftypemethod
+@deftypemethod wxMathGL @code{HMGL} GetGraph ()
+Возвращает указатель на объект, строящий графики.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} SetPopup (@code{QMenu *}p)
+Задает указатель на всплывающее меню.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetSize (@code{int} w, @code{int} h)
+Задает размеры элемента управления и картинки.
+@end deftypemethod
+@deftypemethod wxMathGL @code{double} GetRatio ()
+Возвращает соотношение сторон рисунка.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{int} GetPer ()
+Возвращает величину перспективы в процентах.
+@end deftypemethod
+@deftypemethod wxMathGL @code{int} GetPhi ()
+Возвращает величину угла Phi в градусах.
+@end deftypemethod
+@deftypemethod wxMathGL @code{int} GetTet ()
+Возвращает величину угла Theta в градусах.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetAlpha ()
+Возвращает состояние переключателя прозрачности.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetLight ()
+Возвращает состояние переключателя освещения.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetZoom ()
+Возвращает состояние переключателя приближения мышью.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetRotate ()
+Возвращает состояние переключателя вращения мышью.
+@end deftypemethod
+
+
+@deftypemethod wxMathGL @code{void} Repaint ()
+Перерисовывает (обновляет) элемент управления без вызова функции рисования.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Update ()
+Обновляет рисунок путем вызова функции рисования.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Copy ()
+Копирует график в буфер обмена.
+@end deftypemethod
+@comment  @deftypemethod wxMathGL @code{void} copyClickCoor ()
+@comment  Копирует координаты щелчка мышью (как текст).
+@comment  @end deftypemethod
+@deftypemethod wxMathGL @code{void} Print ()
+Печатает текущий рисунок.
+@end deftypemethod
+
+@comment  @deftypemethod wxMathGL @code{void} Stop ()
+@comment  Посылает сигнал остановки рисования.
+@comment  @end deftypemethod
+@deftypemethod wxMathGL @code{void} Adjust ()
+Подгоняет размер картинки под размер окна.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} NextSlide ()
+Показывает следующий кадр.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} PrevSlide ()
+Показывает предыдущий кадр.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Animation (@code{bool} st=@code{true})
+Запускает анимацию.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} SetPer (@code{int} val)
+Задает величину перспективы.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetPhi (@code{int} val)
+Задает величину угла Phi.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetTet (@code{int} val)
+Задает величину угла Theta.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetAlpha (@code{bool} val)
+Включает/выключает прозрачность.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetLight (@code{bool} val)
+Включает/выключает освещение.
+@end deftypemethod
+@comment  @deftypemethod wxMathGL @code{void} SetGrid (@code{bool} val)
+@comment  Включает/выключает рисование сетки абсолютных координат на графике.
+@comment  @end deftypemethod
+@deftypemethod wxMathGL @code{void} SetZoom (@code{bool} val)
+Включает/выключает приближение мышью.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetRotate (@code{bool} val)
+Включает/выключает вращение мышью.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ZoomIn ()
+Приблиажет график.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ZoomOut ()
+Отдаляет график.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftLeft ()
+Сдвигает график влево.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftRight ()
+Сдвигает график вправо.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftUp  ()
+Сдвигает график вверх.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftDown ()
+Сдвигает график вниз.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Restore ()
+Восстанавливает приближение и поворот графика в значения по умолчанию.
+@end deftypemethod
+@c @deftypemethod wxMathGL @code{void} reload ()
+@c Обновляет данные и перерисовывает график.
+@c @end deftypemethod
+
+@deftypemethod wxMathGL @code{void} About ()
+Показывает информацию о программе.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} ExportPNG (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в PNG файл.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportPNGs (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в PNG файл без прозрачности.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportJPG (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в JPEG файл.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportBPS (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в растровый EPS файл.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportEPS (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный EPS файл.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportSVG (@code{QString} fname=@code{""})
+Сохраняет текущий рисунок в векторный SVG файл.
+@end deftypemethod
+
+@external{}
+

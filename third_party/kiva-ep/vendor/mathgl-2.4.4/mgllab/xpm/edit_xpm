@@ -1,0 +1,9 @@
+#!/bin/sh
+
+for file in *.png
+do
+	convert $file $file.xpm
+	sed 's/_png/_xpm/' $file.xpm > 1.tmp
+	sed 's/static /static const /' 1.tmp > $file.xpm
+done
+rename 's/png.//' *.xpm

@@ -1,0 +1,146 @@
+@chapter UDAV
+@nav{}
+
+UDAV (Universal Data Array Visualizator) is cross-platform program for data arrays visualization based on MathGL library. It support wide spectrum of graphics, simple script language and visual data handling and editing. It has window interface for data viewing, changing and plotting. Also it can execute MGL scripts, setup and rotate graphics and so on. UDAV hot-keys can be found in the appendix @ref{Hot-keys for UDAV}.
+
+@menu
+* UDAV overview::
+* UDAV dialogs::
+* UDAV hints::
+@end menu
+
+@c ------------------------------------------------------------------
+@external{}
+@node UDAV overview, UDAV dialogs, , UDAV
+@section UDAV overview
+@nav{}
+
+UDAV have main window divided by 2 parts in general case and optional bottom panel(s). Left side contain tabs for MGL script and data arrays. Right side contain tabs with graphics itself, with list of variables and with help on MGL. Bottom side may contain the panel with MGL messages and warnings, and the panel with calculator.
+
+@ufig{udav_main,11, Main window}
+
+Main window is shown on the figure above. You can see the script (at left) with current line highlighted by light-yellow, and result of its execution at right. Each panel have its own set of toolbuttons.
+
+Editor toolbuttons allow: open and save script from/to file; undo and redo changes; cut, copy and paste selection; find/replace text; show dialogs for command arguments and for plot setup; show calculator at bottom.
+
+Graphics toolbuttons allow: enable/disable additional transparency and lighting; show grid of absolute coordinates; enable mouse rotation; restore image view; refresh graphics (execute the script); stop calculation; copy graphics into clipboard; add primitives (line, curve, box, rhombus, ellipse, mark, text) to the image; change view angles manually. Vertical toolbuttons allow: shift and zoom in/out of image as whole; show next and previous frame of animation, or start animation (if one present).
+
+Graphics panel support plot editing by mouse.
+@itemize
+@item
+Axis range can be changed by mouse wheel or by dragging image by middle mouse button. Right button show popup menu. Left button show the coordinates of mouse click. At this double click will highlight plot under mouse and jump to the corresponded string of the MGL script.
+@item
+Pressing "mouse rotation" toolbutton will change mouse actions: dragging by left button will rotate plot, middle button will shift the plot as whole, right button will zoom in/out plot as whole and add perspective, mouse wheel will zoom in/out plot as whole.
+@item
+Manual primitives can be added by pressing corresponding toolbutton. They can be shifted as whole at any time by mouse dragging. At this double click open dialog with its properties. If toolbutton "grid of absolute coordinates" is pressed then editing of active points for primitives is enabled.
+@end itemize
+
+@ufig{udav_help,11, Main window - help panel}
+
+Short command description and list of its arguments are shown at the status-bar, when you move cursor to the new line of code. You can press @key{F1} to see more detailed help on special panel.
+
+@ufig{udav_data,11, Main window - data viewing}
+
+Also you can look the current list of variables, its dimensions and its size in the memory (right side of above figure). Toolbuttons allow: create new variable, edit variable, delete variable, preview variable plot and its properties, refresh list of variables. Pressing on any column will sort table according its contents. Double click on a variable will open panel with data cells of the variable, where you can view/edit each cell independently or apply a set of transformations.
+
+@ufig{udav_calc,11, Main window - calculator and messages}
+
+Finally, pressing @key{F2} or @key{F4} you can show/hide windows with messages/warnings and with calculator. Double click on a warning in message window will jump to corresponding line in editor. Calculator allow you type expression by keyboard as well as by toolbuttons. It know about all current variables, so you can use them in formulas.
+
+@c ------------------------------------------------------------------
+@external{}
+@node UDAV dialogs, UDAV hints, UDAV overview, UDAV
+@section UDAV dialogs
+@nav{}
+
+There are a set of dialogs, which allow change/add a command, setup global plot properties, or setup UDAV itself.
+
+@ufig{udav_cmd,8, New command dialog}
+
+One of most interesting dialog (hotkey @key{Meta-C} or @key{Win-C}) is dialog which help to enter new command or change arguments of existed one. It allows consequently select the category of command, command name in category and appropriate set of command arguments. At this right side show detailed command description. Required argument(s) are denoted by bold text. Strings are placed in apostrophes, like @code{'txt'}. Buttons below table allow to call dialogs for changing style of command (if argument @code{'fmt'} is present in the list of command arguments); to set variable or expression for argument(s); to add options for command. Note, you can click on a cell to enter value, or double-click to call corresponding dialog.
+
+@ufig{udav_pen,5, Style dialog - pen style}
+@ufig{udav_sch,5, Style dialog - color scheme}
+@ufig{udav_txt,5, Style dialog - text style}
+@ufig{udav_mask,5, Style dialog - manual mask}
+
+Dialog for changing style can be called independently, but usually is called from @emph{New command} dialog or by double click on primitive. It contain 3 tabs: one for pen style, one for color scheme, one for text style. You should select appropriate one. Resulting string of style and sample picture are shown at bottom of dialog. Usually it can be called from New command dialog.
+
+@ufig{udav_var,3, Variable dialog}
+
+Dialog for entering variable allow to select variable or expression which can be used as argument of a command. Here you can select the variable name; range of indexes in each directions; operation which will be applied (like, summation, finding minimal/maximal values and so on). Usually it can be called from New command dialog.
+
+@ufig{udav_opt,7.5, Dialog for options of a command}
+
+Dialog for command options allow to change @ref{Command options}. Usually it can be called from New command dialog.
+
+
+
+@ufig{udav_inplot,8, New inplot dialog}
+
+Another interesting dialog, which help to select and properly setup a @ref{subplot}, @ref{inplot}, @ref{columnplot}, @ref{stickplot} and similar commands.
+
+
+@ufig{udav_gen_set,9, Dialog for general properties}
+@ufig{udav_light,9, Dialog for light properties}
+
+There is dialog for setting general plot properties, including tab for setting lighting properties. It can be called by called by hotkey @key{???} and put setup commands at the beginning of MGL script.
+
+@ufig{udav_arg,3.2, Dialog for script parameters}
+
+Also you can set or change script parameters (@samp{$0} ... @samp{$9}, see @ref{MGL definition}).
+
+@ufig{udav_prop,5, Dialog for UDAV settings}
+
+Finally, there is dialog for UDAV settings. It allow to change most of things in UDAV appearance and working, including colors of keywords and numbers, default font and image size, and so on (see figure above).
+
+There are also a set of dialogs for data handling, but they are too simple and clear. So, I will not put them here.
+
+@c ------------------------------------------------------------------
+@external{}
+@node UDAV hints, , UDAV dialogs, UDAV
+@section UDAV hints
+@nav{}
+
+@itemize
+@item
+You can shift axis range by pressing middle button and moving mouse. Also, you can zoom in/out axis range by using mouse wheel.
+@item
+You can rotate/shift/zoom whole plot by mouse. Just press 'Rotate' toolbutton, click image and hold a mouse button: left button for rotation, right button for zoom/perspective, middle button for shift.
+@item
+You may quickly draw the data from file. Just use: udav 'filename.dat' in command line.
+@item
+You can copy the current image to clipboard by pressing @key{Ctrl-Shift-C}. Later you can paste it directly into yours document or presentation.
+@item
+You can export image into a set of format (EPS, SVG, PNG, JPEG) by pressing right mouse button inside image and selecting 'Export as ...'.
+@item
+You can setup colors for script highlighting in Property dialog. Just select menu item 'Settings/Properties'.
+@item
+You can save the parameter of animation inside MGL script by using comment started from '##a ' or '##c ' for loops.
+@item
+New drawing never clears things drawn already. For example, you can make a surface with contour lines by calling commands 'surf' and 'cont' one after another (in any order).
+@item
+You can put several plots in the same image by help of commands 'subplot' or 'inplot'.
+@item
+All indexes (of data arrays, subplots and so on) are always start from 0.
+@item
+You can edit MGL file in any text editor. Also you can run it in console by help of commands: @code{mglconv}, @code{mglview}.
+@item
+You can use command 'once on|off' for marking the block which should be executed only once. For example, this can be the block of large data reading/creating/handling. Press @key{F9} (or menu item 'Graphics/Reload') to re-execute this block.
+@item
+You can use command 'stop' for terminating script parsing. It is useful if you don't want to execute a part of script.
+@item
+You can type arbitrary expression as input argument for data or number. In last case (for numbers), the first value of data array is used.
+@item
+There is powerful calculator with a lot of special functions. You can use buttons or keyboard to type the expression. Also you can use existed variables in the expression.
+@item
+The calculator can help you to put complex expression in the script. Just type the expression (which may depend on coordinates x,y,z and so on) and put it into the script.
+@item
+You can easily insert file or folder names, last fitted formula or numerical value of selection by using menu Edit|Insert.
+@item
+The special dialog (Edit|Insert|New Command) help you select the command, fill its arguments and put it into the script.
+@item
+You can put several plotting commands in the same line or in separate function, for highlighting all of them simultaneously.
+@end itemize
+
+@external{}

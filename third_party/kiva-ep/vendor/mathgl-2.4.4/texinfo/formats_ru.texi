@@ -1,0 +1,141 @@
+@nav{}
+
+This appendix contain description of file formats used by MathGL.
+
+@menu
+* Font files::
+* MGLD format::
+* JSON format::
+* IFS format::
+@end menu
+
+@c ------------------------------------------------------------------
+@external{}
+@node Font files, MGLD format, , File formats
+@section Font files
+@nav{}
+
+Starting from v.1.6 the MathGL library uses new font files. The font is defined in 4 files with suffixes @samp{*.vfm}, @samp{*_b.vfm}, @samp{*_i.vfm}, @samp{*_bi.vfm}. These files are text files containing the data for roman font, bold font, italic font and bold italic font. The files (or some symbols in the files) for bold, italic or bold italic fonts can be absent. In this case the roman glyph will be used for them. By analogy, if the bold italic font is absent but the bold font is present then bold glyph will be used for bold italic. You may create these font files by yourself from *.ttf, *.otf files with the help of program @code{font_tools}. This program can be found at MathGL home site.
+
+The format of font files (*.vfm -- vector font for MathGL) is the following.
+@enumerate
+@item
+First string contains human readable comment and is always ignored.
+@item
+Second string contains 3 numbers, delimited by space or tabulation. The order of numbers is the following: @var{numg} -- the number of glyphs in the file (integer), @var{fact} -- the factor for glyph sizing (mreal), @var{size} -- the size of buffer for glyph description (integer).
+@item
+After it @var{numg}-th strings with glyphs description are placed. Each string contains 6 positive numbers, delimited by space of tabulation. The order of numbers is the following: Unicode glyph ID, glyph width, number of lines in glyph, position of lines coordinates in the buffer (length is 2*number of lines), number of triangles in glyph, position of triangles coordinates in the buffer (length is 6*number of triangles).
+@item
+The end of file contains the buffer with point coordinates at lines or triangles vertexes. The size of buffer (the number of integer) is @var{size}.
+@end enumerate
+
+Each font file can be compressed by gzip.
+
+Note: the closing contour line  is done automatically (so the last segment may be absent). For starting new contour use a point with coordinates @code{@{0x3fff, 0x3fff@}}.
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node MGLD format, JSON format, Font files, File formats
+@section MGLD format
+@nav{}
+
+MGLD is textual file, which contain all required information for drawing 3D image, i.e. it contain vertexes with colors and normales, primitives with all properties, textures, and glyph descriptions. MGLD file can be imported or viewed separately, without parsing data files itself.
+
+MGLD file start from string
+@verbatim
+MGLD npnts nprim ntxtr nglfs # optional description
+@end verbatim
+which contain signature @samp{MGLD} and number of points @var{npnts}, number of primitives @var{nprim}, number of textures @var{ntxtr}, number of glyph descriptions @var{nglfs}, and optional description. Empty strings and string with @samp{#} are ignored.
+
+Next, file contain @var{npnts} strings with points coordinates and colors. The format of each string is
+@verbatim
+x y z c t ta u v w r g b a
+@end verbatim
+Here @var{x}, @var{y}, @var{z} are coordinates, @var{c}, @var{t} are color indexes in texture, @var{ta} is normalized @var{t} according to current alpha setting, @var{u}, @var{v}, @var{w} are coordinates of normal vector (can be @code{NAN} if disabled), @var{r}, @var{g}, @var{b}, @var{a} are RGBA color values.
+
+Next, file contain @var{nprim} strings with properties of primitives. The format of each string is
+@verbatim
+type n1 n2 n3 n4 id s w p
+@end verbatim
+Here @var{type} is kind of primitive (0 - mark, 1 - line, 2 - triangle, 3 - quadrangle, 4 - glyph), @var{n1}...@var{n4} is index of point for vertexes,  @var{id} is primitive identification number, @var{s} and @var{w} are size and width if applicable, @var{p} is scaling factor for glyphs.
+
+Next, file contain @var{ntxtr} strings with descriptions of textures. The format of each string is
+@verbatim
+smooth alpha colors
+@end verbatim
+Here @var{smooth} set to enable smoothing between colors, @var{alpha} set to use half-transparent texture, @var{colors} contain color scheme itself as it described in @ref{Color scheme}.
+
+Finally, file contain @var{nglfs} entries with description of each glyph used in the figure. The format of entries are
+@verbatim
+nT nL
+xA yA xB yB xC yC ...
+xP yP ...
+@end verbatim
+Here nT is the number of triangles; nL is the number of line vertexes; xA, yA, xB, yB, xC, yC are coordinates of triangles; and xP, yP, xQ, yQ are coordinates of lines. Line coordinate xP=0x3fff, yP=0x3fff denote line breaking.
+
+@c ------------------------------------------------------------------
+@external{}
+@node JSON format, IFS format, MGLD format, File formats
+@section JSON format
+@nav{}
+
+MathGL can save points and primitives of 3D object. It contain a set of variables listed below.
+
+@table @samp
+@item width
+width of the image;
+@item height
+height of the image
+@item depth
+depth of the image, usually =sqrt(width*height);
+
+@item npnts
+number of points (vertexes);
+@item pnts
+array of coordinates of points (vertexes), each element is array in form [x, y, z];
+
+@item nprim
+number of primitives;
+@item prim
+array of primitives, each element is array in form [type, n1, n2, n3, n4, id, s, w, p, z, color].
+
+Here @var{type} is kind of primitive (0 - mark, 1 - line, 2 - triangle, 3 - quadrangle, 4 - glyph), @var{n1}...@var{n4} is index of point for vertexes and @var{n2} can be index of glyph coordinate, @var{s} and @var{w} are size and width if applicable, @var{z} is average z-coordinate, @var{id} is primitive identification number, @var{p} is scaling factor for glyphs.
+
+@item ncoor
+number of glyph positions
+@item coor
+array of glyph positions, each element is array in form [dx,dy]
+
+@item nglfs
+number of glyph descriptions
+@item glfs
+array of glyph descriptions, each element is array in form @code{[nL, [xP0, yP0, xP1, yP1 ...]]}. Here @code{nL} is the number of line vertexes; and @code{xP, yP, xQ, yQ} are coordinates of lines. Line coordinate xP=0x3fff, yP=0x3fff denote line breaking.
+
+@end table
+
+@c ------------------------------------------------------------------
+@external{}
+@node IFS format, , JSON format, File formats
+@section IFS format
+@nav{}
+
+MathGL can read IFS fractal parameters (see @ref{ifsfile}) from a IFS file. Let remind IFS file format. File may contain several records. Each record contain the name of fractal (@samp{binary} in the example below) and the body of fractal, which is enclosed in curly braces @{@}. Symbol @samp{;} start the comment. If the name of fractal contain @samp{(3D)} or @samp{(3d)} then the 3d IFS fractal is specified. The sample below contain two fractals: @samp{binary} -- usual 2d fractal, and @samp{3dfern (3D)} -- 3d fractal.
+
+@verbatim
+ binary
+ { ; comment allowed here
+  ; and here
+  .5  .0 .0 .5 -2.563477 -0.000003 .333333   ; also comment allowed here
+  .5  .0 .0 .5  2.436544 -0.000003 .333333
+  .0 -.5 .5 .0  4.873085  7.563492 .333333
+  }
+
+ 3dfern (3D) {
+   .00  .00 0 .0 .18 .0 0  0.0 0.00 0 0.0 0 .01
+   .85  .00 0 .0 .85 .1 0 -0.1 0.85 0 1.6 0 .85
+   .20 -.20 0 .2 .20 .0 0  0.0 0.30 0 0.8 0 .07
+  -.20  .20 0 .2 .20 .0 0  0.0 0.30 0 0.8 0 .07
+  }
+@end verbatim
+@external{}

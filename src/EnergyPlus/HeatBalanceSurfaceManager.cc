@@ -4637,6 +4637,13 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) =
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum);
+            // Inside face conduction calculation for Kiva surfaces
+            if (state.dataSurface->Surface(surfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
+                state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
+                    -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
+                        state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
+                        state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
+            }
         }
     }
 }
@@ -5747,14 +5754,6 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             state.dataHeatBal->SurfInitialDifSolInAbsReport(surfNum) = state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs(surfNum) * surface.Area;
             // Total Shortwave Radiation Absorbed on Inside of Surface[W]
             state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) * surface.Area;
-
-            // Inside face conduction calculation for Kiva surfaces
-            if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
-                state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
-                    -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
-                      state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
-                      state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum));
-            }
 
             // inside face conduction updates
             state.dataHeatBalSurf->SurfOpaqInsFaceCond(surfNum) = state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) * surface.Area;
@@ -7168,8 +7167,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         // Read Kiva results for each surface
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
                             state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
-                        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) =
-                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
 
                         TH11 = 0.0;
                     }

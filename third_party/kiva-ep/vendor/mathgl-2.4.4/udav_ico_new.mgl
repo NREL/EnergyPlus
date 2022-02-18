@@ -1,0 +1,21 @@
+setsize 200 200
+zrange 0 2
+
+define $s 0.8
+new x 200 '$s*(x+1)/2*sin(2*pi*x)'
+new y 200 '$s*(x+1)/2*cos(2*pi*x)'
+#new z 200 '$s*(2-(x+1))^2/2+0.1'
+new z 200 '$s*(2-(x+1))+0.1'
+new r 200 '0.02+0.07*(x+1)'
+
+subplot 1 1 0 '#'
+fsurf 'v*cos(2*pi*u)' 'v*sin(2*pi*u)-0.05' 'v/2' 'Yyyww'
+#circle 0 -0.25 0 1 'y';alpha 0.5
+light on
+rotate 65 80
+tube x y z+0.15 r
+define $r 0.13
+fsurf '0+$r*cos(2*pi*u)*cos(2*pi*v)' '0.03+$r*cos(2*pi*u)*sin(2*pi*v)' '2*$s+0.25+$r*sin(2*pi*u)' 'r'
+define $r 0.155
+fsurf '$r*cos(2*pi*u)*cos(2*pi*v)' '$s+$r*cos(2*pi*u)*sin(2*pi*v)' '0.25+$r*sin(2*pi*u)' 'b'
+write 'udav_new.png'

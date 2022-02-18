@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<title>MGL script preview (SVG)</title>
+<link rel="stylesheet" href="../styles.css"></head><body onload="init()" onunload="save()">
+<div class="topnav" id="myTopnav"></div><div class="main">
+
+<div style="width:620px;display:inline-block">
+<p>Enter script below</p>
+<form action='/cgi-bin/mgl.cgi' method='POST' target='result'>
+<textarea name='mgl' rows='18' cols='80'>box</textarea><br/>
+<button type='submit'> Draw </button></form><br>
+</div>
+
+<div style="width:620px;display:inline-block">
+<iframe src="" name="result" style="border:none;height:420px;width:620px;" ></iframe>
+</div>
+
+</div><script type="text/javascript" src="../accordion.js"></script>
+</body></html>

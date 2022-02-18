@@ -1,0 +1,157 @@
+\input texinfo
+@documentencoding UTF-8
+@documentlanguage en
+
+@setfilename mathgl_en.info
+@include version.texi
+@settitle MathGL @value{VERSION}
+@syncodeindex pg cp
+@comment %**end of header
+
+@copying
+This manual is for MathGL (version @value{VERSION}), a collection of classes and routines for scientific plotting. Please report any errors in this manual to @email{mathgl.abalakin@@gmail.org}.
+
+@include copyright.texi
+@end copying
+
+@dircategory MathGL documentation system
+@direntry
+* MathGL: (mathgl). The library for scientific graphics.
+@end direntry
+
+@titlepage
+@title MathGL
+@subtitle for version @value{VERSION}
+@author A.A. Balakin (@uref{http://mathgl.sourceforge.net/})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top MathGL
+
+This file documents the Mathematical Graphic Library (MathGL), a collection of classes and routines for scientific plotting. It corresponds to release @value{VERSION} of the library. Please report any errors in this manual to @email{mathgl.abalakin@@gmail.org}. More information about MathGL can be found at the project homepage, @uref{http://mathgl.sourceforge.net/}.
+
+@include copyright.texi
+
+@end ifnottex
+
+@menu
+* Overview::
+* Examples::
+* General concepts::
+* MathGL core::
+* Widget classes::
+* Data processing::
+* MGL scripts::
+* UDAV::
+* Other classes::
+* All samples::
+* Symbols and hot-keys::
+* File formats::
+@ifhtml
+* TeX-like symbols::
+@end ifhtml
+* Plotting time::
+* Copying This Manual::
+* Index::
+@end menu
+
+@macro external {}
+@end macro
+@macro nav {}
+@end macro
+
+@macro fig {fname,text}
+@center @image{\fname\, 11cm, , \text\, png}
+@end macro
+@macro pfig {fname,text}
+@center @image{png/\fname\, 11cm, , \text\, png}
+@c @center @image{../png/\fname\, 11cm, , \text\. See also @uref{../pdf/\fname\.pdf, U3D PDF} sample, .png}
+@end macro
+@macro ufig {fname,width,text}
+@center @image{udav/\fname\, \width\cm, , \text\, png}
+@end macro
+
+@macro sref {arg}
+@xref{\arg\}, for sample code and picture.
+@end macro
+
+@node Overview, Examples, Top, Top
+@include overview_en.texi
+
+@node Examples, General concepts, Overview, Top
+@include example_en.texi
+
+@node General concepts, MathGL core, Examples, Top
+@include concept_en.texi
+
+@node MathGL core, Widget classes, General concepts, Top
+@include core_en.texi
+
+@node Widget classes, Data processing, MathGL core, Top
+@include widget_en.texi
+
+@node Data processing, MGL scripts, Widget classes, Top
+@include data_en.texi
+
+@node MGL scripts, UDAV, Data processing, Top
+@include parse_en.texi
+
+@node UDAV, Other classes, MGL scripts, Top
+@include udav_en.texi
+
+@node Other classes, All samples, UDAV, Top
+@include other_en.texi
+
+@node All samples, Symbols and hot-keys, Other classes, Top
+@include samples.texi
+
+@node Symbols and hot-keys, File formats, All samples, Top
+@appendix Symbols and hot-keys
+@include symbols_en.texi
+
+@node File formats, Plotting time, Symbols and hot-keys, Top
+@appendix File formats
+@include formats_en.texi
+
+@ifhtml
+@node Plotting time, TeX-like symbols, File formats, Top
+@end ifhtml
+@ifnothtml
+@node Plotting time, Copying This Manual, File formats, Top
+@end ifnothtml
+@appendix Plotting time
+
+Table below show plotting time in seconds for all samples in file @uref{http://sourceforge.net/p/mathgl/code/HEAD/tree/mathgl-2x/examples/samples.cpp, examples/samples.cpp}. The test was done in my laptop (i5-2430M) with 64-bit Debian.
+
+Few words about the speed. Firstly, direct bitmap drawing (Quality=4,5,6) is faster than buffered one (Quality=0,1,2), but sometimes it give incorrect result (see @ref{cloud}) and don't allow to export in vector or 3d formats (like EPS, SVG, PDF ...). Secondly, lower quality is faster than high one generally, i.e. Quality=1 is faster than Quality=2, and Quality=0 is faster than Quality=1. However, if plot contain a lot of faces (like @ref{cloud}, @ref{surf3}, @ref{pipe}, @ref{dew}) then Quality=0 may become slow, especially for small images. Finally, smaller images are drawn faster than larger ones.
+
+Results for image size 800*600 (default one).
+@include time.texi
+
+Results for image size 1920*1440 (print quality)
+@include time_big.texi
+
+@ifhtml
+@node TeX-like symbols, Copying This Manual, Plotting time, Top
+@appendix TeX-like symbols
+@include appendix_en.texi
+@node Copying This Manual, Index, TeX-like symbols, Top
+@end ifhtml
+@ifnothtml
+@node Copying This Manual, Index, Plotting time, Top
+@end ifnothtml
+@appendix GNU Free Documentation License
+@include fdl.texi
+
+@node Index, , Copying This Manual, Top
+@unnumbered Index
+
+@printindex cp
+
+@bye

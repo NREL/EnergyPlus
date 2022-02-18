@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Hextris</TITLE>
+<link rel="stylesheet" href="../styles.css"></head>
+<body onkeydown="keydown(event)" onblur="needPause()" onload="startGame()">
+<div class="topnav" id="myTopnav"></div><div class="main">
+
+<h2>"Hextris" game</h2>
+<canvas id="myCanvas" width="700" height="550" onmousedown="mousedown(event)">
+Your browser does not support the HTML5 canvas tag.</canvas></div>
+
+<script type="text/javascript" src="../accordion.js"></script>
+<script>
+var ctx;
+const s3 = Math.sqrt(3);
+var bar = 9;	// block radius in px (default)
+var nx = 11, ny = 20;	// box size
+var fX, fY;		// figure position
+var next = [];
+var fig = [];
+var cols = ['none', '#FF0000', '#FFAA00', '#AAFF00', '#00FF00', '#00FFAA', '#00AAFF', '#0000FF', '#AA00FF', '#FF00AA', 'silver'];
+var dols = ['none', '#7F0000', '#7F5500', '#557F00', '#007F00', '#007F55', '#00557F', '#00007F', '#55007F', '#7F0055', 'gray'];
+
+// var cols = ['none', '#FF00FF', '#00AF00', '#FF8000', '#0000FF', '#dFdF00', '#00dFdF', '#FF0000', '#8000FF', '#FF0080', 'silver'];
+// var dols = ['none', '#7F007F', '#007F00', '#7F4000', '#00007F', '#7F7F00', '#007F7F', '#7F0000', '#40007F', '#7F0040', 'gray'];
+var f1 = [4, 9,	0,s3/2,	0,-s3, 0,0, 0,s3, 0,2*s3];		// line 4x1
+var f2 = [4, 2,	0,0, 	0,-s3, 0,0, 0,s3, 1.5,-s3/2];	// hat
+var f3 = [4, 3,	0,0, 	0,-s3, 0,0, 0,s3, -1.5,-s3/2];	// hat
+var f4 = [4, 4,	0,0, 	0,-s3, 0,0, 0,s3, 1.5,3*s3/2];	// hock
+var f5 = [4, 7,	0,0, 	0,-s3, 0,0, 0,s3, -1.5,3*s3/2];	// hock
+var f6 = [4, 6,	0,0,	0,-s3, 0,0, 1.5,s3/2, -1.5,s3/2];	// tripod
+var f7 = [4, 1,	3/4,-s3/4,	0,-s3, 0,0, 1.5,-s3/2, 1.5,s3/2];	// rhomb
+var f8 = [4, 8,	3/4,s3/4,	0,-s3, 0,0, 1.5,s3/2, 1.5,3*s3/2];
+var f9 = [4, 5,	-3/4,s3/4,	0,-s3, 0,0, -1.5,s3/2, -1.5,3*s3/2];
+
+var figs = [f1, f2, f3, f4, f5, f6, f7, f8, f9];
+var box = [];
+
+var level = 0;
+var score = 0;
+var nlines = 0;
+var lines = 0;	// actually removed lines
+var interval;
+var hiscore = 0;
+var paused = 0;
+var finished = 0;
+var marked = 0;
+var preview = 0;
+
+var step = 1./32;	// step of down-shift (higher is more complex)
+
+function needPause()
+{	if(paused==0)	pause();	}
+
+function pause()
+{
+	paused = 1-paused;
+	if(paused)
+	{
+		if(score > hiscore)
+		{	hiscore = score;
+			localStorage.setItem("hiscoreHexris", hiscore);	}
+		clearInterval(interval);	draw();
+	}
+	else if(!finished)	interval = setInterval(updateCanvas, 30);
+}
+
+function startGame()
+{
+	ctx = document.getElementById("myCanvas").getContext("2d");
+	ctx.lineCap="round";
+	var i = Math.floor(Math.random()*figs.length);
+	next = figs[i].slice();	// if somebody want to view the next figure
+
+	newFig();	level = 0;		step = 1./32;
+	score = 0;	nlines = 0;		paused = 0;		finished = 0;
+	for(var i=0;i<nx*ny;i++)	box[i] = 0;
+
+	hiscore = localStorage.getItem("hiscoreHexris");
+	if(!hiscore)	hiscore = 0;
+//	document.getElementById("hiscore").innerHTML = hiscore;
+	interval = setInterval(updateCanvas, 30);
+}
+
+function newFig()
+{
+	var i = Math.floor(Math.random()*figs.length);
+	fig = next.slice();	next = figs[i].slice();
+	fX = 1+3/4*(nx-1);	fY = (ny-1)*s3;
+}
+
+function finish()	// game over
+{
+	finished = 1;	draw();
+	ctx.font="40px Arial";
+	ctx.fillStyle = 'black';
+	ctx.fillText("GAME OVER", ctx.canvas.width/4, ctx.canvas.height/2);
+	if(score > hiscore)
+	{	hiscore = score;
+		localStorage.setItem("hiscoreHexris", hiscore);	}
+//	document.getElementById("hiscore").innerHTML = hiscore;
+	clearInterval(interval);
+}
+
+function toLab(i,j)
+{	return [1+i*3/2, s3*(j+(i%2)/2)];	}
+function toBox(x,y)
+{	var i = Math.floor(0.5+2/3*(x-1));
+	return [i, Math.floor(0.5+(y/s3)-(i%2)/2)];	}
+
+function moveLeft()
+{
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var [x,y] = toBox(fX+fig[4+2*i]-1.5, fY+fig[5+2*i]);
+		if(x<0 || box[x+nx*y]>0)	return;
+	}
+	fX -= 1.5;
+}
+
+function moveRight()
+{
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var [x,y] = toBox(fX+fig[4+2*i]+1.5, fY+fig[5+2*i]);
+		if(x>=nx || box[x+nx*y]>0)	return;
+	}
+	fX += 1.5;
+}
+
+function canFall()
+{
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var [x,y] = toBox(fX+fig[4+2*i], fY+fig[5+2*i]-s3);
+		if(y<0 || box[x+nx*y]>0)	return 0;
+	}
+	return 1;
+}
+
+function putFig()
+{
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var [x,y] = toBox(fX+fig[4+2*i], fY+fig[5+2*i]);
+		if(x>=0 && y>=0 && x<nx && y<ny)	box[x+nx*y] = fig[1];
+	}
+	score += 1;
+	markLines();
+}
+
+function moveDown()
+{
+	if(canFall())	fY -= s3;
+}
+
+function fallDown()
+{
+	while(canFall())	fY -= s3;
+	putFig();	newFig();
+}
+
+function fallLeft()
+{
+	var n = fig[0], ok = 1;
+	while(canFall())	fY -= s3;
+	for(var i=0;i<n;i++)
+	{
+		var [x,y] = toBox(fX+fig[4+2*i]-1.5, fY+fig[5+2*i]);
+		if(x<0 || box[x+nx*y]>0)	ok = 0;
+	}
+	if(ok)	fX -= 1.5;
+}
+
+function fallRight()
+{
+	var n = fig[0], ok = 1;
+	while(canFall())	fY -= s3;
+	for(var i=0;i<n;i++)
+	{
+		var [x,y] = toBox(fX+fig[4+2*i]+1.5, fY+fig[5+2*i]);
+		if(x<0 || box[x+nx*y]>0)	ok = 0;
+	}
+	if(ok)	fX += 1.5;
+}
+
+function rotate()
+{
+	var f = fig.slice(), n = fig[0], dx=0;
+	for(var i=0;i<n;i++)
+	{
+		var x0 = fig[2], y0 = fig[3];
+		var xx = fig[4+2*i], yy = fig[5+2*i];
+		f[4+2*i] = (xx+x0)/2-s3/2*(yy-y0);
+		f[5+2*i] = (yy+y0)/2+s3/2*(xx-x0);
+		var [x,y] = toBox(fX+f[4+2*i], fY+f[5+2*i]);
+		if(x<0 && x<0)		dx = -x;
+		if(x>=nx && x+dx>=nx)	dx = nx-1-x;
+	}
+	for(var i=0;i<n;i++)
+	{
+		var x0 = fig[2], y0 = fig[3];
+		var xx = fig[4+2*i], yy = fig[5+2*i];
+		f[4+2*i] = (xx+x0)/2-s3/2*(yy-y0);
+		f[5+2*i] = (yy+y0)/2+s3/2*(xx-x0);
+		var [x,y] = toBox(fX+f[4+2*i]+dx*1.5, fY+f[5+2*i]);
+		if(box[x+nx*y]>0)	return;
+	}
+	fX += dx*1.5;	fig = f;
+}
+
+function updateCanvas()
+{
+	if(paused)	{	draw();	return;	}
+	if(marked>0)
+	{
+		marked -= 1;
+		if(marked==0)	removeLines();
+	}
+	else if(canFall())
+		fY -= step*s3;
+	else
+	{
+		putFig();
+		newFig();
+		if(!canFall())	finish();
+	}
+	draw();
+}
+
+function markLines()
+{
+	var c = cols.length-1, same;
+	lines = 0;
+	for(var j=0;j<ny;j++)
+	{
+		same = 0;
+		for(var i=0;i<nx;i++)	if(box[i+nx*j])	same += 1;
+		if(same==nx)	// line is filled
+		{	marked = 5;	lines++;
+			for(var i=0;i<nx;i++)	box[i+nx*j] = c;
+		}
+		same = 0;
+		for(var i=0;i<nx;i++)
+		{
+			var jj = j-(i%2);
+			if(jj>0 && box[i+nx*jj])	same += 1;
+		}
+		if(same==nx)	// line is filled
+		{	marked = 5;	lines++;
+			for(var i=0;i<nx;i++)
+			{	var jj = j-(i%2);
+				if(jj>0)	box[i+nx*jj] = c;	}
+		}
+		same = 0;
+		for(var i=0;i<nx;i++)
+		{
+			var jj = j+Math.floor(i/2);
+			if(jj<nx && box[i+nx*jj])	same += 1;
+		}
+		if(same==nx)	// line is filled
+		{	marked = 5;	lines++;
+			for(var i=0;i<nx;i++)
+			{	var jj = j+Math.floor(i/2);
+				if(jj<nx)	box[i+nx*jj] = c;	}
+		}
+		same = 0;
+		for(var i=0;i<nx;i++)
+		{
+			var jj = j+Math.floor((nx-1-i)/2);
+			if(box[i+nx*jj])	same += 1;
+		}
+		if(same==nx)	// line is filled
+		{	marked = 5;	lines++;
+			for(var i=0;i<nx;i++)
+			{	var jj = j+Math.floor((nx-1-i)/2);
+				if(jj<nx)	box[i+nx*jj] = c;	}
+		}
+	}
+}
+
+function removeLines()
+{
+	var ok=1, c = cols.length-1;
+	while(ok)	// remove marked blocks
+	{
+		ok = 0;
+		for(var i=0;i<nx;i++)	for(var j=0;j<ny;j++)
+		{
+			if(box[i+nx*j]==c)
+			{
+				ok = 1;
+				for(var k=j+1;k<ny;k++)	box[i+nx*(k-1)] = box[i+nx*k];
+				box[i+nx*(ny-1)] = 0;
+			}
+		}
+	}
+	if(preview)
+		score += lines*lines*4*level;
+	else
+		score += lines*lines*10*level;
+	nlines += lines;	lines = 0;
+	if(nlines>50*level)
+	{	level += 1;	step = Math.pow(2,level/4-5);
+		if(level>15)	level = 15;	}
+	markLines();	// TODO summary score ?!!
+}
+
+function drawSq(i,j,col,col2)
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/23/s3/bar, r = bar*s;
+	var [x,y] = toLab(i+1,ny-j+1);
+	x *= r;	y *= r;
+	ctx.beginPath();
+	if(col!='none')
+	{
+		var grd=ctx.createRadialGradient(x+0.5*r,y-r/3,r/5,x+0.5*r,y,r);
+		grd.addColorStop(0,"white");
+		grd.addColorStop(1,col);
+		ctx.fillStyle = grd;
+	}
+	ctx.strokeStyle = col2;
+	ctx.moveTo(x-r,y);
+	ctx.lineTo(x-r/2,y+s3*r/2);
+	ctx.lineTo(x+r/2,y+s3*r/2);
+	ctx.lineTo(x+r,y);
+	ctx.lineTo(x+r/2,y-s3*r/2);
+	ctx.lineTo(x-r/2,y-s3*r/2);
+	ctx.lineTo(x-r,y);
+	ctx.stroke();	if(col!='none')	ctx.fill();
+}
+
+function draw()
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/23/s3/bar, r = bar*s;
+	ctx.clearRect(0, 0, cwidth, cheight);
+	// boundary
+	for(var i=0;i<=ny;i++)
+	{
+		drawSq(-1,i,'gray','black');
+		drawSq(nx,i,'gray','black');
+	}
+	for(var i=0;i<=nx+1;i++)	drawSq(i-1,-1,'gray','black');
+	// existing bricks
+	for(var i=0;i<nx;i++)	for(var j=0;j<ny;j++)
+	{
+		var c = box[i+nx*j];
+		if(c)	drawSq(i,j,cols[c],'black');
+		else	drawSq(i,j,'none','lightgray');
+	}
+	// figure	
+	var n = fig[0], cf = cols[fig[1]], df = dols[fig[1]];
+	for(var i=0;i<n;i++)
+	{
+		var [x,y] = toBox(fX+fig[4+2*i], fY+fig[5+2*i]);
+		drawSq(x,y,cf,'black');
+	}
+
+	// preview figure
+	if(preview)
+	{
+		var n = next[0], cf = cols[next[1]], df = dols[next[1]];
+		for(var i=0;i<n;i++)
+		{
+			var [x,y] = toBox(next[4+2*i]+nx+19, 0.1+next[5+2*i]+18);
+			drawSq(x,y,cf,'black');
+		}
+		ctx.strokeStyle = 'black';
+		ctx.strokeRect((nx+14)*r,7*s3*r,12*r,7*s3*r);
+
+		var dy = ny;	n = fig[0];
+		for(var i=0;i<n;i++)
+		{
+			var [x,y] = toBox(fX+fig[4+2*i], fY+fig[5+2*i]), j;
+			for(j=0;j<=y;j++)	if(box[x+nx*(y-j)]>0)	break;
+			if(j<dy)	dy = j;
+		}
+		for(var i=0;i<n;i++)
+		{
+			var [x,y] = toBox(fX+fig[4+2*i], fY+fig[5+2*i]), j;
+			drawSq(x,y-dy+1,'none','black');
+		}
+	}
+
+	ctx.font="24px Arial";	// score
+	ctx.fillStyle = 'black';
+	ctx.fillText("Score: "+score, (nx+11)*r, 2*r);
+	ctx.fillText("Level: "+level, (nx+23)*r, 2*r);
+	ctx.fillStyle = 'darkgreen';
+	ctx.fillText("HiScore: "+hiscore, (nx+11)*r, 4*r);
+
+	var dh = r*7, b = dh/10;
+	var y0 = cheight-2*dh, x0 = r*(nx+10);
+	ctx.strokeStyle = 'blue';	ctx.fillStyle = 'lightblue';	
+
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// left
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/4,y0+dh/2);
+	ctx.lineTo(x0+3*dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+
+	ctx.strokeRect(x0+dh+b, y0+b, dh-2*b, dh-2*b);	// rotate
+	ctx.beginPath();
+	ctx.arc(x0+3*dh/2, y0+dh/2, 0.3*dh, 0, 2*Math.PI);
+	ctx.fill();	ctx.stroke();
+	ctx.beginPath();	ctx.fillStyle = 'white';
+	ctx.arc(x0+3*dh/2, y0+dh/2, 0.2*dh, 0, 2*Math.PI);
+	ctx.fill();	ctx.stroke();
+
+	ctx.strokeRect(x0+2*dh+b, y0+b, dh-2*b, dh-2*b);	// right
+	ctx.beginPath();	ctx.fillStyle = 'lightblue';
+	ctx.moveTo(x0+2*dh+3*dh/4,y0+dh/2);
+	ctx.lineTo(x0+2*dh+dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+2*dh+dh/4,y0+dh/4);
+	ctx.lineTo(x0+2*dh+3*dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+
+	y0 += dh;
+	ctx.strokeStyle = 'green';	ctx.fillStyle = 'lightgreen';	
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall left
+	ctx.beginPath();
+	ctx.moveTo(x0+3*dh/4,y0+0.2*dh);
+	ctx.lineTo(x0+5*dh/8,y0+0.2*dh);
+	ctx.lineTo(x0+5*dh/8,y0+dh/2);
+	ctx.lineTo(x0+0.4*dh,y0+dh/2);
+	ctx.lineTo(x0+0.4*dh,y0+3*dh/8);
+	ctx.lineTo(x0+0.2*dh,y0+5*dh/8);
+	ctx.lineTo(x0+0.4*dh,y0+7*dh/8);
+	ctx.lineTo(x0+0.4*dh,y0+6*dh/8);
+	ctx.lineTo(x0+3*dh/4,y0+6*dh/8);
+	ctx.lineTo(x0+3*dh/4,y0+0.2*dh);	ctx.fill();	ctx.stroke();
+
+	x0 += dh;
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall down
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/2,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/2,y0+3*dh/4);	ctx.fill();	ctx.stroke();
+	ctx.beginPath();
+	ctx.rect(x0+dh/4,y0+3*dh/4,dh/2,dh/16);
+	ctx.fill();	ctx.stroke();
+
+	x0 += dh;
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall right
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/4,y0+0.2*dh);
+	ctx.lineTo(x0+3*dh/8,y0+0.2*dh);
+	ctx.lineTo(x0+3*dh/8,y0+dh/2);
+	ctx.lineTo(x0+0.6*dh,y0+dh/2);
+	ctx.lineTo(x0+0.6*dh,y0+3*dh/8);
+	ctx.lineTo(x0+0.8*dh,y0+5*dh/8);
+	ctx.lineTo(x0+0.6*dh,y0+7*dh/8);
+	ctx.lineTo(x0+0.6*dh,y0+6*dh/8);
+	ctx.lineTo(x0+dh/4,y0+6*dh/8);
+	ctx.lineTo(x0+dh/4,y0+0.2*dh);	ctx.fill();	ctx.stroke();
+
+	x0 -= 2*dh;	y0 -= 4*dh;	// preview
+	ctx.strokeStyle = 'magenta';	ctx.fillStyle = 'violet';
+	if(preview)
+	{
+		ctx.fillStyle = 'lightpink';
+		ctx.fillRect(x0+b, y0+b, dh-2*b, dh-2*b);
+	}
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+dh/4,dh/2,Math.PI/4,3*Math.PI/4);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+3*dh/4,dh/2,-3*Math.PI/4,-Math.PI/4);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+dh/2,dh/5,0,2*Math.PI);	
+	ctx.fill();	ctx.stroke();
+
+	x0 += dh;	ctx.strokeStyle = 'red';
+	if(paused)
+	{
+		ctx.fillStyle = 'pink';
+		ctx.fillRect(x0+b, y0+b, dh-2*b, dh-2*b);
+	}
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);
+	ctx.beginPath();	ctx.fillStyle = 'salmon';
+	ctx.rect(x0+dh/4,y0+dh/4,dh/8,dh/2);
+	ctx.rect(x0+5*dh/8,y0+dh/4,dh/8,dh/2);	ctx.fill();	ctx.stroke();
+
+	x0 += dh;
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);	// run
+	ctx.beginPath();	ctx.fillStyle = 'salmon';
+	ctx.moveTo(x0+dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+dh/2,y0+dh/2);	ctx.fill();	ctx.stroke();
+	ctx.moveTo(x0+dh/2,y0+dh/4);
+	ctx.lineTo(x0+dh/2,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+}
+
+function keydown(event)	// key is pressed
+{
+	if(event.key == ' ')	fallDown();
+	else if(event.key == 'ArrowUp')	rotate();
+	else if(event.key == 'ArrowDown')	moveDown();
+	else if(event.key == 'ArrowLeft')	moveLeft();
+	else if(event.key == 'ArrowRight')	moveRight();
+	else if(event.key == 'End')		fallRight();
+	else if(event.key == 'Home')	fallLeft();
+}
+
+function mousedown(event)	// mouse button is pressed
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/23/s3/bar, r = bar*s;
+	var dh = r*7, b = dh/10, y0 = cheight-2*dh;
+	var xx = event.offsetX-s*r*(nx+3), yy = event.offsetY-y0;
+
+	if(xx<0)	pause();
+	else if(yy>-0.5*dh && yy<dh)	// main buttons
+	{
+		if(xx<dh)	moveLeft();
+		else if(xx<2*dh)	rotate();
+		else	moveRight();
+	}
+	else if(yy>dh)	// fall buttons
+	{
+		if(xx<dh)	fallLeft();
+		else if(xx<2*dh)	fallDown();
+		else	fallRight();
+	}
+	else if(yy<-2*dh)	// setup buttons
+	{
+		if(xx<dh)	preview = 1-preview;
+		else if(xx<2*dh)	pause();
+		else
+		{	clearInterval(interval);	startGame();	}
+	}
+}
+</script>
+</body>
+</html> 

@@ -1,0 +1,560 @@
+2.4.4 Released 8 July 2019
+
+* mglData now have operator() which work as SubData() function.
+* Add 'minmax' for positions of local maximums and minimums.
+* Add ContGen() and ContFGen() to draw contour lines manually. Correspondingly 'cont' and 'contf' commands are extended.
+* Add 'conts' for getting coordinate of contour lines.
+* Extend 'put' for partial filling if data size(s) are smaller as destination.
+* Classes mglFormula and mglFormulaC now can read file with given sizes if string have the format ":fname:x1:x2:y1:y2:z1:z2". Here data is supposed in range [x1,x2]*[y1,y2]*[z1,z2] (by default [0,1]*[0,1]*[0,1]). Calc() in this case return the interpolated values.
+* Fix [xyz]range option for Area and Region.
+* Minor bugfixes.
+
+2.4.3 Released 14 March 2019
+
+* Add 'clabel' command -- draw labels for colorbar. Should be used *after* drawing colorbar!
+* Extend 'ctick' command
+* Add subpixel smoothing for masks
+* Boxes around text (style '@') now use actual height and position of the text.
+* Add mask to EPS export. Note, mask angles are reduced to 45*(0,1,...7) degrees for decreasing pattern size in the EPS.
+* Update default masks: '*' become dot, '^' become bricks, 'd' become plus, 'D' become tacks, ';' and 'j' change lengths. Note, you can use brush.ods to prepare user-defined masks.
+* Add styles '^' and '_' for command 'smooth' to find upper/lower bound of the data.
+* Improve FlowP() to draw both branches (in positive and negative time direction).
+* Improve CGI interface and update website.
+* Introduce struct mdual as interface for C and C++ complex numbers. It is implicitly converted to std::complex<> in C++. And need to call c2mdual() and mdual2c() in pure C. However mdual is binary compatible with C _Complex numbers.
+* Add flag in CMake to manually disable support of C99 complex numbers.
+* Bypass user-specified extension in base font family name.
+* Improve hints in mgllab and udav.
+* Add utility 'mgltask' for making output file with a set of copies of mask-file. It useful for making set of initial conditions with a few parameters varied in specified range.
+* Add example of OpenGL output.
+* Bugfix for approximate min and max position.
+* Bugfix for position of SVG output.
+* Compatibility fixes for new versions of CMake, compilers and libraries.
+INCOMPATIBLE:
+* Formally pure C interface handle complex numbers by new way due to strict following of C/C++ standards. However, the MathGL library is binary compatible with previous version(s).
+
+2.4.2.1 Released 31 March 2018
+
+* Bugfix for panel placement in mgllab.
+* Move colorbars close to axis by default.
+* Improve Spanish translation (thanks to Diego Sejas Viscarra).
+
+2.4.2 Released 21 March 2018
+
+* Add custom dialog for FLTK widgets. This can be constructed from C/C++ code, or from MGL script using special comments "##d##d $I kind|label|par1|par2|..." will create an entry in custom dialog for changing plot properties. Here "$I" is id ($0,$1...$9,$a,$b...$z), "label" is the label of element, "kind" is one following:
+	'e' for editor or input line (parameter is initial value) , 
+	'v' for spinner or counter (parameters are "ini|min|max|step|big_step"), 
+	's' for slider (parameters are "ini|min|max|step"), 
+	'b' for check box (parameter is "ini"; also understand "on"=1), 
+	'c' for choice (parameters are possible choices).
+* Add 'progress' for displaying the progress of execution (by '#' symbols in console, or by progress-bar widget).
+* Add 'contp' for contour lines on parametrically specified surface.
+* Add 'flow3' for flow threads of 3D vector field, which start from the plain.
+* Add variant of 'flow' for drawing a flow thread, starting from specified point.
+* Add 'scaletext' for disabling text size scaling in relative inplots (like columnplot, ...).
+* Add 'setup' for setting all low-level flags.
+* Add 'coil' for projecting periodical data.
+* Add modulo operation "%" (x%y=fmod(x,y)) to the list of known operations in real-valued formulas.
+* Add style '.' for 'cont' to draw contour lines from saddle points.
+* Add style '.' for 'flow' to draw flow thread from saddle points.
+* Add option 'value' in 'tube' for setting number of edges manually.
+* Crop output of 'ode' if NAN or INFINITY value occurs.
+* Remove style '~' for 'plot' and 'tens'. Now, all curves try to omit points.
+* Add setup flag MGL_FULL_CURV which disable omitting points of curve.
+* Shift axis labels closer to axis.
+* Change size of LaTeX-like commands \sup, \sub to be the same as \overset, \underset.
+* Change ticks drawing in colorbar.
+* Add new section "All samples" of documentation with large set of samples for most of MathGL features.
+* Samples in documentation are generated automatically now (from sample.cpp).
+INCOMPATIBLE:
+* Make obsolete MGL command 'setsizescl'. At this, the similar C/C++/Fortran/... functions still working.
+
+
+2.4.1 Released 20 July 2017
+
+* Add 'beltc' plot, which is 'belt' with manual coloring.
+* Add style '~' for 'plot' and 'tens' to omit some points at output.
+* Add style ':' for 'axis' to draw lines through point (0,0,0).
+* Bugfixes
+
+2.4 Released 17 May 2017
+
+* Add mgllab executable, which is FLTK based version of UDAV. Most things mgllab do faster.
+* Add string manipulation in MGL language:
+	o 'str'[n] -- get string of only n-th symbol;
+	o 'str'+v -- add value v to the last character of the string;
+	o 'str',val || 'str',!val -- append numeric value to the string (as before).
+* Add time value to MGL language in format: "hh-mm-ss_DD.MM.YYYY" or "hh-mm-ss" or "DD.MM.YYYY".
+* Add 'iris' plot to show cross-dependencies of several data arrays.
+* Add 'flame2d' to draw flame fractals.
+* Add 'bbox' to set bounding box for 2D output.
+* Add 'section' to get part of data between specified values.
+* Add 'detect' to found curves along data maximums.
+* Add 'dilate' to extend the region of 1-th value.
+* Add 'erode' to narrow the region of 1-th value.
+* Add 'apde' to solve PDE equation in inhomogeneous nonlinear media with spatial dispersion.
+* Add 'symbol' to draw the glyphs defined by 'addsymbol'.
+* Add 'addsymbol' to declare user-defined symbol (or glyph), which can be used as markers for plot (with style '&') or drawn itself by 'symbol' command.
+* Add 'openhdf' to open all data arrays from HDF file.
+* Extend 'crop' to cut to optimal size for FFT (i.e. to closest of 2^n*3^m*5^l).
+* Add function mgl_data_max_first() and data suffixes .m[xyz][fl] to find first/last maximum along direction.
+* Add function mgl_datac_diff_par() to parametric derivative of complex data.
+* Add style 'F' for 'bars' and 'barh' to set fixed bar widths.
+* Add style 'a' for 'plot', 'tens', 'area' and 'region' to accurate drawing of data, which partially lie out of axis range.
+* Add style '#' for 'region' to draw wired plot.
+* Add possibility of manual shift in 'multiplot'.
+* Add parsing arguments of options for MGL commands.
+* MGL command 'correl' now can perform 2d and 3d correlations.
+* Option 'meshnum' now change the number of drawn markers for 'plot', 'tens', 'step, 'mark' and 'textmark'.
+* Function 'step' handle data with x.nx>y.nx similarly to 'bars'.
+* Extend 'tile' and 'tiles' by adding manual coloring and face orientation.
+* Add variant of MGL command 'copy' to copy data with "incorrect" names.
+* Improve tick labels drawing.
+* Improve time-ticks (add weeks) and add subticks to its.
+* Improve 'fplot' to handle several singularities.
+* Add LaTeX command \dfrac{}{}. This is full-sized version of \frac{}{}. Unfortunately, there is no support of nesting (i.e. \dfrac{\dfrac{}{}}{} not working). Contrary, \frac{}{} allow nesting.
+* Add mglODEc() -- ODE solver for complex variables.
+* Add cmplx(a,b)=a+i*b to the list of known functions in formula parsing
+* Update CMake find_package to find MathGL.
+* Increase line width for wired text.
+* Update documentation: add description of new commands, add hint @ref{Mixing bitmap and vector output}.
+* Add translation to Russian for most of labels and messages.
+* Name 'all' are reserved in MGL scripts now as synonym of -1.
+
+* INCOMPATIBLE: Replace libmgl-qt by libmgl-qt4 and libmgl-qt5 for resolving conflicts of simultaneously installed both Qt4 and Qt5.
+* Minor bugfixes.
+
+
+2.3.5.1 Released 20 June 2016
+
+* INCOMPATIBLE: library libmgl-qt is removed. You need to use libmgl-qt4 or libmgl-qt5 explicitly now.
+* Compatibility changes for latest MS VisualStudio.
+* Bugfixes.
+
+2.3.5 Released 16 May 2016
+
+* Greatly update mgltex (by Diego Sejas Viscarra)
+	o \MGL@codes: Bugfix: category code for tabulators is changed too
+	o \MGL@quality: 9 is accepted as quality value now
+	o \MGL@scale: Now accepts any positive value
+	o \MGL@test@switch: New command to verify and validate switching arguments
+	o \mglTeX: Add a small negative space in the logo, between the "mgl" and "TEX"
+	o \mglTeX: Declared now as robust command
+	o \mglcomments: Now accepts arguments 0 (equivalent to off) and 1 (equivalent to on), besides the usual off and on
+	o \mglgraphics: New command options: gray, mglscale, quality, variant
+	o \mglname: Now writes the MGL code line setsize 600 400 to the main script
+	o \mglplot: Added \bgroup and \egroup in order to keep changes private
+	o New command options: gray, mglscale, quality, variant
+	o \mglsettings: Added options gray and variant
+	o Now calls the \mglswitch and \mglcomments commands for the switch and comments options, respectively
+	o \mglswitch: Now accepts arguments 0 (equivalent to off) and 1 (equivalent to on), besides the usual off and on
+	o mglTeX now depends on the ifpdf package
+	o Change definition of \mglcommentname from MGL comment to mglTEX comment
+	o Introduce the concept of global, local and private settings in the documentation
+	o New commands: \mglgray (to activate/deactivate) gray-scale mode locally, and \mglvariant (to set variant of arguments in MGL scripts locally)
+	o New package option 9q for setting quality to 9 (for testing purposes of the author)
+	o New package options 0v, 1v, 2v to select variant of arguments in MGL scripts
+	o New package options gray, color to activate/deactivate gray-scale mode for graphics
+	o Remove the \MGL@setkeys command, since it isn’t needed as first thought
+	o Rename \MGL@document@scripts to \MGL@doc@scripts
+	o Rename \MGL@script@name to \MGL@script
+	o Rename command \MGL@graph@ext to \MGL@imgext
+	o Rename command \mglcommonscriptname to mglsetupscriptname
+	o Rename environment mglcommon to mglsetupscript (mglcommon is still available, but deprecated)
+	o Rename family MGL@keys as MGL@gr@keys for consistency
+	o Reorganize and update documentation
+	o Some minor bugfixes
+	o The MGL code line "setsize 600 400" is now automatically written to the main script in order for the scaling options and commands to work
+	o mgl: New environment options: gray, mglscale, quality, variant
+	o mglcode: New environment options: gray, mglscale, quality, variant
+* Add MGL command 'variant' to select proper variant of arguments (like "var1?var2?var3?...") in MGL commands.
+* Remove limitation of maximal number (was 1000) of arguments for MGL commands. This is actual for 'list' command.
+* Add mglWnd::Widget() for accessing widget which is used for drawing.
+* Add Gray() for producing gray-scaled image.
+* Add MGL command 'setsizescl' for scaling all further 'setsize'.
+* Add Shear() for shearing plot.
+* Add ShearPlot() for placing plots side-by-side with some shearing.
+* Add mglData::Limit() for limit maximal absolute value of data.
+* Add mglTridMat() for tridiagonal matrix algorithm.
+* Add MGL command 'diffract' for single step diffraction calculation.
+* Add 'ifsfile' for reading IFS fractal parameters from *.ifs file.
+* Add style '*' for 2d versions of Pipe() and Flow() to draw threads from points inside axis range.
+* Add "norm()" to the list of known functions
+* Compatibility changes for MS VisualStudio, MacOS, Win64.
+* Bugfix for legend export into EPS and SVG.
+* Bugfix for importing data from std::vector.
+* Improve Surf3*() drawing.
+* Force NAN if divided by 0 in formulas.
+* Option "-S" of mglconv now perform scaling in any cases
+
+
+2.3.4 Released 13 February 2016
+
+* Add mglData::Pulse() for determining pulse parameters.
+* Add mglData::ScanFile() for getting formated data from textual file.
+* Add mglData::SetList() for setting data from variable argument list of double values.
+* Add mglIFS2d() and mglIFS3d() for fractal generation using iterated function system (thanks to Diego Sejas Viscarra).
+* Add option to SetSize() for scaling only primitives but don't erase it.
+* Add Pmap() plot for Poincare map.
+* Add Lamerey() plot for Lamerey diagram.
+* Add Bifurcation() plot for Bifurcation diagram.
+* Add mglGraph::SetPenDelta() for changing size of semi-transparent area around lines, marks, glyphs, ...
+
+* Add MGL command 'echo' for printing the content of data.
+* Add MGL command 'print' -- like 'info' but print immediately in stdout.
+* Allow MGL command 'save' append textual strings to a file.
+* Add option to rewrite file in 'savehdf'.
+
+* Add callback functions to mglQt, mglFLTK, and extend mglDraw class for simpler drawing in parallel with calculation (see @ref{Draw and calculate}).
+
+* Force set focus for editor in UDAV.
+* Add line numbers to UDAV editor. Cyan number denote current line, red numbers denote lines with errors.
+* Disable mouse wheel for zooming in UDAV by default.
+
+* Update mgltex (thanks to Diego Sejas Viscarra).
+
+* INCOMPATIBLE: Scale internally d1,d2 arguments in Curve() to be exactly the same as Bezier curve (P0=p1, P1=d1+p1, P2=p2-d2, P3=p2).
+
+* Minor bugfixes and improvements.
+
+2.3.3 Released 01 June 2015
+
+* Add SurfCA() and Surf3CA() plots.
+* Add wavelet transforms.
+* Add AttachLight() for attaching light settings to inplots.
+* Add manual rotation angle for axis ticks (by "value" option).
+* Add mglDataS class which is similar to std::vector<double> one.
+* Add missing mglDataC functions.
+
+* Add style '%' for color scheme along 2 coordinates (as in Map()).
+* If tick template start with '&' then long integer is passed instead of double.
+* Add style 'V' for drawing text centered vertically.
+* Add style "dN" in Smooth() for averaging over (2*N+1)-th points.
+* Add TeX symbols "\quote", "--" and Cyrillic ones.
+
+* Add complex numbers in MGL -- any expression started with '!' will have complex value(s).
+* Add 'rkstep' command for Runge-Kutta step in MGL script.
+* Add functions 'min()', 'max()' to MGL parser and formula evaluation.
+* MGL command 'join' now can join arbitrary number of data arrays.
+* Command 'stop' is not required to be placed before 'func'.
+* Add warning about writing to temporary arrays in MGL scripts.
+* Names 'rnd','nan','inf' are reserved in MGL scripts now.
+
+* Add annotation for plot styles and options into header files.
+* Greatly improve the speed of formula parsing for MGL scripts
+* Update JS interface
+* Add binary font files for speeding up initialization and font loading
+* Exclude "pure" attribute for function due to compatibility reasons
+* Add mgl_set_size_scl() for additional scaling width and height of the image
+* Add options -S, -q for mglconv
+* Rearrange toolbuttons in UDAV.
+* Bugfix for Flow() and Pipe() functions
+* Other minor improvements, bugfixes and compatibility changes
+
+2.3.2 Released 2 February 2015
+
+* Update mgltex (thanks to Diego Sejas Viscarra)
+* Add reading files with complex numbers by 'read' command.
+* Parallelize reading textual data files.
+* Add 'i','j','k' variables for data filling.
+* Add 2-color style for candle and ohlc plot.
+* Add saving images in QMathGL even if corresponding format support is disabled.
+* Add cmake option MGL_DEF_FONT to change default font name or use built-in one (if MGL_DEF_FONT is empty).
+* Compatibility changes and bugfixes.
+
+2.3.1 Released 21 October 2014
+
+* Add MGL command 'load' for loading MGL commands from external DLL (or .so) module.
+* Add Logo() function to draw bitmap (logo), which is stretched along whole axis range
+* Add MGL command 'reset' which restore default settings and clear image (i.e. call DefaultPlotParam()).
+* Change y coordinate at x-z projection.
+* Improve projection of 'unrotatable' objects (like legend, title, ...).
+* Add projection (Ternary&8) which is the same as usual (Ternary&4) but don't print text on projections
+* Improve orientation of axis ticks and labels.
+* Add mglWnd::SetDrawFunc().
+* Add mgl_set_global_warn() and mgl_get_global_warn() for set/get messages of global scope.
+* Make copying private of mglGraph and derived.
+* Add virtual destructors.
+* Add some static functions for mglGraph.
+* Add option "-n" to mglconv to disable automatic saving of the image.
+* Add option "-s" to mglview and mglconv to run setup script before the main one.
+* Become compatible with giflib 5.1.
+* Add light scaling at MGLD import.
+* Add scaling of frames at Adjust().
+* Possible bugfix for 32bit gcc.
+* Update docs.
+
+
+2.3 Released 7 August 2014
+
+* Add background image, which allow in particular semi-transparent background color. Correspondingly add function Rasterize() for saving current image as background, and function LoadBackground() for loading background image from PNG or JPEG file.
+* Add primitives to draw polygon and angle arc.
+* Allow arbitrary factor for axis ticks (like, gr->SetTicks('x',M_PI,0,NAN,"\\pi");).
+* Add function AddTick() for adding manual tick to existed ones.
+* Add new styles and symbols:
+  - arrow style 'X';
+  - color gradient (color scheme) of glyphs in text;
+  - manual dash style, like "{df090}";
+  - manual mask style, like "{s00ff00182424f800}";
+  - Add styles 'fFE0123456789+-' for printing numbers in functions Axis(), Colorbar(), Table() and Label();
+  - style '!' to disable ticks tuning in Axis() and Colorbar();
+  - special symbol '\b' which will be ignored at printing;
+  - calligraphic TeX symbols, like \calB, \calE, \calF, \calH, \calI, \calL, \calM, \calR, \ell, \scrg, \scro.
+
+* Add ODE solving functions for textual formulas
+* Add function for global cubic spline interpolation, and function to refill using global spline.
+* Add functions "random(dat)" and "gamma_inc(a,x)" to the list of known functions for formula parsing
+* Add 'inf' variable to the MGL and formula parsing
+* Allow reading JPEG files for mglData::Import().
+* Function mgl_data_subdata_ext() handle NULL argument(s). Add variants of SubData() with 1 and 2 arguments.
+* Warning messages and information are printed to stderr until call of mgl_suppress_warn(true) will disable it.
+* Add function mgl_check_version() and MGL command 'version' to check if MathGL version is valid.
+* Add move constructor(s) if compiler support C++11 rvalues.
+
+* Changes in algorithms:
+  - Greatly increase speed of formula parsing (i.e. of functions mglData::Modify(), mglData::Fill() and similar), and speeding up many other places;
+  - Improve algorithm for contours drawing and filling, taking special attention to quasi-random data.
+  - Spline() now use 5-th order polynomials to keep continuity of 2nd derivative too.
+  - Add function attributes 'pure' or 'const', which potentially can speed up drawing.
+  - Use spline instead of linear interpolation in functions Flow() and Pipe().
+  - Adjust columnplot and gridplot positions for non-zero distance between the inplots.
+  - Improve colorbar labels drawing at SetRotatedText(false)
+  - Choose new scales for perspective.
+  - Allow 'negative' angles for text rotation
+  - Use new s-hull version for triangulation.
+* Make function mgl_get_curvs() to be exported. This function is used internally to connect line segments to a set of curves (in particular, for contour lines).
+* Add ViewAsRotate() function which handle arguments of View() by the same way as Rotate() function, i.e View(tetx,tetz,tety) <=> ViewAsRotate(-tetz,-tetx,-tety)
+* Function mglWindow::Adjust() for Quality&4==0 now show image in widgets even if draw function is absent (i.e. =NULL).
+
+* improvements in UDAV:
+  - Rearrange tool buttons;
+  - Add features for manual dashing and manual mask in Style dialog;
+  - Add dialog for new dialog for new inplots (including subplot, multiplot, columnplot, stickplot, gridplot);
+  - Add option to use dots plot at image refreshing (for faster rotation etc);
+  - Add new primitives (arc,polygon,rotated text) as mouse handled ones;
+  - Add close button to data tabs;
+  - Add button to stop script drawing  and stop() slot for QMathGL;
+  - Allow to delete/hide/unhide selected plot;
+  - Allow to move selected plot between inplots;
+  - Improve NewCommand dialog -- now it replace the script command if user change arguments only;
+  - MGL commands 'perspective' and 'fog' now work correctly in UDAV;
+  - Update UDAV icons to use Oxygen ones.
+
+2.2.2.1 Released 19 March 2014
+
+* Compatibility changes for MS VisualStudio 2010 and early.
+* Function SetRange(v1,v2) ignore NAN values now.
+* Add enable-json-sample for building json-samples on demand only.
+* Update docs.
+
+
+2.2.2 Released 10 March 2014
+
+* Add mgl_region_3d() to draw region (or ribbon) between 2 curves. Correspondingly extend mglGraph::Region() function and MGL command 'region'.
+* Allow LGPL for MathGL widgets.
+* Improve export to TeX.
+* Add missing functions to Fortran interface.
+* Bugfix for legend with enabled lighting.
+* Minor bugfixes and memory leaks.
+
+
+2.2.1 Released 22 January 2014
+
+* Add Qt5 support.
+* Add Pascal interface.
+* Improve JavaScript interface.
+* Add function AddRange(char dir, mreal v1, mreal v2) and extend corresponding MGL commands '[xyzc]range'.
+* Add 'hypot' function for known functions in formula parsing.
+* Add style '~' to disable colorbar or axis labels. NOTE, axis style '_' is obsolete and should be replaced by '~'.
+* Change Aspect() if Ax=NAN. Now, Ay and Az set the ratio to optimal aspect (not exact value as previously).
+* Disable changes by View(),Zoom(),Perspective() for position of Title(), Legend(), Colorbar().
+* Partial support of perspective in CalcXYZ().
+* Speed up PDE solving.
+* Add complex versions of PDE, QO2d, QO3d.
+* Correct filled background for Box() in curved coordinates.
+* Allow nx=1 for Stem and Error.
+* Bugfix for drawing single axis.
+* Bugfix for missing options parsing for some of MGL commands.
+* Bugfix for .pmin suffix in MGL. Add mglData::MaximalNeg() and mglData::MinimalPos() functions. Add .nmin and .nmax suffixes.
+* Bugfix for colorbar labels.
+* Force using python 2.7 by default due to bug in Ubuntu. Debian sid works well with python 3.* too.
+* Minor bugfixes and memory leaks.
+
+
+2.2 Released 11 November 2013
+
+* Add OpenMP calls mostly everywhere (can work as replacement of pthreads - a bit faster since more loops is parallelized).
+* Greatly speed up consequent FFT and Hankel transforms. Add mgl_clear_fft() function for manual clearing of saved FFT/Hankel data.
+* Add OHLC() plot for drawing Open-High-Low-Close diagram
+* Add wxMathGL widget.
+* Add interface for Lua v.5.1.
+* Add mask for face drawing if one of symbols "-+=;oOsS~<>jdD*^" is specified in color scheme. This work only for export in bitmap images.
+* Add Quality=8 for dots drawing (extremely fast).
+* Add styles '4','6','8' for Cone() and Cones() to produce square, hex-, octo-prism.
+* Add style 't' for Cones() to produce tubes (cylinders).
+* Add style '^' for Legend() to left/right align legend if its coordinates are right/left from the center
+* Add style '<', '^', '>' for aligning/centering boxes in Bars(), Barh(), BoxPlot(), Cones(). Also this plots become centered by default if nx sizes are the same for all data.
+* Add Dots() function which set independently both color and alpha of dots
+* Improve automatic axis position. Add style '^' for inverse automatic axis position.
+* Improve tick labeling. Add style TuneTicks&4 for zero filling of tick labels.
+* Add mglData::Refill() for filling by interpolation of parametrically dependent data
+* Add transparency for Area() and Region() plots.
+* Add mgl_clf_chr() function and extend 'clf' command.
+* Fourier now perform true inverse Fourier transform (instead of backward one).
+* Improve/change lighting from local sources. Add SetDiffuse() function.
+* C functions now return NULL if HMDT data cannot be created for given input argument(s).
+* Enable line width for Mesh() and Fall() plots.
+* Replace +INF and -INF by NAN in textual formula output.
+* Add manual compression of JSON.
+* Define WORDS_BIGENDIAN and HAVE_MEMRCHR (thanks to Dinar Valeev).
+* Bugfix for cleaning unused points.
+* Fix 'setsize' command at UDAV starting.
+* Rewrite MGL parsing by using std::wstring for avoiding possible bugs of wcs*() functions.
+* Minor bugfixes.
+* Update docs.
+
+2.1.3.1 Released 8 May 2013
+
+* Compatibility changes for MS VS.
+* Bugfixes for cmake options enable-double=OFF, enable-zlib=OFF.
+* Enable mouse actions for Firefox in JS sample.
+
+2.1.3 Released 2 May 2013
+
+* Functions SinFFT, CosFFT, Hankel and so on, become multi-threaded
+* Use DFT instead of FFT if GSL support is disabled (much slow!).
+* Add Join() function for joining mglData arrays
+* Add Roots() function for root finding of nonlinear equation using provided guess(es)
+* Add mglExprC for parsing formula with complex numbers
+* Correctly read #QNAN values in data files
+* Speed up Dots() drawing
+* Add flag to disable tick labels at axis origin (see SetOriginTick())
+* Add MGL commands 'origintick', 'tickshift'
+* WriteJSON now use zlib if filename end at 'z' (like "test.jsonz")
+* Make separate libmgl-mpi
+* Add SetAutoRanges() function (duplicate corresponding options)
+* Add JSON sample usage via QtWebKit (thanks to DATADVANCE)
+* Bugfixes and memory leaks
+
+2.1.2 Released 28 January 2013
+
+* Exclude "local" functions from resulting library.
+* String in MGL script now can be concatenated with another string or data/numbers (like 'max(u)=',u.max,' a.u.').
+* Bugfix for colors in 3D PDF.
+* Bugfix for drawing in MPI mode.
+* If Aspect() function have NAN argument(s) then it try to select optimal aspect ratio.
+* Option 'size' in Legend() now change only text size (not mark size).
+* Option 'meshnum' now influence on Boxs() and Belt() functions
+* Adjust marks drawing (line width and dots).
+* Minor improvements and bugfixes.
+
+2.1.1 Released 24 December 2012
+
+* Bugfix for SetRange(val,val) function
+* Exclude export MGL to CPP
+* MGL parsing now produce errors for any wrong list of arguments
+* Add help message to mgl.cgi
+* Improve text rotation at View()
+* Make compatible with GIF library v.5.0.
+* Bugfix for making MPI interface.
+* Bugfix for running in Win32 mode.
+* Update docs and MGL samples
+
+2.1 Released 13 December 2012
+
+* Add class mglDataC for complex data arrays.
+* Add mglData::Solve() for finding x-value where dat(x)=val.
+* Add mglData::Clean() for removing rows with duplicate values for given column.
+* Add Vect3() plot for drawing vectors on slice of 3d vector field.
+* Add Table() function for drawing table with data values.
+* Add ZoomAxis() for zooming/shifting axis range as whole.
+* Add WriteJSON() function for exporting in JSON format suitable for later drawing by JavaScript
+* Add JavaScript code for visualizing JSON data.
+* Add mgl.cgi tool which return PNG image for CGI request in form of MGL script.
+* Add MGL commands 'errbox', 'face'
+
+* Color can be specified as its RGB[A] values, i.e. like "{xFFFFFF}" or "{xFFFFFFFF}".
+* Color in color scheme  may have position in range [0,1]. Format is {CN,pos} or {xFFFFFF,pos}.
+* Now pen width for marks is proportional to pen width of line multiplied by size of marks.
+* Now you can use different font-faces in the plot simultaneously.
+* Now Legend() automatically use several columns if it contain too many legend entries.
+* Add style '-' for legend for drawing them horizontally.
+* Vectors is drawn now even if only starting or ending points are placed in bounding box.
+* Strongly rewrite the algorithm of vector field plotting.
+
+* Grid lines for NAN origin values are always located at far-away edges.
+* Try correctly place axis and tick labels even for axis with inverse range (i.e. for v2<v1).
+  Note, it work well for 2D axis. One should use Aspect() with negative values to do it correctly in general case.
+* Axis style 'XYZ' draw corresponding axis with ticks labels from other side of axis. This also influence on followng Label() calls.
+* Text is drawn for initially invisible axis (like z-axis) too.
+
+* Add functions GetFrame(), AddFrame() for replacing or adding data from given frame. Work if MGL_VECT_FRAME is set on (by default is on).
+* Frames now save 3D information if MGL_VECT_FRAME is set (by default).
+* CalcXYZ() function now use data from z-buffer for better determining {x,y,z} coordinates.
+
+* Add dialog for data arguments in "New command" dialog of UDAV.
+* Value of arguments are saved while the kind of command is changed in "New command" dialog of UDAV.
+* Extend classification of commands in "New command" dialog of UDAV and make it automatic.
+* Mouse position at an object click now is displayed on the image itself.
+* Add zoom in/out by mouse wheel.
+* Add zoom in/out of axis range by mouse wheel, and shift of axis range by middle button.
+* Text editor in UDAV now highlight current line.
+* Completer can be switched off correctly now.
+* Multi-line strings (i.e. separated by "\" symbol) are highlighted correctly now.
+* Add option to enable/disable selected plot in UDAV.
+* Rearrange hot-keys in UDAV and in QMathGL.
+
+* Make code compilable by Borland compiler too.
+* Improve output in OpenGL mode.
+* Add fog at export in EPS/SVG formats.
+* Add mglParse::AllowFileIO() for enable/disable I/O commands in MGL scripts.
+
+* Export functions now can write in stdout if file name is "-".
+* Picture drawing now use multi-threading for each stage.
+
+* Functions mglData::Spline*, mglData::Linear* now can return gradient at the point.
+* mglFourier now make true inverse transform
+
+* Add annotation for all pure C functions.
+* Update list of built-in glyphs
+* Update samples
+* Update documentation
+* Different bugfixes
+
+* INCOMPATIBLE CHANGES in the arguments of functions: mgl_axis, mgl_axis_grid, mgl_label, mgl_labelw, mgl_legend_pos, mgl_legend; and in functions for MGL parsing.
+* MINOR INCOMPATIBLE: plotting functions now use double argument always.
+
+2.0.3 Released 27 July 2012
+
+* Make code compilable by compilers GNU/MinGW GCC, Clang, MS VisualStudio
+* Add mglTriangulation() using s_hull_pro algorithm
+* Add mglData::Grid() and mglGraph::DataGrid() for filling regular data by values of triangulated surface
+* Add cmake options 'enable-png' and 'enable-zlib'
+* Add SetTimeUTC() for using UTC time instead of local one
+* Add SetTickShift() for additional shift of tick labels
+* Add mglGraph::MPI_Send() and mglGraph::MPI_Recv()
+* Vector plots now draw vector at edges, which are directed out of bounding box
+* Add gap between 1d plots for avoiding possible undetermined overlapping.
+* Add parallel build for documentation
+* Bugfixes for memory leaks and uninitialized variables
+* Bugfix for setting text size
+* Bugfix for handling NAN color value
+* Bugfix for missing lines in export to EPS/SVG
+
+2.0.2 Released 24 May 2012
+
+* Add 'U' style for Axis() which disable ticks rotation.
+* Bugfix for enable-opengl option.
+* Bugfix for lighting.
+
+2.0.1 Released 23 May 2012
+
+* Improve speed of drawing
+* Add reading 3d data files using mglData::ReadMat()
+* Exclude unnecessary dependencies/inclusions
+* Improve build system
+	- Add multithreading
+	- Add install for Octave
+	- Separate enable-doc option from enable-all
+* Minor bugfixes
+
+2.0 Released 12 April 2012

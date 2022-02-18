@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="text/mgl">
+    <alias type="text/x.mgl"/>
+    <alias type="text/x-mgl"/>
+    <comment>MGL script</comment>
+    <icon name="${CMAKE_INSTALL_PREFIX}/share/pixmaps/udav.png"/>
+    <glob pattern="*.mgl"/>
+  </mime-type>
+</mime-info>

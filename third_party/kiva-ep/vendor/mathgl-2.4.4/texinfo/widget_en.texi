@@ -1,0 +1,723 @@
+
+@c ------------------------------------------------------------------
+@chapter Widget classes
+@nav{}
+@cindex mglWnd
+@cindex mglGLUT
+@cindex Fl_MathGL
+@cindex QMathGL
+@cindex window
+@cindex widgets
+
+There are set of ``window'' classes for making a window with MathGL graphics: @code{mglWindow}, @code{mglFLTK}, @code{mglQT} and @code{mglGLUT} for whole window, @code{Fl_MathGL} and @code{QMathGL} as widgets. All these classes allow user to show, rotate, export, and change view of the plot using keyboard. Most of them (except @code{mglGLUT}) also have toolbar and menu for simplifying plot manipulation. All window classes have mostly the same set of functions derived from @ref{mglWnd class}.
+
+For drawing you can use: @code{NULL} pointer if you'll update plot manually, global callback function of type @code{int draw(@code{HMGL} gr, @code{void *}p)} or @code{int draw(@code{mglGraph *}gr)}, or instance of class derived from @ref{mglDraw class}. Basically, this class have 2 main virtual methods:
+@verbatim
+class mglDraw
+{
+public:
+    virtual int Draw(mglGraph *) { return 0; };
+    virtual void Reload() {};
+};
+@end verbatim
+You should inherit yours class from @code{mglDraw} and re-implement one or both functions for drawing.
+
+The window can be constructed using one of following classes (see @ref{Using MathGL window} for examples).
+
+@deftypefn {Constructor on @code{mglFLTK}} {} mglFLTK (@code{const char *}title=@code{"MathGL"})
+@deftypefnx {Constructor on @code{mglFLTK}} {} mglFLTK (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title=@code{"MathGL"}, @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p)=0)
+@deftypefnx {Constructor on @code{mglFLTK}} {} mglFLTK (@code{int} (*draw)(@code{mglGraph *}gr), @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Constructor on @code{mglFLTK}} {} mglFLTK (@code{mglDraw *}draw, @code{const char *}title=@code{"MathGL"})
+@deftypefnx {C function} @code{HMGL} mgl_create_graph_fltk (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title, @code{void *}par, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p))
+
+Creates a FLTK-based window for plotting. Parameter @var{draw} sets a pointer to drawing function (this is the name of function) or instance of @ref{mglDraw class}. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. Note, that @var{draw} can be @code{NULL} for displaying static bitmaps only (no animation or slides). Parameter @var{title} sets the title of the window. Parameter @var{par} contains pointer to data for the plotting function @var{draw}. FLTK-based windows is a bit faster than Qt ones, and provide better support of multi-threading.
+@end deftypefn
+
+@deftypefn {Method on @code{mglFLTK}} @code{int} RunThr ()
+@deftypefnx {C function} @code{int} mgl_fltk_thr ()
+Run main loop for event handling in separate thread. Note, right now it work for FLTK windows only.
+@end deftypefn
+
+
+@deftypefn {Constructor on @code{mglQT}} {} mglQT (@code{const char *}title=@code{"MathGL"})
+@deftypefnx {Constructor on @code{mglQT}} {} mglQT (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title=@code{"MathGL"}, @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p)=0)
+@deftypefnx {Constructor on @code{mglQT}} {} mglQT (@code{int} (*draw)(@code{mglGraph *}gr), @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Constructor on @code{mglQT}} {} mglQT (@code{mglDraw *}draw, @code{const char *}title=@code{"MathGL"})
+@deftypefnx {C function} @code{HMGL} mgl_create_graph_qt (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title, @code{void *}par, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p))
+
+Creates a FLTK-based window for plotting. Parameter @var{draw} sets a pointer to drawing function (this is the name of function) or instance of @ref{mglDraw class}. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. Note, that @var{draw} can be @code{NULL} for displaying static bitmaps only (no animation or slides). Parameter @var{title} sets the title of the window. Parameter @var{par} contains pointer to data for the plotting function @var{draw}.
+@end deftypefn
+
+
+@deftypefn {Constructor on @code{mglGLUT}} {} mglGLUT (@code{const char *}title=@code{"MathGL"})
+@deftypefnx {Constructor on @code{mglGLUT}} {} mglGLUT (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title=@code{"MathGL"}, @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p)=0)
+@deftypefnx {Constructor on @code{mglGLUT}} {} mglGLUT (@code{int} (*draw)(@code{mglGraph *}gr), @code{const char *}title=@code{"MathGL"})
+@deftypefnx {Constructor on @code{mglGLUT}} {} mglGLUT (@code{mglDraw *}draw, @code{const char *}title=@code{"MathGL"})
+@deftypefnx {C function} @code{HMGL} mgl_create_graph_glut (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{const char *}title, @code{void *}par, @code{void} (*reload)(@code{HMGL} gr, @code{void *}p))
+
+Creates a GLUT-based window for plotting. Parameter @var{draw} sets a pointer to drawing function (this is the name of function) or instance of @code{mglDraw} class. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. Note, that @var{draw} can be @code{NULL} for displaying static bitmaps only (no animation or slides). Parameter @var{title} sets the title of the window. Parameter @var{par} contains pointer to data for the plotting function @var{draw}. GLUT-based windows are fastest one but there is no toolbar, and plot have some issues due to OpenGL limitations.
+
+There are some keys handles for manipulating by the plot: 'a', 'd', 'w', 's' for the rotating; ',', '.' for viewing of the previous or next frames in the list; 'r' for the switching of transparency; 'f' for the switching of lightning; 'x' for hiding (closing) the window.
+@end deftypefn
+
+@menu
+* mglWnd class::
+* mglDraw class::
+* Fl_MathGL class::
+* QMathGL class::
+* wxMathGL class::
+@end menu
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglWnd class, mglDraw class, , Widget classes
+@section mglWnd class
+@nav{}
+@cindex mglWnd
+@cindex window
+@c @cindex mglDraw
+
+This class is abstract class derived from mglGraph class (see @ref{MathGL core}). It is defined in @code{#include <mgl2/wnd.h>} and provide base methods for handling window with MathGL graphics. Inherited classes are exist for QT and FLTK widget libraries: @code{mglQT} in @code{#include <mgl2/qt.h>}, @code{mglFLTK} in @code{#include <mgl2/fltk.h>}.
+
+
+@deftypefn {Method on @code{mglWnd}} @code{int} Run ()
+@deftypefnx {C function} @code{int} mgl_qt_run ()
+@deftypefnx {C function} @code{int} mgl_fltk_run ()
+Run main loop for event handling. Usually it should be called in a separate thread or as last function call in @code{main()}.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void} SetDrawFunc (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{void *}par=@code{NULL}, @code{void} (*reload)(@code{void *}p)=@code{NULL})
+@deftypefnx {Method on @code{mglWnd}} @code{void} SetDrawFunc (@code{int} (*draw)(@code{mglGraph *}gr))
+@deftypefnx {Method on @code{mglWnd}} @code{void} SetDrawFunc (@code{mglDraw *}obj)
+@deftypefnx {C function} @code{void} mgl_wnd_set_func (@code{HMGL} gr, @code{int} (*draw)(@code{HMGL} gr, @code{void *}p), @code{void *}par, @code{void} (*reload)(@code{void *}p))
+Set callback functions for drawing (@var{draw}) and data reloading (@var{reload}), or instance @var{obj} of a class derived from @code{mglDraw}.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void} SetClickFunc (@code{void} (*func)(@code{HMGL} gr, @code{void *}p))
+@deftypefnx {C function} @code{void} mgl_set_click_func (@code{void} (*func)(@code{HMGL} gr, @code{void *}p))
+Set callback function @var{func} which will be called on mouse click.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void} SetMutex(@code{pthread_mutex_t *}mutex)
+@deftypefnx {C function} @code{void} mgl_wnd_set_mutex(@code{HMGL} gr, @code{pthread_mutex_t *}mutex)
+Set external mutex for lock/unlock external calculations by widget. This functions is called automatically at using @ref{mglDraw class}.
+@end deftypefn
+
+
+@deftypefn {Method on @code{mglWnd}} @code{void} ToggleAlpha ()
+@deftypefnx {C function} @code{void} mgl_wnd_toggle_alpha (@code{HMGL} gr)
+Switch on/off transparency but do not overwrite switches in user drawing function.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} ToggleLight ()
+@deftypefnx {C function} @code{void} mgl_wnd_toggle_light (@code{HMGL} gr)
+Switch on/off lighting but do not overwrite switches in user drawing function.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} ToggleRotate ()
+@deftypefnx {C function} @code{void} mgl_wnd_toggle_rotate (@code{HMGL} gr)
+Switch on/off rotation by mouse. Usually, left button is used for rotation, middle button for shift, right button for zoom/perspective.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} ToggleZoom ()
+@deftypefnx {C function} @code{void} mgl_wnd_toggle_zoom (@code{HMGL} gr)
+Switch on/off zooming by mouse. Just select rectangular region by mouse and it will be zoomed in.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} ToggleNo ()
+@deftypefnx {C function} @code{void} mgl_wnd_toggle_no (@code{HMGL} gr)
+Switch off all zooming and rotation and restore initial state.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} Update ()
+@deftypefnx {C function} @code{void} mgl_wnd_update (@code{HMGL} gr)
+Update window contents. This is very useful function for manual updating the plot while long calculation was running in parallel thread.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} ReLoad ()
+@deftypefnx {C function} @code{void} mgl_wnd_reload (@code{HMGL} gr)
+Reload user data and update picture. This function also update number of frames which drawing function can create.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} Adjust ()
+@deftypefnx {C function} @code{void} mgl_wnd_adjust (@code{HMGL} gr)
+Adjust size of bitmap to window size.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} NextFrame ()
+@deftypefnx {C function} @code{void} mgl_wnd_next_frame (@code{HMGL} gr)
+Show next frame if one.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} PrevFrame ()
+@deftypefnx {C function} @code{void} mgl_wnd_prev_frame (@code{HMGL} gr)
+Show previous frame if one.
+@end deftypefn
+@deftypefn {Method on @code{mglWnd}} @code{void} Animation ()
+@deftypefnx {C function} @code{void} mgl_wnd_animation (@code{HMGL} gr)
+Run/stop slideshow (animation) of frames.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void} SetDelay (@code{double} dt)
+@deftypefnx {C function} @code{void} mgl_wnd_set_delay (@code{HMGL} gr, @code{double} dt)
+Sets delay for animation in seconds. Default value is 1 sec.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{double} GetDelay ()
+@deftypefnx {C function} @code{double} mgl_wnd_get_delay (@code{HMGL} gr)
+Gets delay for animation in seconds.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void} Setup (@code{bool} clfupd=@code{true}, @code{bool} showpos=@code{false})
+@deftypefnx {C function} @code{void} mgl_setup_window (@code{HMGL} gr, @code{bool} clfupd, @code{bool} showpos)
+Enable/disable flags for:
+@itemize @bullet
+@item
+clearing plot before Update();
+@item
+showing the last mouse click position in the widget.
+@end itemize
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{mglPoint} LastMousePos ()
+@deftypefnx {C function} @code{void} mgl_get_last_mouse_pos (@code{HMGL} gr, @code{mreal *}x, @code{mreal *}y, @code{mreal *}z)
+Gets last position of mouse click.
+@end deftypefn
+
+@deftypefn {Method on @code{mglWnd}} @code{void *} Widget ()
+@deftypefnx {C function} @code{void *} mgl_fltk_widget (@code{HMGL} gr)
+@deftypefnx {C function} @code{void *} mgl_qt_widget (@code{HMGL} gr)
+Return pointer to widget (@ref{Fl_MathGL class} or @ref{QMathGL class}) used for plotting.
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node mglDraw class, Fl_MathGL class, mglWnd class, Widget classes
+@section mglDraw class
+@nav{}
+@cindex mglDraw
+
+This class provide base functionality for callback drawing and running calculation in separate thread. It is defined in @code{#include <mgl2/wnd.h>}. You should make inherited class and implement virtual functions if you need it.
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{int} Draw (@code{mglGraph *}gr)
+This is callback drawing function, which will be called when any redrawing is required for the window. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. 
+@end deftypefn
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{void} Reload ()
+This is callback function, which will be called if user press menu or toolbutton to reload data. 
+@end deftypefn
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{void} Click ()
+This is callback function, which will be called if user click mouse. 
+@end deftypefn
+
+@deftypefn {Virtual method on @code{mglDraw}} @code{void} Calc ()
+This is callback function, which will be called if user start calculations in separate thread by calling @code{mglDraw::Run()} function. It should periodically call @code{mglDraw::Check()} function to check if calculations should be paused. 
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Run ()
+Runs @code{mglDraw::Calc()} function in separate thread. It also initialize @code{mglDraw::thr} variable and unlock @code{mglDraw::mutex}. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Cancel ()
+Cancels thread with calculations. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Pause ()
+Pauses thread with calculations by locking @code{mglDraw::mutex}. You should call @code{mglDraw::Continue()} to continue calculations. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Continue ()
+Continues calculations by unlocking @code{mglDraw::mutex}. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDraw}} @code{void} Continue ()
+Checks if calculations should be paused and pause it. Function is present only if FLTK support for widgets was enabled.
+@end deftypefn
+
+@c ------------------------------------------------------------------
+@external{}
+@node Fl_MathGL class, QMathGL class, mglDraw class, Widget classes
+@section Fl_MathGL class
+@nav{}
+@cindex Fl_MathGL
+@cindex widgets
+
+Class is FLTK widget which display MathGL graphics. It is defined in @code{#include <mgl2/Fl_MathGL.h>}.
+
+@fig{fltk, Example of FLTK window with MathGL plot.}
+
+@deftypemethod Fl_MathGL @code{void} set_draw (@code{int} (*draw)(@code{HMGL} gr, @code{void *}p))
+@deftypemethodx Fl_MathGL @code{void} set_draw (@code{int} (*draw)(@code{mglGraph *}gr))
+@deftypemethodx Fl_MathGL @code{void} set_draw (@code{mglDraw *}draw)
+Sets drawing function as global function or as one from a class @code{mglDraw}. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. Parameter @var{par} contains pointer to data for the plotting function @var{draw}.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{mglDraw *}get_class ()
+Get pointer to @code{mglDraw} class or @code{NULL} if absent.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} update ()
+Update (redraw) plot.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_angle (@code{mreal} t, @code{mreal} p)
+Set angles for additional plot rotation
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_flag (@code{int} f)
+Set bitwise flags for general state (1-Alpha, 2-Light)
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_state (@code{bool} r, @code{bool} z)
+Set flags for handling mouse:
+@var{z}=@code{true} allow zooming,
+@var{r}=@code{true} allow rotation/shifting/perspective and so on.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_zoom (@code{mreal} X1, @code{mreal} Y1, @code{mreal} X2, @code{mreal} Y2)
+Set zoom in/out region
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} get_zoom (@code{mreal *}X1, @code{mreal *}Y1, @code{mreal *}X2, @code{mreal *}Y2)
+Get zoom in/out region
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_popup (@code{const Fl_Menu_Item *}pmenu, @code{Fl_Widget *}w, @code{void *}v)
+Set popup menu pointer
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_graph (@code{HMGL} gr)
+@deftypemethodx Fl_MathGL @code{void} set_graph (@code{mglGraph *}gr)
+Set new grapher instead of built-in one. Note that Fl_MathGL will automatically delete this object at destruction or at new @code{set_graph()} call.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{HMGL} get_graph ()
+Get pointer to grapher.
+@end deftypemethod
+
+@deftypemethod Fl_MathGL @code{void} set_show_warn (@code{bool} val)
+Show window with warnings after script parsing.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} stop (@code{bool} stop=@code{true})
+Ask to stop of script parsing.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{void} set_handle_key (@code{bool} val)
+Enable/disable key handling as in mglview (default is false).
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{int} get_last_id ()
+Get id of last clicked object.
+@end deftypemethod
+@deftypemethod Fl_MathGL @code{bool} running ()
+Check if script is parsing now or not.
+@end deftypemethod
+
+@deftypecv {Fl_MathGL option} Fl_MathGL @code{Fl_Valuator *} tet_val
+Pointer to external tet-angle validator.
+@end deftypecv
+@deftypecv {Fl_MathGL option} Fl_MathGL @code{Fl_Valuator *} phi_val
+Pointer to external phi-angle validator.
+@end deftypecv
+
+@c ------------------------------------------------------------------
+@external{}
+@node QMathGL class, wxMathGL class, Fl_MathGL class, Widget classes
+@section QMathGL class
+@nav{}
+@cindex QMathGL
+@cindex widgets
+
+Class is Qt widget which display MathGL graphics. It is defined in @code{#include <mgl2/qt.h>}.
+
+@fig{qt, Example of Qt window with MathGL plot.}
+
+@deftypemethod QMathGL @code{void} setDraw (@code{mglDraw *}dr)
+Sets drawing functions from a class inherited from @code{mglDraw}.
+@end deftypemethod
+@deftypemethod QMathGL @code{void} setDraw (@code{int (*}draw@code{)(mglBase *}gr, @code{void *}p@code{)}, @code{void *}par=@code{NULL})
+@deftypemethodx QMathGL @code{void} setDraw (@code{int (*}draw@code{)(mglGraph *}gr@code{)})
+Sets the drawing function @var{draw}. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. Parameter @var{par} contains pointer to data for the plotting function @var{draw}.
+@end deftypemethod
+
+@deftypemethod QMathGL @code{void} setGraph (@code{HMGL} gr)
+@deftypemethodx QMathGL @code{void} setGraph (@code{mglGraph *}gr)
+Set pointer to external grapher (instead of built-in one). Note that QMathGL will automatically delete this object at destruction or at new @code{setGraph()} call.
+@end deftypemethod
+@deftypemethod QMathGL @code{HMGL} getGraph ()
+Get pointer to grapher.
+@end deftypemethod
+
+@deftypemethod QMathGL @code{void} setPopup (@code{QMenu *}p)
+Set popup menu pointer.
+@end deftypemethod
+@deftypemethod QMathGL @code{void} setSize (@code{int} w, @code{int} h)
+Set widget/picture sizes
+@end deftypemethod
+@deftypemethod QMathGL @code{double} getRatio ()
+Return aspect ratio of the picture.
+@end deftypemethod
+
+@deftypemethod QMathGL @code{int} getPer ()
+Get perspective value in percents.
+@end deftypemethod
+@deftypemethod QMathGL @code{int} getPhi ()
+Get Phi-angle value in degrees.
+@end deftypemethod
+@deftypemethod QMathGL @code{int} getTet ()
+Get Theta-angle value in degrees.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getAlpha ()
+Get transparency state.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getLight ()
+Get lightning state.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getZoom ()
+Get mouse zooming state.
+@end deftypemethod
+@deftypemethod QMathGL @code{bool} getRotate ()
+Get mouse rotation state.
+@end deftypemethod
+
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} refresh ()
+Redraw saved bitmap without executing drawing function.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} update ()
+Update picture by executing drawing function.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} copy ()
+Copy graphics to clipboard.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} copyClickCoor ()
+Copy coordinates of click (as text).
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} print ()
+Print current picture.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} stop ()
+Send signal to stop drawing.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} adjust ()
+Adjust image size to fit whole widget.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} nextSlide ()
+Show next slide.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} prevSlide ()
+Show previous slide.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} animation (@code{bool} st=@code{true})
+Start/stop animation.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} setPer (@code{int} val)
+Set perspective value.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setPhi (@code{int} val)
+Set Phi-angle value.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setTet (@code{int} val)
+Set Theta-angle value.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setAlpha (@code{bool} val)
+Switch on/off transparency.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setLight (@code{bool} val)
+Switch on/off lightning.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setGrid (@code{bool} val)
+Switch on/off drawing of grid for absolute coordinates.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setZoom (@code{bool} val)
+Switch on/off mouse zooming.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setRotate (@code{bool} val)
+Switch on/off mouse rotation.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} zoomIn ()
+Zoom in graphics.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} zoomOut ()
+Zoom out graphics.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftLeft ()
+Shift graphics to left direction.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftRight ()
+Shift graphics to right direction.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftUp ()
+Shift graphics to up direction.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} shiftDown ()
+Shift graphics to down direction.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} restore ()
+Restore zoom and rotation to default values.
+@end deftypefn
+@c @deftypefn {Slot on @code{QMathGL}} @code{void} reload ()
+@c Reload data and redraw graphics.
+@c @end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportPNG (@code{QString} fname=@code{""})
+Export current picture to PNG file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportPNGs (@code{QString} fname=@code{""})
+Export current picture to PNG file (no transparency).
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportJPG (@code{QString} fname=@code{""})
+Export current picture to JPEG file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportBPS (@code{QString} fname=@code{""})
+Export current picture to bitmap EPS file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportEPS (@code{QString} fname=@code{""})
+Export current picture to vector EPS file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportSVG (@code{QString} fname=@code{""})
+Export current picture to SVG file.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportGIF (@code{QString} fname=@code{""})
+Export current picture to GIF file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportTEX (@code{QString} fname=@code{""})
+Export current picture to LaTeX/Tikz file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportTGA (@code{QString} fname=@code{""})
+Export current picture to TGA file.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportXYZ (@code{QString} fname=@code{""})
+Export current picture to XYZ/XYZL/XYZF file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportOBJ (@code{QString} fname=@code{""})
+Export current picture to OBJ/MTL file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportSTL (@code{QString} fname=@code{""})
+Export current picture to STL file.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} exportOFF (@code{QString} fname=@code{""})
+Export current picture to OFF file.
+@end deftypefn
+@c @deftypefn {Slot on @code{QMathGL}} @code{void} exportX3D (@code{QString} fname=@code{""})
+@c Export current picture to X3D file.
+@c @end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void}setUsePrimitives (@code{bool} use)
+Enable using list of primitives for frames. This allows frames transformation/zoom but requires much more memory. Default value is @code{true}.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} setMGLFont (@code{QString} path)
+Restore (@var{path}=@code{""}) or load font for graphics.
+@end deftypefn
+
+@deftypefn {Slot on @code{QMathGL}} @code{void} about ()
+Show about information.
+@end deftypefn
+@deftypefn {Slot on @code{QMathGL}} @code{void} aboutQt ()
+Show information about Qt version.
+@end deftypefn
+
+@deftypefn {Signal on @code{QMathGL}} @code{void} phiChanged (@code{int} val)
+Phi angle changed (by mouse or by toolbar).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} tetChanged (@code{int} val)
+Tet angle changed (by mouse or by toolbar).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} perChanged (@code{int} val)
+Perspective changed (by mouse or by toolbar).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} alphaChanged (@code{bool} val)
+Transparency changed (by toolbar).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} lightChanged (@code{bool} val)
+Lighting changed (by toolbar).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} gridChanged (@code{bool} val)
+Grid drawing changed (by toolbar).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} zoomChanged (@code{bool} val)
+Zooming changed (by toolbar).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} rotateChanged (@code{bool} val)
+Rotation changed (by toolbar).
+@end deftypefn
+
+@deftypefn {Signal on @code{QMathGL}} @code{void} mouseClick (@code{mreal} x, @code{mreal} y, @code{mreal} z)
+Mouse click take place at position @{x,y,z@}.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} frameChanged (@code{int} val)
+Need another frame to show.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} showWarn (@code{QString} warn)
+Need to show warning.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} posChanged (@code{QString} pos)
+Position of mouse click is changed.
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} objChanged (@code{int} id)
+Object id is changed (due to mouse click).
+@end deftypefn
+@deftypefn {Signal on @code{QMathGL}} @code{void} refreshData ()
+Data can be changed (drawing is finished).
+@end deftypefn
+
+
+@deftypecv {QMathGL option} QMathGL @code{QString} appName
+Application name for message boxes.
+@end deftypecv
+@deftypecv {QMathGL option} QMathGL @code{bool} autoResize
+Allow auto resizing (default is false).
+@end deftypecv
+
+@c ------------------------------------------------------------------
+@external{}
+@node wxMathGL class, , QMathGL class, Widget classes
+@section wxMathGL class
+@nav{}
+@cindex wxMathGL
+@cindex widgets
+
+Class is WX widget which display MathGL graphics. It is defined in @code{#include <mgl2/wx.h>}.
+
+@deftypemethod wxMathGL @code{void} SetDraw (@code{mglDraw *}dr)
+Sets drawing functions from a class inherited from @code{mglDraw}.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetDraw (@code{int (*}draw@code{)(mglBase *}gr, @code{void *}p@code{)}, @code{void *}par=@code{NULL})
+@deftypemethodx wxMathGL @code{void} SetDraw (@code{int (*}draw@code{)(mglGraph *}gr@code{)})
+Sets the drawing function @var{draw}. There is support of a list of plots (frames). So as one can prepare a set of frames at first and redraw it fast later (but it requires more memory). Function should return positive number of frames for the list or zero if it will plot directly. Parameter @var{par} contains pointer to data for the plotting function @var{draw}.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} SetGraph (@code{HMGL} gr)
+@deftypemethodx wxMathGL @code{void} SetGraph (@code{mglGraph *}gr)
+Set pointer to external grapher (instead of built-in one). Note that wxMathGL will automatically delete this object at destruction or at new @code{setGraph()} call.
+@end deftypemethod
+@deftypemethod wxMathGL @code{HMGL} GetGraph ()
+Get pointer to grapher.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} SetPopup (@code{wxMenu *}p)
+Set popup menu pointer.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetSize (@code{int} w, @code{int} h)
+Set widget/picture sizes
+@end deftypemethod
+@deftypemethod wxMathGL @code{double} GetRatio ()
+Return aspect ratio of the picture.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{int} GetPer ()
+Get perspective value in percents.
+@end deftypemethod
+@deftypemethod wxMathGL @code{int} GetPhi ()
+Get Phi-angle value in degrees.
+@end deftypemethod
+@deftypemethod wxMathGL @code{int} GetTet ()
+Get Theta-angle value in degrees.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetAlpha ()
+Get transparency state.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetLight ()
+Get lightning state.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetZoom ()
+Get mouse zooming state.
+@end deftypemethod
+@deftypemethod wxMathGL @code{bool} GetRotate ()
+Get mouse rotation state.
+@end deftypemethod
+
+
+@deftypemethod wxMathGL @code{void} Repaint ()
+Redraw saved bitmap without executing drawing function.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Update ()
+Update picture by executing drawing function.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Copy ()
+Copy graphics to clipboard.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Print ()
+Print current picture.
+@end deftypemethod
+
+@comment  @deftypemethod wxMathGL @code{void} Stop ()
+@comment  Send signal to stop drawing.
+@comment  @end deftypemethod
+@deftypemethod wxMathGL @code{void} Adjust ()
+Adjust image size to fit whole widget.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} NextSlide ()
+Show next slide.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} PrevSlide ()
+Show previous slide.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Animation (@code{bool} st=@code{true})
+Start/stop animation.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} SetPer (@code{int} val)
+Set perspective value.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetPhi (@code{int} val)
+Set Phi-angle value.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetTet (@code{int} val)
+Set Theta-angle value.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetAlpha (@code{bool} val)
+Switch on/off transparency.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetLight (@code{bool} val)
+Switch on/off lightning.
+@end deftypemethod
+@comment  @deftypemethod wxMathGL @code{void} SetGrid (@code{bool} val)
+@comment  Switch on/off drawing of grid for absolute coordinates.
+@comment  @end deftypemethod
+@deftypemethod wxMathGL @code{void} SetZoom (@code{bool} val)
+Switch on/off mouse zooming.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} SetRotate (@code{bool} val)
+Switch on/off mouse rotation.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ZoomIn ()
+Zoom in graphics.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ZoomOut ()
+Zoom out graphics.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftLeft ()
+Shift graphics to left direction.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftRight ()
+Shift graphics to right direction.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftUp  ()
+Shift graphics to up direction.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ShiftDown ()
+Shift graphics to down direction.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} Restore ()
+Restore zoom and rotation to default values.
+@end deftypemethod
+@c @deftypemethod wxMathGL @code{void} reload ()
+@c Reload data and redraw graphics.
+@c @end deftypemethod
+
+@deftypemethod wxMathGL @code{void} About ()
+Show about information.
+@end deftypemethod
+
+@deftypemethod wxMathGL @code{void} ExportPNG (@code{QString} fname=@code{""})
+Export current picture to PNG file.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportPNGs (@code{QString} fname=@code{""})
+Export current picture to PNG file (no transparency).
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportJPG (@code{QString} fname=@code{""})
+Export current picture to JPEG file.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportBPS (@code{QString} fname=@code{""})
+Export current picture to bitmap EPS file.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportEPS (@code{QString} fname=@code{""})
+Export current picture to vector EPS file.
+@end deftypemethod
+@deftypemethod wxMathGL @code{void} ExportSVG (@code{QString} fname=@code{""})
+Export current picture to SVG file.
+@end deftypemethod
+
+@external{}
+

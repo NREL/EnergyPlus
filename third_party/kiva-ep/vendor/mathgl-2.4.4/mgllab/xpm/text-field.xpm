@@ -1,0 +1,25 @@
+/* XPM */
+static const char *text_field_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 3 1 ",
+"  c black",
+". c #8B8B8B",
+"X c None",
+/* pixels */
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXX     X....XXX",
+"XXXXX XXXXXXXXXX",
+"XXXXX XXXXXXXXXX",
+"XXXXX XXX....XXX",
+"XXXXX XXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXX..........XXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX"
+};

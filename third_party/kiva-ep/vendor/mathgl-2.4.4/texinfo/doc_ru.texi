@@ -1,0 +1,191 @@
+\input texinfo
+@documentencoding UTF-8
+@documentlanguage ru
+
+@setfilename mathgl_en.info
+@include version.texi
+@settitle MathGL @value{VERSION}
+@syncodeindex pg cp
+@comment %**end of header
+
+@copying
+This manual is for MathGL (version @value{VERSION}), a collection of classes and routines for scientific plotting. Please report any errors in this manual to @email{mathgl.abalakin@@gmail.org}.
+
+@include copyright.texi
+@end copying
+
+@dircategory MathGL documentation system
+@direntry
+* MathGL: (mathgl). The library for scientific graphics.
+@end direntry
+
+@titlepage
+@title MathGL
+@subtitle for version @value{VERSION}
+@author A.A. Balakin (@uref{http://mathgl.sourceforge.net/})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top MathGL
+
+This file documents the Mathematical Graphic Library (MathGL), a collection of classes and routines for scientific plotting. It corresponds to release @value{VERSION} of the library. Please report any errors in this manual to @email{mathgl.abalakin@@gmail.org}. More information about MathGL can be found at the project homepage, @uref{http://mathgl.sourceforge.net/}.
+
+@include copyright.texi
+
+@end ifnottex
+
+@menu
+* Website::
+* Overview::
+* Examples::
+* General concepts::
+* MathGL core::
+* Widget classes::
+* Data processing::
+* MGL scripts::
+* UDAV ::
+* Other classes::
+* All samples::
+* Symbols and hot-keys::
+* File formats::
+* TeX-like symbols::
+* Plotting time::
+* Copying This Manual::
+* Index::
+@end menu
+
+@macro nav {}
+@html
+<nav style="float:right;border:1px solid black;padding:3px;margin-left:7px">
+@end html
+@ @ @ref{Main, Main page}@*
+@ @ @ref{News}@*
+@ @ @ref{Pictures}@*
+@ @ @ref{Download}@*
+@comment @ @ @ref{Download}
+
+@html
+<table style="background-color: #fff; padding: 5px;" cellspacing=0>
+<tr><td><img src="http://groups.google.com/intl/en/images/logos/groups_logo_sm.gif" height=25 width=117 alt="Google Groups"></td></tr>
+<tr><td style="padding-left: 5px;font-size: 110%"> <a target=_blank href="http://groups.google.com/group/mathgl"><b>MathGL</b></a> </td></tr>
+</table>
+</nav>
+@end html
+@end macro
+
+@macro external {}
+@html
+<footer>
+<!--LiveInternet counter--><script type="text/javascript"><!--
+document.write("<a href='http://www.liveinternet.ru/click' "+
+"target=_blank><img src='http://counter.yadro.ru/hit?t12.2;r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random()+
+"' alt='' title='LiveInternet: number of views during 24"+
+" hours, number of visitors during 24 hours and during today' "+
+"border=0 width=88 height=31><\/a>")//--></script><!--/LiveInternet-->
+
+<a target=_blank href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=152187&amp;type=2" alt="SourceForge.net Logo" border="0" height="37" width="125"></a>
+
+<a target=_blank href="http://www.thefreecountry.com/"> <img src="http://www.thefreecountry.com/images/tfc88x31green.gif" alt="thefreecountry.com: Free Programmers' Resources, Free Webmasters' Resources, Free Security Resources, Free Software" border="0" height="31" width="88"></a>
+
+<a target=_blank href="http://sourceforge.net/donate/index.php?group_id=152187"><img src="http://images.sourceforge.net/images/project-support.jpg" width="88" height="32" border="0" alt="Support This Project" /> </a>
+</footer>
+@end html
+@end macro
+
+@macro fig {fname,text}
+@center @image{../\fname\, 11cm, , \text\, png}
+@end macro
+@macro pfig {fname,text}
+@uref{../pdf/\fname\.pdf, @image{../png/\fname\, 11cm, , \text\, png}}
+@c @center @image{../png/\fname\, 11cm, , \text\ См. также пример @uref{../pdf/\fname\.pdf, 3D PDF}, .png}
+@end macro
+@macro ufig {fname,width,text}
+@center @image{../udav/\fname\, \width\cm, , \text\, png}
+@end macro
+@macro sfig {plot,text}
+@ref{\text\, @image{../small/\plot\-sm,3cm, , , png}}
+@end macro
+
+@macro sref {arg}
+См. раздел @ref{\arg\}, для примеров кода и графика.
+@end macro
+
+@node Website, Overview, , Top
+@include web_ru.texi
+
+@node Overview, Examples, Website, Top
+@include overview_ru.texi
+
+@node Examples, General concepts, Overview, Top
+@include example_ru.texi
+
+@node General concepts, MathGL core, Examples, Top
+@include concept_ru.texi
+
+@node MathGL core, Widget classes, General concepts, Top
+@include core_ru.texi
+
+@node Widget classes, Data processing, MathGL core, Top
+@include widget_ru.texi
+
+@node Data processing, MGL scripts, Widget classes, Top
+@include data_ru.texi
+
+@node MGL scripts, UDAV, Data processing, Top
+@include parse_ru.texi
+
+@node UDAV, Other classes, MGL scripts, Top
+@include udav_ru.texi
+
+@node Other classes, All samples, UDAV, Top
+@include other_ru.texi
+
+@node All samples, Symbols and hot-keys, Other classes, Top
+@include samples.texi
+
+@node Symbols and hot-keys, File formats, All samples, Top
+@appendix Symbols and hot-keys
+@include symbols_ru.texi
+
+@node File formats, TeX-like symbols, Symbols and hot-keys, Top
+@appendix File formats
+@include formats_ru.texi
+
+@node TeX-like symbols, Plotting time, File formats, Top
+@appendix Символы TeX
+@include appendix_ru.texi
+
+@node Plotting time, Copying This Manual, TeX-like symbols, Top
+@appendix Время отрисовки
+@nav{}
+
+В таблице показаны времена создания графика для всех примеров из файла @uref{http://sourceforge.net/p/mathgl/code/HEAD/tree/mathgl-2x/examples/samples.cpp, examples/samples.cpp}. Тест выполнен на моем ноутбуке (i5-2430M) с 64-bit Debian.
+
+Несколько слов о скорости. Во-первых, прямое рисование в память (Quality=4,5,6) быстрее буферизованного (Quality=0,1,2), но иногда результат некоректен (см. @ref{cloud}) и пропадает возможность экспорта в векторные и 3d форматы (например, EPS, SVG, PDF, ...). Во-вторых, обычно картинка худшего качества рисуется быстрее, т.е. Quality=1 быстрее Quality=2, и Quality=0 быстрее Quality=1. Однако, если график содержит множество граней (например @ref{cloud}, @ref{surf3}, @ref{pipe}, @ref{dew}), то Quality=0 может быть достаточно медленным, особенно для маленьких картинок. Наконец, картинки меньшего размера рисуются быстрее.
+
+Результаты для изображения размером 800*600 (по умолчанию).
+@include time.texi
+
+Результаты для изображения размером 1920*1440 (для печати)
+@include time_big.texi
+
+@node Copying This Manual, Index, Plotting time, Top
+@appendix GNU Free Documentation License
+@include fdl.texi
+
+@node Index, , Copying This Manual, Top
+@unnumbered Index
+
+@printindex cp
+
+@bye

@@ -2141,13 +2141,12 @@ namespace ThermalComfort {
             }
         }
 
-        // Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
+        // Now weight the MRT excluding the surface used for weighting
         if (state.dataThermalComforts->ZoneAESum(ZoneNum) > 0.01) {
+            CalcSurfaceWeightedMRT = SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum);
+            // if averaged with surface--half comes from the surface used for weighting (SurfNum) and the rest from the calculated MRT that excludes this surface
             if (AverageWithSurface) {
-                CalcSurfaceWeightedMRT =
-                    0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + (SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum)));
-            } else {
-                CalcSurfaceWeightedMRT = SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum);
+                CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + CalcSurfaceWeightedMRT);
             }
         } else {
             if (state.dataThermalComforts->FirstTimeError) {
@@ -2155,10 +2154,9 @@ namespace ThermalComfort {
                     state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\"");
                 ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
                 state.dataThermalComforts->FirstTimeError = false;
+                CalcSurfaceWeightedMRT = state.dataHeatBalFanSys->MAT(ZoneNum);
                 if (AverageWithSurface) {
-                    CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + state.dataHeatBalFanSys->MAT(ZoneNum));
-                } else {
-                    CalcSurfaceWeightedMRT = state.dataHeatBalFanSys->MAT(ZoneNum);
+                    CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + CalcSurfaceWeightedMRT);
                 }
             }
         }

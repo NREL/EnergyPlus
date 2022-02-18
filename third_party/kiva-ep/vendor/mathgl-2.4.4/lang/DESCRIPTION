@@ -1,0 +1,13 @@
+Name: mathgl
+Version: 2.0
+Date: 2011-08-23
+Author: Alexey Balakin
+Maintainer: Dmitry Kulagin
+Title: MathGL
+Description: Data plotting library
+Depends: octave (>= 2.9.12)
+Autoload: yes
+SystemRequirements: ...
+License: GPL
+Keywords: ...
+Url: http://octave.sf.net http://mathgl.sf.net

@@ -1,0 +1,48 @@
+.\" Process this file with
+.\" groff -man -Tascii mglconv.1
+.\"
+.TH MGLCONV 1 "MARCH 2012" MathGL "User Manuals"
+.SH NAME
+mglconv \- Execute MathGL scripts to generate graphical output.
+.SH SYNOPSIS
+.B mglconv
+[parameters] scriptfile
+.SH DESCRIPTION
+.B mglconv
+reads MGL scripts from
+.I scriptfile
+to produce plots of specified functions or data. Result can be saved in bitmap (PNG/JPEG/GIF/BMP) or vector (EPS/SVG/LaTeX/OFF/STL/OBJ/X3D) format. You can use
+.B -
+as file name for reading script from standard input.
+.SH OPTIONS
+.IP "\fB-1 string\fP"
+Set
+.I string
+as argument $1 for script.
+.IP "\fB...\fP"
+.IP "\fB-9 string\fP"
+Set
+.I string
+as argument $9 for script.
+.IP "\fB-A value\fP"
+Add
+.I value
+into the list of animation parameters.
+.IP "\fB-C v1:v2[:dv]\fP"
+Add values in range
+.I v1:v2
+with step
+.I dv
+(default is 1) into the list of animation parameters.
+.IP "\fB-L locname\fP"
+Set the locale to
+.I locname.
+.IP "\fB-o name\fP"
+Set output file name.
+.IP "\fB-h\fP"
+Print help message.
+.SH AUTHOR
+mglconv was written by Alexey Balakin, http://mathgl.sourceforge.net/
+.SH "SEE ALSO"
+.BR mglview (1),
+.BR mgl (5)

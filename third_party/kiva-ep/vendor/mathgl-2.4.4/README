@@ -1,0 +1,24 @@
+MathGL is a free library of fast C++ routines for the plotting of the data 
+varied in one or more dimensions. MathGL has more than 50 general types 
+of graphics for 1d, 2d and 3d data arrays. It can export graphics to bitmap 
+and vector (EPS, SVG etc) files. It has OpenGL interface and can be used from 
+console programs. It has functions for data handling and script MGL language 
+for simplification of data plotting. Also it has several types of transparency 
+and smoothed lightning, vector fonts and TeX-like symbol parsing, arbitrary 
+curvilinear coordinate system and many over useful things. Finally it is 
+platform independent and free (under GPL v.2.0 or later license).
+Installation instructions are provided in the manual (don't worry, it
+is straightforward).
+
+About LGPL and GPL licenses.
+Generally, MathGL is GPL library. However, you can use LGPL license for MathGL 
+core and widget libraries if you don't use SWIG-based interfaces and disable GSL 
+and HDF features. This can be done by using 'enable-lgpl' option at build time.
+However, I ask you to put the information of used MathGL version and link to 
+MathGL website into "About" section of yours program.
+
+CONTACTS
+--------
+MathGL was written by Alexey Balakin. You can contact me at 
+mathgl.abalakin@gmail.com . The latest version of MathGL can be found at
+the sourceforge.net page (http://mathgl.sourceforge.net).

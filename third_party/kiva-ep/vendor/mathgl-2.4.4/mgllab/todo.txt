@@ -1,0 +1,8 @@
+1. Start/Stop on single button
+2. Update FLTK icons
+3. Flat toolbuttons
+4. Detach data table
+5. Menu items to show/hide extra toolbars
+6. Update help or graph only if paths are changed
+7. Common colors in format dialog
+8. Show graph on update

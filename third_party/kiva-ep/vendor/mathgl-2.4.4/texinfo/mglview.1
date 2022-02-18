@@ -1,0 +1,37 @@
+.\" Process this file with
+.\" groff -man -Tascii mglview.1
+.\"
+.TH MGLVIEW 1 "MARCH 2012" MathGL "User Manuals"
+.SH NAME
+mglview \- Execute MathGL scripts and show in an window
+.SH SYNOPSIS
+.B mglview
+[parameters] scriptfile
+.SH DESCRIPTION
+.B mglview
+reads MGL scripts from
+.I scriptfile
+to produce plots of specified functions or data. The program will create a GUI window showing the script result. You can use
+.B -
+as file name for reading script from standard input. Another option is using *.mgld files for quick viewing 3d pictures.
+.SH OPTIONS
+.IP "\fB-1 string\fP"
+Set
+.I string
+as argument $1 for script.
+.IP "\fB...\fP"
+.IP "\fB-9 string\fP"
+Set
+.I string
+as argument $9 for script.
+.IP "\fB-L locname\fP"
+Set the locale to
+.I locname.
+.IP "\fB-h\fP"
+Print help message.
+.SH AUTHOR
+mglview was written by Alexey Balakin, http://mathgl.sourceforge.net/
+.SH "SEE ALSO"
+.BR mglconv (1),
+.BR udav (1),
+.BR mgl (5)

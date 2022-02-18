@@ -1,0 +1,105 @@
+\input texinfo
+@documentencoding UTF-8
+@documentlanguage en
+
+@setfilename mgl_en.info
+@include version.texi
+@settitle MGL script language for version @value{VERSION}
+@syncodeindex pg cp
+@comment %**end of header
+
+@copying
+This manual is for MathGL (version @value{VERSION}), a collection of classes and routines for scientific plotting. Please report any errors in this manual to @email{mathgl.abalakin@@gmail.org}.
+
+@include copyright.texi
+@end copying
+
+@dircategory MathGL documentation system
+@direntry
+* MathGL: (mathgl). The library for scientific graphics.
+@end direntry
+
+@titlepage
+@title MGL script language
+@subtitle for version @value{VERSION}
+@author A.A. Balakin (@uref{http://mathgl.sourceforge.net/})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top MGL script language
+
+This file documents the MGL script language. It corresponds to release @value{VERSION} of the MathGL library. Please report any errors in this manual to @email{mathgl.abalakin@@gmail.org}. More information about MGL and MathGL can be found at the project homepage, @uref{http://mathgl.sourceforge.net/}.
+
+@include copyright.texi
+
+@end ifnottex
+
+@menu
+@c * Overview::
+* MGL scripts::
+* General concepts::
+* MathGL core::
+* Data processing::
+* Examples::
+* All samples::
+* Symbols and hot-keys::
+* Copying This Manual::
+* Index::
+@end menu
+
+@macro external {}
+@end macro
+@macro nav {}
+@end macro
+
+@macro fig {fname,text}
+@center @image{\fname\, 11cm, , \text\, png}
+@end macro
+@macro pfig {fname,text}
+@center @image{png/\fname\, 11cm, , \text\, png}
+@end macro
+
+@macro sref {arg}
+@xref{\arg\}, for sample code and picture.
+@end macro
+@set UDAV
+
+
+@node MGL scripts, General concepts, , Top
+@include parse_en.texi
+
+@node General concepts, MathGL core, MGL scripts, Top
+@include concept_en.texi
+
+@node MathGL core, Data processing, General concepts, Top
+@include core_en.texi
+
+@node Data processing, Examples, MathGL core, Top
+@include data_en.texi
+
+@node Examples, All samples, Data processing, Top
+@include ex_mgl_en.texi
+
+@node All samples, Symbols and hot-keys, Examples, Top
+@include samples.texi
+
+@node Symbols and hot-keys, Copying This Manual, All samples, Top
+@appendix Symbols and hot-keys
+@include symbols_en.texi
+
+@node Copying This Manual, Index, Symbols and hot-keys, Top
+@appendix GNU Free Documentation License
+@include fdl.texi
+
+@node Index, , Copying This Manual, Top
+@unnumbered Index
+
+@printindex cp
+
+@bye

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+	<title>Example of dysplaying MathGL plots using JSON</title>
+	<link rel="stylesheet" href="../styles.css">
+	<script type="text/javascript" src="mathgl.js"></script>
+<!--	<script type="text/javascript" src="inflate.min.js"></script>-->
+</head>
+
+<!-- Use "chromium-browser --disable-web-security json.html" for debug -->
+
+<body onload="main();">
+<div class="topnav" id="myTopnav"></div><div class="main">
+
+Select sample
+
+<select id="select" onchange="mglChange()">
+	<option value="alpha">alpha</option>
+	<option value="area">area</option>
+	<option value="aspect">aspect</option>
+	<option value="axial">axial</option>
+	<option value="axis">axis</option>
+	<option value="barh">barh</option>
+	<option value="bars">bars</option>
+	<option value="belt">belt</option>
+	<option value="box">box</option>
+	<option value="boxplot">boxplot</option>
+	<option value="boxs">boxs</option>
+	<option value="candle">candle</option>
+	<option value="chart">chart</option>
+	<option value="cloud">cloud</option>
+	<option value="colorbar">colorbar</option>
+	<option value="combined">combined</option>
+	<option value="cones">cones</option>
+	<option value="conta">conta</option>
+	<option value="contd">contd</option>
+	<option value="contfa">contfa</option>
+	<option value="contf">contf</option>
+	<option value="contf_xyz">contf_xyz</option>
+	<option value="cont">cont</option>
+	<option value="contv">contv</option>
+	<option value="cont_xyz">cont_xyz</option>
+	<option value="curvcoor">curvcoor</option>
+	<option value="cut">cut</option>
+	<option value="dat_diff">dat_diff</option>
+	<option value="dat_extra">dat_extra</option>
+	<option value="densa">densa</option>
+	<option value="dens">dens</option>
+	<option value="dens_xyz">dens_xyz</option>
+	<option value="dew">dew</option>
+	<option value="dots">dots</option>
+	<option value="error">error</option>
+	<option value="fall">fall</option>
+	<option value="fit">fit</option>
+	<option value="flow">flow</option>
+	<option value="fog">fog</option>
+	<option value="fonts">fonts</option>
+	<option value="grad">grad</option>
+	<option value="hist">hist</option>
+	<option value="inplot">inplot</option>
+	<option value="label">label</option>
+	<option value="legend">legend</option>
+	<option value="loglog">loglog</option>
+	<option value="map">map</option>
+	<option value="mark">mark</option>
+	<option value="mesh">mesh</option>
+	<option value="mirror">mirror</option>
+	<option value="molecule">molecule</option>
+	<option value="parser">parser</option>
+	<option value="pde">pde</option>
+	<option value="pipe">pipe</option>
+	<option value="plot">plot</option>
+	<option value="primitives">primitives</option>
+	<option value="projection5">projection5</option>
+	<option value="projection">projection</option>
+	<option value="qo2d">qo2d</option>
+	<option value="radar">radar</option>
+	<option value="region">region</option>
+	<option value="schemes">schemes</option>
+	<option value="several_light">several_light</option>
+	<option value="solve">solve</option>
+	<option value="stem">stem</option>
+	<option value="step">step</option>
+	<option value="stereo">stereo</option>
+	<option value="stfa">stfa</option>
+	<option value="style">style</option>
+	<option value="surf3a">surf3a</option>
+	<option value="surf3c">surf3c</option>
+	<option value="surf3">surf3</option>
+	<option value="surfa">surfa</option>
+	<option value="surfc">surfc</option>
+	<option value="surf">surf</option>
+	<option value="table">table</option>
+	<option value="tape">tape</option>
+	<option value="tens">tens</option>
+	<option value="ternary">ternary</option>
+	<option value="text">text</option>
+	<option value="textmark">textmark</option>
+	<option value="ticks">ticks</option>
+	<option value="tile">tile</option>
+	<option value="tiles">tiles</option>
+	<option value="torus">torus</option>
+	<option value="traj">traj</option>
+	<option value="triangulation">triangulation</option>
+	<option value="triplot">triplot</option>
+	<option value="tube">tube</option>
+	<option value="vecta">vecta</option>
+	<option value="vect">vect</option>
+	<option value="venn">venn</option>
+</select> 
+
+<p>You can use mouse with pressed left button for rotation; with pressed middle button for shift; mouse wheel for zoom in/out. Double click will restore original view.</p>
+<center>
+<canvas id="canvas" width="800" height="600"
+	style="border:1px solid #d3d3d3;" onmousemove="mglMouseMove(event)"
+	onmousedown="mglMouseDown(event)" onmouseup="mglMouseUp(event)"
+	onmouseout="mglMouseUp(event)" onmousewheel="mglMouseWheel(event)"
+	ondblclick="mglRestore(event)"></canvas>
+</center>
+
+<p id="time"></p>
+
+</div><script type="text/javascript" src="../accordion.js"></script>
+</body>
+
+</html>

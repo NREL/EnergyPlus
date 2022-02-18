@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <script type="text/javascript" src="sylvester.src.js"></script>
+  <script type="text/javascript" src="mathgl.js"></script>
+  <script type="text/javascript" src="mathgl.View.js"></script>
+  <script type="text/javascript" src="mathgl.Backend.js"></script>
+  <script type="text/javascript" src="mathgl.WebkitBackend.js"></script>
+  <script type="text/javascript" src="mathgl.Graph.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+</head>
+
+<body onload="main();">
+  <center>
+    <button type="button" onclick="graph.moveLeft()">Left</button>
+    <button type="button" onclick="graph.moveUp()">Up</button>
+    <button type="button" onclick="graph.zoomIn()">Zoom in</button>
+    <button type="button" onclick="graph.zoomOut()">Zoom out</button>
+    <button type="button" onclick="graph.moveDown()">Down</button>
+    <button type="button" onclick="graph.moveRight()">Right</button><br>
+    <canvas id="canvas" width="800" height="600" style="border:1px solid #d3d3d3;">
+    </canvas>
+  </center>
+</body>
+</html>

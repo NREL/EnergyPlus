@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Shiftix</TITLE>
+<link rel="stylesheet" href="../styles.css"></head>
+<body onkeydown="keydown(event)" onblur="needPause()" onload="startGame()">
+<div class="topnav" id="myTopnav"></div><div class="main">
+
+<h2>"Shiftix" game</h2>
+<canvas id="myCanvas" width="700" height="550" onmousedown="mousedown(event)">
+Your browser does not support the HTML5 canvas tag.</canvas></div>
+
+<script type="text/javascript" src="../accordion.js"></script>
+<script>
+var ctx;
+var bar = 25;	// block size in px (default)
+var nx = 10, ny = 20;	// box size
+var fX, fY;		// figure position (lowest point)
+var next = [];
+var fig = [];
+//			0		1			2			3			4		5			6			7			8			9		10			11			12			13
+var cols = ['none', '#FF0080', '#FF00FF', '#8000FF', '#8080FF', '#0080FF', '#00FFFF', '#00FF80', '#00FF00', '#80FF00', '#FFFF00', '#FF8000', '#FF0000', '#FF8080', 
+					'#7F4040', '#7F0000', '#7F4000', '#7F7F00', '#407F00', '#007F00', '#007F40', '#007F7F', '#00407F', '#40407F', '#40007F', '#7F007F', '#7F0040', 'black', 'silver'];
+var box = [];
+var fp1 = [1, 1,	0,0, 	0,0];	// line 1x1
+var fp2 = [2,1,	0.5,0,	0,0,1, 1,0,1];	// line 2x1
+var fp3 = [3,1,	0,0,	-1,0,1, 0,0,1, 1,0,1];	// line 3x1
+var fp4 = [3,4,	0,0,	0,1,1, 0,0,1, 1,0,1];
+//var figs = [f1, f2, f3, f4, f5, f6, f7];
+var figs = [fp1, fp2, fp3, fp4];
+
+var level = 0;
+var score = 0;
+var nlines = 0;
+var interval;
+var hiscore = 0;
+var paused = 0;
+var finished = 0;
+var marked = 0;
+var preview = 0;
+
+var step = 0.1;	// step of down-shift (higher is more complex)
+
+function needPause()
+{	if(paused==0)	pause();	}
+
+function pause()	// useless
+{
+	paused = 1-paused;
+	if(paused)
+	{
+		if(score > hiscore)
+		{	hiscore = score;
+			localStorage.setItem("hiscoreHexris", hiscore);	}
+		clearInterval(interval);	draw();
+	}
+	else if(!finished)	interval = setInterval(updateCanvas, 30);
+}
+
+function startGame()
+{
+	ctx = document.getElementById("myCanvas").getContext("2d");
+	ctx.lineCap="round";
+
+	newFig();	newFig();	level = 0;		step = 1./32;
+	score = 0;	nlines = 0;	paused = 0;		finished = 0;
+	for(var i=0;i<nx*ny;i++)	box[i] = 0;
+
+	hiscore = localStorage.getItem("hiscoreColumns");
+	if(!hiscore)	hiscore = 0;
+//	document.getElementById("hiscore").innerHTML = hiscore;
+	interval = setInterval(updateCanvas, 30);
+}
+
+function newFig()
+{
+	var i = Math.floor(Math.random()*figs.length);
+	fig = next.slice();	next = figs[i].slice();
+	fX = Math.floor(nx/2);	fY = ny-1;
+	for(var j=0;j<next[0];j++)
+		next[6+3*j] = 1+Math.floor(Math.random()*5)
+}
+
+function finish()	// game over
+{
+	finished = 1;	draw();
+	ctx.font="40px Arial";
+	ctx.fillStyle = 'black';
+	ctx.fillText("GAME OVER", ctx.canvas.width/4, ctx.canvas.height/2);
+	if(score > hiscore)
+	{	hiscore = score;
+		localStorage.setItem("hiscoreColumns", hiscore);	}
+//	document.getElementById("hiscore").innerHTML = hiscore;
+	clearInterval(interval);
+}
+
+function moveLeft()
+{
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var x = Math.floor(fX+fig[4+3*i]-1);
+		var y = Math.floor(fY+fig[5+3*i]);
+		if(x<0 || box[x+nx*y]>0)	return;
+	}
+	fX -= 1;
+}
+
+function moveRight()
+{
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var x = Math.floor(fX+fig[4+3*i]+1);
+		var y = Math.floor(fY+fig[5+3*i]);
+		if(x>=nx || box[x+nx*y]>0)	return;
+	}
+	fX += 1;
+}
+
+function canFall()
+{
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var x = Math.floor(fX+fig[4+3*i]);
+		var y = Math.floor(fY+fig[5+3*i]-1);
+		if(y<0 || box[x+nx*y]>0)	return 0;
+	}
+	return 1;
+}
+
+function putFig()
+{
+	var n = fig[0], ok = 1;
+	for(var i=0;i<n;i++)
+	{
+		var x = Math.floor(fX+fig[4+3*i]);
+		var y = Math.floor(fY+fig[5+3*i]);
+		if(x>=0 && y>=0 && x<nx && y<ny)	box[x+nx*y] = fig[6+3*i];
+	}
+	while(ok)	// remove empty blocks
+	{
+		ok = 0;
+		for(var i=0;i<nx;i++)	for(var j=0;j<ny;j++)
+		{
+			if(box[i+nx*j]==0 && box[i+nx*j+nx]>0)
+			{
+				ok = 1;
+				for(var k=j+1;k<ny;k++)	box[i+nx*(k-1)] = box[i+nx*k];
+				box[i+nx*(ny-1)] = 0;
+			}
+		}
+	}
+	score += 1;
+	markLines();
+}
+
+function moveDown()
+{
+	if(canFall())	fY -= 1;
+}
+
+function fallDown()
+{
+	while(canFall())	fY -= 1;
+	putFig();	newFig();
+}
+
+function fallLeft()
+{
+	var n = fig[0], ok = 1;
+	while(canFall())	fY -= 1;
+	for(var i=0;i<n;i++)
+	{
+		var x = Math.floor(fX+fig[4+3*i]-1);
+		var y = Math.floor(fY+fig[5+3*i]);
+		if(x<0 || box[x+nx*y]>0)	ok = 0;
+	}
+	if(ok)	fX -= 1;
+//	putFig();	newFig();
+}
+
+function fallRight()
+{
+	var n = fig[0], ok = 1;
+	while(canFall())	fY -= 1;
+	for(var i=0;i<n;i++)
+	{
+		var x = Math.floor(fX+fig[4+3*i]+1);
+		var y = Math.floor(fY+fig[5+3*i]);
+		if(x<0 || box[x+nx*y]>0)	ok = 0;
+	}
+	if(ok)	fX += 1;
+//	putFig();	newFig();
+}
+
+function rotate()
+{
+	var f = fig.slice(), n = fig[0], dx=0;
+	for(var i=0;i<n;i++)
+	{
+		f[4+3*i] = fig[2]-fig[5+3*i]+fig[3];
+		f[5+3*i] = fig[4+3*i]-fig[2]+fig[3];
+		var x = Math.floor(fX+f[4+3*i]);
+		var y = Math.floor(fY+f[5+3*i]);
+		if(x<0 && x+dx<0)		dx = -x;
+		if(x>=nx && x+dx>=nx)	dx = nx-1-x;
+	}
+	for(var i=0;i<n;i++)
+	{
+		f[4+3*i] = fig[2]-fig[5+3*i]+fig[3];
+		f[5+3*i] = fig[4+3*i]-fig[2]+fig[3];
+		var x = Math.floor(fX+f[4+3*i]+dx);
+		var y = Math.floor(fY+f[5+3*i]);
+		if(box[x+nx*y]>0)	return;
+	}
+	fX += dx;	fig = f;
+}
+
+function updateCanvas()
+{
+	if(paused)	{	draw();	return;	}
+	if(marked>0)
+	{
+		marked -= 1;
+		if(marked==0)	removeLines();
+	}
+	else if(canFall())
+		fY -= step;
+	else
+	{
+		putFig();
+		newFig();
+		if(!canFall())	finish();
+	}
+	draw();
+}
+
+function mark(i,j,c,lst)
+{
+	var i0 = i+nx*j, cr = cols.length-1;
+	lst.push(i0);
+	if(i>0 && box[i0-1]==c)		{	box[i0-1]=cr;	mark(i-1,j,c,lst);	}
+	if(i<nx-1 && box[i0+1]==c)	{	box[i0+1]=cr;	mark(i+1,j,c,lst);	}
+	if(j>0 && box[i0-nx]==c)	{	box[i0-nx]=cr;	mark(i,j-1,c,lst);	}
+	if(j<ny-1 && box[i0+nx]==c)	{	box[i0+nx]=cr;	mark(i,j+1,c,lst);	}
+}
+
+function markLines()
+{
+	var cr = cols.length-1;
+	var flst=[];	// all found lists
+	var clst=[];	// color for found lists
+	for(var j=0;j<ny;j++)	for(var i=0;i<nx;i++)
+	{
+		var i0 = i+nx*j, c = box[i0], lst = [];
+		if(c>0 && c<cr)
+			mark(i,j,c,lst);
+		if(lst.length>1)
+		{	box[i0]==cr;	flst.push(lst);	clst.push(c);	}
+	}
+	for(var j=0;j<flst.length;j++)
+	{
+		var lst = flst[j], n = lst.length;
+		var x0 = -100, i0 = -1;
+		for(var i=0;i<n;i++)
+		{
+			var x = lst[i]%nx;
+			if(Math.abs(x-fX)<Math.abs(x0-fX))	{	x0 = x;	i0 = lst[i];	}
+		}
+		box[i0] = clst[j]-2+n;	marked = 5;
+		nlines += n-1;
+		if(preview)
+			score += Math.floor(box[i0]*(n-1)*level/2+0.5);
+		else
+			score += box[i0]*(n-1)*level;
+	}
+	if(nlines>=100*level)
+	{	level += 1;	step = Math.pow(2,level/4-5);
+		if(level>15)	level = 15;	}
+	removeLines();
+}
+
+function removeLines()
+{
+	var ok=1, cr = cols.length-1, rem = 0;
+	while(ok)
+	{
+		ok = 0;
+		for(var i=0;i<nx;i++)	for(var j=0;j<ny;j++)
+		{
+			if(box[i+nx*j]==cr)
+			{
+				ok = 1;	rem = 1;
+				for(var k=j+1;k<ny;k++)	box[i+nx*(k-1)] = box[i+nx*k];
+				box[i+nx*(ny-1)] = 0;
+			}
+		}
+	}
+	if(rem)	markLines();
+}
+
+function drawSq(i,j,col,val)
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/22/bar, r = bar*s;
+	var x = r*(i+1), y = r*(ny-j);
+	var cc = col!='none'?1:0;
+	ctx.beginPath();
+	if(cc)
+	{
+		var grd=ctx.createRadialGradient(x+0.5*r,y-r/3,r/5,x+0.5*r,y,r);
+		grd.addColorStop(0,"white");
+		grd.addColorStop(1,col);
+		ctx.fillStyle = grd;
+	}
+	ctx.rect(x,y,r,r);	if(cc)	ctx.fill();
+	ctx.strokeStyle = (cc || val!=0)?'black':'lightgray';	ctx.stroke();
+	if(cc)	
+	{
+		ctx.font="18px Arial";	// score
+		ctx.fillStyle = val+1<cols.length/2?'black':'white';
+		if(val<10)
+			ctx.fillText(val, x+r/3,y+0.7*r);
+		else
+			ctx.fillText(val, x+r/12,y+0.7*r);
+	}
+}
+
+function draw()
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/22/bar;
+	ctx.clearRect(0, 0, cwidth, cheight);
+	// boundary
+	for(var i=0;i<=ny;i++)
+	{
+		drawSq(-1,i,'gray','');
+		drawSq(nx,i,'gray','');
+	}
+	for(var i=0;i<=nx+1;i++)	drawSq(i-1,-1,'gray','');
+	// existing bricks
+	for(var i=0;i<nx;i++)	for(var j=0;j<ny;j++)
+	{
+		var c = box[i+nx*j];
+		if(c)	drawSq(i,j,cols[c],c);
+		else	drawSq(i,j,'none',0);
+	}
+	// figure	
+	var n = fig[0];
+	for(var i=0;i<n;i++)
+	{
+		var x = Math.floor(fX+fig[4+3*i]);
+		var y = Math.floor(fY+fig[5+3*i]);
+		drawSq(x,y, cols[fig[6+3*i]], fig[6+3*i]);
+	}
+
+	// preview figure
+	if(preview)
+	{
+		var n = next[0];
+		for(var i=0;i<n;i++)
+		{
+			var x = Math.floor(next[4+3*i]);
+			var y = Math.floor(next[5+3*i]);
+			drawSq(x+nx+7,y+11, cols[next[6+3*i]], next[6+3*i]);
+		}
+		ctx.strokeStyle = 'black';
+		ctx.strokeRect((nx+5)*bar*s,6*bar*s,8*bar*s,7*bar*s);
+
+		var dy = [];	n = fig[0];
+		for(var i=0;i<nx;i++)	dy[i]=ny;
+		for(var i=0;i<n;i++)
+		{
+			var x = Math.floor(fX+fig[4+3*i]), y = Math.floor(fY+fig[5+3*i]), j;
+			for(j=0;j<=y;j++)	if(box[x+nx*(y-j)]>0)	break;
+			if(j<dy[x])	dy[x] = j;
+		}
+		for(var i=0;i<n;i++)
+		{
+			var x = Math.floor(fX+fig[4+3*i]), y = Math.floor(fY+fig[5+3*i]);
+			drawSq(x,y-dy[x]+1,'none',-1);
+		}
+	}
+
+
+	ctx.font="24px Arial";	// score
+	ctx.fillStyle = 'black';
+	ctx.fillText("Score: "+score, (nx+4)*s*bar, bar*s);
+	ctx.fillText("Level: "+level, (nx+11)*s*bar, s*bar);
+	ctx.fillStyle = 'darkgreen';
+	ctx.fillText("HiScore: "+hiscore, (nx+4)*s*bar, 2*bar*s);
+
+	var dh = s*100, b = dh/10;
+	var y0 = cheight-2*dh, x0 = s*bar*(nx+3);
+	ctx.strokeStyle = 'blue';	ctx.fillStyle = 'lightblue';	
+
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// left
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/4,y0+dh/2);
+	ctx.lineTo(x0+3*dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+
+	ctx.strokeRect(x0+dh+b, y0+b, dh-2*b, dh-2*b);	// rotate
+	ctx.beginPath();
+	ctx.arc(x0+3*dh/2, y0+dh/2, 0.3*dh, 0, 2*Math.PI);
+	ctx.fill();	ctx.stroke();
+	ctx.beginPath();	ctx.fillStyle = 'white';
+	ctx.arc(x0+3*dh/2, y0+dh/2, 0.2*dh, 0, 2*Math.PI);
+	ctx.fill();	ctx.stroke();
+
+	ctx.strokeRect(x0+2*dh+b, y0+b, dh-2*b, dh-2*b);	// right
+	ctx.beginPath();	ctx.fillStyle = 'lightblue';
+	ctx.moveTo(x0+2*dh+3*dh/4,y0+dh/2);
+	ctx.lineTo(x0+2*dh+dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+2*dh+dh/4,y0+dh/4);
+	ctx.lineTo(x0+2*dh+3*dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+
+	y0 += dh;
+	ctx.strokeStyle = 'green';	ctx.fillStyle = 'lightgreen';	
+/*	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall left
+	ctx.beginPath();
+	ctx.moveTo(x0+3*dh/4,y0+0.2*dh);
+	ctx.lineTo(x0+5*dh/8,y0+0.2*dh);
+	ctx.lineTo(x0+5*dh/8,y0+dh/2);
+	ctx.lineTo(x0+0.4*dh,y0+dh/2);
+	ctx.lineTo(x0+0.4*dh,y0+3*dh/8);
+	ctx.lineTo(x0+0.2*dh,y0+5*dh/8);
+	ctx.lineTo(x0+0.4*dh,y0+7*dh/8);
+	ctx.lineTo(x0+0.4*dh,y0+6*dh/8);
+	ctx.lineTo(x0+3*dh/4,y0+6*dh/8);
+	ctx.lineTo(x0+3*dh/4,y0+0.2*dh);	ctx.fill();	ctx.stroke();*/
+
+	x0 += dh;
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall down
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/2,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/2,y0+3*dh/4);	ctx.fill();	ctx.stroke();
+	ctx.beginPath();
+	ctx.rect(x0+dh/4,y0+3*dh/4,dh/2,dh/16);
+	ctx.fill();	ctx.stroke();
+
+	x0 += dh;
+/*	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall right
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/4,y0+0.2*dh);
+	ctx.lineTo(x0+3*dh/8,y0+0.2*dh);
+	ctx.lineTo(x0+3*dh/8,y0+dh/2);
+	ctx.lineTo(x0+0.6*dh,y0+dh/2);
+	ctx.lineTo(x0+0.6*dh,y0+3*dh/8);
+	ctx.lineTo(x0+0.8*dh,y0+5*dh/8);
+	ctx.lineTo(x0+0.6*dh,y0+7*dh/8);
+	ctx.lineTo(x0+0.6*dh,y0+6*dh/8);
+	ctx.lineTo(x0+dh/4,y0+6*dh/8);
+	ctx.lineTo(x0+dh/4,y0+0.2*dh);	ctx.fill();	ctx.stroke();*/
+
+	x0 -= 2*dh;	y0 -= 4*dh;	// preview
+	ctx.strokeStyle = 'magenta';	ctx.fillStyle = 'violet';
+	if(preview)
+	{
+		ctx.fillStyle = 'lightpink';
+		ctx.fillRect(x0+b, y0+b, dh-2*b, dh-2*b);
+	}
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+dh/4,dh/2,Math.PI/4,3*Math.PI/4);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+3*dh/4,dh/2,-3*Math.PI/4,-Math.PI/4);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+dh/2,dh/5,0,2*Math.PI);	
+	ctx.fill();	ctx.stroke();
+
+	x0 += dh;	ctx.strokeStyle = 'red';
+	if(paused)
+	{
+		ctx.fillStyle = 'pink';
+		ctx.fillRect(x0+b, y0+b, dh-2*b, dh-2*b);
+	}
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);
+	ctx.beginPath();	ctx.fillStyle = 'salmon';
+	ctx.rect(x0+dh/4,y0+dh/4,dh/8,dh/2);
+	ctx.rect(x0+5*dh/8,y0+dh/4,dh/8,dh/2);	ctx.fill();	ctx.stroke();
+
+	x0 += dh;
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);	// run
+	ctx.beginPath();	ctx.fillStyle = 'salmon';
+	ctx.moveTo(x0+dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+dh/2,y0+dh/2);	ctx.fill();	ctx.stroke();
+	ctx.moveTo(x0+dh/2,y0+dh/4);
+	ctx.lineTo(x0+dh/2,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+}
+
+function keydown(event)	// key is pressed
+{
+	if(event.key == ' ')	fallDown();
+	else if(event.key == 'ArrowUp')	rotate();
+	else if(event.key == 'ArrowDown')	moveDown();
+	else if(event.key == 'ArrowLeft')	moveLeft();
+	else if(event.key == 'ArrowRight')	moveRight();
+//	else if(event.key == 'End')		fallRight();
+//	else if(event.key == 'Home')	fallLeft();
+}
+
+function mousedown(event)	// mouse button is pressed
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/22/bar;
+	var dh = s*100, b = dh/10, y0 = cheight-2*dh;
+	var xx = event.offsetX-s*bar*(nx+3), yy = event.offsetY-y0;
+
+	if(xx<0)	pause();
+	else if(yy>-0.5*dh && yy<dh)	// main buttons
+	{
+		if(xx<dh)	moveLeft();
+		else if(xx<2*dh)	rotate();
+		else if(xx>2*dh)	moveRight();
+	}
+	else if(yy>dh)	// fall buttons
+	{
+//		if(xx<dh)	fallLeft();
+//		else if(xx<2*dh)
+			fallDown();
+//		else	fallRight();
+	}
+	else if(yy<-2*dh)	// setup buttons
+	{
+		if(xx<dh)	preview = 1-preview;
+		else if(xx<2*dh)	pause();
+		else
+		{	clearInterval(interval);	startGame();	}
+	}
+}
+</script>
+</body>
+</html> 

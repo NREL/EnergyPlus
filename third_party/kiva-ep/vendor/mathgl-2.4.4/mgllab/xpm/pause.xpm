@@ -1,0 +1,22 @@
+/* XPM */
+static const char * pause_xpm[] = {
+"16 16 3 1",
+" 	c None",
+".	c #777777",
+"q	c #000000",
+"                ",
+"                ",
+"                ",
+"   qqq    qqq   ",
+"   q.q    q.q   ",
+"   q.q    q.q   ",
+"   q.q    q.q   ",
+"   q.q    q.q   ",
+"   q.q    q.q   ",
+"   q.q    q.q   ",
+"   q.q    q.q   ",
+"   q.q    q.q   ",
+"   qqq    qqq   ",
+"                ",
+"                ",
+"                "};

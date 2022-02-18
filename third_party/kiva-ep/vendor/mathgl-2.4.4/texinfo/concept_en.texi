@@ -1,0 +1,396 @@
+@chapter General concepts
+@nav{}
+
+The set of MathGL features is rather rich -- just the number of basic graphics types
+is larger than 50. Also there are functions for data handling, plot setup and so on. In spite of it I tried to keep a similar style in function names and in the order of arguments. Mostly it is
+used for different drawing functions.
+
+There are six most general (base) concepts:
+@enumerate
+@item
+@strong{Any picture is created in memory first.} The internal (memory) representation can be different: bitmap picture (for @code{SetQuality(MGL_DRAW_LMEM)} or @code{@ref{quality} 6}) or the list of vector primitives (default). After that the user may decide what he/she want: save to file, display on the screen, run animation, do additional editing and so on. This approach assures a high portability of the program -- the source code will produce exactly the same picture in @emph{any} OS. Another big positive consequence is the ability to create the picture in the console program (using command line, without creating a window)!
+@item
+@strong{Every plot settings (style of lines, font, color scheme) are specified by a string.} It provides convenience for user/programmer -- short string with parameters is more comprehensible than a large set of parameters. Also it provides portability -- the strings are the same in any OS so that it is not necessary to think about argument types.
+@item
+@strong{All functions have ``simplified'' and ``advanced'' forms.} It is done for user's convenience. One needs to specify only one data array in the ``simplified'' form in order to see the result. But one may set parametric dependence of coordinates and produce rather complex curves and surfaces in the ``advanced'' form. In both cases the order of function arguments is the same: first data arrays, second the string with style, and later string with options for additional plot tuning.
+@item
+@strong{All data arrays for plotting are encapsulated in mglData(A) class.} This reduces the number of errors while working with memory and provides a uniform interface for data of different types (mreal, double and so on) or for formula plotting.
+@item
+@strong{All plots are vector plots.} The MathGL library is intended for handling scientific data which have vector nature (lines, faces, matrices and so on). As a result, vector representation is used in all cases! In addition, the vector representation allows one to scale the plot easily -- change the canvas size by a factor of 2, and the picture will be proportionally scaled.
+@item
+@strong{New drawing never clears things drawn already.} This, in some sense, unexpected, idea allows to create a lot of ``combined'' graphics. For example, to make a surface with contour lines one needs to call the function for surface plotting and the function for contour lines plotting (in any order). Thus the special functions for making this ``combined'' plots (as it is done in Matlab and some other plotting systems) are superfluous.
+@end enumerate
+
+In addition to the general concepts I want to comment on some non-trivial or less commonly used general ideas -- plot positioning, axis specification and curvilinear coordinates, styles for lines, text and color scheme.
+
+@menu
+* Coordinate axes::
+* Color styles::
+* Line styles::
+* Color scheme::
+* Font styles::
+* Textual formulas::
+* Command options::
+* Interfaces::
+@end menu
+
+@c ------------------------------------------------------------------
+@external{}
+@node Coordinate axes, Color styles, , General concepts
+@section Coordinate axes
+@nav{}
+
+Two axis representations are used in MathGL. The first one consists of normalizing coordinates of data points in axis range (see @ref{Axis settings}). If @code{SetCut()} is @code{true} then the outlier points are omitted, otherwise they are projected to the bounding box (see @ref{Cutting}). Also, the point will be omitted if it lies inside the box defined by @code{SetCutBox()} or if the value of formula @code{CutOff()} is nonzero for its coordinates. After that, transformation formulas defined by @code{SetFunc()} or @code{SetCoor()} are applied to the data point (see @ref{Curved coordinates}). Finally, the data point is plotted by one of the functions.
+
+The range of @emph{x, y, z}-axis can be specified by @code{SetRange()} or @ref{ranges} functions. Its origin is specified by @ref{origin} function. At this you can you can use @code{NAN} values for selecting axis origin automatically.
+
+There is 4-th axis @emph{c} (color axis or colorbar) in addition to the usual axes @emph{x, y, z}. It sets the range of values for the surface coloring. Its borders are automatically set to values of z-range during the call of @ref{ranges} function. Also, one can directly set it by call @code{SetRange('c', ...)}. Use @ref{colorbar} function for drawing the colorbar.
+
+The form (appearence) of tick labels is controlled by @code{SetTicks()} function (@pxref{Ticks}). Function @var{SetTuneTicks} switches on/off tick enhancing by factoring out acommon multiplier (for small coordinate values, like 0.001 to 0.002, or large, like from 1000 to 2000) or common component (for narrow range, like from 0.999 to 1.000). Finally, you may use functions @code{SetTickTempl()} for setting templates for tick labels (it supports TeX symbols). Also, there is a possibility to print arbitrary text as tick labels the by help of @code{SetTicksVal()} function.
+
+@c ------------------------------------------------------------------
+@external{}
+@node Color styles, Line styles, Coordinate axes, General concepts
+@section Color styles
+@nav{}
+
+Base colors are defined by one of symbol @samp{wkrgbcymhRGBCYMHWlenupqLENUPQ}.
+@ifhtml
+@html
+<p>The color types are: &lsquo;<samp>k</samp>&rsquo; &ndash; black, &lsquo;<samp>r</samp>&rsquo; &ndash; <span style="color: rgb(255, 0, 0);">red</span>, &lsquo;<samp>R</samp>&rsquo; &ndash; <span style="color: rgb(127, 0, 0);">dark red</span>, &lsquo;<samp>g</samp>&rsquo; &ndash; <span style="color: rgb(0, 255, 0);">green</span>, &lsquo;<samp>G</samp>&rsquo; &ndash; <span style="color: rgb(0, 127, 0);">dark green</span>, &lsquo;<samp>b</samp>&rsquo; &ndash; <span style="color: rgb(0, 0, 255);">blue</span>, &lsquo;<samp>B</samp>&rsquo; &ndash; <span style="color: rgb(0, 0, 127);">dark blue</span>, &lsquo;<samp>c</samp>&rsquo; &ndash; <span style="color: rgb(0, 255, 255);">cyan</span>, &lsquo;<samp>C</samp>&rsquo; &ndash; <span style="color: rgb(0, 127, 127);">dark cyan</span>, &lsquo;<samp>m</samp>&rsquo; &ndash; <span style="color: rgb(255, 0, 255);">magenta</span>, &lsquo;<samp>M</samp>&rsquo; &ndash; <span style="color: rgb(127, 0, 127);">dark magenta</span>, &lsquo;<samp>y</samp>&rsquo; &ndash; <span style="color: rgb(255, 255, 0);">yellow</span>, &lsquo;<samp>Y</samp>&rsquo; &ndash; <span style="color: rgb(127, 127, 0);">dark yellow (gold)</span>, &lsquo;<samp>h</samp>&rsquo; &ndash; <span style="color: rgb(127, 127, 127);">gray</span>, &lsquo;<samp>H</samp>&rsquo; &ndash; <span style="color: rgb(76, 76, 76);">dark gray</span>, &lsquo;<samp>w</samp>&rsquo; &ndash; white, &lsquo;<samp>W</samp>&rsquo; &ndash; <span style="color: rgb(178, 178, 178);">bright gray</span>, &lsquo;<samp>l</samp>&rsquo; &ndash; <span style="color: rgb(0, 255, 127);">green-blue</span>, &lsquo;<samp>L</samp>&rsquo; &ndash; <span style="color: rgb(0, 127, 63);">dark green-blue</span>, &lsquo;<samp>e</samp>&rsquo; &ndash; <span style="color: rgb(127, 255, 0);">green-yellow</span>, &lsquo;<samp>E</samp>&rsquo; &ndash; <span style="color: rgb(63, 127, 0);">dark green-yellow</span>, &lsquo;<samp>n</samp>&rsquo; &ndash; <span style="color: rgb(0, 127, 255);">sky-blue</span>, &lsquo;<samp>N</samp>&rsquo; &ndash; <span style="color: rgb(0, 63, 127);">dark sky-blue</span>, &lsquo;<samp>u</samp>&rsquo; &ndash; <span style="color: rgb(127, 0, 255);">blue-violet</span>, &lsquo;<samp>U</samp>&rsquo; &ndash; <span style="color: rgb(63, 0, 127);">dark blue-violet</span>, &lsquo;<samp>p</samp>&rsquo; &ndash; <span style="color: rgb(255, 0, 127);">purple</span>, &lsquo;<samp>P</samp>&rsquo; &ndash; <span style="color: rgb(127, 0, 63);">dark purple</span>, &lsquo;<samp>q</samp>&rsquo; &ndash; <span style="color: rgb(255, 127, 0);">orange</span>, &lsquo;<samp>Q</samp>&rsquo; &ndash; <span style="color: rgb(127, 63, 0);">dark orange (brown)</span>.</p>
+@end html
+@end ifhtml
+@ifnothtml
+The color types are: @samp{k} -- black, @samp{r} -- red, @samp{R} -- dark red, @samp{g} -- green, @samp{G} -- dark green, @samp{b} -- blue, @samp{B} -- dark blue, @samp{c} -- cyan, @samp{C} -- dark cyan, @samp{m} -- magenta, @samp{M} -- dark magenta, @samp{y} -- yellow, @samp{Y} -- dark yellow (gold), @samp{h} -- gray, @samp{H} -- dark gray, @samp{w} -- white, @samp{W} -- bright gray, @samp{l} -- green-blue, @samp{L} -- dark green-blue, @samp{e} -- green-yellow, @samp{E} -- dark green-yellow, @samp{n} -- sky-blue, @samp{N} -- dark sky-blue, @samp{u} -- blue-violet, @samp{U} -- dark blue-violet, @samp{p} -- purple, @samp{P} -- dark purple, @samp{q} -- orange, @samp{Q} -- dark orange (brown).
+@end ifnothtml
+
+You can also use ``bright'' colors. The ``bright'' color contain 2 symbols in brackets @samp{@{cN@}}: first one is the usual symbol for color id, the second one is a digit for its brightness. The digit can be in range @samp{1}...@samp{9}. Number @samp{5} corresponds to a normal color, @samp{1} is a very dark version of the color (practically black), and @samp{9} is a very bright version of the color (practically white). For example, the colors can be @samp{@{b2@}} @samp{@{b7@}} @samp{@{r7@}} and so on.
+
+Finally, you can specify RGB or RGBA values of a color using format @samp{@{xRRGGBB@}} or @samp{@{xRRGGBBAA@}} correspondingly. For example, @samp{@{xFF9966@}} give you
+@ifhtml
+@html
+<span style="color: rgb(255, 153, 102);">melone</span> color.
+@end html
+@end ifhtml
+@ifnothtml
+melone color.
+@end ifnothtml
+
+@c ------------------------------------------------------------------
+@external{}
+@node Line styles, Color scheme, Color styles, General concepts
+@section Line styles
+@nav{}
+
+@cindex Line style
+@cindex Mark style
+@cindex Arrows
+
+The line style is defined by the string which may contain specifications for color (@samp{wkrgbcymhRGBCYMHWlenupqLENUPQ}), dashing style (@samp{-|;:ji=} or space), width (@samp{123456789}) and marks (@samp{*o+xsd.^v<>} and @samp{#} modifier). If one of the type of information is omitted then default values used with next color from palette (see @ref{Palette and colors}). Note, that internal color counter will be nullified by any change of palette. This includes even hidden change (for example, by @ref{box} or @ref{axis} functions).
+@ifhtml
+@html
+By default palette contain following colors: <span style="color: rgb(76, 76, 76);">dark gray</span> &lsquo;<samp>H</samp>&rsquo;, <span style="color: rgb(0, 0, 255);">blue</span> &lsquo;<samp>b</samp>&rsquo;, <span style="color: rgb(0, 255, 0);">green</span> &lsquo;<samp>g</samp>&rsquo;, <span style="color: rgb(255, 0, 0);">red</span> &lsquo;<samp>r</samp>&rsquo;, <span style="color: rgb(0, 255, 255);">cyan</span> &lsquo;<samp>c</samp>&rsquo;, <span style="color: rgb(255, 0, 255);">magenta</span> &lsquo;<samp>m</samp>&rsquo;, <span style="color: rgb(255, 255, 0);">yellow</span> &lsquo;<samp>y</samp>&rsquo;, <span style="color: rgb(127, 127, 127);">gray</span> &lsquo;<samp>h</samp>&rsquo;, <span style="color: rgb(0, 255, 127);">green-blue</span> &lsquo;<samp>l</samp>&rsquo;, <span style="color: rgb(0, 127, 255);">sky-blue</span> &lsquo;<samp>n</samp>&rsquo;, <span style="color: rgb(255, 127, 0);">orange</span> &lsquo;<samp>q</samp>&rsquo;, <span style="color: rgb(127, 255, 0);">green-yellow</span> &lsquo;<samp>e</samp>&rsquo;, <span style="color: rgb(127, 0, 255);">blue-violet</span> &lsquo;<samp>u</samp>&rsquo;, <span style="color: rgb(255, 0, 127);">purple</span> &lsquo;<samp>p</samp>&rsquo;.
+
+<p>Dashing style has the following meaning: space &ndash; no line (usable for plotting only marks), &lsquo;<samp>-</samp>&rsquo; &ndash; solid line (&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;), &lsquo;<samp>|</samp>&rsquo; &ndash; long dashed line (&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9633;&#9633;&#9633;&#9633;&#9633;&#9633;&#9633;&#9633;), &lsquo;<samp>;</samp>&rsquo; &ndash; dashed line (&#9632;&#9632;&#9632;&#9632;&#9633;&#9633;&#9633;&#9633;&#9632;&#9632;&#9632;&#9632;&#9633;&#9633;&#9633;&#9633;), &lsquo;<samp>=</samp>&rsquo; &ndash; small dashed line (&#9632;&#9632;&#9633;&#9633;&#9632;&#9632;&#9633;&#9633;&#9632;&#9632;&#9633;&#9633;&#9632;&#9632;&#9633;&#9633;), &lsquo;<samp>:</samp>&rsquo; &ndash; dotted line (&#9632;&#9633;&#9633;&#9633;&#9632;&#9633;&#9633;&#9633;&#9632;&#9633;&#9633;&#9633;&#9632;&#9633;&#9633;&#9633;), &lsquo;<samp>j</samp>&rsquo; &ndash; dash-dotted line (&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9632;&#9633;&#9633;&#9633;&#9633;&#9632;&#9633;&#9633;&#9633;&#9633;), &lsquo;<samp>i</samp>&rsquo; &ndash; small dash-dotted line (&#9632;&#9632;&#9632;&#9633;&#9633;&#9632;&#9633;&#9633;&#9632;&#9632;&#9632;&#9633;&#9633;&#9632;&#9633;&#9633;), &lsquo;<samp>{dNNNN}</samp>&rsquo; &ndash; manual mask style (for v.2.3 and later, like &lsquo;<samp>{df090}</samp>&rsquo; for (&#9632;&#9632;&#9632;&#9632;&#9633;&#9633;&#9633;&#9633;&#9632;&#9633;&#9633;&#9632;&#9633;&#9633;&#9633;&#9633;)).</p>
+@end html
+@end ifhtml
+@ifnothtml
+By default palette contain following colors: dark gray @samp{H}, blue @samp{b}, green @samp{g}, red @samp{r}, cyan @samp{c}, magenta @samp{m}, yellow @samp{y}, gray @samp{h}, blue-green @samp{l}, sky-blue @samp{n}, orange @samp{q}, yellow-green @samp{e}, blue-violet @samp{u}, purple @samp{p}.
+
+Dashing style has the following meaning: space -- no line (usable for plotting only marks), @samp{-} -- solid line (################), @samp{|} -- long dashed line (########________), @samp{;} -- dashed line (####____####____), @samp{=} -- small dashed line (##__##__##__##__), @samp{:} -- dotted line (#___#___#___#___), @samp{j} -- dash-dotted line (#######____#____), @samp{i} -- small dash-dotted line (###__#__###__#__), @samp{@{dNNNN@}} -- manual mask style (for v.2.3 and later, like @samp{@{df090@}} for (####____#__#____)).
+@end ifnothtml
+
+Marker types are: @samp{o} -- circle, @samp{+} -- cross, @samp{x} -- skew cross, @samp{s} -- square, @samp{d} -- rhomb (or diamond), @samp{.} -- dot (point), @samp{^} -- triangle up, @samp{v} -- triangle down, @samp{<} -- triangle left, @samp{>} -- triangle right, @samp{#*} -- Y sign, @samp{#+} -- squared cross, @samp{#x} -- squared skew cross, @samp{#.} -- circled dot. If string contain symbol @samp{#} then the solid versions of markers are used.
+
+You can provide user-defined symbols (see @ref{addsymbol}) to draw it as marker by using @samp{&} style. In particular, @samp{&*}, @samp{&o}, @samp{&+}, @samp{&x}, @samp{&s}, @samp{&d}, @samp{&.}, @samp{&^}, @samp{&v}, @samp{&<}, @samp{&>} will draw user-defined symbol @samp{*o+xsd.^v<>} correspondingly; and 
+@samp{&#o}, @samp{&#+}, @samp{&#x}, @samp{&#s}, @samp{&#d}, @samp{&#.}, @samp{&#^}, @samp{&#v}, @samp{&#<}, @samp{&#>} will draw user-defined symbols @samp{YOPXSDCTVLR} correspondingly. Note, that wired version of user-defined symbols will be drawn if you set negative marker size (see @ref{marksize} or @code{size} in @ref{Command options}).
+
+One may specify to draw a special symbol (an arrow) at the beginning and at the end of line. This is done if the specification string contains one of the following symbols: @samp{A} -- outer arrow, @samp{V} -- inner arrow, @samp{I} -- transverse hatches, @samp{K} -- arrow with hatches, @samp{T} -- triangle, @samp{S} -- square, @samp{D} -- rhombus, @samp{O} -- circle, @samp{X} -- skew cross, @samp{_} -- nothing (the default). The following rule applies: the first symbol specifies the arrow at the end of line, the second specifies the arrow at the beginning of the line. For example, @samp{r-A} defines a red solid line with usual arrow at the end, @samp{b|AI} defines a blue dash line with an arrow at the end and with hatches at the beginning, @samp{_O} defines a line with the current style and with a circle at the beginning. These styles are applicable during the graphics plotting as well (for example, @ref{1D plotting}).
+
+@pfig{style, Color and line styles.}
+
+@c ------------------------------------------------------------------
+@external{}
+@node Color scheme, Font styles, Line styles, General concepts
+@section Color scheme
+@nav{}
+
+@cindex Color scheme
+
+The color scheme is used for determining the color of surfaces, isolines, isosurfaces and so on. The color scheme is defined by the string, which may contain several characters that are color id (@pxref{Line styles}) or characters @samp{#:|}. Symbol @samp{#} switches to mesh drawing or to a wire plot. Symbol @samp{|} disables color interpolation in color scheme, which can be useful, for example, for sharp colors during matrix plotting. Symbol @samp{:} terminate the color scheme parsing. Following it, the user may put styles for the text, rotation axis for curves/isocontours, and so on. Color scheme may contain up to 32 color values.
+
+The final color is a linear interpolation of color array. The color array is constructed from the string ids (including ``bright'' colors, see @ref{Color styles}). The argument is the amplitude normalized in color range (see @ref{Axis settings}). For example, string containing 4 characters @samp{bcyr} corresponds to a colorbar from blue (lowest value) through cyan (next value) through yellow (next value) to the red (highest value). String @samp{kw} corresponds to a colorbar from black (lowest value) to white (highest value). String @samp{m} corresponds to a simple magenta color.
+
+The special 2-axis color scheme (like in @ref{map} plot) can be used if it contain symbol @samp{%}. In this case the second direction (alpha channel) is used as second coordinate for colors. At this, up to 4 colors can be specified for corners: @{c1,a1@}, @{c2,a1@}, @{c1,a2@}, @{c2,a2@}. Here color and alpha ranges are @{c1,c2@} and @{a1,a2@} correspondingly. If one specify less than 4 colors then black color is used for corner @{c1,a1@}. If only 2 colors are specified then the color of their sum is used for corner @{c2,a2@}.
+
+There are several useful combinations. String @samp{kw} corresponds to the simplest gray color scheme where higher values are brighter. String @samp{wk} presents the inverse gray color scheme where higher value is darker. Strings @samp{kRryw}, @samp{kGgw}, @samp{kBbcw} present the well-known @emph{hot}, @emph{summer} and @emph{winter} color schemes. Strings @samp{BbwrR} and @samp{bBkRr} allow to view bi-color figure on white or black background, where negative values are blue and positive values are red. String @samp{BbcyrR} gives a color scheme similar to the well-known @emph{jet} color scheme.
+
+For more precise coloring, you can change default (equidistant) position of colors in color scheme. The format is @samp{@{CN,pos@}}, @samp{@{CN,pos@}} or @samp{@{xRRGGBB,pos@}}. The position value @var{pos} should be in range [0, 1]. Note, that alternative method for fine tuning of the color scheme is using the formula for coloring (see @ref{Curved coordinates}).
+
+@pfig{schemes, Most popular color schemes.}
+
+When coloring by @emph{coordinate} (used in @ref{map}), the final color is determined by the position of the point in 3d space and is calculated from formula c=x*c[1] + y*c[2]. Here, c[1], c[2] are the first two elements of color array; x, y are normalized to axis range coordinates of the point.
+@c This type of coloring is useful for isosurface plot where color may show the exact position of a piece of surface.
+
+Additionally, MathGL can apply mask to face filling at bitmap rendering. The kind of mask is specified by one of symbols @samp{-+=;oOsS~<>jdD*^} in color scheme. Mask can be rotated by arbitrary angle by command @ref{mask} or by three predefined values +45, -45 and 90 degree by symbols @samp{\/I} correspondingly. Examples of predefined masks are shown on the figure below.
+
+@pfig{mask, Example of masks for face coloring.}
+
+However, you can redefine mask for one symbol by specifying new matrix of size 8*8 as second argument for @ref{mask} command. For example, the right-down subplot on the figure above is produced by code@*
+@ifclear UDAV
+@code{gr->SetMask('+', "ff00182424f800");	gr->Dens(a,"3+");}@*
+or just use manual mask style (for v.2.3 and later)@*
+@code{gr->Dens(a,"3@{s00ff00182424f800@}");}
+@end ifclear
+@ifset UDAV
+@code{mask '+' 'ff00182424f800':dens a '3+'}@*
+or just use manual mask style (for v.2.3 and later)@*
+@code{dens a '3@{s00ff00182424f800@}'}
+@end ifset
+
+@c ------------------------------------------------------------------
+@external{}
+@node Font styles, Textual formulas, Color scheme, General concepts
+@section Font styles
+@nav{}
+
+@cindex Font styles
+
+Text style is specified by the string which may contain: color id characters @samp{wkrgbcymhRGBCYMHW} (see @ref{Color styles}), and font style (@samp{ribwou}) and/or alignment (@samp{LRC}) specifications. At this, font style and alignment begin after the separator @samp{:}. For example, @samp{r:iCb} sets the bold (@samp{b}) italic (@samp{i}) font text aligned at the center (@samp{C}) and with red color (@samp{r}). Starting from MathGL v.2.3, you can set not single color for whole text, but use color gradient for printed text (see @ref{Color scheme}).
+
+The font styles are: @samp{r} -- roman (or regular) font, @samp{i} -- italic style, @samp{b} -- bold style. By default roman roman font is used. The align types are: @samp{L} -- align left (default), @samp{C} -- align center, @samp{R} -- align right, @samp{T} -- align under, @samp{V} -- align center vertical. Additional font effects are: @samp{w} -- wired, @samp{o} -- over-lined, @samp{u} -- underlined.
+
+Also a parsing of the LaTeX-like syntax is provided. There are commands for the font style changing inside the string (for example, use \b for bold font): \a or \overline -- over-lined, \b or \textbf -- bold, \i or \textit -- italic, \r or \textrm -- roman (disable bold and italic attributes), \u or \underline -- underlined, \w or \wire -- wired, \big -- bigger size, @@ -- smaller size. The lower and upper indexes are specified by @samp{_} and @samp{^} symbols. At this the changed font style is applied only on next symbol or symbols in braces @{@}. The text in braces @{@} are treated as single symbol that allow one to print the index of index. For example, compare the strings @samp{sin (x^@{2^3@})} and @samp{sin (x^2^3)}. You may also change text color inside string by command #? or by \color? where @samp{?} is symbolic id of the color (@pxref{Color styles}). For example, words @samp{blue} and @samp{red} will be colored in the string @samp{#b@{blue@} and \colorr@{red@} text}. The most of functions understand the newline symbol @samp{\n} and allows to print multi-line text. Finally, you can use arbitrary (if it was defined in font-face) UTF codes by command @code{\utf0x????}. For example, @code{\utf0x3b1} will produce
+@ifhtml
+@html
+ &alpha; symbol.
+@end html
+@end ifhtml
+@ifnothtml
+ @math{\alpha} symbol.
+@end ifnothtml
+
+The most of commands for special TeX or AMSTeX symbols, the commands for font style changing (\textrm, \textbf, \textit, \textsc, \overline, \underline), accents (\hat, \tilde, \dot, \ddot, \acute, \check, \grave, \bar, \breve) and roots (\sqrt, \sqrt3, \sqrt4) are recognized. The full list contain approximately 2000 commands. Note that first space symbol after the command is ignored, but second one is printed as normal symbol (space). For example, the following strings produce the same result @math{\tilde a}: @samp{\tilde@{a@}}; @samp{\tilde a}; @samp{\tilde@{@}a}.
+
+@ifhtml
+@html
+In particular, the Greek letters are recognizable special symbols: &alpha; &ndash; \alpha, &beta; &ndash; \beta, &gamma; &ndash; \gamma, &delta; &ndash; \delta, &epsilon; &ndash; \epsilon, &eta; &ndash; \eta, &iota; &ndash; \iota, &chi; &ndash; \chi, &kappa; &ndash; \kappa, &lambda; &ndash; \lambda, &mu; &ndash; \mu, &nu; &ndash; \nu, o &ndash; \o, &omega; &ndash; \omega, &#981; &ndash; \phi, &pi; &ndash; \pi, &psi; &ndash; \psi, &rho; &ndash; \rho, &sigma; &ndash; \sigma, &theta; &ndash; \theta, &tau; &ndash; \tau, &upsilon; &ndash; \upsilon, &xi; &ndash; \xi, &zeta; &ndash; \zeta, &sigmaf; &ndash; \varsigma, &#603; &ndash; \varepsilon, &thetasym; &ndash; \vartheta, &phi; &ndash; \varphi, &#1008; &ndash; \varkappa; A &ndash; \Alpha, B &ndash; \Beta, &Gamma; &ndash; \Gamma, &Delta; &ndash; \Delta, E &ndash; \Epsilon, H &ndash; \Eta, I &ndash; \Iota, C &ndash; \Chi, K &ndash; \Kappa, &Lambda; &ndash; \Lambda, M &ndash; \Mu, N &ndash; \Nu, O &ndash; \O, &Omega; &ndash; \Omega, &Phi; &ndash; \Phi, &Pi; &ndash; \Pi, &Psi; &ndash; \Psi, R &ndash; \Rho, &Sigma; &ndash; \Sigma, &Theta; &ndash; \Theta, T &ndash; \Tau, &Upsilon; &ndash; \Upsilon, &Xi; &ndash; \Xi, Z &ndash; \Zeta.
+
+<p>The small part of most common special TeX symbols are: &ang; &ndash; \angle, &sdot; &ndash; \cdot, &clubs; &ndash; \clubsuit, &#10003; &ndash; \checkmark, &cup; &ndash; \cup, &cap; &ndash; \cap, &#9826; &ndash; \diamondsuit, &#9671; &ndash; \diamond, &divide;
+ &ndash; \div,
+&darr; &ndash; \downarrow, &dagger; &ndash; \dag, &Dagger; &ndash; \ddag, &equiv; &ndash; \equiv, &exist; &ndash; \exists, &#8994; &ndash; \frown, &#9837; &ndash; \flat, &ge; &ndash; \ge, &ge; &ndash; \geq, &#8807; &ndash; \geqq, &larr; &ndash; \gets, &#9825; &ndash; \heartsuit, &infin; &ndash; \infty, &int; &ndash; \int, \Int, &image;  &ndash; \Im, &#9826; &ndash; \lozenge, &#10216; &ndash; \langle, &le; &ndash; \le, &le; &ndash; \leq, &#8806; &ndash; \leqq, &larr; &ndash; \leftarrow, &#8723; &ndash; \mp, &nabla; &ndash; \nabla, &ne; &ndash; \ne, &ne; &ndash; \neq, &#9838; &ndash; \natural, &#8750; &ndash; \oint, &#8857; &ndash; \odot, &oplus; &ndash; \oplus, &part; &ndash; \partial, &#8741; &ndash; \parallel, &perp; &ndash;\perp, &plusmn; &ndash; \pm, &prop; &ndash; \propto, &prod; &ndash; \prod, &real; &ndash; \Re, &rarr; &ndash; \rightarrow, &#10217; &ndash; \rangle, &spades; &ndash; \spadesuit, ~ &ndash; \sim, &#8995; &ndash; \smile, &sub;  &ndash; \subset, &sup; &ndash; \supset, &radic; &ndash; \sqrt or \surd, &sect; &ndash; \S, &#9839; &ndash; \sharp, &sum; &ndash; \sum, &times; &ndash; \times, &rarr; &ndash; \to, &there4; &ndash; \therefore, &uarr; &ndash; \uparrow, &weierp; &ndash; \wp. </p>
+@end html
+@end ifhtml
+@ifnothtml
+In particular, the Greek letters are recognizable special symbols: @math{\alpha} -- \alpha, @math{\beta} -- \beta, @math{\gamma} -- \gamma, @math{\delta} -- \delta, @math{\epsilon} -- \epsilon, @math{\eta} -- \eta, @math{\iota} -- \iota, @math{\chi} -- \chi, @math{\kappa} -- \kappa, @math{\lambda} -- \lambda, @math{\mu} -- \mu, @math{\nu} -- \nu, @math{o} -- \o, @math{\omega} -- \omega, @math{\phi} -- \phi, @math{\pi} -- \pi, @math{\psi} -- \psi, @math{\rho} -- \rho, @math{\sigma} -- \sigma, @math{\theta} -- \theta, @math{\tau} -- \tau, @math{\upsilon} -- \upsilon, @math{\xi} -- \xi, @math{\zeta} -- \zeta, @math{\varsigma} -- \varsigma, @math{\varepsilon} -- \varepsilon, @math{\vartheta} -- \vartheta, @math{\varphi} -- \varphi, A -- \Alpha, B -- \Beta, @math{\Gamma} -- \Gamma, @math{\Delta} -- \Delta, E -- \Epsilon, H -- \Eta, I -- \Iota, C -- \Chi, K -- \Kappa, @math{\Lambda} -- \Lambda, M -- \Mu, N -- \Nu, O -- \O, @math{\Omega} -- \Omega, @math{\Phi} -- \Phi, @math{\Pi} -- \Pi, @math{\Psi} -- \Psi, R -- \Rho, @math{\Sigma} -- \Sigma, @math{\Theta} -- \Theta, T -- \Tau, @math{\Upsilon} -- \Upsilon, @math{\Xi} -- \Xi, Z -- \Zeta.
+
+The small part of most common special TeX symbols are: @math{\angle} -- \angle, @math{\aleph} -- \aleph, @math{\cdot} -- \cdot, @math{\clubsuit} -- \clubsuit, @math{\cup} -- \cup, @math{\cap} -- \cap, @math{\diamondsuit} -- \diamondsuit, @math{\diamond} -- \diamond, @math{\div} -- \div, @math{\downarrow} -- \downarrow, @math{\dag} -- \dag, @math{\ddag} -- \ddag, @math{\equiv} -- \equiv, @math{\exists} -- \exists, @math{\frown} -- \frown, @math{\flat} -- \flat, @math{\ge} -- \ge, @math{\geq} -- \geq, @math{\gets} -- \gets, @math{\heartsuit} -- \heartsuit, @math{\infty} -- \infty, @math{\in} -- \in, @math{\int} -- \int, @math{\Im} -- \Im, @math{\langle} -- \langle, @math{\le} -- \le, @math{\leq} -- \leq, @math{\leftarrow} -- \leftarrow, @math{\mp} -- \mp, @math{\nabla} -- \nabla, @math{\ne} -- \ne, @math{\neq} -- \neq, @math{\natural} -- \natural, @math{\oint} -- \oint, @math{\odot} -- \odot, @math{\oplus} -- \oplus, @math{\partial} -- \partial, @math{\parallel} -- \parallel, @math{\perp} -- \perp, @math{\pm} -- \pm, @math{\propto} -- \propto, @math{\prod} -- \prod, @math{\Re} -- \Re, @math{\rightarrow} -- \rightarrow, @math{\rangle} -- \rangle, @math{\spadesuit} -- \spadesuit, @math{\sim} -- \sim, @math{\smile} -- \smile, @math{\subset} -- \subset, @math{\supset} -- \supset, @math{\surd} -- \sqrt or \surd, @math{\S} -- \S, @math{\sharp} -- \sharp, @math{\sum} -- \sum, @math{\times} -- \times, @math{\to} -- \to, @math{\uparrow} -- \uparrow, @math{\wp} -- \wp and so on.
+@end ifnothtml
+
+The font size can be defined explicitly (if @var{size}>0) or relatively to a base font size as |@var{size}|*@var{FontSize} (if @var{size}<0). The value @var{size}=0 specifies that the string will not be printed. The base font size is measured in internal ``MathGL'' units. Special functions @code{SetFontSizePT(), SetFontSizeCM(), SetFontSizeIN()} (see @ref{Font settings}) allow one to set it in more ``common'' variables for a given dpi value of the picture.
+
+@c ------------------------------------------------------------------
+@external{}
+@node Textual formulas, Command options, Font styles, General concepts
+@section Textual formulas
+@nav{}
+
+@cindex Textual formulas
+
+MathGL have the fast variant of textual formula evaluation
+@ifclear UDAV
+(@pxref{Evaluate expression})
+@end ifclear
+. There are a lot of functions and operators available. The operators are: @samp{+} -- addition, @samp{-} -- subtraction, @samp{*} -- multiplication, @samp{/} -- division, @samp{%} -- modulo, @samp{^} -- integer power. Also there are logical ``operators'': @samp{<} -- true if x<y, @samp{>} -- true if x>y, @samp{=} -- true if x=y, @samp{&} -- true if x and y both nonzero, @samp{|} -- true if x or y nonzero. These logical operators have lowest priority and return 1 if true or 0 if false.
+
+The basic functions are: @samp{sqrt(x)} -- square root of @var{x}, @samp{pow(x,y)} -- power @var{x} in @var{y}, @samp{ln(x)} -- natural logarithm of @var{x}, @samp{lg(x)} -- decimal logarithm of @var{x}, @samp{log(a,x)} -- logarithm base @var{a} of @var{x}, @samp{abs(x)} -- absolute value of @var{x}, @samp{sign(x)} -- sign of @var{x}, @samp{mod(x,y)} -- @var{x} modulo @var{y}, @samp{step(x)} -- step function, @samp{int(x)} -- integer part of @var{x}, @samp{rnd} -- random number, @samp{random(x)} -- random data of size as in @var{x}, @samp{hypot(x,y)}=sqrt(x^2+y^2) -- hypotenuse, @samp{cmplx(x,y)}=x+i*y -- complex number,  @samp{pi} -- number
+@ifhtml
+@html
+&pi; = 3.1415926&hellip;, inf=&infin;
+@end html
+@end ifhtml
+@ifnothtml
+@math{\pi=3.1415926..., inf=\infty}
+@end ifnothtml
+
+Functions for complex numbers @samp{real(x)}, @samp{imag(x)}, @samp{abs(x)}, @samp{arg(x)}, @samp{conj(x)}.
+
+Trigonometric functions are: @samp{sin(x)}, @samp{cos(x)}, @samp{tan(x)} (or @samp{tg(x)}). Inverse trigonometric functions are: @samp{asin(x)}, @samp{acos(x)}, @samp{atan(x)}. Hyperbolic functions are: @samp{sinh(x)} (or @samp{sh(x)}), @samp{cosh(x)} (or @samp{ch(x)}), @samp{tanh(x)} (or @samp{th(x)}). Inverse hyperbolic functions are: @samp{asinh(x)}, @samp{acosh(x)}, @samp{atanh(x)}.
+
+@ifhtml
+@html
+<p>There are a set of special functions: &lsquo;<samp>gamma(x)</samp>&rsquo; &ndash; Gamma function &Gamma;(x) = &int;<sub>0</sub><sup>&infin;</sup> t<sup>x-1</sup> exp(-t) dt, &lsquo;<samp>gamma_inc(x,y)</samp>&rsquo; &ndash; incomplete Gamma function &Gamma;(x,y) = &int;<sub>y</sub><sup>&infin;</sup> t<sup>x-1</sup> exp(-t) dt, &lsquo;<samp>psi(x)</samp>&rsquo; &ndash; digamma function &psi;(x) = &Gamma;&prime;(x)/&Gamma;(x) for x&ne;0, &lsquo;<samp>ai(x)</samp>&rsquo; &ndash; Airy function Ai(x), &lsquo;<samp>bi(x)</samp>&rsquo; &ndash; Airy function Bi(x), &lsquo;<samp>cl(x)</samp>&rsquo; &ndash; Clausen function, &lsquo;<samp>li2(x)</samp>&rsquo; (or &lsquo;<samp>dilog(x)</samp>&rsquo;) &ndash; dilogarithm Li<sub>2</sub>(x) = -&real;&int;<sub>0</sub><sup>x</sup>ds log(1-s)/s, &lsquo;<samp>sinc(x)</samp>&rsquo; &ndash; compute sinc(x) = sin(&pi;x)/(&pi;x) for any value of x, &lsquo;<samp>zeta(x)</samp>&rsquo; &ndash; Riemann zeta function &zeta;(s) = &sum;<sub>k=1</sub><sup>&infin;</sup>k<sup>-s</sup> for arbitrary s&ne;1, &lsquo;<samp>eta(x)</samp>&rsquo; &ndash; eta function &eta;(s) = (1 - 2<sup>1-s</sup>)&zeta;(s) for arbitrary s, &lsquo;<samp>lp(l,x)</samp>&rsquo; &ndash; Legendre polynomial P<sub>l</sub>(x), (|x|&le;1, l&ge;0), &lsquo;<samp>w0(x)</samp>&rsquo; &ndash; principal branch of the Lambert W function, &lsquo;<samp>w1(x)</samp>&rsquo; &ndash; principal branch of the Lambert W function. Function W(x) is defined to be solution of the equation: W exp(W) = x. </p>
+
+<p>The exponent integrals are: &lsquo;<samp>ci(x)</samp>&rsquo; &ndash; Cosine integral Ci(x) = &int;<sub>0</sub><sup>x</sup>dt cos(t)/t, &lsquo;<samp>si(x)</samp>&rsquo; &ndash; Sine integral Si(x) = &int;<sub>0</sub><sup>x</sup>dt sin(t)/t, &lsquo;<samp>erf(x)</samp>&rsquo; &ndash; error function erf(x) = (2/&radic;&pi;) &int;<sub>0</sub><sup>x</sup>dt exp(-t<sup>2</sup>) , &lsquo;<samp>ei(x)</samp>&rsquo; &ndash; exponential integral Ei(x) = -PV(&int;<sub>-x</sub><sup>&infin;</sup>dt exp(-t)/t) (where PV denotes the principal value of the integral), &lsquo;<samp>e1(x)</samp>&rsquo; &ndash; exponential integral E<sub>1</sub>(x) = &real;&int;<sub>1</sub><sup>&infin;</sup>dt exp(-xt)/t, &lsquo;<samp>e2(x)</samp>&rsquo; &ndash; exponential integral E<sub>2</sub>(x) = &real;&int;<sub>1</sub>&infin;</sup>dt exp(-xt)/t<sup>2</sup>, &lsquo;<samp>ei3(x)</samp>&rsquo; &ndash; exponential integral Ei<sub>3</sub>(x) = &int;<sub>0</sub><sup>x</sup>dt exp(-t<sup>3</sup>) for x&ge;0. </p>
+
+<p>Bessel functions are: &lsquo;<samp>j(nu,x)</samp>&rsquo; &ndash; regular cylindrical Bessel function of fractional order <em>nu</em>, &lsquo;<samp>y(nu,x)</samp>&rsquo; &ndash; irregular cylindrical Bessel function of fractional order <em>nu</em>, &lsquo;<samp>i(nu,x)</samp>&rsquo; &ndash; regular modified Bessel function of fractional order <em>nu</em>, &lsquo;<samp>k(nu,x)</samp>&rsquo; &ndash; irregular modified Bessel function of fractional order <em>nu</em>. </p>
+
+<p>Elliptic integrals are: &lsquo;<samp>ee(k)</samp>&rsquo; &ndash; complete elliptic integral is denoted by E(k) = E(&pi;/2,k), &lsquo;<samp>ek(k)</samp>&rsquo; &ndash; complete elliptic integral is denoted by K(k) = F(&pi;/2,k), &lsquo;<samp>e(phi,k)</samp>&rsquo; &ndash; elliptic integral E(&phi;,k) = &int;<sub>0</sub><sup>&phi;</sup>dt &radic;(1 - k<sup>2</sup>sin<sup>2</sup>(t)), &lsquo;<samp>f(phi,k)</samp>&rsquo; &ndash; elliptic integral F(&phi;,k) = &int;<sub>0</sub><sup>&phi;</sup>dt 1/&radic;(1 - k<sup>2</sup>sin<sup>2</sup>(t))</p>
+@end html
+@end ifhtml
+@ifnothtml
+There are a set of special functions: @samp{gamma(x)} -- Gamma function @math{\Gamma(x) = \int_0^\infty dt t^@{x-1@} exp(-t)}, @samp{gamma_inc(x,y)} -- incomplete Gamma function @math{\Gamma(x,y) = \int_y^\infty dt t^@{x-1@} exp(-t)}, @samp{psi(x)} -- digamma function @math{\psi(x) = \Gamma'(x)/\Gamma(x)} for x!=0, @samp{ai(x)} -- Airy function Ai(x), @samp{bi(x)} -- Airy function Bi(x), @samp{cl(x)} -- Clausen function, @samp{li2(x)} (or @samp{dilog(x)}) -- dilogarithm @math{Li_2(x) = - \Re \int_0^x ds \log(1-s)/s}, @samp{sinc(x)} -- compute @math{sinc(x) = \sin(\pi x) / (\pi x)} for any value of x, @samp{zeta(x)} -- Riemann zeta function @math{\zeta(s) = \sum_@{k=1@}^\infty k^@{-s@}} for arbitrary s!=1, @samp{eta(x)} -- eta function @math{\eta(s) = (1-2^@{1-s@}) \zeta(s)} for arbitrary s, @samp{lp(l,x)} -- Legendre polynomial @math{P_l(x)}, (|x|<=1, l>=0), @samp{w0(x)}, @samp{w1(x)} -- principal branch of the Lambert @var{W} functions. Function W(x) is defined to be solution of the equation @math{W \exp(W) = x}.
+
+The exponent integrals are: @samp{ci(x)} -- Cosine integral @math{Ci(x) = \int_0^x dt \cos(t)/t}, @samp{si(x)} -- Sine integral @math{Si(x) = \int_0^x dt \sin(t)/t}, @samp{erf(x)} -- error function @math{erf(x) = (2/\sqrt(\pi)) \int_0^x dt \exp(-t^2)}, @samp{ei(x)} -- exponential integral @math{Ei(x) := - PV(\int_@{-x@}^\infty dt \exp(-t)/t)} (where PV denotes the principal value of the integral), @samp{e1(x)} -- exponential integral @math{E_1(x) := Re \int_1^\infty dt \exp(-xt)/t} , @samp{e2(x)} -- exponential integral @math{E_2(x) := Re \int_1^\infty dt \exp(-xt)/t^2}, @samp{ei3(x)} -- exponential integral @math{Ei_3(x) = \int_0^x dt \exp(-t^3)} for x>=0.
+
+Bessel functions are: @samp{j(nu,x)} -- regular cylindrical Bessel function of fractional order @var{nu}, @samp{y(nu,x)} -- irregular cylindrical Bessel function of fractional order @var{nu}, @samp{i(nu,x)} -- regular modified Bessel function of fractional order @var{nu}, @samp{k(nu,x)} -- irregular modified Bessel function of fractional order @var{nu}.
+
+Elliptic integrals are: @samp{ee(k)} -- complete elliptic integral is denoted by @math{E(k) = E(\pi/2, k)}, @samp{ek(k)} -- complete elliptic integral is denoted by @math{K(k) = F(\pi/2, k)}, @samp{e(phi,k)} -- elliptic integral @math{E(\phi,k) = \int_0^\phi dt \sqrt((1 - k^2 \sin^2(t)))}, @samp{f(phi,k)} -- elliptic integral @math{F(\phi,k) = \int_0^\phi dt 1/\sqrt((1 - k^2 \sin^2(t)))}.
+@end ifnothtml
+
+Jacobi elliptic functions are: @samp{sn(u,m)}, @samp{cn(u,m)}, @samp{dn(u,m)}, @samp{sc(u,m)}, @samp{sd(u,m)}, @samp{ns(u,m)}, @samp{cs(u,m)}, @samp{cd(u,m)}, @samp{nc(u,m)}, @samp{ds(u,m)}, @samp{dc(u,m)}, @samp{nd(u,m)}.
+
+Note, some of these functions are unavailable if MathGL was compiled without GSL support.
+
+There is no difference between lower or upper case in formulas. If argument value lie outside the range of function definition then function returns NaN.
+
+@c ------------------------------------------------------------------
+@external{}
+@node  Command options, Interfaces, Textual formulas, General concepts
+@section Command options
+@nav{}
+
+Command options allow the easy setup of the selected plot by changing global settings only for this plot. Each option start from symbol @samp{;}. Options work so that MathGL remember the current settings, change settings as it being set in the option, execute function and return the original settings back. So, the options are most usable for plotting functions.
+
+The most useful options are @code{xrange, yrange, zrange}. They sets the boundaries for data change. This boundaries are used for automatically filled variables. So, these options allow one to change the position of some plots. For example, in command @code{Plot(y,"","xrange 0.1 0.9");} or @code{plot y; xrange 0.1 0.9} the x coordinate will be equidistantly distributed in range 0.1 ... 0.9.  @sref{Using options}
+
+The full list of options are:
+@cindex alpha
+@cindex alphadef
+@deffn {MGL option} alpha @code{val}
+Sets alpha value (transparency) of the plot. The value should be in range [0, 1]. See also @ref{alphadef}.
+@end deffn
+@c @cindex ambient
+@c @deffn {MGL option} ambient @code{val}
+@c Sets brightness of ambient light for the plot. The value should be in range [0, 1]. See also @ref{ambient}.
+@c @end deffn
+@c @cindex diffuse
+@c @deffn {MGL option} diffuse @code{val}
+@c Sets brightness of diffuse light for the plot. The value should be in range [0, 1]. See also @ref{diffuse}.
+@c @end deffn
+
+@cindex xrange
+@deffn {MGL option} xrange @code{val1 val2}
+Sets boundaries of x coordinate change for the plot. See also @ref{xrange}.
+@end deffn
+@cindex yrange
+@deffn {MGL option} yrange @code{val1 val2}
+Sets boundaries of y coordinate change for the plot. See also @ref{yrange}.
+@end deffn
+@cindex zrange
+@deffn {MGL option} zrange @code{val1 val2}
+Sets boundaries of z coordinate change for the plot. See also @ref{zrange}.
+@end deffn
+
+@cindex cut
+@deffn {MGL option} cut @code{val}
+Sets whether to cut or to project the plot points lying outside the bounding box. See also @ref{cut}.
+@end deffn
+@cindex fontsize
+@deffn {MGL option} size @code{val}
+Sets the size of text, marks and arrows. See also @ref{font}, @ref{marksize}, @ref{arrowsize}.
+@end deffn
+@cindex meshnum
+@deffn {MGL option} meshnum @code{val}
+Work like @ref{meshnum} command.
+@end deffn
+
+@cindex legend
+@deffn {MGL option} legend 'txt'
+Adds string 'txt' to internal legend accumulator. The style of described line and mark is taken from arguments of the last @ref{1D plotting} command. See also @ref{legend}.
+@end deffn
+@cindex value
+@deffn {MGL option} value @code{val}
+Set the value to be used as additional numeric parameter in plotting command.
+@end deffn
+
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Interfaces, , Command options, General concepts
+@section Interfaces
+@nav{}
+
+@ifset UDAV
+You can use @code{mglParse} class for executing MGL scripts from different languages.
+@end ifset
+
+@ifclear UDAV
+
+The MathGL library has interfaces for a set of languages. Most of them are based on the C interface via SWIG tool. There are Python, Java, Octave, Lisp, C#, Guile, Lua, Modula 3, Ocaml, Perl, PHP, Pike, R, Ruby, and Tcl interfaces. Also there is a Fortran interface which has a similar set of functions, but slightly different types of arguments (integers instead of pointers). These functions are marked as [C function].
+
+Some of the languages listed above support classes (like C++ or Python). The name of functions for them is the same as in C++ (see @ref{MathGL core} and @ref{Data processing}) and marked like [Method on mglGraph].
+
+Finally, a special command language MGL (see @ref{MGL scripts}) was written for a faster access to plotting functions. Corresponding scripts can be executed separately (by UDAV, mglconv, mglview and so on) or from the C/C++/Python/... code (@pxref{mglParse class}).
+
+@menu
+* C interface::
+* C++ interface::
+@end menu
+
+@external{}
+@node C interface, C++ interface, , Interfaces
+@subsection C/Fortran interface
+@nav{}
+
+The C interface is a base for many other interfaces. It contains the pure C functions for most of the methods of MathGL classes. In distinction to C++ classes, C functions must have an argument HMGL (for graphics) and/or HMDT (for data arrays), which specifies the object for drawing or manipulating (changing). So, firstly, the user has to create this object by the function @code{mgl_create_*()} and has to delete it after the use by function @code{mgl_delete_*()}.
+
+All C functions are described in the header file @code{#include <mgl2/mgl_cf.h>} and use variables of the following types:
+@itemize
+@item
+@code{HMGL} --- Pointer to class @code{mglGraph} (@pxref{MathGL core}).
+@item
+@code{HCDT} --- Pointer to class @code{const mglDataA} (@pxref{Data processing}) --- constant data array.
+@item
+@code{HMDT} --- Pointer to class @code{mglData} (@pxref{Data processing}) --- data array of real numbers.
+@item
+@code{HADT} --- Pointer to class @code{mglDataC} (@pxref{Data processing}) --- data array of complex numbers.
+@item
+@code{HMPR} --- Pointer to class @code{mglParse} (@pxref{mglParse class}) --- MGL script parsing.
+@item
+@code{HMEX} --- Pointer to class @code{mglExpr} (@pxref{Evaluate expression}) --- textual formulas for real numbers.
+@item
+@code{HMAX} --- Pointer to class @code{mglExprC} (@pxref{Evaluate expression}) --- textual formulas for complex numbers.
+@end itemize
+These variables contain identifiers for graphics drawing objects and for the data objects.
+
+Fortran functions/subroutines have the same names as C functions. However, there is a difference. Variable of type @code{HMGL, HMDT} must be an integer with sufficient size (@code{integer*4} in the 32-bit operating system or @code{integer*8} in the 64-bit operating system). All C functions of type @code{void} are subroutines in Fortran, which are called by operator @code{call}. The exceptions are functions, which return variables of types @code{HMGL} or @code{HMDT}. These functions should be declared as integer in Fortran code. Also, one should keep in mind that strings in Fortran are denoted by @code{'} symbol, not the @code{"} symbol.
+
+@external{}
+@node C++ interface, , C interface, Interfaces
+@subsection C++/Python interface
+@nav{}
+
+MathGL provides the interface to a set of languages via SWIG library. Some of these languages support classes. The typical example is Python -- which is named in this chapter's title. Exactly the same classes are used for high-level C++ API. Its feature is using only inline member-functions what make high-level API to be independent on compiler even for binary build.
+
+There are 3 main classes in:
+@itemize
+@item @code{mglGraph}
+-- provide most plotting functions (see @ref{MathGL core}).
+@item @code{mglData}
+-- provide base data processing (see @ref{Data processing}). It have an additional feature to access data values. You can use a construct like this: @code{dat[i]=sth;} or @code{sth=dat[i]} where flat representation of data is used (i.e., @var{i} can be in range 0...nx*nx*nz-1). You can also import NumPy arrays as input arguments in Python: @code{mgl_dat = mglData(numpy_dat);}.
+@item @code{mglParse}
+-- provide functions for parsing MGL scripts (see @ref{MGL scripts}).
+@end itemize
+
+
+To use Python classes just execute @samp{import mathgl}. The simplest example will be:
+@verbatim
+import mathgl
+a=mathgl.mglGraph()
+a.Box()
+a.WritePNG("test.png")
+@end verbatim
+Alternatively you can import all classes from @code{mathgl} module and easily access MathGL classes like this:
+@verbatim
+from mathgl import *
+a=mglGraph()
+a.Box()
+a.WritePNG("test.png")
+@end verbatim
+This becomes useful if you create many @code{mglData} objects, for example.
+
+@end ifclear
+
+@external{}

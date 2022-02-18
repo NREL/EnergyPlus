@@ -1,0 +1,156 @@
+\input texinfo
+@documentencoding UTF-8
+@documentlanguage ru
+
+@setfilename mathgl_ru.info
+@documentencoding UTF-8
+@include version.texi
+@settitle MathGL @value{VERSION}
+@syncodeindex pg cp
+
+@copying
+Это документация для MathGL (версии @value{VERSION}) -- библиотеки классов и функций для построения научной графики. Пожалуйста сообщайте о любых ошибках в этом руководстве на @email{mathgl.abalakin@@gmail.org}.
+
+@include copyright.texi
+@end copying
+
+@dircategory MathGL documentation system
+@direntry
+* MathGL: (mathgl). The library for scientific graphics.
+@end direntry
+
+@titlepage
+@title MathGL
+@subtitle версия @value{VERSION}
+@author А.А. Балакин (@uref{http://mathgl.sourceforge.net/})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top MathGL
+
+Это документация для MathGL (версии @value{VERSION}) -- библиотеки классов и функций для построения научной графики. Пожалуйста сообщайте о любых ошибках в этом руководстве на @email{mathgl.abalakin@@gmail.org}. Дополнительную информацию о MathGL можно найти на домашней странице проекта @uref{http://mathgl.sourceforge.net/}.
+
+@include copyright.texi
+
+@end ifnottex
+
+@menu
+* Overview::
+* Examples::
+* General concepts::
+* MathGL core::
+* Widget classes::
+* Data processing::
+* MGL scripts::
+* UDAV::
+* Other classes::
+* All samples::
+* Symbols and hot-keys::
+* File formats::
+@ifhtml
+* TeX-like symbols::
+@end ifhtml
+* Plotting time::
+* Copying This Manual::
+* Index::
+@end menu
+
+@macro external {}
+@end macro
+@macro nav {}
+@end macro
+
+@macro fig {fname,text}
+@center @image{\fname\, 11cm, , \text\, png}
+@end macro
+@macro pfig {fname,text}
+@center @image{png/\fname\, 11cm, , \text\, png}
+@end macro
+@macro ufig {fname,width,text}
+@center @image{udav/\fname\, \width\cm, , \text\, png}
+@end macro
+
+@macro sref {arg}
+См. раздел @ref{\arg\}, для примеров кода и графика.
+@end macro
+
+@node Overview, Examples, Top, Top
+@include overview_ru.texi
+
+@node Examples, General concepts, Overview, Top
+@include example_ru.texi
+
+@node General concepts, MathGL core, Examples, Top
+@include concept_ru.texi
+
+@node MathGL core, Widget classes, General concepts, Top
+@include core_ru.texi
+
+@node Widget classes, Data processing, MathGL core, Top
+@include widget_ru.texi
+
+@node Data processing, MGL scripts, Widget classes, Top
+@include data_ru.texi
+
+@node MGL scripts, UDAV, Data processing, Top
+@include parse_ru.texi
+
+@node UDAV, Other classes, MGL scripts, Top
+@include udav_ru.texi
+
+@node Other classes, All samples, UDAV, Top
+@include other_en.texi
+
+@node All samples, Symbols and hot-keys, Other classes, Top
+@include samples.texi
+
+@node Symbols and hot-keys, File formats, All samples, Top
+@appendix Symbols and hot-keys
+@include symbols_ru.texi
+
+@node File formats, Plotting time, Symbols and hot-keys, Top
+@appendix File formats
+@include formats_ru.texi
+
+@ifhtml
+@node Plotting time, TeX-like symbols, File formats, Top
+@end ifhtml
+@ifnothtml
+@node Plotting time, Copying This Manual, File formats, Top
+@end ifnothtml
+@appendix Время отрисовки
+
+В таблице показаны времена создания графика для всех примеров из файла @uref{http://sourceforge.net/p/mathgl/code/HEAD/tree/mathgl-2x/examples/samples.cpp, examples/samples.cpp}. Тест выполнен на моем ноутбуке (i5-2430M) с 64-bit Debian.
+
+Несколько слов о скорости. Во-первых, прямое рисование в память (Quality=4,5,6) быстрее буферизованного (Quality=0,1,2), но иногда результат некоректен (см. @ref{cloud}) и пропадает возможность экспорта в векторные и 3d форматы (например, EPS, SVG, PDF, ...). Во-вторых, обычно картинка худшего качества рисуется быстрее, т.е. Quality=1 быстрее Quality=2, и Quality=0 быстрее Quality=1. Однако, если график содержит множество граней (например @ref{cloud}, @ref{surf3}, @ref{pipe}, @ref{dew}), то Quality=0 может быть достаточно медленным, особенно для маленьких картинок. Наконец, картинки меньшего размера рисуются быстрее.
+
+Результаты для изображения размером 800*600 (по умолчанию).
+@include time.texi
+
+Результаты для изображения размером 1920*1440 (для печати)
+@include time_big.texi
+
+@ifhtml
+@node TeX-like symbols, Copying This Manual, Plotting time, Top
+@appendix Символы TeX
+@include appendix_en.texi
+@node Copying This Manual, Index, TeX-like symbols, Top
+@end ifhtml
+@ifnothtml
+@node Copying This Manual, Index, Plotting time, Top
+@end ifnothtml
+@appendix GNU Free Documentation License
+@include fdl.texi
+
+@node Index, , Copying This Manual, Top
+@unnumbered Индекс
+
+@printindex cp
+
+@bye

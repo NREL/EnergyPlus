@@ -1,0 +1,2165 @@
+@c ------------------------------------------------------------------
+@chapter Data processing
+@nav{}
+
+@ifset UDAV
+This chapter describe commands for allocation, resizing, loading and saving, modifying of data arrays. Also it can numerically differentiate and integrate data, interpolate, fill data by formula and so on. Class supports data with dimensions up to 3 (like function of 3 variables -- x,y,z). Data arrays are denoted by Small Caps (like @sc{dat}) if it can be (re-)created by MGL commands.
+@end ifset
+
+@ifclear UDAV
+This chapter describe classes @code{mglData} and @code{mglDataC} for working with data arrays of real and complex numbers. Both classes are derived from abstract class @code{mglDataA}, and can be used as arguments of any plotting functions (see @ref{MathGL core}). These classes are defined in @code{#include <mgl2/data.h>} and @code{#include <mgl2/datac.h>} correspondingly. The classes have mostly the same set of functions for easy and safe allocation, resizing, loading, saving, modifying of data arrays. Also it can numerically differentiate and integrate data, interpolate, fill data by formula and so on. Classes support data with dimensions up to 3 (like function of 3 variables -- x,y,z). The internal representation of numbers is mreal (or dual=std::complex<mreal> for @code{mglDataC}), which can be configured as float or double by selecting option @code{--enable-double} at the MathGL configuring (see @ref{Installation}). Float type have smaller size in memory and usually it has enough precision in plotting purposes. However, double type provide high accuracy what can be important for time-axis, for example. Data arrays are denoted by Small Caps (like @sc{dat}) if it can be (re-)created by MGL commands.
+@end ifclear
+
+@menu
+* Public variables::
+* Data constructor::
+* Data resizing::
+* Data filling::
+* File I/O::
+* Make another data::
+* Data changing::
+* Interpolation::
+* Data information::
+* Operators::
+* Global functions::
+* Evaluate expression::
+* Special data classes::
+@end menu
+
+@c ------------------------------------------------------------------
+@external{}
+@node Public variables, Data constructor, , Data processing
+@section Public variables
+@nav{}
+
+@ifset UDAV
+MGL don't support direct access to data arrays. See section @ref{Data filling}
+@end ifset
+
+@ifclear UDAV
+@deftypecv {Variable} mglData @code{mreal *} a
+@deftypecvx {Variable} mglDataC @code{dual *} a
+Data array itself. The flat data representation is used. For example, matrix [nx x ny] is presented as flat (1d-) array with length nx*ny. The element with indexes @{i, j, k@} is a[i+nx*j+nx*ny*k] (indexes are zero based).
+@end deftypecv
+@deftypecv {Variable} mglData @code{long} nx
+@deftypecvx {Variable} mglDataC @code{long} nx
+Number of points in 1st dimensions ('x' dimension).
+@end deftypecv
+@deftypecv {Variable} mglData @code{long} ny
+@deftypecvx {Variable} mglDataC @code{long} ny
+Number of points in 2nd dimensions ('y' dimension).
+@end deftypecv
+@deftypecv {Variable} mglData @code{long} nz
+@deftypecvx {Variable} mglDataC @code{long} nz
+Number of points in 3d dimensions ('z' dimension).
+@end deftypecv
+@deftypecv {Variable} mglData @code{std::string} id
+@deftypecvx {Variable} mglDataC @code{std::string} id
+Names of column (or slice if nz>1)  -- one character per column.
+@end deftypecv
+@deftypecv {Variable} mglData @code{bool} link
+@deftypecvx {Variable} mglDataC @code{bool} link
+Flag to use external data, i.e. don't delete it.
+@end deftypecv
+
+@deftypecv {Variable} mglDataA @code{std::wstring} s
+Name of data. It is used in parsing of MGL scripts.
+@end deftypecv
+@deftypecv {Variable} mglDataA @code{bool} temp
+Flag of temporary variable, which should be deleted.
+@end deftypecv
+@deftypecv {Variable} mglDataA @code{void (*)(void *)} func
+Pointer to callback function which will be called at destroying.
+@end deftypecv
+@deftypecv {Variable} mglDataA @code{void *} o
+Pointer to object for callback function.
+@end deftypecv
+
+
+@deftypefn {Method on @code{mglData}} @code{mreal} GetVal (@code{long} i)
+@deftypefnx {Method on @code{mglDataC}} @code{mreal} GetVal (@code{long} i)
+@deftypefnx {Method on @code{mglData}} @code{void} SetVal (@code{mreal} val, @code{long} i)
+@deftypefnx {Method on @code{mglDataC}} @code{void} SetVal (@code{mreal} val, @code{long} i)
+Gets or sets the value in by "flat" index @var{i} without border checking. Index @var{i} should be in range [0, nx*ny*nz-1].
+@end deftypefn
+
+@deftypefn {Method on @code{mglDataA}} @code{long} GetNx ()
+@deftypefnx {Method on @code{mglDataA}} @code{long} GetNy ()
+@deftypefnx {Method on @code{mglDataA}} @code{long} GetNz ()
+@deftypefnx {C function} @code{long} mgl_data_get_nx (@code{HCDT} dat)
+@deftypefnx {C function} @code{long} mgl_data_get_ny (@code{HCDT} dat)
+@deftypefnx {C function} @code{long} mgl_data_get_nz (@code{HCDT} dat)
+Gets the x-, y-, z-size of the data.
+@end deftypefn
+
+@deftypefn {C function} @code{mreal} mgl_data_get_value (@code{HCDT} dat, @code{int} i, @code{int} j, @code{int} k)
+@deftypefnx {C function} @code{dual} mgl_datac_get_value (@code{HCDT} dat, @code{int} i, @code{int} j, @code{int} k)
+@deftypefnx {C function} @code{mreal *} mgl_data_value (@code{HMDT} dat, @code{int} i, @code{int} j, @code{int} k)
+@deftypefnx {C function} @code{dual *} mgl_datac_value (@code{HADT} dat, @code{int} i, @code{int} j, @code{int} k)
+@deftypefnx {C function} @code{void} mgl_data_set_value (@code{HMDT} dat, @code{mreal} v, @code{int} i, @code{int} j, @code{int} k)
+@deftypefnx {C function} @code{void} mgl_datac_set_value (@code{HADT} dat, @code{dual} v, @code{int} i, @code{int} j, @code{int} k)
+Gets or sets the value in specified cell of the data with border checking.
+@end deftypefn
+@deftypefn {C function} @code{const mreal *} mgl_data_data (@code{HCDT} dat)
+@deftypefnx {C function} @code{const dual *} mgl_datac_data (@code{HCDT} dat)
+Returns pointer to internal data array.
+@end deftypefn
+
+@deftypefn {C function only} @code{void} mgl_data_set_func (@code{mglDataA *}dat, @code{void (*}func@code{)(void *)}, @code{void *}par)
+Set pointer to callback function which will be called at destroying.
+@end deftypefn
+
+@deftypefn {C function} @code{void} mgl_data_set_name (@code{mglDataA *}dat, @code{const char *}name)
+@deftypefnx {C function} @code{void} mgl_data_set_name_w (@code{mglDataA *}dat, @code{const wchar_t *}name)
+Set name of data, which used in parsing of MGL scripts.
+@end deftypefn
+
+@end ifclear
+
+@c ------------------------------------------------------------------
+@external{}
+@node Data constructor, Data resizing, Public variables, Data processing
+@section Data constructor
+@nav{}
+@cindex mglData
+
+@ifset UDAV
+There are many functions, which can create data for output (see @ref{Data filling}, @ref{File I/O}, @ref{Make another data}, @ref{Global functions}). Here I put most useful of them.
+@end ifset
+
+@anchor{new}
+@deftypefn {MGL command} {} new @sc{dat} [@code{nx=1} 'eq']
+@deftypefnx {MGL command} {} new @sc{dat} @code{nx ny} ['eq']
+@deftypefnx {MGL command} {} new @sc{dat} @code{nx ny nz} ['eq']
+@ifclear UDAV
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{int} mx=@code{1}, @code{int} my=@code{1}, @code{int} mz=@code{1})
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{int} mx=@code{1}, @code{int} my=@code{1}, @code{int} mz=@code{1})
+@deftypefnx {C function} @code{HMDT} mgl_create_data ()
+@deftypefnx {C function} @code{HMDT} mgl_create_data_size (@code{int} mx, @code{int} my, @code{int} mz)
+@deftypefnx {C function} @code{HADT} mgl_create_datac ()
+@deftypefnx {C function} @code{HADT} mgl_create_datac_size (@code{int} mx, @code{int} my, @code{int} mz)
+@end ifclear
+Default constructor. Allocates the memory for data array and initializes it by zero. If string @var{eq} is specified then data will be filled by corresponding formula as in @ref{fill}.
+@end deftypefn
+
+@anchor{copy}
+@deftypefn {MGL command} {} copy @sc{dat} dat2 ['eq'='']
+@deftypefnx {MGL command} {} copy @sc{dat} @code{val}
+@ifclear UDAV
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{const mglDataA &}dat2)
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{const mglDataA *}dat2)
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{int} size, @code{const float *}dat2)
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{int} size, @code{int} cols, @code{const float *}dat2)
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{int} size, @code{const double *}dat2)
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{int} size, @code{int} cols, @code{const double *}dat2)
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{const double *}dat2, @code{int} size)
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{const double *}dat2, @code{int} size, @code{int} cols)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{const mglDataA &}dat2)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{const mglDataA *}dat2)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{int} size, @code{const float *}dat2)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{int} size, @code{int} cols, @code{const float *}dat2)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{int} size, @code{const double *}dat2)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{int} size, @code{int} cols, @code{const double *}dat2)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{int} size, @code{const dual *}dat2)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{int} size, @code{int} cols, @code{const dual *}dat2)
+@end ifclear
+Copy constructor. Allocates the memory for data array and copy values from other array. At this, if parameter @var{eq} or @var{val} is specified then the data will be modified by corresponding formula similarly to @ref{fill}.
+@end deftypefn
+
+@deftypefn {MGL command} {} copy @sc{redat} @sc{imdat} dat2 ['eq'='']
+Allocates the memory for data array and copy real and imaginary values from complex array @var{dat2}.
+@end deftypefn
+
+@deftypefn {MGL command} {} copy 'name'
+Allocates the memory for data array and copy values from other array specified by its name, which can be "invalid" for MGL names (like one read from HDF5 files).
+@end deftypefn
+
+
+@deftypefn {MGL command} {} read @sc{dat} 'fname'
+@ifclear UDAV
+@deftypefnx {Constructor on @code{mglData}} {} mglData (@code{const char *}fname)
+@deftypefnx {Constructor on @code{mglDataC}} {} mglDataC (@code{const char *}fname)
+@deftypefnx {C function} @code{HMDT} mgl_create_data_file (@code{const char *}fname)
+@deftypefnx {C function} @code{HADT} mgl_create_datac_file (@code{const char *}fname)
+@end ifclear
+Reads data from tab-separated text file with auto determining sizes of the data.
+@end deftypefn
+
+@deftypefn {MGL command} {} delete dat
+@deftypefnx {MGL command} {} delete 'name'
+@ifclear UDAV
+@deftypefnx {Destructor on @code{mglData}} {} ~mglData ()
+@deftypefnx {C function} @code{void} mgl_delete_data (@code{HMDT} dat)
+@deftypefnx {Destructor on @code{mglDataC}} {} ~mglDataC ()
+@deftypefnx {C function} @code{void} mgl_delete_datac (@code{HADT} dat)
+@end ifclear
+Deletes the data array from memory.
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Data resizing, Data filling, Data constructor, Data processing
+@section Data resizing
+@nav{}
+@cindex Create
+@cindex Rearrange
+@cindex Extend
+@cindex Transpose
+@cindex Squeeze
+@cindex Crop
+@cindex Insert
+@cindex Delete
+@cindex Sort
+@cindex Clean
+@cindex Join
+
+@deftypefn {MGL command} {} new @sc{dat} [@code{nx=1 ny=1 nz=1}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Create (@code{int} mx, @code{int} my=@code{1}, @code{int} mz=@code{1})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Create (@code{int} mx, @code{int} my=@code{1}, @code{int} mz=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_create (@code{HMDT} dat, @code{int} mx, @code{int} my, @code{int} mz)
+@deftypefnx {C function} @code{void} mgl_datac_create (@code{HADT} dat, @code{int} mx, @code{int} my, @code{int} mz)
+@end ifclear
+Creates or recreates the array with specified size and fills it by zero. This function does nothing if one of parameters @var{mx}, @var{my}, @var{mz} is zero or negative.
+@end deftypefn
+
+@anchor{rearrange}
+@deftypefn {MGL command} {} rearrange dat @code{mx [my=0 mz=0]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Rearrange (@code{int} mx, @code{int} my=@code{0}, @code{int} mz=@code{0})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Rearrange (@code{int} mx, @code{int} my=@code{0}, @code{int} mz=@code{0})
+@deftypefnx {C function} @code{void} mgl_data_rearrange (@code{HMDT} dat, @code{int} mx, @code{int} my, @code{int} mz)
+@deftypefnx {C function} @code{void} mgl_datac_rearrange (@code{HADT} dat, @code{int} mx, @code{int} my, @code{int} mz)
+@end ifclear
+Rearrange dimensions without changing data array so that resulting sizes should  be @var{mx}*@var{my}*@var{mz} < nx*ny*nz. If some of parameter @var{my} or @var{mz} are zero then it will be selected to optimal fill of data array. For example, if @var{my}=0 then it will be change to @var{my}=nx*ny*nz/@var{mx} and @var{mz}=1.
+@end deftypefn
+
+@anchor{transpose}
+@deftypefn {MGL command} {} transpose dat ['dim'='yxz']
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Transpose (@code{const char *}dim=@code{"yx"})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Transpose (@code{const char *}dim=@code{"yx"})
+@deftypefnx {C function} @code{void} mgl_data_transpose (@code{HMDT} dat, @code{const char *}dim)
+@deftypefnx {C function} @code{void} mgl_datac_transpose (@code{HADT} dat, @code{const char *}dim)
+@end ifclear
+Transposes (shift order of) dimensions of the data. New order of dimensions is specified in string @var{dim}. This function can be useful also after reading of one-dimensional data.
+@end deftypefn
+
+@anchor{extend}
+@deftypefn {MGL command} {} extend dat @code{n1 [n2=0]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Extend (@code{int} n1, @code{int} n2=@code{0})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Extend (@code{int} n1, @code{int} n2=@code{0})
+@deftypefnx {C function} @code{void} mgl_data_extend (@code{HMDT} dat, @code{int} n1, @code{int} n2)
+@deftypefnx {C function} @code{void} mgl_datac_extend (@code{HADT} dat, @code{int} n1, @code{int} n2)
+@end ifclear
+Increase the dimensions of the data by inserting new (|@var{n1}|+1)-th slices after (for @var{n1}>0) or before (for @var{n1}<0) of existed one. It is possible to insert 2 dimensions simultaneously for 1d data by using parameter @var{n2}. Data to new slices is copy from existed one. For example, for @var{n1}>0 new array will be
+@iftex
+@math{a_{ij}^{new} = a_i^{old}} where j=0...@var{n1}. Correspondingly, for @var{n1}<0 new array will be @math{a_{ij}^{new} = a_j^{old}} where i=0...|@var{n1}|.
+@end iftex
+@ifnottex
+a_ij^new = a_i^old where j=0...@var{n1}. Correspondingly, for @var{n1}<0 new array will be a_ij^new = a_j^old where i=0...|@var{n1}|.
+@end ifnottex
+@end deftypefn
+
+@anchor{squeeze}
+@deftypefn {MGL command} {} squeeze dat @code{rx [ry=1 rz=1 sm=off]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Squeeze (@code{int} rx, @code{int} ry=@code{1}, @code{int} rz=@code{1}, @code{bool} smooth=@code{false})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Squeeze (@code{int} rx, @code{int} ry=@code{1}, @code{int} rz=@code{1}, @code{bool} smooth=@code{false})
+@deftypefnx {C function} @code{void} mgl_data_squeeze (@code{HMDT} dat, @code{int} rx, @code{int} ry, @code{int} rz, @code{int} smooth)
+@deftypefnx {C function} @code{void} mgl_datac_squeeze (@code{HADT} dat, @code{int} rx, @code{int} ry, @code{int} rz, @code{int} smooth)
+@end ifclear
+Reduces the data size by excluding data elements which indexes are not divisible by @var{rx}, @var{ry}, @var{rz} correspondingly. Parameter @var{smooth} set to use smoothing
+@iftex
+(i.e. @math{a_{out}[i]=\sum_{j=i,i+r}a[j]/r}) or not (i.e. @math{a_{out}[i]=a[j*r]}).
+@end iftex
+@ifnottex
+(i.e. out[i]=\sum_@{j=i,i+r@} a[j]/r) or not (i.e. out[i]=a[j*r]).
+@end ifnottex
+@end deftypefn
+
+@anchor{crop}
+@deftypefn {MGL command} {} crop dat @code{n1 n2} 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Crop (@code{int} n1, @code{int} n2, @code{char} dir=@code{'x'})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Crop (@code{int} n1, @code{int} n2, @code{char} dir=@code{'x'})
+@deftypefnx {C function} @code{void} mgl_data_crop (@code{HMDT} dat, @code{int} n1, @code{int} n2, @code{char} dir)
+@deftypefnx {C function} @code{void} mgl_datac_crop (@code{HADT} dat, @code{int} n1, @code{int} n2, @code{char} dir)
+@end ifclear
+Cuts off edges of the data @var{i}<@var{n1} and @var{i}>@var{n2} if @var{n2}>0 or @var{i}>@code{n[xyz]}-@var{n2} if @var{n2}<=0 along direction @var{dir}.
+@end deftypefn
+
+@deftypefn {MGL command} {} crop dat 'how'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Crop (@code{const char *}how=@code{"235x"})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Crop (@code{const char *}how=@code{"235x"})
+@deftypefnx {C function} @code{void} mgl_data_crop_opt (@code{HMDT} dat, @code{const char *}how)
+@deftypefnx {C function} @code{void} mgl_datac_crop_opt (@code{HADT} dat, @code{const char *}how)
+@end ifclear
+Cuts off far edge of the data to be more optimal for fast Fourier transform. The resulting size will be the closest value of 2^n*3^m*5^l to the original one. The string @var{how} may contain: @samp{x}, @samp{y}, @samp{z} for directions, and @samp{2}, @samp{3}, @samp{5} for using corresponding bases.
+@end deftypefn
+
+@anchor{insert}
+@deftypefn {MGL command} {} insert dat 'dir' @code{[pos=off num=0]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Insert (@code{char} dir, @code{int} pos=@code{0}, @code{int} num=@code{1})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Insert (@code{char} dir, @code{int} pos=@code{0}, @code{int} num=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_insert (@code{HMDT} dat, @code{char} dir, @code{int} pos, @code{char} num)
+@deftypefnx {C function} @code{void} mgl_datac_insert (@code{HADT} dat, @code{char} dir, @code{int} pos, @code{char} num)
+@end ifclear
+Insert @var{num} slices along @var{dir}-direction at position @var{pos} and fill it by zeros.
+@end deftypefn
+
+@anchor{delete}
+@deftypefn {MGL command} {} delete dat 'dir' @code{[pos=off num=0]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Delete (@code{char} dir, @code{int} pos=@code{0}, @code{int} num=@code{1})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Delete (@code{char} dir, @code{int} pos=@code{0}, @code{int} num=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_delete (@code{HMDT} dat, @code{char} dir, @code{int} pos, @code{char} num)
+@deftypefnx {C function} @code{void} mgl_datac_delete (@code{HADT} dat, @code{char} dir, @code{int} pos, @code{char} num)
+@end ifclear
+Delete @var{num} slices along @var{dir}-direction at position @var{pos}.
+@end deftypefn
+
+@deftypefn {MGL command} {} delete dat
+@deftypefnx {MGL command} {} delete 'name'
+Deletes the whole data array.
+@end deftypefn
+
+@anchor{sort}
+@deftypefn {MGL command} {} sort dat @code{idx [idy=-1]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Sort (@code{lond} idx, @code{long} idy=@code{-1})
+@deftypefnx {C function} @code{void} mgl_data_sort (@code{HMDT} dat, @code{lond} idx, @code{long} idy)
+@end ifclear
+Sort data rows (or slices in 3D case) by values of specified column @var{idx} (or cell @{@var{idx},@var{idy}@} for 3D case). Note, this function is not thread safe!
+@end deftypefn
+
+@anchor{clean}
+@deftypefn {MGL command} {} clean dat @code{idx}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Clean (@code{lond} idx)
+@deftypefnx {C function} @code{void} mgl_data_clean (@code{HMDT} dat, @code{lond} idx)
+@end ifclear
+Delete rows which values are equal to next row for given column @var{idx}.
+@end deftypefn
+
+@anchor{join}
+@deftypefn {MGL command} {} join dat vdat [v2dat ...]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Join (@code{const mglDataA &}vdat)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Join (@code{const mglDataA &}vdat)
+@deftypefnx {C function} @code{void} mgl_data_join (@code{HMDT} dat, @code{HCDT} vdat)
+@deftypefnx {C function} @code{void} mgl_datac_join (@code{HADT} dat, @code{HCDT} vdat)
+@end ifclear
+Join data cells from @var{vdat} to @var{dat}. At this, function increase @var{dat} sizes according following: z-size for data arrays arrays with equal x-,y-sizes; or y-size for data arrays with equal x-sizes; or x-size otherwise.
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Data filling, File I/O, Data resizing, Data processing
+@section Data filling
+@nav{}
+@cindex Fill
+@cindex Modify
+@cindex Set
+@cindex List
+@cindex Var
+@cindex Refill
+
+@anchor{list}
+@deftypefn {MGL command} {} list @sc{dat} @code{v1 ...}
+Creates new variable with name @var{dat} and fills it by numeric values of command arguments @code{v1 ...}. Command can create one-dimensional and two-dimensional arrays with arbitrary values. For creating 2d array the user should use delimiter @samp{|} which means that the following values lie in next row. Array sizes are [maximal of row sizes * number of rows]. For example, command @code{list 1 | 2 3} creates the array [1 0; 2 3]. Note, that the maximal number of arguments is 1000.
+@end deftypefn
+@deftypefn {MGL command} {} list @sc{dat} d1 ...
+Creates new variable with name @var{dat} and fills it by data values of arrays of command arguments @var{d1 ...}. Command can create two-dimensional or three-dimensional (if arrays in arguments are 2d arrays) arrays with arbitrary values. Minor dimensions of all arrays in arguments should be equal to dimensions of first array d1. In the opposite case the argument will be ignored. Note, that the maximal number of arguments is 1000.
+@end deftypefn
+
+@ifclear UDAV
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{const float *}A, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {Method on @code{mglData}} @code{void} Set (@code{const double *}A, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_set_float (@code{HMDT} dat, @code{const mreal *}A, @code{int} NX, @code{int} NY, @code{int} NZ)
+@deftypefnx {C function} @code{void} mgl_data_set_double (@code{HMDT} dat, @code{const double *}A, @code{int} NX, @code{int} NY, @code{int} NZ)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const float *}A, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const double *}A, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const dual *}A, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {C function} @code{void} mgl_datac_set_float (@code{HADT} dat, @code{const mreal *}A, @code{int} NX, @code{int} NY, @code{int} NZ)
+@deftypefnx {C function} @code{void} mgl_datac_set_double (@code{HADT} dat, @code{const double *}A, @code{int} NX, @code{int} NY, @code{int} NZ)
+@deftypefnx {C function} @code{void} mgl_datac_set_complex (@code{HADT} dat, @code{const dual *}A, @code{int} NX, @code{int} NY, @code{int} NZ)
+Allocates memory and copies the data from the @strong{flat} @code{float*} or @code{double*} array.
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{const float **}A, @code{int} N1, @code{int} N2)
+@deftypefnx {Method on @code{mglData}} @code{void} Set (@code{const double **}A, @code{int} N1, @code{int} N2)
+@deftypefnx {C function} @code{void} mgl_data_set_mreal2 (@code{HMDT} dat, @code{const mreal **}A, @code{int} N1, @code{int} N2)
+@deftypefnx {C function} @code{void} mgl_data_set_double2 (@code{HMDT} dat, @code{const double **}A, @code{int} N1, @code{int} N2)
+Allocates memory and copies the data from the @code{float**} or @code{double**} array with dimensions @var{N1}, @var{N2}, i.e. from array defined as @code{mreal a[N1][N2];}.
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{const float ***}A, @code{int} N1, @code{int} N2)
+@deftypefnx {Method on @code{mglData}} @code{void} Set (@code{const double ***}A, @code{int} N1, @code{int} N2)
+@deftypefnx {C function} @code{void} mgl_data_set_mreal3 (@code{HMDT} dat, @code{const mreal ***}A, @code{int} N1, @code{int} N2)
+@deftypefnx {C function} @code{void} mgl_data_set_double3 (@code{HMDT} dat, @code{const double ***}A, @code{int} N1, @code{int} N2)
+Allocates memory and copies the data from the @code{float***} or @code{double***} array with dimensions @var{N1}, @var{N2}, @var{N3}, i.e. from array defined as @code{mreal a[N1][N2][N3];}.
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{gsl_vector *}v)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{gsl_vector *}v)
+@deftypefnx {C function} @code{void} mgl_data_set_vector (@code{HMDT} dat, @code{gsl_vector *}v)
+@deftypefnx {C function} @code{void} mgl_datac_set_vector (@code{HADT} dat, @code{gsl_vector *}v)
+Allocates memory and copies the data from the @code{gsl_vector *} structure.
+@end deftypefn
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{gsl_matrix *}m)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{gsl_matrix *}m)
+@deftypefnx {C function} @code{void} mgl_data_set_matrix (@code{HMDT} dat, @code{gsl_matrix *}m)
+@deftypefnx {C function} @code{void} mgl_datac_set_matrix (@code{HADT} dat, @code{gsl_matrix *}m)
+Allocates memory and copies the data from the @code{gsl_matrix *} structure.
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{const mglDataA &}from)
+@deftypefnx {Method on @code{mglData}} @code{void} Set (@code{HCDT} from)
+@deftypefnx {C function} @code{void} mgl_data_set (@code{HMDT} dat, @code{HCDT} from)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const mglDataA &}from)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{HCDT} from)
+@deftypefnx {C function} @code{void} mgl_datac_set (@code{HADT} dat, @code{HCDT} from)
+Copies the data from @code{mglData} (or @code{mglDataA}) instance @var{from}.
+@end deftypefn
+
+@deftypefn {Method on @code{mglDataC}} @code{void} Set (@code{const mglDataA &}re, @code{const mglDataA &}im)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{HCDT} re, @code{HCDT} im)
+@deftypefnx {Method on @code{mglDataC}} @code{void} SetAmpl (@code{HCDT} ampl, @code{const mglDataA &}phase)
+@deftypefnx {C function} @code{void} mgl_datac_set_ri (@code{HADT} dat, @code{HCDT} re, @code{HCDT} im)
+@deftypefnx {C function} @code{void} mgl_datac_set_ap (@code{HADT} dat, @code{HCDT} ampl, @code{HCDT} phase)
+Copies the data from @code{mglData} instances for real and imaginary parts of complex data arrays.
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{const std::vector<int> &}d)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const std::vector<int> &}d)
+@deftypefnx {Method on @code{mglData}} @code{void} Set (@code{const std::vector<float> &}d)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const std::vector<float> &}d)
+@deftypefnx {Method on @code{mglData}} @code{void} Set (@code{const std::vector<double> &}d)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const std::vector<double> &}d)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const std::vector<dual> &}d)
+Allocates memory and copies the data from the @code{std::vector<T>} array.
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{void} Set (@code{const char *}str, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_set_values (@code{const char *}str, @code{int} NX, @code{int} NY, @code{int} NZ)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Set (@code{const char *}str, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {C function} @code{void} mgl_datac_set_values (@code{const char *}str, @code{int} NX, @code{int} NY, @code{int} NZ)
+Allocates memory and scanf the data from the string.
+@end deftypefn
+
+
+@deftypefn {Method on @code{mglData}} @code{void} SetList (@code{long} n, ...)
+Allocate memory and set data from variable argument list of @emph{double} values. Note, you need to specify decimal point @samp{.} for integer values! For example, the code @code{SetList(2,0.,1.);} is correct, but the code @code{SetList(2,0,1);} is incorrect.
+@end deftypefn
+
+
+
+@deftypefn {Method on @code{mglData}} @code{void} Link (@code{mglData &}from)
+@deftypefnx {Method on @code{mglData}} @code{void} Link (@code{mreal *}A, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_link (@code{HMDT} dat, @code{mreal *}A, @code{int} NX, @code{int} NY, @code{int} NZ)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Link (@code{mglDataC &}from)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Link (@code{dual *}A, @code{int} NX, @code{int} NY=@code{1}, @code{int} NZ=@code{1})
+@deftypefnx {C function} @code{void} mgl_datac_link (@code{HADT} dat, @code{dual *}A, @code{int} NX, @code{int} NY, @code{int} NZ)
+Links external data array, i.e. don't delete this array at exit.
+@end deftypefn
+@end ifclear
+
+@anchor{var}
+@deftypefn {MGL command} {} var @sc{dat} @code{num v1 [v2=nan]}
+Creates new variable with name @var{dat} for one-dimensional array of size @var{num}. Array elements are equidistantly distributed in range [@var{v1}, @var{v2}]. If @var{v2}=@code{nan} then @var{v2=v1} is used.
+@end deftypefn
+
+@anchor{fill}
+@deftypefn {MGL command} {} fill dat v1 v2 ['dir'='x']
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Fill (@code{mreal} v1, @code{mreal} v2, @code{char} dir=@code{'x'})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Fill (@code{dual} v1, @code{dual} v2, @code{char} dir=@code{'x'})
+@deftypefnx {C function} @code{void} mgl_data_fill (@code{HMDT} dat, @code{mreal} v1, @code{mreal} v2, @code{char} dir)
+@deftypefnx {C function} @code{void} mgl_datac_fill (@code{HADT} dat, @code{dual} v1, @code{dual} v2, @code{char} dir)
+@end ifclear
+Equidistantly fills the data values to range [@var{v1}, @var{v2}] in direction @var{dir}=@{@samp{x},@samp{y},@samp{z}@}.
+@end deftypefn
+
+@deftypefn {MGL command} {} fill dat 'eq' [vdat wdat]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Fill (@code{HMGL} gr, @code{const char *}eq, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglData}} @code{void} Fill (@code{HMGL} gr, @code{const char *}eq, @code{const mglDataA &}vdat, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglData}} @code{void} Fill (@code{HMGL} gr, @code{const char *}eq, @code{const mglDataA &}vdat, @code{const mglDataA &}wdat, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Fill (@code{HMGL} gr, @code{const char *}eq, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Fill (@code{HMGL} gr, @code{const char *}eq, @code{const mglDataA &}vdat, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Fill (@code{HMGL} gr, @code{const char *}eq, @code{const mglDataA &}vdat, @code{const mglDataA &}wdat, @code{const char *}opt=@code{""})
+@deftypefnx {C function} @code{void} mgl_data_fill_eq (@code{HMGL} gr, @code{HMDT} dat, @code{const char *}eq, @code{HCDT} vdat, @code{HCDT} wdat, @code{const char *}opt)
+@deftypefnx {C function} @code{void} mgl_datac_fill_eq (@code{HMGL} gr, @code{HADT} dat, @code{const char *}eq, @code{HCDT} vdat, @code{HCDT} wdat, @code{const char *}opt)
+@end ifclear
+Fills the value of array according to the formula in string @var{eq}. Formula is an arbitrary expression depending  on variables @samp{x}, @samp{y}, @samp{z}, @samp{u}, @samp{v}, @samp{w}. Coordinates @samp{x}, @samp{y}, @samp{z} are supposed to be normalized in axis range of canvas @var{gr} (in difference from @code{Modify} functions). Variable @samp{u} is the original value of the array. Variables @samp{v} and @samp{w} are values of @var{vdat}, @var{wdat} which can be @code{NULL} (i.e. can be omitted).
+@end deftypefn
+
+@anchor{modify}
+@deftypefn {MGL command} {} modify dat 'eq' [@code{dim=0}]
+@deftypefnx {MGL command} {} modify dat 'eq' vdat [wdat]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Modify (@code{const char *}eq, @code{int} dim=@code{0})
+@deftypefnx {Method on @code{mglData}} @code{void} Modify (@code{const char *}eq, @code{const mglDataA &}v)
+@deftypefnx {Method on @code{mglData}} @code{void} Modify (@code{const char *}eq, @code{const mglDataA &}v, @code{const mglDataA &}w)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Modify (@code{const char *}eq, @code{int} dim=@code{0})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Modify (@code{const char *}eq, @code{const mglDataA &}v)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Modify (@code{const char *}eq, @code{const mglDataA &}v, @code{const mglDataA &}w)
+@deftypefnx {C function} @code{void} mgl_data_modify (@code{HMDT} dat, @code{const char *}eq, @code{int} dim)
+@deftypefnx {C function} @code{void} mgl_data_modify_vw (@code{HMDT} dat, @code{const char *}eq, @code{HCDT} v, @code{HCDT} w)
+@deftypefnx {C function} @code{void} mgl_datac_modify (@code{HADT} dat, @code{const char *}eq, @code{int} dim)
+@deftypefnx {C function} @code{void} mgl_datac_modify_vw (@code{HADT} dat, @code{const char *}eq, @code{HCDT} v, @code{HCDT} w)
+@end ifclear
+The same as previous ones but coordinates @samp{x}, @samp{y}, @samp{z} are supposed to be normalized in range [0,1]. If @var{dim}>0 is specified then modification will be fulfilled only for slices >=@var{dim}.
+@end deftypefn
+
+@anchor{fillsample}
+@deftypefn {MGL command} {} fillsample dat 'how'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} FillSample (@code{const char *}how)
+@deftypefnx {C function} @code{void} mgl_data_fill_sample (@code{HMDT} a, @code{const char *}how)
+@end ifclear
+Fills data by 'x' or 'k' samples for Hankel ('h') or Fourier ('f') transform.
+@end deftypefn
+
+
+@anchor{datagrid}
+@deftypefn {MGL command} {} datagrid dat xdat ydat zdat
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Grid (@code{HMGL} gr, @code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglData}} @code{mglData} Grid (@code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z, @code{mglPoint} p1, @code{mglPoint} p2)
+@deftypefnx {C function} @code{void} mgl_data_grid (@code{HMGL} gr, @code{HMDT} u, @code{HCDT} x, @code{HCDT} y, @code{HCDT} z, @code{const char *}opt)
+@deftypefnx {C function} @code{void} mgl_data_grid_xy (@code{HMDT} u, @code{HCDT} x, @code{HCDT} y, @code{HCDT} z, @code{mreal} x1, @code{mreal} x2, @code{mreal} y1, @code{mreal} y2)
+@end ifclear
+Fills the value of array according to the linear interpolation of triangulated surface assuming x-,y-coordinates equidistantly distributed in axis range (or in range [x1,x2]*[y1,y2]). Triangulated surface is found for arbitrary placed points @samp{x}, @samp{y}, @samp{z}. NAN value is used for grid points placed outside of triangulated surface. @sref{Making regular data}
+@end deftypefn
+
+
+@anchor{put}
+@deftypefn {MGL command} {} put dat @code{val [i=all j=all k=all]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Put (@code{mreal} val, @code{int} i=@code{-1}, @code{int} j=@code{-1}, @code{int} k=@code{-1})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Put (@code{dual} val, @code{int} i=@code{-1}, @code{int} j=@code{-1}, @code{int} k=@code{-1})
+@deftypefnx {C function} @code{void} mgl_data_put_val (@code{HMDT} a, @code{mreal} val, @code{int} i, @code{int} j, @code{int} k)
+@deftypefnx {C function} @code{void} mgl_datac_put_val (@code{HADT} a, @code{dual} val, @code{int} i, @code{int} j, @code{int} k)
+@end ifclear
+Sets value(s) of array a[@var{i}, @var{j}, @var{k}] = @var{val}. Negative indexes @var{i}, @var{j}, @var{k}=-1 set the value @var{val} to whole range in corresponding direction(s). For example, @code{Put(val,-1,0,-1);} sets a[i,0,j]=@var{val} for i=0...(nx-1), j=0...(nz-1).
+@end deftypefn
+
+@deftypefn {MGL command} {} put dat vdat [@code{i=all j=all k=all}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Put (@code{const mglDataA &}v, @code{int} i=@code{-1}, @code{int} j=@code{-1}, @code{int} k=@code{-1})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Put (@code{const mglDataA &}v, @code{int} i=@code{-1}, @code{int} j=@code{-1}, @code{int} k=@code{-1})
+@deftypefnx {C function} @code{void} mgl_data_put_dat (@code{HMDT} a, @code{HCDT} v, @code{int} i, @code{int} j, @code{int} k)
+@deftypefnx {C function} @code{void} mgl_datac_put_dat (@code{HADT} a, @code{HCDT} v, @code{int} i, @code{int} j, @code{int} k)
+@end ifclear
+Copies value(s) from array @var{v} to the range of original array. Negative indexes @var{i}, @var{j}, @var{k}=-1 set the range in corresponding direction(s). At this minor dimensions of array @var{v} should be large than corresponding dimensions of this array. For example, @code{Put(v,-1,0,-1);} sets a[i,0,j]=v.ny>nz ? v[i,j] : v[i], where i=0...(nx-1), j=0...(nz-1) and condition v.nx>=nx is true.
+@end deftypefn
+
+@anchor{refill}
+@deftypefn {MGL command} {} refill dat xdat vdat [sl=-1]
+@deftypefnx {MGL command} {} refill dat xdat ydat vdat [sl=-1]
+@deftypefnx {MGL command} {} refill dat xdat ydat zdat vdat
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Refill (@code{const mglDataA &}x, @code{const mglDataA &}v, @code{mreal} x1, @code{mreal} x2, @code{long} sl=@code{-1})
+@deftypefnx {Method on @code{mglData}} @code{void} Refill (@code{const mglDataA &}x, @code{const mglDataA &}v, @code{mglPoint} p1, @code{mglPoint} p2, @code{long} sl=@code{-1})
+@deftypefnx {Method on @code{mglData}} @code{void} Refill (@code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}v, @code{mglPoint} p1, @code{mglPoint} p2, @code{long} sl=@code{-1})
+@deftypefnx {Method on @code{mglData}} @code{void} Refill (@code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z, @code{const mglDataA &}v, @code{mglPoint} p1, @code{mglPoint} p2)
+@deftypefnx {Method on @code{mglData}} @code{void} Refill (@code{HMGL} gr, @code{const mglDataA &}x, @code{const mglDataA &}v, @code{long} sl=@code{-1}, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglData}} @code{void} Refill (@code{HMGL} gr, @code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}v, @code{long} sl=@code{-1}, @code{const char *}opt=@code{""})
+@deftypefnx {Method on @code{mglData}} @code{void} Refill (@code{HMGL} gr, @code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z, @code{const mglDataA &}v, @code{const char *}opt=@code{""})
+@deftypefnx {C function} @code{void} mgl_data_refill_x (@code{HMDT} a, @code{HCDT} x, @code{HCDT} v, @code{mreal} x1, @code{mreal} x2, @code{long} sl)
+@deftypefnx {C function} @code{void} mgl_data_refill_xy (@code{HMDT} a, @code{HCDT} x, @code{HCDT} y, @code{HCDT} v, @code{mreal} x1, @code{mreal} x2, @code{mreal} y1, @code{mreal} y2, @code{long} sl)
+@deftypefnx {C function} @code{void} mgl_data_refill_xyz (@code{HMDT} a, @code{HCDT} x, @code{HCDT} y, @code{HCDT} z, @code{HCDT} v, @code{mreal} x1, @code{mreal} x2, @code{mreal} y1, @code{mreal} y2, @code{mreal} z1, @code{mreal} z2)
+@deftypefnx {C function} @code{void} mgl_data_refill_gr (@code{HMGL} gr, @code{HMDT} a, @code{HCDT} x, @code{HCDT} y, @code{HCDT} z, @code{HCDT} v, @code{long} sl, @code{const char *}opt)
+@end ifclear
+Fills by interpolated values of array @var{v} at the point @{@var{x}, @var{y}, @var{z}@}=@{@code{X[i], Y[j], Z[k]}@} (or @{@var{x}, @var{y}, @var{z}@}=@{@code{X[i,j,k], Y[i,j,k], Z[i,j,k]}@} if @var{x}, @var{y}, @var{z} are not 1d arrays), where @code{X,Y,Z} are equidistantly distributed in range [@var{x1},@var{x2}]*[@var{y1},@var{y2}]*[@var{z1},@var{z2}] and have the same sizes as this array. If parameter @var{sl} is 0 or positive then changes will be applied only for slice @var{sl}.
+@end deftypefn
+
+@anchor{gspline}
+@deftypefn {MGL command} {} gspline dat xdat vdat [sl=-1]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} RefillGS (@code{const mglDataA &}x, @code{const mglDataA &}v, @code{mreal} x1, @code{mreal} x2, @code{long} sl=@code{-1})
+@deftypefnx {C function} @code{void} mgl_data_refill_gs (@code{HMDT} a, @code{HCDT} x, @code{HCDT} v, @code{mreal} x1, @code{mreal} x2, @code{long} sl)
+@end ifclear
+Fills by global cubic spline values of array @var{v} at the point @var{x}=@code{X[i]}, where @code{X} are equidistantly distributed in range [@var{x1},@var{x2}] and have the same sizes as this array. If parameter @var{sl} is 0 or positive then changes will be applied only for slice @var{sl}.
+@end deftypefn
+
+@anchor{idset}
+@deftypefn {MGL command} {} idset dat 'ids'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} SetColumnId (@code{const char *}ids)
+@deftypefnx {Method on @code{mglDataC}} @code{void} SetColumnId (@code{const char *}ids)
+@deftypefnx {C function} @code{void} mgl_data_set_id (@code{HMDT} a, @code{const char *}ids)
+@deftypefnx {C function} @code{void} mgl_datac_set_id (@code{HADT} a, @code{const char *}ids)
+@end ifclear
+Sets the symbol @var{ids} for data columns. The string should contain one symbol 'a'...'z' per column. These ids are used in @ref{column}.
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node File I/O, Make another data, Data filling, Data processing
+@section File I/O
+@nav{}
+@cindex Read
+@cindex ReadMat
+@cindex ReadRange
+@cindex ReadAll
+@cindex Save
+@cindex ReadHDF
+@cindex SaveHDF
+@cindex Import
+@cindex Export
+
+@anchor{read}
+@deftypefn {MGL command} {} read @sc{dat} 'fname'
+@deftypefnx {MGL command} {} read @sc{redat} @sc{imdat} 'fname'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{bool} Read (@code{const char *}fname)
+@deftypefnx {Method on @code{mglDataC}} @code{bool} Read (@code{const char *}fname)
+@deftypefnx {C function} @code{int} mgl_data_read (@code{HMDT} dat, @code{const char *}fname)
+@deftypefnx {C function} @code{int} mgl_datac_read (@code{HADT} dat, @code{const char *}fname)
+@end ifclear
+Reads data from tab-separated text file with auto determining sizes of the data. Double newline means the beginning of new z-slice.
+@end deftypefn
+
+@deftypefn {MGL command} {} read @sc{dat} 'fname' @code{mx [my=1 mz=1]}
+@deftypefnx {MGL command} {} read @sc{redat} @sc{imdat} 'fname' @code{mx [my=1 mz=1]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{bool} Read (@code{const char *}fname, @code{int} mx, @code{int} my=@code{1}, @code{int} mz=@code{1})
+@deftypefnx {Method on @code{mglDataC}} @code{bool} Read (@code{const char *}fname, @code{int} mx, @code{int} my=@code{1}, @code{int} mz=@code{1})
+@deftypefnx {C function} @code{int} mgl_data_read_dim (@code{HMDT} dat, @code{const char *}fname, @code{int} mx, @code{int} my, @code{int} mz)
+@deftypefnx {C function} @code{int} mgl_datac_read_dim (@code{HADT} dat, @code{const char *}fname, @code{int} mx, @code{int} my, @code{int} mz)
+@end ifclear
+Reads data from text file with specified data sizes. This function does nothing if one of parameters @var{mx}, @var{my} or @var{mz} is zero or negative.
+@end deftypefn
+
+@anchor{readmat}
+@deftypefn {MGL command} {} readmat @sc{dat} 'fname' [@code{dim=2}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{bool} ReadMat (@code{const char *}fname, @code{int} dim=@code{2})
+@deftypefnx {Method on @code{mglDataC}} @code{bool} ReadMat (@code{const char *}fname, @code{int} dim=@code{2})
+@deftypefnx {C function} @code{int} mgl_data_read_mat (@code{HMDT} dat, @code{const char *}fname, @code{int} dim)
+@deftypefnx {C function} @code{int} mgl_datac_read_mat (@code{HADT} dat, @code{const char *}fname, @code{int} dim)
+@end ifclear
+Read data from text file with size specified at beginning of the file by first @var{dim} numbers. At this, variable @var{dim} set data dimensions.
+@end deftypefn
+
+@anchor{readall}
+@deftypefn {MGL command} {} readall @sc{dat} 'templ' @code{v1 v2 [dv=1 slice=off]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} ReadRange (@code{const char *}templ, @code{mreal} from, @code{mreal} to, @code{mreal} step=@code{1}, @code{bool} as_slice=@code{false})
+@deftypefnx {Method on @code{mglDataC}} @code{void} ReadRange (@code{const char *}templ, @code{mreal} from, @code{mreal} to, @code{mreal} step=@code{1}, @code{bool} as_slice=@code{false})
+@deftypefnx {C function} @code{int} mgl_data_read_range (@code{HMDT} dat, @code{const char *}templ, @code{mreal} from, @code{mreal} to, @code{mreal} step, @code{int} as_slice)
+@deftypefnx {C function} @code{int} mgl_datac_read_range (@code{HADT} dat, @code{const char *}templ, @code{mreal} from, @code{mreal} to, @code{mreal} step, @code{int} as_slice)
+@end ifclear
+Join data arrays from several text files. The file names are determined by function call @code{sprintf(fname,templ,val);}, where @var{val} changes from @var{from} to @var{to} with step @var{step}. The data load one-by-one in the same slice if @var{as_slice}=@code{false} or as slice-by-slice if @var{as_slice}=@code{true}.
+@end deftypefn
+
+@deftypefn {MGL command} {} readall @sc{dat} 'templ' @code{[slice=off]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} ReadAll (@code{const char *}templ, @code{bool} as_slice=@code{false})
+@deftypefnx {Method on @code{mglDataC}} @code{void} ReadAll (@code{const char *}templ, @code{bool} as_slice=@code{false})
+@deftypefnx {C function} @code{int} mgl_data_read_all (@code{HMDT} dat, @code{const char *}templ, @code{int} as_slice)
+@deftypefnx {C function} @code{int} mgl_datac_read_all (@code{HADT} dat, @code{const char *}templ, @code{int} as_slice)
+@end ifclear
+Join data arrays from several text files which filenames satisfied the template @var{templ} (for example, @var{templ}=@code{"t_*.dat"}). The data load one-by-one in the same slice if @var{as_slice}=@code{false} or as slice-by-slice if @var{as_slice}=@code{true}.
+@end deftypefn
+
+@anchor{scanfile}
+@deftypefn {MGL command} {} scanfile @sc{dat} 'fname' 'templ'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{bool} ScanFile (@code{const char *}fname, @code{const char *}templ)
+@deftypefnx {C function} @code{int} mgl_data_scan_file (@code{HMDT} dat, @code{const char *}fname, @code{const char *}templ)
+@end ifclear
+Read file @var{fname} line-by-line and scan each line for numbers according the template @var{templ}. The numbers denoted as @samp{%g} in the template. @sref{Saving and scanning file}
+@end deftypefn
+
+@anchor{save}
+@deftypefn {MGL command} {} save dat 'fname'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{void} Save (@code{const char *}fname, @code{int} ns=@code{-1}) @code{const}
+@deftypefnx {C function} @code{void} mgl_data_save (@code{HCDT} dat, @code{const char *}fname, @code{int} ns)
+@deftypefnx {C function} @code{void} mgl_datac_save (@code{HCDT} dat, @code{const char *}fname, @code{int} ns)
+@end ifclear
+Saves the whole data array (for @var{ns}=@code{-1}) or only @var{ns}-th slice to the text file @var{fname}.
+@end deftypefn
+
+@deftypefn {MGL command} {} save 'str' 'fname' ['mode'='a']
+Saves the string @var{str} to the text file @var{fname}. For parameter @var{mode}=@samp{a} will append string to the file (default); for @var{mode}=@samp{w} will overwrite the file. @sref{Saving and scanning file}
+@end deftypefn
+
+
+@anchor{readhdf}
+@deftypefn {MGL command} {} readhdf @sc{dat} 'fname' 'dname'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} ReadHDF (@code{const char *}fname, @code{const char *}dname)
+@deftypefnx {Method on @code{mglDataC}} @code{void} ReadHDF (@code{const char *}fname, @code{const char *}dname)
+@deftypefnx {C function} @code{void} mgl_data_read_hdf (@code{HMDT} dat, @code{const char *}fname, @code{const char *}dname)
+@deftypefnx {C function} @code{void} mgl_datac_read_hdf (@code{HADT} dat, @code{const char *}fname, @code{const char *}dname)
+@end ifclear
+Reads data array named @var{dname} from HDF5 or HDF4 file. This function does nothing if HDF5|HDF4 was disabled during library compilation.
+@end deftypefn
+
+@anchor{savehdf}
+@deftypefn {MGL command} {} savehdf dat 'fname' 'dname' [@code{rewrite}=@code{off}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{void} SaveHDF (@code{const char *}fname, @code{const char *}dname, @code{bool} rewrite=@code{false}) @code{const}
+@deftypefnx {C function} @code{void} mgl_data_save_hdf (@code{HCDT} dat, @code{const char *}fname, @code{const char *}dname, @code{int} rewrite)
+@deftypefnx {C function} @code{void} mgl_datac_save_hdf (@code{HCDT} dat, @code{const char *}fname, @code{const char *}dname, @code{int} rewrite)
+@end ifclear
+Saves data array named @var{dname} to HDF5 file. This function does nothing if HDF5 was disabled during library compilation.
+@end deftypefn
+
+@anchor{datas}
+@deftypefn {MGL command} {} datas 'fname'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{int} DatasHDF (@code{const char *}fname, @code{char *}buf, @code{long} size) @code{static}
+@deftypefnx {C function} @code{int} mgl_datas_hdf (@code{const char *}fname, @code{char *}buf, @code{long} size)
+@end ifclear
+Put data names from HDF5 file @var{fname} into @var{buf} as '\t' separated fields. In MGL version the list of data names will be printed as message. This function does nothing if HDF5 was disabled during library compilation.
+@end deftypefn
+
+@anchor{openhdf}
+@deftypefn {MGL command} {} openhdf 'fname'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglParse}} @code{void} OpenHDF (@code{const char *}fname)
+@deftypefnx {C function} @code{void} mgl_parser_openhdf (@code{HMPR} pr, @code{const char *}fname)
+@end ifclear
+Reads all data array from HDF5 file @var{fname} and create MGL variables with names of data names in HDF file. Complex variables will be created if data name starts with @samp{!}.
+@end deftypefn
+
+@ifclear UDAV
+@deftypefn {C function} @code{const char * const *} mgl_datas_hdf_str (@code{HMPR} pr, @code{const char *}fname)
+Put HDF data names as list of strings (last one is ""). The result is valid untill next call of the function.
+@end deftypefn
+@end ifclear
+
+
+@anchor{import}
+@deftypefn {MGL command} {} import @sc{dat} 'fname' 'sch' [@code{v1=0 v2=1}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Import (@code{const char *}fname, @code{const char *}scheme, @code{mreal} v1=@code{0}, mreal v2=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_import (@code{HMDT} dat, @code{const char *}fname, @code{const char *}scheme, @code{mreal} v1, mreal v2)
+@end ifclear
+Reads data from bitmap file (now support only PNG format). The RGB values of bitmap pixels are transformed to mreal values in range [@var{v1}, @var{v2}] using color scheme @var{scheme} (@pxref{Color scheme}).
+@end deftypefn
+
+@anchor{export}
+@deftypefn {MGL command} {} export dat 'fname' 'sch' [@code{v1=0 v2=0}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{void} Export (@code{const char *}fname, @code{const char *}scheme, @code{mreal} v1=@code{0}, mreal v2=@code{0}, @code{int} ns=@code{-1}) const
+@deftypefnx {C function} @code{void} mgl_data_export (@code{HMDT} dat, @code{const char *}fname, @code{const char *}scheme, @code{mreal} v1, mreal v2, @code{int} ns) const
+@end ifclear
+Saves data matrix (or @code{ns}-th slice for 3d data) to bitmap file (now support only PNG format). The data values are transformed from range [@var{v1}, @var{v2}] to RGB pixels of bitmap using color scheme @var{scheme} (@pxref{Color scheme}). If @var{v1}>=@var{v2} then the values of @var{v1}, @var{v2} are automatically determined as minimal and maximal value of the data array.
+@end deftypefn
+
+@c ------------------------------------------------------------------
+@external{}
+@node Make another data, Data changing, File I/O, Data processing
+@section Make another data
+@nav{}
+@cindex SubData
+@cindex Column
+@cindex Trace
+@cindex Hist
+@cindex Resize
+@cindex Evaluate
+@cindex Combine
+@cindex Momentum
+@cindex Sum
+@cindex Min
+@cindex Max
+@cindex Roots
+@cindex Correl
+@cindex AutoCorrel
+
+
+@anchor{subdata}
+@deftypefn {MGL command} {} subdata @sc{res} dat @code{xx [yy=all zz=all]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} SubData (@code{mreal} xx, @code{mreal} yy=@code{-1}, @code{mreal} zz=@code{-1}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} SubData (@code{mreal} xx, @code{mreal} yy=@code{-1}, @code{mreal} zz=@code{-1}) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_subdata (@code{HCDT} dat, @code{mreal} xx, @code{mreal} yy, @code{mreal} zz)
+@end ifclear
+Extracts sub-array data from the original data array keeping fixed positive index. For example @code{SubData(-1,2)} extracts 3d row (indexes are zero based), @code{SubData(4,-1)} extracts 5th column, @code{SubData(-1,-1,3)} extracts 4th slice and so on. If argument(s) are non-integer then linear interpolation between slices is used. In MGL version this command usually is used as inline one @code{dat(xx,yy,zz)}. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@deftypefn {MGL command} {} subdata @sc{res} dat xdat [ydat zdat]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} SubData (@code{const mglDataA &}xx, @code{const mglDataA &}yy, @code{const mglDataA &}zz) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} SubData (@code{const mglDataA &}xx, @code{const mglDataA &}yy, @code{const mglDataA &}zz) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} SubData (@code{const mglDataA &}xx, @code{const mglDataA &}yy) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} SubData (@code{const mglDataA &}xx, @code{const mglDataA &}yy) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} SubData (@code{const mglDataA &}xx) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} SubData (@code{const mglDataA &}xx) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_subdata_ext (@code{HCDT} dat, @code{HCDT} xx, @code{HCDT} yy, @code{HCDT} zz)
+@deftypefnx {C function} @code{HADT} mgl_datac_subdata_ext (@code{HCDT} dat, @code{HCDT} xx, @code{HCDT} yy, @code{HCDT} zz)
+@end ifclear
+Extracts sub-array data from the original data array for indexes specified by arrays @var{xx}, @var{yy}, @var{zz} (indirect access). This function work like previous one for 1D arguments or numbers, and resulting array dimensions are equal dimensions of 1D arrays for corresponding direction. For 2D and 3D arrays in arguments, the resulting array have the same dimensions as input arrays. The dimensions of all argument must be the same (or to be scalar 1*1*1) if they are 2D or 3D arrays. In MGL version this command usually is used as inline one @code{dat(xx,yy,zz)}. Function return NULL or create empty data if data cannot be created for given arguments. In C function some of @var{xx}, @var{yy}, @var{zz} can be NULL.
+@end deftypefn
+
+@anchor{column}
+@deftypefn {MGL command} {} column @sc{res} dat 'eq'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Column (@code{const char *}eq) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Column (@code{const char *}eq) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_column (@code{HCDT} dat, @code{const char *}eq)
+@end ifclear
+Get column (or slice) of the data filled by formula @var{eq} on column ids. For example, @code{Column("n*w^2/exp(t)");}. The column ids must be defined first by @ref{idset} function or read from files. In MGL version this command usually is used as inline one @code{dat('eq')}. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{resize}
+@deftypefn {MGL command} {} resize @sc{res} dat @code{mx [my=1 mz=1]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Resize (@code{int} mx, @code{int} my=@code{0}, @code{int} mz=@code{0}, @code{mreal} x1=@code{0}, @code{mreal} x2=@code{1}, @code{mreal} y1=@code{0}, @code{mreal} y2=@code{1}, @code{mreal} z1=@code{0}, @code{mreal} z2=@code{1}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Resize (@code{int} mx, @code{int} my=@code{0}, @code{int} mz=@code{0}, @code{mreal} x1=@code{0}, @code{mreal} x2=@code{1}, @code{mreal} y1=@code{0}, @code{mreal} y2=@code{1}, @code{mreal} z1=@code{0}, @code{mreal} z2=@code{1}) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_resize (@code{HCDT} dat, @code{int} mx, @code{int} my, @code{int} mz)
+@deftypefnx {C function} @code{HMDT} mgl_data_resize_box (@code{HCDT} dat, @code{int} mx, @code{int} my, @code{int} mz, @code{mreal} x1, @code{mreal} x2, @code{mreal} y1, @code{mreal} y2, @code{mreal} z1, @code{mreal} z2)
+@end ifclear
+Resizes the data to new size @var{mx}, @var{my}, @var{mz} from box (part) [@var{x1},@var{x2}] x [@var{y1},@var{y2}] x [@var{z1},@var{z2}] of original array. Initially x,y,z coordinates are supposed to be in [0,1]. If one of sizes @var{mx}, @var{my} or @var{mz} is 0 then initial size is used. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{evaluate}
+@deftypefn {MGL command} {} evaluate @sc{res} dat idat [@code{norm=on}]
+@deftypefnx {MGL command} {} evaluate @sc{res} dat idat jdat [@code{norm=on}]
+@deftypefnx {MGL command} {} evaluate @sc{res} dat idat jdat kdat [@code{norm=on}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Evaluate (@code{const mglDataA &}idat, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} Evaluate (@code{const mglDataA &}idat, @code{const mglDataA &}jdat, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} Evaluate (@code{const mglDataA &}idat, @code{const mglDataA &}jdat, @code{const mglDataA &}kdat, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Evaluate (@code{const mglDataA &}idat, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Evaluate (@code{const mglDataA &}idat, @code{const mglDataA &}jdat, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Evaluate (@code{const mglDataA &}idat, @code{const mglDataA &}jdat, @code{const mglDataA &}kdat, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_evaluate (@code{HCDT} dat, @code{HCDT} idat, @code{HCDT} jdat, @code{HCDT} kdat, @code{int} norm)
+@end ifclear
+Gets array which values is result of interpolation of original array for coordinates from other arrays. All dimensions must be the same for data @var{idat}, @var{jdat}, @var{kdat}. Coordinates from @var{idat}, @var{jdat}, @var{kdat} are supposed to be normalized in range [0,1] (if @var{norm}=@code{true}) or in ranges [0,nx], [0,ny], [0,nz] correspondingly. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{section}
+@deftypefn {MGL command} {} section @sc{res} dat ids ['dir'='y' @code{val=nan}]
+@deftypefnx {MGL command} {} section @sc{res} dat @code{id} ['dir'='y' @code{val=nan}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Section (@code{const mglDataA &}ids, @code{const char *}dir=@code{'y'}, @code{mreal} val=@code{NAN}) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} Section (@code{long} id, @code{const char *}dir=@code{'y'}, @code{mreal} val=@code{NAN}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Section (@code{const mglDataA &}ids, @code{const char *}dir=@code{'y'}, @code{mreal} val=@code{NAN}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Section (@code{long} id, @code{const char *}dir=@code{'y'}, @code{mreal} val=@code{NAN}) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_section (@code{HCDT} dat, @code{HCDT} ids, @code{const char *}dir, @code{mreal} val)
+@deftypefnx {C function} @code{HMDT} mgl_data_section_val (@code{HCDT} dat, @code{long} id, @code{const char *}dir, @code{mreal} val)
+@deftypefnx {C function} @code{HADT} mgl_datac_section (@code{HCDT} dat, @code{HCDT} ids, @code{const char *}dir, @code{mreal} val)
+@deftypefnx {C function} @code{HADT} mgl_datac_section_val (@code{HCDT} dat, @code{long} id, @code{const char *}dir, @code{mreal} val)
+@end ifclear
+Gets array which is @var{id}-th section (range of slices separated by value @var{val}) of original array @var{dat}. For @var{id}<0 the reverse order is used (i.e. -1 give last section). If several @var{ids} are provided then output array will be result  of sequential joining of sections.
+@end deftypefn
+
+
+@anchor{solve}
+@deftypefn {MGL command} {} solve @sc{res} dat @code{val} 'dir' [@code{norm=on}]
+@deftypefnx {MGL command} {} solve @sc{res} dat @code{val} 'dir' idat [@code{norm=on}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Solve (@code{mreal} val, @code{char} dir, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} Solve (@code{mreal} val, @code{char} dir, @code{const mglDataA &}idat, @code{bool} norm=@code{true}) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_solve (@code{HCDT} dat, @code{mreal} val, @code{char} dir, @code{HCDT} idat, @code{int} norm)
+@end ifclear
+Gets array which values is indexes (roots) along given direction @var{dir}, where interpolated values of data @var{dat} are equal to @var{val}. Output data will have the sizes of @var{dat} in directions transverse to @var{dir}. If data @var{idat} is provided then its values are used as starting points. This allows to find several branches by consequentive calls. Indexes are supposed to be normalized in range [0,1] (if @var{norm}=@code{true}) or in ranges [0,nx], [0,ny], [0,nz] correspondingly. Function return NULL or create empty data if data cannot be created for given arguments. @sref{Solve sample}
+@end deftypefn
+
+@anchor{roots}
+@deftypefn {MGL command} {} roots @sc{res} 'func' ini ['var'='x']
+@deftypefnx {MGL command} {} roots @sc{res} 'func' @code{ini} ['var'='x']
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Roots (@code{const char *}func, @code{char} var) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_roots (@code{const char *}func, @code{HCDT} ini, @code{char} var)
+@deftypefnx {C function} @code{mreal} mgl_find_root_txt (@code{const char *}func, @code{mreal} ini, @code{char} var)
+@end ifclear
+Find roots of equation 'func'=0 for variable @var{var} with initial guess @var{ini}. Secant method is used for root finding. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@deftypefn {MGL command} {} roots @sc{res} 'funcs' 'vars' ini
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} MultiRoots (@code{const char *}funcs, @code{const char *}vars) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglDataC} MultiRoots (@code{const char *}funcs, @code{const char *}vars) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_find_roots_txt (@code{const char *}func, @code{const char *}vars, @code{HCDT} ini)
+@deftypefnx {C function} @code{HADT} mgl_find_roots_txt_c (@code{const char *}func, @code{const char *}vars, @code{HCDT} ini)
+@end ifclear
+Find roots of system of equations 'funcs'=0 for variables @var{vars} with initial guesses @var{ini}. Secant method is used for root finding. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{detect}
+@deftypefn {MGL command} {} detect @sc{res} dat @code{lvl dj [di=0 minlen=0]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Detect (@code{mreal} lvl, @code{mreal} dj, @code{mreal} di=@code{0}, @code{mreal} minlen=@code{0}) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_detect (@code{HCDT} dat, @code{mreal} lvl, @code{mreal} dj, @code{mreal} di, @code{mreal} minlen)
+@end ifclear
+Get curves @{x,y@}, separated by NAN values, for local maximal values of array @var{dat} as function of x-coordinate. Noises below @var{lvl} amplitude are ignored. Parameter @var{dj} (in range [0,ny]) set the "attraction" y-distance of points to the curve. Similarly, @var{di} continue curve in x-direction through gaps smaller than @var{di} points. Curves with minimal length smaller than @var{minlen} will be ignored.
+@end deftypefn
+
+@anchor{hist}
+@deftypefn {MGL command} {} hist @sc{res} dat @code{num v1 v2 [nsub=0]}
+@deftypefnx {MGL command} {} hist @sc{res} dat wdat @code{num v1 v2 [nsub=0]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Hist (@code{int} n, @code{mreal} v1=@code{0}, @code{mreal} v2=@code{1}, @code{int} nsub=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} Hist (@code{const mglDataA &}w, @code{int} n, @code{mreal} v1=@code{0}, @code{mreal} v2=@code{1}, @code{int} nsub=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Hist (@code{int} n, @code{mreal} v1=@code{0}, @code{mreal} v2=@code{1}, @code{int} nsub=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Hist (@code{const mglDataA &}w, @code{int} n, @code{mreal} v1=@code{0}, @code{mreal} v2=@code{1}, @code{int} nsub=@code{0}) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_hist (@code{HCDT} dat, @code{int} n, @code{mreal} v1, @code{mreal} v2, @code{int} nsub)
+@deftypefnx {C function} @code{HMDT} mgl_data_hist_w (@code{HCDT} dat, @code{HCDT} w, @code{int} n, @code{mreal} v1, @code{mreal} v2, @code{int} nsub)
+@end ifclear
+Creates @var{n}-th points distribution of the data values in range [@var{v1}, @var{v2}]. Array @var{w} specifies weights of the data elements (by default is 1). Parameter @var{nsub} define the number of additional interpolated points (for smoothness of histogram). Function return NULL or create empty data if data cannot be created for given arguments. See also @ref{Data manipulation}
+@end deftypefn
+
+@anchor{momentum}
+@deftypefn {MGL command} {} momentum @sc{res} dat 'how' ['dir'='z']
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Momentum (@code{char} dir, @code{const char *}how) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Momentum (@code{char} dir, @code{const char *}how) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_momentum (@code{HCDT} dat, @code{char} dir, @code{const char *}how)
+@end ifclear
+Gets momentum (1d-array) of the data along direction @var{dir}. String @var{how} contain kind of momentum. The momentum is defined like as
+@iftex
+@math{res_k = \sum_{ij} how(x_i,y_j,z_k) a_{ij}/\sum_{ij} a_{ij}}
+@end iftex
+@ifnottex
+res_k = \sum_ij how(x_i,y_j,z_k) a_ij/ \sum_ij a_ij
+@end ifnottex
+if @var{dir}=@samp{z} and so on. Coordinates @samp{x}, @samp{y}, @samp{z} are data indexes normalized in range [0,1]. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{sum}
+@deftypefn {MGL command} {} sum @sc{res} dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Sum (@code{const char *}dir) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Sum (@code{const char *}dir) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_sum (@code{HCDT} dat, @code{const char *}dir)
+@end ifclear
+Gets array which is the result of summation in given direction or direction(s). Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{max}
+@deftypefn {MGL command} {} max @sc{res} dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Max (@code{const char *}dir) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Max (@code{const char *}dir) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_max_dir (@code{HCDT} dat, @code{const char *}dir)
+@end ifclear
+Gets array which is the maximal data values in given direction or direction(s). Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{min}
+@deftypefn {MGL command} {} min @sc{res} dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Min (@code{const char *}dir) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Min (@code{const char *}dir) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_min_dir (@code{HCDT} dat, @code{const char *}dir)
+@end ifclear
+Gets array which is the maximal data values in given direction or direction(s). Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{minmax}
+@deftypefn {MGL command} {} minmax @sc{res} dat
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} MinMax () @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_minmax (@code{HCDT} dat)
+@end ifclear
+Gets positions of local maximums and minimums. Function return NULL or create empty data if there is no minimums and maximums.
+@end deftypefn
+
+@anchor{conts}
+@deftypefn {MGL command} {} conts @sc{res} @code{val} dat
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Conts (@code{mreal} val) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_conts (@code{mreal} val, @code{HCDT} dat)
+@end ifclear
+Gets coordinates of contour lines for dat[i,j]=val. NAN values separate the the curves. Function return NULL or create empty data if there is contour lines.
+@end deftypefn
+
+@anchor{combine}
+@deftypefn {MGL command} {} combine @sc{res} adat bdat
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Combine (@code{const mglDataA &}a) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Combine (@code{const mglDataA &}a) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_combine (@code{HCDT} dat, @code{HCDT} a)
+@end ifclear
+Returns direct multiplication of arrays (like, res[i,j] = this[i]*a[j] and so on). Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{trace}
+@deftypefn {MGL command} {} trace @sc{res} dat
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Trace () @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglData} Trace () @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_trace (@code{HCDT} dat)
+@end ifclear
+Gets array of diagonal elements a[i,i] (for 2D case) or a[i,i,i] (for 3D case) where i=0...nx-1. Function return copy of itself for 1D case. Data array must have dimensions ny,nz >= nx or ny,nz = 1. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@anchor{correl}
+@deftypefn {MGL command} {} correl @sc{res} adat bdat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Correl (@code{const mglDataA &}b, @code{const char *}dir) @code{const}
+@deftypefnx {Method on @code{mglData}} @code{mglData} AutoCorrel (@code{const char *}dir) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglDataC} Correl (@code{const mglDataA &}b, @code{const char *}dir) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{mglDataC} AutoCorrel (@code{const char *}dir) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_correl (@code{HCDT} a, @code{HCDT} b, @code{const char *}dir)
+@deftypefnx {C function} @code{HADT} mgl_datac_correl (@code{HCDT} a, @code{HCDT} b, @code{const char *}dir)
+@end ifclear
+Find correlation between data @var{a} (or this in C++) and @var{b} along directions @var{dir}. Fourier transform is used to find the correlation. So, you may want to use functions @ref{swap} or @ref{norm} before plotting it. Function return NULL or create empty data if data cannot be created for given arguments.
+@end deftypefn
+
+@ifclear UDAV
+@deftypefn {Method on @code{mglDataC}} @code{mglData} Real () @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_datac_real (@code{HCDT} dat)
+Gets array of real parts of the data.
+@end deftypefn
+@deftypefn {Method on @code{mglDataC}} @code{mglData} Imag () @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_datac_imag (@code{HCDT} dat)
+Gets array of imaginary parts of the data.
+@end deftypefn
+@deftypefn {Method on @code{mglDataC}} @code{mglData} Abs () @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_datac_abs (@code{HCDT} dat)
+Gets array of absolute values of the data.
+@end deftypefn
+@deftypefn {Method on @code{mglDataC}} @code{mglData} Arg () @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_datac_arg (@code{HCDT} dat)
+Gets array of arguments of the data.
+@end deftypefn
+@end ifclear
+
+@anchor{pulse}
+@deftypefn {MGL command} {} pulse @sc{res} dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{mglData} Pulse (@code{const char *}dir) @code{const}
+@deftypefnx {C function} @code{HMDT} mgl_data_pulse (@code{HCDT} dat, @code{const char *}dir)
+@end ifclear
+Find pulse properties along direction @var{dir}: pulse maximum (in column 0) and its position (in column 1), pulse width near maximum (in column 3) and by half height (in column 2), energy in first pulse (in column 4). NAN values are used for widths if maximum is located near the edges. Note, that there is uncertainty for complex data. Usually one should use square of absolute value (i.e. |dat[i]|^2) for them. So, MathGL don't provide this function for complex data arrays. However, C function will work even in this case but use absolute value (i.e. |dat[i]|). Function return NULL or create empty data if data cannot be created for given arguments. See also @ref{max}, @ref{min}, @ref{momentum}, @ref{sum}. @sref{Pulse properties}
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Data changing, Interpolation, Make another data, Data processing
+@section Data changing
+@nav{}
+@cindex CumSum
+@cindex Integral
+@cindex Diff
+@cindex Diff2
+@cindex SinFFT
+@cindex CosFFT
+@cindex Hankel
+@cindex Swap
+@cindex Roll
+@cindex Mirror
+@cindex Sew
+@cindex Smooth
+@cindex Envelop
+@cindex Norm
+@cindex NormSl
+
+These functions change the data in some direction like differentiations, integrations and so on. The direction in which the change will applied is specified by the string parameter, which may contain @samp{x}, @samp{y} or @samp{z} characters for 1-st, 2-nd and 3-d dimension correspondingly.
+
+@anchor{cumsum}
+@deftypefn {MGL command} {} cumsum dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} CumSum (@code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} CumSum (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_cumsum (@code{HMDT} dat, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_cumsum (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Cumulative summation of the data in given direction or directions.
+@end deftypefn
+
+@anchor{integrate}
+@deftypefn {MGL command} {} integrate dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Integral (@code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Integral (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_integral (@code{HMDT} dat, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_integral (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Integrates (like cumulative summation) the data in given direction or directions.
+@end deftypefn
+
+@anchor{diff}
+@deftypefn {MGL command} {} diff dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Diff (@code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Diff (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_diff (@code{HMDT} dat, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_diff (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Differentiates the data in given direction or directions.
+@end deftypefn
+
+@deftypefn {MGL command} {} diff dat xdat ydat [zdat]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Diff (@code{const mglDataA &}x)
+@deftypefnx {Method on @code{mglData}} @code{void} Diff (@code{const mglDataA &}x, @code{const mglDataA &}y)
+@deftypefnx {Method on @code{mglData}} @code{void} Diff (@code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Diff (@code{const mglDataA &}x)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Diff (@code{const mglDataA &}x, @code{const mglDataA &}y)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Diff (@code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z)
+@deftypefnx {C function} @code{void} mgl_data_diff_par (@code{HMDT} dat, @code{HCDT} x, @code{HCDT}y, @code{HCDT}z)
+@deftypefnx {C function} @code{void} mgl_datac_diff_par (@code{HADT} dat, @code{HCDT} x, @code{HCDT}y, @code{HCDT}z)
+@end ifclear
+Differentiates the data specified parametrically in direction @var{x} with @var{y}, @var{z}=constant. Parametrical differentiation uses the formula (for 2D case): @math{da/dx = (a_j*y_i-a_i*y_j)/(x_j*y_i-x_i*y_j)} where @math{a_i=da/di, a_j=da/dj} denotes usual differentiation along 1st and 2nd dimensions. The similar formula is used for 3D case. Note, that you may change the order of arguments -- for example, if you have 2D data a(i,j) which depend on coordinates @{x(i,j), y(i,j)@} then usual derivative along @samp{x} will be @code{Diff(x,y);} and usual derivative along @samp{y} will be @code{Diff(y,x);}.
+@end deftypefn
+
+@anchor{diff2}
+@deftypefn {MGL command} {} diff2 dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Diff2 (@code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Diff2 (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_diff2 (@code{HMDT} dat, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_diff2 (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Double-differentiates (like Laplace operator) the data in given direction.
+@end deftypefn
+
+@anchor{sinfft}
+@deftypefn {MGL command} {} sinfft dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} SinFFT (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_sinfft (@code{HMDT} dat, @code{const char *}dir)
+@end ifclear
+Do Sine transform of the data in given direction or directions. The Sine transform is @math{\sum a_j \sin(k j)} (see @uref{http://en.wikipedia.org/wiki/Discrete_sine_transform#DST-I}).
+@end deftypefn
+
+@anchor{cosfft}
+@deftypefn {MGL command} {} cosfft dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} CosFFT (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_cosfft (@code{HMDT} dat, @code{const char *}dir)
+@end ifclear
+Do Cosine transform of the data in given direction or directions. The Cosine transform is @math{\sum a_j \cos(k j)} (see @uref{http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-I}).
+@end deftypefn
+
+@ifclear UDAV
+@deftypefn {Method on @code{mglDataC}} @code{void} FFT (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_fft (@code{HADT} dat, @code{const char *}dir)
+Do Fourier transform of the data in given direction or directions. If @var{dir} contain @samp{i} then inverse Fourier is used. The Fourier transform is @math{\sum a_j \exp(i k j)} (see @uref{http://en.wikipedia.org/wiki/Discrete_Fourier_transform}).
+@end deftypefn
+@end ifclear
+
+@anchor{hankel}
+@deftypefn {MGL command} {} hankel dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Hankel (@code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Hankel (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_hankel (@code{HMDT} dat, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_hankel (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Do Hankel transform of the data in given direction or directions. The Hankel transform is @math{\sum a_j J_0(k j)} (see @uref{http://en.wikipedia.org/wiki/Hankel_transform}).
+@end deftypefn
+
+@anchor{wavelet}
+@deftypefn {MGL command} {} wavelet dat 'dir' @code{k}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Wavelet (@code{const char *}dir, @code{int} k)
+@deftypefnx {C function} @code{void} mgl_data_wavelet (@code{HMDT} dat, @code{const char *}dir, @code{int} k)
+@end ifclear
+Apply wavelet transform of the data in given direction or directions. Parameter @var{dir} set the kind of wavelet transform:
+@samp{d} for daubechies, @samp{D} for centered daubechies, @samp{h} for haar, @samp{H} for centered haar, @samp{b} for bspline, @samp{B} for centered bspline. If string @var{dir} contain symbol @samp{i} then inverse wavelet transform is applied. Parameter @var{k} set the size of wavelet transform.
+@end deftypefn
+
+@anchor{swap}
+@deftypefn {MGL command} {} swap dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Swap (@code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Swap (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_swap (@code{HMDT} dat, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_swap (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Swaps the left and right part of the data in given direction (useful for Fourier spectrum).
+@end deftypefn
+
+@anchor{roll}
+@deftypefn {MGL command} {} roll dat 'dir' num
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Roll (@code{char} dir, @code{num})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Roll (@code{char} dir, @code{num})
+@deftypefnx {C function} @code{void} mgl_data_roll (@code{HMDT} dat, @code{char} dir, @code{num})
+@deftypefnx {C function} @code{void} mgl_datac_roll (@code{HADT} dat, @code{char} dir, @code{num})
+@end ifclear
+Rolls the data along direction @var{dir}. Resulting array will be out[i] = ini[(i+@var{num})%nx] if @code{dir='x'}.
+@end deftypefn
+
+@anchor{mirror}
+@deftypefn {MGL command} {} mirror dat 'dir'
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Mirror (@code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Mirror (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_mirror (@code{HMDT} dat, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_mirror (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Mirror the left-to-right part of the data in given direction. Looks like change the value index @var{i}->@var{n-i}. Note, that the similar effect in graphics you can reach by using options (@pxref{Command options}), for example, @code{surf dat; xrange 1 -1}.
+@end deftypefn
+
+@anchor{sew}
+@deftypefn {MGL command} {} sew dat ['dir'='xyz' @code{da=2*pi}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Sew (@code{const char *}dir, @code{mreal} da=@code{2*M_PI})
+@deftypefnx {C function} @code{void} mgl_data_sew (@code{HMDT} dat, @code{const char *}dir, @code{mreal} da)
+@end ifclear
+Remove value steps (like phase jumps after inverse trigonometric functions) with period @var{da} in given direction.
+@end deftypefn
+
+@anchor{smooth}
+@deftypefn {MGL command} {} smooth data ['dir'='xyz']
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Smooth (@code{const char *}dir=@code{"xyz"}, @code{mreal} delta=@code{0})
+@deftypefnx {Method on @code{mglDataC}} @code{void} Smooth (@code{const char *}dir=@code{"xyz"}, @code{mreal} delta=@code{0})
+@deftypefnx {C function} @code{void} mgl_data_smooth (@code{HMDT} dat, @code{const char *}dir, @code{mreal} delta)
+@deftypefnx {C function} @code{void} mgl_datac_smooth (@code{HADT} dat, @code{const char *}dir, @code{mreal} delta)
+@end ifclear
+Smooths the data on specified direction or directions. String @var{dirs} specifies the dimensions which will be smoothed. It may contain characters:
+@itemize @bullet
+@item
+@samp{xyz} for smoothing along x-,y-,z-directions correspondingly,
+@item
+@samp{0} does nothing,
+@item
+@samp{3} for linear averaging over 3 points,
+@item
+@samp{5} for linear averaging over 5 points,
+@item
+@samp{d1}...@samp{d9} for linear averaging over (2*N+1)-th points,
+@item
+@samp{^} for finding upper bound,
+@item
+@samp{_} for finding lower bound.
+@end itemize
+By default quadratic averaging over 5 points is used.
+@end deftypefn
+
+@anchor{envelop}
+@deftypefn {MGL command} {} envelop dat ['dir'='x']
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Envelop (@code{char} dir=@code{'x'})
+@deftypefnx {C function} @code{void} mgl_data_envelop (@code{HMDT} dat, @code{char} dir)
+@end ifclear
+Find envelop for data values along direction @var{dir}.
+@end deftypefn
+
+@anchor{diffract}
+@deftypefn {MGL command} {} diffract dat 'how' @code{q}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataC}} @code{void} Diffraction (@code{const char *}how, @code{mreal} q)
+@deftypefnx {C function} @code{void} mgl_datac_diffr (@code{HADT} dat, @code{const char *}how, @code{mreal} q)
+@end ifclear
+Calculates one step of diffraction by finite-difference method with parameter @var{q}=@math{\delta t/\delta x^2} using method with 3-d order of accuracy. Parameter @var{how} may contain:
+@itemize @bullet
+ @item @samp{xyz} for calculations along x-,y-,z-directions correspondingly;
+@item
+ @samp{r} for using axial symmetric Laplace operator for x-direction;
+@item
+ @samp{0} for zero boundary conditions;
+@item
+ @samp{1} for constant boundary conditions;
+@item
+ @samp{2} for linear boundary conditions;
+@item
+ @samp{3} for parabolic boundary conditions;
+@item
+ @samp{4} for exponential boundary conditions;
+@item
+ @samp{5} for gaussian boundary conditions.
+@end itemize
+@end deftypefn
+
+@anchor{norm}
+@deftypefn {MGL command} {} norm dat @code{v1 v2 [sym=off dim=0]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Norm (@code{mreal} v1=@code{0}, @code{mreal} v2=@code{1}, @code{bool} sym=@code{false}, @code{long} dim=@code{0})
+@deftypefnx {C function} @code{void} mgl_data_norm (@code{HMDT} dat, @code{mreal} v1, @code{mreal} v2, @code{int} sym, @code{long} dim)
+@end ifclear
+Normalizes the data to range [@var{v1},@var{v2}]. If flag @var{sym}=@code{true} then symmetrical interval [-max(|v1|,|v2|), max(|v1|,|v2|)] is used. Modification will be applied only for slices >=@var{dim}.
+@end deftypefn
+
+@anchor{normsl}
+@deftypefn {MGL command} {} normsl dat @code{v1 v2} ['dir'='z' @code{keep=on sym=off}]
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} NormSl (@code{mreal} v1=@code{0}, @code{mreal} v2=@code{1}, @code{char} dir=@code{'z'}, @code{bool} keep=@code{true}, @code{bool} sym=@code{false})
+@deftypefnx {C function} @code{void} mgl_data_norm_slice (@code{HMDT} dat, @code{mreal} v1, @code{mreal} v2, @code{char} dir, @code{int} keep, @code{int} sym)
+@end ifclear
+Normalizes data slice-by-slice along direction @var{dir} the data in slices to range [@var{v1},@var{v2}]. If flag @var{sym}=@code{true} then symmetrical interval [-max(|v1|,|v2|), max(|v1|,|v2|)] is used. If @var{keep} is set then maximal value of k-th slice will be limited by
+@iftex
+@math{\sqrt{\sum a_{ij}(k)/\sum a_{ij}(0)}}.
+@end iftex
+@ifnottex
+@math{\sqrt@{\sum a_ij(k)/\sum a_ij(0)@}}.
+@end ifnottex
+@end deftypefn
+
+@anchor{limit}
+@deftypefn {MGL command} {} limit dat @code{val}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Limit (@code{mreal} val)
+@deftypefnx {Method on @code{mglDataC}} @code{void} Limit (@code{mreal} val)
+@deftypefnx {C function} @code{void} mgl_data_limit (@code{HMDT} dat, @code{mreal} val)
+@deftypefnx {C function} @code{void} mgl_datac_limit (@code{HADT} dat, @code{mreal} val)
+@end ifclear
+Limits the data values to be inside the range [-@var{val},@var{val}], keeping the original sign of the value (phase for complex numbers). This is equivalent to operation @code{a[i] *= abs(a[i])<val?1.:val/abs(a[i]);}.
+@end deftypefn
+
+@anchor{coil}
+@deftypefn {MGL command} {} coil dat @code{v1 v2 [sep=on]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Coil (@code{mreal} v1, @code{mreal} v2, @code{bool} sep=@code{true})
+@deftypefnx {C function} @code{void} mgl_data_coil (@code{HMDT} dat, @code{mreal} v1, @code{mreal} v2, @code{int} sep)
+@end ifclear
+Project the periodical data to range [@var{v1},@var{v2}] (like @code{mod()} function). Separate branches by @code{NAN} if @var{sep}=@code{true}.
+@end deftypefn
+
+
+@anchor{dilate}
+@deftypefn {MGL command} {} dilate dat @code{[val=1 step=1]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Dilate (@code{mreal} val=@code{1}, @code{long} step=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_dilate (@code{HMDT} dat, @code{mreal} val, @code{long} step)
+@end ifclear
+Return dilated by @var{step} cells array of 0 or 1 for data values larger @var{val}. @c TODO @sref{Dilate and erode sample}
+@end deftypefn
+
+@anchor{erode}
+@deftypefn {MGL command} {} erode dat @code{[val=1 step=1]}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} Erode (@code{mreal} val=@code{1}, @code{long} step=@code{1})
+@deftypefnx {C function} @code{void} mgl_data_erode (@code{HMDT} dat, @code{mreal} val, @code{long} step)
+@end ifclear
+Return eroded by @var{step} cells array of 0 or 1 for data values larger @var{val}. @c TODO @sref{Dilate and erode sample}
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Interpolation, Data information, Data changing, Data processing
+@section Interpolation
+@nav{}
+
+MGL scripts can use spline interpolation by @ref{evaluate} or @ref{refill} commands. Also you can use @ref{resize} for obtaining a data array with new sizes.
+
+@ifclear UDAV
+
+However, there are much special faster functions in other modes (C/C++/Fortran/Python/...).
+
+@cindex Spline
+@deftypefn {Method on @code{mglData}} @code{mreal} Spline (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{dual} Spline (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_spline (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z)
+@deftypefnx {C function} @code{dual} mgl_datac_spline (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z)
+Interpolates data by cubic spline to the given point @var{x} in [0...nx-1], @var{y} in [0...ny-1], @var{z} in [0...nz-1].
+@end deftypefn
+@cindex Spline1
+@deftypefn {Method on @code{mglData}} @code{mreal} Spline1 (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{dual} Spline1 (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+Interpolates data by cubic spline to the given point @var{x}, @var{y}, @var{z} which assumed to be normalized in range [0, 1].
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{mreal} Spline (@code{mglPoint} &dif, @code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_spline_ext (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z, @code{mreal *}dx, @code{mreal *}dy, @code{mreal *}dz)
+@deftypefnx {C function} @code{dual} mgl_datac_spline_ext (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z, @code{dual *}dx, @code{dual *}dy, @code{dual *}dz)
+Interpolates data by cubic spline to the given point @var{x} in [0...nx-1], @var{y} in [0...ny-1], @var{z} in [0...nz-1]. The values of derivatives at the point are saved in @var{dif}.
+@end deftypefn
+@cindex Spline1
+@deftypefn {Method on @code{mglData}} @code{mreal} Spline1 (@code{mglPoint} &dif, @code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+Interpolates data by cubic spline to the given point @var{x}, @var{y}, @var{z} which assumed to be normalized in range [0, 1]. The values of derivatives at the point are saved in @var{dif}.
+@end deftypefn
+
+@cindex Linear
+@deftypefn {Method on @code{mglData}} @code{mreal} Linear (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{dual} Linear (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_linear (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z)
+@deftypefnx {C function} @code{dual} mgl_datac_linear (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z)
+Interpolates data by linear function to the given point @var{x} in [0...nx-1], @var{y} in [0...ny-1], @var{z} in [0...nz-1].
+@end deftypefn
+@cindex Linear1
+@deftypefn {Method on @code{mglData}} @code{mreal} Linear1 (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{dual} Linear1 (@code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+Interpolates data by linear function to the given point @var{x}, @var{y}, @var{z} which assumed to be normalized in range [0, 1].
+@end deftypefn
+
+@deftypefn {Method on @code{mglData}} @code{mreal} Linear (@code{mglPoint} &dif, @code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{dual} Linear (@code{mglPoint} &dif, @code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_linear_ext (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z, @code{mreal *}dx, @code{mreal *}dy, @code{mreal *}dz)
+@deftypefnx {C function} @code{dual} mgl_datac_linear_ext (@code{HCDT} dat, @code{mreal} x, @code{mreal} y, @code{mreal} z, @code{dual *}dx, @code{dual *}dy, @code{dual *}dz)
+Interpolates data by linear function to the given point @var{x} in [0...nx-1], @var{y} in [0...ny-1], @var{z} in [0...nz-1]. The values of derivatives at the point are saved in @var{dif}.
+@end deftypefn
+@cindex Linear1
+@deftypefn {Method on @code{mglData}} @code{mreal} Linear1 (@code{mglPoint} &dif, @code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+@deftypefnx {Method on @code{mglDataC}} @code{dual} Linear1 (@code{mglPoint} &dif, @code{mreal} x, @code{mreal} y=@code{0}, @code{mreal} z=@code{0}) @code{const}
+Interpolates data by linear function to the given point @var{x}, @var{y}, @var{z} which assumed to be normalized in range [0, 1]. The values of derivatives at the point are saved in @var{dif}.
+@end deftypefn
+
+@end ifclear
+
+@c ------------------------------------------------------------------
+@external{}
+@node Data information, Operators, Interpolation, Data processing
+@section Data information
+@nav{}
+
+There are a set of functions for obtaining data properties in MGL language. However most of them can be found using "suffixes". Suffix can get some numerical value of the data array (like its size, maximal or minimal value, the sum of elements and so on) as number. Later it can be used as usual number in command arguments. The suffixes start from point @samp{.} right after (without spaces) variable name or its sub-array. For example, @code{a.nx} give the x-size of data @var{a}, @code{b(1).max} give maximal value of second row of variable @var{b}, @code{(c(:,0)^2).sum} give the sum of squares of elements in the first column of @var{c} and so on.
+
+
+@cindex PrintInfo
+@anchor{info}
+@deftypefn {MGL command} {} info dat
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{const char *} PrintInfo () @code{const}
+@deftypefnx {Method on @code{mglDataA}} @code{void} PrintInfo (@code{FILE *}fp) @code{const}
+@deftypefnx {C function only} @code{const char *} mgl_data_info (@code{HCDT} dat)
+@deftypefnx {Fortran subroutine} @code{} mgl_data_info (@code{long} dat, @code{char *}out, @code{int} len)
+@end ifclear
+Gets or prints to file @var{fp} or as message (in MGL) information about the data (sizes, maximum/minimum, momentums and so on).
+@end deftypefn
+
+@deftypefn {MGL command} {} info 'txt'
+Prints string @var{txt} as message.
+@end deftypefn
+
+@deftypefn {MGL command} {} info val
+Prints value of number @var{val} as message.
+@end deftypefn
+
+@anchor{print}
+@deftypefn {MGL command} {} print dat
+@deftypefnx {MGL command} {} print 'txt'
+@deftypefnx {MGL command} {} print val
+The same as @ref{info} but immediately print to stdout.
+@end deftypefn
+
+@anchor{echo}
+@deftypefn {MGL command} {} echo dat
+Prints all values of the data array @var{dat} as message.
+@end deftypefn
+
+@anchor{progress}
+@deftypefn {MGL command} {} progress @code{val max}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglGraph}} @code{void} Progress (@code{int} val, @code{int} max)
+@deftypefnx {C function} @code{void} mgl_progress (@code{int} val, @code{int} max)
+@end ifclear
+Display progress of something as filled horizontal bar with relative length @var{val}/@var{max}. Note, it work now only in console and in FLTK-based applications, including @code{mgllab} and @code{mglview}.
+@end deftypefn
+
+
+@cindex GetNx
+@cindex GetNy
+@cindex GetNz
+@anchor{.nx} @anchor{.ny} @anchor{.nz}
+@deftypefn {MGL suffix} {(dat)} .nx
+@deftypefnx {MGL suffix} {(dat)} .ny
+@deftypefnx {MGL suffix} {(dat)} .nz
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{long} GetNx ()
+@deftypefnx {Method on @code{mglDataA}} @code{long} GetNy ()
+@deftypefnx {Method on @code{mglDataA}} @code{long} GetNz ()
+@deftypefnx {C function} @code{long} mgl_data_get_nx (@code{HCDT} dat)
+@deftypefnx {C function} @code{long} mgl_data_get_ny (@code{HCDT} dat)
+@deftypefnx {C function} @code{long} mgl_data_get_nz (@code{HCDT} dat)
+@end ifclear
+Gets the x-, y-, z-size of the data.
+@end deftypefn
+
+
+
+@cindex Maximal
+@anchor{.max}
+@deftypefn {MGL suffix} {(dat)} .max
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{mreal} Maximal () @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_max (@code{HCDT} dat)
+@end ifclear
+Gets maximal value of the data.
+@end deftypefn
+
+@cindex Minimal
+@anchor{.min}
+@deftypefn {MGL suffix} {(dat)} .min
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{mreal} Minimal () @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_min (@code{HMDT} dat) @code{const}
+@end ifclear
+Gets minimal value of the data.
+@end deftypefn
+
+@ifclear UDAV
+@deftypefn {Method on @code{mglDataA}} @code{mreal} Minimal (@code{int} &i, @code{int} &j, @code{int} &k) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_min_int (@code{HCDT} dat, @code{int} *i, @code{int} *j, @code{int} *k)
+Gets position of minimum to variables @var{i}, @var{j}, @var{k} and returns the minimal value.
+@end deftypefn
+@deftypefn {Method on @code{mglDataA}} @code{mreal} Maximal (@code{int} &i, @code{int} &j, @code{int} &k) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_max_int (@code{HCDT} dat, @code{int} *i, @code{int} *j, @code{int} *k)
+Gets position of maximum to variables @var{i}, @var{j}, @var{k} and returns the maximal value.
+@end deftypefn
+@deftypefn {Method on @code{mglDataA}} @code{mreal} Minimal (@code{mreal} &x, @code{mreal} &y, @code{mreal} &z) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_min_real (@code{HCDT} dat, @code{mreal} *x, @code{mreal} *y, @code{mreal} *z)
+Gets approximated (interpolated) position of minimum to variables @var{x}, @var{y}, @var{z} and returns the minimal value.
+@end deftypefn
+@end ifclear
+
+@anchor{.mx} @anchor{.my} @anchor{.mz}
+@deftypefn {MGL suffix} {(dat)} .mx
+@deftypefnx {MGL suffix} {(dat)} .my
+@deftypefnx {MGL suffix} {(dat)} .mz
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{mreal} Maximal (@code{mreal} &x, @code{mreal} &y, @code{mreal} &z) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_max_real (@code{HCDT} dat, @code{mreal} *x, @code{mreal} *y, @code{mreal} *z)
+@end ifclear
+Gets approximated (interpolated) position of maximum to variables @var{x}, @var{y}, @var{z} and returns the maximal value.
+@end deftypefn
+
+
+@anchor{.mxf} @anchor{.myf} @anchor{.mzf}
+@anchor{.mxl} @anchor{.myl} @anchor{.mzl}
+@deftypefn {MGL suffix} {(dat)} .mxf
+@deftypefnx {MGL suffix} {(dat)} .myf
+@deftypefnx {MGL suffix} {(dat)} .mzf
+@deftypefnx {MGL suffix} {(dat)} .mxl
+@deftypefnx {MGL suffix} {(dat)} .myl
+@deftypefnx {MGL suffix} {(dat)} .mzl
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{long} Maximal (@code{char} dir, @code{long} from) @code{const}
+@deftypefnx {Method on @code{mglDataA}} @code{long} Maximal (@code{char} dir, @code{long} from, @code{long} &p1, @code{long} &p2) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_max_firstl (@code{HCDT} dat, @code{char} dir, @code{long} from, @code{long} *p1, @code{long} *p2)
+@end ifclear
+Get first starting @var{from} give position (or last one if @var{from}<0) maximum along direction @var{dir}, and save its orthogonal coordinates in @var{p1}, @var{p2}.
+@end deftypefn
+
+
+@cindex Momentum
+@anchor{.ax} @anchor{.ay} @anchor{.az} @anchor{.aa} @anchor{.sum}
+@anchor{.wx} @anchor{.wy} @anchor{.wz} @anchor{.wa}
+@anchor{.sx} @anchor{.sy} @anchor{.sz} @anchor{.sa}
+@anchor{.kx} @anchor{.ky} @anchor{.kz} @anchor{.ka}
+@deftypefn {MGL suffix} {(dat)} .sum
+@deftypefnx {MGL suffix} {(dat)} .ax
+@deftypefnx {MGL suffix} {(dat)} .ay
+@deftypefnx {MGL suffix} {(dat)} .az
+@deftypefnx {MGL suffix} {(dat)} .aa
+@deftypefnx {MGL suffix} {(dat)} .wx
+@deftypefnx {MGL suffix} {(dat)} .wy
+@deftypefnx {MGL suffix} {(dat)} .wz
+@deftypefnx {MGL suffix} {(dat)} .wa
+@deftypefnx {MGL suffix} {(dat)} .sx
+@deftypefnx {MGL suffix} {(dat)} .sy
+@deftypefnx {MGL suffix} {(dat)} .sz
+@deftypefnx {MGL suffix} {(dat)} .sa
+@deftypefnx {MGL suffix} {(dat)} .kx
+@deftypefnx {MGL suffix} {(dat)} .ky
+@deftypefnx {MGL suffix} {(dat)} .kz
+@deftypefnx {MGL suffix} {(dat)} .ka
+@ifclear UDAV
+@deftypefnx {Method on @code{mglDataA}} @code{mreal} Momentum (@code{char} dir, @code{mreal} &a, @code{mreal} &w) @code{const}
+@deftypefnx {Method on @code{mglDataA}} @code{mreal} Momentum (@code{char} dir, @code{mreal} &m, @code{mreal} &w, @code{mreal} &s, @code{mreal} &k) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_momentum_val (@code{HCDT} dat, @code{char} dir, @code{mreal} *a, @code{mreal} *w, @code{mreal} *s, @code{mreal} *k)
+@end ifclear
+Gets zero-momentum (energy, @math{I=\sum dat_i}) and write first momentum (median, @math{a = \sum \xi_i dat_i/I}), second momentum (width, @math{w^2 = \sum (\xi_i-a)^2 dat_i/I}), third momentum (skewness, @math{s = \sum (\xi_i-a)^3 dat_i/ I w^3}) and fourth momentum (kurtosis, @math{k = \sum (\xi_i-a)^4 dat_i / 3 I w^4}) to variables. Here @math{\xi} is corresponding coordinate if @var{dir} is @samp{'x'}, @samp{'y'} or @samp{'z'}. Otherwise median is @math{a = \sum dat_i/N}, width is @math{w^2 = \sum (dat_i-a)^2/N} and so on.
+@end deftypefn
+
+@anchor{.fst}
+@deftypefn {MGL suffix} {(dat)} .fst
+@ifclear UDAV
+@cindex Find
+@deftypefnx {Method on @code{mglDataA}} @code{mreal} Find (@code{const char *}cond, @code{int} &i, @code{int} &j, @code{int} &k) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_first (@code{HCDT} dat, @code{const char *}cond, @code{int} *i, @code{int} *j, @code{int} *k)
+@end ifclear
+Find position (after specified in @var{i}, @var{j}, @var{k}) of first nonzero value of formula @var{cond}. Function return the data value at found position.
+@end deftypefn
+
+@anchor{.lst}
+@deftypefn {MGL suffix} {(dat)} .lst
+@ifclear UDAV
+@cindex Last
+@deftypefnx {Method on @code{mglDataA}} @code{mreal} Last (@code{const char *}cond, @code{int} &i, @code{int} &j, @code{int} &k) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_last (@code{HCDT} dat, @code{const char *}cond, @code{int} *i, @code{int} *j, @code{int} *k)
+@end ifclear
+Find position (before specified in @var{i}, @var{j}, @var{k}) of last nonzero value of formula @var{cond}. Function return the data value at found position.
+@end deftypefn
+
+@ifclear UDAV
+@deftypefn {Method on @code{mglDataA}} @code{int} Find (@code{const char *}cond, @code{char} dir, @code{int} i=@code{0}, @code{int} j=@code{0}, @code{int} k=@code{0}) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_find (@code{HCDT} dat, @code{const char *}cond, @code{int} i, @code{int} j, @code{int} k)
+Return position of first in direction @var{dir} nonzero value of formula @var{cond}. The search is started from point @{i,j,k@}.
+@end deftypefn
+@cindex FindAny
+@deftypefn {Method on @code{mglDataA}} @code{bool} FindAny (@code{const char *}cond) @code{const}
+@deftypefnx {C function} @code{mreal} mgl_data_find_any (@code{HCDT} dat, @code{const char *}cond)
+Determines if any nonzero value of formula in the data array.
+@end deftypefn
+@end ifclear
+
+@anchor{.a}
+@deftypefn {MGL suffix} {(dat)} .a
+Give first (for @code{.a}, i.e. @code{dat->a[0]}).
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Operators, Global functions, Data information, Data processing
+@section Operators
+@nav{}
+
+@deftypefn {MGL command} {} copy @sc{dat} dat2 ['eq'='']
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} operator= (@code{const mglDataA &}d)
+@end ifclear
+Copies data from other variable.
+@end deftypefn
+
+@deftypefn {MGL command} {} copy dat @code{val}
+@ifclear UDAV
+@deftypefnx {Method on @code{mreal}} @code{void} operator= (@code{mreal} val)
+@end ifclear
+Set all data values equal to @var{val}.
+@end deftypefn
+
+@anchor{multo}
+@deftypefn {MGL command} {} multo dat dat2
+@deftypefnx {MGL command} {} multo dat @code{val}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} operator*= (@code{const mglDataA &}d)
+@deftypefnx {Method on @code{mglData}} @code{void} operator*= (@code{mreal} d)
+@deftypefnx {C function} @code{void} mgl_data_mul_dat (@code{HMDT} dat, @code{HCDT} d)
+@deftypefnx {C function} @code{void} mgl_data_mul_num (@code{HMDT} dat, @code{mreal} d)
+@end ifclear
+Multiplies data element by the other one or by value.
+@end deftypefn
+
+@anchor{divto}
+@deftypefn {MGL command} {} divto dat dat2
+@deftypefnx {MGL command} {} divto dat @code{val}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} operator/= (@code{const mglDataA &}d)
+@deftypefnx {Method on @code{mglData}} @code{void} operator/= (@code{mreal} d)
+@deftypefnx {C function} @code{void} mgl_data_div_dat (@code{HMDT} dat, @code{HCDT} d)
+@deftypefnx {C function} @code{void} mgl_data_div_num (@code{HMDT} dat, @code{mreal} d)
+@end ifclear
+Divides each data element by the other one or by value.
+@end deftypefn
+
+@anchor{addto}
+@deftypefn {MGL command} {} addto dat dat2
+@deftypefnx {MGL command} {} addto dat @code{val}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} operator+= (@code{const mglDataA &}d)
+@deftypefnx {Method on @code{mglData}} @code{void} operator+= (@code{mreal} d)
+@deftypefnx {C function} @code{void} mgl_data_add_dat (@code{HMDT} dat, @code{HCDT} d)
+@deftypefnx {C function} @code{void} mgl_data_add_num (@code{HMDT} dat, @code{mreal} d)
+@end ifclear
+Adds to each data element the other one or the value.
+@end deftypefn
+
+@anchor{subto}
+@deftypefn {MGL command} {} subto dat dat2
+@deftypefnx {MGL command} {} subto dat @code{val}
+@ifclear UDAV
+@deftypefnx {Method on @code{mglData}} @code{void} operator-= (@code{const mglDataA &}d)
+@deftypefnx {Method on @code{mglData}} @code{void} operator-= (@code{mreal} d)
+@deftypefnx {C function} @code{void} mgl_data_sub_dat (@code{HMDT} dat, @code{HCDT} d)
+@deftypefnx {C function} @code{void} mgl_data_sub_num (@code{HMDT} dat, @code{mreal} d)
+@end ifclear
+Subtracts from each data element the other one or the value.
+@end deftypefn
+
+@ifclear UDAV
+@deftypefn {Library Function} mglData operator+ (@code{const mglDataA &}a, @code{const mglDataA &}b)
+@deftypefnx {Library Function} mglData operator+ (@code{mreal} a, @code{const mglDataA &}b)
+@deftypefnx {Library Function} mglData operator+ (@code{const mglDataA &}a, @code{mreal} b)
+Adds the other data or the number.
+@end deftypefn
+
+@deftypefn {Library Function} mglData operator- (@code{const mglDataA &}a, @code{const mglDataA &}b)
+@deftypefnx {Library Function} mglData operator- (@code{mreal} a, @code{const mglDataA &}b)
+@deftypefnx {Library Function} mglData operator- (@code{const mglDataA &}a, @code{mreal} b)
+Subtracts the other data or the number.
+@end deftypefn
+
+@deftypefn {Library Function} mglData operator* (@code{const mglDataA &}a, @code{const mglDataA &}b)
+@deftypefnx {Library Function} mglData operator* (@code{mreal} a, @code{const mglDataA &}b)
+@deftypefnx {Library Function} mglData operator* (@code{const mglDataA &}a, @code{mreal} b)
+Multiplies by the other data or the number.
+@end deftypefn
+
+@deftypefn {Library Function} mglData operator/ (@code{const mglDataA &}a, @code{const mglDataA &}b)
+@deftypefnx {Library Function} mglData operator/ (@code{const mglDataA &}a, @code{mreal} b)
+Divides by the other data or the number.
+@end deftypefn
+@end ifclear
+
+@c ------------------------------------------------------------------
+@external{}
+@node Global functions, Evaluate expression, Operators, Data processing
+@section Global functions
+@nav{}
+
+@ifclear UDAV
+These functions are not methods of @code{mglData} class. However it provide additional functionality to handle data. So I put it in this chapter.
+@end ifclear
+
+@anchor{transform}
+@deftypefn {MGL command} {} transform @sc{dat} 'type' real imag
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglTransform (@code{const mglDataA &}real, @code{const mglDataA &}imag, @code{const char *}type)
+@deftypefnx {C function} @code{HMDT} mgl_transform (@code{HCDT} real, @code{HCDT} imag, @code{const char *}type)
+@end ifclear
+Does integral transformation of complex data @var{real}, @var{imag} on specified direction. The order of transformations is specified in string @var{type}: first character for x-dimension, second one for y-dimension, third one for z-dimension. The possible character are: @samp{f} is forward Fourier transformation, @samp{i} is inverse Fourier transformation, @samp{s} is Sine transform, @samp{c} is Cosine transform, @samp{h} is Hankel transform, @samp{n} or @samp{ } is no transformation.
+@end deftypefn
+
+@anchor{transforma}
+@deftypefn {MGL command} {} transforma @sc{dat} 'type' ampl phase
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglTransformA @code{const mglDataA &}ampl, @code{const mglDataA &}phase, @code{const char *}type)
+@deftypefnx {C function} @code{HMDT} mgl_transform_a @code{HCDT} ampl, @code{HCDT} phase, @code{const char *}type)
+@end ifclear
+The same as previous but with specified amplitude @var{ampl} and phase @var{phase} of complex numbers.
+@end deftypefn
+
+@anchor{fourier}
+@deftypefn {MGL command} {} fourier reDat imDat 'dir'
+@deftypefnx {MGL command} {} fourier complexDat 'dir'
+@ifclear UDAV
+@deftypefnx {Global function} @code{void} mglFourier @code{const mglDataA &}re, @code{const mglDataA &}im, @code{const char *}dir)
+@deftypefnx {Method on @code{mglDataC}} @code{void} FFT (@code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_data_fourier @code{HCDT} re, @code{HCDT} im, @code{const char *}dir)
+@deftypefnx {C function} @code{void} mgl_datac_fft (@code{HADT} dat, @code{const char *}dir)
+@end ifclear
+Does Fourier transform of complex data @var{re}+i*@var{im} in directions @var{dir}. Result is placed back into @var{re} and @var{im} data arrays. If @var{dir} contain @samp{i} then inverse Fourier is used.
+@end deftypefn
+
+@anchor{stfad}
+@deftypefn {MGL command} {} stfad @sc{res} real imag @code{dn} ['dir'='x']
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglSTFA (@code{const mglDataA &}real, @code{const mglDataA &}imag, @code{int} dn, @code{char} dir=@code{'x'})
+@deftypefnx {C function} @code{HMDT} mgl_data_stfa (@code{HCDT} real, @code{HCDT} imag, @code{int} dn, @code{char} dir)
+@end ifclear
+Short time Fourier transformation for real and imaginary parts. Output  is amplitude of partial Fourier of length @var{dn}. For example if @var{dir}=@samp{x}, result will have size @{int(nx/dn), dn, ny@} and it will contain @math{res[i,j,k]=|\sum_d^dn exp(I*j*d)*(real[i*dn+d,k]+I*imag[i*dn+d,k])|/dn}.
+@end deftypefn
+
+@anchor{triangulate}
+@deftypefn {MGL command} {} triangulate dat xdat ydat
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglTriangulation (@code{const mglDataA &}x, @code{const mglDataA &}y)
+@deftypefnx {C function} @code{void} mgl_triangulation_2d (@code{HCDT} x, @code{HCDT} y)
+@end ifclear
+Do Delone triangulation for 2d points and return result suitable for @ref{triplot} and @ref{tricont}. @sref{Making regular data}
+@end deftypefn
+
+
+@anchor{tridmat}
+@deftypefn {MGL command} {} tridmat @sc{res adat bdat cdat ddat} 'how'
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglTridMat (@code{const mglDataA &}A, @code{const mglDataA &}B, @code{const mglDataA &}C, @code{const mglDataA &}D, @code{const char *}how)
+@deftypefnx {Global function} @code{mglDataC} mglTridMatC (@code{const mglDataA &}A, @code{const mglDataA &}B, @code{const mglDataA &}C, @code{const mglDataA &}D, @code{const char *}how)
+@deftypefnx {C function} @code{HMDT} mgl_data_tridmat (@code{HCDT} A, @code{HCDT} B, @code{HCDT} C, @code{HCDT} D, @code{const char*}how)
+@deftypefnx {C function} @code{HADT} mgl_datac_tridmat (@code{HCDT} A, @code{HCDT} B, @code{HCDT} C, @code{HCDT} D, @code{const char*}how)
+@end ifclear
+Get array as solution of tridiagonal system of equations @var{A}[i]*x[i-1]+@var{B}[i]*x[i]+@var{C}[i]*x[i+1]=@var{D}[i]. String @var{how} may contain:
+@itemize @bullet
+@item
+@samp{xyz} for solving along x-,y-,z-directions correspondingly;
+@item
+@samp{h} for solving along hexagonal direction at x-y plain (require square matrix);
+@item
+@samp{c} for using periodical boundary conditions;
+@item
+@samp{d} for for diffraction/diffuse calculation (i.e. for using -@var{A}[i]*@var{D}[i-1]+(2-@var{B}[i])*@var{D}[i]-@var{C}[i]*@var{D}[i+1] at right part instead of @var{D}[i]).
+@end itemize
+Data dimensions of arrays @var{A}, @var{B}, @var{C} should be equal. Also their dimensions need to be equal to all or to minor dimension(s) of array @var{D}. @sref{PDE solving hints}
+@end deftypefn
+
+
+@anchor{pde}
+@deftypefn {MGL command} {} pde @sc{res} 'ham' ini_re ini_im [@code{dz=0.1 k0=100}]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglPDE (@code{HMGL} gr, @code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{mreal} dz=@code{0.1}, @code{mreal} k0=@code{100}, @code{const char *}opt=@code{""})
+@deftypefnx {Global function} @code{mglDataC} mglPDEc (@code{HMGL} gr, @code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{mreal} dz=@code{0.1}, @code{mreal} k0=@code{100}, @code{const char *}opt=@code{""})
+@deftypefnx {C function} @code{HMDT} mgl_pde_solve (@code{HMGL} gr, @code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{mreal} dz, @code{mreal} k0, @code{const char *}opt)
+@deftypefnx {C function} @code{HADT} mgl_pde_solve_c (@code{HMGL} gr, @code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{mreal} dz, @code{mreal} k0, @code{const char *}opt)
+@end ifclear
+Solves equation du/dz = i*k0*@var{ham}(p,q,x,y,z,|u|)[u], where p=-i/k0*d/dx, q=-i/k0*d/dy are pseudo-differential operators. Parameters @var{ini_re}, @var{ini_im} specify real and imaginary part of initial field distribution. Parameters @var{Min}, @var{Max} set the bounding box for the solution. Note, that really this ranges are increased by factor 3/2 for purpose of reducing reflection from boundaries. Parameter @var{dz} set the step along evolutionary coordinate z. At this moment, simplified form of function @var{ham} is supported -- all ``mixed'' terms (like @samp{x*p}->x*d/dx) are excluded. For example, in 2D case this function is effectively @math{ham = f(p,z) + g(x,z,u)}. However commutable combinations (like @samp{x*q}->x*d/dy) are allowed. Here variable @samp{u} is used for field amplitude |u|. This allow one solve nonlinear problems -- for example, for nonlinear Shrodinger equation you may set @code{ham="p^2 + q^2 - u^2"}. You may specify imaginary part for wave absorption, like @code{ham = "p^2 + i*x*(x>0)"}. See also @ref{apde}, @ref{qo2d}, @ref{qo3d}. @sref{PDE solving hints}
+@end deftypefn
+
+@anchor{apde}
+@deftypefn {MGL command} {} apde @sc{res} 'ham' ini_re ini_im [@code{dz=0.1 k0=100}]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglAPDE (@code{HMGL} gr, @code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{mreal} dz=@code{0.1}, @code{mreal} k0=@code{100}, @code{const char *}opt=@code{""})
+@deftypefnx {Global function} @code{mglDataC} mglAPDEc (@code{HMGL} gr, @code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{mreal} dz=@code{0.1}, @code{mreal} k0=@code{100}, @code{const char *}opt=@code{""})
+@deftypefnx {C function} @code{HMDT} mgl_pde_solve_adv (@code{HMGL} gr, @code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{mreal} dz, @code{mreal} k0, @code{const char *}opt)
+@deftypefnx {C function} @code{HADT} mgl_pde_solve_adv_c (@code{HMGL} gr, @code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{mreal} dz, @code{mreal} k0, @code{const char *}opt)
+@end ifclear
+Solves equation du/dz = i*k0*@var{ham}(p,q,x,y,z,|u|)[u], where p=-i/k0*d/dx, q=-i/k0*d/dy are pseudo-differential operators. Parameters @var{ini_re}, @var{ini_im} specify real and imaginary part of initial field distribution. Parameters @var{Min}, @var{Max} set the bounding box for the solution. Note, that really this ranges are increased by factor 3/2 for purpose of reducing reflection from boundaries. Parameter @var{dz} set the step along evolutionary coordinate z. The advanced and rather slow algorithm is used for taking into account both spatial dispersion and inhomogeneities of media [see A.A. Balakin, E.D. Gospodchikov, A.G. Shalashov, JETP letters v.104, p.690-695 (2016)]. Variable @samp{u} is used for field amplitude |u|. This allow one solve nonlinear problems -- for example, for nonlinear Shrodinger equation you may set @code{ham="p^2 + q^2 - u^2"}. You may specify imaginary part for wave absorption, like @code{ham = "p^2 + i*x*(x>0)"}. See also @ref{pde}. @sref{PDE solving hints}
+@end deftypefn
+
+
+@anchor{ray}
+@deftypefn {MGL command} {} ray @sc{res} 'ham' @code{x0 y0 z0 p0 q0 v0 [dt=0.1 tmax=10]}
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglRay (@code{const char *}ham, @code{mglPoint} r0, @code{mglPoint} p0, @code{mreal} dt=@code{0.1}, @code{mreal} tmax=@code{10})
+@deftypefnx {C function} @code{HMDT} mgl_ray_trace (@code{const char *}ham, @code{mreal} x0, @code{mreal} y0, @code{mreal} z0, @code{mreal} px, @code{mreal} py, @code{mreal} pz, @code{mreal} dt, @code{mreal} tmax)
+@end ifclear
+Solves GO ray equation like dr/dt = d @var{ham}/dp, dp/dt = -d @var{ham}/dr. This is Hamiltonian equations for particle trajectory in 3D case. Here @var{ham} is Hamiltonian which may depend on coordinates @samp{x}, @samp{y}, @samp{z}, momentums @samp{p}=px, @samp{q}=py, @samp{v}=pz and time @samp{t}: @math{ham = H(x,y,z,p,q,v,t)}. The starting point (at @code{t=0}) is defined by variables @var{r0}, @var{p0}. Parameters @var{dt} and @var{tmax} specify the integration step and maximal time for ray tracing. Result is array of @{x,y,z,p,q,v,t@} with dimensions @{7 * int(@var{tmax}/@var{dt}+1) @}.
+@end deftypefn
+
+@anchor{ode}
+@deftypefn {MGL command} {} ode @sc{res} 'df' 'var' ini [@code{dt=0.1 tmax=10}]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglODE (@code{const char *}df, @code{const char *}var, @code{const mglDataA &}ini, @code{mreal} dt=@code{0.1}, @code{mreal} tmax=@code{10})
+@deftypefnx {Global function} @code{mglDataC} mglODEc (@code{const char *}df, @code{const char *}var, @code{const mglDataA &}ini, @code{mreal} dt=@code{0.1}, @code{mreal} tmax=@code{10})
+@deftypefnx {C function} @code{HMDT} mgl_ode_solve_str (@code{const char *}df, @code{const char *}var, @code{HCDT} ini, @code{mreal} dt, @code{mreal} tmax)
+@deftypefnx {C function} @code{HADT} mgl_ode_solve_str_c (@code{const char *}df, @code{const char *}var, @code{HCDT} ini, @code{mreal} dt, @code{mreal} tmax)
+@deftypefnx {C function} @code{HMDT} mgl_ode_solve (@code{void (*}df@code{)(const mreal *x, mreal *dx, void *par)}, @code{int} n, @code{const mreal *}ini, @code{mreal} dt, @code{mreal} tmax)
+@deftypefnx {C function} @code{HMDT} mgl_ode_solve_ex (@code{void (*}df@code{)(const mreal *x, mreal *dx, void *par)}, @code{int} n, @code{const mreal *}ini, @code{mreal} dt, @code{mreal} tmax, @code{void (*}bord@code{)(mreal *x, const mreal *xprev, void *par)})
+@end ifclear
+Solves ODE equations dx/dt = df(x). The functions @var{df} can be specified as string of ';'-separated textual formulas (argument @var{var} set the character ids of variables x[i]) or as callback function, which fill @code{dx} array for give @code{x}'s. Parameters @var{ini}, @var{dt}, @var{tmax} set initial values, time step and maximal time of the calculation. Function stop execution if @code{NAN} or @code{INF} values appears. Result is data array with dimensions @{@var{n} * @var{Nt}@}, where @var{Nt} <= int(@var{tmax}/@var{dt}+1)
+@end deftypefn
+
+@anchor{qo2d}
+@deftypefn {MGL command} {} qo2d @sc{res} 'ham' ini_re ini_im ray [@code{r=1 k0=100} xx yy]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglQO2d (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {Global function} @code{mglData} mglQO2d (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mglData &}xx, @code{mglData &}yy, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {Global function} @code{mglDataC} mglQO2dc (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {Global function} @code{mglDataC} mglQO2dc (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mglData &}xx, @code{mglData &}yy, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {C function} @code{HMDT} mgl_qo2d_solve (@code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy)
+@deftypefnx {C function} @code{HADT} mgl_qo2d_solve_c (@code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy)
+@deftypefnx {C function} @code{HMDT} mgl_qo2d_func (@code{dual (*}ham@code{)(mreal u, mreal x, mreal y, mreal px, mreal py, void *par)}, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy)
+@deftypefnx {C function} @code{HADT} mgl_qo2d_func_c (@code{dual (*}ham@code{)(mreal u, mreal x, mreal y, mreal px, mreal py, void *par)}, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy)
+@end ifclear
+Solves equation du/dt = i*k0*@var{ham}(p,q,x,y,|u|)[u], where p=-i/k0*d/dx, q=-i/k0*d/dy are pseudo-differential operators (see @code{mglPDE()} for details). Parameters @var{ini_re}, @var{ini_im} specify real and imaginary part of initial field distribution. Parameters @var{ray} set the reference ray, i.e. the ray around which the accompanied coordinate system will be maked. You may use, for example, the array created by @ref{ray} function. Note, that the reference ray @strong{must be} smooth enough to make accompanied coodrinates unambiguity. Otherwise errors in the solution may appear. If @var{xx} and @var{yy} are non-zero then Cartesian coordinates for each point will be written into them. See also @ref{pde}, @ref{qo3d}. @sref{PDE solving hints}
+@end deftypefn
+
+
+@anchor{qo3d}
+@deftypefn {MGL command} {} qo3d @sc{res} 'ham' ini_re ini_im ray [@code{r=1 k0=100} xx yy zz]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglQO3d (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {Global function} @code{mglData} mglQO3d (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mglData &}xx, @code{mglData &}yy, @code{mglData &}zz, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {Global function} @code{mglDataC} mglQO3dc (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {Global function} @code{mglDataC} mglQO3dc (@code{const char *}ham, @code{const mglDataA &}ini_re, @code{const mglDataA &}ini_im, @code{const mglDataA &}ray, @code{mglData &}xx, @code{mglData &}yy, @code{mglData &}zz, @code{mreal} r=@code{1}, @code{mreal} k0=@code{100})
+@deftypefnx {C function} @code{HMDT} mgl_qo3d_solve (@code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy, @code{HMDT} zz)
+@deftypefnx {C function} @code{HADT} mgl_qo3d_solve_c (@code{const char *}ham, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy, @code{HMDT} zz)
+@deftypefnx {C function} @code{HMDT} mgl_qo3d_func (@code{dual (*}ham@code{)(mreal u, mreal x, mreal y, mreal z, mreal px, mreal py, mreal pz, void *par)}, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy, @code{HMDT} zz)
+@deftypefnx {C function} @code{HADT} mgl_qo3d_func_c (@code{dual (*}ham@code{)(mreal u, mreal x, mreal y, mreal z, mreal px, mreal py, mreal pz, void *par)}, @code{HCDT} ini_re, @code{HCDT} ini_im, @code{HCDT} ray, @code{mreal} r, @code{mreal} k0, @code{HMDT} xx, @code{HMDT} yy, @code{HMDT} zz)
+@end ifclear
+Solves equation du/dt = i*k0*@var{ham}(p,q,v,x,y,z,|u|)[u], where p=-i/k0*d/dx, q=-i/k0*d/dy, v=-i/k0*d/dz are pseudo-differential operators (see @code{mglPDE()} for details). Parameters @var{ini_re}, @var{ini_im} specify real and imaginary part of initial field distribution. Parameters @var{ray} set the reference ray, i.e. the ray around which the accompanied coordinate system will be maked. You may use, for example, the array created by @ref{ray} function. Note, that the reference ray @strong{must be} smooth enough to make accompanied coodrinates unambiguity. Otherwise errors in the solution may appear. If @var{xx} and @var{yy} and @var{zz} are non-zero then Cartesian coordinates for each point will be written into them. See also @ref{pde}, @ref{qo2d}. @sref{PDE solving hints}
+@end deftypefn
+
+
+@anchor{jacobian}
+@deftypefn {MGL command} {} jacobian @sc{res} xdat ydat [zdat]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglJacobian (@code{const mglDataA &}x, @code{const mglDataA &}y)
+@deftypefnx {Global function} @code{mglData} mglJacobian (@code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z)
+@deftypefnx {C function} @code{HMDT} mgl_jacobian_2d (@code{HCDT} x, @code{HCDT} y)
+@deftypefnx {C function} @code{HMDT} mgl_jacobian_3d (@code{HCDT} x, @code{HCDT} y, @code{HCDT} z)
+@end ifclear
+Computes the Jacobian for transformation @{i,j,k@} to @{@var{x},@var{y},@var{z}@} where initial coordinates  @{i,j,k@} are data indexes normalized in range [0,1]. The Jacobian is determined by formula det||@math{dr_\alpha/d\xi_\beta}|| where @math{r}=@{@var{x},@var{y},@var{z}@} and @math{\xi}=@{i,j,k@}. All dimensions must be the same for all data arrays. Data must be 3D if all 3 arrays @{@var{x},@var{y},@var{z}@} are specified or 2D if only 2 arrays @{@var{x},@var{y}@} are specified.
+@end deftypefn
+
+@anchor{triangulation}
+@deftypefn {MGL command} {} triangulation @sc{res} xdat ydat
+@c @deftypefn {MGL command} {} triangulation @sc{res} xdat ydat [zdat]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglTriangulation (@code{const mglDataA &}x, @code{const mglDataA &}y)
+@c @deftypefnx {Global function} @code{mglData} mglTriangulation (@code{const mglDataA &}x, @code{const mglDataA &}y, @code{const mglDataA &}z)
+@deftypefnx {C function} @code{HMDT} mgl_triangulation_2d (@code{HCDT} x, @code{HCDT} y)
+@c @deftypefnx {C function} @code{HMDT} mgl_triangulation_3d (@code{HCDT} x, @code{HCDT} y, @code{HCDT} z)
+@end ifclear
+Computes triangulation for arbitrary placed points with coordinates @{@var{x},@var{y}@} (i.e. finds triangles which connect points). MathGL use @uref{http://www.s-hull.org/,s-hull} code for triangulation. The sizes of 1st dimension @strong{must be equal} for all arrays @code{x.nx=y.nx}. Resulting array can be used in @ref{triplot} or @ref{tricont} functions for visualization of reconstructed surface. @sref{Making regular data}
+@end deftypefn
+
+@ifclear UDAV
+
+@deftypefn {Global function} @code{mglData} mglGSplineInit (@code{const mglDataA &}x, @code{const mglDataA &}y)
+@deftypefnx {Global function} @code{mglDataC} mglGSplineCInit (@code{const mglDataA &}x, @code{const mglDataA &}y)
+@deftypefnx {C function} @code{HMDT} mgl_gspline_init (@code{HCDT} x, @code{HCDT} y)
+@deftypefnx {C function} @code{HADT} mgl_gsplinec_init (@code{HCDT} x, @code{HCDT} y)
+Prepare coefficients for global cubic spline interpolation.
+@end deftypefn
+
+@deftypefn {Global function} @code{mreal} mglGSpline (@code{const mglDataA &}coef, @code{mreal} dx, @code{mreal *}d1=@code{0}, @code{mreal *}d2=@code{0})
+@deftypefnx {Global function} @code{dual} mglGSplineC (@code{const mglDataA &}coef, @code{mreal} dx, @code{dual *}d1=@code{0}, @code{dual *}d2=@code{0})
+@deftypefnx {C function} @code{mreal} mgl_gspline (@code{HCDT} coef, @code{mreal} dx, @code{mreal *}d1, @code{mreal *}d2)
+@deftypefnx {C function} @code{dual} mgl_gsplinec (@code{HCDT} coef, @code{mreal} dx, @code{dual *}d1, @code{dual *}d2)
+Evaluate global cubic spline (and its 1st and 2nd derivatives @var{d1}, @var{d2} if they are not @code{NULL}) using prepared coefficients @var{coef} at point @var{dx}+@var{x0} (where @var{x0} is 1st element of data @var{x} provided to @code{mglGSpline*Init()} function).
+@end deftypefn
+
+@end ifclear
+
+
+@anchor{ifs2d}
+@deftypefn {MGL command} {} ifs2d @sc{res} dat @code{num} [@code{skip=20}]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglIFS2d (@code{const mglDataA &}dat, @code{long} num, @code{long} skip=@code{20})
+@deftypefnx {C function} @code{HMDT} mgl_data_ifs_2d (@code{HCDT} dat, @code{long} num, @code{long} skip)
+@end ifclear
+Computes @var{num} points @{x[i]=res[0,i], y[i]=res[1,i]@} for fractal using iterated function system. Matrix @var{dat} is used for generation according the formulas
+@verbatim
+x[i+1] = dat[0,i]*x[i] + dat[1,i]*y[i] + dat[4,i];
+y[i+1] = dat[2,i]*x[i] + dat[3,i]*y[i] + dat[5,i];
+@end verbatim
+Value @code{dat[6,i]} is used as weight factor for i-th row of matrix @var{dat}. At this first @var{skip} iterations will be omitted. Data array @var{dat} must have x-size greater or equal to 7. See also @ref{ifs3d}, @ref{flame2d}. @sref{ifs2d sample}
+@end deftypefn
+
+@anchor{ifs3d}
+@deftypefn {MGL command} {} ifs3d @sc{res} dat @code{num} [@code{skip=20}]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglIFS3d (@code{const mglDataA &}dat, @code{long} num, @code{long} skip=@code{20})
+@deftypefnx {C function} @code{HMDT} mgl_data_ifs_3d (@code{HCDT} dat, @code{long} num, @code{long} skip)
+@end ifclear
+Computes @var{num} points @{x[i]=res[0,i], y[i]=res[1,i], z[i]=res[2,i]@} for fractal using iterated function system. Matrix @var{dat} is used for generation according the formulas
+@verbatim
+x[i+1] = dat[0,i]*x[i] + dat[1,i]*y[i] + dat[2,i]*z[i] + dat[9,i];
+y[i+1] = dat[3,i]*x[i] + dat[4,i]*y[i] + dat[5,i]*z[i] + dat[10,i];
+z[i+1] = dat[6,i]*x[i] + dat[7,i]*y[i] + dat[8,i]*z[i] + dat[11,i];
+@end verbatim
+Value @code{dat[12,i]} is used as weight factor for i-th row of matrix @var{dat}. At this first @var{skip} iterations will be omitted. Data array @var{dat} must have x-size greater or equal to 13. See also @ref{ifs2d}. @sref{ifs3d sample}
+@end deftypefn
+
+@anchor{ifsfile}
+@deftypefn {MGL command} {} ifsfile @sc{res} 'fname' 'name' @code{num} [@code{skip=20}]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglIFSfile (@code{const char *}fname, @code{const char *}name, @code{long} num, @code{long} skip=@code{20})
+@deftypefnx {C function} @code{HMDT} mgl_data_ifs_file (@code{const char *}fname, @code{const char *}name, @code{long} num, @code{long} skip)
+@end ifclear
+Reads parameters of IFS fractal named @var{name} from file @var{fname} and computes @var{num} points for this fractal. At this first @var{skip} iterations will be omitted. See also @ref{ifs2d}, @ref{ifs3d}.
+
+IFS file may contain several records. Each record contain the name of fractal (@samp{binary} in the example below) and the body of fractal, which is enclosed in curly braces @{@}. Symbol @samp{;} start the comment. If the name of fractal contain @samp{(3D)} or @samp{(3d)} then the 3d IFS fractal is specified. The sample below contain two fractals: @samp{binary} -- usual 2d fractal, and @samp{3dfern (3D)} -- 3d fractal. See also @ref{ifs2d}, @ref{ifs3d}.
+
+@verbatim
+ binary
+ { ; comment allowed here
+  ; and here
+  .5  .0 .0 .5 -2.563477 -0.000003 .333333   ; also comment allowed here
+  .5  .0 .0 .5  2.436544 -0.000003 .333333
+  .0 -.5 .5 .0  4.873085  7.563492 .333333
+  }
+
+ 3dfern (3D) {
+   .00  .00 0 .0 .18 .0 0  0.0 0.00 0 0.0 0 .01
+   .85  .00 0 .0 .85 .1 0 -0.1 0.85 0 1.6 0 .85
+   .20 -.20 0 .2 .20 .0 0  0.0 0.30 0 0.8 0 .07
+  -.20  .20 0 .2 .20 .0 0  0.0 0.30 0 0.8 0 .07
+  }
+@end verbatim
+@end deftypefn
+
+@anchor{flame2d}
+@deftypefn {MGL command} {} flame2d @sc{res} dat func @code{num} [@code{skip=20}]
+@ifclear UDAV
+@deftypefnx {Global function} @code{mglData} mglFlame2d (@code{const mglDataA &}dat, @code{const mglDataA &}func, @code{long} num, @code{long} skip=@code{20})
+@deftypefnx {C function} @code{HMDT} mgl_data_flame_2d (@code{HCDT} dat, @code{HCDT} func, @code{long} num, @code{long} skip)
+@end ifclear
+Computes @var{num} points @{x[i]=res[0,i], y[i]=res[1,i]@} for "flame" fractal using iterated function system. Array @var{func} define "flame" function identificator (@var{func}[0,i,j]), its weight (@var{func}[0,i,j]) and arguments (@var{func}[2 ... 5,i,j]). Matrix @var{dat} set linear transformation of coordinates before applying the function. The resulting coordinates are
+@verbatim
+xx = dat[0,i]*x[j] + dat[1,j]*y[i] + dat[4,j];
+yy = dat[2,i]*x[j] + dat[3,j]*y[i] + dat[5,j];
+x[j+1] = sum_i @var{func}[1,i,j]*@var{func}[0,i,j]_x(xx, yy; @var{func}[2,i,j],...,@var{func}[5,i,j]);
+y[j+1] = sum_i @var{func}[1,i,j]*@var{func}[0,i,j]_y(xx, yy; @var{func}[2,i,j],...,@var{func}[5,i,j]);
+@end verbatim
+The possible function ids are: @code{mglFlame2d_linear=0,	mglFlame2d_sinusoidal,	mglFlame2d_spherical,	mglFlame2d_swirl,		mglFlame2d_horseshoe,
+	mglFlame2d_polar,		mglFlame2d_handkerchief,mglFlame2d_heart,		mglFlame2d_disc,		mglFlame2d_spiral,
+	mglFlame2d_hyperbolic,	mglFlame2d_diamond,		mglFlame2d_ex,			mglFlame2d_julia,		mglFlame2d_bent,
+	mglFlame2d_waves,		mglFlame2d_fisheye,		mglFlame2d_popcorn,		mglFlame2d_exponential,	mglFlame2d_power,
+	mglFlame2d_cosine,		mglFlame2d_rings,		mglFlame2d_fan,			mglFlame2d_blob,		mglFlame2d_pdj,
+	mglFlame2d_fan2,		mglFlame2d_rings2,		mglFlame2d_eyefish,		mglFlame2d_bubble,		mglFlame2d_cylinder,
+	mglFlame2d_perspective,	mglFlame2d_noise,		mglFlame2d_juliaN,		mglFlame2d_juliaScope,	mglFlame2d_blur,
+	mglFlame2d_gaussian,	mglFlame2d_radialBlur,	mglFlame2d_pie,			mglFlame2d_ngon,		mglFlame2d_curl,
+	mglFlame2d_rectangles,	mglFlame2d_arch,		mglFlame2d_tangent,		mglFlame2d_square,		mglFlame2d_blade,
+	mglFlame2d_secant,		mglFlame2d_rays,		mglFlame2d_twintrian,	mglFlame2d_cross,		mglFlame2d_disc2,
+	mglFlame2d_supershape,	mglFlame2d_flower,		mglFlame2d_conic,		mglFlame2d_parabola,	mglFlame2d_bent2,
+	mglFlame2d_bipolar,		mglFlame2d_boarders,	mglFlame2d_butterfly,	mglFlame2d_cell,		mglFlame2d_cpow,
+	mglFlame2d_curve,		mglFlame2d_edisc,		mglFlame2d_elliptic,	mglFlame2d_escher,		mglFlame2d_foci,
+	mglFlame2d_lazySusan,	mglFlame2d_loonie,		mglFlame2d_preBlur,		mglFlame2d_modulus,		mglFlame2d_oscope,
+	mglFlame2d_polar2,		mglFlame2d_popcorn2,	mglFlame2d_scry,		mglFlame2d_separation,	mglFlame2d_split,
+	mglFlame2d_splits,		mglFlame2d_stripes,		mglFlame2d_wedge,		mglFlame2d_wedgeJulia,	mglFlame2d_wedgeSph,
+	mglFlame2d_whorl,		mglFlame2d_waves2,		mglFlame2d_exp,			mglFlame2d_log,			mglFlame2d_sin,
+	mglFlame2d_cos,			mglFlame2d_tan,			mglFlame2d_sec,			mglFlame2d_csc,			mglFlame2d_cot,
+	mglFlame2d_sinh,		mglFlame2d_cosh,		mglFlame2d_tanh,		mglFlame2d_sech,		mglFlame2d_csch,
+	mglFlame2d_coth,		mglFlame2d_auger,		mglFlame2d_flux.}
+Value @code{dat[6,i]} is used as weight factor for i-th row of matrix @var{dat}. At this first @var{skip} iterations will be omitted. Sizes of data arrays must be: @var{dat}.nx>=7, @var{func}.nx>=2 and @var{func}.nz=@var{dat}.ny. See also @ref{ifs2d}, @ref{ifs3d}. @sref{flame2d sample}
+@end deftypefn
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node Evaluate expression, Special data classes, Global functions, Data processing
+@section Evaluate expression
+@nav{}
+
+@ifset UDAV
+You can use arbitrary formulas of existed data arrays or constants as any argument of data processing or data plotting commands. There are only 2 limitations: formula shouldn't contain spaces (to be recognized as single argument), and formula cannot be used as argument which will be (re)created by MGL command.
+@end ifset
+
+@ifclear UDAV
+@cindex mglExpr
+@cindex mglExprC
+
+MathGL have a special classes @code{mglExpr} and @code{mglExprC} for evaluating of formula specified by the string for real and complex numbers correspondingly. These classes are defined in @code{#include <mgl2/data.h>} and @code{#include <mgl2/datac.h>} correspondingly. It is the fast variant of formula evaluation. At creation it will be recognized and compiled to tree-like internal code. At evaluation stage only fast calculations are performed. There is no difference between lower or upper case in formulas. If argument value lie outside the range of function definition then function returns NaN. @xref{Textual formulas}.
+
+@deftypefn {Constructor on @code{mglExpr}} @code{} mglExpr (@code{const char *}expr)
+@deftypefnx {Constructor on @code{mglExprC}} @code{} mglExprC (@code{const char *}expr)
+@deftypefnx {C function} @code{HMEX} mgl_create_expr (@code{const char *}expr)
+@deftypefnx {C function} @code{HAEX} mgl_create_cexpr (@code{const char *}expr)
+Parses the formula @var{expr} and creates formula-tree. Constructor recursively parses the formula and creates a tree-like structure containing functions and operators for fast further evaluating by @code{Calc()} or @code{CalcD()} functions.
+@end deftypefn
+
+@deftypefn {Destructor on @code{mglExpr}} @code{} ~mglExpr ()
+@deftypefnx {Destructor on @code{mglExprC}} @code{} ~mglExprC ()
+@deftypefnx {C function} @code{void} mgl_delete_expr (@code{HMEX} ex)
+@deftypefnx {C function} @code{void} mgl_delete_cexpr (@code{HAEX} ex)
+Deletes the instance of class  mglExpr.
+@end deftypefn
+
+@deftypefn {Method on @code{mglExpr}} @code{mreal} Eval (@code{mreal} x, @code{mreal} y, @code{mreal} z)
+@deftypefnx {Method on @code{mglExprC}} @code{dual} Eval (@code{dual} x, @code{dual} y, @code{dual} z)
+@deftypefnx {C function} @code{mreal} mgl_expr_eval (@code{HMEX} ex, @code{mreal} x, @code{mreal} y, @code{mreal} z)
+@deftypefnx {C function} @code{dual} mgl_cexpr_eval (@code{HAEX} ex, @code{dual} x, @code{dual} y, @code{dual} z)
+Evaluates the formula for @code{'x','r'}=@var{x}, @code{'y','n'}=@var{y}, @code{'z','t'}=@var{z}, @code{'a','u'}=@var{u}.
+@end deftypefn
+
+@deftypefn {Method on @code{mglExpr}} @code{mreal} Eval (@code{mreal} var[26])
+@deftypefnx {Method on @code{mglExprC}} @code{dual} Eval (@code{dual} var[26])
+@deftypefnx {C function} @code{mreal} mgl_expr_eval_v (@code{HMEX} ex, @code{mreal *}var)
+@deftypefnx {C function} @code{dual} mgl_expr_eval_v (@code{HAEX} ex, @code{dual *}var)
+Evaluates the formula for variables in array @var{var}[0,...,'z'-'a'].
+@end deftypefn
+
+
+@deftypefn {Method on @code{mglExpr}} @code{mreal} Diff (@code{char} dir, @code{mreal} x, @code{mreal} y, @code{mreal} z)
+@deftypefnx {C function} @code{mreal} mgl_expr_diff (@code{HMEX} ex, @code{char} dir, @code{mreal} x, @code{mreal} y, @code{mreal} z)
+Evaluates the formula derivation respect to @var{dir} for @code{'x','r'}=@var{x}, @code{'y','n'}=@var{y}, @code{'z','t'}=@var{z}, @code{'a','u'}=@var{u}.
+@end deftypefn
+
+@deftypefn {Method on @code{mglExpr}} @code{mreal} Diff (@code{char} dir, @code{mreal} var[26])
+@deftypefnx {C function} @code{mreal} mgl_expr_diff_v (@code{HMEX} ex, @code{char} dir, @code{mreal *}var)
+Evaluates the formula derivation respect to @var{dir} for variables in array @var{var}[0,...,'z'-'a'].
+@end deftypefn
+
+@end ifclear
+
+@c ------------------------------------------------------------------
+@external{}
+@node Special data classes, , Evaluate expression, Data processing
+@section Special data classes
+@nav{}
+
+
+@ifset UDAV
+MGL use these special classes automatically.
+@end ifset
+
+@ifclear UDAV
+This section describe special data classes @code{mglDataV}, @code{mglDataF}, @code{mglDataT} and @code{mglDataR} which sometime can noticeable speed up drawing or data handling. These classes are defined in @code{#include <mgl2/data.h>}. Note, that all plotting and data handling routines can be done using usual @code{mglData} or @code{mglDataC} classes. Also these special classes are usable in C++ code only.
+
+@heading Class @code{mglDataV}
+represent variable with values equidistantly distributed in given range.
+@deftypefn {Constructor on @code{mglDataV}} @code{} mglDataV (@code{const mglDataV &} d)
+Copy constructor.
+@end deftypefn
+@deftypefn {Constructor on @code{mglDataV}} @code{} mglDataV (@code{long} nx=@code{1}, @code{long} ny=@code{1}, @code{long} nz=@code{1}, @code{mreal} v1=@code{0}, @code{mreal} v2=@code{NaN}, @code{char} dir=@code{'x'})
+Create variable with "sizes" @var{nx}x@var{ny}x@var{nz} which changes from @var{v1} to @var{v2} (or is constant if @var{v2}=@code{NaN}) along @var{dir} direction.
+@end deftypefn
+@deftypefn {Method on @code{mglDataV}} @code{void} Create (@code{long} nx=@code{1}, @code{long} ny=@code{1}, @code{long} nz=@code{1})
+Set "sizes" @var{nx}x@var{ny}x@var{nz}.
+@end deftypefn
+@deftypefn {Method on @code{mglDataV}} @code{void} Fill (@code{mreal} x1, @code{mreal} x2=@code{NaN}, @code{char} dir=@code{'x'})
+Set ranges of the variable.
+@end deftypefn
+@deftypefn {Method on @code{mglDataV}} @code{void} Freq (@code{mreal} dp, @code{char} dir=@code{'x'})
+Set as frequency variable with increment @var{dp}.
+@end deftypefn
+
+@heading Class @code{mglDataF}
+represent function which values are evaluated (instead of access to data array as in @code{mglData}).
+@deftypefn {Constructor on @code{mglDataF}} @code{} mglDataF (@code{const mglDataF &} d)
+Copy constructor.
+@end deftypefn
+@deftypefn {Constructor on @code{mglDataF}} @code{} mglDataF (@code{long} nx=@code{1}, @code{long} ny=@code{1}, @code{long} nz=@code{1})
+Create variable with "sizes" @var{nx}x@var{ny}x@var{nz} with zero function.
+@end deftypefn
+@deftypefn {Method on @code{mglDataF}} @code{void} Create (@code{long} nx=@code{1}, @code{long} ny=@code{1}, @code{long} nz=@code{1})
+Set "sizes" @var{nx}x@var{ny}x@var{nz}.
+@end deftypefn
+@deftypefn {Method on @code{mglDataF}} @code{void} SetRanges (@code{mglPoint} p1, @code{mglPoint} p2)
+Set ranges for internal x,y,z variables.
+@end deftypefn
+@deftypefn {Method on @code{mglDataF}} @code{void} SetFormula (@code{const char *}func)
+Set string which will be evaluated at function calls. Note this variant is about 10 times slower than @code{SetFunc}() one.
+@end deftypefn
+@deftypefn {Method on @code{mglDataF}} @code{void} SetFunc (@code{mreal (*}f@code{)(mreal x,mreal y,mreal z,void *p)}, @code{void *}p=@code{NULL})
+Set pointer to function which will be used for data.
+@end deftypefn
+
+@heading Class @code{mglDataT}
+represent named reference to column of another data array.
+@deftypefn {Constructor on @code{mglDataT}} @code{} mglDataT (@code{const mglDataT &} d)
+Copy constructor.
+@end deftypefn
+@deftypefn {Constructor on @code{mglDataT}} @code{} mglDataT (@code{const mglDataA &} d, @code{long} col=@code{0})
+Create variable which reference @var{col}-th column of data @var{d}.
+@end deftypefn
+@deftypefn {Method on @code{mglDataT}} @code{void} SetInd (@code{long} col, @code{wchar_t} name)
+@deftypefnx {Method on @code{mglDataT}} @code{void} SetInd (@code{long} col, @code{const wchar_t *} name)
+Set reference to another column of the same data and its name.
+@end deftypefn
+
+@heading Class @code{mglDataR}
+represent named reference to row of another data array.
+@deftypefn {Constructor on @code{mglDataR}} @code{} mglDataR (@code{const mglDataR &} d)
+Copy constructor.
+@end deftypefn
+@deftypefn {Constructor on @code{mglDataR}} @code{} mglDataR (@code{const mglDataA &} d, @code{long} row=@code{0})
+Create variable which reference @var{row}-th row of data @var{d}.
+@end deftypefn
+@deftypefn {Method on @code{mglDataR}} @code{void} SetInd (@code{long} row, @code{wchar_t} name)
+@deftypefnx {Method on @code{mglDataR}} @code{void} SetInd (@code{long} row, @code{const wchar_t *} name)
+Set reference to another row of the same data and its name.
+@end deftypefn
+
+@heading Class @code{mglDataW}
+represent FFT frequency as data array.
+@deftypefn {Constructor on @code{mglDataW}} @code{} mglDataW (@code{const mglDataW &} d)
+Copy constructor.
+@end deftypefn
+@deftypefn {Constructor on @code{mglDataW}} @code{} mglDataW (@code{long} xx=@code{1}, @code{long} yy=@code{1}, @code{long} zz=@code{1}, @code{double} dp=@code{0}, @code{char} dir=@code{'x'})
+Set frequency sizes, direction @var{dir} and increment @var{dp}.
+@end deftypefn
+@deftypefn {Method on @code{mglDataR}} @code{void} Freq (@code{double} dp, @code{char} dir=@code{'x'})
+Equidistantly fill the data with step @var{dp} in direction @var{dir}.
+@end deftypefn
+
+
+@heading Class @code{mglDataS}
+incapsulate std::vector and present it as data array.
+@deftypecv {Variable} mglDataS @code{std::vector<mreal>} dat
+Data array itself.
+@end deftypecv
+@deftypefn {Constructor on @code{mglDataS}} @code{} mglDataS (@code{const mglDataS &} d)
+Copy constructor.
+@end deftypefn
+@deftypefn {Constructor on @code{mglDataS}} @code{} mglDataS (@code{const std::vector<mreal> &} d)
+Create copy data from @var{d}.
+@end deftypefn
+@deftypefn {Constructor on @code{mglDataS}} @code{} mglDataS (@code{size_t} s)
+Allocate memory for @var{s} .
+@end deftypefn
+@deftypefn {Method on @code{mglDataS}} @code{void} reserve (@code{size_t} num)
+Reserve space for @var{num} elements.
+@end deftypefn
+@deftypefn {Method on @code{mglDataS}} @code{void} push_back (@code{double} v)
+Appends value @var{v} to the end of data.
+@end deftypefn
+
+@end ifclear
+
+@external{}

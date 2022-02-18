@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon=udav
+Name=UDAV
+Exec=udav %f
+MimeType=text/mgl;
+Comment=Data handling and plotting tool
+Comment[en_US]=Data handling and plotting tool
+Comment[ru_RU]=Обработка и отображение данных
+Categories=Education;Science;Math;
+Keywords=Visualization;Data;Array;

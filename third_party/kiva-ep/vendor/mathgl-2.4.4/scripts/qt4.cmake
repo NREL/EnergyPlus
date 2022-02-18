@@ -1,0 +1,14 @@
+set(MGL_HAVE_QT4 1)
+set(MGL_QT4_LIBS_FIND QtCore QtGui QtOpenGL)
+set(MGL_QT4_LIBS_FIND_JSON QtNetwork QtWebKit)
+
+FIND_PACKAGE(Qt4 4.8 REQUIRED ${MGL_QT4_LIBS_FIND})
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(MGL_QT4_LIBS)
+foreach(mgl_qt4_lib ${MGL_QT4_LIBS_FIND})
+	set(MGL_QT4_LIBS ${MGL_QT4_LIBS} Qt4::${mgl_qt4_lib})
+endforeach(mgl_qt4_lib)

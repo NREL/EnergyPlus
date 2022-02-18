@@ -1,0 +1,248 @@
+@chapter Overview
+@nav{}
+
+@cindex MathGL overview
+
+MathGL is ...
+@itemize @bullet
+@item
+a library for making high-quality scientific graphics under Linux and Windows;
+@item
+a library for the fast data plotting and handling of large data arrays;
+@item
+a library for working in window and console modes and for easy embedding into other programs;
+@item
+a library with large and growing set of graphics.
+@end itemize
+
+@menu
+* What is MathGL?::
+* MathGL features::
+* Installation::
+* Quick guide::
+* Changes from v.1::
+* Utilities::
+* Thanks::
+@end menu
+
+@external{}
+@node What is MathGL?, MathGL features, , Overview
+@section What is MathGL?
+@nav{}
+
+A code for making high-quality scientific graphics under Linux and Windows. A  code for the fast handling and plotting of large data arrays. A code for working in window and console regimes and for easy including into another program. A code with large and renewal set of graphics. Exactly such a code I tried to put in MathGL library.
+
+At this version (@value{VERSION}) MathGL has more than 50 general types of graphics for 1d, 2d and 3d data arrays. It can export graphics to bitmap and vector (EPS or SVG) files. It has OpenGL interface and can be used from console programs. It has functions for data handling and script MGL language for simplification of data plotting. It also has several types of transparency and smoothed lighting, vector fonts and TeX-like symbol parsing, arbitrary curvilinear coordinate system and many other useful things (see pictures section at @uref{http://mathgl.sf.net/, homepage}). Finally it is platform-independent and free (under GPL v.2.0 or later license).
+
+@external{}
+@node MathGL features, Installation, What is MathGL?, Overview
+@section MathGL features
+@nav{}
+
+MathGL can plot a wide range of graphics. It includes:
+@itemize @bullet
+@item
+one-dimensional (Plot, Area, Bars, Step, Stem, Torus, Chart, Error, Tube, Mark, @pxref{1D plotting});
+
+@item
+two-dimensional plots (Mesh, Surf, Dens, Cont, ContF, Boxs, Axial, Fall, Belt, Tile, @pxref{2D plotting});
+
+@item
+three-dimensional plots (Surf3, Dens3, Cont3, ContF3, Cloud-like, @pxref{3D plotting});
+
+@item
+dual data plots: vector fields Vect, flow threads Flow, mapping chart Map, surfaces and isosurfaces, transparent or colored (i.e. with transparency or color varied) by other data SurfA, SurfC, Surf3A, Surf3C (@pxref{Dual plotting});
+
+@item
+and so on. For details see @pxref{MathGL core}.
+@end itemize
+
+In fact, I created the functions for drawing of all the types of scientific plots that I know. The list of plots is growing; if you need some special type of a plot then please email me @email{mathgl.abalakin@@gmail.com, e-mail} and it will appear in the new version.
+
+I tried to make plots as nice looking as possible: e.g., a surface can be transparent and highlighted by several (up to 10) light sources. Most of the drawing functions have 2 variants: simple one for the fast plotting of data, complex one for specifying of the exact position of the plot (including parametric representation). Resulting image can be saved in bitmap PNG, JPEG, GIF, TGA, BMP format, or in vector EPS, SVG or TeX format, or in 3D formats OBJ, OFF, STL, or in PRC format which can be converted into U3D.
+
+All texts are drawn by vector fonts, which allows for high scalability and portability. Texts may contain commands for: some of the TeX-like symbols, changing index (upper or lower indexes) and the style of font inside the text string (@pxref{Font styles}). Texts of ticks are rotated with axis rotation. It is possible to create a legend of plot and put text in an arbitrary position on the plot. Arbitrary text encoding (by the help of function @code{setlocale()}) and UTF-16 encoding are supported.
+
+Special class mglData is used for data encapsulation (@pxref{Data processing}). In addition to a safe creation and deletion of data arrays it includes functions for data processing (smoothing, differentiating, integrating, interpolating and so on) and reading of data files with automatic size determination. Class mglData can handle arrays with up to three dimensions (arrays which depend on up to 3 independent indexes @math{a_@{ijk@}}). Using an array with higher number of dimensions is not meaningful, because I do not know how it can be plotted. Data filling and modification may be done manually or by textual formulas.
+
+There is fast evaluation of a textual mathematical expression (@pxref{Textual formulas}). It is based on string precompilation to tree-like code at the creation of class instance. At evaluation stage code performs only fast tree-walk and returns the value of the expression. In addition to changing data values, textual formulas are also used for drawing in @emph{arbitrary} curvilinear coordinates. A set of such curvilinear coordinates is limited only by user's imagination rather than a fixed list like: polar, parabolic, spherical, and so on.
+
+@external{}
+@node Installation, Quick guide, MathGL features, Overview
+@section Installation
+@nav{}
+
+MathGL can be installed in 4 different ways.
+@enumerate
+@item
+Compile from sources. The cmake build system is useded in the library. To run it, one should execute commands: @code{cmake .} twice, after it @code{make} and @code{make install} with root/sudo rights. Sometimes after installation you may need to update the library list -- just execute @code{ldconfig} with root/sudo rights.
+
+There are several additional options which are switched off by default. They are: @code{enable-fltk, enable-glut, enable-qt4, enable-qt5} for ebabling FLTK, GLUT and/or Qt windows; @code{enable-jpeg, enable-gif, enable-hdf5} and so on for enabling corresponding file formats; @code{enable-all} for enabling all additional features. For using @code{double} as base internal data type use option @code{enable-double}. For enabling language interfaces use @code{enable-python, enable-octave} or @code{enable-all-swig} for all languages. You can use WYSIWYG tool (@code{cmake-gui}) to view all of them, or type @code{cmake -D enable-all=on -D enable-all-widgets=on -D enable-all-swig=on .} in command line for enabling all features.
+
+There is known bug for building in MinGW -- you need to manually add linker option @code{-fopenmp} (i.e. @code{CMAKE_EXE_LINKER_FLAGS:STRING='-fopenmp'} and @code{CMAKE_SHARED_LINKER_FLAGS:STRING='-fopenmp'}) if you enable OpenMP support (i.e. if @code{enable-openmp=ON}).
+
+@item
+Use a precompiled binary. There are binaries for MinGW (platform Win32). For a precompiled variant one needs only to unpack the archive to the location of the compiler (i.e. mathgl/lib in mingw/lib, mathgl/include in mingw/include and so on) or in arbitrary other folder and setup paths in compiler. By default, precompiled versions include the support of GSL (www.gsl.org) and PNG. So, one needs to have these libraries installed on system (it can be found, for example, at @uref{http://gnuwin32.sourceforge.net/packages.html}).
+
+@item
+Install precompiled versions from standard packages (RPM, deb, DevPak and so on).
+@end enumerate
+
+Note, you can download the latest sources (which can be not stable) from sourceforge.net SVN by command
+@verbatim
+svn checkout http://svn.code.sf.net/p/mathgl/code/mathgl-2x mathgl-code
+@end verbatim
+
+@strong{IMPORTANT!} MathGL use a set of defines, which were determined at configure stage and may differ if used with non-default compiler (like using MathGL binaries compiled by MinGW in VisualStudio). There are @code{MGL_SYS_NAN, MGL_HAVE_TYPEOF, MGL_HAVE_PTHREAD, MGL_HAVE_ATTRIBUTE, MGL_HAVE_C99_COMPLEX, MGL_HAVE_RVAL}. I specially set them to @code{0} for Borland and Microsoft compilers due to compatibility reasons. Also default setting are good for GNU (gcc, mingw) and clang compilers. However, for another compiler you may need to manually set this defines to @code{0} in file @code{include/mgl2/config.h} if you are using precompiled binaries.
+
+
+@c ------------------------------------------------------------------
+@external{}
+@node  Quick guide, Changes from v.1, Installation, Overview
+@section Quick guide
+@nav{}
+
+There are 3 steps to prepare the plot in MathGL: (1) prepare data to be plotted, (2) setup plot, (3) plot data. Let me show this on the example of surface plotting.
+
+First we need the data. MathGL use its own class @code{mglData} to handle data arrays (see @ref{Data processing}). This class give ability to handle data arrays by more or less format independent way. So, create it
+@verbatim
+    int main()
+    {
+        mglData dat(30,40);	// data to for plotting
+        for(long i=0;i<30;i++)   for(long j=0;j<40;j++)
+            dat.a[i+30*j] = 1/(1+(i-15)*(i-15)/225.+(j-20)*(j-20)/400.);
+@end verbatim
+Here I create matrix 30*40 and initialize it by formula. Note, that I use @code{long} type for indexes @var{i}, @var{j} because data arrays can be really large and @code{long} type will automatically provide proper indexing.
+
+Next step is setup of the plot. The only setup I need is axis rotation and lighting.
+@verbatim
+        mglGraph gr;		// class for plot drawing
+        gr.Rotate(50,60);	// rotate axis
+        gr.Light(true);		// enable lighting
+@end verbatim
+
+Everything is ready. And surface can be plotted.
+@verbatim
+        gr.Surf(dat);		// plot surface
+@end verbatim
+Basically plot is done. But I decide to add yellow (@samp{y} color, see @ref{Color styles}) contour lines on the surface. To do it I can just add:
+@verbatim
+        gr.Cont(dat,"y");	// plot yellow contour lines
+@end verbatim
+This demonstrate one of base MathGL concept (see, @ref{General concepts}) -- ``new drawing never clears things drawn already''. So, you can just consequently call different plotting functions to obtain ``combined'' plot. For example, if one need to draw axis then he can just call one more plotting function
+@verbatim
+        gr.Axis();			// draw axis
+@end verbatim
+
+Now picture is ready and we can save it in a file.
+@verbatim
+        gr.WriteFrame("sample.png");	// save it
+    }
+@end verbatim
+
+To compile your program, you need to specify the linker option @code{-lmgl}.
+
+This is enough for a compilation of console program or with external (non-MathGL) window library. If you want to use FLTK or Qt windows provided by MathGL then you need to add the option @code{-lmgl-wnd}.
+
+Fortran users also should add C++ library by the option @code{-lstdc++}. If library was built with @code{enable-double=ON} (this default for v.2.1 and later) then all real numbers must be real*8. You can make it automatic if use option @code{-fdefault-real-8}.
+
+@c ------------------------------------------------------------------
+@external{}
+@node  Changes from v.1, Utilities, Quick guide, Overview
+@section Changes from v.1.*
+@nav{}
+
+There are a lot of changes for v.2. Here I denote only main of them.
+@itemize @bullet
+@item
+mglGraph class is single plotter class instead of mglGraphZB, mglGraphPS and so on.
+@item
+Text style and text color positions are swapped. I.e. text style @samp{r:C} give red centered text, but not roman dark cyan text as for v.1.*.
+@item
+ColumnPlot() indexing is reverted.
+@item
+Move most of arguments of plotting functions into the string parameter and/or options.
+@item
+``Bright'' colors (like @{b8@}) can be used in color schemes and line styles.
+@item
+Intensively use pthread internally for parallelization of drawing and data processing.
+@item
+Add tick labels rotation and skipping. Add ticks in time/date format.
+@item
+New kinds of plots (Tape(), Label(), Cones(), ContV()). Extend existing plots. New primitives (Circle(), Ellipse(), Rhomb(), ...). New plot positioning (MultiPlot(), GridPlot())
+@item
+Improve MGL scripts. Add 'ask' command and allow string concatenation from different lines.
+@item
+Export to LaTeX and to 3D formats (OBJ, OFF, STL).
+@item
+Add pipes support in utilities (@code{mglconv, mglview}).
+@end itemize
+
+@c ------------------------------------------------------------------
+@external{}
+@node  Utilities, Thanks, Changes from v.1, Overview
+@section Utilities for parsing MGL
+@nav{}
+
+MathGL library provides several tools for parsing MGL scripts. There is tools saving it to bitmap or vectorial images (@code{mglconv}). Tool @code{mglview} show MGL script and allow to rotate and setup the image. Another feature of @code{mglview} is loading *.mgld files (see @code{ExportMGLD()}) for quick viewing 3d pictures.
+
+Both tools have similar set of arguments. They can be name of script file or options. You can use @samp{-} as script name for using standard input (i.e. pipes). Options are:
+@itemize
+@item @strong{-1} @var{str}
+set @var{str} as argument $1 for script;
+@item ...
+...
+@item @strong{-9} @var{str}
+set @var{str} as argument $9 for script;
+@item @strong{-L} @var{loc}
+set locale to @var{loc};
+@item @strong{-s} @var{fname}
+set MGL script for setting up the plot;
+@item @strong{-h}
+print help message.
+@end itemize
+Additionally @code{mglconv} have following options:
+@itemize
+@item @strong{-A} @var{val}
+add @var{val} into the list of animation parameters;
+@item @strong{-C} @var{v1}:@var{v2}[:@var{dv}]
+add values from @var{v1} ot @var{v2} with step @var{dv} (default is 1) into the list of animation parameters;
+@item @strong{-o} @var{name}
+set output file name;
+@item @strong{-n}
+disable default output (script should save results by itself);
+@item @strong{-S} @var{val}
+set set scaling factor for @ref{setsize};
+@item @strong{-q} @var{val}
+set @ref{quality} for output (val=0...9).
+@end itemize
+
+Also you can create animated GIF file or a set of JPEG files with names @samp{frameNNNN.jpg} (here @samp{NNNN} is frame index). Values of the parameter @code{$0} for making animation can be specified inside the script by comment @code{##a val} for each value @code{val} (one comment for one value) or by option(s) @samp{-A val}. Also you can specify a cycle for animation by comment @code{##c v1 v2 dv} or by option @code{-C v1:v2:dv}. In the case of found/specified animation parameters, tool will execute script several times -- once for each value of @code{$0}.
+
+
+MathGL also provide another simple tool @code{mgl.cgi} which parse MGL script from CGI request and send back produced PNG file. Usually this program should be placed in @code{/usr/lib/cgi-bin/}. But you need to put this program by yourself due to possible security issues and difference of Apache server settings.
+
+@c ------------------------------------------------------------------
+@external{}
+@node Thanks, , Utilities, Overview
+@section Thanks
+@nav{}
+
+@itemize @bullet
+@item
+My special thanks to my wife for the patience during the writing of this library and for the help in documentation writing and spelling.
+@item
+I'm thankful to my coauthors D. Kulagin and M. Vidassov for help in developing MathGL.
+@item
+I'm thankful to Diego Sejas Viscarra for developing mgltex, contribution to fractal generation and fruitful suggestions.
+@item
+I'm thankful to D. Eftaxiopoulos, D. Haley, V. Lipatov and S.M. Plis for making binary packages for Linux.
+@item
+I'm thankful to S. Skobelev, C. Mikhailenko, M. Veysman, A. Prokhorov, A. Korotkevich, V. Onuchin, S.M. Plis, R. Kiselev, A. Ivanov, N. Troickiy and V. Lipatov for fruitful comments.
+@item
+I'm thankful to sponsors M. Veysman (@uref{http://jiht.ru/en/about/structure.php?set_filter_structure=Y&structure_UF_DEPARTMENT=241&filter=Y&set_filter=Y, IHED RAS}) and A. Prokhorov (@url{www.datadvance.net, DATADVANCE}).
+@end itemize
+
+Javascript interface was developed with support of @url{www.datadvance.net, DATADVANCE} company.
+
+@external{}

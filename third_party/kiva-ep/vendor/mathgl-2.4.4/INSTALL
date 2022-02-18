@@ -1,0 +1,10 @@
+Installation is simple. Just execute:
+cmake .
+cmake .
+make
+sudo make install
+
+Sometimes you also need to execute:
+sudo ldconfig
+
+See MathGL documentation for more details.

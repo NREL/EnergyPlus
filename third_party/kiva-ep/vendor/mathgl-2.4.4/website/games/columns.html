@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Columns</TITLE>
+<link rel="stylesheet" href="../styles.css"></head>
+<body onkeydown="keydown(event)" onblur="needPause()" onload="startGame()">
+<!--<div class="sidenav" id="common"></div><div class="main">-->
+<div class="topnav" id="myTopnav"></div><div class="main">
+
+<h2>"Columns" game</h2>
+<canvas id="myCanvas" width="700" height="550" onmousedown="mousedown(event)">
+Your browser does not support the HTML5 canvas tag.</canvas></div>
+
+<script type="text/javascript" src="../accordion.js"></script>
+<script>
+var ctx;
+var bar = 25;	// block size in px (default)
+var nx = 10, ny = 20;	// box size
+var fX, fY;		// figure position (lowest point)
+var next = [];
+var fig = [];
+var cols = ['none', '#FF00FF', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF0000', 'silver'];
+var dols = ['none', '#7F007F', '#007F00', '#00007F', '#7F7F00', '#007F7F', '#7F0000', 'gray'];
+var box = [];
+
+var level = 0;
+var nlines = 0;
+var score = 0;
+var interval;
+var hiscore = 0;
+var paused = 0;
+var finished = 0;
+var marked = 0;
+var preview = 0;
+
+var step = 0.1;	// step of down-shift (higher is more complex)
+
+function needPause()
+{	if(paused==0)	pause();	}
+
+function pause()	// useless
+{
+	paused = 1-paused;
+	if(paused)
+	{
+		if(score > hiscore)
+		{	hiscore = score;
+			localStorage.setItem("hiscoreHexris", hiscore);	}
+		clearInterval(interval);	draw();
+	}
+	else if(!finished)	interval = setInterval(updateCanvas, 30);
+}
+
+function startGame()
+{
+	ctx = document.getElementById("myCanvas").getContext("2d");
+	ctx.lineCap="round";
+
+	newFig();	newFig();	level = 0;		step = 1./32;
+	score = 0;	nlines = 0;	paused = 0;		finished = 0;
+	for(var i=0;i<nx*ny;i++)	box[i] = 0;
+
+	hiscore = localStorage.getItem("hiscoreColumns");
+	if(!hiscore)	hiscore = 0;
+//	document.getElementById("hiscore").innerHTML = hiscore;
+	interval = setInterval(updateCanvas, 30);
+}
+
+function newFig()
+{
+	fig = next.slice();
+	next[0] = 1+Math.floor(Math.random()*(cols.length-2));
+	next[1] = 1+Math.floor(Math.random()*(cols.length-2));
+	next[2] = 1+Math.floor(Math.random()*(cols.length-2));
+	fX = Math.floor(nx/2);	fY = ny-2;
+}
+
+function finish()	// game over
+{
+	finished = 1;	draw();
+	ctx.font="40px Arial";
+	ctx.fillStyle = 'black';
+	ctx.fillText("GAME OVER", ctx.canvas.width/4, ctx.canvas.height/2);
+	if(score > hiscore)
+	{	hiscore = score;
+		localStorage.setItem("hiscoreColumns", hiscore);	}
+//	document.getElementById("hiscore").innerHTML = hiscore;
+	clearInterval(interval);
+}
+
+function moveLeft()
+{
+	var y = Math.floor(fY);
+	if(fX>0 && box[fX-1+nx*y]==0)		fX -= 1;
+}
+
+function moveRight()
+{
+	var y = Math.floor(fY);
+	if(fX<nx-1 && box[fX+1+nx*y]==0)	fX += 1;
+}
+
+function canFall()
+{
+	var y = Math.floor(fY-1);
+	if(y<0 || box[fX+nx*y]>0)	return 0;
+	return 1;
+}
+
+function putFig()
+{
+	var y = Math.floor(fY);
+	box[fX+nx*y] = fig[0];
+	box[fX+nx*(y+1)] = fig[1];
+	box[fX+nx*(y+2)] = fig[2];
+	score += 1;
+	markLines();
+}
+
+function moveDown()
+{	if(canFall())	fY -= 1;	}
+
+function fallDown()
+{
+	while(canFall())	fY -= 1;
+	putFig();	newFig();
+}
+
+function rotate()
+{
+	var f = fig[0];
+	fig[0] = fig[1];	fig[1] = fig[2];	fig[2] = f;
+}
+
+function updateCanvas()
+{
+	if(paused)	{	draw();	return;	}
+	if(marked>0)
+	{
+		marked -= 1;
+		if(marked==0)	removeLines();
+	}
+	else if(canFall())
+		fY -= step;
+	else
+	{
+		putFig();
+		newFig();
+		if(!canFall())	finish();
+	}
+	draw();
+}
+
+function markLines()
+{
+	var rem = [];
+	for(var j=0;j<ny;j++) for(var i=0;i<nx;i++)	rem[i+nx*j] = 0;
+	for(var j=1;j<ny-1;j++) for(var i=1;i<nx-1;i++)	// main field
+	{
+		var i0 = i+nx*j, c = box[i0];
+		if(c>0)
+		{
+			if(box[i0-1]==c && box[i0+1]==c)
+			{	rem[i0-1]=1;	rem[i0]=1;	rem[i0+1]=1;	}
+			if(box[i0-nx]==c && box[i0+nx]==c)
+			{	rem[i0-nx]=1;	rem[i0]=1;	rem[i0+nx]=1;	}
+			if(box[i0-1-nx]==c && box[i0+1+nx]==c)
+			{	rem[i0-1-nx]=1;	rem[i0]=1;	rem[i0+1+nx]=1;	}
+			if(box[i0-1+nx]==c && box[i0+1-nx]==c)
+			{	rem[i0-1+nx]=1;	rem[i0]=1;	rem[i0+1-nx]=1;	}
+		}
+	}
+	for(var j=1;j<ny-1;j++) // vertical boundaries
+	{
+		var i0 = nx*j, i1 = nx-1+nx*j, c0 = box[i0], c1 = box[i1];
+		if(c0>0 && box[i0-nx]==c0 && box[i0+nx]==c0)
+		{	rem[i0-nx]=1;	rem[i0]=1;	rem[i0+nx]=1;	}
+		if(c1>0 && box[i1-nx]==c1 && box[i1+nx]==c1)
+		{	rem[i1-nx]=1;	rem[i1]=1;	rem[i1+nx]=1;	}
+	}
+	for(var i=1;i<nx-1;i++)	// horizontal boundary
+	{
+		var c = box[i];
+		if(c>0 && box[i-1]==c && box[i+1]==c)
+		{	rem[i-1]=1;	rem[i]=1;	rem[i+1]=1;	}
+	}
+	var cr = cols.length-1;
+	for(var j=0;j<ny;j++) for(var i=0;i<nx;i++)
+	{
+		if(rem[i+nx*j]>0)	{	box[i+nx*j] = cr;	marked = 5;	}
+	}
+}
+
+function removeLines()
+{
+	var ok=1, c = cols.length-1, rem = 0, items=0;
+	while(ok)
+	{
+		ok = 0;
+		for(var i=0;i<nx;i++)	for(var j=0;j<ny;j++)
+		{
+			if(box[i+nx*j]==c)
+			{
+				ok = 1;	items += 1;
+				for(var k=j+1;k<ny;k++)	box[i+nx*(k-1)] = box[i+nx*k];
+				box[i+nx*(ny-1)] = 0;
+			}
+		}
+	}
+	if(preview)
+		score += items*items*4*level;
+	else
+		score += items*items*10*level;
+	nlines += items;
+	if(nlines>=30*level)
+	{	level += 1;	step = Math.pow(2,level/4-5);
+		if(level>15)	level = 15;	}
+	markLines();	// TODO summary score ?!!
+}
+
+function drawSq(i,j,col,col2)
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/22/bar, r = bar*s;
+	var x = r*(i+1), y = r*(ny-j);
+	ctx.beginPath();
+	if(col!='none')
+	{
+		var grd=ctx.createRadialGradient(x+0.5*r,y-r/3,r/5,x+0.5*r,y,r);
+		grd.addColorStop(0,"white");
+		grd.addColorStop(1,col);
+		ctx.fillStyle = grd;
+	}
+	ctx.rect(x,y,r,r);	if(col!='none')	ctx.fill();
+	ctx.strokeStyle = col2;
+	ctx.stroke();
+}
+
+function draw()
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/22/bar;
+	ctx.clearRect(0, 0, cwidth, cheight);
+	// boundary
+	for(var i=0;i<=ny;i++)
+	{
+		drawSq(-1,i,'gray','black');
+		drawSq(nx,i,'gray','black');
+	}
+	for(var i=0;i<=nx+1;i++)	drawSq(i-1,-1,'gray','black');
+	// existing bricks
+	for(var i=0;i<nx;i++)	for(var j=0;j<ny;j++)
+	{
+		var c = box[i+nx*j];
+		if(c)	drawSq(i,j,cols[c],'black');
+		else	drawSq(i,j,'none','lightgray');
+	}
+	// figure	
+	var x = Math.floor(fX), y = Math.floor(fY);
+	drawSq(x,y,cols[fig[0]],'black');
+	drawSq(x,y+1,cols[fig[1]],'black');
+	drawSq(x,y+2,cols[fig[2]],'black');
+
+	// preview figure
+	if(preview)
+	{
+		drawSq(nx+7.5,10,cols[next[0]],'black');
+		drawSq(nx+7.5,11,cols[next[1]],'black');
+		drawSq(nx+7.5,12,cols[next[2]],'black');
+		ctx.strokeStyle = 'black';
+		ctx.strokeRect((nx+5)*bar*s,6*bar*s,8*bar*s,7*bar*s);
+
+		var x = Math.floor(fX), y = Math.floor(fY), dy;
+		for(dy=0;dy<=y;dy++)	if(box[x+nx*(y-dy)]>0)	break;
+		drawSq(x,y-dy+1,'none','black');
+		drawSq(x,y-dy+2,'none','black');
+		drawSq(x,y-dy+3,'none','black');
+	}
+
+
+	ctx.font="24px Arial";	// score
+	ctx.fillStyle = 'black';
+	ctx.fillText("Score: "+score, (nx+4)*s*bar, bar*s);
+	ctx.fillText("Level: "+level, (nx+11)*s*bar, s*bar);
+	ctx.fillStyle = 'darkgreen';
+	ctx.fillText("HiScore: "+hiscore, (nx+4)*s*bar, 2*bar*s);
+
+	var dh = s*100, b = dh/10;
+	var y0 = cheight-2*dh, x0 = s*bar*(nx+3);
+	ctx.strokeStyle = 'blue';	ctx.fillStyle = 'lightblue';	
+
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// left
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/4,y0+dh/2);
+	ctx.lineTo(x0+3*dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+
+	ctx.strokeRect(x0+dh+b, y0+b, dh-2*b, dh-2*b);	// rotate
+	ctx.beginPath();
+	ctx.arc(x0+3*dh/2, y0+dh/2, 0.3*dh, 0, 2*Math.PI);
+	ctx.fill();	ctx.stroke();
+	ctx.beginPath();	ctx.fillStyle = 'white';
+	ctx.arc(x0+3*dh/2, y0+dh/2, 0.2*dh, 0, 2*Math.PI);
+	ctx.fill();	ctx.stroke();
+
+	ctx.strokeRect(x0+2*dh+b, y0+b, dh-2*b, dh-2*b);	// right
+	ctx.beginPath();	ctx.fillStyle = 'lightblue';
+	ctx.moveTo(x0+2*dh+3*dh/4,y0+dh/2);
+	ctx.lineTo(x0+2*dh+dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+2*dh+dh/4,y0+dh/4);
+	ctx.lineTo(x0+2*dh+3*dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+
+	y0 += dh;
+	ctx.strokeStyle = 'green';	ctx.fillStyle = 'lightgreen';	
+/*	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall left
+	ctx.beginPath();
+	ctx.moveTo(x0+3*dh/4,y0+0.2*dh);
+	ctx.lineTo(x0+5*dh/8,y0+0.2*dh);
+	ctx.lineTo(x0+5*dh/8,y0+dh/2);
+	ctx.lineTo(x0+0.4*dh,y0+dh/2);
+	ctx.lineTo(x0+0.4*dh,y0+3*dh/8);
+	ctx.lineTo(x0+0.2*dh,y0+5*dh/8);
+	ctx.lineTo(x0+0.4*dh,y0+7*dh/8);
+	ctx.lineTo(x0+0.4*dh,y0+6*dh/8);
+	ctx.lineTo(x0+3*dh/4,y0+6*dh/8);
+	ctx.lineTo(x0+3*dh/4,y0+0.2*dh);	ctx.fill();	ctx.stroke();*/
+
+	x0 += dh;
+	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall down
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/2,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/2,y0+3*dh/4);	ctx.fill();	ctx.stroke();
+	ctx.beginPath();
+	ctx.rect(x0+dh/4,y0+3*dh/4,dh/2,dh/16);
+	ctx.fill();	ctx.stroke();
+
+	x0 += dh;
+/*	ctx.strokeRect(x0+b, y0+b, dh-2*b, dh-2*b);	// fall right
+	ctx.beginPath();
+	ctx.moveTo(x0+dh/4,y0+0.2*dh);
+	ctx.lineTo(x0+3*dh/8,y0+0.2*dh);
+	ctx.lineTo(x0+3*dh/8,y0+dh/2);
+	ctx.lineTo(x0+0.6*dh,y0+dh/2);
+	ctx.lineTo(x0+0.6*dh,y0+3*dh/8);
+	ctx.lineTo(x0+0.8*dh,y0+5*dh/8);
+	ctx.lineTo(x0+0.6*dh,y0+7*dh/8);
+	ctx.lineTo(x0+0.6*dh,y0+6*dh/8);
+	ctx.lineTo(x0+dh/4,y0+6*dh/8);
+	ctx.lineTo(x0+dh/4,y0+0.2*dh);	ctx.fill();	ctx.stroke();*/
+
+	x0 -= 2*dh;	y0 -= 4*dh;	// preview
+	ctx.strokeStyle = 'magenta';	ctx.fillStyle = 'violet';
+	if(preview)
+	{
+		ctx.fillStyle = 'lightpink';
+		ctx.fillRect(x0+b, y0+b, dh-2*b, dh-2*b);
+	}
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+dh/4,dh/2,Math.PI/4,3*Math.PI/4);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+3*dh/4,dh/2,-3*Math.PI/4,-Math.PI/4);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(x0+dh/2,y0+dh/2,dh/5,0,2*Math.PI);	
+	ctx.fill();	ctx.stroke();
+
+	x0 += dh;	ctx.strokeStyle = 'red';
+	if(paused)
+	{
+		ctx.fillStyle = 'pink';
+		ctx.fillRect(x0+b, y0+b, dh-2*b, dh-2*b);
+	}
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);
+	ctx.beginPath();	ctx.fillStyle = 'salmon';
+	ctx.rect(x0+dh/4,y0+dh/4,dh/8,dh/2);
+	ctx.rect(x0+5*dh/8,y0+dh/4,dh/8,dh/2);	ctx.fill();	ctx.stroke();
+
+	x0 += dh;
+	ctx.strokeRect(b+x0, y0+b, dh-2*b, dh-2*b);	// run
+	ctx.beginPath();	ctx.fillStyle = 'salmon';
+	ctx.moveTo(x0+dh/4,y0+dh/4);
+	ctx.lineTo(x0+dh/4,y0+3*dh/4);
+	ctx.lineTo(x0+dh/2,y0+dh/2);	ctx.fill();	ctx.stroke();
+	ctx.moveTo(x0+dh/2,y0+dh/4);
+	ctx.lineTo(x0+dh/2,y0+3*dh/4);
+	ctx.lineTo(x0+3*dh/4,y0+dh/2);	ctx.fill();	ctx.stroke();
+}
+
+function keydown(event)	// key is pressed
+{
+	if(event.key == ' ')	fallDown();
+	else if(event.key == 'ArrowUp')	rotate();
+	else if(event.key == 'ArrowDown')	moveDown();
+	else if(event.key == 'ArrowLeft')	moveLeft();
+	else if(event.key == 'ArrowRight')	moveRight();
+//	else if(event.key == 'End')		fallRight();
+//	else if(event.key == 'Home')	fallLeft();
+}
+
+function mousedown(event)	// mouse button is pressed
+{
+	cwidth = ctx.canvas.width;
+	cheight = ctx.canvas.height;
+	var s = cheight/22/bar;
+	var dh = s*100, b = dh/10, y0 = cheight-2*dh;
+	var xx = event.offsetX-s*bar*(nx+3), yy = event.offsetY-y0;
+
+	if(xx<0)	pause();
+	else if(yy>-0.5*dh && yy<dh)	// main buttons
+	{
+		if(xx<dh)	moveLeft();
+		else if(xx<2*dh)	rotate();
+		else	moveRight();
+	}
+	else if(yy>dh)	// fall buttons
+	{
+//		if(xx<dh)	fallLeft();
+//		else if(xx<2*dh)
+			fallDown();
+//		else	fallRight();
+	}
+	else if(yy<-2*dh)	// setup buttons
+	{
+		if(xx<dh)	preview = 1-preview;
+		else if(xx<2*dh)	pause();
+		else
+		{	clearInterval(interval);	startGame();	}
+	}
+}
+</script>
+</body>
+</html> 

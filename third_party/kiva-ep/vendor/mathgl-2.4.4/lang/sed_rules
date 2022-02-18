@@ -1,0 +1,13 @@
+1,19d
+s/MGL_EXPORT//g
+s/mglDataA/mglData/g
+/SWIG/,/endif/ { s/.*//g }
+s/^.*---.*$//g
+s/^#include.*$//g
+s/^#define.*$//g
+s/^.*public mglData$//g
+s/^#ifndef _MGL_DATA_H_.*$//g
+s/^#ifndef _MGL_H_.*$//g
+s/^#ifdef __cplusplus.*$//g
+/^\s*$/d
+N;$!P;$!D;$d
