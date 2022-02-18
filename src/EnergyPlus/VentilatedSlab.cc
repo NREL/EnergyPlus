@@ -134,10 +134,6 @@ namespace VentilatedSlab {
     //    int constexpr NotOperating = 0; // Parameter for use with OperatingMode variable, set for no heating/cooling
     int constexpr HeatingMode = 1; // Parameter for use with OperatingMode variable, set for heating
     int constexpr CoolingMode = 2; // Parameter for use with OperatingMode variable, set for cooling
-                                   // Ventilated Slab Configurations
-    int constexpr SlabOnly = 1;    // Air circulate through cores of slab only
-    int constexpr SlabAndZone = 2; // Circulated Air is introduced to zone
-    int constexpr SeriesSlabs = 3;
 
     void SimVentilatedSlab(EnergyPlusData &state,
                            std::string const &CompName,   // name of the fan coil unit
@@ -557,17 +553,17 @@ namespace VentilatedSlab {
 
             // System Configuration:
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SlabOnly")) {
-                ventSlab.SysConfg = SlabOnly;
+                ventSlab.SysConfg = VentilatedSlabConfig::SlabOnly;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SlabAndZone")) {
-                ventSlab.SysConfg = SlabAndZone;
+                ventSlab.SysConfg = VentilatedSlabConfig::SlabAndZone;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SeriesSlabs")) {
-                ventSlab.SysConfg = SeriesSlabs;
+                ventSlab.SysConfg = VentilatedSlabConfig::SeriesSlabs;
             } else {
                 ShowSevereError(state,
                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(8) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(8) + "\".");
                 ShowContinueError(state, "Control reset to SLAB ONLY Configuration.");
-                ventSlab.SysConfg = SlabOnly;
+                ventSlab.SysConfg = VentilatedSlabConfig::SlabOnly;
             }
 
             // Hollow Core information :
@@ -743,7 +739,7 @@ namespace VentilatedSlab {
             //      %OutsideAirNode is the outdoor air inlet to the OA mixer
             //         For all types of ventilated slab, this is DataLoopNode::NodeConnectionType::Inlet,ObjectIsNotParent, -OA MIXER
 
-            if (ventSlab.SysConfg == SlabOnly) {
+            if (ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) {
 
                 ventSlab.ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
@@ -784,7 +780,7 @@ namespace VentilatedSlab {
                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsParent);
 
-            } else if (ventSlab.SysConfg == SeriesSlabs) {
+            } else if (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs) {
 
                 ventSlab.ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
@@ -825,7 +821,7 @@ namespace VentilatedSlab {
                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsParent);
 
-            } else if (ventSlab.SysConfg == SlabAndZone) {
+            } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
 
                 ventSlab.ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
@@ -875,7 +871,7 @@ namespace VentilatedSlab {
                                                                                            ObjectIsParent);
             }
 
-            if (ventSlab.SysConfg == SlabOnly) {
+            if (ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) {
                 if (!lAlphaBlanks(20)) {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" " + cAlphaFields(20) + "=\"" +
@@ -883,7 +879,7 @@ namespace VentilatedSlab {
                     ShowContinueError(state, "It is used for \"SlabAndZone\" only");
                 }
 
-            } else if (ventSlab.SysConfg == SlabAndZone) {
+            } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
                 if (lAlphaBlanks(20)) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(20) +
@@ -3005,7 +3001,7 @@ namespace VentilatedSlab {
             state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(FanOutletNode).Temp;
 
             // Node condition
-            if (ventSlab.SysConfg == SeriesSlabs) {
+            if (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs) {
                 for (RadSurfNum = 1; RadSurfNum <= ventSlab.NumOfSurfaces; ++RadSurfNum) {
                     SlabName = ventSlab.SurfaceName(RadSurfNum);
                     MSlabIn = ventSlab.SlabIn(RadSurfNum);
@@ -3994,8 +3990,8 @@ namespace VentilatedSlab {
 
         if (AirMassFlow > 0.0) {
 
-            if ((ventSlab.SysConfg == SlabOnly) ||
-                (ventSlab.SysConfg == SlabAndZone)) {
+            if ((ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) ||
+                (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone)) {
 
                 for (RadSurfNum = 1; RadSurfNum <= ventSlab.NumOfSurfaces; ++RadSurfNum) {
                     SurfNum = ventSlab.SurfacePtr(RadSurfNum);
@@ -4089,13 +4085,13 @@ namespace VentilatedSlab {
                                 state.dataHeatBalFanSys->QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) =
                                     0.0; // Also zero the other side of an interzone
 
-                            if (ventSlab.SysConfg == SlabOnly) {
+                            if (ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) {
                                 //            state.dataLoopNodes->Node(Returnairnode)%Temp = MAT(Zonenum)
                                 state.dataLoopNodes->Node(ReturnAirNode).Temp =
                                     state.dataHeatBalSurf->SurfInsideTempHist(1)(ventSlab.SurfacePtr(RadSurfNum));
                                 state.dataLoopNodes->Node(FanOutletNode).Temp = state.dataLoopNodes->Node(ReturnAirNode).Temp;
                                 state.dataLoopNodes->Node(SlabInNode).Temp = state.dataLoopNodes->Node(FanOutletNode).Temp;
-                            } else if (ventSlab.SysConfg == SlabAndZone) {
+                            } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
                                 state.dataLoopNodes->Node(ReturnAirNode).Temp = state.dataHeatBalFanSys->MAT(ZoneNum);
                                 state.dataLoopNodes->Node(SlabInNode).Temp = state.dataLoopNodes->Node(ReturnAirNode).Temp;
                                 state.dataLoopNodes->Node(FanOutletNode).Temp = state.dataLoopNodes->Node(SlabInNode).Temp;
@@ -4187,7 +4183,7 @@ namespace VentilatedSlab {
                 TotalVentSlabRadPower *= ZoneMult;
 
                 // Return Air temp Check
-                if (ventSlab.SysConfg == SlabOnly) {
+                if (ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) {
                     if (AirMassFlow > 0.0) {
                         CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ventSlab.RadInNode).HumRat);
                         state.dataLoopNodes->Node(ReturnAirNode).Temp =
@@ -4226,7 +4222,7 @@ namespace VentilatedSlab {
                     }
                 }
 
-                if (ventSlab.SysConfg == SlabAndZone) {
+                if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
                     if (AirMassFlow > 0.0) {
                         state.dataLoopNodes->Node(ZoneAirInNode).Temp =
                             state.dataLoopNodes->Node(SlabInNode).Temp - (TotalVentSlabRadPower / (AirMassFlow * CpAirZn));
@@ -4279,7 +4275,7 @@ namespace VentilatedSlab {
 
             } // SYSCONFIG. SLABONLY&SLABANDZONE
 
-            if (ventSlab.SysConfg == SeriesSlabs) {
+            if (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs) {
 
                 for (RadSurfNum = 1; RadSurfNum <= ventSlab.NumOfSurfaces; ++RadSurfNum) {
 
@@ -4722,15 +4718,15 @@ namespace VentilatedSlab {
 
         if ((CpAppAir > 0.0) && (AirMassFlow > 0.0)) {
 
-            if ((ventSlab.SysConfg == SlabOnly) ||
-                (ventSlab.SysConfg == SeriesSlabs)) {
+            if ((ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) ||
+                (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs)) {
                 state.dataLoopNodes->Node(AirInletNode) = state.dataLoopNodes->Node(AirInletNode);
                 state.dataLoopNodes->Node(AirInletNode).Temp =
                     state.dataLoopNodes->Node(AirOutletNode).Temp - TotalHeatSource / AirMassFlow / CpAppAir;
                 state.dataLoopNodes->Node(AirInletNode).MassFlowRate = state.dataLoopNodes->Node(AirOutletNode).MassFlowRate;
                 state.dataLoopNodes->Node(AirInletNode).HumRat = state.dataLoopNodes->Node(AirOutletNode).HumRat;
 
-            } else if (ventSlab.SysConfg == SlabAndZone) {
+            } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
                 state.dataLoopNodes->Node(ZoneInletNode) = state.dataLoopNodes->Node(ZoneInletNode);
                 state.dataLoopNodes->Node(ZoneInletNode).Temp =
                     state.dataLoopNodes->Node(AirOutletNode).Temp - TotalHeatSource / AirMassFlow / CpAppAir;
@@ -4740,12 +4736,12 @@ namespace VentilatedSlab {
             }
 
         } else {
-            if ((ventSlab.SysConfg == SlabOnly) ||
-                (ventSlab.SysConfg == SeriesSlabs)) {
+            if ((ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) ||
+                (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs)) {
                 state.dataLoopNodes->Node(FanOutNode) = state.dataLoopNodes->Node(AirOutletNode);
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0.0;
 
-            } else if (ventSlab.SysConfg == SlabAndZone) {
+            } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
                 state.dataLoopNodes->Node(ZoneInletNode) = state.dataLoopNodes->Node(AirInletNode);
                 state.dataLoopNodes->Node(FanOutNode) = state.dataLoopNodes->Node(AirOutletNode); // Fan Resolve
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0.0;
@@ -5043,12 +5039,12 @@ namespace VentilatedSlab {
         ventSlab.ElecFanEnergy =
             ventSlab.ElecFanPower * TimeStepSys * DataGlobalConstants::SecInHour;
 
-        if ((ventSlab.SysConfg == SlabOnly) || (ventSlab.SysConfg == SeriesSlabs)) {
+        if ((ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) || (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs)) {
             ventSlab.SlabInTemp = state.dataLoopNodes->Node(ventSlab.RadInNode).Temp;
             ventSlab.SlabOutTemp =
                 state.dataLoopNodes->Node(ventSlab.ReturnAirNode).Temp;
 
-        } else if (ventSlab.SysConfg == SlabAndZone) {
+        } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
             ventSlab.SlabInTemp = state.dataLoopNodes->Node(ventSlab.RadInNode).Temp;
             ventSlab.ZoneInletTemp =
                 state.dataLoopNodes->Node(ventSlab.ZoneAirInNode).Temp;

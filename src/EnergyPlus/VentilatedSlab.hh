@@ -115,6 +115,16 @@ namespace VentilatedSlab {
         Num
     };
 
+    // Ventilated Slab Configurations
+    enum class VentilatedSlabConfig
+    {
+        Invalid = -1,
+        SlabOnly,    // Air circulate through cores of slab only
+        SlabAndZone, // Circulated Air is introduced to zone
+        SeriesSlabs,
+        Num
+    };
+
     struct VentilatedSlabData
     {
         // Members
@@ -172,7 +182,7 @@ namespace VentilatedSlab {
         Real64 OutAirMassFlow;    // kg/s
         Real64 MinOutAirVolFlow;  // m3/s
         Real64 MinOutAirMassFlow; // kg/s
-        int SysConfg;             // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
+        VentilatedSlabConfig SysConfg;             // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
         CoilType coilOption;           // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
         bool heatingCoilPresent;        // .TRUE. if ventilated slab has a heating coil
         HeatingCoilType hCoilType;            // type of heating coil (water, gas, electric, etc.)
@@ -285,7 +295,7 @@ namespace VentilatedSlab {
               ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0),
               TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
-              MinOutAirMassFlow(0.0), SysConfg(0), coilOption(CoilType::Invalid), heatingCoilPresent(false), hCoilType(HeatingCoilType::Invalid), heatingCoil_Index(0),
+              MinOutAirMassFlow(0.0), SysConfg(VentilatedSlabConfig::Invalid), coilOption(CoilType::Invalid), heatingCoilPresent(false), hCoilType(HeatingCoilType::Invalid), heatingCoil_Index(0),
               heatingCoilType(DataPlant::PlantEquipmentType::Invalid), heatingCoil_FluidIndex(0), heatingCoilSchedPtr(0), heatingCoilSchedValue(0.0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
