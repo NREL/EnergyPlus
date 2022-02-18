@@ -399,8 +399,9 @@ namespace ExhaustAirSystemManager {
 
             thisExhSys.centralFan_VolumeFlowRate_Std = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
 
-            thisExhSys.centralFan_VolumeFlowRate_Cur =
-                state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
+            thisExhSys.centralFan_VolumeFlowRate_Cur = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
+            // state.dataLoopNodes->MoreNodeInfo(outletNode_Num).VolFlowRateCrntRho;
+            // state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
             thisExhSys.centralFan_Power = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->fanPower();
 
@@ -418,7 +419,9 @@ namespace ExhaustAirSystemManager {
 
             thisExhSys.centralFan_VolumeFlowRate_Std = fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
 
-            thisExhSys.centralFan_VolumeFlowRate_Cur = fancomp.OutletAirMassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
+            thisExhSys.centralFan_VolumeFlowRate_Cur = fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
+            // state.dataLoopNodes->MoreNodeInfo(outletNode_Num).VolFlowRateCrntRho;
+            // fancomp.OutletAirMassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
             thisExhSys.centralFan_Power = fancomp.FanPower * 1000.0;
 
