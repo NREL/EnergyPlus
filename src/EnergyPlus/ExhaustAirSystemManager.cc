@@ -926,24 +926,13 @@ namespace ExhaustAirSystemManager {
     {
         // Given a mixer name, this routine determines if that mixer is found on Exhaust Systems.
 
-        // Return value
-        bool YesNo; // True if found
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int ItemNum;
-
         if (state.dataExhAirSystemMrg->GetInputFlag) {
             GetExhaustAirSystemInput(state);
             state.dataExhAirSystemMrg->GetInputFlag = false;
         }
 
-        YesNo = false;
-        if (state.dataZoneEquip->NumExhaustAirSystems > 0) {
-            ItemNum = UtilityRoutines::FindItemInList(CompName, state.dataZoneEquip->ExhaustAirSystem, &ExhaustAir::ZoneMixerName);
-            if (ItemNum > 0) YesNo = true;
-        }
-
-        return YesNo;
+        return (state.dataZoneEquip->NumExhaustAirSystems > 0) &&
+               (UtilityRoutines::FindItemInList(CompName, state.dataZoneEquip->ExhaustAirSystem, &ExhaustAir::ZoneMixerName) > 0);
     }
 
 } // namespace ExhaustAirSystemManager
