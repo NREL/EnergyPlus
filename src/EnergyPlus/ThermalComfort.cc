@@ -2144,7 +2144,8 @@ namespace ThermalComfort {
         // Now weight the MRT excluding the surface used for weighting
         if (state.dataThermalComforts->ZoneAESum(ZoneNum) > 0.01) {
             CalcSurfaceWeightedMRT = SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum);
-            // if averaged with surface--half comes from the surface used for weighting (SurfNum) and the rest from the calculated MRT that excludes this surface
+            // if averaged with surface--half comes from the surface used for weighting (SurfNum) and the rest from the calculated MRT that excludes
+            // this surface
             if (AverageWithSurface) {
                 CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + CalcSurfaceWeightedMRT);
             }

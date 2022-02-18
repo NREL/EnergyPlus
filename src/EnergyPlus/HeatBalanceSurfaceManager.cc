@@ -4641,8 +4641,8 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
             if (state.dataSurface->Surface(surfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
                 state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
                     -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
-                        state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
-                        state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
+                      state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
+                      state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
             }
         }
     }
