@@ -1140,7 +1140,6 @@ namespace VentilatedSlab {
                         break;
                     }
                     case CoolingCoilType::HXAssisted: {
-                        ventSlab.cCoilType = CoolingCoilType::HXAssisted;
                         GetHXCoilTypeAndName(state,
                                              state.dataIPShortCut->cAlphaArgs(30),
                                              state.dataIPShortCut->cAlphaArgs(31),
