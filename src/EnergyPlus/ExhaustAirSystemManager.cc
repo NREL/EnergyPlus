@@ -70,6 +70,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 // #include <EnergyPlus/ReturnAirPathManager.hh> //2022-01-14: replace with exhaust system
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -387,6 +388,7 @@ namespace ExhaustAirSystemManager {
         // auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         int outletNode_Num = 0;
+        Real64 RhoAirCurrent = state.dataEnvrn->StdRhoAir;
 
         if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
@@ -399,7 +401,12 @@ namespace ExhaustAirSystemManager {
 
             thisExhSys.centralFan_VolumeFlowRate_Std = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
 
-            thisExhSys.centralFan_VolumeFlowRate_Cur = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataEnvrn->StdRhoAir;
+            RhoAirCurrent = EnergyPlus::Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                                                 state.dataEnvrn->OutBaroPress,
+                                                                                 state.dataLoopNodes->Node(outletNode_Num).Temp,
+                                                                                 state.dataLoopNodes->Node(outletNode_Num).HumRat);
+            if (RhoAirCurrent == 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
+            thisExhSys.centralFan_VolumeFlowRate_Cur = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / RhoAirCurrent;
             // state.dataLoopNodes->MoreNodeInfo(outletNode_Num).VolFlowRateCrntRho;
             // state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
@@ -415,13 +422,20 @@ namespace ExhaustAirSystemManager {
             // Update output variables
             auto &fancomp = state.dataFans->Fan(thisExhSys.CentralFanIndex);
 
+            outletNode_Num = fancomp.OutletNodeNum;
+
             thisExhSys.centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
 
             thisExhSys.centralFan_VolumeFlowRate_Std = fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
 
-            thisExhSys.centralFan_VolumeFlowRate_Cur = fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
+            RhoAirCurrent = EnergyPlus::Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                                          state.dataEnvrn->OutBaroPress,
+                                                                          state.dataLoopNodes->Node(outletNode_Num).Temp,
+                                                                          state.dataLoopNodes->Node(outletNode_Num).HumRat);
+            if (RhoAirCurrent == 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
+            thisExhSys.centralFan_VolumeFlowRate_Cur = fancomp.OutletAirMassFlowRate / RhoAirCurrent;
             // state.dataLoopNodes->MoreNodeInfo(outletNode_Num).VolFlowRateCrntRho;
-            // fancomp.OutletAirMassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
+            // state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / state.dataLoopNodes->MoreNodeInfo(outletNode_Num).Density;
 
             thisExhSys.centralFan_Power = fancomp.FanPower * 1000.0;
 
