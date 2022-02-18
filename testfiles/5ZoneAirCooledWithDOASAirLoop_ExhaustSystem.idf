@@ -1,130 +1,7 @@
-!-Generator IDFEditor 1.51
-!-Option OriginalOrderTop UseSpecialFormat
-
-!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
-!-      Use '!' comments if they need to be retained when using the IDFEditor.
-
-ZoneHVAC:ExhaustControl,
-    Zone1Exh1,               !- Name
-    ,                        !- Availability Schedule Name
-    SPACE1-1,                !- Zone Name
-    Space1-1_ExhCtrl_Inlet,  !- Inlet Node Name
-    Space1-1_ExhCtrl_Outlet, !- Outlet Node Name
-    0.1,                     !- Design Exhaust Flow Rate {m3/s}
-    Scheduled;               !- Flow Control Type
-
-ZoneHVAC:ExhaustControl,
-    Zone2Exh1,               !- Name
-    ,                        !- Availability Schedule Name
-    SPACE2-1,                !- Zone Name
-    Space2-1_ExhCtrl_Inlet,  !- Inlet Node Name
-    Space2-1_ExhCtrl_Outlet, !- Outlet Node Name
-    autosize,                !- Design Exhaust Flow Rate {m3/s}
-    Scheduled;               !- Flow Control Type
-
-ZoneHVAC:ExhaustControl,
-    Zone3Exh1,               !- Name
-    ,                        !- Availability Schedule Name
-    SPACE3-1,                !- Zone Name
-    Space3-1_ExhCtrl_Inlet,  !- Inlet Node Name
-    Space3-1_ExhCtrl_Outlet, !- Outlet Node Name
-    autosize,                !- Design Exhaust Flow Rate {m3/s}
-    Scheduled;               !- Flow Control Type
-
-ZoneHVAC:ExhaustControl,
-    Zone4Exh1,               !- Name
-    ,                        !- Availability Schedule Name
-    SPACE4-1,                !- Zone Name
-    Space4-1_ExhCtrl_Inlet,  !- Inlet Node Name
-    Space4-1_ExhCtrl_Outlet, !- Outlet Node Name
-    autosize,                !- Design Exhaust Flow Rate {m3/s}
-    Scheduled;               !- Flow Control Type
-
-ZoneHVAC:ExhaustControl,
-    Zone5Exh1,               !- Name
-    ,                        !- Availability Schedule Name
-    SPACE5-1,                !- Zone Name
-    Space5-1_ExhCtrl_Inlet,  !- Inlet Node Name
-    Space5-1_ExhCtrl_Outlet, !- Outlet Node Name
-    autosize,                !- Design Exhaust Flow Rate {m3/s}
-    Scheduled;               !- Flow Control Type
-
-AirLoopHVAC:ZoneMixer,
-    ZoneExhMixer1,           !- Name
-    Central_ExhFan_1_Inlet,  !- Outlet Node Name
-    Space1-1_ExhCtrl_Outlet, !- Inlet 1 Node Name
-    Space5-1_ExhCtrl_Outlet; !- Inlet 2 Node Name
-
-AirLoopHVAC:ZoneMixer,
-    ZoneExhMixer2,           !- Name
-    Central_ExhFan_2_Inlet,  !- Outlet Node Name
-    Space2-1_ExhCtrl_Outlet, !- Inlet 1 Node Name
-    Space3-1_ExhCtrl_Outlet, !- Inlet 2 Node Name
-    Space4-1_ExhCtrl_Outlet; !- Inlet 3 Node Name
-
-Fan:SystemModel,
-    Central_Exhaust_Fan_1,   !- Name
-    ,                        !- Availability Schedule Name
-    Central_ExhFan_1_Inlet,  !- Air Inlet Node Name
-    Central_ExhFan_1_Outlet, !- Air Outlet Node Name
-    1,                       !- Design Maximum Air Flow Rate {m3/s}
-    Discrete,                !- Speed Control Method
-    0.2,                     !- Electric Power Minimum Flow Rate Fraction
-    10,                      !- Design Pressure Rise {Pa}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Air Stream Fraction
-    autosize,                !- Design Electric Power Consumption {W}
-    PowerPerFlowPerPressure, !- Design Power Sizing Method
-    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
-    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
-    0.7,                     !- Fan Total Efficiency
-    ,                        !- Electric Power Function of Flow Fraction Curve Name
-    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
-    ,                        !- Night Ventilation Mode Flow Fraction
-    ,                        !- Motor Loss Zone Name
-    ,                        !- Motor Loss Radiative Fraction
-    General,                 !- End-Use Subcategory
-    1;                       !- Number of Speeds
-
-Fan:SystemModel,
-    Central_Exhaust_Fan_2,   !- Name
-    ,                        !- Availability Schedule Name
-    Central_ExhFan_2_Inlet,  !- Air Inlet Node Name
-    Central_ExhFan_2_Outlet, !- Air Outlet Node Name
-    1,                       !- Design Maximum Air Flow Rate {m3/s}
-    Discrete,                !- Speed Control Method
-    0.2,                     !- Electric Power Minimum Flow Rate Fraction
-    15,                      !- Design Pressure Rise {Pa}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Air Stream Fraction
-    autosize,                !- Design Electric Power Consumption {W}
-    PowerPerFlowPerPressure, !- Design Power Sizing Method
-    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
-    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
-    0.7,                     !- Fan Total Efficiency
-    ,                        !- Electric Power Function of Flow Fraction Curve Name
-    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
-    ,                        !- Night Ventilation Mode Flow Fraction
-    ,                        !- Motor Loss Zone Name
-    ,                        !- Motor Loss Radiative Fraction
-    General,                 !- End-Use Subcategory
-    1;                       !- Number of Speeds
-
-AirLoopHVAC:ExhaustSystem,
-    ExhaustSystem1,          !- Name
-    ZoneExhMixer1,           !- Zone Mixer Name
-    Fan:SystemModel,         !- Fan Object Type
-    Central_Exhaust_Fan_1;   !- Fan Name
-
-AirLoopHVAC:ExhaustSystem,
-    ExhaustSystem2,          !- Name
-    ZoneExhMixer2,           !- Zone Mixer Name
-    Fan:SystemModel,         !- Fan Object Type
-    Central_Exhaust_Fan_2;   !- Fan Name
-
-! 5ZoneAirCooledWithDOASAirLoop.idf
+! 5ZoneAirCooledWithDOASAirLoop_ExhaustSystem.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
-!                          Served by two airloops, one DOAS and one VAV recirculation.  Based on 5ZoneAirCooled.
+!                          Served by two airloops, one DOAS and one VAV recirculation, and two exhaust systems.
+!                          Based on 5ZoneAirCooledWithDOASAirLoop.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
 !                          outside air stream controlled to preheat and precool setpoints.
@@ -2604,6 +2481,19 @@ AirLoopHVAC:ReturnPath,
     AirLoopHVAC:ReturnPlenum,!- Component 1 Object Type
     Return-Plenum-1;         !- Component 1 Name
 
+AirLoopHVAC:ZoneMixer,
+    ZoneExhMixer1,           !- Name
+    Central_ExhFan_1_Inlet,  !- Outlet Node Name
+    Space1-1_ExhCtrl_Outlet, !- Inlet 1 Node Name
+    Space5-1_ExhCtrl_Outlet; !- Inlet 2 Node Name
+
+AirLoopHVAC:ZoneMixer,
+    ZoneExhMixer2,           !- Name
+    Central_ExhFan_2_Inlet,  !- Outlet Node Name
+    Space2-1_ExhCtrl_Outlet, !- Inlet 1 Node Name
+    Space3-1_ExhCtrl_Outlet, !- Inlet 2 Node Name
+    Space4-1_ExhCtrl_Outlet; !- Inlet 3 Node Name
+
 AirLoopHVAC:ReturnPlenum,
     Return-Plenum-1,         !- Name
     PLENUM-1,                !- Zone Name
@@ -2621,6 +2511,63 @@ AirLoopHVAC:SupplyPath,
     Zone Eq In Node,         !- Supply Air Path Inlet Node Name
     AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
     Zone Supply Air Splitter 1;  !- Component 1 Name
+
+AirLoopHVAC:ExhaustSystem,
+    ExhaustSystem1,          !- Name
+    ZoneExhMixer1,           !- Zone Mixer Name
+    Fan:SystemModel,         !- Fan Object Type
+    Central_Exhaust_Fan_1;   !- Fan Name
+
+AirLoopHVAC:ExhaustSystem,
+    ExhaustSystem2,          !- Name
+    ZoneExhMixer2,           !- Zone Mixer Name
+    Fan:SystemModel,         !- Fan Object Type
+    Central_Exhaust_Fan_2;   !- Fan Name
+
+ZoneHVAC:ExhaustControl,
+    Zone1Exh1,               !- Name
+    ,                        !- Availability Schedule Name
+    SPACE1-1,                !- Zone Name
+    Space1-1_ExhCtrl_Inlet,  !- Inlet Node Name
+    Space1-1_ExhCtrl_Outlet, !- Outlet Node Name
+    0.1,                     !- Design Exhaust Flow Rate {m3/s}
+    Scheduled;               !- Flow Control Type
+
+ZoneHVAC:ExhaustControl,
+    Zone2Exh1,               !- Name
+    ,                        !- Availability Schedule Name
+    SPACE2-1,                !- Zone Name
+    Space2-1_ExhCtrl_Inlet,  !- Inlet Node Name
+    Space2-1_ExhCtrl_Outlet, !- Outlet Node Name
+    autosize,                !- Design Exhaust Flow Rate {m3/s}
+    Scheduled;               !- Flow Control Type
+
+ZoneHVAC:ExhaustControl,
+    Zone3Exh1,               !- Name
+    ,                        !- Availability Schedule Name
+    SPACE3-1,                !- Zone Name
+    Space3-1_ExhCtrl_Inlet,  !- Inlet Node Name
+    Space3-1_ExhCtrl_Outlet, !- Outlet Node Name
+    autosize,                !- Design Exhaust Flow Rate {m3/s}
+    Scheduled;               !- Flow Control Type
+
+ZoneHVAC:ExhaustControl,
+    Zone4Exh1,               !- Name
+    ,                        !- Availability Schedule Name
+    SPACE4-1,                !- Zone Name
+    Space4-1_ExhCtrl_Inlet,  !- Inlet Node Name
+    Space4-1_ExhCtrl_Outlet, !- Outlet Node Name
+    autosize,                !- Design Exhaust Flow Rate {m3/s}
+    Scheduled;               !- Flow Control Type
+
+ZoneHVAC:ExhaustControl,
+    Zone5Exh1,               !- Name
+    ,                        !- Availability Schedule Name
+    SPACE5-1,                !- Zone Name
+    Space5-1_ExhCtrl_Inlet,  !- Inlet Node Name
+    Space5-1_ExhCtrl_Outlet, !- Outlet Node Name
+    autosize,                !- Design Exhaust Flow Rate {m3/s}
+    Scheduled;               !- Flow Control Type
 
 AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter 1,  !- Name
@@ -3712,6 +3659,54 @@ Fan:VariableVolume,
     0,                       !- Fan Power Coefficient 5
     DOAS Air Loop Inlet,     !- Air Inlet Node Name
     DOAS Supply Fan Outlet;  !- Air Outlet Node Name
+
+Fan:SystemModel,
+    Central_Exhaust_Fan_1,   !- Name
+    ,                        !- Availability Schedule Name
+    Central_ExhFan_1_Inlet,  !- Air Inlet Node Name
+    Central_ExhFan_1_Outlet, !- Air Outlet Node Name
+    1,                       !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.2,                     !- Electric Power Minimum Flow Rate Fraction
+    10,                      !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Air Stream Fraction
+    autosize,                !- Design Electric Power Consumption {W}
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    1;                       !- Number of Speeds
+
+Fan:SystemModel,
+    Central_Exhaust_Fan_2,   !- Name
+    ,                        !- Availability Schedule Name
+    Central_ExhFan_2_Inlet,  !- Air Inlet Node Name
+    Central_ExhFan_2_Outlet, !- Air Outlet Node Name
+    1,                       !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.2,                     !- Electric Power Minimum Flow Rate Fraction
+    15,                      !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Air Stream Fraction
+    autosize,                !- Design Electric Power Consumption {W}
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    1;                       !- Number of Speeds
 
 Schedule:Compact,
     HVACTemplate-Always 0.00924,  !- Name
