@@ -598,7 +598,6 @@ End
 		  dim dirOfTransApp as FolderItem
 		  dim s as Shell
 		  dim origFileOrigDate as FolderItem
-		  dim origFileNewOld as FolderItem
 		  dim origFileInter as FolderItem
 		  dim origFileWithNewName as String
 		  dim auditSource as FolderItem
@@ -884,10 +883,10 @@ End
 		  dim numFiles as Integer  = 0
 		  dim i as integer = 0
 		  dim fileName as String
-		  dim s as String =""
-		  dim t as String =""
+		  'dim s as String =""
+		  'dim t as String =""
 		  dim u as String = ""
-		  dim v as String = ""
+		  'dim v as String = ""
 		  dim newVersionWithDashes as String
 		  dim oldVersionWithDashes as String
 		  Var strParts() as String
