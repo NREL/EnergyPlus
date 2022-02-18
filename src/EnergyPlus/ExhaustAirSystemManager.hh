@@ -149,7 +149,7 @@ namespace ExhaustAirSystemManager {
 
     void UpdateZoneExhaustControl(EnergyPlusData &state);
 
-    void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound);
+    void CheckForSupplyNode(); // (EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound);
 
     bool ExhaustSystemHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 } // namespace ExhaustAirSystemManager

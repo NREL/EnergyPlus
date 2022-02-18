@@ -622,7 +622,7 @@ namespace ExhaustAirSystemManager {
                 bool nodeNotFound = false;
                 if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
                     for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
-                        CheckForSupplyNode(state, thisExhCtrl.SuppNodeNums(i), nodeNotFound);
+                        CheckForSupplyNode(); //(state, thisExhCtrl.SuppNodeNums(i), nodeNotFound);
                         if (nodeNotFound) {
                             ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
                             ShowContinueError(state, format("Node or NodeList Name ={}. Must all be supply nodes.", supplyNodeOrNodelistName));
@@ -916,7 +916,7 @@ namespace ExhaustAirSystemManager {
         }
     }
 
-    void CheckForSupplyNode(EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound)
+    void CheckForSupplyNode() // (EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound)
     {
         // Trying to check a node to see if it is truely a supply node
         // for a nodelist, need a call loop to check each node in the list
