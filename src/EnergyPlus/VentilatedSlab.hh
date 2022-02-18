@@ -208,19 +208,19 @@ namespace VentilatedSlab {
         // (where the highest Air temperature is requested)
         int HotCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
         // (where the highest Air temperature is requested)
-        bool CCoilPresent;       // .TRUE. if ventilated slab has a cooling coil
-        std::string CCoilName;   // name of cooling coil
-        std::string CCoilTypeCh; // type of cooling coil (character string)
-        int CCoil_Index;
-        std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-        std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+        bool coolingCoilPresent;       // .TRUE. if ventilated slab has a cooling coil
+        std::string coolingCoilName;   // name of cooling coil
+        std::string coolingCoilTypeCh; // type of cooling coil (character string)
+        int coolingCoil_Index;
+        std::string coolingCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+        std::string coolingCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
         DataPlant::PlantEquipmentType coolingCoilType;
         CoolingCoilType cCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-        std::string CCoilSchedName; // availability schedule for the cooling coil
-        int CCoilSchedPtr;          // index to schedule
-        Real64 CCoilSchedValue;
+        std::string coolingCoilSchedName; // availability schedule for the cooling coil
+        int coolingCoilSchedPtr;          // index to schedule
+        Real64 coolingCoilSchedValue;
         Real64 MaxVolColdWaterFlow;      // m3/s
         Real64 MaxColdWaterFlow;         // kg/s
         Real64 MinVolColdWaterFlow;      // m3/s
@@ -290,8 +290,7 @@ namespace VentilatedSlab {
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
               HotControlOffset(0.0), HWPlantLoc{}, HotAirHiTempSchedPtr(0), HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0),
-              HotCtrlLoTempSchedPtr(0), CCoilPresent(false), CCoil_Index(0), coolingCoilType(DataPlant::PlantEquipmentType::Invalid), cCoilType(CoolingCoilType::Invalid),
-              CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
+              HotCtrlLoTempSchedPtr(0), coolingCoilPresent(false), coolingCoil_Index(0), coolingCoilType(DataPlant::PlantEquipmentType::Invalid), cCoilType(CoolingCoilType::Invalid), coolingCoilSchedPtr(0), coolingCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
               MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWPlantLoc{}, ColdAirHiTempSchedPtr(0),
               ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0), ColdCtrlLoTempSchedPtr(0), CondErrIndex(0), EnrgyImbalErrIndex(0), RadSurfNum(0),
               MSlabIn(0), MSlabOut(0), DirectHeatLossPower(0.0), DirectHeatLossEnergy(0.0), DirectHeatGainPower(0.0), DirectHeatGainEnergy(0.0),

@@ -1121,8 +1121,8 @@ namespace VentilatedSlab {
                 //             \object-list CoolingCoilsWater
                 // Cooling coil information (if one is present):
                 if (!lAlphaBlanks(31)) {
-                    ventSlab.CCoilPresent = true;
-                    ventSlab.CCoilTypeCh = state.dataIPShortCut->cAlphaArgs(30);
+                    ventSlab.coolingCoilPresent = true;
+                    ventSlab.coolingCoilTypeCh = state.dataIPShortCut->cAlphaArgs(30);
                     errFlag = false;
 
                     ventSlab.cCoilType= static_cast<CoolingCoilType>(
@@ -1131,12 +1131,12 @@ namespace VentilatedSlab {
                     switch (ventSlab.cCoilType) {
                     case CoolingCoilType::WaterCooling: {
                         ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                        ventSlab.CCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
+                        ventSlab.coolingCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
                         break;
                     }
                     case CoolingCoilType::DetailedCooling: {
                         ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
-                        ventSlab.CCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
+                        ventSlab.coolingCoilPlantName = state.dataIPShortCut->cAlphaArgs(31);
                         break;
                     }
                     case CoolingCoilType::HXAssisted: {
@@ -1144,11 +1144,11 @@ namespace VentilatedSlab {
                                              state.dataIPShortCut->cAlphaArgs(30),
                                              state.dataIPShortCut->cAlphaArgs(31),
                                              ErrorsFound,
-                                             ventSlab.CCoilPlantType,
-                                             ventSlab.CCoilPlantName);
-                        if (UtilityRoutines::SameString(ventSlab.CCoilPlantType, "Coil:Cooling:Water")) {
+                                             ventSlab.coolingCoilPlantType,
+                                             ventSlab.coolingCoilPlantName);
+                        if (UtilityRoutines::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water")) {
                             ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                        } else if (UtilityRoutines::SameString(ventSlab.CCoilPlantType,
+                        } else if (UtilityRoutines::SameString(ventSlab.coolingCoilPlantType,
                                                                "Coil:Cooling:Water:DetailedGeometry")) {
                             ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                         } else {
@@ -1157,8 +1157,8 @@ namespace VentilatedSlab {
                                                 "\", invalid");
                             ShowContinueError(state, "For: " + cAlphaFields(30) + "=\"" + state.dataIPShortCut->cAlphaArgs(30) + "\".");
                             ShowContinueError(state,
-                                              "Invalid Coil Type=" + ventSlab.CCoilPlantType +
-                                                  ", Name=" + ventSlab.CCoilPlantName);
+                                              "Invalid Coil Type=" + ventSlab.coolingCoilPlantType +
+                                                  ", Name=" + ventSlab.coolingCoilPlantName);
                             ShowContinueError(state, "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
                             ErrorsFound = true;
                         }
@@ -1175,10 +1175,10 @@ namespace VentilatedSlab {
                     }
 
                     if (!errFlag) {
-                        ventSlab.CCoilName = state.dataIPShortCut->cAlphaArgs(31);
+                        ventSlab.coolingCoilName = state.dataIPShortCut->cAlphaArgs(31);
                         ValidateComponent(state,
                                           state.dataIPShortCut->cAlphaArgs(30),
-                                          ventSlab.CCoilName,
+                                          ventSlab.coolingCoilName,
                                           IsNotOK,
                                           "ZoneHVAC:VentilatedSlab ");
                         if (IsNotOK) {
@@ -1214,13 +1214,13 @@ namespace VentilatedSlab {
 
                     if (ventSlab.cCoilType == CoolingCoilType::WaterCooling) {
                         ventSlab.MaxVolColdWaterFlow =
-                            GetWaterCoilMaxFlowRate(state, "Coil:Cooling:Water", ventSlab.CCoilName, ErrorsFound);
+                            GetWaterCoilMaxFlowRate(state, "Coil:Cooling:Water", ventSlab.coolingCoilName, ErrorsFound);
                     } else if (ventSlab.cCoilType == CoolingCoilType::DetailedCooling) {
                         ventSlab.MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate(
-                            state, "Coil:Cooling:Water:DetailedGeometry", ventSlab.CCoilName, ErrorsFound);
+                            state, "Coil:Cooling:Water:DetailedGeometry", ventSlab.coolingCoilName, ErrorsFound);
                     } else if (ventSlab.cCoilType == CoolingCoilType::HXAssisted) {
                         ventSlab.MaxVolColdWaterFlow = GetHXAssistedCoilFlowRate(
-                            state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", ventSlab.CCoilName, ErrorsFound);
+                            state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", ventSlab.coolingCoilName, ErrorsFound);
                     }
 
                 } else { // No Cooling Coil
@@ -1600,7 +1600,7 @@ namespace VentilatedSlab {
                 (ventSlab.coolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
-                                        ventSlab.CCoilPlantName,
+                                        ventSlab.coolingCoilPlantName,
                                         ventSlab.coolingCoilType,
                                         ventSlab.CWPlantLoc,
                                         errFlag);
@@ -1612,7 +1612,7 @@ namespace VentilatedSlab {
                 ventSlab.ColdCoilOutNodeNum =
                     DataPlant::CompData::getPlantComponent(state, ventSlab.CWPlantLoc).NodeNumOut;
             } else {
-                if (ventSlab.CCoilPresent)
+                if (ventSlab.coolingCoilPresent)
                     ShowFatalError(state,
                                    "InitVentilatedSlab: Unit=" + ventSlab.Name +
                                        ", invalid cooling coil type. Program terminated.");
@@ -1730,7 +1730,7 @@ namespace VentilatedSlab {
                 }
             } //(VentSlab(Item)%HCoilPresent)
 
-            if (ventSlab.CCoilPresent && !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
+            if (ventSlab.coolingCoilPresent && !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
                 // Only initialize these if a cooling coil is actually present
                 if ((ventSlab.coolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                     (ventSlab.coolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
@@ -2483,12 +2483,12 @@ namespace VentilatedSlab {
                 CheckZoneSizing(state, cMO_VentilatedSlab, ventSlab.Name);
                 if (ventSlab.cCoilType == CoolingCoilType::HXAssisted) {
                     CoolingCoilName = GetHXDXCoilName(
-                        state, ventSlab.CCoilTypeCh, ventSlab.CCoilName, ErrorsFound);
+                        state, ventSlab.coolingCoilTypeCh, ventSlab.coolingCoilName, ErrorsFound);
                     CoolingCoilType = GetHXCoilType(
-                        state, ventSlab.CCoilTypeCh, ventSlab.CCoilName, ErrorsFound);
+                        state, ventSlab.coolingCoilTypeCh, ventSlab.coolingCoilName, ErrorsFound);
                 } else {
-                    CoolingCoilName = ventSlab.CCoilName;
-                    CoolingCoilType = ventSlab.CCoilTypeCh;
+                    CoolingCoilName = ventSlab.coolingCoilName;
+                    CoolingCoilType = ventSlab.coolingCoilTypeCh;
                 }
                 CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                 CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
@@ -2613,12 +2613,12 @@ namespace VentilatedSlab {
 
         if (ventSlab.cCoilType == CoolingCoilType::HXAssisted) {
             CoolingCoilName = GetHXDXCoilName(
-                state, ventSlab.CCoilTypeCh, ventSlab.CCoilName, ErrorsFound);
+                state, ventSlab.coolingCoilTypeCh, ventSlab.coolingCoilName, ErrorsFound);
             CoolingCoilType = GetHXCoilType(
-                state, ventSlab.CCoilTypeCh, ventSlab.CCoilName, ErrorsFound);
+                state, ventSlab.coolingCoilTypeCh, ventSlab.coolingCoilName, ErrorsFound);
         } else {
-            CoolingCoilName = ventSlab.CCoilName;
-            CoolingCoilType = ventSlab.CCoilTypeCh;
+            CoolingCoilName = ventSlab.coolingCoilName;
+            CoolingCoilType = ventSlab.coolingCoilTypeCh;
         }
         WaterCoils::SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, ventSlab.MaxAirVolFlow, ErrorsFound);
         WaterCoils::SetCoilDesFlow(state,
@@ -2805,25 +2805,25 @@ namespace VentilatedSlab {
             case CoolingCoilType::WaterCooling: {
                 CheckWaterCoilSchedule(state,
                                        "Coil:Cooling:Water",
-                                       ventSlab.CCoilName,
-                                       ventSlab.CCoilSchedValue,
-                                       ventSlab.CCoil_Index);
+                                       ventSlab.coolingCoilName,
+                                       ventSlab.coolingCoilSchedValue,
+                                       ventSlab.coolingCoil_Index);
                 break;
             }
             case CoolingCoilType::DetailedCooling: {
                 CheckWaterCoilSchedule(state,
                                        "Coil:Cooling:Water:DetailedGeometry",
-                                       ventSlab.CCoilName,
-                                       ventSlab.CCoilSchedValue,
-                                       ventSlab.CCoil_Index);
+                                       ventSlab.coolingCoilName,
+                                       ventSlab.coolingCoilSchedValue,
+                                       ventSlab.coolingCoil_Index);
                 break;
             }
             case CoolingCoilType::HXAssisted: {
                 CheckHXAssistedCoolingCoilSchedule(state,
                                                    "CoilSystem:Cooling:Water:HeatExchangerAssisted",
-                                                   ventSlab.CCoilName,
-                                                   ventSlab.CCoilSchedValue,
-                                                   ventSlab.CCoil_Index);
+                                                   ventSlab.coolingCoilName,
+                                                   ventSlab.coolingCoilSchedValue,
+                                                   ventSlab.coolingCoil_Index);
                 break;
             }
             default:
@@ -2877,25 +2877,25 @@ namespace VentilatedSlab {
             case CoolingCoilType::WaterCooling: {
                 CheckWaterCoilSchedule(state,
                                        "Coil:Cooling:Water",
-                                       ventSlab.CCoilName,
-                                       ventSlab.CCoilSchedValue,
-                                       ventSlab.CCoil_Index);
+                                       ventSlab.coolingCoilName,
+                                       ventSlab.coolingCoilSchedValue,
+                                       ventSlab.coolingCoil_Index);
                 break;
             }
             case CoolingCoilType::DetailedCooling: {
                 CheckWaterCoilSchedule(state,
                                        "Coil:Cooling:Water:DetailedGeometry",
-                                       ventSlab.CCoilName,
-                                       ventSlab.CCoilSchedValue,
-                                       ventSlab.CCoil_Index);
+                                       ventSlab.coolingCoilName,
+                                       ventSlab.coolingCoilSchedValue,
+                                       ventSlab.coolingCoil_Index);
                 break;
             }
             case CoolingCoilType::HXAssisted: {
                 CheckHXAssistedCoolingCoilSchedule(state,
                                                    "CoilSystem:Cooling:Water:HeatExchangerAssisted",
-                                                   ventSlab.CCoilName,
-                                                   ventSlab.CCoilSchedValue,
-                                                   ventSlab.CCoil_Index);
+                                                   ventSlab.coolingCoilName,
+                                                   ventSlab.coolingCoilSchedValue,
+                                                   ventSlab.coolingCoil_Index);
                 break;
             }
             default:
@@ -3360,7 +3360,7 @@ namespace VentilatedSlab {
 
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
-                if ((!FirstHVACIteration) && (ControlNode > 0) && (ventSlab.CCoilPresent)) {
+                if ((!FirstHVACIteration) && (ControlNode > 0) && (ventSlab.coolingCoilPresent)) {
                     MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
                     MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                 }
@@ -3374,7 +3374,7 @@ namespace VentilatedSlab {
                 }
                 MinOAFrac = min(1.0, max(0.0, MinOAFrac));
 
-                if ((!ventSlab.CCoilPresent) || (ventSlab.CCoilSchedValue <= 0.0)) {
+                if ((!ventSlab.coolingCoilPresent) || (ventSlab.coolingCoilSchedValue <= 0.0)) {
                     // In cooling mode, but there is no coil to provide cooling.  This is handled
                     // differently than if there was a cooling coil present.  Fixed temperature
                     // will still try to vary the amount of outside air to meet the desired
@@ -3683,20 +3683,20 @@ namespace VentilatedSlab {
                                         ZoneCompTurnFansOn,
                                         ZoneCompTurnFansOff);
         }
-        if ((ventSlab.CCoilPresent) && (ventSlab.CCoilSchedValue >= 0.0)) {
+        if ((ventSlab.coolingCoilPresent) && (ventSlab.coolingCoilSchedValue >= 0.0)) {
             if (ventSlab.cCoilType == CoolingCoilType::HXAssisted) {
                 SimHXAssistedCoolingCoil(state,
-                                         ventSlab.CCoilName,
+                                         ventSlab.coolingCoilName,
                                          FirstHVACIteration,
                                          DataHVACGlobals::CompressorOperation::On,
                                          0.0,
-                                         ventSlab.CCoil_Index,
+                                         ventSlab.coolingCoil_Index,
                                          ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state,
-                                            ventSlab.CCoilName,
+                                            ventSlab.coolingCoilName,
                                             FirstHVACIteration,
-                                            ventSlab.CCoil_Index);
+                                            ventSlab.coolingCoil_Index);
             }
         }
 
@@ -3954,7 +3954,7 @@ namespace VentilatedSlab {
 
         if (state.dataVentilatedSlab->OperatingMode == CoolingMode) {
 
-            if ((!ventSlab.CCoilPresent) || (ventSlab.CCoilSchedValue <= 0.0)) {
+            if ((!ventSlab.coolingCoilPresent) || (ventSlab.coolingCoilSchedValue <= 0.0)) {
 
                 AirTempIn = state.dataLoopNodes->Node(FanOutletNode).Temp;
                 state.dataLoopNodes->Node(SlabInNode).Temp =
