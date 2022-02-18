@@ -2309,7 +2309,7 @@ namespace WeatherManager {
         if (state.dataEnvrn->EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = state.dataEnvrn->EMSBeamSolarRadOverrideValue;
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
-        if (state.dataEnvrn->RunPeriodEnvironment) {
+        if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
             int month = state.dataEnvrn->Month;
             state.dataWaterData->RainFall.MonthlyTotalPrecInWeather.at(month - 1) += state.dataEnvrn->LiquidPrecipitation * 1000.0;
             if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {

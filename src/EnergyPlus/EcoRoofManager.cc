@@ -936,7 +936,7 @@ namespace EcoRoofManager {
 
         Moisture += state.dataEcoRoofMgr->CurrentIrrigation / state.dataEcoRoofMgr->TopDepth; // irrigation in (m)/timestep put into top layer
 
-        if (!state.dataGlobal->WarmupFlag) {
+        if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
             // aggregate to monthly for reporting
             int month = state.dataEnvrn->Month;

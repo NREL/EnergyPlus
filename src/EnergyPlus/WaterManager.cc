@@ -962,8 +962,10 @@ namespace WaterManager {
         state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * state.dataGlobal->TimeStepZoneSec;
         state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
-            int month = state.dataEnvrn->Month;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInSitePrec.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+            if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
+                int month = state.dataEnvrn->Month;
+                state.dataWaterData->RainFall.MonthlyTotalPrecInSitePrec.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+            }
         }
     }
 
@@ -1483,8 +1485,10 @@ namespace WaterManager {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
-            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly.at(month - 1) +=
-                state.dataWaterData->RainCollector(RainColNum).VolCollected;
+            if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
+                state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly.at(month - 1) +=
+                    state.dataWaterData->RainCollector(RainColNum).VolCollected;
+            }
         }
     }
 
