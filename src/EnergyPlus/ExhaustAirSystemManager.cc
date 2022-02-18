@@ -599,7 +599,6 @@ namespace ExhaustAirSystemManager {
                 int supplyNodeOrNodelistNum = 0;
 
                 bool NodeListError = false;
-                int NumNum = 0;
                 int NumParams = 0;
                 int NumNodes = 0;
 
@@ -851,7 +850,7 @@ namespace ExhaustAirSystemManager {
         // mixer outlet sizing:
         Real64 outletFlowMaxAvail = 0.0;
         int inletNode_index = 0;
-        for (size_t i = 1; i <= state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).NumInletNodes; ++i) {
+        for (int i = 1; i <= state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).NumInletNodes; ++i) {
             inletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).InletNode(i);
             outletFlowMaxAvail += state.dataLoopNodes->Node(inletNode_index).MassFlowRateMaxAvail;
         }
