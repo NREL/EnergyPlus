@@ -955,13 +955,13 @@ namespace WaterManager {
             if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
                 // LiquidPrecipitation is for a certain timestep in an hour, the rate = depth / seconds in a timestep
                 state.dataWaterData->RainFall.CurrentRate =
-                    state.dataEnvrn->LiquidPrecipitation / (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
+                    state.dataEnvrn->LiquidPrecipitation / state.dataGlobal->TimeStepZoneSec;
             } else {
                 state.dataWaterData->RainFall.CurrentRate = 0.0;
             }
         }
         state.dataWaterData->RainFall.CurrentAmount =
-            state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
+            state.dataWaterData->RainFall.CurrentRate * state.dataGlobal->TimeStepZoneSec;
         state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
             int month = state.dataEnvrn->Month;
