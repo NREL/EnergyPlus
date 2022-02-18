@@ -976,8 +976,14 @@ if(BUILD_TESTING)
   add_executable(TestAPI_Runtime_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c)
   target_link_libraries(TestAPI_Runtime_C PRIVATE energyplusapi project_options project_fp_options)
   # target_compile_options(TestAPI_Runtime_C PRIVATE -Wall -Wextra -Wno-unused)
-
   add_test(NAME "API.TestRuntimeC" COMMAND TestAPI_Runtime_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtimeresetpython")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_executable(TestAPI_RuntimeResetState_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntimeResetState.c)
+  target_link_libraries(TestAPI_RuntimeResetState_C PRIVATE energyplusapi project_options project_fp_options)
+  # target_compile_options(TestAPI_RuntimeResetPython_C PRIVATE -Wall -Wextra -Wno-unused)
+  add_test(NAME "API.TestRuntimeResetStateC" COMMAND TestAPI_RuntimeResetState_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange")
   file(MAKE_DIRECTORY ${TEST_DIR})
@@ -1010,6 +1016,12 @@ if(BUILD_TESTING)
     add_test(NAME "API.TestRuntimePython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
   endif()
   set_tests_properties("API.TestRuntimePython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  # Runtime tests need a folder to be created for output files
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_resetstate_python")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_test(NAME "API.TestRuntimeResetStatePython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntimeResetState.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+  set_tests_properties("API.TestRuntimeResetStatePython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
 
   # Data exchange tests also need an output folder
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")
