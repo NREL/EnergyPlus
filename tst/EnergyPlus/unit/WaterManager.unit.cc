@@ -85,6 +85,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     state->dataEnvrn->EndYear = 2000;
     state->dataEnvrn->Month = 1;
     state->dataGlobal->TimeStep = 2;
+    state->dataGlobal->TimeStepZoneSec = 900;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
@@ -118,7 +119,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
-    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->TimeStepZoneSec = 900;
     state->dataEnvrn->Year = 2000;
     state->dataEnvrn->EndYear = 2000;
     state->dataEnvrn->Month = 1;
@@ -135,7 +136,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     state->dataEnvrn->LiquidPrecipitation = 0.5;
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::None;
     WaterManager::UpdatePrecipitation(*state);
-    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / (3600 / state->dataGlobal->NumOfTimeStepInHour));
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / state->dataGlobal->TimeStepZoneSec);
     // when "LiquidPrecipitation" is 0, rainfall rate is 0
     state->dataEnvrn->LiquidPrecipitation = 0.0;
     WaterManager::UpdatePrecipitation(*state);
@@ -164,6 +165,7 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     state->dataEnvrn->EndYear = 2000;
     state->dataEnvrn->Month = 1;
     state->dataGlobal->TimeStep = 2;
+    state->dataGlobal->TimeStepZoneSec = 900;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
