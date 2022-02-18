@@ -4332,7 +4332,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // Airloop HVAC Exhaust System
-    for (size_t iExhSys = 1; iExhSys < state.dataZoneEquip->NumExhaustAirSystems; ++iExhSys) {
+    for (int iExhSys = 1; iExhSys < state.dataZoneEquip->NumExhaustAirSystems; ++iExhSys) {
         state.dataHeatBal->SysTotalHVACReliefHeatLoss += state.dataZoneEquip->ExhaustAirSystem(iExhSys).exhTotalHVACReliefHeatLoss;
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataZoneEquip->ExhaustAirSystem(iExhSys).exhTotalHVACRejectHeatLoss;
     }
