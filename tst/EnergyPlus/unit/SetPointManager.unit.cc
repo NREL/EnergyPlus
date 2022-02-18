@@ -805,21 +805,20 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     EXPECT_NEAR(state->dataLoopNodes->Node(7).TempSetPoint, 26.19976, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointTest)
+TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointLinInt)
 {
     Real64 SetPt1, SetPt2, SetPt3, SetPt4, SetPt5, SetPt6, SetPt7, SetPt8;
     SetPointManager::DefineOutsideAirSetPointManager thisSPM;
-    // CalcSetPoint(OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
     // SetTempAtOutLow > SetTempAtOutHigh
-    SetPt1 = thisSPM.CalcSetPoint(10, 5, 0, 50, 60);
-    SetPt2 = thisSPM.CalcSetPoint(5, 10, 0, 50, 60);
-    SetPt3 = thisSPM.CalcSetPoint(5, 10, 15, 50, 60);
-    SetPt4 = thisSPM.CalcSetPoint(5, 10, 8, 50, 60);
+    SetPt1 = thisSPM.calcSetPointLinInt(10, 5, 0, 50, 60);
+    SetPt2 = thisSPM.calcSetPointLinInt(5, 10, 0, 50, 60);
+    SetPt3 = thisSPM.calcSetPointLinInt(5, 10, 15, 50, 60);
+    SetPt4 = thisSPM.calcSetPointLinInt(5, 10, 8, 50, 60);
     // SetTempAtOutLow < SetTempAtOutHigh
-    SetPt5 = thisSPM.CalcSetPoint(10, 5, 0, 60, 50);
-    SetPt6 = thisSPM.CalcSetPoint(5, 10, 0, 60, 50);
-    SetPt7 = thisSPM.CalcSetPoint(5, 10, 15, 60, 50);
-    SetPt8 = thisSPM.CalcSetPoint(5, 10, 8, 60, 50);
+    SetPt5 = thisSPM.calcSetPointLinInt(10, 5, 0, 60, 50);
+    SetPt6 = thisSPM.calcSetPointLinInt(5, 10, 0, 60, 50);
+    SetPt7 = thisSPM.calcSetPointLinInt(5, 10, 15, 60, 50);
+    SetPt8 = thisSPM.calcSetPointLinInt(5, 10, 8, 60, 50);
 
     EXPECT_EQ(55, SetPt1);
     EXPECT_EQ(50, SetPt2);
@@ -1314,7 +1313,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     // check the new reset value is set
     EXPECT_EQ(60.0, state->dataLoopNodes->Node(1).TempSetPointHi);
 
-    // set out door dry bukb temp
+    // set out door dry bulb temp
     state->dataEnvrn->OutDryBulbTemp = 2.0;
     // check OA Reset Set Point Manager run
     SetPointManager::SimSetPointManagers(*state);
@@ -1610,4 +1609,118 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 14.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, -99.0, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetTempTest)
+{
+    bool ErrorsFound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  SetpointManager:SystemNodeReset:Temperature,",
+        "    Return Node Reset,       !- Name",
+        "    Temperature,             !- Control Variable",
+        "    16.7,                    !- Setpoint at Low Reference Temperature {C}",
+        "    12.8,                    !- Setpoint at High Reference Temperature {C}",
+        "    20.0,                    !- Low Reference Temperature {C}",
+        "    23.3,                    !- High Reference Temperature {C}",
+        "    Return Node,             !- Reference Node Name",
+        "    Supply Node;             !- Setpoint Node or NodeList Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(ErrorsFound);
+
+    // check Setpoint Manager inputs
+    SetPointManager::GetSetPointManagerInputs(*state);
+    EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).ctrlVarType, "TEMPERATURE");
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::Temp));
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeResetTemp));
+    Real64 SpAtLowRefTemp = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtLowRef;
+    Real64 SpAtHighRefTemp = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtHighRef;
+    Real64 LowRefTemp = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).LowRef;
+    Real64 HighRefTemp = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).HighRef;
+    EXPECT_EQ(16.7, SpAtLowRefTemp);
+    EXPECT_EQ(12.8, SpAtHighRefTemp);
+    EXPECT_EQ(20.0, LowRefTemp);
+    EXPECT_EQ(23.3, HighRefTemp);
+
+    // initialize Setpoint Manager
+    SetPointManager::InitSetPointManagers(*state);
+
+    // case 1: calculate and check setpoint value when reference node temperature is below the low reference value
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
+    EXPECT_EQ(16.7, state->dataLoopNodes->Node(2).TempSetPoint);
+
+    // case 2: calculate and check setpoint value when reference node temperature is above the high reference value
+    state->dataLoopNodes->Node(1).Temp = 24.0;
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
+    EXPECT_EQ(12.8, state->dataLoopNodes->Node(2).TempSetPoint);
+
+    // case 3: calculate and check setpoint value when the reference node temperature is in between the low and high value; value should be
+    // determined based on a linear interpolation based on setpoint at low/high reference
+    Real64 Temp = 21.0;
+    state->dataLoopNodes->Node(1).Temp = Temp;
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
+    Real64 SetPt = SpAtLowRefTemp - ((Temp - LowRefTemp) / (HighRefTemp - LowRefTemp)) * (SpAtLowRefTemp - SpAtHighRefTemp);
+    EXPECT_EQ(SetPt, state->dataLoopNodes->Node(2).TempSetPoint);
+}
+
+TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetHumRatTest)
+{
+    bool ErrorsFound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  SetpointManager:SystemNodeReset:Humidity,",
+        "    Return Node Reset,       !- Name",
+        "    HumidityRatio,           !- Control Variable",
+        "    0.008,                   !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}",
+        "    0.004,                   !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}",
+        "    0.003,                   !- Low Reference Humidity Ratio {kgWater/kgDryAir}",
+        "    0.010,                   !- High Reference Humidity Ratio {kgWater/kgDryAir}",
+        "    Return Node,             !- Reference Node Name",
+        "    Supply Node;             !- Setpoint Node or NodeList Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(ErrorsFound);
+
+    // check Setpoint Manager inputs
+    SetPointManager::GetSetPointManagerInputs(*state);
+    EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).ctrlVarType, "HUMIDITYRATIO");
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::HumRat));
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeResetHum));
+    Real64 SpAtLowRefHumRat = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtLowRef;
+    Real64 SpAtHighRefHumRat = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtHighRef;
+    Real64 LowRefHumRat = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).LowRef;
+    Real64 HighRefHumRat = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).HighRef;
+    EXPECT_EQ(0.008, SpAtLowRefHumRat);
+    EXPECT_EQ(0.004, SpAtHighRefHumRat);
+    EXPECT_EQ(0.003, LowRefHumRat);
+    EXPECT_EQ(0.010, HighRefHumRat);
+
+    // initialize Setpoint Manager
+    SetPointManager::InitSetPointManagers(*state);
+
+    // case 1: calculate and check setpoint value when reference node humidity ratio is below the low reference value
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
+    EXPECT_EQ(0.008, state->dataLoopNodes->Node(2).HumRatSetPoint);
+
+    // case 2: calculate and check setpoint value when reference node humidity ratio is above the high reference value
+    state->dataLoopNodes->Node(1).HumRat = 0.011;
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
+    EXPECT_EQ(0.004, state->dataLoopNodes->Node(2).HumRatSetPoint);
+
+    // case 3: calculate and check setpoint value when the reference node humidity ratio is in between the low and high value; value should be
+    // determined based on a linear interpolation based on setpoint at low/high reference
+    Real64 HumRat = 0.005;
+    state->dataLoopNodes->Node(1).HumRat = HumRat;
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
+    Real64 SetPt = SpAtLowRefHumRat - ((HumRat - LowRefHumRat) / (HighRefHumRat - LowRefHumRat)) * (SpAtLowRefHumRat - SpAtHighRefHumRat);
+    EXPECT_EQ(SetPt, state->dataLoopNodes->Node(2).HumRatSetPoint);
 }
