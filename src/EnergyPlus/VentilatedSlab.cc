@@ -1003,8 +1003,8 @@ namespace VentilatedSlab {
 
                 // Heating coil information:
                 if (!lAlphaBlanks(28)) {
-                    ventSlab.HCoilPresent = true;
-                    ventSlab.HCoilTypeCh = state.dataIPShortCut->cAlphaArgs(27);
+                    ventSlab.heatingCoilPresent = true;
+                    ventSlab.heatingCoilTypeCh = state.dataIPShortCut->cAlphaArgs(27);
                     errFlag = false;
 
                     ventSlab.hCoilType = static_cast<HeatingCoilType>(
@@ -1018,8 +1018,8 @@ namespace VentilatedSlab {
                     }
                     case HeatingCoilType::Steam: {
                         ventSlab.heatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-                        ventSlab.HCoil_FluidIndex = FindRefrigerant(state, "Steam");
-                        if (ventSlab.HCoil_FluidIndex == 0) {
+                        ventSlab.heatingCoil_FluidIndex = FindRefrigerant(state, "Steam");
+                        if (ventSlab.heatingCoil_FluidIndex == 0) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "Steam Properties not found.");
                             if (SteamMessageNeeded) ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                             ErrorsFound = true;
@@ -1040,10 +1040,10 @@ namespace VentilatedSlab {
                     }
                     }
                     if (!errFlag) {
-                        ventSlab.HCoilName = state.dataIPShortCut->cAlphaArgs(28);
+                        ventSlab.heatingCoilName = state.dataIPShortCut->cAlphaArgs(28);
                         ValidateComponent(state,
                                           state.dataIPShortCut->cAlphaArgs(27),
-                                          ventSlab.HCoilName,
+                                          ventSlab.heatingCoilName,
                                           IsNotOK,
                                           CurrentModuleObject);
                         if (IsNotOK) {
@@ -1090,14 +1090,14 @@ namespace VentilatedSlab {
 
                     if (ventSlab.hCoilType == HeatingCoilType::Water) {
                         ventSlab.MaxVolHotWaterFlow =
-                            GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", ventSlab.HCoilName, ErrorsFound);
+                            GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", ventSlab.heatingCoilName, ErrorsFound);
                         ventSlab.MaxVolHotSteamFlow =
-                            GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", ventSlab.HCoilName, ErrorsFound);
+                            GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", ventSlab.heatingCoilName, ErrorsFound);
                     } else if (ventSlab.hCoilType == HeatingCoilType::Steam) {
                         ventSlab.MaxVolHotWaterFlow =
-                            GetSteamCoilMaxFlowRate(state, "Coil:Heating:Steam", ventSlab.HCoilName, ErrorsFound);
+                            GetSteamCoilMaxFlowRate(state, "Coil:Heating:Steam", ventSlab.heatingCoilName, ErrorsFound);
                         ventSlab.MaxVolHotSteamFlow =
-                            GetSteamCoilMaxFlowRate(state, "Coil:Heating:Steam", ventSlab.HCoilName, ErrorsFound);
+                            GetSteamCoilMaxFlowRate(state, "Coil:Heating:Steam", ventSlab.heatingCoilName, ErrorsFound);
                     }
 
                 } else { // no heating coil
@@ -1578,7 +1578,7 @@ namespace VentilatedSlab {
                 (ventSlab.heatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
-                                        ventSlab.HCoilName,
+                                        ventSlab.heatingCoilName,
                                         ventSlab.heatingCoilType,
                                         ventSlab.HWPlantLoc,
                                         errFlag,
@@ -1693,7 +1693,7 @@ namespace VentilatedSlab {
             state.dataLoopNodes->Node(InNode).MassFlowRateMax = ventSlab.MaxAirMassFlow;
             state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
 
-            if (ventSlab.HCoilPresent) { // Only initialize these if a heating coil is actually present
+            if (ventSlab.heatingCoilPresent) { // Only initialize these if a heating coil is actually present
 
                 if (ventSlab.heatingCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating &&
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
@@ -1716,7 +1716,7 @@ namespace VentilatedSlab {
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
                     TempSteamIn = 100.00;
                     SteamDensity = GetSatDensityRefrig(
-                        state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.HCoil_FluidIndex, RoutineName);
+                        state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                     ventSlab.MaxHotSteamFlow =
                         SteamDensity * ventSlab.MaxVolHotSteamFlow;
                     ventSlab.MinHotSteamFlow =
@@ -2196,18 +2196,18 @@ namespace VentilatedSlab {
                     CheckZoneSizing(state, cMO_VentilatedSlab, ventSlab.Name);
 
                     CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(
-                        state, "Coil:Heating:Water", ventSlab.HCoilName, ErrorsFound);
+                        state, "Coil:Heating:Water", ventSlab.heatingCoilName, ErrorsFound);
                     CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(
-                        state, "Coil:Heating:Water", ventSlab.HCoilName, ErrorsFound);
+                        state, "Coil:Heating:Water", ventSlab.heatingCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = MyPlantSizingIndex(state,
                                                            "Coil:Heating:Water",
-                                                           ventSlab.HCoilName,
+                                                           ventSlab.heatingCoilName,
                                                            CoilWaterInletNode,
                                                            CoilWaterOutletNode,
                                                            ErrorsFound);
                         CoilNum = WaterCoils::GetWaterCoilIndex(
-                            state, "COIL:HEATING:WATER", ventSlab.HCoilName, ErrorsFound);
+                            state, "COIL:HEATING:WATER", ventSlab.heatingCoilName, ErrorsFound);
                         if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
@@ -2349,13 +2349,13 @@ namespace VentilatedSlab {
                     CheckZoneSizing(state, "ZoneHVAC:VentilatedSlab", ventSlab.Name);
 
                     CoilSteamInletNode =
-                        GetCoilSteamInletNode(state, "Coil:Heating:Steam", ventSlab.HCoilName, ErrorsFound);
+                        GetCoilSteamInletNode(state, "Coil:Heating:Steam", ventSlab.heatingCoilName, ErrorsFound);
                     CoilSteamOutletNode =
-                        GetCoilSteamOutletNode(state, "Coil:Heating:Steam", ventSlab.HCoilName, ErrorsFound);
+                        GetCoilSteamOutletNode(state, "Coil:Heating:Steam", ventSlab.heatingCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = MyPlantSizingIndex(state,
                                                            "Coil:Heating:Steam",
-                                                           ventSlab.HCoilName,
+                                                           ventSlab.heatingCoilName,
                                                            CoilSteamInletNode,
                                                            CoilSteamOutletNode,
                                                            ErrorsFound);
@@ -2409,12 +2409,12 @@ namespace VentilatedSlab {
                                 }
                                 TempSteamIn = 100.00;
                                 EnthSteamInDry = GetSatEnthalpyRefrig(
-                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.HCoil_FluidIndex, RoutineName);
+                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 EnthSteamOutWet = GetSatEnthalpyRefrig(
-                                    state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.HCoil_FluidIndex, RoutineName);
+                                    state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                                 SteamDensity = GetSatDensityRefrig(
-                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.HCoil_FluidIndex, RoutineName);
+                                    state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, fluidNameWater, DataGlobalConstants::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 rho = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 MaxVolHotSteamFlowDes =
@@ -2622,8 +2622,8 @@ namespace VentilatedSlab {
         }
         WaterCoils::SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, ventSlab.MaxAirVolFlow, ErrorsFound);
         WaterCoils::SetCoilDesFlow(state,
-                                   ventSlab.HCoilTypeCh,
-                                   ventSlab.HCoilName,
+                                   ventSlab.heatingCoilTypeCh,
+                                   ventSlab.heatingCoilName,
                                    ventSlab.MaxAirVolFlow,
                                    ErrorsFound);
 
@@ -2768,33 +2768,33 @@ namespace VentilatedSlab {
             case HeatingCoilType::Water: {
                 CheckWaterCoilSchedule(state,
                                        "Coil:Heating:Water",
-                                       ventSlab.HCoilName,
-                                       ventSlab.HCoilSchedValue,
-                                       ventSlab.HCoil_Index);
+                                       ventSlab.heatingCoilName,
+                                       ventSlab.heatingCoilSchedValue,
+                                       ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Steam: {
                 CheckSteamCoilSchedule(state,
                                        "Coil:Heating:Steam",
-                                       ventSlab.HCoilName,
-                                       ventSlab.HCoilSchedValue,
-                                       ventSlab.HCoil_Index);
+                                       ventSlab.heatingCoilName,
+                                       ventSlab.heatingCoilSchedValue,
+                                       ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Electric: {
                 CheckHeatingCoilSchedule(state,
                                          "Coil:Heating:Electric",
-                                         ventSlab.HCoilName,
-                                         ventSlab.HCoilSchedValue,
-                                         ventSlab.HCoil_Index);
+                                         ventSlab.heatingCoilName,
+                                         ventSlab.heatingCoilSchedValue,
+                                         ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Gas: {
                 CheckHeatingCoilSchedule(state,
                                          "Coil:Heating:Fuel",
-                                         ventSlab.HCoilName,
-                                         ventSlab.HCoilSchedValue,
-                                         ventSlab.HCoil_Index);
+                                         ventSlab.heatingCoilName,
+                                         ventSlab.heatingCoilSchedValue,
+                                         ventSlab.heatingCoil_Index);
                 break;
             }
             default:
@@ -2837,33 +2837,33 @@ namespace VentilatedSlab {
             case HeatingCoilType::Water: {
                 CheckWaterCoilSchedule(state,
                                        "Coil:Heating:Water",
-                                       ventSlab.HCoilName,
-                                       ventSlab.HCoilSchedValue,
-                                       ventSlab.HCoil_Index);
+                                       ventSlab.heatingCoilName,
+                                       ventSlab.heatingCoilSchedValue,
+                                       ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Steam: {
                 CheckSteamCoilSchedule(state,
                                        "Coil:Heating:Steam",
-                                       ventSlab.HCoilName,
-                                       ventSlab.HCoilSchedValue,
-                                       ventSlab.HCoil_Index);
+                                       ventSlab.heatingCoilName,
+                                       ventSlab.heatingCoilSchedValue,
+                                       ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Electric: {
                 CheckHeatingCoilSchedule(state,
                                          "Coil:Heating:Electric",
-                                         ventSlab.HCoilName,
-                                         ventSlab.HCoilSchedValue,
-                                         ventSlab.HCoil_Index);
+                                         ventSlab.heatingCoilName,
+                                         ventSlab.heatingCoilSchedValue,
+                                         ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Gas: {
                 CheckHeatingCoilSchedule(state,
                                          "Coil:Heating:Fuel",
-                                         ventSlab.HCoilName,
-                                         ventSlab.HCoilSchedValue,
-                                         ventSlab.HCoil_Index);
+                                         ventSlab.heatingCoilName,
+                                         ventSlab.heatingCoilSchedValue,
+                                         ventSlab.heatingCoil_Index);
                 break;
             }
             default:
@@ -3106,7 +3106,7 @@ namespace VentilatedSlab {
 
                 MinOAFrac = min(1.0, max(0.0, MinOAFrac));
 
-                if ((!ventSlab.HCoilPresent) || (ventSlab.HCoilSchedValue <= 0.0)) {
+                if ((!ventSlab.heatingCoilPresent) || (ventSlab.heatingCoilSchedValue <= 0.0)) {
                     // In heating mode, but there is no coil to provide heating.  This is handled
                     // differently than if there was a heating coil present.  Fixed temperature
                     // will still try to vary the amount of outside air to meet the desired
@@ -3700,16 +3700,16 @@ namespace VentilatedSlab {
             }
         }
 
-        if ((ventSlab.HCoilPresent) && (ventSlab.HCoilSchedValue >= 0.0)) {
+        if ((ventSlab.heatingCoilPresent) && (ventSlab.heatingCoilSchedValue >= 0.0)) {
 
             switch (ventSlab.hCoilType) {
 
             case HeatingCoilType::Water: {
 
                     SimulateWaterCoilComponents(state,
-                                                ventSlab.HCoilName,
+                                                ventSlab.heatingCoilName,
                                                 FirstHVACIteration,
-                                                ventSlab.HCoil_Index);
+                                                ventSlab.heatingCoil_Index);
                     break;
                 }
                 case HeatingCoilType::Steam: {
@@ -3727,9 +3727,9 @@ namespace VentilatedSlab {
                     if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
                     SimulateSteamCoilComponents(state,
-                                                ventSlab.HCoilName,
+                                                ventSlab.heatingCoilName,
                                                 FirstHVACIteration,
-                                                ventSlab.HCoil_Index,
+                                                ventSlab.heatingCoil_Index,
                                                 QCoilReq);
                     break;
                 }
@@ -3749,10 +3749,10 @@ namespace VentilatedSlab {
                     if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
                     SimulateHeatingCoilComponents(state,
-                                                  ventSlab.HCoilName,
+                                                  ventSlab.heatingCoilName,
                                                   FirstHVACIteration,
                                                   QCoilReq,
-                                                  ventSlab.HCoil_Index);
+                                                  ventSlab.heatingCoil_Index);
                     break;
                 }
                 default:
@@ -3940,7 +3940,7 @@ namespace VentilatedSlab {
 
         if (state.dataVentilatedSlab->OperatingMode == HeatingMode) {
 
-            if ((!ventSlab.HCoilPresent) || (ventSlab.HCoilSchedValue <= 0.0)) {
+            if ((!ventSlab.heatingCoilPresent) || (ventSlab.heatingCoilSchedValue <= 0.0)) {
 
                 AirTempIn = state.dataLoopNodes->Node(FanOutletNode).Temp;
                 state.dataLoopNodes->Node(SlabInNode).Temp =
