@@ -121,3 +121,16 @@ Two variables in the emission system were renamed to use "OtherFuel" instead of 
 - Environmental Impact OtherFuel2 CO2 Water Consumption Volume -> Environmental Impact OtherFuel2 Water Consumption Volume
 
 See pull request [#9089](https://github.com/NREL/EnergyPlus/pull/9089) for more details.
+
+
+### Exhaust System New Output Variables
+
+Five new output variables related to the AirLoopHVAC:Exhaust System have been added along with the new feature development. These new variables are:
+
+- Central Exhaust Fan Mass Flow Rate [kg/s]
+- Central Exhaust Fan Volumetric Flow Rate Standard [m3/s]
+- Central Exhaust Fan Volumetric Flow Rate Current [m3/s]
+- Central Exhaust Fan Power [W]
+- Central Exhaust Fan Energy [J]
+
+See pull request [#9209](https://github.com/NREL/EnergyPlus/pull/9209) for more details.
