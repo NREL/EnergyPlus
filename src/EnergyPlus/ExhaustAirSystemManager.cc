@@ -908,7 +908,7 @@ namespace ExhaustAirSystemManager {
 
     void UpdateZoneExhaustControl(EnergyPlusData &state)
     {
-        for (size_t i = 1; i <= state.dataZoneEquip->NumZoneExhaustControls; ++i) {
+        for (int i = 1; i <= state.dataZoneEquip->NumZoneExhaustControls; ++i) {
             int controlledZoneNum = state.dataZoneEquip->ZoneExhaustControlSystem(i).ControlledZoneNum;
             state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneExh +=
                 state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow + state.dataZoneEquip->ZoneExhaustControlSystem(i).UnbalancedFlow;
