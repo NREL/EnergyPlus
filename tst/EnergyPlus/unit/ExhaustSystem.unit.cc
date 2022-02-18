@@ -99,16 +99,16 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "! Zone4,",
 
         "AirLoopHVAC:ZoneMixer,",
-        "    Mixer1,   !-Name,"
+        "    Mixer1,   !-Name",
         "    Central_ExhFan_1_Inlet,     !-Outlet Node Name",
         "    Zone1 Exhaust Outlet Node,  !-Inlet 1 Node Name",
-        "    Zone2 Exhaust Outlet Node;  !-Inlet 2 Node Name",
+        "    Zone4 Exhaust Outlet Node;  !-Inlet 2 Node Name",
 
         "AirLoopHVAC:ZoneMixer,",
         "    Mixer2, !-Name",
         "    Central_ExhFan_2_Inlet,    !-Outlet Node Name",
-        "    Zone3 Exhaust Outlet Node, !-Inlet 1 Node Name",
-        "    Zone4 Exhaust Outlet Node; !-Inlet 2 Node Name",
+        "    Zone2 Exhaust Outlet Node, !-Inlet 1 Node Name",
+        "    Zone3 Exhaust Outlet Node; !-Inlet 2 Node Name",
 
         "Fan:SystemModel,",
         "    CentralExhaustFan1,      !- Name",
@@ -190,7 +190,7 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    Zone2,                              !- Zone Name",
         "    Zone2 Exhaust Node,                 !- Inlet Node Name",
         "    Zone2 Exhaust Outlet Node,          !- Outlet Node Name",
-        "    0.1,                                !- Design Flow Rate {m3/s}",
+        "    0.2,                                !- Design Flow Rate {m3/s}",
         // "    FollowSupply,                       !- Flow Control Type (Scheduled, or FollowSupply)",
         "    Scheduled,",
         "    ,                                   !- Flow Fraction Schedule Name",
@@ -206,7 +206,7 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    Zone3,                              !- Zone Name",
         "    Zone3 Exhaust Node,                 !- Inlet Node Name",
         "    Zone3 Exhaust Outlet Node,          !- Outlet Node Name",
-        "    0.1,                                !- Design Flow Rate {m3/s}",
+        "    0.3,                                !- Design Flow Rate {m3/s}",
         "    Scheduled,                          !- Flow Control Type (Scheduled, or FollowSupply)",
         "    Zone3Exh Exhaust Flow Frac Sched,   !- Flow Fraction Schedule Name",
         "    ,                                   !- Supply Node or NodeList Name (used with FollowSupply control type)",
@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    Zone4,                              !- Zone Name",
         "    Zone4 Exhaust Node,                 !- Inlet Node Name",
         "    Zone4 Exhaust Outlet Node,          !- Outlet Node Name",
-        "    0.1,                                !- Design Flow Rate {m3/s}",
+        "    0.4,                                !- Design Flow Rate {m3/s}",
         // "! may consider an autosize here,",
         "    Scheduled,                          !- Flow Control Type (Scheduled, or FollowSupply)",
         "    Zone4Exh Exhaust Flow Frac Sched,   !- Flow Fraction Schedule Name",
@@ -388,4 +388,7 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     // Expected values:
     // EXPECT_STREQ();
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(1).DesignExhaustFlowRate, 0.1, 1e-5);
+    EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(2).DesignExhaustFlowRate, 0.2, 1e-5);
+    EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(3).DesignExhaustFlowRate, 0.3, 1e-5);
+    EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(4).DesignExhaustFlowRate, 0.4, 1e-5);
 }
