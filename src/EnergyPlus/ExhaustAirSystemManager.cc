@@ -553,7 +553,7 @@ namespace ExhaustAirSystemManager {
                     mixerIndexMap.emplace(outletNodeNum, exhCtrlNum);
                 }
 
-                Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
+                Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate");
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
 
                 std::string flowControlType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type");
