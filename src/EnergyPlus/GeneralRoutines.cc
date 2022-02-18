@@ -2011,7 +2011,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             if (FoundZoneMixer(Count1)) continue;
             ShowSevereError(state,
                             "AirLoopHVAC:ZoneMixer=\"" + state.dataMixerComponent->MixerCond(Count1).MixerName +
-                                "\", not found on any AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat,");
+                                "\", not found on any AirLoopHVAC:ReturnPath, AirLoopHVAC:ExhaustSystem, AirTerminal:SingleDuct:SeriesPIU:Reheat,");
             ShowContinueError(state, "AirTerminal:SingleDuct:ParallelPIU:Reheat or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction.");
             //      ErrFound=.TRUE.
         }
