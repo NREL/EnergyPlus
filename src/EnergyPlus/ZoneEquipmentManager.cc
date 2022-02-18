@@ -3169,7 +3169,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             ZoneEquipTypeNum = state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipTypeEnum;
 
             // TODO: need a way to set ParentIndex for other than UnitarySystem so ZoneCompNum is correct when using ParentIndex
-            if (ZoneEquipTypeNum == ZoneEquip::PkgTermACAirToAir || ZoneEquipTypeNum == ZoneEquip::PkgTermHPAirToAir) {
+            if (ZoneEquipTypeNum == ZoneEquip::PkgTermACAirToAir || ZoneEquipTypeNum == ZoneEquip::PkgTermHPAirToAir ||
+                ZoneEquipTypeNum == ZoneEquip::PkgTermHPWaterToAir) {
                 ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).ParentIndex(EquipPtr);
             } else {
                 ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr);
