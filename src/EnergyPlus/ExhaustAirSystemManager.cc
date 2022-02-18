@@ -188,7 +188,7 @@ namespace ExhaustAirSystemManager {
                         availSchNum = state.dataHVACFan->fanObjs[centralFanIndex]->availSchedIndex;
                         // normal index
                         SetupOutputVariable(state,
-                                            "Central Exhaust Fan Outlet Air Mass Flow Rate",
+                                            "Central Exhaust Fan Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             thisExhSys.centralFan_MassFlowRate,
                                             OutputProcessor::SOVTimeStepType::System,
@@ -196,7 +196,7 @@ namespace ExhaustAirSystemManager {
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
-                                            "Central Exhaust Fan Outlet Air Volume Flow Rate Standard",
+                                            "Central Exhaust Fan Volumetric Flow Rate Standard",
                                             OutputProcessor::Unit::m3_s,
                                             thisExhSys.centralFan_VolumeFlowRate_Std,
                                             OutputProcessor::SOVTimeStepType::System,
@@ -204,7 +204,7 @@ namespace ExhaustAirSystemManager {
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
-                                            "Central Exhaust Fan Outlet Air Volume Flow Rate Current",
+                                            "Central Exhaust Fan Volumetric Flow Rate Current",
                                             OutputProcessor::Unit::m3_s,
                                             thisExhSys.centralFan_VolumeFlowRate_Cur,
                                             OutputProcessor::SOVTimeStepType::System,
@@ -264,7 +264,7 @@ namespace ExhaustAirSystemManager {
                                                                  state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).OutletNodeNum));
 
                             SetupOutputVariable(state,
-                                                "Central Exhaust Fan Outlet Air Mass Flow Rate",
+                                                "Central Exhaust Fan Mass Flow Rate",
                                                 OutputProcessor::Unit::kg_s,
                                                 thisExhSys.centralFan_MassFlowRate,
                                                 OutputProcessor::SOVTimeStepType::System,
@@ -272,7 +272,7 @@ namespace ExhaustAirSystemManager {
                                                 thisExhSys.Name);
 
                             SetupOutputVariable(state,
-                                                "Central Exhaust Fan Outlet Air Volume Flow Rate Standard",
+                                                "Central Exhaust Fan Volumetric Flow Rate Standard",
                                                 OutputProcessor::Unit::m3_s,
                                                 thisExhSys.centralFan_VolumeFlowRate_Std,
                                                 OutputProcessor::SOVTimeStepType::System,
@@ -280,7 +280,7 @@ namespace ExhaustAirSystemManager {
                                                 thisExhSys.Name);
 
                             SetupOutputVariable(state,
-                                                "Central Exhaust Fan Outlet Air Volume Flow Rate Current",
+                                                "Central Exhaust Fan Volumetric Flow Rate Current",
                                                 OutputProcessor::Unit::m3_s,
                                                 thisExhSys.centralFan_VolumeFlowRate_Cur,
                                                 OutputProcessor::SOVTimeStepType::System,
