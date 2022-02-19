@@ -2225,20 +2225,12 @@ namespace UnitVentilator {
             } else {
                 CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType == FixedOAControl) {
-                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex > 0) {
-                        // use value set above
-                        OutAirVolFlowDes = ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow;
-                    } else if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneDesignSpecOAIndex > 0) {
-                        // the user has specified inputs for OA flow
-                        OutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA,
-                                               state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow);
-                    } else {
-                        OutAirVolFlowDes = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
-                    }
+                    OutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA,
+                                           state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow);
                 } else {
                     OutAirVolFlowDes = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
                 }
-                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
+                if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
                     OutAirVolFlowDes = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
                 }
 

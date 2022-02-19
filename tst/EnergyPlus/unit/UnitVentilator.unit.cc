@@ -329,8 +329,9 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
     state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = fixedOAControl;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
-    EXPECT_NEAR(
-        state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow, state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 0.001);
+    EXPECT_NEAR(state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow,
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA,
+                0.001);
 
     // test variable percent OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
