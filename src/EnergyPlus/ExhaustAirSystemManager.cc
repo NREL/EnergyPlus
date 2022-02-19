@@ -931,8 +931,8 @@ namespace ExhaustAirSystemManager {
             state.dataExhAirSystemMrg->GetInputFlag = false;
         }
 
-        return (state.dataZoneEquip->NumExhaustAirSystems > 0) &&
-               (UtilityRoutines::FindItemInList(CompName, state.dataZoneEquip->ExhaustAirSystem, &ExhaustAir::ZoneMixerName) > 0);
+        return // ( state.dataZoneEquip->NumExhaustAirSystems > 0) &&
+            (UtilityRoutines::FindItemInList(CompName, state.dataZoneEquip->ExhaustAirSystem, &ExhaustAir::ZoneMixerName) > 0);
     }
 
 } // namespace ExhaustAirSystemManager
