@@ -315,7 +315,7 @@ namespace ExhaustAirSystemManager {
                     ShowContinueError(state, "It needs to be either a Fan:SystemModel or a Fan:ComponentModel type.");
                     ErrorsFound = true;
                 }
-
+                thisExhSys.CentralFanName = centralFanName;
                 thisExhSys.CentralFanIndex = centralFanIndex;
 
                 if (availSchNum > 0) {
