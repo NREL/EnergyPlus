@@ -91,7 +91,6 @@ using namespace EnergyPlus::SimulationManager;
 
 TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
 {
-    // 2022-01: For now, place the unit test here; may move to a new place with other tests later.
     std::string const idf_objects = delimited_string({
         "! Zone1,",
         "! Zone2,",
@@ -190,7 +189,7 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
         "    Zone2,                              !- Zone Name",
         "    Zone2 Exhaust Node,                 !- Inlet Node Name",
         "    Zone2 Exhaust Outlet Node,          !- Outlet Node Name",
-        "    0.2,                                !- Design Flow Rate {m3/s}",
+        "    autosize,                                !- Design Flow Rate {m3/s}",
         // "    FollowSupply,                       !- Flow Control Type (Scheduled, or FollowSupply)",
         "    Scheduled,",
         "    ,                                   !- Flow Fraction Schedule Name",
@@ -364,12 +363,13 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
 
     // Preset some elements
     state->dataHeatBal->Zone.allocate(4);
-    state->dataHeatBal->Zone(1).Name = "Zone1";
-    state->dataHeatBal->Zone(2).Name = "Zone2";
-    state->dataHeatBal->Zone(3).Name = "Zone3";
-    state->dataHeatBal->Zone(4).Name = "Zone4";
+    state->dataHeatBal->Zone(1).Name = "ZONE1";
+    state->dataHeatBal->Zone(2).Name = "ZONE2";
+    state->dataHeatBal->Zone(3).Name = "ZONE3";
+    state->dataHeatBal->Zone(4).Name = "ZONE4";
 
     state->dataSize->FinalZoneSizing.allocate(4);
+    state->dataSize->FinalZoneSizing(2).MinOA = 0.25;
 
     // state->dataMixerComponent->MixerCond.allocate(2);
     // state->dataMixerComponent->MixerCond(1).MixerName = "MIXER1";
@@ -385,10 +385,42 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
 
     ExhaustAirSystemManager::GetExhaustAirSystemInput(*state);
 
-    // Expected values:
-    // EXPECT_STREQ();
+    // Expected input values:
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(1).ZoneName, "ZONE1");
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(2).ZoneName, "ZONE2");
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(3).ZoneName, "ZONE3");
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(4).ZoneName, "ZONE4");
+
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(1).ZoneNum, 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(2).ZoneNum, 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(3).ZoneNum, 3);
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(4).ZoneNum, 4);
+
+    // Expected input value:
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(1).DesignExhaustFlowRate, 0.1, 1e-5);
-    EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(2).DesignExhaustFlowRate, 0.2, 1e-5);
+
+    // autosized value
+    EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(2).DesignExhaustFlowRate, 0.25, 1e-5);
+
+    // Expected input values:
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(3).DesignExhaustFlowRate, 0.3, 1e-5);
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(4).DesignExhaustFlowRate, 0.4, 1e-5);
+
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlTypeNum, 0);
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlTypeNum, 0);
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlTypeNum, 0);
+    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlTypeNum, 0);
+
+    EXPECT_EQ(state->dataZoneEquip->NumExhaustAirSystems, 2);
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(1).Name, "CENTRAL EXHAUST 1");
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(2).Name, "CENTRAL EXHAUST 2");
+
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(1).ZoneMixerName, "MIXER1");
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(2).ZoneMixerName, "MIXER2");
+
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(1).ZoneMixerIndex, 1);
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(2).ZoneMixerIndex, 2);
+
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(1).CentralFanName, "CENTRALEXHAUSTFAN1");
+    EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(2).CentralFanName, "CENTRALEXHAUSTFAN2");
 }
