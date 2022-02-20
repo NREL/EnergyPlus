@@ -195,6 +195,8 @@ struct EnvironmentData : BaseGlobalStruct
     bool PrintEnvrnStampWarmup = false;
     bool PrintEnvrnStampWarmupPrinted = false;
     bool RunPeriodEnvironment = false; // True if Run Period, False if DesignDay
+    int StartYear = 0;                 // Start year for Environment
+    int EndYear = 0;                   // End year for Environment
     std::string EnvironmentStartEnd;   // Start/End dates for Environment
     bool CurrentYearIsLeapYear =
         false; // true when current year is leap year (convoluted logic dealing with whether weather file allows leap years, runperiod inputs.
