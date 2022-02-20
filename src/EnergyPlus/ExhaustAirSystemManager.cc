@@ -105,13 +105,12 @@ namespace ExhaustAirSystemManager {
 
     void GetExhaustAirSystemInput(EnergyPlusData &state)
     {
+        if (!state.dataExhAirSystemMrg->GetInputFlag) return;
+        // state.dataExhAirSystemMrg->GetInputFlag = false;
+
         // Locals
         bool IsNotOK; // Flag to verify name
         bool ErrorsFound = false;
-
-        if (allocated(state.dataZoneEquip->ExhaustAirSystem)) {
-            return;
-        }
 
         constexpr std::string_view RoutineName("GetExhaustAirSystemInput: ");
         std::string cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
