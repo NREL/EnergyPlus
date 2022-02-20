@@ -2230,9 +2230,6 @@ namespace UnitVentilator {
                 } else {
                     OutAirVolFlowDes = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
                 }
-                if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
-                    OutAirVolFlowDes = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-                }
 
                 if (IsAutoSize) {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = OutAirVolFlowDes;
