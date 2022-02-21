@@ -246,11 +246,13 @@ This is a required field for the name of the central exhaust fan.
 An example of the AirLoopHVAC:ExhaustSystem input object is like this:
 
 \begin{lstlisting}
+
 AirLoopHVAC:ExhaustSystem,
-Central Exhaust 1,           !- Name
-AirLoopExhaustMixer1,        !- Zone Mixer Name    
-Fan:SystemModel,             !- Fan Object Type
-CentralExhaustFan1;          !- Fan Name
+    Central Exhaust 1,           !- Name
+    AirLoopExhaustMixer1,        !- Zone Mixer Name    
+    Fan:SystemModel,             !- Fan Object Type
+    CentralExhaustFan1;          !- Fan Name
+
 \end{lstlisting}
 
 \subsubsection{Outputs}
@@ -259,11 +261,11 @@ The following output will be added the to the new exhaust system:
 
 \begin{itemize}
 
-\item Central Exhaust Fan Mass Flow Rate [kg/s];
-\item Central Exhaust Fan Volumetric Flow Rate Standard [m3/s];
-\item Central Exhaust Fan Volumetric Flow Rate Current [m3/s];
-\item Central Exhaust Fan Power [W];
-\item Central Exhaust Fan Energy [J];
+\item HVAC,Average,Central Exhaust Fan Mass Flow Rate {[}kg/s{]}
+\item HVAC,Average,Central Exhaust Fan Volumetric Flow Rate Standard {[}m3/s{]}
+\item HVAC,Average,Central Exhaust Fan Volumetric Flow Rate Current {[}m3/s{]}
+\item HVAC,Average,Central Exhaust Fan Power {[}W{]}
+\item HVAC,Sum,Central Exhaust Fan Energy {[}J{]}
 
 \end{itemize}
 
@@ -341,19 +343,19 @@ An example of the ZoneHVAC:ExhaustControl input object is like this:
 \begin{lstlisting}
 
 ZoneHVAC:ExhaustControl,
-Zone2 Exhaust System,           !-Name
-HVACOperationSchd,              !- Availability Schedule Name
-Zone2,                          !- Zone Name
-Zone2 Exhaust Node,             !- Inlet Node Name
-Zone2 ExhaustSystem Node,       !- Outlet Node Name
-0.1,                            !- Design Flow Rate {m3/s}
-Scheduled,                      !- Flow Control Type (Scheduled or FollowSupply)
-Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name
-,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
-,                               !- System Availability Manager Name
-,                               !- Minimum Zone Temperature Limit Schedule Name
-Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name
-FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
+    Zone2 Exhaust System,           !-Name
+    HVACOperationSchd,              !- Availability Schedule Name
+    Zone2,                          !- Zone Name
+    Zone2 Exhaust Node,             !- Inlet Node Name
+    Zone2 ExhaustSystem Node,       !- Outlet Node Name
+    0.1,                            !- Design Flow Rate {m3/s}
+    Scheduled,                      !- Flow Control Type (Scheduled or FollowSupply)
+    Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name
+    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
+    ,                               !- System Availability Manager Name
+    ,                               !- Minimum Zone Temperature Limit Schedule Name
+    Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name
+    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 
 \end{lstlisting}
 
