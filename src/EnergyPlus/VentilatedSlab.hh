@@ -130,7 +130,6 @@ namespace VentilatedSlab {
         // Members
         // Input data
         std::string Name;      // name of system
-        std::string SchedName; // availability schedule
         int SchedPtr;          // index to schedule
         std::string ZoneName;  // Name of zone the system is serving
         int ZonePtr;           // Point to this zone in the Zone derived type

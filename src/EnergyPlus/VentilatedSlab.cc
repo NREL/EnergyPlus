@@ -328,7 +328,6 @@ namespace VentilatedSlab {
             auto & ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
             ventSlab.Name = state.dataIPShortCut->cAlphaArgs(1);
-            ventSlab.SchedName = state.dataIPShortCut->cAlphaArgs(2);
             if (lAlphaBlanks(2)) {
                 ventSlab.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
