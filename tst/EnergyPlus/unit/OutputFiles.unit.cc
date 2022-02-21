@@ -48,12 +48,12 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
-#include <EnergyPlus/IOFiles.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "EnergyPlus/InputProcessing/InputProcessor.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
@@ -219,4 +219,67 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:12.3Z}", 0.0), "   0.000E+00");
     EXPECT_EQ(format("{:12.4Z}", 0.0), "  0.0000E+00");
 }
+
+TEST_F(EnergyPlusFixture, OutputControlFiles)
+{
+    std::string const idf_objects = delimited_string({
+        "OutputControl:Files,",
+        "  No,                      !- Output CSV",
+        "  No,                      !- Output MTR",
+        "  No,                      !- Output ESO",
+        "  No,                      !- Output EIO",
+        "  No,                      !- Output Tabular",
+        "  Yes,                     !- Output SQLite",
+        "  Yes,                     !- Output JSON",
+        "  No,                      !- Output AUDIT",
+        "  Yes,                     !- Output Zone Sizing",
+        "  Yes,                     !- Output System Sizing",
+        "  Yes,                     !- Output DXF",
+        "  No,                      !- Output BND",
+        "  No,                      !- Output RDD",
+        "  No,                      !- Output MDD",
+        "  No,                      !- Output MTD",
+        "  Yes,                     !- Output END",
+        "  No,                      !- Output SHD",
+        "  Yes,                     !- Output DFS",
+        "  Yes,                     !- Output GLHE",
+        "  Yes,                     !- Output DelightIn",
+        "  Yes,                     !- Output DelightELdmp",
+        "  Yes,                     !- Output DelightDFdmp",
+        "  Yes,                     !- Output EDD",
+        "  Yes,                     !- Output DBG",
+        "  Yes,                     !- Output PerfLog",
+        "  Yes,                     !- Output SLN",
+        "  Yes,                     !- Output SCI",
+        "  Yes,                     !- Output WRL",
+        "  Yes,                     !- Output Screen",
+        "  Yes,                     !- Output ExtShd",
+        "  Yes;                     !- Output Tarcog",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->files.outputControl.getInput(*state);
+
+    state->dataGlobal->DisplayUnusedObjects = true;
+
+    state->dataInputProcessing->inputProcessor->reportOrphanRecordObjects(*state);
+
+    // It does not include "   **   ~~~   ** Object=OutputControl:Files=OutputControl:Files 1"
+    EXPECT_FALSE(match_err_stream("OutputControl:Files"));
+
+    std::string expected_error = delimited_string({
+
+        "   ** Warning ** The following lines are \"Unused Objects\".  These objects are in the input",
+        "   **   ~~~   **  file but are never obtained by the simulation and therefore are NOT used.",
+        "   **   ~~~   **  Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.",
+        "   **   ~~~   **  See InputOutputReference document for more details.",
+        "   ************* Object=Building=Bldg",
+        "   **   ~~~   ** Object=GlobalGeometryRules",
+        "   **   ~~~   ** Object=Version",
+    });
+
+    compare_err_stream(expected_error);
+}
+
 } // namespace EnergyPlus
