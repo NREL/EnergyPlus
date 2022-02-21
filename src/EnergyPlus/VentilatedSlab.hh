@@ -131,7 +131,6 @@ namespace VentilatedSlab {
         // Input data
         std::string Name;      // name of system
         int SchedPtr;          // index to schedule
-        std::string ZoneName;  // Name of zone the system is serving
         int ZonePtr;           // Point to this zone in the Zone derived type
         // Variables for Delivery Config.
         Array1D_string ZName;            // Name of zone the system is serving

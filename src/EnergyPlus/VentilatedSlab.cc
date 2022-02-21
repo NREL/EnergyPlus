@@ -337,7 +337,6 @@ namespace VentilatedSlab {
                 ErrorsFound = true;
             }
 
-            ventSlab.ZoneName = state.dataIPShortCut->cAlphaArgs(3);
             ventSlab.ZonePtr =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (ventSlab.ZonePtr == 0) {
