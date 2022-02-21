@@ -144,6 +144,21 @@ See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more 
 Renamed the output variable "Environment:Site Precipitation Depth" to "Environment:Liquid Precipitation Depth".
 
 See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
+## Fenestration Assembly Reporting
+
+Added several items to Envelope Summary in tabular output report:
+
+- For Exterior Fenestration subtable, added Frame and Divider Name
+- For Exterior Fenestration subtable, added NFRC product type, assembly u-factor, assembly SHGC, assembly visible transmittance
+- Added new Exterior Fenestration Shaded State subtable by construction listing some of the same items as the Exterior Fenestration subtable but when the shading is deployed.
+
+Also added two new EIO lines showing same additions as were added to the tabular output report:
+
+- FenestrationAssembly
+- FenestrationShadedState
+
+See pull request [#8740](https://github.com/NREL/EnergyPlus/pull/8740) for more details.
+See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
 
 
 ### Exhaust System New Output Variables

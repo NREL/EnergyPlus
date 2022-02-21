@@ -4,10 +4,7 @@
 #include <vector>
 #include <memory>
 
-namespace FenestrationCommon
-{
-    class SquareMatrix;
-}
+#include <WCECommon.hpp>
 
 namespace Viewer
 {
@@ -22,7 +19,7 @@ namespace Viewer
 
         void appendSegment(std::shared_ptr<CViewSegment2D> const & t_Segment);
         void appendGeometry2D(std::shared_ptr<CGeometry2D> const & t_Geometry2D);
-        std::shared_ptr<FenestrationCommon::SquareMatrix> viewFactors();
+        FenestrationCommon::SquareMatrix viewFactors();
 
         // Shifts all segments for given coordinates
         std::shared_ptr<CGeometry2D> Translate(double const t_x, double const t_y) const;
@@ -72,7 +69,7 @@ namespace Viewer
 
         // Holds state for the view factors. No need to recalculate them every time since it is
         // time consuming operation.
-        std::shared_ptr<FenestrationCommon::SquareMatrix> m_ViewFactors;
+        FenestrationCommon::SquareMatrix m_ViewFactors;
         bool m_ViewFactorsCalculated;
     };
 

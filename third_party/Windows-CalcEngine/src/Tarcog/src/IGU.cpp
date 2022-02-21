@@ -26,9 +26,7 @@ namespace Tarcog
     namespace ISO15099
     {
         CIGU::CIGU(double const t_Width, double const t_Height, double const t_Tilt) :
-            m_Width(t_Width),
-            m_Height(t_Height),
-            m_Tilt(t_Tilt)
+            m_Width(t_Width), m_Height(t_Height), m_Tilt(t_Tilt)
         {}
 
         CIGU::CIGU(CIGU const & t_IGU)
@@ -46,6 +44,11 @@ namespace Tarcog
             {
                 const auto aLayer{layer->clone()};
                 addLayer(aLayer);
+            }
+
+            if(t_IGU.m_DeflectionFromE1300Curves != nullptr)
+            {
+                m_DeflectionFromE1300Curves = std::make_unique<Deflection::DeflectionE1300>(*t_IGU.m_DeflectionFromE1300Curves);
             }
 
             return *this;
@@ -112,6 +115,12 @@ namespace Tarcog
             {
                 layer->setTilt(t_Tilt);
             }
+            m_Tilt = t_Tilt;
+
+            if(m_DeflectionFromE1300Curves != nullptr)
+            {
+                m_DeflectionFromE1300Curves->setIGUTilt(t_Tilt);
+            }
         }
 
         void CIGU::setWidth(double const t_Width)
@@ -121,6 +130,11 @@ namespace Tarcog
                 layer->setWidth(t_Width);
             }
             m_Width = t_Width;
+
+            if(m_DeflectionFromE1300Curves != nullptr)
+            {
+                m_DeflectionFromE1300Curves->setDimensions(m_Width, m_Height);
+            }
         }
 
         void CIGU::setHeight(double const t_Height)
@@ -130,6 +144,11 @@ namespace Tarcog
                 layer->setHeight(t_Height);
             }
             m_Height = t_Height;
+
+            if(m_DeflectionFromE1300Curves != nullptr)
+            {
+                m_DeflectionFromE1300Curves->setDimensions(m_Width, m_Height);
+            }
         }
 
         void CIGU::setSolarRadiation(double const t_SolarRadiation) const
@@ -239,6 +258,19 @@ namespace Tarcog
             return aMeanDeflections;
         }
 
+        std::vector<double> CIGU::getPanesLoad() const
+        {
+
+            std::vector<double> paneLoad(getSolidLayers().size());
+
+            if(m_DeflectionFromE1300Curves != nullptr)
+            {
+                paneLoad = m_DeflectionFromE1300Curves->results().paneLoad;
+            }
+
+            return paneLoad;
+        }
+
         double CIGU::getThickness() const
         {
             auto totalWidth = 0.0;
@@ -308,38 +340,73 @@ namespace Tarcog
             }
         }
 
-        void CIGU::setDeflectionProperties(double const t_Tini, double const t_Pini)
+        void CIGU::setDeflectionProperties(const double t_Tini,
+                                           const double t_Pini,
+                                           const double t_InsidePressure,
+                                           const double t_OutsidePressure)
         {
-            // Simply decorating layers in a list with new behavior
-            auto aVector = getSolidLayers();
-            // deflection properties of the IGU
-            auto Lmean = Ldmean();
-            auto Lmax = Ldmax();
-
-            for(auto & aLayer : getSolidLayers())
+            std::vector<Deflection::LayerData> layerData;
+            for(const auto & layer : getSolidLayers())
             {
-                // Deflection could also be decorated (created) outside in which case program
-                // already have a layer as deflection layer. If that is not done then layer must be
-                // decorated with default deflection properties
-                std::shared_ptr<CIGUSolidLayerDeflection> aDeflectionLayer = nullptr;
-                if(!aLayer->isDeflected())
-                {
-                    aDeflectionLayer = std::make_shared<CIGUSolidLayerDeflection>(*aLayer);
-                }
-                else
-                {
-                    aDeflectionLayer = std::dynamic_pointer_cast<CIGUSolidLayerDeflection>(aLayer);
-                }
-                replaceLayer(
-                  aLayer,
-                  std::make_shared<CIGUDeflectionTempAndPressure>(aDeflectionLayer, Lmax, Lmean));
+                layerData.emplace_back(layer->getThickness(), layer->density(), layer->youngsModulus());
             }
-            for(std::shared_ptr<CIGUGapLayer> & aLayer : getGapLayers())
+
+            std::vector<Deflection::GapData> gapData;
+            for(const auto & gap : getGapLayers())
             {
-                replaceLayer(aLayer,
-                             std::make_shared<CIGUGapLayerDeflection>(*aLayer, t_Tini, t_Pini));
+                gapData.emplace_back(gap->getThickness(), t_Tini, t_Pini);
+            }
+
+            m_DeflectionFromE1300Curves =
+              std::make_unique<Deflection::DeflectionE1300>(m_Width, m_Height, layerData, gapData);
+
+            m_DeflectionFromE1300Curves->setIGUTilt(m_Tilt);
+            m_DeflectionFromE1300Curves->setInteriorPressure(t_InsidePressure);
+            m_DeflectionFromE1300Curves->setExteriorPressure(t_OutsidePressure);
+
+            if(m_DeflectionAppliedLoad.size() == layerData.size())
+            {
+                m_DeflectionFromE1300Curves->setAppliedLoad(m_DeflectionAppliedLoad);
             }
         }
+
+        //! The old deflection routine that did not work because program failed to converge. Will
+        //! disable it for now since results are incorrect (Simon)
+        // void CIGU::setDeflectionProperties(double const t_Tini, double const t_Pini)
+        //{
+        //    // Simply decorating layers in a list with new behavior
+        //    auto aVector = getSolidLayers();
+        //    // deflection properties of the IGU
+        //    auto Lmean = Ldmean();
+        //    auto Lmax = Ldmax();
+        //
+        //    for(auto & aLayer : getSolidLayers())
+        //    {
+        //        // Deflection could also be decorated (created) outside in which case program
+        //        // already have a layer as deflection layer. If that is not done then layer must
+        //        be
+        //        // decorated with default deflection properties
+        //        std::shared_ptr<CIGUSolidLayerDeflection> aDeflectionLayer = nullptr;
+        //        if(!aLayer->isDeflected())
+        //        {
+        //            aDeflectionLayer = std::make_shared<CIGUSolidLayerDeflection>(*aLayer);
+        //        }
+        //        else
+        //        {
+        //            aDeflectionLayer =
+        //            std::dynamic_pointer_cast<CIGUSolidLayerDeflection>(aLayer);
+        //        }
+        //        replaceLayer(
+        //          aLayer,
+        //          std::make_shared<CIGUDeflectionTempAndPressure>(aDeflectionLayer, Lmax, Lmean));
+        //    }
+        //
+        //    for(std::shared_ptr<CIGUGapLayer> & aLayer : getGapLayers())
+        //    {
+        //        replaceLayer(aLayer,
+        //                     std::make_shared<CIGUGapLayerDeflection>(*aLayer, t_Tini, t_Pini));
+        //    }
+        //}
 
         void CIGU::setDeflectionProperties(std::vector<double> const & t_MeasuredDeflections)
         {
@@ -392,6 +459,35 @@ namespace Tarcog
                 aDefLayer =
                   std::make_shared<CIGUDeflectionMeasuread>(aDefLayer, LDefNMean, LDefNMax);
                 replaceLayer(aLayer, aDefLayer);
+            }
+        }
+
+        void CIGU::updateDeflectionState()
+        {
+            if(m_DeflectionFromE1300Curves != nullptr)
+            {
+                const auto gapLayers{getGapLayers()};
+                std::vector<double> gapTemperatures(gapLayers.size());
+                for(size_t i = 0u; i < gapTemperatures.size(); ++i)
+                {
+                    gapTemperatures[i] = gapLayers[i]->averageTemperature();
+                }
+                m_DeflectionFromE1300Curves->setLoadTemperatures(gapTemperatures);
+
+                auto deflectionResults{m_DeflectionFromE1300Curves->results()};
+
+                // This is borrowed from Timschenko. It will be used till E1300 calculations are actually doing this.
+                const auto deflectionRatio = Ldmean() / Ldmax();
+
+                auto solidLayers{getSolidLayers()};
+
+                assert(deflectionResults.deflection.size() == solidLayers.size());
+
+                for(size_t i = 0u; i < deflectionResults.deflection.size(); ++i)
+                {
+                    auto def{deflectionResults.deflection[i]};
+                    solidLayers[i]->applyDeflection(deflectionRatio * def, def);
+                }
             }
         }
 
@@ -515,6 +611,20 @@ namespace Tarcog
             for(size_t i = 0; i < solidLayers.size(); ++i)
             {
                 solidLayers[i]->setSolarAbsorptance(absorptances[i], solarRadiation);
+            }
+        }
+
+        void CIGU::clearDeflection()
+        {
+            m_DeflectionFromE1300Curves = nullptr;
+        }
+
+        void CIGU::setAppliedLoad(std::vector<double> t_AppliedLoad)
+        {
+            m_DeflectionAppliedLoad = t_AppliedLoad;
+            if(m_DeflectionFromE1300Curves != nullptr)
+            {
+                m_DeflectionFromE1300Curves->setAppliedLoad(std::move(t_AppliedLoad));
             }
         }
 
