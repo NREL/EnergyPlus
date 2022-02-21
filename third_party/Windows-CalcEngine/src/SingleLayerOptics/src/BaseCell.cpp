@@ -9,13 +9,13 @@ using namespace FenestrationCommon;
 
 namespace SingleLayerOptics
 {
-    CBaseCell::CBaseCell() : m_Material(nullptr), m_CellDescription(nullptr)
+    CBaseCell::CBaseCell() : m_Material(nullptr), m_CellDescription(nullptr), m_CellRotation(0)
     {}
 
     CBaseCell::CBaseCell(const std::shared_ptr<CMaterial> & t_Material,
-                         const std::shared_ptr<ICellDescription> & t_CellDescription) :
-        m_Material(t_Material),
-        m_CellDescription(t_CellDescription)
+                         const std::shared_ptr<ICellDescription> & t_CellDescription,
+                         const double rotation) :
+        m_Material(t_Material), m_CellDescription(t_CellDescription), m_CellRotation(rotation)
     {}
 
     void CBaseCell::setSourceData(CSeries & t_SourceData)
@@ -25,11 +25,19 @@ namespace SingleLayerOptics
 
     double CBaseCell::T_dir_dir(const Side t_Side, const CBeamDirection & t_Direction)
     {
+        if(m_CellRotation != 0)
+        {
+            return m_CellDescription->T_dir_dir(t_Side, t_Direction.rotate(m_CellRotation));
+        }
         return m_CellDescription->T_dir_dir(t_Side, t_Direction);
     }
 
     double CBaseCell::R_dir_dir(const Side t_Side, const CBeamDirection & t_Direction)
     {
+        if(m_CellRotation != 0)
+        {
+            return m_CellDescription->R_dir_dir(t_Side, t_Direction.rotate(m_CellRotation));
+        }
         return m_CellDescription->R_dir_dir(t_Side, t_Direction);
     }
 

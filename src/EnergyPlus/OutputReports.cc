@@ -1656,7 +1656,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                                    << ",N/A," << format("{:.2R}", state.dataSurface->FrameDivider(fd).FrameWidth) << ",N/A" << '\n';
                     }
                     if (state.dataSurface->FrameDivider(fd).DividerWidth > 0.0) {
-                        if (state.dataSurface->FrameDivider(fd).DividerType == DividedLite) {
+                        if (state.dataSurface->FrameDivider(fd).DividerType == DataSurfaces::FrameDividerType::DividedLite) {
                             *eiostream << "Frame/Divider Surface," << state.dataSurface->FrameDivider(fd).Name << ","
                                        << "Divider:DividedLite," << state.dataSurface->Surface(surf).Name << ",,";
                         } else {
