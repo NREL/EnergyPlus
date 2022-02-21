@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <iomanip>
@@ -124,6 +125,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
@@ -5250,6 +5252,7 @@ void WriteTabularReports(EnergyPlusData &state)
 
     FillWeatherPredefinedEntries(state);
     FillRemainingPredefinedEntries(state);
+    WaterManager::ReportRainfall(state);
     auto &ort(state.dataOutRptTab);
 
     // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
@@ -5404,6 +5407,12 @@ void parseStatLine(const std::string &lineIn,
         lineType = StatLineType::WithHDDLine;
     } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
         lineType = StatLineType::WithCDDLine;
+    } else if (has(lineIn, "Max Hourly")) {
+        lineType = StatLineType::MaxHourlyPrec;
+    } else if (has(lineIn, "Total")) {
+        if (!has(lineIn, "Statistics for Total Sky Cover")) {
+            lineType = StatLineType::MonthlyPrec;
+        }
     }
     // these not part of big if/else because sequential
     if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
@@ -5910,6 +5919,49 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
                 }
+            } break;
+            case StatLineType::MonthlyPrec: { //   - Monthly precipitation mm
+                std::stringstream ss(lineIn);
+                std::vector<std::string> result;
+                while (ss.good()) {
+                    std::string substr;
+                    getline(ss, substr, '\t');
+                    substr.erase(remove_if(substr.begin(), substr.end(), isspace), substr.end());
+                    result.push_back(substr);
+                }
+                int monthlyTotalPrecFromStat[12];
+                int annualTotalPrecFromStat = 0;
+                for (int i = 0; i < 12; i++) {
+                    monthlyTotalPrecFromStat[i] = std::stoi(result[i + 2]);
+                    // fixme: add to monthly data structure
+                    annualTotalPrecFromStat += monthlyTotalPrecFromStat[i];
+                }
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Annual Total Precipitation [mm]", annualTotalPrecFromStat);
+                // fixme: store the monthly data in some data structure
+            } break;
+            case StatLineType::MaxHourlyPrec: { //   - Highest hourly precipitation in each month
+                // Split string by \t into substrings and remove the space in each substring
+                std::stringstream ss(lineIn);
+                std::vector<std::string> result;
+                while (ss.good()) {
+                    std::string substr;
+                    getline(ss, substr, '\t');
+                    substr.erase(remove_if(substr.begin(), substr.end(), isspace), substr.end());
+                    result.push_back(substr);
+                }
+                int MaxHourlyPrecEachMonth[12];
+                int MaxHourlyPrec = 0;
+                int MaxHourlyPrecIdx = 0;
+                for (int i = 0; i < 12; i++) {
+                    MaxHourlyPrecEachMonth[i] = std::stoi(result[i + 2]);
+                    if (MaxHourlyPrecEachMonth[i] > MaxHourlyPrec) {
+                        MaxHourlyPrec = MaxHourlyPrecEachMonth[i];
+                        MaxHourlyPrecIdx = i;
+                    }
+                }
+                constexpr std::array<std::string_view, 12> Months{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation [mm]", MaxHourlyPrec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation Occurs in", Months[MaxHourlyPrecIdx]);
             } break;
             case StatLineType::WithHDDLine: { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
                 if (storeASHRAEHDD != "") {
@@ -17460,7 +17512,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     //    na
     auto &ort(state.dataOutRptTab);
 
-    ort->UnitConvSize = 115;
+    ort->UnitConvSize = 117;
     ort->UnitConv.allocate(ort->UnitConvSize);
     ort->UnitConv(1).siName = "%";
     ort->UnitConv(2).siName = "°C";
@@ -17577,6 +17629,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).siName = "NM";
     ort->UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
     ort->UnitConv(115).siName = "PERSON/M2";
+    ort->UnitConv(116).siName = "MM";
+    ort->UnitConv(117).siName = "MM";
 
     ort->UnitConv(1).ipName = "%";
     ort->UnitConv(2).ipName = "F";
@@ -17693,6 +17747,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).ipName = "lbf-ft";
     ort->UnitConv(114).ipName = "Btu/W-h";
     ort->UnitConv(115).ipName = "person/ft2";
+    ort->UnitConv(116).ipName = "in";
+    ort->UnitConv(117).ipName = "ft";
 
     ort->UnitConv(1).mult = 1.0;
     ort->UnitConv(2).mult = 1.8;
@@ -17809,6 +17865,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).mult = 0.737562149277;
     ort->UnitConv(114).mult = 1.0;
     ort->UnitConv(115).mult = 0.09290304;
+    ort->UnitConv(116).mult = 0.03937;
+    ort->UnitConv(117).mult = 0.003281;
 
     ort->UnitConv(2).offset = 32.0;
     ort->UnitConv(11).offset = 32.0;
@@ -17881,6 +17939,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(93).several = true;
     ort->UnitConv(94).several = true;
     ort->UnitConv(95).several = true;
+    ort->UnitConv(116).several = true;
+    ort->UnitConv(117).several = true;
 }
 
 std::string GetUnitSubString(std::string const &inString) // Input String
