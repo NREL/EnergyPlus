@@ -410,6 +410,45 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.0452, 0.0001);
 }
 
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest_Actual)
+{
+
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_TRUE(
+        compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    EXPECT_TRUE(state->dataWeatherManager->WaterMainsParameterReport);
+
+    // CalcAnnualAndMonthlyDryBulbTemp was the one that was faulty
+    state->dataWeatherManager->OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp(*state);
+
+    EXPECT_TRUE(state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp, 7.31, 0.01);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 27.94, 0.01);
+
+    // January 15th water mains temperature test
+    state->dataEnvrn->DayOfYear = 15; // January 15th
+    WeatherManager::CalcWaterMainsTemp(*state);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 5.8439, 0.0001);
+}
+
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
 {
 
