@@ -186,6 +186,15 @@ namespace ExhaustAirSystemManager {
                     if (centralFanIndex >= 0) {
                         availSchNum = state.dataHVACFan->fanObjs[centralFanIndex]->availSchedIndex;
                         // normal index
+
+                        BranchNodeConnections::SetUpCompSets(state,
+                                                             cCurrentModuleObject,
+                                                             thisExhSys.Name,
+                                                             centralFanType,
+                                                             centralFanName,
+                                                             state.dataLoopNodes->NodeID(state.dataHVACFan->fanObjs[centralFanIndex]->inletNodeNum),
+                                                             state.dataLoopNodes->NodeID(state.dataHVACFan->fanObjs[centralFanIndex]->outletNodeNum));
+
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
