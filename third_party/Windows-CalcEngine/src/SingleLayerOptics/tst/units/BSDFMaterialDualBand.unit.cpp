@@ -131,6 +131,6 @@ TEST_F(TestBSDFMaterialDualBand, TestProperties)
 	// Test to make sure getBandProperties returns the correctly scaled values
 	// for each of the calculated wavelength bands.
 	auto bandProperties = m_Material->getBandProperties(Property::T, Side::Front, incomingDirection, outgoingDirection);
-	std::vector<double> expectedBandProperties{0, 0.012749736954558742, 0.012749736954558742, 0.012749736954558742};
+	std::vector<double> expectedBandProperties{0, 0.012749736954558742, 0.012749736954558742, 0.012749736954558742, 0.012749736954558742};
 	EXPECT_EQ(bandProperties, expectedBandProperties);
 }

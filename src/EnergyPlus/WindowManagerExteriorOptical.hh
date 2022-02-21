@@ -77,6 +77,9 @@ namespace WindowManager {
 
     void InitWCE_SimplifiedOpticalData(EnergyPlusData &state);
 
+    double GetSolarTransDirectHemispherical(EnergyPlusData &state, int ConstrNum);
+    double GetVisibleTransDirectHemispherical(EnergyPlusData &state, int ConstrNum);
+
     std::shared_ptr<SingleLayerOptics::CBSDFLayer>
     getBSDFLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
