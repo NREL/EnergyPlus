@@ -290,15 +290,11 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     state->dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex = 1;
     state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow = 1.0;
-
-    // local OA control variables (non external to UnitVentilator)
-    int constexpr variablePercent = 1;
-    int constexpr fixedTemperature = 2;
-    int constexpr fixedOAControl = 3;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = UnitVentilator::CoilOption::None;
 
     // test fixed OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = fixedOAControl;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedOA;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow,
@@ -307,7 +303,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     // test variable percent OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = variablePercent;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::VariablePercent;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(
@@ -315,7 +311,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     // test fixed temperature OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = fixedTemperature;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedTemperature;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(
@@ -326,7 +322,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     // test fixed OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = fixedOAControl;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedOA;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow,
@@ -335,7 +331,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     // test variable percent OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = variablePercent;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::VariablePercent;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(
@@ -343,7 +339,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     // test fixed temperature OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = fixedTemperature;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedTemperature;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(

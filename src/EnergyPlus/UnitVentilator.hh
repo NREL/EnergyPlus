@@ -67,127 +67,143 @@ struct EnergyPlusData;
 
 namespace UnitVentilator {
 
+    enum class CoilOption
+    {
+        Invalid = -1,
+        None,
+        Both,
+        Heating,
+        Cooling,
+        Num
+    };
+    enum class HeatCoilType
+    {
+        Invalid = -1,
+        Electric,
+        Gas,
+        Water,
+        Steam,
+        Num
+    };
+    enum class CoolCoilType
+    {
+        Invalid = -1,
+        Water,
+        Detailed,
+        HXAssisted,
+        Num
+    };
+    enum class OAControl
+    {
+        Invalid = -1,
+        VariablePercent,
+        FixedTemperature,
+        FixedOA,
+        Num
+    };
+
     struct UnitVentilatorData
     {
-        // Members
-        // Input data
         std::string Name;      // name of unit
         std::string SchedName; // availability schedule
-        int SchedPtr;          // index to schedule
-        int AirInNode;         // inlet air node number
-        int AirOutNode;        // outlet air node number
-        int FanOutletNode;     // outlet node number for fan exit
+        int SchedPtr = 0;      // index to schedule
+        int AirInNode = 0;     // inlet air node number
+        int AirOutNode = 0;    // outlet air node number
+        int FanOutletNode = 0; // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
-        int FanType_Num;     // Fan type number (see DataHVACGlobals)
+        int FanType_Num = 0; // Fan type number (see DataHVACGlobals)
         std::string FanType; // type of fan
         std::string FanName; // name of fan
-        int Fan_Index;
-        int FanSchedPtr;      // index to fan operating mode schedule
-        int FanAvailSchedPtr; // index to fan availability schedule
-        int OpMode;           // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
-        int ControlCompTypeNum;
-        int CompErrIndex;
-        Real64 MaxAirVolFlow;       // m3/s
-        Real64 MaxAirMassFlow;      // kg/s
-        int OAControlType;          // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-        std::string MinOASchedName; // schedule of fraction for minimum outside air (all controls)
-        int MinOASchedPtr;          // index to schedule
-        std::string MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
-        int MaxOASchedPtr;          // index to schedule
-        std::string TempSchedName;  // schedule of temperatures for desired "mixed air"
-        // temperature (fixed temp.)
-        int TempSchedPtr;         // index to schedule
-        int OutsideAirNode;       // outside air node number
-        int AirReliefNode;        // relief air node number
-        int OAMixerOutNode;       // outlet node after the outside air mixer (inlet to coils if present)
-        Real64 OutAirVolFlow;     // m3/s
-        Real64 OutAirMassFlow;    // kg/s
-        Real64 MinOutAirVolFlow;  // m3/s
-        Real64 MinOutAirMassFlow; // kg/s
-        int CoilOption;           // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
-        bool HCoilPresent;        // .TRUE. if unit ventilator has a heating coil
-        int HCoilType;            // type of heating coil (water, gas, electric, etc.)
-        std::string HCoilName;    // name of heating coil
-        std::string HCoilTypeCh;  // type of heating coil character string (same as type on idf file).
-        int HCoil_Index;
-        DataPlant::PlantEquipmentType HeatingCoilType;
-        int HCoil_FluidIndex;
+        int Fan_Index = 0;
+        int FanSchedPtr = 0;      // index to fan operating mode schedule
+        int FanAvailSchedPtr = 0; // index to fan availability schedule
+        int OpMode = 0;           // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
+        int ControlCompTypeNum = 0;
+        int CompErrIndex = 0;
+        Real64 MaxAirVolFlow = 0.0;                     // m3/s
+        Real64 MaxAirMassFlow = 0.0;                    // kg/s
+        OAControl OAControlType = OAControl::Invalid;   // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
+        std::string MinOASchedName;                     // schedule of fraction for minimum outside air (all controls)
+        int MinOASchedPtr = 0;                          // index to schedule
+        std::string MaxOASchedName;                     // schedule of percentages for maximum outside air fraction (variable %)
+        int MaxOASchedPtr = 0;                          // index to schedule
+        std::string TempSchedName;                      // schedule of temperatures for desired "mixed air" temperature
+        int TempSchedPtr = 0;                           // index to schedule
+        int OutsideAirNode = 0;                         // outside air node number
+        int AirReliefNode = 0;                          // relief air node number
+        int OAMixerOutNode = 0;                         // outlet node after the outside air mixer (inlet to coils if present)
+        Real64 OutAirVolFlow = 0.0;                     // m3/s
+        Real64 OutAirMassFlow = 0.0;                    // kg/s
+        Real64 MinOutAirVolFlow = 0.0;                  // m3/s
+        Real64 MinOutAirMassFlow = 0.0;                 // kg/s
+        CoilOption CoilOption = CoilOption::Invalid;    // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
+        bool HCoilPresent = false;                      // .TRUE. if unit ventilator has a heating coil
+        HeatCoilType HCoilType = HeatCoilType::Invalid; // type of heating coil (water, gas, electric, etc.)
+        std::string HCoilName;                          // name of heating coil
+        std::string HCoilTypeCh;                        // type of heating coil character string (same as type on idf file).
+        int HCoil_Index = 0;
+        DataPlant::PlantEquipmentType HeatingCoilType = DataPlant::PlantEquipmentType::Invalid;
+        int HCoil_FluidIndex = 0;
         std::string HCoilSchedName; // availability schedule for the heating coil
-        int HCoilSchedPtr;          // index to schedule
-        Real64 HCoilSchedValue;
-        Real64 MaxVolHotWaterFlow; // m3/s
-        Real64 MaxVolHotSteamFlow; // m3/s
-        Real64 MaxHotWaterFlow;    // kg/s
-        Real64 MaxHotSteamFlow;
-        Real64 MinHotSteamFlow;
-        Real64 MinVolHotWaterFlow; // m3/s
-        Real64 MinVolHotSteamFlow; // m3/s
-        Real64 MinHotWaterFlow;    // kg/s
-        int HotControlNode;        // hot water control node
-        int HotCoilOutNodeNum;     // outlet of coil
-        Real64 HotControlOffset;   // control tolerance
-        PlantLocation HWplantLoc;  // index for plant location for hot water coil
-        bool CCoilPresent;         // .TRUE. if unit ventilator has a cooling coil
-        std::string CCoilName;     // name of cooling coil
-        std::string CCoilTypeCh;   // type of cooling coil as character string (same as on idf file)
-        int CCoil_Index;
+        int HCoilSchedPtr = 0;      // index to schedule
+        Real64 HCoilSchedValue = 0.0;
+        Real64 MaxVolHotWaterFlow = 0.0; // m3/s
+        Real64 MaxVolHotSteamFlow = 0.0; // m3/s
+        Real64 MaxHotWaterFlow = 0.0;    // kg/s
+        Real64 MaxHotSteamFlow = 0.0;
+        Real64 MinHotSteamFlow = 0.0;
+        Real64 MinVolHotWaterFlow = 0.0; // m3/s
+        Real64 MinVolHotSteamFlow = 0.0; // m3/s
+        Real64 MinHotWaterFlow = 0.0;    // kg/s
+        int HotControlNode = 0;          // hot water control node
+        int HotCoilOutNodeNum = 0;       // outlet of coil
+        Real64 HotControlOffset = 0.0;   // control tolerance
+        PlantLocation HWplantLoc;        // index for plant location for hot water coil
+        bool CCoilPresent = false;       // .TRUE. if unit ventilator has a cooling coil
+        std::string CCoilName;           // name of cooling coil
+        std::string CCoilTypeCh;         // type of cooling coil as character string (same as on idf file)
+        int CCoil_Index = 0;
         std::string CCoilPlantName; // name of cooling coil for plant
         std::string CCoilPlantType; // type of cooling coil for plant
-        DataPlant::PlantEquipmentType CoolingCoilType;
-        int CCoilType; // type of cooling coil:
-        // 'Coil:Cooling:Water:DetailedGeometry' or
-        // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
+        DataPlant::PlantEquipmentType CoolingCoilType = DataPlant::PlantEquipmentType::Invalid;
+        CoolCoilType CCoilType = CoolCoilType::Invalid;
         std::string CCoilSchedName; // availability schedule for the cooling coil
-        int CCoilSchedPtr;          // index to schedule
-        Real64 CCoilSchedValue;
-        Real64 MaxVolColdWaterFlow; // m3/s
-        Real64 MaxColdWaterFlow;    // kg/s
-        Real64 MinVolColdWaterFlow; // m3/s
-        Real64 MinColdWaterFlow;    // kg/s
-        int ColdControlNode;        // chilled water control node
-        int ColdCoilOutNodeNum;     // chilled water coil out node
-        Real64 ColdControlOffset;   // control tolerance
-        PlantLocation CWPlantLoc;   // index for plant component for chilled water coil
+        int CCoilSchedPtr = 0;      // index to schedule
+        Real64 CCoilSchedValue = 0.0;
+        Real64 MaxVolColdWaterFlow = 0.0; // m3/s
+        Real64 MaxColdWaterFlow = 0.0;    // kg/s
+        Real64 MinVolColdWaterFlow = 0.0; // m3/s
+        Real64 MinColdWaterFlow = 0.0;    // kg/s
+        int ColdControlNode = 0;          // chilled water control node
+        int ColdCoilOutNodeNum = 0;       // chilled water coil out node
+        Real64 ColdControlOffset = 0.0;   // control tolerance
+        PlantLocation CWPlantLoc;         // index for plant component for chilled water coil
         // Report data
-        Real64 HeatPower;  // unit heating output in watts
-        Real64 HeatEnergy; // unit heating output in J
-        Real64 TotCoolPower;
-        Real64 TotCoolEnergy;
-        Real64 SensCoolPower;
-        Real64 SensCoolEnergy;
-        Real64 ElecPower;
-        Real64 ElecEnergy;
+        Real64 HeatPower = 0.0;  // unit heating output in watts
+        Real64 HeatEnergy = 0.0; // unit heating output in J
+        Real64 TotCoolPower = 0.0;
+        Real64 TotCoolEnergy = 0.0;
+        Real64 SensCoolPower = 0.0;
+        Real64 SensCoolEnergy = 0.0;
+        Real64 ElecPower = 0.0;
+        Real64 ElecEnergy = 0.0;
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus;
-        Real64 FanPartLoadRatio; // fan part-load ratio for time step
-        Real64 PartLoadFrac;     // unit ventilator part-load ratio for time step
-        int ZonePtr;             // pointer to a zone served by a unit ventilator
-        int HVACSizingIndex;     // index of a HVACSizing object for a unit ventilator
-        bool ATMixerExists;      // True if there is an ATMixer
-        std::string ATMixerName; // name of air mixer
-        int ATMixerIndex;        // index to the air mixer
-        int ATMixerType;         // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode;      // primary inlet air node number for the mixer
-        int ATMixerSecNode;      // secondary air inlet node number for the mixer
-        int ATMixerOutNode;      // outlet air node number for the mixer
-        bool FirstPass;          // detects first time through for resetting sizing data
-        // for unit ventilator object
+        int AvailStatus = 0;
+        Real64 FanPartLoadRatio = 0.0; // fan part-load ratio for time step
+        Real64 PartLoadFrac = 0.0;     // unit ventilator part-load ratio for time step
+        int ZonePtr = 0;               // pointer to a zone served by a unit ventilator
+        int HVACSizingIndex = 0;       // index of a HVACSizing object for a unit ventilator
+        bool ATMixerExists = false;    // True if there is an ATMixer
+        std::string ATMixerName;       // name of air mixer
+        int ATMixerIndex = 0;          // index to the air mixer
+        int ATMixerType = 0;           // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerPriNode = 0;        // primary inlet air node number for the mixer
+        int ATMixerSecNode = 0;        // secondary air inlet node number for the mixer
+        int ATMixerOutNode = 0;        // outlet air node number for the mixer
+        bool FirstPass = true;         // detects first time through for resetting sizing data
 
-        // Default Constructor
-        UnitVentilatorData()
-            : SchedPtr(0), AirInNode(0), AirOutNode(0), FanOutletNode(0), FanType_Num(0), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0),
-              OpMode(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0),
-              MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
-              MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0),
-              HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
-              MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
-              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
-              HotControlOffset(0.0), HWplantLoc{}, CCoilPresent(false), CCoil_Index(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid),
-              CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
-              MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWPlantLoc{}, HeatPower(0.0), HeatEnergy(0.0),
-              TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0),
-              FanPartLoadRatio(0.0), PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0),
-              ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
+        UnitVentilatorData() = default;
+        ~UnitVentilatorData()
         {
         }
     };
@@ -197,8 +213,8 @@ namespace UnitVentilator {
         // Members
         Array1D_string FieldNames;
 
-        // Default Constructor
-        UnitVentNumericFieldData()
+        UnitVentNumericFieldData() = default;
+        ~UnitVentNumericFieldData()
         {
         }
     };
@@ -241,13 +257,6 @@ namespace UnitVentilator {
                             int const UnitVentNum, // Unit index in unit ventilator array
                             int const FanOpMode    // unit ventilator fan operating mode
     );
-
-    // SUBROUTINE UpdateUnitVentilator
-
-    // No update routine needed in this module since all of the updates happen on
-    // the Node derived type directly and these updates are done by other routines.
-
-    // END SUBROUTINE UpdateUnitVentilator
 
     void ReportUnitVentilator(EnergyPlusData &state, int const UnitVentNum); // Unit index in unit ventilator array
 
@@ -339,6 +348,9 @@ struct UnitVentilatorsData : BaseGlobalStruct
 
     // Default Constructor
     UnitVentilatorsData() = default;
+    ~UnitVentilatorsData()
+    {
+    }
 };
 } // namespace EnergyPlus
 
