@@ -681,21 +681,21 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
 
     // set up for EIO <FenestrationAssembly> output
-    if (state.dataHeatBal->TotFrameDivider > 0) {
+    if (state.dataHeatBal->TotFrameDivider > 0 && state.dataGeneral->Constructions) {
         print(state.files.eio,
               "{}\n",
               "! <FenestrationAssembly>,Construction Name,Frame and Divider Name,NFRC Product Type,"
               "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
     }
     static constexpr std::string_view FenestrationAssemblyFormat("FenestrationAssembly,{},{},{},{:.3R},{:.3R},{:.3R}\n");
-    std::vector<std::string> uniqueConstFrame;
-    std::string constructionAndFrame;
+    std::vector<std::pair<int, int>> uniqConsFrame;
+    std::pair<int, int> consAndFrame;
 
     // set up for EIO <FenestrationShadedState> output
     bool fenestrationShadedStateHeaderShown(false);
     static constexpr std::string_view FenestrationShadedStateFormat("FenestrationShadedState,{},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{:.3R}\n");
-    std::vector<std::string> uniqueShdConstFrame;
-    std::string shdConstructionAndFrame;
+    std::vector<std::pair<int, int>> uniqShdConsFrame;
+    std::pair<int, int> shdConsAndFrame;
 
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         zonePt = Surface(iSurf).Zone;
@@ -787,41 +787,42 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                     // report the selected NRFC product type (specific sizes) and the NFRC rating for the assembly (glass + frame + divider)
                     std::string_view NFRCname =
-                        DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
 
-                    double uValueRep{0.0};
-                    double shgcRep{0.0};
-                    double vtRep{0.0};
+                    double uValueAssembly{0.0};
+                    double shgcAssembly{0.0};
+                    double vtAssembly{0.0};
 
                     GetWindowAssemblyNfrcForReport(
-                        state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueRep, shgcRep, vtRep);
+                        state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueAssembly, shgcAssembly, vtAssembly);
                     if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                         state.dataHeatBal->NominalU(Surface(iSurf).Construction) =
                             GetIGUUValueForNFRCReport(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
                         SHGCSummer = GetSHGCValueForNFRCReporting(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
-                        TransVisNorm = state.dataConstruction->Construct(Surface(iSurf).Construction).VisTransNorm;
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueRep, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcRep, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtRep, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueAssembly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcAssembly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtAssembly, 3);
 
                     // output EIO <FenestrationAssembly> for each unique combination of construction and frame/divider
-                    constructionAndFrame = state.dataConstruction->Construct(curCons).Name + state.dataSurface->FrameDivider(frameDivNum).Name;
-                    if (std::find(uniqueConstFrame.begin(), uniqueConstFrame.end(), constructionAndFrame) == uniqueConstFrame.end()) {
-                        uniqueConstFrame.push_back(constructionAndFrame);
-                        print(state.files.eio,
-                              FenestrationAssemblyFormat,
-                              state.dataConstruction->Construct(curCons).Name,
-                              state.dataSurface->FrameDivider(frameDivNum).Name,
-                              NFRCname,
-                              uValueRep,
-                              shgcRep,
-                              vtRep);
+                    if (state.dataGeneral->Constructions) {
+                        consAndFrame = std::make_pair(curCons, frameDivNum);
+                        if (std::find(uniqConsFrame.begin(), uniqConsFrame.end(), consAndFrame) == uniqConsFrame.end()) {
+                            uniqConsFrame.push_back(consAndFrame);
+                            print(state.files.eio,
+                                  FenestrationAssemblyFormat,
+                                  state.dataConstruction->Construct(curCons).Name,
+                                  state.dataSurface->FrameDivider(frameDivNum).Name,
+                                  NFRCname,
+                                  uValueAssembly,
+                                  shgcAssembly,
+                                  vtAssembly);
+                        }
                     }
                 }
                 windowAreaWMult = windowArea * mult;
@@ -865,7 +866,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
-                        int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
+                        const int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
                         const auto stateUValue{GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
                         const auto stateSHGC{GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
                         std::string const &constructionName{state.dataConstruction->Construct(stateConstrNum).Name};
@@ -882,30 +883,22 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                          state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
                                          3);
 
-                        frameDivNum = Surface(iSurf).FrameDivider;
-                        if (frameDivNum != 0) {
-                            double stateAssemblyUValue{0.0};
-                            double stateAssemblySHGC{0.0};
-                            double stateAssemblyVT{0.0};
+                        double stateAssemblyUValue{0.0};
+                        double stateAssemblySHGC{0.0};
+                        double stateAssemblyVT{0.0};
 
-                            GetWindowAssemblyNfrcForReport(state,
-                                                           iSurf,
-                                                           stateConstrNum,
-                                                           windowWidth,
-                                                           windowHeight,
-                                                           vision,
-                                                           stateAssemblyUValue,
-                                                           stateAssemblySHGC,
-                                                           stateAssemblyVT);
+                        GetWindowAssemblyNfrcForReport(
+                            state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
 
-                            std::string_view NFRCname =
-                                DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
+                        std::string_view NFRCname =
+                            DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
 
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, constructionName, stateAssemblyUValue, 3);
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, constructionName, stateAssemblySHGC, 3);
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, constructionName, stateAssemblyVT, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, constructionName, stateAssemblyUValue, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, constructionName, stateAssemblySHGC, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, constructionName, stateAssemblyVT, 3);
 
+                        if (state.dataGeneral->Constructions) {
                             if (!fenestrationShadedStateHeaderShown) {
                                 print(state.files.eio,
                                       "{}\n",
@@ -915,10 +908,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                 fenestrationShadedStateHeaderShown = true;
                             }
 
-                            shdConstructionAndFrame = constructionName + state.dataSurface->FrameDivider(frameDivNum).Name;
-                            if (std::find(uniqueShdConstFrame.begin(), uniqueShdConstFrame.end(), shdConstructionAndFrame) ==
-                                uniqueShdConstFrame.end()) {
-                                uniqueShdConstFrame.push_back(shdConstructionAndFrame);
+                            shdConsAndFrame = std::make_pair(stateConstrNum, frameDivNum);
+                            if (std::find(uniqShdConsFrame.begin(), uniqShdConsFrame.end(), shdConsAndFrame) == uniqShdConsFrame.end()) {
+                                uniqShdConsFrame.push_back(shdConsAndFrame);
                                 print(state.files.eio,
                                       FenestrationShadedStateFormat,
                                       constructionName,
@@ -3284,7 +3276,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         // DivProjIn will be zero in this case.)
                         if (DivArea > 0.0) {                                                         // Solar absorbed by window divider
                             Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                            if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                            if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                                 // Suspended (between-glass) divider; account for effect glass on outside of divider
                                 // (note that outside and inside projection for this type of divider are both zero)
                                 int MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(1); // Outer glass layer material number
@@ -3799,7 +3791,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {                     // Window has dividers
                     Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum);    // Window divider thermal absorptance
                     Real64 DividerSolAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                    if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {          // Suspended divider; account for inside glass
+                    if (state.dataSurface->SurfWinDividerType(SurfNum) ==
+                        DataSurfaces::FrameDividerType::Suspended) { // Suspended divider; account for inside glass
                         Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                             state.dataConstruction->Construct(ConstrNum).TotLayers);   // Glass layer material number
                         Real64 TransGl = state.dataMaterial->Material(MatNumGl).Trans; // Glass layer solar transmittance, reflectance, absorptance
@@ -4030,7 +4023,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                 Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
                 // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
-                if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended)
+                if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended)
                     DividerThermAbs = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     // Interior shade or blind in place
@@ -4207,7 +4200,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                                 (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum));
                     if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                         Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                        if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                        if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                             // Suspended (between-glass) divider: account for glass on inside of divider
                             Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                                 state.dataConstruction->Construct(ConstrNum).TotLayers); // Glass material number

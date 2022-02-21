@@ -1769,8 +1769,9 @@ namespace WindowManager {
                 state.dataSurface->SurfWinFrameVisAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameVisAbsorp;
                 state.dataSurface->SurfWinFrameEmis(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameEmis;
                 state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrEdgeToCenterGlCondRatio;
-                state.dataSurface->SurfWinDividerType(SurfNum) = DividedLite;
-                if (state.dataSurface->FrameDivider(FrDivNum).DividerType == Suspended) state.dataSurface->SurfWinDividerType(SurfNum) = Suspended;
+                state.dataSurface->SurfWinDividerType(SurfNum) = DataSurfaces::FrameDividerType::DividedLite;
+                if (state.dataSurface->FrameDivider(FrDivNum).DividerType == DataSurfaces::FrameDividerType::Suspended)
+                    state.dataSurface->SurfWinDividerType(SurfNum) = DataSurfaces::FrameDividerType::Suspended;
                 DivWidth = state.dataSurface->FrameDivider(FrDivNum).DividerWidth;
                 state.dataSurface->SurfWinDividerConductance(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerConductance;
                 state.dataSurface->SurfWinDividerSolAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerSolAbsorp;
@@ -6292,10 +6293,10 @@ namespace WindowManager {
         Real64 Bfac;
         Real64 Dfac;
         Real64 Efac;
-        int DivType;       // Divider type
-        Real64 DivCon;     // Divider conductance (W/m2-K)
-        Real64 DivEmisIn;  // Inside divider emissivity
-        Real64 DivEmisOut; // Outside divider emissivity
+        DataSurfaces::FrameDividerType DivType; // Divider type
+        Real64 DivCon;                          // Divider conductance (W/m2-K)
+        Real64 DivEmisIn;                       // Inside divider emissivity
+        Real64 DivEmisOut;                      // Outside divider emissivity
 
         Real64 ProjCorrFrOut; // Outside correction factor for absorbed radiation
         //   for frame with outside projection
@@ -6397,7 +6398,7 @@ namespace WindowManager {
             DivType = state.dataSurface->SurfWinDividerType(SurfNum);
             DivCon = state.dataSurface->SurfWinDividerConductance(SurfNum);
 
-            if (DivType == DividedLite) { // Divided lite
+            if (DivType == DataSurfaces::FrameDividerType::DividedLite) { // Divided lite
                 DivEmisIn = state.dataSurface->SurfWinDividerEmis(SurfNum);
                 DivEmisOut = DivEmisIn;
             } else { // Suspended (between-glass) divider

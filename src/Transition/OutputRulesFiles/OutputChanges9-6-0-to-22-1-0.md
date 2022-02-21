@@ -122,6 +122,28 @@ Two variables in the emission system were renamed to use "OtherFuel" instead of 
 
 See pull request [#9089](https://github.com/NREL/EnergyPlus/pull/9089) for more details.
 
+### Addition of Monthly Precipitation Reporting Table
+
+A tabular report of precipitation related variables was added to the
+Climatic Data Summary section. It summarizes the following quantities
+- Monthly Total Precipitation in mm from the weather file
+- Monthly Total Hours of Rain in mm from the weather file
+- Monthly Total Precipitation in Site:Precipitation [mm]
+- Monthly Total Roof Irrigation Depth in mm
+- Monthly Total Rain Collection Volume in m3
+
+Three rows are added to the Weather Statistics File reporting table:
+- Annual Total Precipitation [mm]
+- Max Hourly Precipitation [mm]	
+- The month in which max hourly precipitation occurs
+
+See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
+
+### Rename output variable "Environment:Site Precipitation Depth"
+
+Renamed the output variable "Environment:Site Precipitation Depth" to "Environment:Liquid Precipitation Depth".
+
+See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
 ## Fenestration Assembly Reporting
 
 Added several items to Envelope Summary in tabular output report:
