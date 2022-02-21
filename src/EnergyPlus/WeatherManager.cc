@@ -9475,8 +9475,11 @@ namespace WeatherManager {
                         }
                         lineIn = statFile.readLine();
                         lineAvg = lineIn.data;
+                        break;
                     }
                 }
+                // TODO: should we check if it has "Daily Avg" in it?
+                // if (lineAvg.find("Daily Avg") == std::string::npos)
                 if (lineAvg.empty()) {
                     ShowSevereError(state,
                                     "CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + statFile.filePath.string() +
