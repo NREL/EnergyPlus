@@ -36,9 +36,9 @@ These assumptions are applied to the new objects: LoadProfile:Plant in a steam l
 1. The current LoadProfile:Plant calculates the outlet water temperature based on the inlet water temperature from the plant loop and user inputs for the scheduled plant load and the requested flow rate. 
 In the new LoadProfile:Plant, three additional input fields were added: Plant Loop Fluid Type (Water or steam); Degree of SubCooling (optional input for steam loop); and Degree of Loop SubCooling (otional input for steam loop). The new LoadProfile:Plant in a steam loop calculates the outlet mass flow rate based on the scheduled plant load and user inputs of degree of subcooling, because the inlet steam temperature and the outlet steam temperature before the steam trap are fixed to saturation temperature according to the assumption.
 
-2. Like DistrictHeating or DistrictCooling, DistrictHeatingSteam calculates the output capacity necessary from the inlet temperature to the setpoint temperature for that loop with the given mass flow rate in Watts.
+2. The current DistrictHeating or DistrictCooling calculates the output capacity necessary from the inlet temperature to the setpoint temperature for that loop with the given mass flow rate in Watts. DistrictHeatingSteam calculates the output capacity necessary from the latent heat with the given saturation temperature.
 
-3. H
+3. 
 Figure 1 describes the loop structure with steam to water heat exchanger.
 
 ![figure1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/figure1.png)

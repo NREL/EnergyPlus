@@ -4163,7 +4163,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
                              state.dataOutRptPredefined->pdchLeedEtsDemUnt,
                              "District Heating Steam",
                              format("{}{}", convDemStrings(distHeatSteamUnits), demWindowStrings(distHeatSteamDemWindowUnits)));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatSteamTotalCost, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating Steam", distHeatSteamTotalCost, 2);
         }
         // save the total costs for later to compute process fraction
         state.dataOutRptPredefined->LEEDelecCostTotal = elecTotalCost;
