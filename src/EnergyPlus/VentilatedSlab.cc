@@ -239,6 +239,10 @@ namespace VentilatedSlab {
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+
+        constexpr std::array<std::string_view, static_cast<int>(VentilatedSlabConfig::Num)> VentilatedSlabConfigNamesUC{
+            "SLABONLY", "SLABANDZONE", "SERIESSLABS"};
+
         constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> ControlTypeNamesUC{
             "MEANAIRTEMPERATURE",
             "MEANRADIANTTEMPERATURE",
@@ -555,13 +559,10 @@ namespace VentilatedSlab {
             }
 
             // System Configuration:
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SlabOnly")) {
-                ventSlab.SysConfg = VentilatedSlabConfig::SlabOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SlabAndZone")) {
-                ventSlab.SysConfg = VentilatedSlabConfig::SlabAndZone;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SeriesSlabs")) {
-                ventSlab.SysConfg = VentilatedSlabConfig::SeriesSlabs;
-            } else {
+            ventSlab.SysConfg = static_cast<VentilatedSlabConfig>(
+                getEnumerationValue(VentilatedSlabConfigNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+
+            if (ventSlab.SysConfg == VentilatedSlabConfig::Invalid) {
                 ShowSevereError(state,
                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(8) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(8) + "\".");
