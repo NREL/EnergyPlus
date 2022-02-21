@@ -233,6 +233,8 @@ namespace OutputReportTabular {
         MinDewPointLine,
         WithHDDLine,
         WithCDDLine,
+        MaxHourlyPrec,
+        MonthlyPrec,
         KoppenLine,
         KoppenDes1Line,
         KoppenDes2Line,
