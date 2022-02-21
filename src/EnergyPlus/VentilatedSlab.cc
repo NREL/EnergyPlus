@@ -239,14 +239,14 @@ namespace VentilatedSlab {
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> ControlTypeNamesCC{
-            "MeanAirTemperature",
-            "MeanRadiantTemperature",
-            "OperativeTemperature",
-            "OutdoorDryBulbTemperature",
-            "OutdoorWetBulbTemperature",
-            "SurfaceTemperature",
-            "ZoneAirDewPointTemperature",
+        constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> ControlTypeNamesUC{
+            "MEANAIRTEMPERATURE",
+            "MEANRADIANTTEMPERATURE",
+            "OPERATIVETEMPERATURE",
+            "OUTDOORDRYBULBTEMPERATURE",
+            "OUTDOORWETBULBTEMPERATURE",
+            "SURFACETEMPERATURE",
+            "ZONEAIRDEWPOINTTEMPERATURE",
         };
 
         static std::string const CurrentModuleObject("ZoneHVAC:VentilatedSlab");
@@ -603,7 +603,7 @@ namespace VentilatedSlab {
 
             // Process the temperature control type
             ventSlab.controlType = static_cast<ControlType>(
-                getEnumerationValue(ControlTypeNamesCC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+                getEnumerationValue(ControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
 
             if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(state,
