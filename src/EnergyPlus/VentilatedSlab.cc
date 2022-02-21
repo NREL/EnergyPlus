@@ -330,15 +330,11 @@ namespace VentilatedSlab {
             ventSlab.Name = state.dataIPShortCut->cAlphaArgs(1);
             if (lAlphaBlanks(2)) {
                 ventSlab.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-            } else {
-                ventSlab.SchedPtr =
-                    GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
-                if (ventSlab.SchedPtr == 0) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(2) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(2) + "\" not found.");
-                    ErrorsFound = true;
-                }
+            } else if ((ventSlab.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2))) == 0) { // convert schedule name to pointer
+                ShowSevereError(state,
+                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(2) + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(2) + "\" not found.");
+                ErrorsFound = true;
             }
 
             ventSlab.ZoneName = state.dataIPShortCut->cAlphaArgs(3);
