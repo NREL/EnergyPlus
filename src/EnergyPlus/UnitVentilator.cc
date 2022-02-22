@@ -609,13 +609,13 @@ namespace UnitVentilator {
             {
                 auto const coilOption(Alphas(13));
                 if (coilOption == "HEATINGANDCOOLING") {
-                    unitVent.CoilOption = CoilOption::Both;
+                    unitVent.CoilOption = CoilsUsed::Both;
                 } else if (coilOption == "HEATING") {
-                    unitVent.CoilOption = CoilOption::Heating;
+                    unitVent.CoilOption = CoilsUsed::Heating;
                 } else if (coilOption == "COOLING") {
-                    unitVent.CoilOption = CoilOption::Cooling;
+                    unitVent.CoilOption = CoilsUsed::Cooling;
                 } else if (coilOption == "NONE") {
-                    unitVent.CoilOption = CoilOption::None;
+                    unitVent.CoilOption = CoilsUsed::None;
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + unitVent.Name + "\", invalid");
                     ShowContinueError(state, "illegal value: " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
@@ -650,7 +650,7 @@ namespace UnitVentilator {
             }
 
             // Get Coil information
-            if (unitVent.CoilOption == CoilOption::Both || unitVent.CoilOption == CoilOption::Heating) {
+            if (unitVent.CoilOption == CoilsUsed::Both || unitVent.CoilOption == CoilsUsed::Heating) {
                 if ((!lAlphaBlanks(16))) {
                     unitVent.HCoilPresent = true;
                     errFlag = false;
@@ -736,7 +736,7 @@ namespace UnitVentilator {
                 } // IF (.NOT. lAlphaBlanks(15)) THEN - from the start of heating coil information
             }     // is option both or heating only
 
-            if (unitVent.CoilOption == CoilOption::Both || unitVent.CoilOption == CoilOption::Cooling) {
+            if (unitVent.CoilOption == CoilsUsed::Both || unitVent.CoilOption == CoilsUsed::Cooling) {
                 if (!lAlphaBlanks(18)) {
                     unitVent.CCoilPresent = true;
                     errFlag = false;
@@ -965,7 +965,7 @@ namespace UnitVentilator {
             }
             {
                 switch (unitVent.CoilOption) {
-                case CoilOption::Both: {
+                case CoilsUsed::Both: {
                     // Add cooling coil to component sets array when present
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
@@ -984,7 +984,7 @@ namespace UnitVentilator {
                                                          "UNDEFINED",
                                                          state.dataLoopNodes->NodeID(unitVent.AirOutNode));
                 } break;
-                case CoilOption::Heating: {
+                case CoilsUsed::Heating: {
                     // Add heating coil to component sets array when no cooling coil present
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
@@ -994,7 +994,7 @@ namespace UnitVentilator {
                                                          state.dataLoopNodes->NodeID(unitVent.FanOutletNode),
                                                          state.dataLoopNodes->NodeID(unitVent.AirOutNode));
                 } break;
-                case CoilOption::Cooling: {
+                case CoilsUsed::Cooling: {
                     // Add cooling coil to component sets array when no heating coil present
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
@@ -1463,8 +1463,6 @@ namespace UnitVentilator {
         int PltSizHeatNum = 0;
         bool ErrorsFound = false;
         bool IsAutoSize = false;
-        Real64 MaxAirVolFlowDes = 0.0;
-        Real64 MaxAirVolFlowUser = 0.0;
         Real64 OutAirVolFlowDes = 0.0;
         Real64 OutAirVolFlowUser = 0.0;
         Real64 MinOutAirVolFlowDes = 0.0;
@@ -1496,14 +1494,14 @@ namespace UnitVentilator {
         state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
         switch (unitVent.CoilOption) {
-        case CoilOption::Both: {
+        case CoilsUsed::Both: {
             state.dataSize->ZoneCoolingOnlyFan = true;
             state.dataSize->ZoneHeatingOnlyFan = true;
         } break;
-        case CoilOption::Heating: {
+        case CoilsUsed::Heating: {
             state.dataSize->ZoneHeatingOnlyFan = true;
         } break;
-        case CoilOption::Cooling: {
+        case CoilsUsed::Cooling: {
             state.dataSize->ZoneCoolingOnlyFan = true;
         } break;
         default: {
@@ -1648,7 +1646,7 @@ namespace UnitVentilator {
                     // DataScalableSizingON = false;
                 } else {
 
-                    if (unitVent.CoilOption != CoilOption::None) {
+                    if (unitVent.CoilOption != CoilsUsed::None) {
                         if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
                             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                             SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
@@ -1767,7 +1765,7 @@ namespace UnitVentilator {
                             }
                         }
                         // DataScalableSizingON = false;
-                    } else { // if (unitVent.CoilOption != CoilOption::None)
+                    } else { // if (unitVent.CoilOption != CoilsUsed::None)
 
                         PrintFlag = true;
                         FieldNum = 1;
@@ -1794,7 +1792,7 @@ namespace UnitVentilator {
                 PrintFlag = true;
                 FieldNum = 1;
                 SizingString = state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames(FieldNum) + " [m3/s]";
-                if (unitVent.CoilOption == CoilOption::None) {
+                if (unitVent.CoilOption == CoilsUsed::None) {
 
                     if (unitVent.MaxAirVolFlow == DataSizing::AutoSize) {
                         TempSize = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
@@ -2479,7 +2477,7 @@ namespace UnitVentilator {
 
         {
             switch (unitVent.CoilOption) {
-            case CoilOption::Both: {
+            case CoilsUsed::Both: {
 
                 {
                     switch (unitVent.HCoilType) {
@@ -2527,7 +2525,7 @@ namespace UnitVentilator {
                 }
 
             } break;
-            case CoilOption::Heating: {
+            case CoilsUsed::Heating: {
 
                 {
                     switch (unitVent.HCoilType) {
@@ -2553,7 +2551,7 @@ namespace UnitVentilator {
                 }
 
             } break;
-            case CoilOption::Cooling: {
+            case CoilsUsed::Cooling: {
 
                 {
                     switch (unitVent.CCoilType) {

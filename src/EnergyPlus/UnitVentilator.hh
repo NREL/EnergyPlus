@@ -67,7 +67,7 @@ struct EnergyPlusData;
 
 namespace UnitVentilator {
 
-    enum class CoilOption
+    enum class CoilsUsed
     {
         Invalid = -1,
         None,
@@ -136,7 +136,7 @@ namespace UnitVentilator {
         Real64 OutAirMassFlow = 0.0;                    // kg/s
         Real64 MinOutAirVolFlow = 0.0;                  // m3/s
         Real64 MinOutAirMassFlow = 0.0;                 // kg/s
-        CoilOption CoilOption = CoilOption::Invalid;    // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
+        CoilsUsed CoilOption = CoilsUsed::Invalid;      // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
         bool HCoilPresent = false;                      // .TRUE. if unit ventilator has a heating coil
         HeatCoilType HCoilType = HeatCoilType::Invalid; // type of heating coil (water, gas, electric, etc.)
         std::string HCoilName;                          // name of heating coil
