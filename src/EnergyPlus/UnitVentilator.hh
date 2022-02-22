@@ -76,6 +76,7 @@ namespace UnitVentilator {
         Cooling,
         Num
     };
+    constexpr std::array<std::string_view, static_cast<int>(CoilsUsed::Num)> CoilsUsedNamesUC = {"NONE", "HEATINGANDCOOLING", "HEATING", "COOLING"};
     enum class HeatCoilType
     {
         Invalid = -1,
@@ -101,6 +102,7 @@ namespace UnitVentilator {
         FixedOA,
         Num
     };
+    constexpr std::array<std::string_view, static_cast<int>(OAControl::Num)> OAControlNamesUC = {"VARIABLEPERCENT", "FIXEDTEMPERATURE", "FIXEDOA"};
 
     struct UnitVentilatorData
     {
@@ -139,8 +141,7 @@ namespace UnitVentilator {
         int HCoil_Index = 0;
         DataPlant::PlantEquipmentType HeatingCoilType = DataPlant::PlantEquipmentType::Invalid;
         int HCoil_FluidIndex = 0;
-        std::string HCoilSchedName; // availability schedule for the heating coil
-        int HCoilSchedPtr = 0;      // index to schedule
+        int HCoilSchedPtr = 0; // index to schedule
         Real64 HCoilSchedValue = 0.0;
         Real64 MaxVolHotWaterFlow = 0.0; // m3/s
         Real64 MaxVolHotSteamFlow = 0.0; // m3/s
@@ -162,8 +163,7 @@ namespace UnitVentilator {
         std::string CCoilPlantType; // type of cooling coil for plant
         DataPlant::PlantEquipmentType CoolingCoilType = DataPlant::PlantEquipmentType::Invalid;
         CoolCoilType CCoilType = CoolCoilType::Invalid;
-        std::string CCoilSchedName; // availability schedule for the cooling coil
-        int CCoilSchedPtr = 0;      // index to schedule
+        int CCoilSchedPtr = 0; // index to schedule
         Real64 CCoilSchedValue = 0.0;
         Real64 MaxVolColdWaterFlow = 0.0; // m3/s
         Real64 MaxColdWaterFlow = 0.0;    // kg/s

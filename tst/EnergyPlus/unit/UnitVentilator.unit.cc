@@ -290,7 +290,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     state->dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex = 1;
     state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow = 1.0;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = UnitVentilator::CoilOption::None;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = UnitVentilator::CoilsUsed::None;
 
     // test fixed OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
