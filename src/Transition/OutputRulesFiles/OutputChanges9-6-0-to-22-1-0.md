@@ -144,7 +144,7 @@ See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more 
 Renamed the output variable "Environment:Site Precipitation Depth" to "Environment:Liquid Precipitation Depth".
 
 See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
-## Fenestration Assembly Reporting
+### Fenestration Assembly Reporting
 
 Added several items to Envelope Summary in tabular output report:
 
@@ -172,3 +172,10 @@ Five new output variables related to the AirLoopHVAC:Exhaust System have been ad
 - Central Exhaust Fan Energy [J]
 
 See pull request [#9209](https://github.com/NREL/EnergyPlus/pull/9209) for more details.
+
+### EIO Sizing information for Central Exhaust Fan
+One line is added to the EIO sizing report regarding the central exhaust fan "Design Fan Airflow [m3/s]" sizing containing the following information: 
+- FanName, FanType, "Design Fan Airflow [m3/s]", Design Flow Rate Value
+
+See pull request [#9209](https://github.com/NREL/EnergyPlus/pull/9209) for more details.
+
