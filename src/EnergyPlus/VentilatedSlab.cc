@@ -332,8 +332,7 @@ namespace VentilatedSlab {
                 ventSlab.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else if ((ventSlab.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2))) == 0) { // convert schedule name to pointer
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(2) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(2) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(2), state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             }
 
@@ -342,12 +341,10 @@ namespace VentilatedSlab {
             if (ventSlab.ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(3) +
-                                        " is required but input is blank.");
+                                    format(R"({}="{}" invalid {} is required but input is blank.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(3)));
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(3) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
+                                    format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(3), state.dataIPShortCut->cAlphaArgs(3)));
                 }
                 ErrorsFound = true;
             }
@@ -400,8 +397,7 @@ namespace VentilatedSlab {
                 // Error checking for single surfaces
                 if (ventSlab.SurfacePtr(1) == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(4) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
+                                    format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(4), state.dataIPShortCut->cAlphaArgs(4)));
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(ventSlab.SurfacePtr(1))) {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + ventSlab.Name + "\", invalid Surface");
@@ -495,8 +491,7 @@ namespace VentilatedSlab {
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
                 if (ventSlab.MaxOASchedPtr == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
+                                    format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(7), state.dataIPShortCut->cAlphaArgs(7)));
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, ventSlab.MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
                     ShowSevereError(state,
@@ -512,8 +507,7 @@ namespace VentilatedSlab {
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
                 if (ventSlab.MaxOASchedPtr == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
+                                    format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(7), state.dataIPShortCut->cAlphaArgs(7)));
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, ventSlab.MaxOASchedPtr, ">=0", 0.0)) {
                     ShowSevereError(state,
@@ -529,16 +523,14 @@ namespace VentilatedSlab {
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
                 if (ventSlab.TempSchedPtr == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(7) + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
+                                    format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(7), state.dataIPShortCut->cAlphaArgs(7)));
                     ErrorsFound = true;
                 }
                 break;
             }
             default: {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(5) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(5) + "\".");
+                                format(R"({}="{}" invalid {}="{}".)", CurrentModuleObject, ventSlab.Name, cAlphaFields(5), state.dataIPShortCut->cAlphaArgs(5)));
             }
             }
 
@@ -547,8 +539,7 @@ namespace VentilatedSlab {
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6)); // convert schedule name to pointer
             if (ventSlab.MinOASchedPtr == 0) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(6) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(6) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ErrorsFound = true;
             }
 
@@ -558,8 +549,7 @@ namespace VentilatedSlab {
 
             if (ventSlab.SysConfg == VentilatedSlabConfig::Invalid) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(8) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(8) + "\".");
+                                format(R"({}="{}" invalid {}="{}".)", CurrentModuleObject, ventSlab.Name, cAlphaFields(8), state.dataIPShortCut->cAlphaArgs(8)));
                 ShowContinueError(state, "Control reset to SLAB ONLY Configuration.");
                 ventSlab.SysConfg = VentilatedSlabConfig::SlabOnly;
             }
@@ -602,8 +592,7 @@ namespace VentilatedSlab {
 
             if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(9) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(9) + "\".");
+                                format(R"({}="{}" invalid {}="{}".)", CurrentModuleObject, ventSlab.Name, cAlphaFields(9), state.dataIPShortCut->cAlphaArgs(9)));
                 ShowContinueError(state, "Control reset to ODB control.");
                 ventSlab.controlType = ControlType::OutdoorDryBulbTemp;
             }
@@ -615,8 +604,7 @@ namespace VentilatedSlab {
             ventSlab.HotAirHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
             if ((ventSlab.HotAirHiTempSchedPtr == 0) && (!lAlphaBlanks(10))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(10) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(10) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(10), state.dataIPShortCut->cAlphaArgs(10)));
                 ErrorsFound = true;
             }
 
@@ -626,8 +614,7 @@ namespace VentilatedSlab {
             ventSlab.HotAirLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
             if ((ventSlab.HotAirLoTempSchedPtr == 0) && (!lAlphaBlanks(11))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(11) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(11) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(11), state.dataIPShortCut->cAlphaArgs(11)));
                 ErrorsFound = true;
             }
 
@@ -635,8 +622,7 @@ namespace VentilatedSlab {
             ventSlab.HotCtrlHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(12));
             if ((ventSlab.HotCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(12))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(12) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(12) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(12), state.dataIPShortCut->cAlphaArgs(12)));
                 ErrorsFound = true;
             }
 
@@ -644,8 +630,7 @@ namespace VentilatedSlab {
             ventSlab.HotCtrlLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
             if ((ventSlab.HotCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(13))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(13) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(13) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(13), state.dataIPShortCut->cAlphaArgs(13)));
                 ErrorsFound = true;
             }
 
@@ -655,8 +640,7 @@ namespace VentilatedSlab {
             ventSlab.ColdAirHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
             if ((ventSlab.ColdAirHiTempSchedPtr == 0) && (!lAlphaBlanks(14))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(14) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(14) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(14), state.dataIPShortCut->cAlphaArgs(14)));
                 ErrorsFound = true;
             }
 
@@ -666,8 +650,7 @@ namespace VentilatedSlab {
             ventSlab.ColdAirLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(15));
             if ((ventSlab.ColdAirLoTempSchedPtr == 0) && (!lAlphaBlanks(15))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(15) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(15) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(15), state.dataIPShortCut->cAlphaArgs(15)));
                 ErrorsFound = true;
             }
 
@@ -677,8 +660,7 @@ namespace VentilatedSlab {
             ventSlab.ColdCtrlHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(16));
             if ((ventSlab.ColdCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(16))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(16) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(16) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(16), state.dataIPShortCut->cAlphaArgs(16)));
                 ErrorsFound = true;
             }
 
@@ -688,8 +670,7 @@ namespace VentilatedSlab {
             ventSlab.ColdCtrlLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(17));
             if ((ventSlab.ColdCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(17))) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(17) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(17) + "\" not found.");
+                                format(R"({}="{}" invalid {}="{}" not found.)", CurrentModuleObject, ventSlab.Name, cAlphaFields(17), state.dataIPShortCut->cAlphaArgs(17)));
                 ErrorsFound = true;
             }
 
@@ -966,8 +947,7 @@ namespace VentilatedSlab {
 
             if (ventSlab.coilOption == CoilType::Invalid) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(26) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(26) + "\".");
+                                format(R"({}="{}" invalid {}="{}".)", CurrentModuleObject, ventSlab.Name, cAlphaFields(26), state.dataIPShortCut->cAlphaArgs(26)));
                 ErrorsFound = true;
             }
 
@@ -1015,8 +995,7 @@ namespace VentilatedSlab {
                         break;
                     default: {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(27) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(27) + "\".");
+                                        format(R"({}="{}" invalid {}="{}".)", CurrentModuleObject, ventSlab.Name, cAlphaFields(27), state.dataIPShortCut->cAlphaArgs(27)));
                         ErrorsFound = true;
                         errFlag = true;
                         break;
@@ -1142,15 +1121,14 @@ namespace VentilatedSlab {
                             ShowContinueError(state,
                                               "Invalid Coil Type=" + ventSlab.coolingCoilPlantType +
                                                   ", Name=" + ventSlab.coolingCoilPlantName);
-                            ShowContinueError(state, "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
+                            ShowContinueError(state, R"(must be "Coil:Cooling:Water" or "Coil:Cooling:Water:DetailedGeometry")");
                             ErrorsFound = true;
                         }
                         break;
                     }
                     default: {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid " + cAlphaFields(29) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(29) + "\".");
+                                        format(R"({}="{}" invalid {}="{}".)", CurrentModuleObject, ventSlab.Name, cAlphaFields(29), state.dataIPShortCut->cAlphaArgs(29)));
                         ErrorsFound = true;
                         errFlag = true;
                         break;
