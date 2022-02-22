@@ -270,7 +270,6 @@ namespace UnitVentilator {
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             unitVent.Name = Alphas(1);
-            unitVent.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
                 unitVent.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
@@ -287,7 +286,6 @@ namespace UnitVentilator {
             // Outside air information:
             unitVent.MinOutAirVolFlow = Numbers(2);
 
-            unitVent.MinOASchedName = Alphas(4);
             unitVent.MinOASchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(4)); // convert schedule name to pointer
             if (unitVent.MinOASchedPtr == 0) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + unitVent.Name + "\", invalid");
@@ -303,37 +301,34 @@ namespace UnitVentilator {
                 auto const OAControl(Alphas(3));
                 if (OAControl == "VARIABLEPERCENT") {
                     unitVent.OAControlType = OAControl::VariablePercent;
-                    unitVent.MaxOASchedName = Alphas(5);
                     unitVent.MaxOASchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     if (unitVent.MaxOASchedPtr == 0) {
                         ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + unitVent.Name + "\", invalid");
-                        ShowContinueError(state, "not found:" + cAlphaFields(5) + "=\"" + unitVent.MaxOASchedName + "\".");
+                        ShowContinueError(state, "not found:" + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
                         ErrorsFound = true;
                     } else if (!ScheduleManager::CheckScheduleValueMinMax(state, unitVent.MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + unitVent.Name + "\", invalid");
-                        ShowContinueError(state, "out of range [0,1]: " + cAlphaFields(5) + "=\"" + unitVent.MaxOASchedName + "\".");
+                        ShowContinueError(state, "out of range [0,1]: " + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
                         ErrorsFound = true;
                     }
                 } else if (OAControl == "FIXEDAMOUNT") {
                     unitVent.OAControlType = OAControl::FixedOA;
-                    unitVent.MaxOASchedName = Alphas(5);
                     unitVent.MaxOASchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     if (unitVent.MaxOASchedPtr == 0) {
-                        ShowSevereError(state, cAlphaFields(5) + " not found = " + unitVent.MaxOASchedName);
+                        ShowSevereError(state, cAlphaFields(5) + " not found = " + Alphas(5));
                         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + unitVent.Name);
                         ErrorsFound = true;
                     } else if (!ScheduleManager::CheckScheduleValueMinMax(state, unitVent.MaxOASchedPtr, ">=0", 0.0)) {
                         ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + unitVent.Name + "\", invalid");
-                        ShowContinueError(state, "out of range [0,1]: " + cAlphaFields(5) + "=\"" + unitVent.MaxOASchedName + "\".");
+                        ShowContinueError(state, "out of range [0,1]: " + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
                         ErrorsFound = true;
                     }
                 } else if (OAControl == "FIXEDTEMPERATURE") {
                     unitVent.OAControlType = OAControl::FixedTemperature;
-                    unitVent.TempSchedName = Alphas(5);
                     unitVent.TempSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     if (unitVent.TempSchedPtr == 0) {
                         ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + unitVent.Name + "\", invalid");
-                        ShowContinueError(state, " not found: " + cAlphaFields(5) + "=\"" + unitVent.MaxOASchedName + "\".");
+                        ShowContinueError(state, " not found: " + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
                         ErrorsFound = true;
                     }
                 } else {
@@ -556,8 +551,7 @@ namespace UnitVentilator {
 
             if (unitVent.OAControlType == OAControl::FixedOA) {
                 unitVent.OutAirVolFlow = unitVent.MinOutAirVolFlow;
-                unitVent.MaxOASchedName = unitVent.MinOASchedName;
-                unitVent.MaxOASchedPtr = ScheduleManager::GetScheduleIndex(state, unitVent.MinOASchedName);
+                unitVent.MaxOASchedPtr = unitVent.MinOASchedPtr;
             }
 
             if (!unitVent.ATMixerExists) {
