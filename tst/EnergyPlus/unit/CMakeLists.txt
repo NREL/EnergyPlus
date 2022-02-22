@@ -101,6 +101,7 @@ set(test_src
     ElectricPowerServiceManager.unit.cc
     EvaporativeCoolers.unit.cc
     EvaporativeFluidCoolers.unit.cc
+    ExhaustSystem.unit.cc
     ExteriorEnergyUse.unit.cc
     FanCoilUnits.unit.cc
     Fans.unit.cc
@@ -243,6 +244,7 @@ set(test_src
     WindowAC.unit.cc
     WindowEquivalentLayer.unit.cc
     WindowLayerEffectiveMultipliers.unit.cc
+    WindowManagerExteriorThermal.unit.cc
     WindowManager.unit.cc
     XingGroundTemperatureModel.unit.cc
     ZoneContaminantPredictorCorrector.unit.cc

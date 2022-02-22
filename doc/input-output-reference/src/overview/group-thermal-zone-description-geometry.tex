@@ -349,7 +349,7 @@ This output variable represents the sensible heating energy in Joules that is ac
 \begin{callout}
 Zone Air System Sensible Heating (and Cooling) Energy (and Rate) all report the heating or cooling delivered by the HVAC system to a zone. These values are calculated by multiplying the supply air mass flow rate by the difference between the supply air temperature and the zone air temperature. This does not always indicate the operation of heating or cooling coils. For example, cooling will be reported if the supply air is cooled due to the introduction of outside air, even if all coils are off.
 
-In addition, certain "non-air" zone-based systems will also add their heating or cooling contribution to this output variable.  For example, the following zone equipment will also add their output to the appropriate heating or cooling energy/rate output variable:
+In addition, certain ``non-air'' zone-based systems will also add their heating or cooling contribution to this output variable.  For example, the following zone equipment will also add their output to the appropriate heating or cooling energy/rate output variable:
 
 \begin{itemize}
 \item
@@ -4833,10 +4833,21 @@ The depth of the inside reveal surfaces other than the sill, measured from the i
 
 The solar absorptance of the inside reveal surfaces other than the sill.
 
+\paragraph{Field: NFRC Product Type for Assembly Calculations}\label{field-nfrc-product-type-for-assembly-calculations}
+
+The selection made for this field corresponds to NFRC 100 ``Procedure for Determining Fenestration Product U-factors'' product types which are used when computing the overall u-factor, SHGC, and visual transmittance. The default is CurtainWall. The options are: CasementDouble, CasementSingle, DualAction, Fixed, Garage, Greenhouse, HingedEscape, HorizontalSlider, Jal, Pivoted, Projecting, DoorSidelite, Skylight, SlidingPatioDoor, CurtainWall, SpandrelPanel, SideHingedDoor, DoorTransom, TropicalAwning, TubularDaylightingDevice, and VerticalSlider. The sizes used in the calculation of the overall u-factor, overall SHGC, and overall VT are based on NFRC 100 Table 4-3 (see Figure~\ref{fig:nfrc100-product-types} ). 
+
+
 \begin{figure}[hbtp] % fig 38
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image064.png}
 \caption{(a) Vertical section through a window (with frame) showing outside and inside reveal surfaces and inside sill. (b) Perspective view looking from the outside of a window (without frame) showing reveal surfaces. Note that “Outside Reveal Depth” is not a user input; it is calculated by the program from the window and wall vertices. \protect \label{fig:a-vertical-section-through-a-window-with}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 41
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/NFRC100-Table4-3.PNG}
+\caption{NFRC 100 Product Types and Model Sizes. \protect \label{fig:nfrc100-product-types}}
 \end{figure}
 
 An IDF example:
@@ -4868,7 +4879,8 @@ An IDF example:
         0.25, ! Inside Sill Depth (m)
         0.6,  ! Inside Sill Solar Absorptance
         0.2,  ! Inside Reveal Depth (m)
-        0.5;  ! Inside Reveal Solar Absorptance
+        0.5,  ! Inside Reveal Solar Absorptance
+        ProjectingSingle; ! NFRC Product Type for Assembly Calculations
 \end{lstlisting}
 
 \subsection{WindowProperty:AirflowControl}\label{windowpropertyairflowcontrol}
@@ -5100,7 +5112,7 @@ In EnergyPlus, the Window data file is searched for each ``\hyperref[constructio
 \begin{lstlisting}
 Construction:WindowDataFile,
   ConstructionName,
-  FileName; ! Default is Window5DataFile.dat in the "run" folder.
+  FileName; ! Default is Window5DataFile.dat in the ``run'' folder.
 \end{lstlisting}
 
 If there is a window called ConstructionName on the Window data file, the data for that window is read from the file and the following EnergyPlus objects and their names are created. The ``W5'' prefixed to these names indicates that the object originated in the Window data file.
