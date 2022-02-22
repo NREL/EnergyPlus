@@ -621,7 +621,7 @@ End
 		  inFileExt = ExtensionOnly(inFile)
 		  
 		  if inFile<>"" then
-		    origFile = new FolderItem(inFile )
+		    origFile = new FolderItem(inFile)
 		    origVerIndx = AllOldVersions.IndexOf(inOrigVersion)
 		    origShortVersion = "_V" + inOrigVersion.ReplaceAll(".","") ' make the version identifier for the end of a file name "_V320" if the version is 3.2.0
 		    finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
@@ -633,7 +633,7 @@ End
 		      'indicate the dialog box is waiting
 		      lblProcessing.Visible = True
 		      lblProcessing.Text = "Processing: " + origFile.Name
-		      dirOfTransApp = transitionapps(iver).Parent
+		      dirOfTransApp = transitionapps(iVer).Parent
 		      'msgbox origFile.AbsolutePath + EndOfLine + origVer + EndOfLine + finalVer
 		      'if original file should be retained then make copy with name ending with "_original.idf"
 		      if not chkDeleteOrig.Value then
@@ -686,16 +686,11 @@ End
 		        Window1.Refresh
 		        'msgbox dirOfTransApp.AbsolutePath + EndOfLine + TransitionApps(iVer).AbsolutePath + EndOfLine + origFile.AbsolutePath
 		        
-		        'for windows
-		        #if TargetWin32
-		          cmdLine = "CD /D " ' this changes the directory and drive - must end with a space
-		          cmdLine = cmdLine + chr(34) + dirOfTransApp.NativePath + chr(34) 'change to the directory of the transition app because needs to find IDD files in that location - use shellpath to eliminate spaces
-		          cmdLine = cmdLine + " && " 'this is DOS function that joins to commands on the same line and only does the second if the first was successful - need spaces before and after
-		          cmdLine = cmdLine + TransitionApps(iVer).name 'this is the name of the Transition program
-		          cmdLine = cmdLine + " " ' leave a space before the argument
-		          cmdLine = cmdLine + chr(34) + origFile.NativePath + chr(34) 'pass the name of the file to be transitioned as an argument
+		        'for windows and linux
+		        #if TargetWindows or TargetLinux
+		          cmdLine = TransitionApps(iVer).NativePath + " " + chr(34) + origFile.NativePath + chr(34)
 		        #else
-		          'for Linux and MacOS assuming using Bash shell
+		          'for MacOS assuming using Bash shell
 		          cmdLine = "cd " ' this changes the directory and drive - must end with a space
 		          cmdLine = cmdLine  + dirOfTransApp.ShellPath 'change to the directory of the transition app because needs to find IDD files in that location - use shellpath to eliminate spaces
 		          cmdLine = cmdLine + " ; ./" 'this is DOS function that joins to commands on the same line and only does the second if the first was successful - need spaces before and after
@@ -703,13 +698,18 @@ End
 		          cmdLine = cmdLine + " " ' leave a space before the argument
 		          cmdLine = cmdLine +  origFile.ShellPath  'pass the name of the file to be transitioned as an argument
 		        #endif
+		        
+		        
+		        ' for debugging
 		        'msgbox cmdLine
+		        'dim clip as new Clipboard
+		        'clip.Text = cmdLine
 		        
 		        s.Execute cmdLine
 		        'MsgBox "transition" + EndOfLine + s.ReadAll
 		        
 		        if s.ErrorCode <>0 then
-		          MsgBox "Error starting Transition-Vx-x-x Program: " + str(s.ErrorCode)
+		          MsgBox "Error starting Transition-Vx-x-x Program: " + str(s.ErrorCode) + EndOfLine + EndOfLine + s.Result
 		        end if
 		        
 		        'collect audit text
@@ -782,6 +782,118 @@ End
 		    end if
 		  end if
 		  s.Close
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub CopyIDDandCSV(inFile as string, inOrigVersion as String, inFinalVersion as String)
+		  ' for Linux and MacOS copy the IDD and report CSV files to the directory with the active file.
+		  dim origFile as FolderItem
+		  dim origFileDirectory as FolderItem
+		  dim origVerIndx as Integer
+		  dim finalVerIndx as Integer
+		  dim iVer as Integer
+		  dim dashVersion as String
+		  dim dirOfTransApp as FolderItem
+		  dim iddName as String
+		  dim iddFileInTrans as FolderItem
+		  dim iddFileInOrig as FolderItem
+		  dim nextDashVersion as String
+		  dim repcsvName as String
+		  dim repcsvFileInTrans as FolderItem
+		  dim repcsvFileInOrig as FolderItem
+		  
+		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  
+		  if inFile<>"" then
+		    origFile = new FolderItem(inFile)
+		    origFileDirectory = origFile.Parent
+		    for iVer = origVerIndx to finalVerIndx
+		      dashVersion = AllNewVersions(iVer).ReplaceAll(".","-") ' Convert "3.1.0" format to "3-1-0"
+		      dirOfTransApp = TransitionApps(iVer).Parent
+		      ' copy the VXX-X-X-Energy+.idd files
+		      iddName = "V" + dashVersion + "-Energy+.idd"
+		      iddFileInTrans = dirOfTransApp.Child(iddName)
+		      iddFileInOrig = origFileDirectory.Child(iddName)
+		      if iddFileInTrans.exists then
+		        try
+		          iddFileInTrans.CopyFileTo(iddFileInOrig)
+		        exception
+		          MsgBox "Cannot copy IDD file to local directory: " + iddFileInOrig.NativePath
+		        end try
+		      end if
+		      ' copy the Report Variables XX-X-X to XX-X-X.csv
+		      ' don't need to do last iteration
+		      if iVer <> finalVerIndx then
+		        nextDashVersion = AllNewVersions(iVer + 1).ReplaceAll(".","-")
+		        repcsvName = "Report Variables "+ dashVersion + " to " + nextDashVersion + ".csv"
+		        repcsvFileInTrans = dirOfTransApp.Child(repcsvName)
+		        repcsvFileInOrig = origFileDirectory.Child(repcsvName)
+		        if repcsvFileInTrans.exists then
+		          try
+		            repcsvFileInTrans.CopyFileTo(repcsvFileInOrig)
+		          exception
+		            MsgBox "Cannot copy report csv file to local directory: " + repcsvFileInOrig.NativePath
+		          end try
+		        end if
+		      end if
+		    next iVer
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub DeleteCopiedIDDandCSV(inFile as string, inOrigVersion as String, inFinalVersion as String)
+		  ' for Linux and MacOS delete the IDD and report CSV files previously copied
+		  dim origFile as FolderItem
+		  dim origFileDirectory as FolderItem
+		  dim origVerIndx as Integer
+		  dim finalVerIndx as Integer
+		  dim iVer as Integer
+		  dim dashVersion as String
+		  dim iddName as String
+		  dim iddFileInOrig as FolderItem
+		  dim nextDashVersion as String
+		  dim repcsvName as String
+		  dim repcsvFileInOrig as FolderItem
+		  
+		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  
+		  if inFile<>"" then
+		    origFile = new FolderItem(inFile)
+		    origFileDirectory = origFile.Parent
+		    for iVer = origVerIndx to finalVerIndx
+		      dashVersion = AllNewVersions(iVer).ReplaceAll(".","-") ' Convert "3.1.0" format to "3-1-0"
+		      ' delete previously copied VXX-X-X-Energy+.idd files
+		      iddName = "V" + dashVersion + "-Energy+.idd"
+		      iddFileInOrig = origFileDirectory.Child(iddName)
+		      if iddFileInOrig.exists then
+		        try
+		          iddFileInOrig.Remove()
+		        exception
+		          MsgBox "Cannot remove copied IDD file from local directory: " + iddFileInOrig.NativePath
+		        end try
+		      end if
+		      ' delete previously copied Report Variables XX-X-X to XX-X-X.csv files
+		      ' don't need to do last iteration
+		      if iVer <> finalVerIndx then
+		        nextDashVersion = AllNewVersions(iVer + 1).ReplaceAll(".","-")
+		        repcsvName = "Report Variables "+ dashVersion + " to " + nextDashVersion + ".csv"
+		        repcsvFileInOrig = origFileDirectory.Child(repcsvName)
+		        if repcsvFileInOrig.exists then
+		          try
+		            repcsvFileInOrig.Remove()
+		          exception
+		            MsgBox "Cannot remove copied report csv file to local directory: " + repcsvFileInOrig.NativePath
+		          end try
+		        end if
+		      end if
+		    next iVer
+		  end if
 		  
 		End Sub
 	#tag EndMethod
@@ -956,7 +1068,7 @@ End
 		  'next i
 		  'MsgBox "Application program location:" + EndOfLine + "  " + transFolder.NativePath + EndOfLine + EndOfLine + "Number of files: "  _
 		  '+ str(numFiles) + EndOfLine + EndOfLine + "Versions found: " + EndOfLine + s +  EndOfLine + "Transition Programs:" _
-		  '+ EndOfLine + "AllSortVersions" + EndOfLine + v + EndOfLine
+		  '+ EndOfLine + "AllSortVersions" + EndOfLine + v + EndOfLine 
 		  '+ EndOfLine + t + EndOfline + "All files: " + EndOfLine + u + EndOfLine _
 		  
 		  
@@ -1132,6 +1244,10 @@ End
 		  'Called when the CONVERT button is pressed
 		  me.MouseCursor = system.Cursors.Wait
 		  me.Refresh
+		  ' for Windows and Linux copy the IDD and CSV to current file location
+		  #if TargetWindows or TargetLinux then
+		    call CopyIDDandCSV(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text)
+		  #EndIf
 		  if ExtensionOnly(txtFileName.Text) = "LST" then
 		    listFile = new FolderItem(txtFileName.Text )
 		    IF listFile.Exists then
@@ -1160,6 +1276,13 @@ End
 		    call ConvertFile(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text,True)
 		    cmdViewAudit.Enabled = True
 		  end if
+		  ' for Windows and Linux copy the IDD and CSV to current file location
+		  #if TargetWindows or TargetLinux then
+		    call DeleteCopiedIDDandCSV(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text)
+		  #EndIf
+		  
+		  
+		  
 		  me.MouseCursor = system.Cursors.StandardPointer
 		  
 		  Exception
