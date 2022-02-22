@@ -262,6 +262,8 @@ set(SRC
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc
     EvaporativeFluidCoolers.hh
+    ExhaustAirSystemManager.cc
+    ExhaustAirSystemManager.hh
     ExteriorEnergyUse.cc
     ExteriorEnergyUse.hh
     ExternalInterface.cc

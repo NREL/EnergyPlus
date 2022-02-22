@@ -56,6 +56,8 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include "WCETarcog.hpp"
+
 namespace EnergyPlus {
 
 // Forward declarations
