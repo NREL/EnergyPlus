@@ -425,7 +425,6 @@ namespace WaterCoils {
     );
 
     void CheckWaterCoilSchedule(EnergyPlusData &state,
-                                std::string const &CompType, // unused1208
                                 std::string_view CompName,
                                 Real64 &Value,
                                 int &CompIndex);
@@ -503,6 +502,7 @@ namespace WaterCoils {
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
+    int GetCompIndex(EnergyPlusData &state, CoilModel coilType, std::string const coilName);
 
     Real64 GetWaterCoilCapacity(EnergyPlusData &state,
                                 std::string const &CoilType, // must match coil types in this module

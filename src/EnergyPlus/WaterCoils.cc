@@ -5956,7 +5956,6 @@ Label10:;
 }
 
 void CheckWaterCoilSchedule(EnergyPlusData &state,
-                            [[maybe_unused]] std::string const &CompType, // unused1208
                             std::string_view CompName,
                             Real64 &Value,
                             int &CompIndex)
@@ -6761,6 +6760,38 @@ int GetWaterCoilIndex(EnergyPlusData &state,
     }
 
     return IndexNum;
+}
+int GetCompIndex(EnergyPlusData &state, CoilModel compType, std::string const coilName)
+{
+    if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
+        GetWaterCoilInput(state);
+        state.dataWaterCoils->GetWaterCoilsInputFlag = false;
+    }
+
+    int indexNum = -1;
+    std::string_view coilType("UNKNOWN");
+    switch (compType) {
+    case CoilModel::HeatingSimple: {
+        indexNum = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
+        coilType = "COIL:HEATING:WATER";
+    } break;
+    case CoilModel::CoolingSimple: {
+        indexNum = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
+        coilType = "COIL:COOLING:WATER";
+    } break;
+    case CoilModel::CoolingDetailed: {
+        indexNum = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
+        coilType = "COIL:COOLING:WATER:DETAILEDGEOMETRY";
+    } break;
+    default: {
+    } break;
+    }
+
+    if (indexNum <= 0) { // may not find coil name
+        indexNum = -1;
+        ShowSevereError(state, format("GetWaterCoilIndex: Could not find CoilType = \"{}\" with Name = \"{}\"", coilType, coilName));
+    }
+    return indexNum;
 }
 
 Real64 GetWaterCoilCapacity(EnergyPlusData &state,

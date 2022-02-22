@@ -294,7 +294,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     // test fixed OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedOA;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedAmount;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow,
@@ -322,7 +322,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
 
     // test fixed OA control
     state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedOA;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedAmount;
     UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
 
     EXPECT_NEAR(state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow,

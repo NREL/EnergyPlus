@@ -76,7 +76,6 @@ namespace UnitVentilator {
         Cooling,
         Num
     };
-    constexpr std::array<std::string_view, static_cast<int>(CoilsUsed::Num)> CoilsUsedNamesUC = {"NONE", "HEATINGANDCOOLING", "HEATING", "COOLING"};
     enum class HeatCoilType
     {
         Invalid = -1,
@@ -99,10 +98,9 @@ namespace UnitVentilator {
         Invalid = -1,
         VariablePercent,
         FixedTemperature,
-        FixedOA,
+        FixedAmount,
         Num
     };
-    constexpr std::array<std::string_view, static_cast<int>(OAControl::Num)> OAControlNamesUC = {"VARIABLEPERCENT", "FIXEDTEMPERATURE", "FIXEDOA"};
 
     struct UnitVentilatorData
     {
@@ -241,11 +239,11 @@ namespace UnitVentilator {
     );
 
     void CalcUnitVentilatorComponents(EnergyPlusData &state,
-                                      int const UnitVentNum,                  // Unit index in unit ventilator array
-                                      bool const FirstHVACIteration,          // flag for 1st HVAV iteration in the time step
-                                      Real64 &LoadMet,                        // load met by unit (watts)
-                                      Optional_int_const OpMode = _,          // Fan Type
-                                      Optional<Real64 const> PartLoadFrac = _ // Part Load Ratio of coil and fan
+                                      int const UnitVentNum,                                       // Unit index in unit ventilator array
+                                      bool const FirstHVACIteration,                               // flag for 1st HVAV iteration in the time step
+                                      Real64 &LoadMet,                                             // load met by unit (watts)
+                                      Optional_int_const OpMode = DataHVACGlobals::ContFanCycCoil, // Fan Type
+                                      Optional<Real64 const> PartLoadFrac = 1.0                    // Part Load Ratio of coil and fan
     );
 
     void SimUnitVentOAMixer(EnergyPlusData &state,
