@@ -275,8 +275,9 @@ public:
             if (specs_.precision > 1) {
                 // reduce the precision to get rounding behavior
                 --specs_.precision;
-            } else {
+            } else if (specs_.precision != -1) {
                 // We need AT LEAST one in precision so we capture a '.' below
+                // If specs_.precision is -1, we don't need to do anything, keep the fmt defaults which are sane
                 initialPrecisionWas1 = true;
                 specs_.precision = 1;
                 ++specs_.width;
