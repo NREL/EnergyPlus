@@ -206,7 +206,6 @@ namespace VentilatedSlab {
         PlantLocation HWPlantLoc;       // index for plant component for hot water coil
         std::string HotAirHiTempSched;  // Schedule name for the highest Air temperature
         int HotAirHiTempSchedPtr;       // Schedule index for the highest Air temperature
-        std::string HotAirLoTempSched;  // Schedule name for the lowest Air temperature
         int HotAirLoTempSchedPtr;       // Schedule index for the lowest Air temperature
         std::string HotCtrlHiTempSched; // Schedule name for the highest control temperature
         // (where the lowest Air temperature is requested)

@@ -610,7 +610,6 @@ namespace VentilatedSlab {
 
             // Low Air Temp :
 
-            ventSlab.HotAirLoTempSched = state.dataIPShortCut->cAlphaArgs(11);
             ventSlab.HotAirLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
             if ((ventSlab.HotAirLoTempSchedPtr == 0) && (!lAlphaBlanks(11))) {
                 ShowSevereError(state,
