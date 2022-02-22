@@ -2310,7 +2310,7 @@ namespace WeatherManager {
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
 
-        constexpr defaultLiquidPrecip = 1.5 / 1000; // in [m]
+        constexpr const Real64 defaultLiquidPrecip = 1.5 / 1000; // in [m]
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
             // TodayIsRain is the Present Weather Codes field in epw. See column 1-3 in Table 2.16 Weather Codes Field Interpretation
             if ((state.dataEnvrn->LiquidPrecipitation == 0) &&
