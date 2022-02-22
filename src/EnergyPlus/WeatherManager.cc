@@ -2310,24 +2310,17 @@ namespace WeatherManager {
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
 
-        // if using epw precipitation, throw warning
+        constexpr defaultLiquidPrecip = 1.5 / 1000; // in [m]
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
+            // TodayIsRain is the Present Weather Codes field in epw. See column 1-3 in Table 2.16 Weather Codes Field Interpretation
             if ((state.dataEnvrn->LiquidPrecipitation == 0) &&
-                // this is the Present Weather Codes field in epw. See column 1-3 in Table 2.16 Weather Codes Field Interpretation
                 (state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay)) &&
                 (state.dataWeatherManager->UseRainValues)) {
-                state.dataEnvrn->LiquidPrecipitation = 1.5 / 1000.0 / state.dataGlobal->TimeStepZone;
+                state.dataEnvrn->LiquidPrecipitation = defaultLiquidPrecip / state.dataGlobal->NumOfTimeStepInHour;
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Rain flag is on but precipitation depth in the weather file is missing or zero. Setting "
                                                "precipitation depth to 1.5 mm for this hour.",
                                                state.dataWaterData->PrecipOverwrittenByRainFlag);
-            }
-        }
-        if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
-            int month = state.dataEnvrn->Month;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather.at(month - 1) += state.dataEnvrn->LiquidPrecipitation * 1000.0;
-            if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
-                state.dataWaterData->RainFall.numRainyHoursInWeather.at(month - 1) += 1;
             }
         }
 
@@ -5648,7 +5641,7 @@ namespace WeatherManager {
                 ErrorsFound = true;
             }
 
-            // A6,  \field Use Rain Indicators
+            // A6,  \field Use Weather File Rain Indicators
             if (state.dataIPShortCut->lAlphaFieldBlanks(6) || UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "YES")) {
                 state.dataWeatherManager->RunPeriodInput(i).useRain = true;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "NO")) {
