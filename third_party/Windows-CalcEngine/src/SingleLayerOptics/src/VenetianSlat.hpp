@@ -21,21 +21,21 @@ namespace SingleLayerOptics
     class CVenetianSlat
     {
     public:
-        CVenetianSlat(const double t_SlatWidth,
-                      const double t_SlatSpacing,
-                      const double t_SlatTiltAngle,
-                      const double t_CurvatureRadius,
-                      const size_t t_NumOfSegments,
+        CVenetianSlat(double t_SlatWidth,
+                      double t_SlatSpacing,
+                      double t_SlatTiltAngle,
+                      double t_CurvatureRadius,
+                      size_t t_NumOfSegments,
                       SegmentsDirection t_Direction);
 
         // Returns the geometry segments that are slats made of
-        std::shared_ptr<Viewer::CGeometry2D> geometry() const;
+        [[nodiscard]] std::shared_ptr<Viewer::CGeometry2D> geometry() const;
 
-        double slatWidth() const;
-        double slatSpacing() const;
-        double slatTiltAngle() const;
-        double curvatureRadius() const;
-        size_t numberOfSegments() const;
+        [[nodiscard]] double slatWidth() const;
+        [[nodiscard]] double slatSpacing() const;
+        [[nodiscard]] double slatTiltAngle() const;
+        [[nodiscard]] double curvatureRadius() const;
+        [[nodiscard]] size_t numberOfSegments() const;
 
     private:
         void buildSlat();

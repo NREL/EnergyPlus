@@ -165,7 +165,22 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Run Period 2,            !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -1954,17 +1969,6 @@
     Until: 24:00,4;          !- Field 9
 
   Schedule:Compact,
-    Min OA Sched,            !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays,           !- Field 2
-    Until: 6:00,0.02,        !- Field 3
-    Until: 20:00,1.0,        !- Field 5
-    Until: 24:00,0.02,       !- Field 7
-    For: AllOtherDays,       !- Field 9
-    Until: 24:00,0.02;       !- Field 10
-
-  Schedule:Compact,
     FanAvailSched,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
@@ -2055,20 +2059,6 @@
     Through: 12/31,          !- Field 9
     For: AllDays,            !- Field 10
     Until: 24:00,16.0;       !- Field 11
-
-  Schedule:Compact,
-    OA Cooling Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,11.5;       !- Field 3
-
-  Schedule:Compact,
-    OA Heating Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,4.5;        !- Field 3
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -3802,4 +3792,3 @@
     ZoneComponentLoadSummary;!- Report 2 Name
 
   Output:Surfaces:List,Details;
-

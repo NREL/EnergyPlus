@@ -121,37 +121,6 @@ namespace SetPointManager {
         Num
     };
 
-    int constexpr NumValidCtrlTypes = 9;
-
-    inline const char *controlTypeName(CtrlVarType cvt)
-    {
-        switch (cvt) {
-        case CtrlVarType::Temp:
-            return "Temperature";
-        case CtrlVarType::MaxTemp:
-            return "MaximumTemperature";
-        case CtrlVarType::MinTemp:
-            return "MinimumTemperature";
-        case CtrlVarType::HumRat:
-            return "HumidityRatio";
-        case CtrlVarType::MaxHumRat:
-            return "MaximumHumidityRatio";
-        case CtrlVarType::MinHumRat:
-            return "MinimumHumidityRatio";
-        case CtrlVarType::MassFlow:
-            return "MassFlowRate";
-        case CtrlVarType::MaxMassFlow:
-            return "MaximumMassFlowRate";
-        case CtrlVarType::MinMassFlow:
-            return "MinimumMassFlowRate";
-        case CtrlVarType::Invalid:
-            return "*UNKNOWN*";
-        default:
-            assert(false);
-        }
-        return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
-    }
-
     enum class SetPointManagerType
     {
         Invalid = -1,
@@ -185,81 +154,10 @@ namespace SetPointManager {
         ReturnWaterResetChW,
         ReturnWaterResetHW,
         TESScheduled,
+        SystemNodeResetTemp,
+        SystemNodeResetHum,
         Num
     };
-
-    int constexpr NumValidSPMTypes = 30;
-
-    inline const char *managerTypeName(SetPointManagerType t)
-    {
-        switch (t) {
-        case SetPointManagerType::Scheduled:
-            return "SetpointManager:Scheduled";
-        case SetPointManagerType::ScheduledDual:
-            return "SetpointManager:Scheduled:DualSetpoint";
-        case SetPointManagerType::OutsideAir:
-            return "SetpointManager:OutdoorAirReset";
-        case SetPointManagerType::SZReheat:
-            return "SetpointManager:SingleZone:Reheat";
-        case SetPointManagerType::SZHeating:
-            return "SetpointManager:SingleZone:Heating";
-        case SetPointManagerType::SZCooling:
-            return "SetpointManager:SingleZone:Cooling";
-        case SetPointManagerType::SZMinHum:
-            return "SetpointManager:SingleZone:Humidity:Minimum";
-        case SetPointManagerType::SZMaxHum:
-            return "SetpointManager:SingleZone:Humidity:Maximum";
-        case SetPointManagerType::MixedAir:
-            return "SetpointManager:MixedAir";
-        case SetPointManagerType::OutsideAirPretreat:
-            return "SetpointManager:OutdoorAirPretreat";
-        case SetPointManagerType::Warmest:
-            return "SetpointManager:Warmest";
-        case SetPointManagerType::Coldest:
-            return "SetpointManager:Coldest";
-        case SetPointManagerType::WarmestTempFlow:
-            return "SetpointManager:WarmestTemperatureFlow";
-        case SetPointManagerType::RAB:
-            return "SetpointManager:ReturnAirBypassFlow";
-        case SetPointManagerType::MZCoolingAverage:
-            return "SetpointManager:MultiZone:Cooling:Average";
-        case SetPointManagerType::MZHeatingAverage:
-            return "SetpointManager:MultiZone:Heating:Average";
-        case SetPointManagerType::MZMinHumAverage:
-            return "SetpointManager:MultiZone:MinimumHumidity:Average";
-        case SetPointManagerType::MZMaxHumAverage:
-            return "SetpointManager:MultiZone:MaximumHumidity:Average";
-        case SetPointManagerType::MZMinHum:
-            return "SetpointManager:MultiZone:Humidity:Minimum";
-        case SetPointManagerType::MZMaxHum:
-            return "SetpointManager:MultiZone:Humidity:Maximum";
-        case SetPointManagerType::FollowOATemp:
-            return "SetpointManager:FollowOutdoorAirTemperature";
-        case SetPointManagerType::FollowSysNodeTemp:
-            return "SetpointManager:FollowSystemNodeTemperature";
-        case SetPointManagerType::GroundTemp:
-            return "SetpointManager:FollowGroundTemperature";
-        case SetPointManagerType::CondEntReset:
-            return "SetpointManager:CondenserEnteringReset";
-        case SetPointManagerType::IdealCondEntReset:
-            return "SetpointManager:CondenserEnteringReset:Ideal";
-        case SetPointManagerType::SZOneStageCooling:
-            return "SetpointManager:SingleZone:OneStageCooling";
-        case SetPointManagerType::SZOneStageHeating:
-            return "SetpointManager:SingleZone:OneStageHeating";
-        case SetPointManagerType::ReturnWaterResetChW:
-            return "SetpointManager:ReturnTemperature:ChilledWater";
-        case SetPointManagerType::ReturnWaterResetHW:
-            return "SetpointManager:ReturnTemperature:HotWater";
-        case SetPointManagerType::TESScheduled:
-            return "SetpointManager:ScheduledTES";
-        case SetPointManagerType::Invalid:
-            return "*UNKNOWN*";
-        default:
-            assert(false);
-        }
-        return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
-    }
 
     struct SPBase
     {
@@ -269,6 +167,8 @@ namespace SetPointManager {
         SPBase() : CtrlTypeMode(CtrlVarType::Invalid)
         {
         }
+
+        Real64 calcSetPointLinInt(Real64 LowVal, Real64 HighVal, Real64 RefVal, Real64 SetptAtLowVal, Real64 SetptAtHighVal);
     };
 
     struct DataSetPointManager : SPBase // Derived type for all Setpoint Managers
@@ -354,8 +254,6 @@ namespace SetPointManager {
         }
 
         void calculate(EnergyPlusData &state);
-
-        Real64 CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh);
     };
 
     struct DefineSZReheatSetPointManager : SPBase // Derived type for the Single Zone Reheat Setpoint Manager data
@@ -1009,6 +907,22 @@ namespace SetPointManager {
         void calculate(EnergyPlusData &state);
     };
 
+    struct DefineSysNodeResetSetPointManager : SPBase // Derived type for System Node Reset Setpoint Manager Data
+    {
+        // Members
+        Real64 SpAtLowRef = 0.0;  // Setpoint at Low Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
+        Real64 SpAtHighRef = 0.0; // Setpoint at High Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
+        Real64 LowRef = 0.0;      // Low Reference Temperature or Humidity Ratio
+        Real64 HighRef = 0.0;     // High Reference Temperature or Humidity Ratio
+        int RefNodeNum = 0;       // Reference Node Number
+        int NumCtrlNodes = 0;
+        std::string CtrlNodeListName;
+        Array1D_int CtrlNodes;
+        Real64 SetPt = 0.0; // current setpoint value
+
+        void calculate(EnergyPlusData &state);
+    };
+
     void ManageSetPoints(EnergyPlusData &state);
 
     void GetSetPointManagerInputs(EnergyPlusData &state); // wrapper for GetInput to accomodate unit testing
@@ -1087,6 +1001,8 @@ struct SetPointManagerData : BaseGlobalStruct
     int NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
     int NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
     int NumSchTESSetPtMgrs = 0;              // number of TES scheduled setpoint managers (created internally, not by user input)
+    int NumSystemNodeResetTempSetPtMgrs = 0; // Number of SystemNodeReset:Temperature setpoint managers
+    int NumSystemNodeResetHumSetPtMgrs = 0;  // Number of SystemNodeReset:Humidity setpoint managers
 
     Real64 TSupNoHC = 0.0;     // supply temperature with no heating or cooling
     Real64 ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
@@ -1161,6 +1077,7 @@ struct SetPointManagerData : BaseGlobalStruct
     Array1D<SetPointManager::DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
     Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
     Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
+    Array1D<SetPointManager::DefineSysNodeResetSetPointManager> SystemNodeResetSetPtMgr;          // Array for System Node Reset Setpoint Manager data
 
     Real64 CondWaterSetPoint = 0; // Condenser entering water temperature setpoint this timestep, C
     Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
@@ -1203,6 +1120,8 @@ struct SetPointManagerData : BaseGlobalStruct
         NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
         NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
         NumSchTESSetPtMgrs = 0;              // number of TES Scheduled setpoint Managers
+        NumSystemNodeResetTempSetPtMgrs = 0; // Number of SystemNodeReset:Temperature setpoint managers
+        NumSystemNodeResetHumSetPtMgrs = 0;  // Number of SystemNodeReset:Humidity setpoint managers
 
         DCESPMDsn_EntCondTemp = 0.0;
         DCESPMDsn_MinCondSetpt = 0.0;
@@ -1265,6 +1184,7 @@ struct SetPointManagerData : BaseGlobalStruct
         ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
         ReturnWaterResetHWSetPtMgr.deallocate();  // hot-water return water reset
         SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
+        SystemNodeResetSetPtMgr.deallocate();     // Array for System Node Reset Temperature and Humidity Ratio setpoint manager
 
         NoSurfaceGroundTempObjWarning = true;
         NoShallowGroundTempObjWarning = true;

@@ -66,6 +66,8 @@ namespace ISO15099 {
     class CEnvironment;
     class CIGU;
     class CSingleSystem;
+    class CSystem;
+    class IIGUSystem;
 } // namespace ISO15099
 } // namespace Tarcog
 
@@ -99,11 +101,24 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
+    double GetIGUUValueForNFRCReport(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight);
+    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight);
+
+    void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
+                                        int const surfNum,
+                                        int constrNum,
+                                        double windowWidth,
+                                        double windowHeight,
+                                        EnergyPlus::DataSurfaces::NfrcVisionType vision,
+                                        double &uvalue,
+                                        double &shgc,
+                                        double &vt);
+
     // Class that is used to create layers for Windows-CalcEngine
     class CWCEHeatTransferFactory
     {
     public:
-        CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int const t_SurfNum);
+        CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int t_SurfNum, int t_ConstrNum);
 
         std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
 
@@ -111,11 +126,26 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoor(EnergyPlusData &state) const;
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
         Tarcog::ISO15099::CIGU getIGU() const;
+        Tarcog::ISO15099::CIGU getIGU(double width, double height, double tilt);
+
+        static int getActiveConstructionNumber(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int t_SurfNum);
+
+        // for assembly windoww reporting
+        std::shared_ptr<Tarcog::ISO15099::IIGUSystem> getTarcogSystemForReporting(
+            EnergyPlusData &state, bool const useSummerConditions, const double width, const double height, const double tilt);
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from
         // old EnergyPlus code and it needs to be checked.
         bool isInteriorShade() const;
+        double overallUfactorFromFilmsAndCond(double conductance, double insideFilm, double outsideFilm);
+
+        // methods specifically for helping in NFRC assembly calculations
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorNfrc(bool const useSummerConditions);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorNfrc(bool const useSummerConditions);
+
+        // Method to determine current construction shade type
+        static EnergyPlus::DataSurfaces::WinShadingType getShadeType(EnergyPlusData &state, int ConstrNum);
 
     private:
         DataSurfaces::SurfaceData m_Surface;
@@ -134,11 +164,8 @@ namespace WindowManager {
 
         int getNumOfLayers(EnergyPlusData &state) const;
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
-                                                                       DataSurfaces::SurfaceData const &surface,
-                                                                       Material::MaterialProperties const &material,
-                                                                       int const t_Index,
-                                                                       int const t_SurfNum);
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
+        getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const &material, int const t_Index);
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
 

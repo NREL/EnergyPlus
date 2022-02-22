@@ -50,10 +50,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -77,6 +81,11 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     WaterManager::GetWaterManagerInput(*state);
+    state->dataEnvrn->Year = 2000;
+    state->dataEnvrn->EndYear = 2000;
+    state->dataEnvrn->Month = 1;
+    state->dataGlobal->TimeStep = 2;
+    state->dataGlobal->TimeStepZoneSec = 900;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
@@ -90,6 +99,48 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     Real64 CurrentRate = state->dataWaterData->RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, ExpectedCurrentRate, 0.000001);
+}
+
+TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
+{
+    // with site:precipitation
+    std::string const idf_objects = delimited_string({
+
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.75;                    !- Average Total Annual Precipitation {m/yr}",
+
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    WaterManager::GetWaterManagerInput(*state);
+    state->dataGlobal->TimeStepZoneSec = 900;
+    state->dataEnvrn->Year = 2000;
+    state->dataEnvrn->EndYear = 2000;
+    state->dataEnvrn->Month = 1;
+    state->dataGlobal->TimeStep = 2;
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 2.0;
+
+    state->dataEnvrn->LiquidPrecipitation = 0.5;
+    WaterManager::UpdatePrecipitation(*state);
+    // note even if LiquidPrecipitation is positive, since site:precipitation is precent, still use site:precipitation first
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 2.0 / 3600);
+
+    // without site:precipitation, use epw "LiquidPrecipitation"
+    state->dataEnvrn->LiquidPrecipitation = 0.5;
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::None;
+    WaterManager::UpdatePrecipitation(*state);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / state->dataGlobal->TimeStepZoneSec);
+    // when "LiquidPrecipitation" is 0, rainfall rate is 0
+    state->dataEnvrn->LiquidPrecipitation = 0.0;
+    WaterManager::UpdatePrecipitation(*state);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.0);
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
@@ -110,6 +161,11 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
+    state->dataEnvrn->Year = 2000;
+    state->dataEnvrn->EndYear = 2000;
+    state->dataEnvrn->Month = 1;
+    state->dataGlobal->TimeStep = 2;
+    state->dataGlobal->TimeStepZoneSec = 900;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
