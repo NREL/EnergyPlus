@@ -18,8 +18,6 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled
 
 if(LINK_WITH_PYTHON)
   add_compile_definitions(LINK_WITH_PYTHON)
-else()
-  add_compile_definitions(LINK_WITH_PYTHON)
 endif()
 
 if(USE_PSYCHROMETRICS_CACHING)
