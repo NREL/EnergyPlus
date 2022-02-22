@@ -105,14 +105,12 @@ namespace UnitVentilator {
     struct UnitVentilatorData
     {
         std::string Name;      // name of unit
-//        std::string SchedName; // availability schedule
         int SchedPtr = 0;      // index to schedule
         int AirInNode = 0;     // inlet air node number
         int AirOutNode = 0;    // outlet air node number
         int FanOutletNode = 0; // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
         int FanType_Num = 0; // Fan type number (see DataHVACGlobals)
-        std::string FanType; // type of fan
         std::string FanName; // name of fan
         int Fan_Index = 0;
         int FanSchedPtr = 0;      // index to fan operating mode schedule
@@ -123,11 +121,8 @@ namespace UnitVentilator {
         Real64 MaxAirVolFlow = 0.0;                     // m3/s
         Real64 MaxAirMassFlow = 0.0;                    // kg/s
         OAControl OAControlType = OAControl::Invalid;   // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-//        std::string MinOASchedName;                     // schedule of fraction for minimum outside air (all controls)
         int MinOASchedPtr = 0;                          // index to schedule
-//        std::string MaxOASchedName;                     // schedule of percentages for maximum outside air fraction (variable %)
         int MaxOASchedPtr = 0;                          // index to schedule
-//        std::string TempSchedName;                      // schedule of temperatures for desired "mixed air" temperature
         int TempSchedPtr = 0;                           // index to schedule
         int OutsideAirNode = 0;                         // outside air node number
         int AirReliefNode = 0;                          // relief air node number

@@ -397,15 +397,14 @@ namespace UnitVentilator {
                                                                          DataLoopNode::ObjectIsNotParent);
             }
 
-            unitVent.FanType = Alphas(11);
             unitVent.FanName = Alphas(12);
             errFlag = false;
-            ValidateComponent(state, unitVent.FanType, unitVent.FanName, errFlag, CurrentModuleObject);
+            ValidateComponent(state, Alphas(11), unitVent.FanName, errFlag, CurrentModuleObject);
             if (errFlag) {
                 ShowContinueError(state, "specified in " + CurrentModuleObject + " = \"" + unitVent.Name + "\".");
                 ErrorsFound = true;
             } else {
-                if (!UtilityRoutines::SameString(unitVent.FanType, "Fan:SystemModel")) {
+                if (!UtilityRoutines::SameString(Alphas(11), "Fan:SystemModel")) {
                     Fans::GetFanType(state, unitVent.FanName, unitVent.FanType_Num, errFlag, CurrentModuleObject, unitVent.Name);
 
                     {
@@ -414,7 +413,7 @@ namespace UnitVentilator {
                             (FanTypeNum == DataHVACGlobals::FanType_SimpleOnOff)) {
 
                             // Get fan outlet node
-                            unitVent.FanOutletNode = Fans::GetFanOutletNode(state, unitVent.FanType, unitVent.FanName, errFlag);
+                            unitVent.FanOutletNode = Fans::GetFanOutletNode(state, Alphas(11), unitVent.FanName, errFlag);
                             if (errFlag) {
                                 ShowContinueError(state, "specified in " + CurrentModuleObject + " = \"" + unitVent.Name + "\".");
                                 ErrorsFound = true;
@@ -447,7 +446,7 @@ namespace UnitVentilator {
                                 }
                                 // Get the fan's availability schedule
                                 errFlag = false;
-                                unitVent.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, unitVent.FanType, unitVent.FanName, errFlag);
+                                unitVent.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, Alphas(11), unitVent.FanName, errFlag);
                                 if (errFlag) {
                                     ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + unitVent.Name + "\"");
                                     ErrorsFound = true;
@@ -459,7 +458,7 @@ namespace UnitVentilator {
                             ErrorsFound = true;
                         }
                     }
-                } else if (UtilityRoutines::SameString(unitVent.FanType, "Fan:SystemModel")) {
+                } else if (UtilityRoutines::SameString(Alphas(11), "Fan:SystemModel")) {
                     unitVent.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, unitVent.FanName)); // call constructor
                     unitVent.Fan_Index = HVACFan::getFanObjectVectorIndex(state, unitVent.FanName);           // zero-based
@@ -559,7 +558,7 @@ namespace UnitVentilator {
                 BranchNodeConnections::SetUpCompSets(state,
                                                      CurrentModuleObject,
                                                      unitVent.Name,
-                                                     unitVent.FanType,
+                                                     Alphas(11),
                                                      unitVent.FanName,
                                                      state.dataLoopNodes->NodeID(unitVent.OAMixerOutNode),
                                                      state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
@@ -569,7 +568,7 @@ namespace UnitVentilator {
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
                                                          unitVent.Name,
-                                                         unitVent.FanType,
+                                                         Alphas(11),
                                                          unitVent.FanName,
                                                          state.dataLoopNodes->NodeID(unitVent.ATMixerOutNode),
                                                          state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
@@ -579,7 +578,7 @@ namespace UnitVentilator {
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
                                                          unitVent.Name,
-                                                         unitVent.FanType,
+                                                         Alphas(11),
                                                          unitVent.FanName,
                                                          state.dataLoopNodes->NodeID(unitVent.AirInNode),
                                                          state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
