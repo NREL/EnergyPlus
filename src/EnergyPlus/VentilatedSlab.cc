@@ -518,7 +518,6 @@ namespace VentilatedSlab {
                 break;
             }
             case OutsideAirControlType::FixedTemperature: {
-                ventSlab.TempSchedName = state.dataIPShortCut->cAlphaArgs(7);
                 ventSlab.TempSchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
                 if (ventSlab.TempSchedPtr == 0) {
@@ -600,7 +599,6 @@ namespace VentilatedSlab {
             // Heating User Input Data For Ventilated Slab Control :
 
             // High Air Temp :
-            ventSlab.HotAirHiTempSched = state.dataIPShortCut->cAlphaArgs(10);
             ventSlab.HotAirHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
             if ((ventSlab.HotAirHiTempSchedPtr == 0) && (!lAlphaBlanks(10))) {
                 ShowSevereError(state,
@@ -617,7 +615,6 @@ namespace VentilatedSlab {
                 ErrorsFound = true;
             }
 
-            ventSlab.HotCtrlHiTempSched = state.dataIPShortCut->cAlphaArgs(12);
             ventSlab.HotCtrlHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(12));
             if ((ventSlab.HotCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(12))) {
                 ShowSevereError(state,
@@ -625,7 +622,6 @@ namespace VentilatedSlab {
                 ErrorsFound = true;
             }
 
-            ventSlab.HotCtrlLoTempSched = state.dataIPShortCut->cAlphaArgs(13);
             ventSlab.HotCtrlLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
             if ((ventSlab.HotCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(13))) {
                 ShowSevereError(state,
@@ -635,7 +631,6 @@ namespace VentilatedSlab {
 
             // Cooling User Input Data For Ventilated Slab Control :
             // Cooling High Temp Sch.
-            ventSlab.ColdAirHiTempSched = state.dataIPShortCut->cAlphaArgs(13);
             ventSlab.ColdAirHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
             if ((ventSlab.ColdAirHiTempSchedPtr == 0) && (!lAlphaBlanks(14))) {
                 ShowSevereError(state,
@@ -645,7 +640,6 @@ namespace VentilatedSlab {
 
             // Cooling Low Temp Sch.
 
-            ventSlab.ColdAirLoTempSched = state.dataIPShortCut->cAlphaArgs(15);
             ventSlab.ColdAirLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(15));
             if ((ventSlab.ColdAirLoTempSchedPtr == 0) && (!lAlphaBlanks(15))) {
                 ShowSevereError(state,
@@ -655,7 +649,6 @@ namespace VentilatedSlab {
 
             // Cooling Control High Sch.
 
-            ventSlab.ColdCtrlHiTempSched = state.dataIPShortCut->cAlphaArgs(16);
             ventSlab.ColdCtrlHiTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(16));
             if ((ventSlab.ColdCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(16))) {
                 ShowSevereError(state,
@@ -665,7 +658,6 @@ namespace VentilatedSlab {
 
             // Cooling Control Low Sch.
 
-            ventSlab.ColdCtrlLoTempSched = state.dataIPShortCut->cAlphaArgs(17);
             ventSlab.ColdCtrlLoTempSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(17));
             if ((ventSlab.ColdCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(17))) {
                 ShowSevereError(state,
@@ -1189,9 +1181,6 @@ namespace VentilatedSlab {
                                       "a cooling coil is required for " + cAlphaFields(26) + "=\"" + state.dataIPShortCut->cAlphaArgs(26) + "\".");
                     ErrorsFound = true;
                 }
-            }
-            if (!lAlphaBlanks(33)) {
-                ventSlab.AvailManagerListName = state.dataIPShortCut->cAlphaArgs(33);
             }
 
             ventSlab.HVACSizingIndex = 0;

@@ -170,7 +170,6 @@ namespace VentilatedSlab {
         int MinOASchedPtr;          // index to schedule
         std::string MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
         int MaxOASchedPtr;          // index to schedule
-        std::string TempSchedName;  // schedule of temperatures for desired "mixed air"
         // temperature (fixed temp.)
         int TempSchedPtr;         // index to schedule
         int OutsideAirNode;       // outside air node number
@@ -189,7 +188,6 @@ namespace VentilatedSlab {
         int heatingCoil_Index;
         DataPlant::PlantEquipmentType heatingCoilType;
         int heatingCoil_FluidIndex;
-        std::string heatingCoilSchedName; // availability schedule for the heating coil
         int heatingCoilSchedPtr;          // index to schedule
         Real64 heatingCoilSchedValue;
         Real64 MaxVolHotWaterFlow; // m3/s
@@ -204,14 +202,11 @@ namespace VentilatedSlab {
         int HotCoilOutNodeNum;          // outlet of coil
         Real64 HotControlOffset;        // control tolerance
         PlantLocation HWPlantLoc;       // index for plant component for hot water coil
-        std::string HotAirHiTempSched;  // Schedule name for the highest Air temperature
         int HotAirHiTempSchedPtr;       // Schedule index for the highest Air temperature
         int HotAirLoTempSchedPtr;       // Schedule index for the lowest Air temperature
-        std::string HotCtrlHiTempSched; // Schedule name for the highest control temperature
         // (where the lowest Air temperature is requested)
         int HotCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
         // (where the lowest Air temperature is requested)
-        std::string HotCtrlLoTempSched; // Schedule name for the lowest control temperature
         // (where the highest Air temperature is requested)
         int HotCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
         // (where the highest Air temperature is requested)
@@ -225,7 +220,6 @@ namespace VentilatedSlab {
         CoolingCoilType cCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-        std::string coolingCoilSchedName; // availability schedule for the cooling coil
         int coolingCoilSchedPtr;          // index to schedule
         Real64 coolingCoilSchedValue;
         Real64 MaxVolColdWaterFlow;      // m3/s
@@ -236,15 +230,11 @@ namespace VentilatedSlab {
         int ColdCoilOutNodeNum;          // chilled water coil out nod
         Real64 ColdControlOffset;        // control tolerance
         PlantLocation CWPlantLoc;        // index for plant component for chilled water coil
-        std::string ColdAirHiTempSched;  // Schedule name for the highest air temperature
         int ColdAirHiTempSchedPtr;       // Schedule index for the highest Air temperature
-        std::string ColdAirLoTempSched;  // Schedule name for the lowest Air temperature
         int ColdAirLoTempSchedPtr;       // Schedule index for the lowest Air temperature
-        std::string ColdCtrlHiTempSched; // Schedule name for the highest control temperature
         // (where the lowest Air temperature is requested)
         int ColdCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
         // (where the lowest Air temperature is requested)
-        std::string ColdCtrlLoTempSched; // Schedule name for the lowest control temperature
         // (where the highest Air temperature is requested)
         int ColdCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
         // (where the highest Air temperature is requested)
@@ -253,8 +243,6 @@ namespace VentilatedSlab {
         int RadSurfNum;         // Radiant Surface Number
         int MSlabIn;            // Internal Slab Inlet Node Number
         int MSlabOut;           // INternal Slab Outlet Node Number
-        std::string DSSlabInNodeName;
-        std::string DSSlabOutNodeName;
         // Report data
         Real64 DirectHeatLossPower;  // system direct heat loss in W
         Real64 DirectHeatLossEnergy; // system direct heat loss in J
