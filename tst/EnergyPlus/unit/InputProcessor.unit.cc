@@ -698,7 +698,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
         "    No,                      !- Apply Weekend Holiday Rule",
-        "    Yes,                     !- Use Rain Indicators",
+        "    Yes,                     !- Use Weather File Rain Indicators",
         "    Yes;                     !- Use Weather File Snow Indicators",
         "",
         "  RunPeriod,",
@@ -713,7 +713,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
         "    Yes,                     !- Use Weather File Holidays and Special Days",
         "    Yes,                     !- Use Weather File Daylight Saving Period",
         "    No,                      !- Apply Weekend Holiday Rule",
-        "    Yes,                     !- Use Rain Indicators",
+        "    Yes,                     !- Use Weather File Rain Indicators",
         "    Yes;                     !- Use Weather File Snow Indicators",
     }));
 
@@ -727,7 +727,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
                          {"end_month", 1},
                          {"use_weather_file_daylight_saving_period", "Yes"},
                          {"use_weather_file_holidays_and_special_days", "Yes"},
-                         {"use_rain_indicators", "Yes"},
+                         {"use_weather_file_rain_indicators", "Yes"},
                          {"use_weather_file_snow_indicators", "Yes"}}},
                        {"SummerDay",
                         {{"apply_weekend_holiday_rule", "No"},
@@ -738,7 +738,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
                          {"end_month", 7},
                          {"use_weather_file_daylight_saving_period", "Yes"},
                          {"use_weather_file_holidays_and_special_days", "Yes"},
-                         {"use_rain_indicators", "Yes"},
+                         {"use_weather_file_rain_indicators", "Yes"},
                          {"use_weather_file_snow_indicators", "Yes"}}}}}};
 
     ASSERT_TRUE(process_idf(idf));
