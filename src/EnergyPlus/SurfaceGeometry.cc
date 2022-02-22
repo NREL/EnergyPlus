@@ -201,7 +201,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinFrameTempSurfOut.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinProjCorrFrOut.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProjCorrFrIn.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinDividerType.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerType.dimension(NumSurfaces, DataSurfaces::FrameDividerType::DividedLite);
         state.dataSurface->SurfWinDividerArea.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDividerConductance.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDividerSolAbsorp.dimension(NumSurfaces, 0);
