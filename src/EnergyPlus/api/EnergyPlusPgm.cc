@@ -219,8 +219,6 @@
 #include <unistd.h>
 #endif
 
-struct EnergyPlus::EnergyPlusData;
-
 int EnergyPlusPgm(int argc, const char *argv[], std::string const &filepath)
 {
     EnergyPlus::EnergyPlusData state;
