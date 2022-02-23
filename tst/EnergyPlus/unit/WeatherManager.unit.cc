@@ -1400,7 +1400,8 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(1, 4), 8.00, 1e-6);
 }
 
-TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag) {
+TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
+{
     // This unit test ensures that the WaterManager correctly calculates the Rainfall CurrentRate
     std::string const idf_objects = delimited_string({
         "  SimulationControl,",
@@ -1651,4 +1652,3 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag) {
     // when TodayIsRain is false, IsRain is still true as site:precipitation has non-zero rain fall
     ASSERT_TRUE(state->dataEnvrn->IsRain);
 }
-
