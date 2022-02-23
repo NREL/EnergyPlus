@@ -71,9 +71,17 @@ namespace DataWater {
     enum class RainfallMode
     {
         Invalid = -1,
+        None,
         RainSchedDesign, // mode of Rainfall determination is Scheduled Design
-        IrrSchedDesign,  // mode of Irrigation determination is Scheduled Design
-        IrrSmartSched,   // mode of irrigation
+        EPWPrecipitation,
+        Num
+    };
+
+    enum class IrrigationMode
+    {
+        Invalid = -1,
+        IrrSchedDesign, // mode of Irrigation determination is Scheduled Design
+        IrrSmartSched,  // mode of irrigation
         Num
     };
 
@@ -219,6 +227,7 @@ namespace DataWater {
         Real64 HorizArea; // area of surfaces in the vertical normal direction
         Real64 VdotAvail;
         Real64 VolCollected;
+        std::array<Real64, 12> VolCollectedMonthly = {0.0}; // Monthly rain water collected in mm;
         Real64 MeanHeight;
 
         // Default Constructor
@@ -274,10 +283,13 @@ namespace DataWater {
         // calculated and from elsewhere.
         Real64 CurrentRate;
         Real64 CurrentAmount;
+        std::array<Real64, 12> MonthlyTotalPrecInWeather = {0.0};  // Monthly total rain in weather file [mm]
+        std::array<Real64, 12> MonthlyTotalPrecInSitePrec = {0.0}; // Monthly total rain in site:precipitation [mm]
+        std::array<int, 12> numRainyHoursInWeather = {0};          // Monthly number of rainy hours
 
         // Default Constructor
         SiteRainFallDataStruct()
-            : ModeID(RainfallMode::Invalid), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
+            : ModeID(RainfallMode::None), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
         {
         }
     };
@@ -285,14 +297,14 @@ namespace DataWater {
     struct IrrigationDataStruct
     {
         // Members
-        RainfallMode ModeID; // type of irrigation modeling
+        IrrigationMode ModeID; // type of irrigation modeling
         int IrrSchedID;
         Real64 ScheduledAmount;
         Real64 ActualAmount;
         Real64 IrrigationThreshold; // percent at which no irrigation happens (smart schedule)
 
         // Default Constructor
-        IrrigationDataStruct() : ModeID(RainfallMode::Invalid), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
+        IrrigationDataStruct() : ModeID(IrrigationMode::Invalid), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
         {
         }
     };
@@ -317,6 +329,7 @@ struct DataWaterData : BaseGlobalStruct
     bool AnyWaterSystemsInModel = false;    // control flag set true if any water systems
     bool WaterSystemGetInputCalled = false; // set true once input data gotten.
     bool AnyIrrigationInModel = false;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
+    int PrecipOverwrittenByRainFlag = 0;    // recurring warning index when the rain flag is on but the liquidprecipitation = 0
 
     void clear_state() override
     {
@@ -332,6 +345,7 @@ struct DataWaterData : BaseGlobalStruct
         AnyWaterSystemsInModel = false;
         WaterSystemGetInputCalled = false;
         AnyIrrigationInModel = false;
+        PrecipOverwrittenByRainFlag = 0;
     }
 };
 
