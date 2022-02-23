@@ -1615,8 +1615,7 @@ namespace SteamCoils {
 
         int indexNum = UtilityRoutines::FindItemInList(coilName, state.dataSteamCoils->SteamCoil);
 
-        if (indexNum <= 0) { // may not find coil name
-            indexNum = -1;
+        if (indexNum == 0) { // may not find coil name
             ShowSevereError(state, format("GetSteamCoilIndex: Could not find CoilType = Coil:Heating:Steam with Name = \"{}\"", coilName));
         }
 

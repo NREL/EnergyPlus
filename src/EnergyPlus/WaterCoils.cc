@@ -5955,10 +5955,7 @@ Label10:;
     }
 }
 
-void CheckWaterCoilSchedule(EnergyPlusData &state,
-                            std::string_view CompName,
-                            Real64 &Value,
-                            int &CompIndex)
+void CheckWaterCoilSchedule(EnergyPlusData &state, std::string_view CompName, Real64 &Value, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -6763,35 +6760,21 @@ int GetWaterCoilIndex(EnergyPlusData &state,
 }
 int GetCompIndex(EnergyPlusData &state, CoilModel compType, std::string const coilName)
 {
+    static constexpr std::array<std::string_view, (int)WaterCoils::CoilModel::Num> CoilModelNamesUC = {
+        "COIL:HEATING:WATER", "COIL:COOLING:WATER", "COIL:COOLING:WATER:DETAILED"};
+
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
         GetWaterCoilInput(state);
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    int indexNum = -1;
-    std::string_view coilType("UNKNOWN");
-    switch (compType) {
-    case CoilModel::HeatingSimple: {
-        indexNum = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
-        coilType = "COIL:HEATING:WATER";
-    } break;
-    case CoilModel::CoolingSimple: {
-        indexNum = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
-        coilType = "COIL:COOLING:WATER";
-    } break;
-    case CoilModel::CoolingDetailed: {
-        indexNum = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
-        coilType = "COIL:COOLING:WATER:DETAILEDGEOMETRY";
-    } break;
-    default: {
-    } break;
-    }
+    int index = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
 
-    if (indexNum <= 0) { // may not find coil name
-        indexNum = -1;
-        ShowSevereError(state, format("GetWaterCoilIndex: Could not find CoilType = \"{}\" with Name = \"{}\"", coilType, coilName));
+    if (index == 0) { // may not find coil name
+        ShowSevereError(state,
+                        format("GetWaterCoilIndex: Could not find CoilType = \"{}\" with Name = \"{}\"", CoilModelNamesUC[(int)compType], coilName));
     }
-    return indexNum;
+    return index;
 }
 
 Real64 GetWaterCoilCapacity(EnergyPlusData &state,
