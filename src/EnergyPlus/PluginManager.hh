@@ -246,7 +246,7 @@ struct PluginManagerData : BaseGlobalStruct
     void clear_state() override
     {
         callbacks.clear();
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
         for (auto &plugin : plugins) {
             plugin.shutdown(); // clear unmanaged memory first
         }
