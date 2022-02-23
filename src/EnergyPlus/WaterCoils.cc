@@ -6758,7 +6758,7 @@ int GetWaterCoilIndex(EnergyPlusData &state,
 
     return IndexNum;
 }
-int GetCompIndex(EnergyPlusData &state, CoilModel compType, std::string const coilName)
+int GetCompIndex(EnergyPlusData &state, CoilModel compType, std::string_view const coilName)
 {
     static constexpr std::array<std::string_view, (int)WaterCoils::CoilModel::Num> CoilModelNamesUC = {
         "COIL:HEATING:WATER", "COIL:COOLING:WATER", "COIL:COOLING:WATER:DETAILED"};

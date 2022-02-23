@@ -1606,7 +1606,7 @@ namespace SteamCoils {
         return IndexNum;
     }
 
-    int GetCompIndex(EnergyPlusData &state, std::string const coilName)
+    int GetCompIndex(EnergyPlusData &state, std::string_view const coilName)
     {
         if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);

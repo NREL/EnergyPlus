@@ -499,7 +499,7 @@ namespace WaterCoils {
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
-    int GetCompIndex(EnergyPlusData &state, CoilModel coilType, std::string const coilName);
+    int GetCompIndex(EnergyPlusData &state, CoilModel coilType, std::string_view const coilName);
 
     Real64 GetWaterCoilCapacity(EnergyPlusData &state,
                                 std::string const &CoilType, // must match coil types in this module
