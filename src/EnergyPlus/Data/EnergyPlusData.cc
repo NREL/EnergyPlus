@@ -308,6 +308,8 @@ EnergyPlusData::EnergyPlusData()
     this->dataZoneTempPredictorCorrector = std::make_unique<ZoneTempPredictorCorrectorData>();
 }
 
+EnergyPlusData::~EnergyPlusData() = default;
+
 void EnergyPlusData::clear_state()
 {
     this->ready = true;

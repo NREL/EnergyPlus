@@ -575,6 +575,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ZoneTempPredictorCorrectorData> dataZoneTempPredictorCorrector;
 
     EnergyPlusData();
+    ~EnergyPlusData();
 
     // Cannot safely copy or delete this until we eradicate all remaining
     // calls to IOFiles::getSingleton and IOFiles::setSingleton
