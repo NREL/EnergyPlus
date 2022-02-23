@@ -8,7 +8,7 @@ Begin Window Window1
    FullScreen      =   False
    FullScreenButton=   False
    HasBackColor    =   False
-   Height          =   200
+   Height          =   230
    ImplicitInstance=   True
    LiveResize      =   "True"
    MacProcID       =   0
@@ -24,7 +24,7 @@ Begin Window Window1
    Resizeable      =   True
    Title           =   "IDF Version Updater"
    Visible         =   True
-   Width           =   662
+   Width           =   802
    Begin TextField txtFileName
       AcceptTabs      =   False
       Alignment       =   0
@@ -66,7 +66,7 @@ Begin Window Window1
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
-      Width           =   622
+      Width           =   762
    End
    Begin BevelButton cmdChooseFile
       AcceptFocus     =   False
@@ -110,7 +110,7 @@ Begin Window Window1
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   189
+      Width           =   283
    End
    Begin BevelButton cmdConvert
       AcceptFocus     =   False
@@ -149,12 +149,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   153
+      Top             =   183
       Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   147
+      Width           =   283
    End
    Begin BevelButton cmdExit
       AcceptFocus     =   False
@@ -179,7 +179,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   519
+      Left            =   639
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   False
@@ -193,12 +193,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   153
+      Top             =   183
       Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   123
+      Width           =   143
    End
    Begin CheckBox chkIntermediate
       AutoDeactivate  =   True
@@ -212,7 +212,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   413
+      Left            =   468
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -226,12 +226,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   83
+      Top             =   84
       Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   229
+      Width           =   314
    End
    Begin Label Label2
       AutoDeactivate  =   True
@@ -244,7 +244,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   127
+      Left            =   188
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -257,7 +257,7 @@ Begin Window Window1
       TabPanelIndex   =   0
       TabStop         =   True
       Text            =   "New Version"
-      TextAlign       =   1
+      TextAlign       =   0
       TextColor       =   &c00000000
       TextFont        =   "System"
       TextSize        =   0.0
@@ -266,20 +266,20 @@ Begin Window Window1
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   107
+      Width           =   144
    End
    Begin Label Label3
       AutoDeactivate  =   True
-      Bold            =   False
+      Bold            =   True
       DataField       =   ""
       DataSource      =   ""
       Enabled         =   True
-      Height          =   21
+      Height          =   24
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   94
+      Left            =   127
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -295,13 +295,13 @@ Begin Window Window1
       TextAlign       =   1
       TextColor       =   &c00000000
       TextFont        =   "System"
-      TextSize        =   0.0
+      TextSize        =   20.0
       TextUnit        =   0
-      Top             =   106
+      Top             =   104
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   28
+      Width           =   40
    End
    Begin TextField txtCurrentVersion
       AcceptTabs      =   False
@@ -316,12 +316,12 @@ Begin Window Window1
       DataSource      =   ""
       Enabled         =   False
       Format          =   ""
-      Height          =   23
+      Height          =   25
       HelpTag         =   "This field shows the current version of the file selected and shown above."
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   43
+      Left            =   29
       LimitText       =   0
       LockBottom      =   False
       LockedInPosition=   False
@@ -340,12 +340,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   107
+      Top             =   105
       Transparent     =   True
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
-      Width           =   39
+      Width           =   76
    End
    Begin Label Label1
       AutoDeactivate  =   True
@@ -358,7 +358,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   20
+      Left            =   29
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -371,16 +371,16 @@ Begin Window Window1
       TabPanelIndex   =   0
       TabStop         =   True
       Text            =   "Current Version"
-      TextAlign       =   1
+      TextAlign       =   0
       TextColor       =   &c00000000
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   83
+      Top             =   84
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   95
+      Width           =   134
    End
    Begin BevelButton cmdViewAudit
       AcceptFocus     =   False
@@ -405,7 +405,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   361
+      Left            =   468
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   False
@@ -419,12 +419,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   153
+      Top             =   183
       Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   125
+      Width           =   146
    End
    Begin CheckBox chkDeleteOrig
       AutoDeactivate  =   True
@@ -438,7 +438,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   413
+      Left            =   468
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -452,12 +452,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   107
+      Top             =   110
       Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   150
+      Width           =   307
    End
    Begin PopupMenu pmnuNewVersion
       AutoDeactivate  =   True
@@ -471,7 +471,7 @@ Begin Window Window1
       InitialParent   =   ""
       InitialValue    =   ""
       Italic          =   False
-      Left            =   150
+      Left            =   188
       ListIndex       =   0
       LockBottom      =   False
       LockedInPosition=   False
@@ -485,11 +485,11 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   104
+      Top             =   105
       Transparent     =   True
       Underline       =   False
       Visible         =   True
-      Width           =   71
+      Width           =   115
    End
    Begin Label lblProcessing
       AutoDeactivate  =   True
@@ -497,12 +497,12 @@ Begin Window Window1
       DataField       =   ""
       DataSource      =   ""
       Enabled         =   True
-      Height          =   22
+      Height          =   39
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   196
+      Left            =   20
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -520,11 +520,11 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   130
+      Top             =   140
       Transparent     =   False
       Underline       =   False
       Visible         =   False
-      Width           =   446
+      Width           =   762
    End
    Begin BevelButton cmdAbout
       AcceptFocus     =   False
@@ -549,7 +549,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   592
+      Left            =   732
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
