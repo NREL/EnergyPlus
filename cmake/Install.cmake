@@ -558,14 +558,18 @@ elseif(UNIX)
   install(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/libRBAppearancePak.so"
           DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
 
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBAppearancePak.so"
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBAppearancePak64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBShell.so"
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBShell64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/RBGUIFramework.so"
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/XojoGUIFramework64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libc++.so.1"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBRegEx64.so"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Resources/appicon_48.png"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Resources/")
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater" DESTINATION "PreProcess/IDFVersionUpdater/")
 
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EPMacro/Linux/EPMacro" DESTINATION "./")
