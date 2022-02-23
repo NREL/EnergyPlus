@@ -451,16 +451,28 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/src/Slab/slabexample.ger" DESTINATION "PreProcess/GrndTempCalc/")
   install(FILES "${PROJECT_SOURCE_DIR}/src/Slab/slabexample.gtp" DESTINATION "PreProcess/GrndTempCalc/")
   install(FILES "${PROJECT_SOURCE_DIR}/src/Slab/SlabExample.idf" DESTINATION "PreProcess/GrndTempCalc/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Appearance Pak.dll"
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Appearance Pakx64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/RBGUIFramework.dll"
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Shellx64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/msvcp120.dll"
-          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/msvcr120.dll"
-          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
-  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Shell.dll"
-          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/icudt65.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/icudt65.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/icuin65.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/icuin65.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/icuuc65.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/icuuc65.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/msvcp120.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/msvcp120.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/msvcp140.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/msvcp140.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/msvcr120.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/msvcr120.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vccorlib140.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/vccorlib140.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vcruntime140.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/vcruntime140.dll")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/XojoGUIFramework64.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/XojoGUIFramework64.dll")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater.exe" DESTINATION "PreProcess/IDFVersionUpdater/")
   install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EPMacro/Windows/EPMacro.exe" DESTINATION "./")
 
