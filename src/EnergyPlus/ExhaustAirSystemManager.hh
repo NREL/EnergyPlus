@@ -62,68 +62,68 @@ namespace ExhaustAirSystemManager {
     struct ExhaustAir
     {
         // Members
-        std::string Name;
+        std::string Name = "";
 
-        int AvailScheduleNum;
-        std::string ZoneMixerName;
-        int ZoneMixerIndex;
-        int CentralFanTypeNum;
-        std::string CentralFanName;
-        int CentralFanIndex;
+        int AvailScheduleNum = 0;
+        std::string ZoneMixerName = "";
+        int ZoneMixerIndex = 0;
+        int CentralFanTypeNum = 0;
+        std::string CentralFanName = "";
+        int CentralFanIndex = 0;
 
-        bool SizingFlag;
+        bool SizingFlag = true;
 
         // output variables
-        Real64 centralFan_MassFlowRate;
-        Real64 centralFan_VolumeFlowRate_Std;
-        Real64 centralFan_VolumeFlowRate_Cur;
-        Real64 centralFan_Power;
-        Real64 centralFan_Energy;
+        Real64 centralFan_MassFlowRate = 0.0;
+        Real64 centralFan_VolumeFlowRate_Std = 0.0;
+        Real64 centralFan_VolumeFlowRate_Cur = 0.0;
+        Real64 centralFan_Power = 0.0;
+        Real64 centralFan_Energy = 0.0;
 
         // Output acc variable for heat rejection outputs
-        Real64 exhTotalHVACReliefHeatLoss; // feed to state.dataHeatBal->SysTotalHVACReliefHeatLoss
+        Real64 exhTotalHVACReliefHeatLoss = 0.0; // feed to state.dataHeatBal->SysTotalHVACReliefHeatLoss
 
-        // Default Constructor
-        ExhaustAir()
-            : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanName(""), CentralFanIndex(0),
-              SizingFlag(true), centralFan_MassFlowRate(0.0), centralFan_VolumeFlowRate_Std(0.0), centralFan_VolumeFlowRate_Cur(0.0),
-              centralFan_Power(0.0), centralFan_Energy(0.0), exhTotalHVACReliefHeatLoss(0.0)
-        {
-        }
+        //// Default Constructor
+        // ExhaustAir()
+        //    : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanName(""), CentralFanIndex(0),
+        //      SizingFlag(true), centralFan_MassFlowRate(0.0), centralFan_VolumeFlowRate_Std(0.0), centralFan_VolumeFlowRate_Cur(0.0),
+        //      centralFan_Power(0.0), centralFan_Energy(0.0), exhTotalHVACReliefHeatLoss(0.0)
+        //{
+        //}
     };
 
     struct ZoneExhaustControl
     {
-        std::string Name;
+        std::string Name = "";
 
-        int AvailScheduleNum;
+        int AvailScheduleNum = 0;
 
-        std::string ZoneName;
-        int ZoneNum;
-        int ControlledZoneNum;
+        std::string ZoneName = "";
+        int ZoneNum = 0;
+        int ControlledZoneNum = 0;
 
-        int InletNodeNum;
-        int OutletNodeNum;
+        int InletNodeNum = 0;
+        int OutletNodeNum = 0;
 
-        Real64 DesignExhaustFlowRate;
-        int FlowControlTypeNum;
-        int ExhaustFlowFractionScheduleNum;
-        int SupplyNodeOrNodelistNum;
-        int MinZoneTempLimitScheduleNum;
-        int MinExhFlowFracScheduleNum;
-        int BalancedExhFracScheduleNum;
-        Real64 BalancedFlow;
-        Real64 UnbalancedFlow;
+        Real64 DesignExhaustFlowRate = 0.0;
+        int FlowControlTypeNum = 0;
+        int ExhaustFlowFractionScheduleNum = 0;
+        int SupplyNodeOrNodelistNum = 0;
+        int MinZoneTempLimitScheduleNum = 0;
+        int MinExhFlowFracScheduleNum = 0;
+        int BalancedExhFracScheduleNum = 0;
+        Real64 BalancedFlow = 0.0;
+        Real64 UnbalancedFlow = 0.0;
 
         Array1D_int SuppNodeNums;
 
-        // default constructor
-        ZoneExhaustControl()
-            : AvailScheduleNum(0), ZoneName(""), ZoneNum(0), ControlledZoneNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0),
-              FlowControlTypeNum(0), ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0),
-              MinExhFlowFracScheduleNum(0), BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
-        {
-        }
+        //// default constructor
+        // ZoneExhaustControl()
+        //    : AvailScheduleNum(0), ZoneName(""), ZoneNum(0), ControlledZoneNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0),
+        //      FlowControlTypeNum(0), ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0),
+        //      MinExhFlowFracScheduleNum(0), BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
+        //{
+        //}
     };
 
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration);
