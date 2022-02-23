@@ -486,7 +486,6 @@ namespace VentilatedSlab {
 
             switch (ventSlab.outsideAirControlType) {
             case OutsideAirControlType::VariablePercent: {
-                ventSlab.MaxOASchedName = state.dataIPShortCut->cAlphaArgs(6);
                 ventSlab.MaxOASchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
                 if (ventSlab.MaxOASchedPtr == 0) {
@@ -502,7 +501,6 @@ namespace VentilatedSlab {
                 break;
             }
             case OutsideAirControlType::FixedOAControl: {
-                ventSlab.MaxOASchedName = state.dataIPShortCut->cAlphaArgs(7);
                 ventSlab.MaxOASchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert schedule name to pointer
                 if (ventSlab.MaxOASchedPtr == 0) {
@@ -533,7 +531,6 @@ namespace VentilatedSlab {
             }
             }
 
-            ventSlab.MinOASchedName = state.dataIPShortCut->cAlphaArgs(6);
             ventSlab.MinOASchedPtr =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6)); // convert schedule name to pointer
             if (ventSlab.MinOASchedPtr == 0) {
@@ -917,9 +914,7 @@ namespace VentilatedSlab {
 
             if (ventSlab.outsideAirControlType == OutsideAirControlType::FixedOAControl) {
                 ventSlab.OutAirVolFlow = ventSlab.MinOutAirVolFlow;
-                ventSlab.MaxOASchedName = ventSlab.MinOASchedName;
-                ventSlab.MaxOASchedPtr =
-                    GetScheduleIndex(state, ventSlab.MinOASchedName);
+                ventSlab.MaxOASchedPtr = ventSlab.MinOASchedPtr;
             }
 
             // Add fan to component sets array

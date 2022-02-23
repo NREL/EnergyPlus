@@ -166,9 +166,7 @@ namespace VentilatedSlab {
         Real64 MaxAirVolFlow;       // m3/s
         Real64 MaxAirMassFlow;      // kg/s
         OutsideAirControlType outsideAirControlType;          // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-        std::string MinOASchedName; // schedule of fraction for minimum outside air (all controls)
         int MinOASchedPtr;          // index to schedule
-        std::string MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
         int MaxOASchedPtr;          // index to schedule
         // temperature (fixed temp.)
         int TempSchedPtr;         // index to schedule
