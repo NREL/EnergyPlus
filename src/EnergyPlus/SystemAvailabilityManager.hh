@@ -64,6 +64,16 @@ struct EnergyPlusData;
 
 namespace SystemAvailabilityManager {
 
+    enum class ControlAlgorithm
+    {
+        Invalid = -1,
+        ConstantTemperatureGradient,
+        AdaptiveTemperatureGradient,
+        AdaptiveASHRAE,
+        ConstantStartTime,
+        Num
+    };
+
     int constexpr StayOff = 0;
     int constexpr CycleOnAny = 1;
     int constexpr CycleOnControlZone = 2;
@@ -188,7 +198,7 @@ namespace SystemAvailabilityManager {
         int NumOfZones;           // Number of zones in the list
         Array1D_int ZonePtrs;     // Pointers to zones in the list
         Real64 MaxOptStartTime;   // Maximum value of start time in hours
-        int CtrlAlgType;          // Control algorithm: ConstantTemperatureGradient,
+        ControlAlgorithm CtrlAlgType;          // Control algorithm: ConstantTemperatureGradient,
         // AdaptiveTemperatureGradient, AdaptiveASHRAE, ConstantStartTime
         Real64 ConstTGradCool;    // Constant temperature gradient in cooling mode, unit: degC per hour
         Real64 ConstTGradHeat;    // Constant temperature gradient in heating mode, unit: degC per hour
@@ -222,7 +232,7 @@ namespace SystemAvailabilityManager {
         // Default Constructor
         DefineOptStartSysAvailManager()
             : MgrType(0), isSimulated(false), SchedPtr(0), FanSchedPtr(0), CtrlType(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0),
-              MaxOptStartTime(6.0), CtrlAlgType(0), ConstTGradCool(1.0), ConstTGradHeat(1.0), InitTGradCool(1.0), InitTGradHeat(1.0),
+              MaxOptStartTime(6.0), CtrlAlgType(ControlAlgorithm::Invalid), ConstTGradCool(1.0), ConstTGradHeat(1.0), InitTGradCool(1.0), InitTGradHeat(1.0),
               AdaptiveTGradCool(1.0), AdaptiveTGradHeat(1.0), ConstStartTime(2.0), NumPreDays(1), AvailStatus(0), NumHoursBeforeOccupancy(0.0),
               TempDiffHi(0.0), TempDiffLo(0.0), ATGWCZoneNumLo(0), ATGWCZoneNumHi(0), CycleOnFlag(false), ATGUpdateFlag1(false),
               ATGUpdateFlag2(false), FirstTimeATGFlag(true), OverNightStartFlag(false), OSReportVarFlag(false), AdaTempGradHeat(0.0),
