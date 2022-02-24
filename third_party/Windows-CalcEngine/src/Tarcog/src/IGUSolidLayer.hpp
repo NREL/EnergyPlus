@@ -43,7 +43,13 @@ namespace Tarcog
 
             virtual bool isDeflected() const;
 
+            virtual double youngsModulus() const;
+
+            virtual double density() const;
+
             std::shared_ptr<CBaseLayer> clone() const override;
+
+            void applyDeflection(double meanDeflection, double maxDeflection);
 
         protected:
             virtual void calculateConvectionOrConductionFlow() override;
@@ -56,6 +62,8 @@ namespace Tarcog
                                  FenestrationCommon::Side t_Position);
 
             double m_SolarAbsorptance;
+
+            bool m_IsDeflected{false};
         };
 
     }   // namespace ISO15099

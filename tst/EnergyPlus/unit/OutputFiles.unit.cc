@@ -48,12 +48,12 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
-#include <EnergyPlus/IOFiles.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "EnergyPlus/InputProcessing/InputProcessor.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
@@ -219,4 +219,244 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:12.3Z}", 0.0), "   0.000E+00");
     EXPECT_EQ(format("{:12.4Z}", 0.0), "  0.0000E+00");
 }
+
+TEST_F(EnergyPlusFixture, OutputControlFiles)
+{
+    std::string const idf_objects = delimited_string({
+        "OutputControl:Files,",
+        "  No,                      !- Output CSV",
+        "  No,                      !- Output MTR",
+        "  No,                      !- Output ESO",
+        "  No,                      !- Output EIO",
+        "  No,                      !- Output Tabular",
+        "  Yes,                     !- Output SQLite",
+        "  Yes,                     !- Output JSON",
+        "  No,                      !- Output AUDIT",
+        "  Yes,                     !- Output Zone Sizing",
+        "  Yes,                     !- Output System Sizing",
+        "  Yes,                     !- Output DXF",
+        "  No,                      !- Output BND",
+        "  No,                      !- Output RDD",
+        "  No,                      !- Output MDD",
+        "  No,                      !- Output MTD",
+        "  Yes,                     !- Output END",
+        "  No,                      !- Output SHD",
+        "  Yes,                     !- Output DFS",
+        "  Yes,                     !- Output GLHE",
+        "  Yes,                     !- Output DelightIn",
+        "  Yes,                     !- Output DelightELdmp",
+        "  Yes,                     !- Output DelightDFdmp",
+        "  Yes,                     !- Output EDD",
+        "  Yes,                     !- Output DBG",
+        "  Yes,                     !- Output PerfLog",
+        "  Yes,                     !- Output SLN",
+        "  Yes,                     !- Output SCI",
+        "  Yes,                     !- Output WRL",
+        "  Yes,                     !- Output Screen",
+        "  Yes,                     !- Output ExtShd",
+        "  Yes;                     !- Output Tarcog",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->files.outputControl.getInput(*state);
+
+    state->dataGlobal->DisplayUnusedObjects = true;
+
+    state->dataInputProcessing->inputProcessor->reportOrphanRecordObjects(*state);
+
+    // It does not include "   **   ~~~   ** Object=OutputControl:Files=OutputControl:Files 1"
+    EXPECT_FALSE(match_err_stream("OutputControl:Files"));
+
+    std::string expected_error = delimited_string({
+
+        "   ** Warning ** The following lines are \"Unused Objects\".  These objects are in the input",
+        "   **   ~~~   **  file but are never obtained by the simulation and therefore are NOT used.",
+        "   **   ~~~   **  Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.",
+        "   **   ~~~   **  See InputOutputReference document for more details.",
+        "   ************* Object=Building=Bldg",
+        "   **   ~~~   ** Object=GlobalGeometryRules",
+        "   **   ~~~   ** Object=Version",
+    });
+
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputControlFiles_GetInput)
+{
+    std::string const idf_objects_fmt = R"(
+OutputControl:Files,
+  {csv},              !- Output CSV
+  {mtr},              !- Output MTR
+  {eso},              !- Output ESO
+  {eio},              !- Output EIO
+  {tabular},          !- Output Tabular
+  {sqlite},           !- Output SQLite
+  {json},             !- Output JSON
+  {audit},            !- Output AUDIT
+  {zsz},              !- Output Zone Sizing
+  {ssz},              !- Output System Sizing
+  {dxf},              !- Output DXF
+  {bnd},              !- Output BND
+  {rdd},              !- Output RDD
+  {mdd},              !- Output MDD
+  {mtd},              !- Output MTD
+  {end},              !- Output END
+  {shd},              !- Output SHD
+  {dfs},              !- Output DFS
+  {glhe},             !- Output GLHE
+  {delightin},        !- Output DelightIn
+  {delighteldmp},     !- Output DelightELdmp
+  {delightdfdmp},     !- Output DelightDFdmp
+  {edd},              !- Output EDD
+  {dbg},              !- Output DBG
+  {perflog},          !- Output PerfLog
+  {sln},              !- Output SLN
+  {sci},              !- Output SCI
+  {wrl},              !- Output WRL
+  {screen},           !- Output Screen
+  {extshd},           !- Output ExtShd
+  {tarcog};           !- Output Tarcog
+  )";
+
+    auto boolToString = [](bool b) { return b ? "Yes" : "No"; };
+
+    for (int i = 0; i < 31; ++i) {
+        bool csv = (i == 0);
+        bool mtr = (i == 1);
+        bool eso = (i == 2);
+        bool eio = (i == 3);
+        bool tabular = (i == 4);
+        bool sqlite = (i == 5);
+        bool json = (i == 6);
+        bool audit = (i == 7);
+        bool zsz = (i == 8);
+        bool ssz = (i == 9);
+        bool dxf = (i == 10);
+        bool bnd = (i == 11);
+        bool rdd = (i == 12);
+        bool mdd = (i == 13);
+        bool mtd = (i == 14);
+        bool end = (i == 15);
+        bool shd = (i == 16);
+        bool dfs = (i == 17);
+        bool glhe = (i == 18);
+        bool delightin = (i == 19);
+        bool delighteldmp = (i == 20);
+        bool delightdfdmp = (i == 21);
+        bool edd = (i == 22);
+        bool dbg = (i == 23);
+        bool perflog = (i == 24);
+        bool sln = (i == 25);
+        bool sci = (i == 26);
+        bool wrl = (i == 27);
+        bool screen = (i == 28);
+        bool extshd = (i == 29);
+        bool tarcog = (i == 30);
+
+        std::string const idf_objects = fmt::format(idf_objects_fmt,
+                                                    fmt::arg("csv", boolToString(csv)),
+                                                    fmt::arg("mtr", boolToString(mtr)),
+                                                    fmt::arg("eso", boolToString(eso)),
+                                                    fmt::arg("eio", boolToString(eio)),
+                                                    fmt::arg("tabular", boolToString(tabular)),
+                                                    fmt::arg("sqlite", boolToString(sqlite)),
+                                                    fmt::arg("json", boolToString(json)),
+                                                    fmt::arg("audit", boolToString(audit)),
+                                                    fmt::arg("zsz", boolToString(zsz)),
+                                                    fmt::arg("ssz", boolToString(ssz)),
+                                                    fmt::arg("dxf", boolToString(dxf)),
+                                                    fmt::arg("bnd", boolToString(bnd)),
+                                                    fmt::arg("rdd", boolToString(rdd)),
+                                                    fmt::arg("mdd", boolToString(mdd)),
+                                                    fmt::arg("mtd", boolToString(mtd)),
+                                                    fmt::arg("end", boolToString(end)),
+                                                    fmt::arg("shd", boolToString(shd)),
+                                                    fmt::arg("dfs", boolToString(dfs)),
+                                                    fmt::arg("glhe", boolToString(glhe)),
+                                                    fmt::arg("delightin", boolToString(delightin)),
+                                                    fmt::arg("delighteldmp", boolToString(delighteldmp)),
+                                                    fmt::arg("delightdfdmp", boolToString(delightdfdmp)),
+                                                    fmt::arg("edd", boolToString(edd)),
+                                                    fmt::arg("dbg", boolToString(dbg)),
+                                                    fmt::arg("perflog", boolToString(perflog)),
+                                                    fmt::arg("sln", boolToString(sln)),
+                                                    fmt::arg("sci", boolToString(sci)),
+                                                    fmt::arg("wrl", boolToString(wrl)),
+                                                    fmt::arg("screen", boolToString(screen)),
+                                                    fmt::arg("extshd", boolToString(extshd)),
+                                                    fmt::arg("tarcog", boolToString(tarcog)));
+
+        EXPECT_TRUE(process_idf(idf_objects));
+
+        state->files.outputControl.getInput(*state);
+
+        EXPECT_EQ(csv, state->files.outputControl.csv);
+        EXPECT_EQ(mtr, state->files.outputControl.mtr);
+        EXPECT_EQ(eso, state->files.outputControl.eso);
+        EXPECT_EQ(eio, state->files.outputControl.eio);
+        EXPECT_EQ(tabular, state->files.outputControl.tabular);
+        EXPECT_EQ(sqlite, state->files.outputControl.sqlite);
+        EXPECT_EQ(json, state->files.outputControl.json);
+        EXPECT_EQ(audit, state->files.outputControl.audit);
+        EXPECT_EQ(zsz, state->files.outputControl.zsz);
+        EXPECT_EQ(ssz, state->files.outputControl.ssz);
+        EXPECT_EQ(dxf, state->files.outputControl.dxf);
+        EXPECT_EQ(bnd, state->files.outputControl.bnd);
+        EXPECT_EQ(rdd, state->files.outputControl.rdd);
+        EXPECT_EQ(mdd, state->files.outputControl.mdd);
+        EXPECT_EQ(mtd, state->files.outputControl.mtd);
+        EXPECT_EQ(end, state->files.outputControl.end);
+        EXPECT_EQ(shd, state->files.outputControl.shd);
+        EXPECT_EQ(dfs, state->files.outputControl.dfs);
+        EXPECT_EQ(glhe, state->files.outputControl.glhe);
+        EXPECT_EQ(delightin, state->files.outputControl.delightin);
+        EXPECT_EQ(delighteldmp, state->files.outputControl.delighteldmp);
+        EXPECT_EQ(delightdfdmp, state->files.outputControl.delightdfdmp);
+        EXPECT_EQ(edd, state->files.outputControl.edd);
+        EXPECT_EQ(dbg, state->files.outputControl.dbg);
+        EXPECT_EQ(perflog, state->files.outputControl.perflog);
+        EXPECT_EQ(sln, state->files.outputControl.sln);
+        EXPECT_EQ(sci, state->files.outputControl.sci);
+        EXPECT_EQ(wrl, state->files.outputControl.wrl);
+        EXPECT_EQ(screen, state->files.outputControl.screen);
+        EXPECT_EQ(extshd, state->files.outputControl.extshd);
+        EXPECT_EQ(tarcog, state->files.outputControl.tarcog);
+
+        // state->clear_state();
+        // Make explicit that we're resetting everything
+        state->files.outputControl.csv = false;
+        state->files.outputControl.mtr = false;
+        state->files.outputControl.eso = false;
+        state->files.outputControl.eio = false;
+        state->files.outputControl.tabular = false;
+        state->files.outputControl.sqlite = false;
+        state->files.outputControl.json = false;
+        state->files.outputControl.audit = false;
+        state->files.outputControl.zsz = false;
+        state->files.outputControl.ssz = false;
+        state->files.outputControl.dxf = false;
+        state->files.outputControl.bnd = false;
+        state->files.outputControl.rdd = false;
+        state->files.outputControl.mdd = false;
+        state->files.outputControl.mtd = false;
+        state->files.outputControl.end = false;
+        state->files.outputControl.shd = false;
+        state->files.outputControl.dfs = false;
+        state->files.outputControl.glhe = false;
+        state->files.outputControl.delightin = false;
+        state->files.outputControl.delighteldmp = false;
+        state->files.outputControl.delightdfdmp = false;
+        state->files.outputControl.edd = false;
+        state->files.outputControl.dbg = false;
+        state->files.outputControl.perflog = false;
+        state->files.outputControl.sln = false;
+        state->files.outputControl.sci = false;
+        state->files.outputControl.wrl = false;
+        state->files.outputControl.screen = false;
+        state->files.outputControl.extshd = false;
+        state->files.outputControl.tarcog = false;
+    }
+}
+
 } // namespace EnergyPlus
