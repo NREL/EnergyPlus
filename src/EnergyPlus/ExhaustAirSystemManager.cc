@@ -580,6 +580,7 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.ExhaustFlowFractionScheduleNum = exhaustFlowFractionScheduleNum;
 
                 std::string supplyNodeOrNodelistName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "supply_node_or_nodelist_name");
+                thisExhCtrl.SupplyNodeOrNodelistName = supplyNodeOrNodelistName;
                 int supplyNodeOrNodelistNum = 0;
 
                 bool NodeListError = false;
@@ -604,8 +605,8 @@ namespace ExhaustAirSystemManager {
                 bool nodeNotFound = false;
                 if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
                     for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
-                        CheckForSupplyNode(); // bypass for debugging
-                        // CheckForSupplyNode(state, exhCtrlNum, nodeNotFound);
+                        // CheckForSupplyNode(); // bypass for debugging
+                        CheckForSupplyNode(state, exhCtrlNum, nodeNotFound);
                         if (nodeNotFound) {
                             ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
                             ShowContinueError(state, format("Node or NodeList Name ={}. Must all be supply nodes.", supplyNodeOrNodelistName));
@@ -913,25 +914,28 @@ namespace ExhaustAirSystemManager {
 
         // check a node is a zone inlet node.
         std::string_view RoutineName = "GetExhaustControlInput: ";
-        std::string CurrentModuleObject = "ZoneHVAC:ExhaustControl Supply Node Num";
+        std::string CurrentModuleObject = "ZoneHVAC:ExhaustControl";
 
         bool ZoneNodeNotFound = true;
         int NodeNum = 0;
         bool ErrorsFound = false;
-        int SupplyNodeNum = thisExhCtrl.SupplyNodeOrNodelistNum;
-        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(thisExhCtrl.ZoneNum).NumInletNodes; ++NodeNum) {
-            if (SupplyNodeNum == state.dataZoneEquip->ZoneEquipConfig(thisExhCtrl.ZoneNum).InletNode(NodeNum)) {
-                ZoneNodeNotFound = false;
-                break;
+        for (int i = 1; i < thisExhCtrl.SuppNodeNums.size(); ++i) {
+            int supplyNodeNum = thisExhCtrl.SuppNodeNums(i);
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(thisExhCtrl.ZoneNum).NumInletNodes; ++NodeNum) {
+                if (supplyNodeNum == state.dataZoneEquip->ZoneEquipConfig(thisExhCtrl.ZoneNum).InletNode(NodeNum)) {
+                    ZoneNodeNotFound = false;
+                    break;
+                }
+            }
+            if (ZoneNodeNotFound) {
+                ShowSevereError(state, format("{}{}={}", RoutineName, CurrentModuleObject, thisExhCtrl.Name));
+                ShowContinueError(state, format("Supply Node or Nodelist Name = {}", supplyNodeNum));
+                ShowContinueError(state, "..Nodes in the supply node or nodelist must be a zone inlet node.");
+                ErrorsFound = true;
             }
         }
-        if (ZoneNodeNotFound) {
-            ShowSevereError(state, format("{}{}={} is not a zone supply node.", RoutineName, CurrentModuleObject, SupplyNodeNum));
-            ShowContinueError(state, "..Nodes in the supply node or nodelist for ZoneHVAC:ExhaustControl object must be a zone inlet node.");
-            ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-            ShowContinueError(state, format("..Supply Node checked ={}.", +SupplyNodeNum));
-            ErrorsFound = true;
-        }
+
+        NodeNotFound = ErrorsFound;
     }
 
     bool ExhaustSystemHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name

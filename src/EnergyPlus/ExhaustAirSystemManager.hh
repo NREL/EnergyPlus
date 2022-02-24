@@ -108,6 +108,7 @@ namespace ExhaustAirSystemManager {
         Real64 DesignExhaustFlowRate = 0.0;
         int FlowControlTypeNum = 0;
         int ExhaustFlowFractionScheduleNum = 0;
+        std::string SupplyNodeOrNodelistName = "";
         int SupplyNodeOrNodelistNum = 0;
         int MinZoneTempLimitScheduleNum = 0;
         int MinExhFlowFracScheduleNum = 0;
@@ -118,10 +119,10 @@ namespace ExhaustAirSystemManager {
         Array1D_int SuppNodeNums;
 
         //// default constructor
-        // ZoneExhaustControl()
+        //ZoneExhaustControl()
         //    : AvailScheduleNum(0), ZoneName(""), ZoneNum(0), ControlledZoneNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0),
-        //      FlowControlTypeNum(0), ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0),
-        //      MinExhFlowFracScheduleNum(0), BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
+        //      FlowControlTypeNum(0), ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistName(""), SupplyNodeOrNodelistNum(0),
+        //      MinZoneTempLimitScheduleNum(0), MinExhFlowFracScheduleNum(0), BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
         //{
         //}
     };
