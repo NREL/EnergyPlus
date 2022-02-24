@@ -4,6 +4,7 @@
 #include <WCEGases.hpp>
 
 #include "EffectiveOpenness.hpp"
+#include "TarcogConstants.hpp"
 
 namespace Tarcog
 {
@@ -24,9 +25,9 @@ namespace Tarcog
                                                          double backIRTransmittance = 0.0);
 
             static std::shared_ptr<CIGUSolidLayer>
-              makeDeflectable(const std::shared_ptr<CIGUSolidLayer> & layer,
-                              double youngsModulus,
-                              double poissonRatio);
+              updateMaterialData(const std::shared_ptr<CIGUSolidLayer> & layer,
+                                 double density = MaterialConstants::GLASSDENSITY,
+                                 double youngsModulus = DeflectionConstants::YOUNGSMODULUS);
 
             static std::shared_ptr<CIGUSolidLayer>
               shading(double thickness,

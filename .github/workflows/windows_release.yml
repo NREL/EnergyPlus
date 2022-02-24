@@ -9,6 +9,7 @@ env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BUILD_TYPE: Release
+  PYTHON_VERSION: 3.8
 
 jobs:
   windows_release:
@@ -32,10 +33,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.7
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v2
+      id: setup-python
       with:
-        python-version: 3.7
+        python-version: ${{ env.PYTHON_VERSION }}
         architecture: ${{ matrix.arch }}
 
     - name: Setup QtIFW 4.x
@@ -104,8 +106,10 @@ jobs:
       run: |
         set -x
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
-              -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
-              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DPython_ROOT_DIR=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.arch }}/ \
+              -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
               ../
 
     - name: Build Package

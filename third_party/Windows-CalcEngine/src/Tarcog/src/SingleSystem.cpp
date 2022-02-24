@@ -84,9 +84,10 @@ namespace Tarcog
             const auto aFirstLayer = m_IGU.getEnvironment(Environment::Outdoor);
             m_Environment.at(Environment::Outdoor)->connectToIGULayer(aFirstLayer);
 
-            //initializeStartValues();
+            // initializeStartValues();
 
-            m_NonLinearSolver = std::make_shared<CNonLinearSolver>(m_IGU, t_SingleSystem.getNumberOfIterations());
+            m_NonLinearSolver =
+              std::make_shared<CNonLinearSolver>(m_IGU, t_SingleSystem.getNumberOfIterations());
 
             return *this;
         }
@@ -121,6 +122,16 @@ namespace Tarcog
             return m_IGU.getMeanDeflections();
         }
 
+        std::vector<double> CSingleSystem::getPanesLoad() const
+        {
+            return m_IGU.getPanesLoad();
+        }
+
+        void CSingleSystem::setAppliedLoad(std::vector<double> load)
+        {
+            m_IGU.setAppliedLoad(std::move(load));
+        }
+
         std::shared_ptr<CSingleSystem> CSingleSystem::clone() const
         {
             return std::make_shared<CSingleSystem>(*this);
@@ -144,6 +155,16 @@ namespace Tarcog
         double CSingleSystem::getHc(Environment const t_Environment) const
         {
             return m_Environment.at(t_Environment)->getHc();
+        }
+
+        double CSingleSystem::getHr(Environment t_Environment) const
+        {
+            return m_Environment.at(t_Environment)->getHr();;
+        }
+
+        double CSingleSystem::getH(Environment t_Environment) const
+        {
+            return getHc(t_Environment) + getHr(t_Environment);
         }
 
         double CSingleSystem::getAirTemperature(Environment const t_Environment) const
@@ -304,12 +325,36 @@ namespace Tarcog
             m_IGU.setHeight(height);
         }
 
+        void CSingleSystem::setTilt(const double tilt)
+        {
+            m_IGU.setTilt(tilt);
+        }
+
         void CSingleSystem::setInteriorAndExteriorSurfacesHeight(double height)
         {
-            for(auto & environment : m_Environment)
+            for(auto & [key, environment] : m_Environment)
             {
-                environment.second->setHeight(height);
+                std::ignore = key;
+                environment->setHeight(height);
             }
+        }
+
+        void CSingleSystem::setDeflectionProperties(const double t_Tini,
+                                                    const double t_Pini)
+        {
+            m_IGU.setDeflectionProperties(t_Tini,
+                                          t_Pini,
+                                          m_Environment.at(Environment::Indoor)->getPressure(),
+                                          m_Environment.at(Environment::Outdoor)->getPressure());
+
+            // Need to throw previous solution off in case someone calculated CSingleSystem without
+            // deflection and then turns deflection on, iterations will conclude that solution is correct (Simon)
+            initializeStartValues();
+        }
+
+        void CSingleSystem::clearDeflection()
+        {
+            m_IGU.clearDeflection();
         }
     }   // namespace ISO15099
 

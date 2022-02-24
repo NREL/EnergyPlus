@@ -56,3 +56,14 @@ TEST_F(TestBeamDirection, TestBeamDirectionAssignment)
     EXPECT_NEAR(18, aCopyDirection.theta(), 1e-6);
     EXPECT_NEAR(90, aCopyDirection.phi(), 1e-6);
 }
+
+TEST_F(TestBeamDirection, TestBeamDirectionRotation)
+{
+    SCOPED_TRACE("Begin Test: Rotation of beam direction.");
+
+    CBeamDirection direction1{18, 90};
+    const double rotationAngle{45};
+    CBeamDirection direction{direction1.rotate(rotationAngle)};
+
+    EXPECT_NEAR(135, direction.phi(), 1e-6);
+}

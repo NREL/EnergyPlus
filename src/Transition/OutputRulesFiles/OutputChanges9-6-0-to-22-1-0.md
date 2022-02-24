@@ -144,3 +144,38 @@ See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more 
 Renamed the output variable "Environment:Site Precipitation Depth" to "Environment:Liquid Precipitation Depth".
 
 See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
+### Fenestration Assembly Reporting
+
+Added several items to Envelope Summary in tabular output report:
+
+- For Exterior Fenestration subtable, added Frame and Divider Name
+- For Exterior Fenestration subtable, added NFRC product type, assembly u-factor, assembly SHGC, assembly visible transmittance
+- Added new Exterior Fenestration Shaded State subtable by construction listing some of the same items as the Exterior Fenestration subtable but when the shading is deployed.
+
+Also added two new EIO lines showing same additions as were added to the tabular output report:
+
+- FenestrationAssembly
+- FenestrationShadedState
+
+See pull request [#8740](https://github.com/NREL/EnergyPlus/pull/8740) for more details.
+See pull request [#9177](https://github.com/NREL/EnergyPlus/pull/9177) for more details.
+
+
+### Exhaust System New Output Variables
+
+Five new output variables related to the AirLoopHVAC:Exhaust System have been added along with the new feature development. These new variables are:
+
+- Central Exhaust Fan Mass Flow Rate [kg/s]
+- Central Exhaust Fan Volumetric Flow Rate Standard [m3/s]
+- Central Exhaust Fan Volumetric Flow Rate Current [m3/s]
+- Central Exhaust Fan Power [W]
+- Central Exhaust Fan Energy [J]
+
+See pull request [#9209](https://github.com/NREL/EnergyPlus/pull/9209) for more details.
+
+### EIO Sizing information for Central Exhaust Fan
+One line is added to the EIO sizing report regarding the central exhaust fan "Design Fan Airflow [m3/s]" sizing containing the following information: 
+- FanName, FanType, "Design Fan Airflow [m3/s]", Design Flow Rate Value
+
+See pull request [#9209](https://github.com/NREL/EnergyPlus/pull/9209) for more details.
+

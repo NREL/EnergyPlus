@@ -7,24 +7,27 @@
    <key>CFBundleName</key>
    <string>IDFVersionUpdater</string>
    <key>CFBundleIdentifier</key>
-   <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+   <string>com.gard.idfversionupdater</string>
    <key>CFBundleInfoDictionaryVersion</key>
    <string>6.0</string>
    <key>CFBundleVersion</key>
-   <string>0.13.0.2.0</string>
+   <string>0.15.0.2.0</string>
    <key>CFBundleDevelopmentRegion</key>
    <string>en</string>
    <key>CFBundlePackageType</key>
    <string>APPL</string>
    <key>CFBundleSignature</key>
-   <string></string>
-   <key>CFBundleGetInfoString</key>
-   <string>0.13</string>
+   <string>????</string>
+   <key>NSHumanReadableCopyright</key>
+   <string>0.15</string>
    <key>CFBundleShortVersionString</key>
-   <string>0.13</string>
+   <string>0.15</string>
    <key>CFBundleIconFile</key>
-   <string>IDFVersionUpdater.icns</string>
+   <string>App</string>
    <key>LSMinimumSystemVersion</key>
-   <string>10.7</string>
+   <string>10.10.0</string>
+<key>NSHighResolutionCapable</key><false/>
+<key>NSRequiresAquaSystemAppearance</key><true/>
+<key>CFBundleSupportedPlatforms</key><array><string>MacOSX</string></array>
 </dict>
 </plist>
