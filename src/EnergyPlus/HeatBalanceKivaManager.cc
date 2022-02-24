@@ -721,21 +721,11 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             }
 
             Kiva::Polygon floorPolygon;
-            if (state.dataSurface->CCW) {
-                for (std::size_t i = 0; i < surface.Vertex.size(); ++i) {
-                    auto &v = surface.Vertex[i];
-                    floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
-                    if (!userSetExposedPerimeter) {
-                        isExposedPerimeter.push_back(true);
-                    }
-                }
-            } else {
-                for (int i = surface.Vertex.size() - 1; i >= 0; --i) {
-                    auto &v = surface.Vertex[i];
-                    floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
-                    if (!userSetExposedPerimeter) {
-                        isExposedPerimeter.push_back(true);
-                    }
+            for (std::size_t i = 0; i < surface.Vertex.size(); ++i) {
+                auto &v = surface.Vertex[i];
+                floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
+                if (!userSetExposedPerimeter) {
+                    isExposedPerimeter.push_back(true);
                 }
             }
 
