@@ -353,6 +353,9 @@ namespace SystemAvailabilityManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetSysAvailManagerInputs: "); // include trailing blank
 
+        constexpr std::array<std::string_view, static_cast<int>(ControlAlgorithm::Num)> ControlAlgorithmNamesUC = {
+            "CONSTANTTEMPERATUREGRADIENT", "ADAPTIVETEMPERATUREGRADIENT", "ADAPTIVEASHRAE", "CONSTANTSTARTTIME"};
+
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
@@ -881,22 +884,14 @@ namespace SystemAvailabilityManager {
                     }
                 }
 
-                {
-                    auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(7)));
-                    if (SELECT_CASE_var == "CONSTANTTEMPERATUREGRADIENT") {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ControlAlgorithm::ConstantTemperatureGradient;
-                    } else if (SELECT_CASE_var == "ADAPTIVETEMPERATUREGRADIENT") {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ControlAlgorithm::AdaptiveTemperatureGradient;
-                    } else if (SELECT_CASE_var == "ADAPTIVEASHRAE") {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ControlAlgorithm::AdaptiveASHRAE;
-                    } else if (SELECT_CASE_var == "CONSTANTSTARTTIME") {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ControlAlgorithm::ConstantStartTime;
-                    } else {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ControlAlgorithm::AdaptiveASHRAE;
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                        ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
-                        ErrorsFound = true;
-                    }
+                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType =
+                    static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(7))));
+
+                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::Invalid) {
+                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ControlAlgorithm::AdaptiveASHRAE;
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
+                    ErrorsFound = true;
                 }
 
                 if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::ConstantTemperatureGradient) {
