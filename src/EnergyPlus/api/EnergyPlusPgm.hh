@@ -53,7 +53,9 @@
 // C++ Headers
 #include <string>
 
-namespace EnergyPlus { struct EnergyPlusData; }
+namespace EnergyPlus {
+struct EnergyPlusData;
+}
 
 // Functions
 
