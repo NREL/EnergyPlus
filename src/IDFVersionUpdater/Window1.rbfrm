@@ -805,7 +805,10 @@ End
 		  dim repcsvFileInOrig as FolderItem
 		  
 		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  if origVerIndx = -1 then origVerIndx = AllNewVersions.FirstIndex 'if not found just start at the beginning
+		  
 		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  if finalVerIndx = -1 then finalVerIndx = AllNewVersions.LastIndex 'if not found go until the last
 		  
 		  if inFile<>"" then
 		    origFile = new FolderItem(inFile)
@@ -861,7 +864,10 @@ End
 		  dim repcsvFileInOrig as FolderItem
 		  
 		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  if origVerIndx = -1 then origVerIndx = AllNewVersions.FirstIndex 'if not found just start at the beginning
+		  
 		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  if finalVerIndx = -1 then finalVerIndx = AllNewVersions.LastIndex 'if not found go until the last
 		  
 		  if inFile<>"" then
 		    origFile = new FolderItem(inFile)
@@ -1203,7 +1209,7 @@ End
 		  if f<>nil then
 		    txtFileName.Text = f.NativePath
 		    txtFileName.Enabled = True
-		    if extensionOnly(f.NativePath) <> "LST" then 'IDF or IDM files are processed
+		    if extensionOnly(f.NativePath) <> "lst" then 'IDF or IDM files are processed
 		      curVersion =  getCurrentFileVersion(f)
 		      if curVersion<>"" then
 		        txtCurrentVersion.Text = curVersion
@@ -1248,7 +1254,7 @@ End
 		  #if TargetWindows or TargetLinux then
 		    call CopyIDDandCSV(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text)
 		  #EndIf
-		  if ExtensionOnly(txtFileName.Text) = "LST" then
+		  if ExtensionOnly(txtFileName.Text) = "lst" then
 		    listFile = new FolderItem(txtFileName.Text )
 		    IF listFile.Exists then
 		      SourceStream = TextInputStream.Open(listFile)
