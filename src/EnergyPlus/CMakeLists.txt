@@ -17,27 +17,25 @@ configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/Configured
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema")
 
 if(LINK_WITH_PYTHON)
-  add_definitions("-DLINK_WITH_PYTHON=1")
-else()
-  add_definitions("-DLINK_WITH_PYTHON=0")
+  add_compile_definitions(LINK_WITH_PYTHON)
 endif()
 
 if(USE_PSYCHROMETRICS_CACHING)
   # Caching defaulted ON
 else()
-  add_definitions("-DEP_nocache_Psychrometrics")
+  add_compile_definitions(EP_nocache_Psychrometrics)
 endif()
 
 if(USE_GLYCOL_CACHING)
-  add_definitions("-DEP_cache_GlycolSpecificHeat")
+  add_compile_definitions(EP_cache_GlycolSpecificHeat)
 endif()
 
 if(USE_PSYCH_STATS)
-  add_definitions("-DEP_psych_stats")
+  add_compile_definitions(EP_psych_stats)
 endif()
 
 if(USE_PSYCH_ERRORS)
-  add_definitions("-DEP_psych_errors")
+  add_compile_definitions(EP_psych_errors)
 endif()
 
 set(SRC
@@ -262,6 +260,8 @@ set(SRC
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc
     EvaporativeFluidCoolers.hh
+    ExhaustAirSystemManager.cc
+    ExhaustAirSystemManager.hh
     ExteriorEnergyUse.cc
     ExteriorEnergyUse.hh
     ExternalInterface.cc
@@ -465,7 +465,6 @@ set(SRC
     Plant/Component.hh
     Plant/ConnectedLoopData.hh
     Plant/Connection.hh
-    Plant/DataPlant.cc
     Plant/DataPlant.hh
     Plant/Enums.hh
     Plant/EquipAndOperations.hh
@@ -831,7 +830,7 @@ option(BUILD_STATIC_ENERGYPLUS_API "Build a static library instead of a shared l
 mark_as_advanced(BUILD_STATIC_ENERGYPLUS_API)
 if(BUILD_STATIC_ENERGYPLUS_API)
   set(API_LIBRARY_TYPE STATIC)
-  add_definitions(-DENERGYPLUS_STATIC_API)
+  add_compile_definitions(ENERGYPLUS_STATIC_API)
 else()
   set(API_LIBRARY_TYPE SHARED)
 endif()

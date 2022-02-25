@@ -219,6 +219,146 @@ AirLoopHVAC:SupplyPath,
   Zone Supply Air Splitter;       ! Component 2 Name
 \end{lstlisting}
 
+\subsection{AirLoopHVAC:ExhaustSystem}\label{airloophvacexhaustsystem}
+
+The AirLoopHVAC:ExhaustSystem and ZoneHVAC:ExhaustControl objects are used to describe the way that the exhaust air streams are configured. These objects provide a way for the exhaust air streams from multiple zones to be rerouted and recombined to form a new central exhausts. The exhaust system is composed of a central exhaust fan and a zone mixer).
+
+\subsubsection{Inputs}
+
+The AirLoopHVAC:ExhaustSystem will take the following input fields:
+
+\paragraph{Field: Name}
+
+The name of the exhaust system.
+
+\paragraph{Field: Zone Mixer Name}
+
+This is the name of the AirLoopHVAC:ZoneMixer object that connects the exhaust air streams from multiple zones. The zone mixer will have the inlet nodes for the exhaust system defined; and typically each inlet node must be the outlet node of a ZoneHVAC:ExhaustControl object.
+
+\paragraph{Field: Fan Object Type}
+
+This is the type of fan object for the central exhaust fan. The available choices are Fan:SystemModel or Fan:ComponentModel.
+
+\paragraph{Field: Fan Name}
+
+This is a required field for the name of the central exhaust fan.
+
+An example of the AirLoopHVAC:ExhaustSystem input object is like this:
+
+\begin{lstlisting}
+
+AirLoopHVAC:ExhaustSystem,
+    Central Exhaust 1,           !- Name
+    AirLoopExhaustMixer1,        !- Zone Mixer Name    
+    Fan:SystemModel,             !- Fan Object Type
+    CentralExhaustFan1;          !- Fan Name
+
+\end{lstlisting}
+
+\subsubsection{Outputs}
+
+The following output will be added the to the new exhaust system: 
+
+\begin{itemize}
+
+\item HVAC,Average,Central Exhaust Fan Mass Flow Rate {[}kg/s{]}
+\item HVAC,Average,Central Exhaust Fan Volumetric Flow Rate Standard {[}m3/s{]}
+\item HVAC,Average,Central Exhaust Fan Volumetric Flow Rate Current {[}m3/s{]}
+\item HVAC,Average,Central Exhaust Fan Power {[}W{]}
+\item HVAC,Sum,Central Exhaust Fan Energy {[}J{]}
+
+\end{itemize}
+
+\paragraph{Central Exhaust Fan Mass Flow Rate [kg/s]}
+Mass flow rate of the central exhaust fan in [kg/s].
+
+\paragraph{Central Exhaust Fan Volumetric Flow Rate Standard [m3/s]}
+Volumetric flow rate of the central exhaust fan in [m3/s] under standard conditions.
+
+\paragraph{Central Exhaust Fan Volumetric Flow Rate Current [m3/s]}
+Volumetric flow rate of the central exhaust fan in [m3/s] under current fan outlet conditions.
+
+\paragraph{Central Exhaust Fan Power [W]}
+Power consumption of the central exhaust fan in [W].
+
+\paragraph{Central Exhaust Fan Energy [J]}
+Energy usage of the central exhaust fan in [J].
+
+\subsection{ZoneHVAC:ExhaustControl}
+
+The input fields for the ZoneHVAC:ExhaustControl object are as follows.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the name of the ZoneHVAC:ExhaustControl.
+
+\paragraph{Field: Availability Schedule Name}
+
+This is the availability schedule name of the ZoneHVAC:ExhaustControl equipment. A schedule value of zero means off, and >0 means on. If the connected AirloopHVAC:ExhaustSystem is on, then this schedule may be used to turn on (or off) the ZoneHVAC:ExhaustControl system. If the connected AirloopHVAC:ExhaustSystem is off, then this ZoneHVAC:ExhaustControl system will be off, and this schedule will be ignored.
+
+\paragraph{Field: Zone Name}
+
+The name of the zone that the exhaust is located within.
+
+\paragraph{Field: Inlet Node Name}
+
+This is the inlet node name of the ZoneHVAC:ExhaustControl object. This should be an exhaust node of the zone.
+
+\paragraph{Field: Outlet Node Name}
+
+This is the outlet node name of the ZoneHVAC:ExhaustControl object. This node must be connected to an AirLoopHVAC:ExhaustSystem object as an inlet node.
+
+\paragraph{Field: Design Flow Rate {m3/s}}
+
+This numerical field is the design exhaust flow rate of the exhaust system in [m3/s]. This field could be autosized. The default is autosize.
+
+\paragraph{Field: Flow Control Type}
+
+This field is the control type on how the exhaust flows are controlled. The available choices are: \emph{Scheduled} or \emph{FollowSupply}. \emph{Scheduled} means that the target exhaust flow rate will be the Design Flow Rate times the Flow Fraction Schedule. \emph{FollowSupply} means that the target exhaust flow rate will be the current total flow rate at the node(s) specified in Supply Node or NodeList Name times the Flow Fraction Schedule. For both control types, if the central exhaust fan is not able to meet the total target exhaust flow rate for all of its inlets, then the flow rate will be reduced proportionally to match the available fan flow.
+
+\paragraph{Field: Flow Fraction Schedule Name}
+
+This is the schedule name for the exhaust flow fraction. If left empty, the default value is 1.0. This schedule is only applied for Flow Control Type - Schedules.
+
+\paragraph{Field: Supply Node or NodeList Name}
+
+This is the supply air node or nodelist name used for the \emph{FollowSupply} flow control type.
+
+\paragraph{Field: Minimum Zone Temperature Limit Schedule Name}
+
+This will be the minimum zone temperature limit schedule name. It will be used to shut down the exhaust flow rate to the Minimum Flow Fraction Schedule value if the zone temperature get below this limit.
+
+\paragraph{Field: Minimum Flow Fraction Schedule Name}
+
+This is the schedule name for the minimum exhaust flow fraction. If left empty, the default value would be 1.0.
+
+\paragraph{Field: Balanced Exhaust Fraction Schedule Name}
+
+This field is optional. If it is not used, then all the exhaust air flow is assumed to be unbalanced by any simple air flows, such as infiltration, ventilation, or zone mixing. Unbalanced exhaust is then modeled as being provided by the outdoor air system in the central air system. The modeling of unbalanced will reduce the flow rates at the zone’s return air node by the flow rate that is being exhausted and will ensure that the outdoor air flow rate is sufficient to serve the exhaust. If this field is used, then enter the name of a schedule with fractional values between 0.0 and 1.0, inclusive. This fraction is applied to the exhaust fan flow rate and the model tracks the portion of the exhaust that is balanced. Balanced exhaust is then modeled as being provided by simple airflows and does not impact the central air system return air or outdoor air flow rates. For example, if a kitchen zone with an exhaust fan is designed to draw half of its make up air from a neighboring dining room and the other half from the outdoor air system, then a schedule value of 0.5 could be used here. This input field must be blank when the zone air flow balance is enforced. If user specifies a schedule and zone air flow balance is enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.
+
+An example of the ZoneHVAC:ExhaustControl input object is like this:
+
+\begin{lstlisting}
+
+ZoneHVAC:ExhaustControl,
+    Zone2 Exhaust System,           !-Name
+    HVACOperationSchd,              !- Availability Schedule Name
+    Zone2,                          !- Zone Name
+    Zone2 Exhaust Node,             !- Inlet Node Name
+    Zone2 ExhaustSystem Node,       !- Outlet Node Name
+    0.1,                            !- Design Flow Rate {m3/s}
+    Scheduled,                      !- Flow Control Type (Scheduled or FollowSupply)
+    Zone2 Exhaust Flow Sched,       !- Flow Fraction Schedule Name
+    ,                               !- Supply Node or NodeList Name (used with FollowSupply control type)
+    ,                               !- System Availability Manager Name
+    ,                               !- Minimum Zone Temperature Limit Schedule Name
+    Zone2 Min Exhaust Flow Sched,   !- Minimum Flow Fraction Schedule Name
+    FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
+
+\end{lstlisting}
+
 \subsection{AirLoopHVAC:ZoneSplitter}\label{airloophvaczonesplitter}
 
 The AirLoopHVAC:ZoneSplitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} object. The input contains only node connection information.
@@ -251,7 +391,7 @@ AirLoopHVAC:ZoneSplitter,
 
 \subsection{AirLoopHVAC:ZoneMixer}\label{airloophvaczonemixer}
 
-The AirLoopHVAC:ZoneMixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This compoment may be part of an air loop return path or part of an induction terminal unit. When used as a return air mixer, this component must be listed in an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} object, and the inlets may be zone return air nodes or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} outlet nodes. When used in an induction terminal unit (ref. \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}, and \hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}), one inlet node is the supply (primary) air inlet from the central air handler, and the second inlet node is the induced (secondary) air inlet. These node names should match equivalent node names in the terminal unit.
+The AirLoopHVAC:ZoneMixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component may be part of an air loop return path, an air loop exhaust system, or part of an induction terminal unit. When used as a return air mixer, this component must be listed in an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} object, and the inlets may be zone return air nodes or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} outlet nodes. When used as an exhaust air mixer, this component must be listed in an \hyperref[airloophvacexhaustsystem]{AirLoopHVAC:ExhaustSystem} object, and the inlets may be zone exhaust air nodes. When used in an induction terminal unit (ref. \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}, and \hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}), one inlet node is the supply (primary) air inlet from the central air handler, and the second inlet node is the induced (secondary) air inlet. These node names should match equivalent node names in the terminal unit.
 
 \subsubsection{Inputs}
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -181,20 +181,18 @@ void SimCoolingPanel(EnergyPlusData &state,
             MinWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMinAvail;
         }
 
-        {
-            auto const SELECT_CASE_var(ThisCP.EquipType);
-
-            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-                ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
-            } else {
-                ShowSevereError(state,
-                                "SimCoolingPanelSimple: Errors in CoolingPanel=" +
-                                    state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-                ShowContinueError(state,
-                                  format("Invalid or unimplemented equipment type={}",
-                                         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
+        switch (ThisCP.EquipType) {
+        case DataPlant::PlantEquipmentType::CoolingPanel_Simple: { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+            ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
+        } break;
+        default: {
+            ShowSevereError(
+                state, "SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            ShowContinueError(
+                state,
+                format("Invalid or unimplemented equipment type={}", state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
+            ShowFatalError(state, "Preceding condition causes termination.");
+        } break;
         }
 
         PowerMet = ThisCP.TotPower;
@@ -322,22 +320,22 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         ThisCP.WaterInletNode = GetOnlySingleNode(state,
                                                   state.dataIPShortCut->cAlphaArgs(3),
                                                   ErrorsFound,
-                                                  cCMO_CoolingPanel_Simple,
+                                                  DataLoopNode::ConnectionObjectType::ZoneHVACCoolingPanelRadiantConvectiveWater,
                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                   DataLoopNode::NodeFluidType::Water,
-                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                  NodeInputManager::compFluidStream::Primary,
+                                                  DataLoopNode::ConnectionType::Inlet,
+                                                  NodeInputManager::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
         // Get outlet node number
         ThisCP.WaterOutletNode = GetOnlySingleNode(state,
                                                    state.dataIPShortCut->cAlphaArgs(4),
                                                    ErrorsFound,
-                                                   cCMO_CoolingPanel_Simple,
+                                                   DataLoopNode::ConnectionObjectType::ZoneHVACCoolingPanelRadiantConvectiveWater,
                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                   NodeInputManager::compFluidStream::Primary,
+                                                   DataLoopNode::ConnectionType::Outlet,
+                                                   NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state,
                     cCMO_CoolingPanel_Simple,
@@ -464,24 +462,24 @@ void GetCoolingPanelInput(EnergyPlusData &state)
 
         // Process the temperature control type
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanAirTemperature)) {
-            ThisCP.ControlType = Control::MAT;
+            ThisCP.controlType = ClgPanelCtrlType::MAT;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanRadiantTemperature)) {
-            ThisCP.ControlType = Control::MRT;
+            ThisCP.controlType = ClgPanelCtrlType::MRT;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OperativeTemperature)) {
-            ThisCP.ControlType = Control::Operative;
+            ThisCP.controlType = ClgPanelCtrlType::Operative;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirDryBulbTemperature)) {
-            ThisCP.ControlType = Control::ODB;
+            ThisCP.controlType = ClgPanelCtrlType::ODB;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirWetBulbTemperature)) {
-            ThisCP.ControlType = Control::OWB;
+            ThisCP.controlType = ClgPanelCtrlType::OWB;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneTotalLoad)) {
-            ThisCP.ControlType = Control::ZoneTotalLoad;
+            ThisCP.controlType = ClgPanelCtrlType::ZoneTotalLoad;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneConvectiveLoad)) {
-            ThisCP.ControlType = Control::ZoneConvectiveLoad;
+            ThisCP.controlType = ClgPanelCtrlType::ZoneConvectiveLoad;
         } else {
             ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " =" + state.dataIPShortCut->cAlphaArgs(6));
             ShowContinueError(state, "Occurs in " + std::string{RoutineName} + " = " + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Control reset to MAT control for this Simple Cooling Panel.");
-            ThisCP.ControlType = Control::MAT;
+            ThisCP.controlType = ClgPanelCtrlType::MAT;
         }
 
         ThisCP.ColdThrottlRange = state.dataIPShortCut->rNumericArgs(8);
@@ -575,7 +573,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         // search zone equipment list structure for zone index
         for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
             for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
+                if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::CoolingPanel &&
                     state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
                     ThisCP.ZonePtr = ctrlZone;
                 }
@@ -818,19 +816,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     if (state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    ThisCP.EquipID,
-                                    ThisCP.EquipType,
-                                    ThisCP.LoopNum,
-                                    ThisCP.LoopSideNum,
-                                    ThisCP.BranchNum,
-                                    ThisCP.CompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+            ScanPlantLoopsForObject(state, ThisCP.EquipID, ThisCP.EquipType, ThisCP.plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "InitCoolingPanel: Program terminated for previous conditions.");
             }
@@ -848,20 +834,12 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
             // set design mass flow rates
             if (ThisCP.WaterInletNode > 0) {
                 rho = GetDensityGlycol(state,
-                                       state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidName,
                                        DataGlobalConstants::CWInitConvTemp,
-                                       state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                        RoutineName);
                 ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
-                InitComponentNodes(state,
-                                   0.0,
-                                   ThisCP.WaterMassFlowRateMax,
-                                   ThisCP.WaterInletNode,
-                                   ThisCP.WaterOutletNode,
-                                   ThisCP.LoopNum,
-                                   ThisCP.LoopSideNum,
-                                   ThisCP.BranchNum,
-                                   ThisCP.CompNum);
+                InitComponentNodes(state, 0.0, ThisCP.WaterMassFlowRateMax, ThisCP.WaterInletNode, ThisCP.WaterOutletNode);
             }
         }
     }
@@ -871,29 +849,21 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
         // Initialize
 
         rho = GetDensityGlycol(state,
-                               state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName,
+                               state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidName,
                                DataGlobalConstants::InitConvTemp,
-                               state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex,
+                               state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                RoutineName);
 
         ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
-        InitComponentNodes(state,
-                           0.0,
-                           ThisCP.WaterMassFlowRateMax,
-                           ThisCP.WaterInletNode,
-                           ThisCP.WaterOutletNode,
-                           ThisCP.LoopNum,
-                           ThisCP.LoopSideNum,
-                           ThisCP.BranchNum,
-                           ThisCP.CompNum);
+        InitComponentNodes(state, 0.0, ThisCP.WaterMassFlowRateMax, ThisCP.WaterInletNode, ThisCP.WaterOutletNode);
 
         ThisInNode.Temp = 7.0;
 
         Cp = GetSpecificHeatGlycol(state,
-                                   state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidName,
                                    ThisInNode.Temp,
-                                   state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                    RoutineName);
 
         ThisInNode.Enthalpy = Cp * ThisInNode.Temp;
@@ -1097,14 +1067,14 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 if (PltSizCoolNum > 0) {
                     if (DesCoilLoad >= SmallLoad) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidName,
                                                5.,
-                                               state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         Cp = GetSpecificHeatGlycol(state,
-                                                   state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidName,
                                                    5.0,
-                                                   state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                         WaterVolFlowMaxCoolDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                     } else {
@@ -1375,21 +1345,21 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     // vary the flow to meet the zone load calculated by the user-defined thermostat.  Temperature based controls vary the flow
     // based on a comparison between the control temperature and the setpoint schedule and throttling range.
 
-    if ((this->ControlType == Control::ZoneTotalLoad) || (this->ControlType == Control::ZoneConvectiveLoad)) {
+    if ((this->controlType == ClgPanelCtrlType::ZoneTotalLoad) || (this->controlType == ClgPanelCtrlType::ZoneConvectiveLoad)) {
 
         if (QZnReq < -SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
             Cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                        waterInletTemp,
-                                       state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
             // Find the actual load: this parameter modifies what the response of the system should be.  For total load control, the system tries
             // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
             // the panel is higher as is its output.  Total load control will miss the setpoint temperature but will likely get there with time.
             // Convective load control will hit the setpoint short term better but will result in overcooling in the long run probably.
-            if (this->ControlType == Control::ZoneConvectiveLoad) {
+            if (this->controlType == ClgPanelCtrlType::ZoneConvectiveLoad) {
                 QZnReq = QZnReq / this->FracConvect;
             }
 
@@ -1458,17 +1428,16 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     }
 
     if (CoolingPanelOn) {
-        SetComponentFlowRate(
-            state, waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        SetComponentFlowRate(state, waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->plantLoc);
         if (waterMassFlowRate <= 0.0) CoolingPanelOn = false;
     }
 
     if (CoolingPanelOn) {
         // Now simulate the system...
         Cp = GetSpecificHeatGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                    waterInletTemp,
-                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                    RoutineName);
         Effectiveness = 1.0 - exp(-this->UA / (waterMassFlowRate * Cp));
         if (Effectiveness <= 0.0) {
@@ -1538,23 +1507,27 @@ void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real6
 
     // Using/Aliasing
 
-    {
-        auto const SELECT_CASE_var(this->ControlType);
-        if (SELECT_CASE_var == Control::MAT) {
-            ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-        } else if (SELECT_CASE_var == Control::MRT) {
-            ControlTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
-        } else if (SELECT_CASE_var == Control::Operative) {
-            ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-        } else if (SELECT_CASE_var == Control::ODB) {
-            ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
-        } else if (SELECT_CASE_var == Control::OWB) {
-            ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
-        } else { // Should never get here
-            ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
-            ShowFatalError(state, "Preceding condition causes termination.");
-        }
+    switch (this->controlType) {
+    case ClgPanelCtrlType::MAT: {
+        ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+    } break;
+    case ClgPanelCtrlType::MRT: {
+        ControlTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+    } break;
+    case ClgPanelCtrlType::Operative: {
+        ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+    } break;
+    case ClgPanelCtrlType::ODB: {
+        ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+    } break;
+    case ClgPanelCtrlType::OWB: {
+        ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
+    } break;
+    default: { // Should never get here
+        ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+        ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
+        ShowFatalError(state, "Preceding condition causes termination.");
+    } break;
     }
 }
 

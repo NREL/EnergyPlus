@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -224,16 +224,17 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(*state,
-                                                                                            "Zone 1 Node",
-                                                                                            ErrorsFound,
-                                                                                            "Zone",
-                                                                                            "BeamTest",
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                            NodeInputManager::compFluidStream::Primary,
-                                                                                            DataLoopNode::ObjectIsNotParent,
-                                                                                            "Test zone node");
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "Zone 1 Node",
+                                            ErrorsFound,
+                                            DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                            "BeamTest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::ConnectionType::ZoneNode,
+                                            NodeInputManager::CompFluidStream::Primary,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "Test zone node");
 
     state->dataDefineEquipment->NumAirDistUnits = 1;
     state->dataDefineEquipment->AirDistUnit.allocate(1);

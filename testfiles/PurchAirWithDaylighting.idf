@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.1;
 
   Timestep,6;
 
@@ -539,7 +539,13 @@
     1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
     0.8,                     !- Divider Solar Absorptance
     0.8,                     !- Divider Visible Absorptance
-    0.9;                     !- Divider Thermal Hemispherical Emissivity
+    0.9,                     !- Divider Thermal Hemispherical Emissivity
+    ,                        !- Outside Reveal Solar Absorptance
+    ,                        !- Inside Sill Depth {m}
+    ,                        !- Inside Sill Solar Absorptance
+    ,                        !- Inside Reveal Depth {m}
+    0.5,                     !- Inside Reveal Solar Absorptance
+    ProjectingSingle;        !- NFRC Product Type for Assembly Calculations
 
   ScheduleTypeLimits,
     Any Number;              !- Name

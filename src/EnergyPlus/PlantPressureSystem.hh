@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,29 +62,42 @@ struct EnergyPlusData;
 
 namespace PlantPressureSystem {
 
-    void SimPressureDropSystem(EnergyPlusData &state,
-                               int LoopNum,                        // Plant Loop to update pressure information
-                               bool FirstHVACIteration,            // System flag
-                               DataPlant::PressureCall CallType,   // Enumerated call type
-                               Optional_int_const LoopSideNum = _, // Loop side num for specific branch simulation
-                               Optional_int_const BranchNum = _    // Branch num for specific branch simulation
+    void SimPressureDropSystem(
+        EnergyPlusData &state,
+        int LoopNum,                                                                    // Plant Loop to update pressure information
+        bool FirstHVACIteration,                                                        // System flag
+        DataPlant::PressureCall CallType,                                               // Enumerated call type
+        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid, // Loop side num for specific branch simulation
+        Optional_int_const BranchNum = _                                                // Branch num for specific branch simulation
     );
 
     void InitPressureDrop(EnergyPlusData &state, int LoopNum, bool FirstHVACIteration);
 
     void BranchPressureDrop(EnergyPlusData &state,
-                            int LoopNum,     // Plant Loop Index
-                            int LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
-                            int BranchNum    // Branch Index on LoopSide LoopSideNum
+                            int LoopNum,                             // Plant Loop Index
+                            DataPlant::LoopSideLocation LoopSideNum, // LoopSide on Plant Loop LoopNum
+                            int BranchNum                            // Branch Index on LoopSide LoopSideNum
     );
 
     void UpdatePressureDrop(EnergyPlusData &state, int LoopNum);
 
-    void DistributePressureOnBranch(EnergyPlusData &state, int LoopNum, int LoopSideNum, int BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
+    void DistributePressureOnBranch(EnergyPlusData &state,
+                                    const int LoopNum,
+                                    const DataPlant::LoopSideLocation LoopSideNum,
+                                    const int BranchNum,
+                                    Real64 &BranchPressureDrop,
+                                    bool &PumpFound);
 
-    void PassPressureAcrossMixer(EnergyPlusData &state, int LoopNum, int LoopSideNum, Real64 &MixerPressure, int NumBranchesOnLoopSide);
+    void PassPressureAcrossMixer(EnergyPlusData &state,
+                                 const int LoopNum,
+                                 const DataPlant::LoopSideLocation LoopSideNum,
+                                 Real64 &MixerPressure,
+                                 const int NumBranchesOnLoopSide);
 
-    void PassPressureAcrossSplitter(EnergyPlusData &state, int LoopNum, int LoopSideNum, Real64 &SplitterInletPressure);
+    void PassPressureAcrossSplitter(EnergyPlusData &state,
+                                    const int LoopNum,
+                                    const DataPlant::LoopSideLocation LoopSideNum,
+                                    Real64 &SplitterInletPressure);
 
     void PassPressureAcrossInterface(EnergyPlusData &state, int LoopNum);
 
@@ -105,7 +118,7 @@ struct PlantPressureSysData : BaseGlobalStruct
 
     bool InitPressureDropOneTimeInit = true;
     Array1D_bool LoopInit;
-    Array1D_bool FullParallelBranchSetFound = Array1D<bool>(2);
+    std::array<bool, static_cast<int>(DataPlant::LoopSideLocation::Num)> FullParallelBranchSetFound{false, false};
     bool CommonPipeErrorEncountered = false;
     int ErrorCounter = 0; // For proper error handling
     int ZeroKWarningCounter = 0;
@@ -115,7 +128,7 @@ struct PlantPressureSysData : BaseGlobalStruct
     {
         this->InitPressureDropOneTimeInit = true;
         this->LoopInit.clear();
-        this->FullParallelBranchSetFound.clear();
+        this->FullParallelBranchSetFound = {false, false};
         this->CommonPipeErrorEncountered = false;
         this->ErrorCounter = 0;
         this->ZeroKWarningCounter = 0;

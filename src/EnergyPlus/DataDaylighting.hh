@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,42 +70,51 @@ namespace DataDaylighting {
 
     enum class SkyType : int
     {
+        Invalid = -1,
         Clear = 1,
         ClearTurbid,
         Intermediate,
-        Overcast
+        Overcast,
+        Num
     };
 
-    enum class iExtWinType
+    enum class ExtWinType
     {
+        Invalid = -1,
         NotInOrAdjZoneExtWin, // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
         InZoneExtWin,         // Exterior window is in a Daylighting:Detailed zone
-        AdjZoneExtWin         // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
+        AdjZoneExtWin,        // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
+        Num
     };
 
-    enum class iCalledFor
+    enum class CalledFor
     {
+        Invalid = -1,
         RefPoint,
-        MapPoint
+        MapPoint,
+        Num
     };
 
-    enum class iDaylightingMethod
+    enum class DaylightingMethod
     {
-        NoDaylighting,
-        SplitFluxDaylighting,
-        DElightDaylighting
+        Invalid = -1,
+        None,
+        SplitFlux,
+        DElight,
+        Num
     };
 
     // Parameters for "Lighting Control Type" - these are the values expected by DElight
     enum class LtgCtrlType
     {
-        Invalid = 0,
+        Invalid = -1,
         Continuous = 1,
         Stepped = 2,
-        ContinuousOff = 3
+        ContinuousOff = 3,
+        Num
     };
 
-    constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
+    static constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
 
     struct IntWinAdjEnclExtWinStruct // nested structure for EnclDaylightCalc
     {
@@ -146,9 +155,9 @@ namespace DataDaylighting {
         int zoneIndex = 0;    // Index to zone where the daylighting:controls object is located
         int spaceIndex = 0;   // Index to space where the daylighting:controls object is located (0 if specified for a zone)
         int enclIndex = 0;    // Index to enclosure where the daylighting:controls object is located
-        DataDaylighting::iDaylightingMethod DaylightMethod = iDaylightingMethod::NoDaylighting; // Type of Daylighting (1=SplitFlux, 2=DElight)
-        int AvailSchedNum = 0;                                                                  // pointer to availability schedule if present
-        int TotalDaylRefPoints = 0;        // Number of daylighting reference points for this control
+        DataDaylighting::DaylightingMethod DaylightMethod = DaylightingMethod::None; // Type of Daylighting (1=SplitFlux, 2=DElight)
+        int AvailSchedNum = 0;                                                       // pointer to availability schedule if present
+        int TotalDaylRefPoints = 0;                                                  // Number of daylighting reference points for this control
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
         Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)
@@ -247,17 +256,11 @@ namespace DataDaylighting {
         Array2D<Real64> MapRefPtAbsCoord; // X,Y,Z coordinates of all illuminance map reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
-        Array1D_bool MapRefPtInBounds;     // True when coordinates are in bounds of zone coordinates
-        Array1D<Real64> DaylIllumAtMapPt;  // Daylight illuminance at illuminance map points (lux)
-        Array1D<Real64> GlareIndexAtMapPt; // Glare index at illuminance map points
+        Array1D_bool MapRefPtInBounds;    // True when coordinates are in bounds of zone coordinates
+        Array1D<Real64> DaylIllumAtMapPt; // Daylight illuminance at illuminance map points (lux)
         // following Hr - report avg hr
-        Array1D<Real64> DaylIllumAtMapPtHr;      // Daylight illuminance at illuminance map points (lux)
-        Array1D<Real64> GlareIndexAtMapPtHr;     // Glare index at illuminance map points
-        Array2D<Real64> SolidAngAtMapPt;         // (Number of Zones, Total Map Reference Points)
-        Array2D<Real64> SolidAngAtMapPtWtd;      // (Number of Zones, Total Map Reference Points)
-        Array3D<Real64> IllumFromWinAtMapPt;     // (Number of Zones, 2, Total Map Reference Points)
-        Array3D<Real64> BackLumFromWinAtMapPt;   // (Number of Zones, 2, Total Map Reference Points)
-        Array3D<Real64> SourceLumFromWinAtMapPt; // (Number of Zones, 2, Total Map Reference Points)
+        Array1D<Real64> DaylIllumAtMapPtHr;  // Daylight illuminance at illuminance map points (lux)
+        Array3D<Real64> IllumFromWinAtMapPt; // (Number of Zones, 2, Total Map Reference Points)
         // Arguments (dimensions) for Dayl---Sky are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
@@ -266,8 +269,6 @@ namespace DataDaylighting {
         //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
         //  5: Daylit window number (1 to NumOfDayltgExtWins)
         Array5D<Real64> DaylIllFacSky;
-        Array5D<Real64> DaylSourceFacSky;
-        Array5D<Real64> DaylBackFacSky;
         // Arguments (dimensions) for Dayl---Sun are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
@@ -276,10 +277,6 @@ namespace DataDaylighting {
         //  4: Daylit window number (1 to NumOfDayltgExtWins)
         Array4D<Real64> DaylIllFacSun;
         Array4D<Real64> DaylIllFacSunDisk;
-        Array4D<Real64> DaylSourceFacSun;
-        Array4D<Real64> DaylSourceFacSunDisk;
-        Array4D<Real64> DaylBackFacSun;
-        Array4D<Real64> DaylBackFacSunDisk;
     };
 
     struct RefPointData

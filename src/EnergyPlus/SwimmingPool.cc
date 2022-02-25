@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -116,7 +116,7 @@ void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration)
     state.dataHeatBalFanSys->SumConvPool = 0.0;
     state.dataHeatBalFanSys->SumLatentPool = 0.0;
 
-    PlantLocation A(0, 0, 0, 0);
+    PlantLocation A(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
     Real64 CurLoad = 0.0;
     bool RunFlag = true;
 
@@ -323,24 +323,26 @@ void GetSwimmingPool(EnergyPlusData &state)
 
         state.dataSwimmingPools->Pool(Item).WaterInletNodeName = Alphas(6);
         state.dataSwimmingPools->Pool(Item).WaterOutletNodeName = Alphas(7);
-        state.dataSwimmingPools->Pool(Item).WaterInletNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                                                 Alphas(6),
-                                                                                                 ErrorsFound,
-                                                                                                 CurrentModuleObject,
-                                                                                                 Alphas(1),
-                                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
-                                                                                                 DataLoopNode::ObjectIsNotParent);
-        state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                                                  Alphas(7),
-                                                                                                  ErrorsFound,
-                                                                                                  CurrentModuleObject,
-                                                                                                  Alphas(1),
-                                                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                                                  DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                  NodeInputManager::compFluidStream::Primary,
-                                                                                                  DataLoopNode::ObjectIsNotParent);
+        state.dataSwimmingPools->Pool(Item).WaterInletNode =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                Alphas(6),
+                                                ErrorsFound,
+                                                DataLoopNode::ConnectionObjectType::SwimmingPoolIndoor,
+                                                Alphas(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::ConnectionType::Inlet,
+                                                NodeInputManager::CompFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
+        state.dataSwimmingPools->Pool(Item).WaterOutletNode =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                Alphas(7),
+                                                ErrorsFound,
+                                                DataLoopNode::ConnectionObjectType::SwimmingPoolIndoor,
+                                                Alphas(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::ConnectionType::Outlet,
+                                                NodeInputManager::CompFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
         if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
         }
@@ -422,7 +424,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                           "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
         ErrorsFound = true;
         // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) {
+    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) {
         ShowSevereError(state,
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
@@ -545,8 +547,7 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature
     // radiant systems)
     Real64 mdot = 0.0;
-    PlantUtilities::SetComponentFlowRate(
-        state, mdot, this->WaterInletNode, this->WaterOutletNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
+    PlantUtilities::SetComponentFlowRate(state, mdot, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
     this->WaterInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
 
     // get the schedule values for different scheduled parameters
@@ -821,19 +822,8 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
     if (this->MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
         bool errFlag = false;
         if (this->WaterInletNode > 0) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::SwimmingPool_Indoor,
-                                                    this->HWLoopNum,
-                                                    this->HWLoopSide,
-                                                    this->HWBranchNum,
-                                                    this->HWCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->WaterInletNode,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::SwimmingPool_Indoor, this->HWplantLoc, errFlag, _, _, _, this->WaterInletNode, _);
             if (errFlag) {
                 ShowFatalError(state, std::string{RoutineName} + ": Program terminated due to previous condition(s).");
             }
@@ -849,15 +839,7 @@ void SwimmingPoolData::initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) cons
 
     if (!this->MyPlantScanFlagPool) {
         if (this->WaterInletNode > 0) {
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->WaterMassFlowRateMax,
-                                               this->WaterInletNode,
-                                               this->WaterOutletNode,
-                                               this->HWLoopNum,
-                                               this->HWLoopSide,
-                                               this->HWBranchNum,
-                                               this->HWCompNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->WaterMassFlowRateMax, this->WaterInletNode, this->WaterOutletNode);
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNode, this->WaterVolFlowMax);
         }
     }
@@ -961,8 +943,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     } else if (MassFlowRate < 0.0) {
         MassFlowRate = 0.0;
     }
-    PlantUtilities::SetComponentFlowRate(
-        state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
+    PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
     this->WaterMassFlowRate = MassFlowRate;
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature

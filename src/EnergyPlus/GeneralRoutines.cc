@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,6 +71,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
@@ -129,9 +130,7 @@ void ControlCompOutput(EnergyPlusData &state,
                        Optional<Real64 const> AirMassFlow,    // air mass flow rate
                        Optional_int_const Action,             // 1=reverse; 2=normal
                        Optional_int_const EquipIndex,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       Optional_int_const LoopNum,            // for plant components, plant loop index
-                       Optional_int_const LoopSide,           // for plant components, plant loop side index
-                       Optional_int_const BranchIndex,        // for plant components, plant branch index
+                       PlantLocation const &plantLoc,         // for plant components, Location
                        Optional_int_const ControlledZoneIndex // controlled zone index for the zone containing the component
 )
 {
@@ -297,13 +296,11 @@ void ControlCompOutput(EnergyPlusData &state,
                     ZoneController.CalculatedSetPoint = ZoneInterHalf.MaxFlow; // CR7253
                 }
                 // Set the Actuated node MassFlowRate with zero value
-                if (present(LoopNum)) { // this is a plant component
+                if (plantLoc.loopNum) { // this is a plant component
                     SetActuatedBranchFlowRate(state,
                                               ZoneController.CalculatedSetPoint,
                                               ActuatedNode,
-                                              LoopNum,
-                                              LoopSide,
-                                              BranchIndex,
+                                              plantLoc,
                                               false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
                 } else {                              // assume not a plant component
                     state.dataLoopNodes->Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;
@@ -407,13 +404,11 @@ void ControlCompOutput(EnergyPlusData &state,
         }
 
         // Set the Actuated node MassFlowRate with the new value
-        if (present(LoopNum)) { // this is a plant component
+        if (plantLoc.loopNum) { // this is a plant component
             SetActuatedBranchFlowRate(state,
                                       ZoneController.CalculatedSetPoint,
                                       ActuatedNode,
-                                      LoopNum,
-                                      LoopSide,
-                                      BranchIndex,
+                                      plantLoc,
                                       false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
         } else {                              // assume not a plant component, leave alone
             state.dataLoopNodes->Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;
@@ -1521,19 +1516,19 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "#Nodes on Supply Air Path,{}\n", state.dataZoneEquip->SupplyAirPath(BCount).NumNodes);
             for (Count2 = 1; Count2 <= state.dataZoneEquip->SupplyAirPath(BCount).NumNodes; ++Count2) {
-                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == PathInlet) {
+                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::PathInlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Inlet Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Intermediate) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Intermediate) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Through Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Outlet) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Outlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Outlet Node,{},{},{}\n",
                           Count2,
@@ -1993,6 +1988,11 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             // fourPipeInduction units
             if (FourPipeInductionUnitHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
         }
+        if (!FoundZoneMixer(Count1)) { // could be as child on other items
+            // Exhaust Systems
+            if (ExhaustAirSystemManager::ExhaustSystemHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName))
+                FoundZoneMixer(Count1) = true;
+        }
     }
     FoundNames.deallocate();
 
@@ -2011,7 +2011,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             if (FoundZoneMixer(Count1)) continue;
             ShowSevereError(state,
                             "AirLoopHVAC:ZoneMixer=\"" + state.dataMixerComponent->MixerCond(Count1).MixerName +
-                                "\", not found on any AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat,");
+                                "\", not found on any AirLoopHVAC:ReturnPath, AirLoopHVAC:ExhaustSystem, AirTerminal:SingleDuct:SeriesPIU:Reheat,");
             ShowContinueError(state, "AirTerminal:SingleDuct:ParallelPIU:Reheat or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction.");
             //      ErrFound=.TRUE.
         }

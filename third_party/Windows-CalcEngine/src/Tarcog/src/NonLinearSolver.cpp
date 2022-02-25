@@ -73,6 +73,8 @@ namespace Tarcog
 
                 m_IGU.setState(m_IGUState);
 
+                m_IGU.updateDeflectionState();
+
                 if(achievedTolerance < m_SolutionTolerance)
                 {
                     initialState = m_IGUState;

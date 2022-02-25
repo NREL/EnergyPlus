@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2566,11 +2566,11 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag = false;
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag2 = false;
     // Current occupancy
-    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 1;
+    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 0.72, 0.0001);
     // Design occupancy
-    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 2;
+    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::ByDesignLevel;
     state->dataHeatBal->Zone(1).TotOccupants = 10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 1.32, 0.0001);
@@ -2634,7 +2634,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag = false;
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag2 = false;
     // Current occupancy
-    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 1;
+    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
 
     // InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
     state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;

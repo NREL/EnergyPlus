@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -349,38 +349,38 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
 bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
 {
     bool errorsFound = false;
-    constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
-                                                                      "HVACTemplate:Zone:IdealLoadsAirSystem",
-                                                                      "HVACTemplate:Zone:BaseboardHeat",
-                                                                      "HVACTemplate:Zone:FanCoil",
-                                                                      "HVACTemplate:Zone:PTAC",
-                                                                      "HVACTemplate:Zone:PTHP",
-                                                                      "HVACTemplate:Zone:WaterToAirHeatPump",
-                                                                      "HVACTemplate:Zone:VRF",
-                                                                      "HVACTemplate:Zone:Unitary",
-                                                                      "HVACTemplate:Zone:VAV",
-                                                                      "HVACTemplate:Zone:VAV:FanPowered",
-                                                                      "HVACTemplate:Zone:VAV:HeatAndCool",
-                                                                      "HVACTemplate:Zone:ConstantVolume",
-                                                                      "HVACTemplate:Zone:DualDuct",
-                                                                      "HVACTemplate:System:VRF",
-                                                                      "HVACTemplate:System:Unitary",
-                                                                      "HVACTemplate:System:UnitaryHeatPump:AirToAir",
-                                                                      "HVACTemplate:System:UnitarySystem",
-                                                                      "HVACTemplate:System:VAV",
-                                                                      "HVACTemplate:System:PackagedVAV",
-                                                                      "HVACTemplate:System:ConstantVolume",
-                                                                      "HVACTemplate:System:DualDuct",
-                                                                      "HVACTemplate:System:DedicatedOutdoorAir",
-                                                                      "HVACTemplate:Plant:ChilledWaterLoop",
-                                                                      "HVACTemplate:Plant:Chiller",
-                                                                      "HVACTemplate:Plant:Chiller:ObjectReference",
-                                                                      "HVACTemplate:Plant:Tower",
-                                                                      "HVACTemplate:Plant:Tower:ObjectReference",
-                                                                      "HVACTemplate:Plant:HotWaterLoop",
-                                                                      "HVACTemplate:Plant:Boiler",
-                                                                      "HVACTemplate:Plant:Boiler:ObjectReference",
-                                                                      "HVACTemplate:Plant:MixedWaterLoop"};
+    static constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
+                                                                             "HVACTemplate:Zone:IdealLoadsAirSystem",
+                                                                             "HVACTemplate:Zone:BaseboardHeat",
+                                                                             "HVACTemplate:Zone:FanCoil",
+                                                                             "HVACTemplate:Zone:PTAC",
+                                                                             "HVACTemplate:Zone:PTHP",
+                                                                             "HVACTemplate:Zone:WaterToAirHeatPump",
+                                                                             "HVACTemplate:Zone:VRF",
+                                                                             "HVACTemplate:Zone:Unitary",
+                                                                             "HVACTemplate:Zone:VAV",
+                                                                             "HVACTemplate:Zone:VAV:FanPowered",
+                                                                             "HVACTemplate:Zone:VAV:HeatAndCool",
+                                                                             "HVACTemplate:Zone:ConstantVolume",
+                                                                             "HVACTemplate:Zone:DualDuct",
+                                                                             "HVACTemplate:System:VRF",
+                                                                             "HVACTemplate:System:Unitary",
+                                                                             "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+                                                                             "HVACTemplate:System:UnitarySystem",
+                                                                             "HVACTemplate:System:VAV",
+                                                                             "HVACTemplate:System:PackagedVAV",
+                                                                             "HVACTemplate:System:ConstantVolume",
+                                                                             "HVACTemplate:System:DualDuct",
+                                                                             "HVACTemplate:System:DedicatedOutdoorAir",
+                                                                             "HVACTemplate:Plant:ChilledWaterLoop",
+                                                                             "HVACTemplate:Plant:Chiller",
+                                                                             "HVACTemplate:Plant:Chiller:ObjectReference",
+                                                                             "HVACTemplate:Plant:Tower",
+                                                                             "HVACTemplate:Plant:Tower:ObjectReference",
+                                                                             "HVACTemplate:Plant:HotWaterLoop",
+                                                                             "HVACTemplate:Plant:Boiler",
+                                                                             "HVACTemplate:Plant:Boiler:ObjectReference",
+                                                                             "HVACTemplate:Plant:MixedWaterLoop"};
 
     // For EnergyPlus, there is no option to convert or allow these objects
     bool objectFound = false;
@@ -399,32 +399,32 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         errorsFound = true;
     }
 
-    constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
-                                                                  "GroundHeatTransfer:Slab:Materials",
-                                                                  "GroundHeatTransfer:Slab:MatlProps",
-                                                                  "GroundHeatTransfer:Slab:BoundConds",
-                                                                  "GroundHeatTransfer:Slab:BldgProps",
-                                                                  "GroundHeatTransfer:Slab:Insulation",
-                                                                  "GroundHeatTransfer:Slab:EquivalentSlab",
-                                                                  "GroundHeatTransfer:Slab:AutoGrid",
-                                                                  "GroundHeatTransfer:Slab:ManualGrid",
-                                                                  "GroundHeatTransfer:Slab:XFACE",
-                                                                  "GroundHeatTransfer:Slab:YFACE",
-                                                                  "GroundHeatTransfer:Slab:ZFACE",
-                                                                  "GroundHeatTransfer:Basement:SimParameters",
-                                                                  "GroundHeatTransfer:Basement:MatlProps",
-                                                                  "GroundHeatTransfer:Basement:Insulation",
-                                                                  "GroundHeatTransfer:Basement:SurfaceProps",
-                                                                  "GroundHeatTransfer:Basement:BldgData",
-                                                                  "GroundHeatTransfer:Basement:Interior",
-                                                                  "GroundHeatTransfer:Basement:ComBldg",
-                                                                  "GroundHeatTransfer:Basement:EquivSlab",
-                                                                  "GroundHeatTransfer:Basement:EquivAutoGrid",
-                                                                  "GroundHeatTransfer:Basement:AutoGrid",
-                                                                  "GroundHeatTransfer:Basement:ManualGrid",
-                                                                  "GroundHeatTransfer:Basement:XFACE",
-                                                                  "GroundHeatTransfer:Basement:YFACE",
-                                                                  "GroundHeatTransfer:Basement:ZFACE"};
+    static constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
+                                                                         "GroundHeatTransfer:Slab:Materials",
+                                                                         "GroundHeatTransfer:Slab:MatlProps",
+                                                                         "GroundHeatTransfer:Slab:BoundConds",
+                                                                         "GroundHeatTransfer:Slab:BldgProps",
+                                                                         "GroundHeatTransfer:Slab:Insulation",
+                                                                         "GroundHeatTransfer:Slab:EquivalentSlab",
+                                                                         "GroundHeatTransfer:Slab:AutoGrid",
+                                                                         "GroundHeatTransfer:Slab:ManualGrid",
+                                                                         "GroundHeatTransfer:Slab:XFACE",
+                                                                         "GroundHeatTransfer:Slab:YFACE",
+                                                                         "GroundHeatTransfer:Slab:ZFACE",
+                                                                         "GroundHeatTransfer:Basement:SimParameters",
+                                                                         "GroundHeatTransfer:Basement:MatlProps",
+                                                                         "GroundHeatTransfer:Basement:Insulation",
+                                                                         "GroundHeatTransfer:Basement:SurfaceProps",
+                                                                         "GroundHeatTransfer:Basement:BldgData",
+                                                                         "GroundHeatTransfer:Basement:Interior",
+                                                                         "GroundHeatTransfer:Basement:ComBldg",
+                                                                         "GroundHeatTransfer:Basement:EquivSlab",
+                                                                         "GroundHeatTransfer:Basement:EquivAutoGrid",
+                                                                         "GroundHeatTransfer:Basement:AutoGrid",
+                                                                         "GroundHeatTransfer:Basement:ManualGrid",
+                                                                         "GroundHeatTransfer:Basement:XFACE",
+                                                                         "GroundHeatTransfer:Basement:YFACE",
+                                                                         "GroundHeatTransfer:Basement:ZFACE"};
 
     objectFound = false;
     for (size_t count = 0; count < groundHTObjects.size(); ++count) {
@@ -441,7 +441,7 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         errorsFound = true;
     }
 
-    constexpr std::array<std::string_view, 4> parametricObjects = {
+    static constexpr std::array<std::string_view, 4> parametricObjects = {
         "Parametric:SetValueForRun", "Parametric:Logic", "Parametric:RunControl", "Parametric:FileNameSuffix"};
 
     objectFound = false;
@@ -503,7 +503,7 @@ int InputProcessor::getNumSectionsFound(std::string const &SectionWord)
     return static_cast<int>(SectionWord_iter.value().size());
 }
 
-int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord)
+int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord)
 {
 
     // FUNCTION INFORMATION:
@@ -521,10 +521,10 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const 
     // Look up object in list of objects.  If there, return the
     // number of objects found in the current input.  If not, return 0.
 
-    auto const &find_obj = epJSON.find(ObjectWord);
+    auto const &find_obj = epJSON.find(std::string(ObjectWord));
 
     if (find_obj == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return 0;
         }
@@ -533,10 +533,10 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const 
         return static_cast<int>(find_obj.value().size());
     }
 
-    if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+    if (schema["properties"].find(std::string(ObjectWord)) == schema["properties"].end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowWarningError(state, "Requested Object not found in Definitions: " + ObjectWord);
+            ShowWarningError(state, fmt::format("Requested Object not found in Definitions: {}", ObjectWord));
         }
     }
     return 0;
@@ -898,7 +898,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
 }
 
 void InputProcessor::getObjectItem(EnergyPlusData &state,
-                                   std::string const &Object,
+                                   std::string_view Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
@@ -919,15 +919,15 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-    int adjustedNumber = getJSONObjNum(state, Object, Number); // if incoming input is idf, then use idf object order
+    int adjustedNumber = getJSONObjNum(state, std::string(Object), Number); // if incoming input is idf, then use idf object order
 
     auto objectInfo = ObjectInfo();
     objectInfo.objectType = Object;
     // auto sorted_iterators = find_iterators;
 
-    auto find_iterators = objectCacheMap.find(Object);
+    auto find_iterators = objectCacheMap.find(std::string(Object));
     if (find_iterators == objectCacheMap.end()) {
-        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(Object)));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return;
         }
@@ -1001,7 +1001,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
         auto const &field_info = legacy_idd_field_info.find(field);
         auto const &field_info_val = field_info.value();
         if (field_info == legacy_idd_field_info.end()) {
-            ShowFatalError(state, "Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
+            ShowFatalError(state, fmt::format(R"(Could not find field = "{}" in "{}" in epJSON Schema.)", field, Object));
         }
 
         bool within_idf_fields = (i < maxFields.max_fields);
@@ -1057,7 +1057,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
                     auto const &field_info_val = field_info.value();
 
                     if (field_info == legacy_idd_field_info.end()) {
-                        ShowFatalError(state, "Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema.");
+                        ShowFatalError(state, fmt::format(R"(Could not find field = "{}" in "{}" in epJSON Schema.)", field_name, Object));
                     }
 
                     bool within_idf_extensible_fields = (extensible_count < maxFields.max_extensible_fields);
@@ -1173,17 +1173,17 @@ int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Obje
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
-                                     std::string const &ObjType, // Object Type (ref: IDD Objects)
-                                     std::string const &ObjName  // Name of the object type
+                                     std::string_view ObjType, // Object Type (ref: IDD Objects)
+                                     std::string_view ObjName  // Name of the object type
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
     // Get the occurrence number of an object of type ObjType and name ObjName
 
     json *obj;
-    auto obj_iter = epJSON.find(ObjType);
-    if (obj_iter == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
+    auto obj_iter = epJSON.find(std::string(ObjType));
+    if (obj_iter == epJSON.end() || obj_iter.value().find(std::string(ObjName)) == obj_iter.value().end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjType)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
         }
@@ -1206,7 +1206,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     if (!found) {
         return 0; // indicates object name not found, see function GeneralRoutines::ValidateComponent
     }
-    return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
+    return getIDFObjNum(state, std::string(ObjType), object_item_num); // if incoming input is idf, then return idf object order
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
@@ -1249,17 +1249,15 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
 
-void InputProcessor::rangeCheck(EnergyPlusData &state,
-                                bool &ErrorsFound,                       // Set to true if error detected
-                                std::string const &WhatFieldString,      // Descriptive field for string
-                                std::string const &WhatObjectString,     // Descriptive field for object, Zone Name, etc.
-                                std::string const &ErrorLevel,           // 'Warning','Severe','Fatal')
-                                Optional_string_const LowerBoundString,  // String for error message, if applicable
-                                Optional_bool_const LowerBoundCondition, // Condition for error condition, if applicable
-                                Optional_string_const UpperBoundString,  // String for error message, if applicable
-                                Optional_bool_const UpperBoundCondition, // Condition for error condition, if applicable
-                                Optional_string_const ValueString,       // Value with digits if to be displayed with error
-                                Optional_string_const WhatObjectName     // ObjectName -- used for error messages
+void InputProcessor::lowerRangeCheck(EnergyPlusData &state,
+                                     bool &ErrorsFound,                    // Set to true if error detected
+                                     std::string const &WhatFieldString,   // Descriptive field for string
+                                     std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
+                                     std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
+                                     std::string const &LowerBoundString,  // String for error message, if applicable
+                                     bool const LowerBoundCondition,       // Condition for error condition, if applicable
+                                     std::string_view const ValueString,   // Value with digits if to be displayed with error
+                                     std::string_view const WhatObjectName // ObjectName -- used for error messages
 )
 {
 
@@ -1273,34 +1271,104 @@ void InputProcessor::rangeCheck(EnergyPlusData &state,
     // This subroutine is a general purpose "range check" routine for GetInput routines.
     // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
     // error message to describe the situation in addition to setting the ErrorsFound variable
-    // to true.
+    // to true. This function is an overload to handle the lower bound check only. It is only
+    // used in WeatherManager.
 
     std::string ErrorString; // Uppercase representation of ErrorLevel
     std::string Message1;
     std::string Message2;
 
     bool Error = false;
-    if (present(UpperBoundCondition)) {
-        if (!UpperBoundCondition) Error = true;
+    if (!LowerBoundCondition) Error = true;
+
+    if (Error) {
+        ConvertCaseToUpper(ErrorLevel, ErrorString);
+        Message1 = WhatObjectString;
+        if (!WhatObjectName.empty()) {
+            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
+        }
+        Message2 = "Out of range value field=" + WhatFieldString;
+        if (!ValueString.empty()) {
+            Message2 += fmt::format(", Value=[{}]", ValueString);
+        }
+        Message2 += fmt::format(", range={{{}}}", LowerBoundString);
+
+        {
+            auto const errorCheck(ErrorString[0]);
+
+            if ((errorCheck == 'W') || (errorCheck == 'w')) {
+                ShowWarningError(state, Message1);
+                ShowContinueError(state, Message2);
+
+            } else if ((errorCheck == 'S') || (errorCheck == 's')) {
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ErrorsFound = true;
+
+            } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ShowFatalError(state, "Program terminates due to preceding condition(s).");
+
+            } else {
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ErrorsFound = true;
+            }
+        }
     }
-    if (present(LowerBoundCondition)) {
-        if (!LowerBoundCondition) Error = true;
+}
+
+void InputProcessor::rangeCheck(EnergyPlusData &state,
+                                bool &ErrorsFound,                    // Set to true if error detected
+                                std::string const &WhatFieldString,   // Descriptive field for string
+                                std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
+                                std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
+                                std::string const &LowerBoundString,  // String for error message, if applicable
+                                bool const LowerBoundCondition,       // Condition for error condition, if applicable
+                                std::string const &UpperBoundString,  // String for error message, if applicable
+                                bool const UpperBoundCondition,       // Condition for error condition, if applicable
+                                std::string_view const ValueString,   // Value with digits if to be displayed with error
+                                std::string_view const WhatObjectName // ObjectName -- used for error messages
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   July 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine is a general purpose "range check" routine for GetInput routines.
+    // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
+    // error message to describe the situation in addition to setting the ErrorsFound variable
+    // to true. This function originally could do just the upper bound, but it was not used
+    // that way so that option has been removed. It is only used in WeatherManager.
+
+    std::string ErrorString; // Uppercase representation of ErrorLevel
+    std::string Message1;
+    std::string Message2;
+
+    bool Error = false;
+    if (!UpperBoundCondition) {
+        Error = true;
+    }
+    if (!LowerBoundCondition) {
+        Error = true;
     }
 
     if (Error) {
         ConvertCaseToUpper(ErrorLevel, ErrorString);
         Message1 = WhatObjectString;
-        if (present(WhatObjectName)) Message1 += "=\"" + WhatObjectName + "\", out of range data";
-        Message2 = "Out of range value field=" + WhatFieldString;
-        if (present(ValueString)) Message2 += ", Value=[" + ValueString + ']';
-        Message2 += ", range={";
-        if (present(LowerBoundString)) Message2 += LowerBoundString;
-        if (present(LowerBoundString) && present(UpperBoundString)) {
-            Message2 += " and " + UpperBoundString;
-        } else if (present(UpperBoundString)) {
-            Message2 += UpperBoundString;
+        if (!WhatObjectName.empty()) {
+            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
         }
-        Message2 += "}";
+        Message2 = "Out of range value field=" + WhatFieldString;
+        if (!ValueString.empty()) {
+            Message2 += fmt::format(", Value=[{}]", ValueString);
+        }
+        Message2 += fmt::format(", range={{{} and {}}}", LowerBoundString, UpperBoundString);
 
         {
             auto const errorCheck(ErrorString[0]);
@@ -1383,10 +1451,10 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
 }
 
 void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
-                                         std::string const &ObjectWord, // Object for definition
-                                         int &NumArgs,                  // How many arguments (max) this Object can have
-                                         int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
-                                         int &NumNumeric                // How many Numeric arguments (max) this Object can have
+                                         std::string_view const &ObjectWord, // Object for definition
+                                         int &NumArgs,                       // How many arguments (max) this Object can have
+                                         int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
+                                         int &NumNumeric                     // How many Numeric arguments (max) this Object can have
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
@@ -1398,28 +1466,28 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     NumAlpha = 0;
     NumNumeric = 0;
     json *object;
-    if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+    if (schema["properties"].find(std::string(ObjectWord)) == schema["properties"].end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
         }
         object = &schema["properties"][tmp_umit->second];
     } else {
-        object = &schema["properties"][ObjectWord];
+        object = &schema["properties"][std::string(ObjectWord)];
     }
     const json &legacy_idd = object->at("legacy_idd");
 
     json *objects;
-    if (epJSON.find(ObjectWord) == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+    if (epJSON.find(std::string(ObjectWord)) == epJSON.end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
         }
         objects = &epJSON[tmp_umit->second];
     } else {
-        objects = &epJSON[ObjectWord];
+        objects = &epJSON[std::string(ObjectWord)];
     }
 
     size_t max_size = 0;

@@ -18,12 +18,16 @@ namespace Tarcog
             explicit CIGUSolidLayerDeflection(const CIGUSolidLayer & t_SolidLayer);
             CIGUSolidLayerDeflection(const CIGUSolidLayer & t_SolidLayer,
                                      double t_YoungsModulus,
-                                     double t_PoisonRatio);
+                                     double t_PoisonRatio,
+                                     double t_Density);
 
             double flexuralRigidity() const;
             bool isDeflected() const override;
 
             std::shared_ptr<CBaseLayer> clone() const override;
+
+            double youngsModulus() const override;
+            double density() const override;
 
         protected:
             void calculateConvectionOrConductionFlow() override;
@@ -32,6 +36,7 @@ namespace Tarcog
         private:
             double m_YoungsModulus;
             double m_PoisonRatio;
+            double m_Density;
         };
 
         ////////////////////////////////////////////////////////////////////////////

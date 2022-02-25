@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -134,10 +134,7 @@ namespace WaterToAirHeatPump {
         int HighPressClgError;  // count for high pressure errors (cooling)
         int LowPressHtgError;   // count for low pressure errors (heating)
         int HighPressHtgError;  // count for high pressure errors (heating)
-        int LoopNum;            // plant loop index for water side
-        int LoopSide;           // plant loop side index
-        int BranchNum;          // plant branch index
-        int CompNum;            // plant component index
+        PlantLocation plantLoc;
 
         // Default Constructor
         WatertoAirHPEquipConditions()
@@ -151,7 +148,7 @@ namespace WaterToAirHeatPump {
               CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0),
               RefVolFlowRate(0.0), VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0),
               LowPressCutoff(0.0), CompressorType(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0)
+              LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), plantLoc{}
         {
         }
     };
@@ -171,7 +168,7 @@ namespace WaterToAirHeatPump {
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         int const CompOp,
+                         DataHVACGlobals::CompressorOperation CompressorOp,
                          Real64 const PartLoadRatio);
 
     void GetWatertoAirHPInput(EnergyPlusData &state);
@@ -194,7 +191,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
-                                 int const CompOp,
+                                 DataHVACGlobals::CompressorOperation CompressorOp,
                                  Real64 const PartLoadRatio);
 
     Real64 CalcCompSuctionTempResidual(EnergyPlusData &state,
@@ -209,7 +206,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
-                                 int const CompOp,
+                                 DataHVACGlobals::CompressorOperation CompressorOp,
                                  Real64 const PartLoadRatio);
 
     void UpdateWatertoAirHP(EnergyPlusData &state, int const HPNum);

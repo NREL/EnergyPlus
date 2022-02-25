@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -164,9 +164,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -179,9 +179,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
 
     CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -194,9 +194,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.0;
 
     CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -257,9 +257,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     Real64 CycRatio = 1.0;
     int SpeedNum = 2;
     int FanOpMode = 1;
-    int CompOp = 1;
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     int SingleMode = 0;
-    CalcMultiSpeedDXCoilCooling(*state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
+    CalcMultiSpeedDXCoilCooling(*state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, SingleMode);
 
     Real64 TdbAtOutlet = PsyTdbFnHW(state->dataDXCoils->DXCoil(CoilIndex).OutletAirEnthalpy, state->dataDXCoils->DXCoil(CoilIndex).OutletAirHumRat);
     Real64 tSatAtOutlet = PsyTsatFnHPb(*state, state->dataDXCoils->DXCoil(CoilIndex).OutletAirEnthalpy, state->dataEnvrn->OutBaroPress);
@@ -319,9 +319,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -334,9 +334,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
 
     CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -349,9 +349,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.0;
 
     CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -481,7 +481,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nCapfT1 = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT1);
-    pCurve->CurveType = CurveTypeEnum::BiQuadratic;
+    pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT1";
     pCurve->Coeff1 = 0.95624428;
     pCurve->Coeff2 = 0;
@@ -498,7 +498,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nCapfFF1 = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF1);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF1";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -512,7 +512,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nEIRfT1 = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT1);
-    pCurve->CurveType = CurveTypeEnum::BiQuadratic;
+    pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT1";
     pCurve->Coeff1 = 1.065476178;
     pCurve->Coeff2 = 0;
@@ -529,7 +529,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nEIRfFF1 = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF1);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF1";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nPLFfPLR1 = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR1);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR1";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -557,7 +557,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nConstantBiquadratic = 6;
     pCurve = &state->dataCurveManager->PerfCurve(nConstantBiquadratic);
-    pCurve->CurveType = CurveTypeEnum::BiQuadratic;
+    pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "ConstantBiquadratic";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -575,7 +575,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nCapfT2 = 7;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT2);
-    pCurve->CurveType = CurveTypeEnum::BiQuadratic;
+    pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT2";
     pCurve->Coeff1 = 0.95624428;
     pCurve->Coeff2 = 0;
@@ -592,7 +592,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nCapfFF2 = 8;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF2);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF2";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nEIRfT2 = 9;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT2);
-    pCurve->CurveType = CurveTypeEnum::BiQuadratic;
+    pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT2";
     pCurve->Coeff1 = 1.065476178;
     pCurve->Coeff2 = 0;
@@ -623,7 +623,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nEIRfFF2 = 10;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF2);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF2";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -637,7 +637,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     int constexpr nPLFfPLR2 = 11;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR2);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR2";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -651,12 +651,12 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
-        if (rCurve.CurveType == CurveTypeEnum::BiQuadratic) {
+        if (rCurve.curveType == CurveType::BiQuadratic) {
             rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        } else if (rCurve.CurveType == CurveTypeEnum::Quadratic) {
+            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+        } else if (rCurve.curveType == CurveType::Quadratic) {
             rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
         }
     }
 
@@ -822,7 +822,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     int constexpr nCapfT2 = 1;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfT2);
-    pCurve->CurveType = CurveTypeEnum::BiQuadratic;
+    pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT2";
     pCurve->Coeff1 = 0.95624428;
     pCurve->Coeff2 = 0;
@@ -839,7 +839,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     int constexpr nCapfFF2 = 2;
     pCurve = &state->dataCurveManager->PerfCurve(nCapfFF2);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF2";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -853,7 +853,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     int constexpr nEIRfT2 = 3;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfT2);
-    pCurve->CurveType = CurveTypeEnum::BiQuadratic;
+    pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT2";
     pCurve->Coeff1 = 1.065476178;
     pCurve->Coeff2 = 0;
@@ -870,7 +870,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     int constexpr nEIRfFF2 = 4;
     pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF2);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF2";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -884,7 +884,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     int constexpr nPLFfPLR2 = 5;
     pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR2);
-    pCurve->CurveType = CurveTypeEnum::Quadratic;
+    pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR2";
     pCurve->Coeff1 = 1;
     pCurve->Coeff2 = 0;
@@ -898,12 +898,12 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
-        if (rCurve.CurveType == CurveTypeEnum::BiQuadratic) {
+        if (rCurve.curveType == CurveType::BiQuadratic) {
             rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        } else if (rCurve.CurveType == CurveTypeEnum::Quadratic) {
+            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+        } else if (rCurve.curveType == CurveType::Quadratic) {
             rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
         }
     }
 
@@ -1089,7 +1089,6 @@ TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
     // Test whether the coil is placed indoor or outdoor, by checking the air inlet node location
 
     using namespace DXCoils;
-    using NodeInputManager::GetOnlySingleNode;
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // Common Inputs
@@ -1339,7 +1338,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
-    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, 1, 0);
+    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 0);
     EXPECT_EQ(0, state->dataHVACGlobal->MSHPWasteHeat);
 
     // Case 3 heat recovery is true and no waste heat function cuvre
@@ -1347,7 +1346,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).MSWasteHeat(2) = 0;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = true;
 
-    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, 1, 0);
+    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 0);
 
     EXPECT_NEAR(1302.748, state->dataHVACGlobal->MSHPWasteHeat, 0.001);
 }
@@ -3866,9 +3865,9 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
 
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP1";
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1.658788451;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -0.0834530076;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.00342409032;
@@ -3882,9 +3881,9 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP2";
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1.472738138;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -0.0672218352;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0029199042;
@@ -3898,9 +3897,9 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP1";
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.84077409;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -0.0014336586;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.000150336;
@@ -3914,9 +3913,9 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
 
     CurveNum = 4;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP2";
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.831506971;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0018392166;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.000187596;
@@ -4023,9 +4022,9 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     Coil.AirInNode = 1;
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.CurveType = CurveTypeEnum::BiQuadratic;
+    constantcurve1.curveType = CurveType::BiQuadratic;
     constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    constantcurve1.InterpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve1.Coeff1 = 1.0;
     constantcurve1.Coeff2 = 0.0;
     constantcurve1.Coeff3 = 0.0;
@@ -4040,9 +4039,9 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.CurveType = CurveTypeEnum::Quadratic;
+    constantcurve2.curveType = CurveType::Quadratic;
     constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    constantcurve2.InterpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve2.Coeff1 = 1.0;
     constantcurve2.Coeff2 = 0.0;
     constantcurve2.Coeff3 = 0.0;
@@ -4073,8 +4072,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     Real64 PartLoadRatio(1.0);
     Real64 AirFlowRatio(1.0);
     int FanOpMode(2);
-    int CompOp(1);
-    CalcDoe2DXCoil(*state, DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
+    CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    CalcDoe2DXCoil(*state, DXCoilNum, CompressorOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
     EXPECT_NEAR(17580.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals fully capacity
     EXPECT_NEAR(17580.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling only
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate
@@ -4101,7 +4100,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     AirInletNode.HumRat = Coil.InletAirHumRat;
     AirInletNode.Enthalpy = Coil.InletAirEnthalpy;
     // run coil at full capacity
-    CalcDoe2DXCoil(*state, DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
+    CalcDoe2DXCoil(*state, DXCoilNum, CompressorOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
     EXPECT_NEAR(17580.0, Coil.TotalCoolingEnergyRate, 0.0001);           // equals fully capacity
     EXPECT_NEAR(13104.577807007219, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate
     EXPECT_NEAR(4475.4221929927808, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate
@@ -4179,9 +4178,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     Coil.AirInNode = 1;
     // biquadratic curve
     constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.CurveType = CurveTypeEnum::BiQuadratic;
+    constantcurve1.curveType = CurveType::BiQuadratic;
     constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    constantcurve1.InterpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve1.Coeff1 = 1.0;
     constantcurve1.Coeff2 = 0.0;
     constantcurve1.Coeff3 = 0.0;
@@ -4196,9 +4195,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.CurveType = CurveTypeEnum::Quadratic;
+    constantcurve2.curveType = CurveType::Quadratic;
     constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    constantcurve2.InterpolationType = InterpType::EvaluateCurveToLimits;
     constantcurve2.Coeff1 = 1.0;
     constantcurve2.Coeff2 = 0.0;
     constantcurve2.Coeff3 = 0.0;
@@ -4242,12 +4241,12 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = 1;
-    int CompOp = 1;
+    CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     int SingleMode = 0;
     // run the coil at low speed
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
-    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
+    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals low speed capacity
     EXPECT_NEAR(10710.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at low speed
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate at low speed
@@ -4266,7 +4265,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
     // run the coil at high speed
     SpeedRatio = 1.0;
-    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
+    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, SingleMode);
     EXPECT_NEAR(17850.0, Coil.TotalCoolingEnergyRate, 0.0001);   // total capacity at high speed
     EXPECT_NEAR(17850.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling rate at high speed
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate at high speed
@@ -4294,7 +4293,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     // run coil at low speed
     SpeedRatio = 0.0;
     CycRatio = 1.0;
-    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
+    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001);           // equals low speed cooling capacity
     EXPECT_NEAR(7930.3412059184047, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at low speed
     EXPECT_NEAR(2779.6587940815953, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate at low speed
@@ -4313,7 +4312,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
 
     // run the coil at high speed
     SpeedRatio = 1.0;
-    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
+    CalcMultiSpeedDXCoilCooling(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, SingleMode);
     EXPECT_NEAR(17850.0, Coil.TotalCoolingEnergyRate, 0.0001);           // total capacity at high speed
     EXPECT_NEAR(13217.235343197342, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at high speed
     EXPECT_NEAR(4632.7646568026576, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate at high speed
