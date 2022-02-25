@@ -847,7 +847,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                                                             "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
                                                                             "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
                                                                             "OnIfHighZoneAirTempAndHighSolarOnWindow",
-                                                                            "OnIfHighZoneAirTempAndHighHorizontalSolar"};
+                                                                            "OnIfHighZoneAirTempAndHighHorizontalSolar",
+                                                                            "OnIfHighLuminanceOrHighSolarTillMidnight"};
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscShading,
                                      surfName,

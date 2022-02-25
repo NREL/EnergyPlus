@@ -9501,7 +9501,7 @@ namespace SurfaceGeometry {
                                                            "BETWEENGLASSBLIND"  // 9
                                                        });
 
-        int constexpr NumValidWindowShadingControlTypes(21);
+        int constexpr NumValidWindowShadingControlTypes(22);
         static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
                                                                     {"ALWAYSON",
                                                                      "ALWAYSOFF",
@@ -9523,7 +9523,8 @@ namespace SurfaceGeometry {
                                                                      "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
                                                                      "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
+                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR",
+                                                                     "ONIFHIGHLUMINANCEORHIGHSOLARTILLMIDNIGHT"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine

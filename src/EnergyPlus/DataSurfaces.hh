@@ -175,6 +175,7 @@ namespace DataSurfaces {
         OnHiOutTemp_HiHorzSolar = 19,
         OnHiZoneTemp_HiSolarWindow = 20,
         OnHiZoneTemp_HiHorzSolar = 21,
+        HiLumin_HiSolar_OffMidNight = 22,
         Num
     };
 
@@ -364,6 +365,7 @@ namespace DataSurfaces {
     constexpr int WSCT_OnHiOutTemp_HiHorzSolar(19);       // OnIfHighOutsideAirTempAndHighHorizontalSolar
     constexpr int WSCT_OnHiZoneTemp_HiSolarWindow(20);    // OnIfHighZoneAirTempAndHighSolarOnWindow
     constexpr int WSCT_OnHiZoneTemp_HiHorzSolar(21);      // OnIfHighZoneAirTempAndHighHorizontalSolar
+    constexpr int WSCT_HiLumin_HiSolar_OffMidNight(22);   // OnIfHighLuminanceOrHighSolarTillMidnight
 
     // WindowShadingControl Slat Angle Control for Blinds
     constexpr int WSC_SAC_FixedSlatAngle(1);
