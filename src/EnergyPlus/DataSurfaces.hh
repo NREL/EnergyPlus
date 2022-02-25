@@ -150,19 +150,6 @@ namespace DataSurfaces {
         Num
     }; // Valid window shading types: IntShade <= Type <= BGBlind; the rest are shading status
 
-    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
-        "No Shade",  // 0
-        "Shade Off", // 1
-        "Interior Shade",
-        "Switchable Glazing",
-        "Exterior Shade",
-        "Exterior Screen",
-        "Interior Blind",
-        "Exterior Blind",
-        "Between Glass Shade",
-        "Between Glass Blind",
-    };
-
     enum class WindowShadingControlType : int
     {
         Invalid = -1,
@@ -190,30 +177,6 @@ namespace DataSurfaces {
         OnHiZoneTemp_HiHorzSolar = 21,
         Num
     };
-
-    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
-        "Uncontrolled",
-        "AlwaysOn",
-        "AlwaysOff",
-        "OnIfScheduleAllows",
-        "OnIfHighSolarOnWindow",
-        "OnIfHighHorizontalSolar",
-        "OnIfHighOutdoorAirTemperature",
-        "OnIfHighZoneAirTemperature",
-        "OnIfHighZoneCooling",
-        "OnIfHighGlare",
-        "MeetDaylightIlluminanceSetpoint",
-        "OnNightIfLowOutdoorTempAndOffDay",
-        "OnNightIfLowInsideTempAndOffDay",
-        "OnNightIfHeatingAndOffDay",
-        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
-        "OnNightIfHeatingAndOnDayIfCooling",
-        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
-        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
-        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
-        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
-        "OnIfHighZoneAirTempAndHighSolarOnWindow",
-        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
 
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):

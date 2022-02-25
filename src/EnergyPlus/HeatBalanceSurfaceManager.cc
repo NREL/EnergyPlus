@@ -672,6 +672,43 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 intVistranArea(0.0);
     bool isNorth;
 
+    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
+        "No Shade",  // 0
+        "Shade Off", // 1
+        "Interior Shade",
+        "Switchable Glazing",
+        "Exterior Shade",
+        "Exterior Screen",
+        "Interior Blind",
+        "Exterior Blind",
+        "Between Glass Shade",
+        "Between Glass Blind",
+    };
+
+        constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
+        "Uncontrolled",
+        "AlwaysOn",
+        "AlwaysOff",
+        "OnIfScheduleAllows",
+        "OnIfHighSolarOnWindow",
+        "OnIfHighHorizontalSolar",
+        "OnIfHighOutdoorAirTemperature",
+        "OnIfHighZoneAirTemperature",
+        "OnIfHighZoneCooling",
+        "OnIfHighGlare",
+        "MeetDaylightIlluminanceSetpoint",
+        "OnNightIfLowOutdoorTempAndOffDay",
+        "OnNightIfLowInsideTempAndOffDay",
+        "OnNightIfHeatingAndOffDay",
+        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+        "OnNightIfHeatingAndOnDayIfCooling",
+        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+        "OnIfHighZoneAirTempAndHighSolarOnWindow",
+        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
+
     auto &Surface(state.dataSurface->Surface);
 
     numSurfaces = 0;
