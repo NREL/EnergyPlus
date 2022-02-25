@@ -685,7 +685,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
         "Between Glass Blind",
     };
 
-        constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
+    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
         "Uncontrolled",
         "AlwaysOn",
         "AlwaysOff",
