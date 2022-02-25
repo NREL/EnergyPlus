@@ -908,7 +908,7 @@ namespace DataSurfaces {
         "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
         "VERTICALSLIDER"};
 
-    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
         // width in meters from Table 4-3 of NFRC 100-2020
         1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
         1.200, 2.134, 1.500, //  Fixed,           Garage,            Greenhouse,
@@ -920,7 +920,7 @@ namespace DataSurfaces {
         1.200                //  VerticalSlider,
     };
 
-    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
         // height in meters from Table 4-3 of NFRC 100-2020
         1.500, 1.500, 1.500, //  CasementDouble,  CasementSingle,    DualAction,
         1.500, 2.134, 1.200, //  Fixed,           Garage,            Greenhouse,

@@ -101,14 +101,14 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    double GetIGUUValueForNFRCReport(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight);
-    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight);
+    Real64 GetIGUUValueForNFRCReport(EnergyPlusData &state, int surfNum, int constrNum, Real64 windowWidth, Real64 windowHeight);
+    Real64 GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, Real64 windowWidth, Real64 windowHeight);
 
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
                                         int constrNum,
-                                        double windowWidth,
-                                        double windowHeight,
+                                        Real64 windowWidth,
+                                        Real64 windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
                                         Real64 &uvalue,
                                         Real64 &shgc,

@@ -258,8 +258,8 @@ namespace WindowManager {
         }
     }
 
-    double
-    GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const double windowWidth, const double windowHeight)
+    Real64
+    GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const Real64 windowWidth, const Real64 windowHeight)
     {
         const auto tilt{90.0};
 
@@ -271,7 +271,7 @@ namespace WindowManager {
         return winterGlassUnit->getUValue();
     }
 
-    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight)
+    Real64 GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, Real64 windowWidth, Real64 windowHeight)
     {
         const auto tilt{90.0};
 
@@ -285,8 +285,8 @@ namespace WindowManager {
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
                                         int constrNum,
-                                        double windowWidth,
-                                        double windowHeight,
+                                        Real64 windowWidth,
+                                        Real64 windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
                                         Real64 &uvalue,
                                         Real64 &shgc,
