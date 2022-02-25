@@ -3985,6 +3985,43 @@ namespace OutputProcessor {
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(5).Used);
     }
 
+    TEST_F(SQLiteFixture, OutputProcessor_getMeters_WildCard)
+    {
+        // Test for #9150
+        std::string const idf_objects = delimited_string({"Output:Meter:MeterFileOnly,InteriorLights:Electricity:Zone:*,Monthly;"});
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        Real64 light_consumption = 0;
+        for (int i = 1; i <= 5; ++i) {
+            SetupOutputVariable(*state,
+                                "Lights Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                light_consumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "SPACE" + std::to_string(i) + "LIGHTS",
+                                _,
+                                "Electricity",
+                                "InteriorLights",
+                                "GeneralLights",
+                                "Building",
+                                "SPACE" + std::to_string(i),
+                                1,
+                                1);
+        }
+
+        UpdateMeterReporting(*state);
+
+        compare_mtr_stream(
+            delimited_string({"53,9,InteriorLights:Electricity:Zone:SPACE1 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "102,9,InteriorLights:Electricity:Zone:SPACE2 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "139,9,InteriorLights:Electricity:Zone:SPACE3 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "176,9,InteriorLights:Electricity:Zone:SPACE4 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "213,9,InteriorLights:Electricity:Zone:SPACE5 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"},
+                             "\n"));
+    }
+
     TEST_F(SQLiteFixture, OutputProcessor_getCustomMeterInput)
     {
         std::string const idf_objects = delimited_string({
