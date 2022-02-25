@@ -4739,7 +4739,9 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) =
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum);
-            // Inside face conduction calculation for Kiva surfaces
+        }
+        // Inside face conduction calculation for Kiva surfaces
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             if (state.dataSurface->Surface(surfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
                 state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
                     -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
