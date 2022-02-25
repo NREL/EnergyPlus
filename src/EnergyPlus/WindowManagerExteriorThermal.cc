@@ -288,9 +288,9 @@ namespace WindowManager {
                                         double windowWidth,
                                         double windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
-                                        double &uvalue,
-                                        double &shgc,
-                                        double &vt)
+                                        Real64 &uvalue,
+                                        Real64 &shgc,
+                                        Real64 &vt)
     {
         auto &surface(state.dataSurface->Surface(surfNum));
         auto &frameDivider(state.dataSurface->FrameDivider(surface.FrameDivider));
