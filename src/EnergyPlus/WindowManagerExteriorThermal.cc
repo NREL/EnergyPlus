@@ -451,7 +451,7 @@ namespace WindowManager {
     }
 
     std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(
-        EnergyPlusData &state, bool const useSummerConditions, const double width, const double height, const double tilt)
+        EnergyPlusData &state, bool const useSummerConditions, const Real64 width, const Real64 height, const Real64 tilt)
     {
         auto Indoor = getIndoorNfrc(useSummerConditions);
         auto Outdoor = getOutdoorNfrc(useSummerConditions);
