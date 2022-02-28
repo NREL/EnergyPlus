@@ -1452,7 +1452,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
-    std::vector<int> AllHTKivaSurfaceList;    // List of all window surfaces
+    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     // Surface HB arrays
