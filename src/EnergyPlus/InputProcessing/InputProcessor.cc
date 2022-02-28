@@ -105,12 +105,17 @@ static std::string const BlankString;
 
 using json = nlohmann::json;
 
+const json &InputProcessor::schema()
+{
+    // avoid re-parsing embedded JSON schema by making this into a static const singleton
+    // because it is const, we don't have to worry about threading issues for creation or access
+    static const auto json_schema = json::from_cbor(EmbeddedEpJSONSchema::embeddedEpJSONSchema());
+    return json_schema;
+}
+
 InputProcessor::InputProcessor() : idf_parser(std::make_unique<IdfParser>()), data(std::make_unique<DataStorage>())
 {
-    auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
-    schema = json::from_cbor(embeddedEpJSONSchema);
-
-    const json &loc = schema["properties"];
+    const json &loc = schema()["properties"];
     caseInsensitiveObjectMap.reserve(loc.size());
     for (auto it = loc.begin(); it != loc.end(); ++it) {
         caseInsensitiveObjectMap.emplace(convertToUpper(it.key()), it.key());
@@ -120,7 +125,7 @@ InputProcessor::InputProcessor() : idf_parser(std::make_unique<IdfParser>()), da
     epJSON = json::object();
     //    objectCacheMap.clear();
     //    unusedInputs.clear();
-    validation = std::make_unique<Validation>(&schema);
+    validation = std::make_unique<Validation>(&schema());
 }
 
 std::unique_ptr<InputProcessor> InputProcessor::factory()
@@ -216,7 +221,7 @@ void InputProcessor::initializeMaps()
     unusedInputs.clear();
     objectCacheMap.clear();
     objectCacheMap.reserve(epJSON.size());
-    auto const &schema_properties = schema.at("properties");
+    auto const &schema_properties = schema().at("properties");
 
     for (auto epJSON_iter = epJSON.begin(); epJSON_iter != epJSON.end(); ++epJSON_iter) {
         auto const &objects = epJSON_iter.value();
@@ -265,7 +270,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
             auto input_file = FileSystem::readFile(state.dataStrGlobals->inputFilePath);
 
             bool success = true;
-            epJSON = idf_parser->decode(input_file, schema, success);
+            epJSON = idf_parser->decode(input_file, schema(), success);
 
             if (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
@@ -293,7 +298,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
 
     if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
         if (versionMatch) {
-            std::string const encoded = idf_parser->encode(epJSON, schema);
+            std::string const encoded = idf_parser->encode(epJSON, schema());
             fs::path convertedEpJSON = FileSystem::makeNativePath(
                 FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
             FileSystem::writeFile<FileSystem::FileTypes::IDF>(convertedEpJSON, encoded);
@@ -533,7 +538,7 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view c
         return static_cast<int>(find_obj.value().size());
     }
 
-    if (schema["properties"].find(std::string(ObjectWord)) == schema["properties"].end()) {
+    if (schema()["properties"].find(std::string(ObjectWord)) == schema()["properties"].end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowWarningError(state, fmt::format("Requested Object not found in Definitions: {}", ObjectWord));
@@ -723,7 +728,7 @@ int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_o
 
 const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
 {
-    auto const &schema_properties = schema.at("properties");
+    auto const &schema_properties = schema().at("properties");
     const json &object_schema = schema_properties.at(objectWord);
     assert(!object_schema.empty()); // If this fails, the object type does not exist in the schema
 
@@ -1402,7 +1407,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
     NumAlpha = 0;
     NumNumeric = 0;
     std::string extension_key;
-    auto const &schema_properties = schema.at("properties");
+    auto const &schema_properties = schema().at("properties");
 
     for (json::iterator object = epJSON.begin(); object != epJSON.end(); ++object) {
         int num_alpha = 0;
@@ -1465,16 +1470,16 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     NumArgs = 0;
     NumAlpha = 0;
     NumNumeric = 0;
-    json *object;
-    if (schema["properties"].find(std::string(ObjectWord)) == schema["properties"].end()) {
+    const json *object;
+    if (schema()["properties"].find(std::string(ObjectWord)) == schema()["properties"].end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
         }
-        object = &schema["properties"][tmp_umit->second];
+        object = &schema()["properties"][tmp_umit->second];
     } else {
-        object = &schema["properties"][std::string(ObjectWord)];
+        object = &schema()["properties"][std::string(ObjectWord)];
     }
     const json &legacy_idd = object->at("legacy_idd");
 
@@ -1551,7 +1556,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
     state.dataOutput->iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
     state.dataOutput->iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
 
-    auto const &schema_properties = schema.at("properties");
+    auto const &schema_properties = schema().at("properties");
 
     // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
     auto processField = [&state](const std::string &field, const json &epJSONObj, const json &schema_field_obj) {
@@ -1951,7 +1956,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
     epJSON_objects = epJSON.find(MeterCustom);
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
-        auto const &legacy_idd = schema["properties"][MeterCustom]["legacy_idd"];
+        auto const &legacy_idd = schema()["properties"][MeterCustom]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
             extension_key = key.value().get<std::string>();
@@ -1973,7 +1978,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
     epJSON_objects = epJSON.find(MeterCustomDecrement);
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
-        auto const &legacy_idd = schema["properties"][MeterCustomDecrement]["legacy_idd"];
+        auto const &legacy_idd = schema()["properties"][MeterCustomDecrement]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
             extension_key = key.value().get<std::string>();
@@ -2035,7 +2040,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
     epJSON_objects = epJSON.find(OutputTableMonthly);
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
-        auto const &legacy_idd = schema["properties"][OutputTableMonthly]["legacy_idd"];
+        auto const &legacy_idd = schema()["properties"][OutputTableMonthly]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
             extension_key = key.value().get<std::string>();
@@ -2055,7 +2060,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
     epJSON_objects = epJSON.find(OutputTableAnnual);
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
-        auto const &legacy_idd = schema["properties"][OutputTableAnnual]["legacy_idd"];
+        auto const &legacy_idd = schema()["properties"][OutputTableAnnual]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
             extension_key = key.value().get<std::string>();
@@ -2076,7 +2081,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
     epJSON_objects = epJSON.find(OutputTableSummaries);
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
-        auto const &legacy_idd = schema["properties"][OutputTableSummaries]["legacy_idd"];
+        auto const &legacy_idd = schema()["properties"][OutputTableSummaries]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
             extension_key = key.value().get<std::string>();
