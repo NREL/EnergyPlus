@@ -2085,7 +2085,7 @@ namespace ThermalComfort {
         return CalcAngleFactorMRT;
     }
 
-    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum, bool AverageWithSurface = true)
+    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum, bool AverageWithSurface)
     {
 
         // Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
