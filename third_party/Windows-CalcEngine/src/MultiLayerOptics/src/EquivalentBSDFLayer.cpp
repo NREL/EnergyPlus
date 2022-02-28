@@ -102,35 +102,6 @@ namespace MultiLayerOptics
         // Calculate total transmitted solar per matrix and perform integration over each wavelength
         size_t WLsize = m_CombinedLayerWavelengths.size();
 
-        // // This is for multithread calculations.
-        // size_t numOfThreads = size_t( thread::hardware_concurrency() - 2 );
-        // size_t step = WLsize / numOfThreads;
-        // std::vector< std::shared_ptr< thread > > aThreads = std::vector< std::shared_ptr< thread
-        // > >( numOfThreads );
-        //
-        // size_t startNum = 0;
-        // size_t endNum = step;
-        //
-        // for( size_t i = 0; i < numOfThreads; ++i ) {
-        //   if( i == numOfThreads - 1 ) {
-        //     endNum = WLsize;
-        //   }
-        //
-        //   aThreads[ i ] = std::make_shared< thread >(
-        //   &CEquivalentBSDFLayer::calculateWavelengthProperties, *this,
-        //    numberOfLayers, startNum, endNum );
-        //
-        //   startNum += step;
-        //   endNum += step;
-        // }
-        //
-        // for( size_t i = 0; i < numOfThreads; ++i ) {
-        //   aThreads[ i ]->join();
-        // }
-        //
-        // // End of multithreaded calculations.
-
-
         calculateWavelengthProperties(numberOfLayers, 0, WLsize);
 
         m_Calculated = true;

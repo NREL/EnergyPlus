@@ -344,6 +344,8 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
 
+            state.dataInputProcessing->inputProcessor->markObjectAsUsed("OutputControl:Files", instance.key());
+
             { // "output_csv"
                 csv = boolean_choice(find_input(fields, "output_csv"));
             }

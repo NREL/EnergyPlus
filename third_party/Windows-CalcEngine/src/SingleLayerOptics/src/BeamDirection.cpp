@@ -103,4 +103,9 @@ namespace SingleLayerOptics
         m_ProfileAngle = degrees(m_ProfileAngle);
     }
 
+    CBeamDirection CBeamDirection::rotate(const double angle) const
+    {
+        return {m_Theta, m_Phi + angle};
+    }
+
 }   // namespace SingleLayerOptics

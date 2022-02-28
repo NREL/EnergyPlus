@@ -98,6 +98,7 @@ namespace WindowManager {
 
         WindowsModel getWindowsModel() const;
         bool isExternalLibraryModel() const;
+        void setExternalLibraryModel(WindowsModel model);
 
     private:
         WindowsModel m_Model;

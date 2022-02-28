@@ -105,7 +105,7 @@ protected:
     std::string encodeIDF()
     {
         return state->dataInputProcessing->inputProcessor->idf_parser->encode(state->dataInputProcessing->inputProcessor->epJSON,
-                                                                              state->dataInputProcessing->inputProcessor->schema);
+                                                                              state->dataInputProcessing->inputProcessor->schema());
     }
 
     json &getEpJSON()
@@ -138,7 +138,7 @@ protected:
     {
         IdfParser idfParser;
         idfParser.idf_size = idf.size();
-        return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor->schema["properties"]);
+        return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor->schema()["properties"]);
     }
 
     json parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc)
