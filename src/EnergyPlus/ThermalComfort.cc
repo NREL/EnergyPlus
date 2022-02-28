@@ -2090,7 +2090,7 @@ namespace ThermalComfort {
 
         // Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
         //          This is necessary for the surface weighted option to not in essence
-        //          double count SurfNum in the MRT calculation when averaged with the Surface( SurfNum ).  
+        //          double count SurfNum in the MRT calculation when averaged with the Surface( SurfNum ).
         //          Other than that, the method here is the same as CalculateZoneMRT.  Once a modified zone
         //          MRT is calculated, the subroutine then calculates and returns the
         //          RadTemp (radiant temperature) for use by the thermal comfort routines

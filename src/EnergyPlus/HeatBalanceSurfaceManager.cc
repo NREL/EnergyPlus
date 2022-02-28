@@ -2226,13 +2226,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
         }
-
-        // Initialize Kiva convection algorithms
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
-        }
+    }
+    // Initialize Kiva convection algorithms
+    for (auto SurfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
     }
     if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -4740,15 +4739,13 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
             state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) =
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum);
         }
-        // Inside face conduction calculation for Kiva surfaces
-        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-            if (state.dataSurface->Surface(surfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
-                state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
-                    -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
-                      state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
-                      state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
-            }
-        }
+    }
+    // Inside face conduction calculation for Kiva surfaces
+    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
+            -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
     }
 }
 
