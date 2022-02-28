@@ -1124,7 +1124,11 @@ End
 		        elseif versionFound.Len = 3 Then
 		          versionFound = versionFound + ".0"
 		        End If
-		        versionFound = versionFound.Left(5) 'trim build number if included, such as: 3.0.0.028 to 3.0.0
+		        if versionFound.instr(".") = 2 then
+		          versionFound = versionFound.Left(5) 'trim build number if included, such as: 3.0.0.028 to 3.0.0
+		        Else
+		          versionFound = versionFound.Left(6) 'trim build number if included, such as: 23.0.0.028 to 23.0.0
+		        End if
 		      Else
 		        versionFound = ""
 		      End If
@@ -1187,25 +1191,11 @@ End
 #tag Events cmdChooseFile
 	#tag Event
 		Sub Action()
-		  dim idfType as new FileType
-		  dim idmType as new FileType
-		  dim lstType as new FileType
 		  dim f as FolderItem
-		  dim dlg as new OpenDialog
 		  dim curVersion as string = ""
 		  dim auditFile as FolderItem
-		  idfType.Name = "EnergyPlus Input File"
-		  idfType.MacType = "idf"
-		  idfType.Extensions = "idf"
-		  idmType.Name = "EnergyPlus Macro File"
-		  idmType.MacType = "imf"
-		  idmType.Extensions = "imf"
-		  lstType.Name = "Text File With List of EnergyPlus Files"
-		  lstType.MacType = "lst"
-		  lstType.Extensions = "lst"
-		  dlg.Title = "Select Old EnergyPlus File to Update"
-		  dlg.filter = idfType  + idmType + lstType
-		  f = dlg.ShowModal()
+		  'dlg.Title = "Select Old EnergyPlus File to Update"
+		  f = FolderItem.ShowOpenFileDialog(ReadFileTypeGroup.all)
 		  if f<>nil then
 		    txtFileName.Text = f.NativePath
 		    txtFileName.Enabled = True
