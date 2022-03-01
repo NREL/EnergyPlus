@@ -1,17 +1,33 @@
 #tag FileTypeSet
 	#tag FileType
-		CodeName=ApplicationText
-		Extension=.lst; .idf
+		CodeName=AppText
+		Extension=.idf
 		Flags=&h5
 		MacCreator=
 		MacType=????
-		Name=special/any
+		Name=EnergyPlus Input Files (*.idf)
 		UTI=public.data
 		UTIConformsTo=,public.data
 		Description=
 		MimeType=
 		Imported=True
-		HandlerRank=&h5
+		HandlerRank=&h9
+		UTIPhysicalType=public.data
+	#tag EndFileType
+
+	#tag FileType
+		CodeName=ApplicationText
+		Extension=.lst
+		Flags=&h5
+		MacCreator=
+		MacType=????
+		Name=Text file with list of EnergyPlus Input Files (*.lst)
+		UTI=public.data
+		UTIConformsTo=,public.data
+		Description=
+		MimeType=
+		Imported=True
+		HandlerRank=&h9
 		UTIPhysicalType=public.data
 	#tag EndFileType
 
