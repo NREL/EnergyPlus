@@ -9478,12 +9478,16 @@ namespace WeatherManager {
                         break;
                     }
                 }
-                // TODO: should we check if it has "Daily Avg" in it?
-                // if (lineAvg.find("Daily Avg") == std::string::npos)
                 if (lineAvg.empty()) {
                     ShowSevereError(state,
                                     "CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + statFile.filePath.string() +
                                         "' does not have Monthly Statistics for Dry Bulb temperatures.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
+                    return;
+                } else if (lineAvg.find("Daily Avg") == std::string::npos) {
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + statFile.filePath.string() +
+                                        "' does not have the 'Daily Avg' line in the Monthly Statistics for Dry Bulb temperatures.");
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 } else {
