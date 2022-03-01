@@ -59,6 +59,13 @@ EnergyPlusState stateNew()
     return reinterpret_cast<EnergyPlusState>(state);
 }
 
+EnergyPlusState stateNewPython()
+{
+    auto *state = new EnergyPlus::EnergyPlusData;
+    state->dataPluginManager->eplusRunningViaPythonAPI = true;
+    return reinterpret_cast<EnergyPlusState>(state);
+}
+
 void stateReset(EnergyPlusState state)
 {
     auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);

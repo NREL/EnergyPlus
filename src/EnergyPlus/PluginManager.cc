@@ -402,7 +402,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 #endif
 }
 
-PluginManager::PluginManager(EnergyPlusData &state)
+PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
 {
 #if LINK_WITH_PYTHON
     // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
@@ -648,7 +648,9 @@ PluginManager::PluginManager(EnergyPlusData &state)
 PluginManager::~PluginManager()
 {
 #if LINK_WITH_PYTHON
-    Py_FinalizeEx();
+    if (!this->eplusRunningViaPythonAPI) {
+        Py_FinalizeEx();
+    }
 #endif // LINK_WITH_PYTHON
 }
 

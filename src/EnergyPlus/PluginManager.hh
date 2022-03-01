@@ -209,6 +209,8 @@ namespace PluginManagement {
         static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
+
+        bool eplusRunningViaPythonAPI = false;
     };
 
     struct PluginTrendVariable
@@ -241,10 +243,11 @@ struct PluginManagerData : BaseGlobalStruct
     std::vector<Real64> globalVariableValues;
     bool fullyReady = false;
     bool apiErrorFlag = false;
-    bool eplusRunningViaAPI = false;
-
     std::vector<std::string> const objectsToFind = {
         "PythonPlugin:OutputVariable", "PythonPlugin:SearchPaths", "PythonPlugin:Instance", "PythonPlugin:Variables", "PythonPlugin:TrendVariable"};
+
+    bool eplusRunningViaPythonAPI = false;
+
     void clear_state() override
     {
         callbacks.clear();
@@ -258,10 +261,8 @@ struct PluginManagerData : BaseGlobalStruct
         plugins.clear();
         fullyReady = false;
         apiErrorFlag = false;
-        if (!eplusRunningViaAPI) {
-            auto *p = pluginManager.release();
-            delete p;
-        }
+        auto *p = pluginManager.release();
+        delete p;
 #endif
     }
 };
