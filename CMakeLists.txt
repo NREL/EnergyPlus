@@ -159,7 +159,13 @@ endif()
 # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
 # If LINK_WITH_PYTHON, also request the Development (libs) at the same time, to ensure consistent version between interpreter and Development
 if(LINK_WITH_PYTHON)
-  find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
+  # find_package(Python) has the problem that on github actions in particular it'll pick up the most recent python (eg 3.9) from the tool cache
+  # even if you have used the setup-python action and set it to 3.8, so we make the exact version required
+  if(PYTHON_VERSION)
+    find_package(Python ${PYTHON_VERSION} EXACT COMPONENTS Interpreter Development REQUIRED)
+  else()
+    find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
+  endif()
 else()
   find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
 endif()
