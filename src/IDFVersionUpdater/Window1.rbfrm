@@ -1193,13 +1193,21 @@ End
 		Sub Action()
 		  dim f as FolderItem
 		  dim curVersion as string = ""
+		  dim filepath as string = ""
 		  dim auditFile as FolderItem
 		  'dlg.Title = "Select Old EnergyPlus File to Update"
 		  f = FolderItem.ShowOpenFileDialog(ReadFileTypeGroup.all)
 		  if f<>nil then
-		    txtFileName.Text = f.NativePath
+		    filepath = f.NativePath
+		    #if TargetMacOS then
+		      if ExtensionOnly(filepath) = "txt" then
+		        filepath = filepath.left(filepath.length - 4)
+		      end if
+		    #EndIf
+		    txtFileName.Text = filepath
+		    'msgbox "cmdChooseFile-Action-1: " + filepath + " extension " + ExtensionOnly(filepath)
 		    txtFileName.Enabled = True
-		    if extensionOnly(f.NativePath) <> "lst" then 'IDF or IDM files are processed
+		    if extensionOnly(filepath) <> "lst" then 'IDF or IDM files are processed
 		      curVersion =  getCurrentFileVersion(f)
 		      if curVersion<>"" then
 		        txtCurrentVersion.Text = curVersion
@@ -1235,7 +1243,8 @@ End
 		  dim curLine as string = ""
 		  dim curFile as FolderItem
 		  dim curVersion as String =""
-		  dim listFile as FolderItem
+		  dim activeFile as FolderItem
+		  dim activeFileName as String = ""
 		  
 		  'Called when the CONVERT button is pressed
 		  me.MouseCursor = system.Cursors.Wait
@@ -1244,10 +1253,21 @@ End
 		  #if TargetWindows or TargetLinux then
 		    call CopyIDDandCSV(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text)
 		  #EndIf
+		  
+		  activeFileName = txtFileName.Text
+		  activeFile = new FolderItem(activeFileName)
+		  'on MacOS the file name sometime has an extra extension of .txt
+		  #if TargetMacOS then
+		    if not activeFile.Exists then
+		      activeFileName = activeFileName + ".txt"
+		      activeFile = new FolderItem(activeFileName)
+		    end if
+		  #endif
+		  'MsgBox "cmdConvert-Action-2: " + activeFileName + " extension " + ExtensionOnly(activeFileName)
+		  
 		  if ExtensionOnly(txtFileName.Text) = "lst" then
-		    listFile = new FolderItem(txtFileName.Text )
-		    IF listFile.Exists then
-		      SourceStream = TextInputStream.Open(listFile)
+		    IF activeFile.Exists then
+		      SourceStream = TextInputStream.Open(activeFile)
 		      While Not SourceStream.EOF
 		        curLine = LTrim(SourceStream.ReadLine)
 		        If curLine.Len>0 and  curLine.Left(1) <>"!" then 'skip lines with comments and blank lines
@@ -1267,9 +1287,11 @@ End
 		        end if
 		      wend
 		      MsgBox "All conversions complete"
+		    else
+		      MsgBox "Could not file file: " + txtFileName.Text + " or " + txtFileName.Text + ".txt"
 		    end if
 		  else
-		    call ConvertFile(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text,True)
+		    call ConvertFile(activeFileName, txtCurrentVersion.Text, pmnuNewVersion.Text,True)
 		    cmdViewAudit.Enabled = True
 		  end if
 		  ' for Windows and Linux copy the IDD and CSV to current file location
