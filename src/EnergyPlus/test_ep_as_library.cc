@@ -45,9 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Data/CommonIncludes.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
+#include <EnergyPlus/api/state.h>
 #include <iostream>
 
 void message_callback_handler(std::string const &message)
@@ -63,16 +62,17 @@ void progress_callback_handler(int const progress)
 int main(int argc, char *argv[])
 {
     std::cout << "Using EnergyPlus as a library." << std::endl;
-    EnergyPlus::EnergyPlusData state;
-    StoreMessageCallback(state, message_callback_handler);
-    StoreProgressCallback(state, progress_callback_handler);
+    EnergyPlus::EnergyPlusData *state {reinterpret_cast<EnergyPlus::EnergyPlusData *>(stateNew())};
+    StoreMessageCallback(*state, message_callback_handler);
+    StoreProgressCallback(*state, progress_callback_handler);
 
     int status(EXIT_FAILURE);
     if (argc < 2) {
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
         return EXIT_FAILURE;
     } else {
-        status = RunEnergyPlus(state, argv[1]);
+        status = RunEnergyPlus(*state, argv[1]);
+        stateDelete(reinterpret_cast<EnergyPlusState>(state));
     }
     if (!std::cin.good()) std::cin.clear();
     if (!std::cerr.good()) std::cerr.clear();

@@ -252,7 +252,7 @@ set(test_src
     ZoneTempPredictorCorrector.unit.cc
     main.cc)
 
-set(test_dependencies energyplusapi)
+set(test_dependencies energypluslib)
 
 if(LINK_WITH_PYTHON)
   add_definitions("-DLINK_WITH_PYTHON")
