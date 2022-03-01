@@ -74,8 +74,6 @@ print("MUTED E+ RUN 1 DONE")
 print("RESETTING STATE")
 api.state_manager.reset_state(state)
 
-print("REBOOT STATE")
-state = api.state_manager.new_state()
 api.runtime.callback_progress(state, progress_handler)
 v = api.runtime.run_energyplus(state, sys.argv[1:])
 if v != 0:
