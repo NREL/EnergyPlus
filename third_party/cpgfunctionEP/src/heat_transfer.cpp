@@ -3,6 +3,7 @@
 //
 
 #include <stdexcept>
+#include <chrono>
 #include <cpgfunction/boreholes.h>
 #include <cpgfunction/heat_transfer.h>
 
