@@ -74,6 +74,16 @@ namespace SystemAvailabilityManager {
         Num
     };
 
+    // Cycling Run Time Control Type
+    enum class CyclingRunTimeControl
+    {
+        Invalid = -1,
+        FixedRunTime,
+        Thermostat,
+        ThermostatWithMinimumRunTime,
+        Num
+    };
+
     int constexpr StayOff = 0;
     int constexpr CycleOnAny = 1;
     int constexpr CycleOnControlZone = 2;
@@ -82,11 +92,6 @@ namespace SystemAvailabilityManager {
     int constexpr CycleOnAnyCoolingZone = 5;
     int constexpr CycleOnAnyHeatingZone = 6;
     int constexpr CycleOnAnyHeatingZoneFansOnly = 7;
-
-    // Cycling Run Time Control Type
-    int constexpr FixedRunTime = 1;
-    int constexpr Thermostat = 2;
-    int constexpr ThermostatWithMinimumRunTime = 3;
 
     int constexpr NumValidSysAvailManagerTypes = 12;
 
@@ -155,7 +160,6 @@ namespace SystemAvailabilityManager {
         int FanSchedPtr;      // Fan schedule pointer
         int CtrlType;         // type of control: Stay Off, Cycle On Any,
         //   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
-        int CycRunTimeCntrlType;           // Cycling Run Time Control Type
         Real64 TempTolRange;               // range in degrees C of thermostat tolerance
         int CyclingTimeSteps;              // period (in Loads time steps) system will cycle on.
         int AvailStatus;                   // reports status of availability manager
@@ -172,10 +176,11 @@ namespace SystemAvailabilityManager {
         std::string HeatZnFanZoneListName; // heating zone fans only zone or zonelist name
         int NumOfHeatZnFanZones;           // number of heating zone fans only zones
         Array1D_int HeatZnFanZonePtrs;     // pointers to heating zone fans only zone(s)
+        CyclingRunTimeControl cyclingRunTimeControl = CyclingRunTimeControl::Invalid;           // Cycling Run Time Control Type
 
         // Default Constructor
         DefineNightCycSysAvailManager()
-            : MgrType(0), SchedPtr(0), FanSchedPtr(0), CtrlType(0), CycRunTimeCntrlType(0), TempTolRange(1.0), CyclingTimeSteps(1), AvailStatus(0),
+            : MgrType(0), SchedPtr(0), FanSchedPtr(0), CtrlType(0), TempTolRange(1.0), CyclingTimeSteps(1), AvailStatus(0),
               PriorAvailStatus(0), NumOfCtrlZones(0), NumOfCoolingZones(0), NumOfHeatingZones(0), NumOfHeatZnFanZones(0)
         {
         }

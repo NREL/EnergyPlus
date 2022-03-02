@@ -356,6 +356,12 @@ namespace SystemAvailabilityManager {
         constexpr std::array<std::string_view, static_cast<int>(ControlAlgorithm::Num)> ControlAlgorithmNamesUC = {
             "CONSTANTTEMPERATUREGRADIENT", "ADAPTIVETEMPERATUREGRADIENT", "ADAPTIVEASHRAE", "CONSTANTSTARTTIME"};
 
+        constexpr std::array<std::string_view, static_cast<int>(CyclingRunTimeControl::Num)> CyclingRunTimeControlNamesUC{
+            "FIXEDRUNTIME",
+            "THERMOSTAT",
+            "THERMOSTATWITHMINIMUMRUNTIME",
+        };
+
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
@@ -647,22 +653,13 @@ namespace SystemAvailabilityManager {
                 }
 
                 // Cycling Run Time Control Type
-                if (!lAlphaFieldBlanks(5)) {
-                    {
-                        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(5)));
-                        if (SELECT_CASE_var == "FIXEDRUNTIME") {
-                            state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CycRunTimeCntrlType = FixedRunTime;
-                        } else if (SELECT_CASE_var == "THERMOSTAT") {
-                            state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CycRunTimeCntrlType = Thermostat;
-                        } else if (SELECT_CASE_var == "THERMOSTATWITHMINIMUMRUNTIME") {
-                            state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CycRunTimeCntrlType = ThermostatWithMinimumRunTime;
-                        } else {
-                            ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
-                            ErrorsFound = true;
-                        }
-                    }
+                state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(
+                    getEnumerationValue(CyclingRunTimeControlNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(5))));
+
+                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).cyclingRunTimeControl == CyclingRunTimeControl::Invalid) {
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
+                    ErrorsFound = true;
                 }
 
                 // Control zone or zonelist
@@ -2083,7 +2080,7 @@ namespace SystemAvailabilityManager {
         int ZoneNum;
         Real64 TempTol;
         auto &ZoneCompNCControlType = state.dataSystemAvailabilityManager->ZoneCompNCControlType;
-        int CyclingRunTimeControlType;
+        CyclingRunTimeControl cyclingRunTimeControl;
 
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         if (present(ZoneEquipType)) {
@@ -2117,9 +2114,9 @@ namespace SystemAvailabilityManager {
             return;
         }
 
-        CyclingRunTimeControlType = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CycRunTimeCntrlType;
+        cyclingRunTimeControl = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).cyclingRunTimeControl;
 
-        if (CyclingRunTimeControlType == FixedRunTime) {
+        if (cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) {
             TempTol = 0.5 * state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).TempTolRange;
         } else {
             TempTol = 0.05;
@@ -2127,10 +2124,10 @@ namespace SystemAvailabilityManager {
 
         if (present(ZoneEquipType)) {
             if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
-                (CyclingRunTimeControlType == FixedRunTime || CyclingRunTimeControlType == ThermostatWithMinimumRunTime)) { // if cycled on
+                (cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime || cyclingRunTimeControl == CyclingRunTimeControl::ThermostatWithMinimumRunTime)) { // if cycled on
                 AvailStatus = CycleOn;
             } else if (state.dataGlobal->SimTimeSteps == StopTime &&
-                       CyclingRunTimeControlType == FixedRunTime) { // if end of cycle run time, shut down if fan off
+                       cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) { // if end of cycle run time, shut down if fan off
                 AvailStatus = NoAction;
             } else {
 
@@ -2208,7 +2205,7 @@ namespace SystemAvailabilityManager {
                 } // end select type of night cycle control
 
                 if (AvailStatus == CycleOn) {                      // reset the start and stop times
-                    if (CyclingRunTimeControlType == Thermostat) { // Cycling Run Time is ignored
+                    if (cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
                     } else {
@@ -2220,11 +2217,11 @@ namespace SystemAvailabilityManager {
             }
         } else {
             if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
-                (CyclingRunTimeControlType == FixedRunTime || CyclingRunTimeControlType == ThermostatWithMinimumRunTime)) { // if cycled on
+                (cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime || cyclingRunTimeControl == CyclingRunTimeControl::ThermostatWithMinimumRunTime)) { // if cycled on
                 AvailStatus = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus;
                 if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType == ZoneFansOnly) AvailStatus = CycleOnZoneFansOnly;
             } else if (state.dataGlobal->SimTimeSteps == StopTime &&
-                       CyclingRunTimeControlType == FixedRunTime) { // if end of cycle run time, shut down if fan off
+                       cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) { // if end of cycle run time, shut down if fan off
                 AvailStatus = NoAction;
             } else {
 
@@ -2370,7 +2367,7 @@ namespace SystemAvailabilityManager {
                     if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType == ZoneFansOnly)
                         AvailStatus = CycleOnZoneFansOnly;
                     // issue #6151
-                    if (CyclingRunTimeControlType == Thermostat) { // Cycling Run Time is ignored
+                    if (cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
                         state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = state.dataGlobal->SimTimeSteps;
                         state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = state.dataGlobal->SimTimeSteps;
                     } else {

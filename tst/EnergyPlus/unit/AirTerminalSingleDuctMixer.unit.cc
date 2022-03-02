@@ -8186,8 +8186,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->ZoneEqFanCoil = true;
     // check availability manager Night Cycle parameters
-    EXPECT_EQ(SystemAvailabilityManager::ThermostatWithMinimumRunTime,
-              state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CycRunTimeCntrlType);
+    EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime,
+                              state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl));
     EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
 
     // set predicted heating load
