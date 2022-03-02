@@ -3,7 +3,6 @@
 //
 
 #include <stdexcept>
-#include <thread>
 #include <cpgfunction/boreholes.h>
 #include <cpgfunction/heat_transfer.h>
 

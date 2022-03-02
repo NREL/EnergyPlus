@@ -10,7 +10,6 @@
 #include <cpgfunction/boreholes.h>
 #include <cpgfunction/segments.h>
 #include <iostream>
-#include <thread>
 #include <vector>
 
 /** The functions will be listed here in the order which they appear in the

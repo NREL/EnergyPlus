@@ -94,7 +94,6 @@ vector<double> gt::gfunction::uniform_borehole_wall_temperature(
     // ------ Segment lengths -------
     start = std::chrono::steady_clock::now();
     std::vector<float> Hb(nSources);
-# pragma omp parallel for num_threads(n_Threads)
     for (int b=0; b<nSources; b++) {
         Hb[b] = SegRes.boreSegments[b].H;
     } // next b
@@ -111,7 +110,6 @@ vector<double> gt::gfunction::uniform_borehole_wall_temperature(
     std::vector<double> _time(time.size()+1);
     std::vector<double> dt(time.size()+1);
 
-# pragma omp parallel for num_threads(n_Threads)
     for (int i=0; i<_time.size(); i++) {
         if (i==0) {
             _time[0] = 0;
@@ -221,7 +219,6 @@ vector<double> gt::gfunction::uniform_borehole_wall_temperature(
         };
         // A needs filled each loop because the _gsl partial pivot
         // decomposition modifies the matrix
-# pragma omp parallel for num_threads(n_Threads)
         for (int i=0; i<SIZE; i++) {
             _fillA(i, p, SIZE);
         }  // next i
