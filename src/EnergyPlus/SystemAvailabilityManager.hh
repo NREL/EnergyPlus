@@ -98,6 +98,16 @@ namespace SystemAvailabilityManager {
         Num
     };
 
+    // Optimum start parameter definitions
+    enum class OptimumStartControlType
+    {
+        Invalid = -1,
+        Off,
+        ControlZone,
+        MaximumOfZoneList,
+        Num
+    };
+
     int constexpr NumValidSysAvailManagerTypes = 12;
 
     int constexpr SysAvailMgr_Scheduled = 1;
@@ -200,7 +210,6 @@ namespace SystemAvailabilityManager {
         int SchedPtr;             // Applicability schedule pointer
         std::string FanSched;     // Fan schedule name
         int FanSchedPtr;          // Fan schedule pointer
-        int CtrlType;             // Type of control: Stay Off, ControlZone, MaximumofZoneList
         std::string CtrlZoneName; // Name of the control zone
         int ZoneNum;              // zone number of control zone
         int ControlledZoneNum;    // controlled zone number of control zone
@@ -238,10 +247,12 @@ namespace SystemAvailabilityManager {
         Real64 ATGUpdateTime2;
         Real64 ATGUpdateTemp1;
         Real64 ATGUpdateTemp2;
+        OptimumStartControlType optimumStartControlType =
+            OptimumStartControlType::Invalid; // Type of control: Stay Off, ControlZone, MaximumofZoneList
 
         // Default Constructor
         DefineOptStartSysAvailManager()
-            : MgrType(0), isSimulated(false), SchedPtr(0), FanSchedPtr(0), CtrlType(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0),
+            : MgrType(0), isSimulated(false), SchedPtr(0), FanSchedPtr(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0),
               MaxOptStartTime(6.0), CtrlAlgType(ControlAlgorithm::Invalid), ConstTGradCool(1.0), ConstTGradHeat(1.0), InitTGradCool(1.0), InitTGradHeat(1.0),
               AdaptiveTGradCool(1.0), AdaptiveTGradHeat(1.0), ConstStartTime(2.0), NumPreDays(1), AvailStatus(0), NumHoursBeforeOccupancy(0.0),
               TempDiffHi(0.0), TempDiffLo(0.0), ATGWCZoneNumLo(0), ATGWCZoneNumHi(0), CycleOnFlag(false), ATGUpdateFlag1(false),

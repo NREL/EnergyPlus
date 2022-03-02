@@ -111,11 +111,6 @@ namespace SystemAvailabilityManager {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
-    // Optimum start parameter definitions
-    int constexpr StayOff = 0;
-    int constexpr ControlZone = 4;
-    int constexpr MaximumOfZoneList = 5;
-
     // Hybrid Ventilation parameters
     int constexpr HybridVentMode_No = 0;       // No hybrid ventilation control
     int constexpr HybridVentMode_Temp = 1;     // Temperature control
@@ -372,6 +367,12 @@ namespace SystemAvailabilityManager {
             "CYCLEONANYCOOLINGZONE",
             "CYCLEONANYHEATINGZONE",
             "CYCLEONANYHEATINGZONEFANSONLY",
+        };
+
+        constexpr std::array<std::string_view, static_cast<int>(OptimumStartControlType::Num)> OptimumStartControlTypeNamesUC{
+            "STAYOFF",
+            "CONTROLZONE",
+            "MAXIMUMOFZONELIST",
         };
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -827,23 +828,20 @@ namespace SystemAvailabilityManager {
 
                 state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).MaxOptStartTime = rNumericArgs(1);
 
-                {
-                    auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
-                    if (SELECT_CASE_var == "STAYOFF") {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType = StayOff;
-                    } else if (SELECT_CASE_var == "CONTROLZONE") {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType = ControlZone;
-                    } else if (SELECT_CASE_var == "MAXIMUMOFZONELIST") {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType = MaximumOfZoneList;
-                    } else {
-                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType = ControlZone;
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                        ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
-                        ErrorsFound = true;
-                    }
+                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType =
+                    static_cast<OptimumStartControlType>(
+                        getEnumerationValue(OptimumStartControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+
+                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType ==
+                    OptimumStartControlType::Invalid) {
+                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType =
+                        OptimumStartControlType::ControlZone;
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                    ErrorsFound = true;
                 }
 
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType == ControlZone) {
+                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType == OptimumStartControlType::ControlZone) {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlZoneName = cAlphaArgs(5);
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
@@ -854,7 +852,7 @@ namespace SystemAvailabilityManager {
                     }
                 }
 
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType == MaximumOfZoneList) {
+                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType == OptimumStartControlType::MaximumOfZoneList) {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneListName = cAlphaArgs(6);
                     for (ZoneListNum = 1; ZoneListNum <= state.dataHeatBal->NumOfZoneLists; ++ZoneListNum) {
                         if (state.dataHeatBal->ZoneList(ZoneListNum).Name == cAlphaArgs(6)) {
@@ -1713,8 +1711,8 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs; ++SysAvailNum) {
                 {
-                    auto const SELECT_CASE_var(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType);
-                    if (SELECT_CASE_var == ControlZone) {
+                    auto const SELECT_CASE_var(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType);
+                    if (SELECT_CASE_var == OptimumStartControlType::ControlZone) {
                         // set the controlled zone numbers
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
@@ -1725,7 +1723,7 @@ namespace SystemAvailabilityManager {
                                 }
                             }
                         }
-                    } else if (SELECT_CASE_var == MaximumOfZoneList) {
+                    } else if (SELECT_CASE_var == OptimumStartControlType::MaximumOfZoneList) {
                         // a zone list
                         ZoneListNum = UtilityRoutines::FindItemInList(
                             state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneListName, state.dataHeatBal->ZoneList);
@@ -2621,7 +2619,7 @@ namespace SystemAvailabilityManager {
             {
                 auto const SELECT_CASE_var(OptStartMgr.CtrlAlgType);
                 if (SELECT_CASE_var == ControlAlgorithm::ConstantStartTime) {
-                    if (OptStartMgr.CtrlType == StayOff) {
+                    if (OptStartMgr.optimumStartControlType == OptimumStartControlType::Off) {
                         AvailStatus = NoAction;
                     } else {
                         DeltaTime = OptStartMgr.ConstStartTime;
@@ -2672,7 +2670,7 @@ namespace SystemAvailabilityManager {
                     }
 
                 } else if (SELECT_CASE_var == ControlAlgorithm::ConstantTemperatureGradient) {
-                    if (OptStartMgr.CtrlType == ControlZone) {
+                    if (OptStartMgr.optimumStartControlType == OptimumStartControlType::ControlZone) {
                         ZoneNum = OptStartMgr.ZoneNum;
                         if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
                             (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
@@ -2819,7 +2817,7 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                             CycleOnFlag = false;
                         }
-                    } else if (OptStartMgr.CtrlType == MaximumOfZoneList) {
+                    } else if (OptStartMgr.optimumStartControlType == OptimumStartControlType::MaximumOfZoneList) {
 
                         NumOfZonesInList = OptStartMgr.NumOfZones;
                         if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
@@ -2982,7 +2980,7 @@ namespace SystemAvailabilityManager {
 
                 } else if (SELECT_CASE_var == ControlAlgorithm::AdaptiveTemperatureGradient) {
 
-                    if (OptStartMgr.CtrlType == ControlZone) {
+                    if (OptStartMgr.optimumStartControlType == OptimumStartControlType::ControlZone) {
                         ZoneNum = OptStartMgr.ZoneNum;
                         if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) ||
                             (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
@@ -3254,7 +3252,7 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                             CycleOnFlag = false;
                         }
-                    } else if (OptStartMgr.CtrlType == MaximumOfZoneList) {
+                    } else if (OptStartMgr.optimumStartControlType == OptimumStartControlType::MaximumOfZoneList) {
 
                         NumOfZonesInList = OptStartMgr.NumOfZones;
                         ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
