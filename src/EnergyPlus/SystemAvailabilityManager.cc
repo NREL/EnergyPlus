@@ -112,6 +112,7 @@ namespace SystemAvailabilityManager {
     using namespace ScheduleManager;
 
     // Optimum start parameter definitions
+    int constexpr StayOff = 0;
     int constexpr ControlZone = 4;
     int constexpr MaximumOfZoneList = 5;
 
@@ -360,6 +361,17 @@ namespace SystemAvailabilityManager {
             "FIXEDRUNTIME",
             "THERMOSTAT",
             "THERMOSTATWITHMINIMUMRUNTIME",
+        };
+
+        constexpr std::array<std::string_view, static_cast<int>(NightCycleControlType::Num)> NightCycleControlTypeNamesUC{
+            "STAYOFF",
+            "CYCLEONANY",
+            "CYCLEONCONTROLZONE",
+            "CYCLEONANYZONEFANSONLY",
+            "CYCLEONANYCOOLINGORHEATINGZONE",
+            "CYCLEONANYCOOLINGZONE",
+            "CYCLEONANYHEATINGZONE",
+            "CYCLEONANYHEATINGZONEFANSONLY",
         };
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -627,29 +639,13 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                {
-                    auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
-                    if (SELECT_CASE_var == "STAYOFF") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = StayOff;
-                    } else if (SELECT_CASE_var == "CYCLEONANY") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = CycleOnAny;
-                    } else if (SELECT_CASE_var == "CYCLEONCONTROLZONE") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = CycleOnControlZone;
-                    } else if (SELECT_CASE_var == "CYCLEONANYZONEFANSONLY") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = ZoneFansOnly;
-                    } else if (SELECT_CASE_var == "CYCLEONANYCOOLINGORHEATINGZONE") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = CycleOnAnyCoolingOrHeatingZone;
-                    } else if (SELECT_CASE_var == "CYCLEONANYCOOLINGZONE") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = CycleOnAnyCoolingZone;
-                    } else if (SELECT_CASE_var == "CYCLEONANYHEATINGZONE") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = CycleOnAnyHeatingZone;
-                    } else if (SELECT_CASE_var == "CYCLEONANYHEATINGZONEFANSONLY") {
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType = CycleOnAnyHeatingZoneFansOnly;
-                    } else {
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                        ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
-                        ErrorsFound = true;
-                    }
+                state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType = static_cast<NightCycleControlType>(
+                    getEnumerationValue(NightCycleControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+
+                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType == NightCycleControlType::Invalid) {
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                    ErrorsFound = true;
                 }
 
                 // Cycling Run Time Control Type
@@ -1699,7 +1695,7 @@ namespace SystemAvailabilityManager {
         if (state.dataSystemAvailabilityManager->InitSysAvailManagers_MyOneTimeFlag) {
 
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs; ++SysAvailNum) {
-                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType == CycleOnControlZone) {
+                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType == NightCycleControlType::OnControlZone) {
                     // set the controlled zone numbers
                     for (int index = 1; index <= state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones; ++index) {
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
@@ -2133,12 +2129,12 @@ namespace SystemAvailabilityManager {
 
                 {
                     auto const SELECT_CASE_var(
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType); // select type of night cycle control
+                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType); // select type of night cycle control
 
-                    if (SELECT_CASE_var == StayOff) {
+                    if (SELECT_CASE_var == NightCycleControlType::Off) {
                         AvailStatus = NoAction;
 
-                    } else if (SELECT_CASE_var == CycleOnControlZone) {
+                    } else if (SELECT_CASE_var == NightCycleControlType::OnControlZone) {
 
                         ZoneNum = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(1);
 
@@ -2186,7 +2182,7 @@ namespace SystemAvailabilityManager {
                             }
                         } // end select on thermostat control
 
-                    } else if ((SELECT_CASE_var == CycleOnAny) || (SELECT_CASE_var == ZoneFansOnly)) {
+                    } else if ((SELECT_CASE_var == NightCycleControlType::OnAny) || (SELECT_CASE_var == NightCycleControlType::OnZoneFansOnly)) {
                         if (ZoneCompNCControlType(SysAvailNum)) {
                             ShowWarningError(
                                 state,
@@ -2219,7 +2215,7 @@ namespace SystemAvailabilityManager {
             if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
                 (cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime || cyclingRunTimeControl == CyclingRunTimeControl::ThermostatWithMinimumRunTime)) { // if cycled on
                 AvailStatus = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus;
-                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType == ZoneFansOnly) AvailStatus = CycleOnZoneFansOnly;
+                if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType == NightCycleControlType::OnZoneFansOnly) AvailStatus = CycleOnZoneFansOnly;
             } else if (state.dataGlobal->SimTimeSteps == StopTime &&
                        cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) { // if end of cycle run time, shut down if fan off
                 AvailStatus = NoAction;
@@ -2227,12 +2223,12 @@ namespace SystemAvailabilityManager {
 
                 {
                     auto const SELECT_CASE_var(
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType); // select type of night cycle control
+                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType); // select type of night cycle control
 
-                    if (SELECT_CASE_var == StayOff) {
+                    if (SELECT_CASE_var == NightCycleControlType::Off) {
                         AvailStatus = NoAction;
 
-                    } else if ((SELECT_CASE_var == CycleOnAny) || (SELECT_CASE_var == ZoneFansOnly)) {
+                    } else if ((SELECT_CASE_var == NightCycleControlType::OnAny) || (SELECT_CASE_var == NightCycleControlType::OnZoneFansOnly)) {
 
                         // If no zones cooled, Availstatus could be "unknown"
                         AvailStatus = NoAction;
@@ -2293,7 +2289,7 @@ namespace SystemAvailabilityManager {
 
                         } // end loop over zones in system
 
-                    } else if (SELECT_CASE_var == CycleOnControlZone) {
+                    } else if (SELECT_CASE_var == NightCycleControlType::OnControlZone) {
                         AvailStatus = NoAction;
                         if (CoolingZoneOutOfTolerance(state,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs,
@@ -2305,7 +2301,7 @@ namespace SystemAvailabilityManager {
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones,
                                                       TempTol))
                             AvailStatus = CycleOn;
-                    } else if (SELECT_CASE_var == CycleOnAnyCoolingOrHeatingZone) {
+                    } else if (SELECT_CASE_var == NightCycleControlType::OnAnyCoolingOrHeatingZone) {
                         if (CoolingZoneOutOfTolerance(state,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones,
@@ -2325,7 +2321,7 @@ namespace SystemAvailabilityManager {
                         } else {
                             AvailStatus = NoAction;
                         }
-                    } else if (SELECT_CASE_var == CycleOnAnyCoolingZone) {
+                    } else if (SELECT_CASE_var == NightCycleControlType::OnAnyCoolingZone) {
                         if (CoolingZoneOutOfTolerance(state,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones,
@@ -2334,7 +2330,7 @@ namespace SystemAvailabilityManager {
                         } else {
                             AvailStatus = NoAction;
                         }
-                    } else if (SELECT_CASE_var == CycleOnAnyHeatingZone) {
+                    } else if (SELECT_CASE_var == NightCycleControlType::OnAnyHeatingZone) {
                         if (HeatingZoneOutOfTolerance(state,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones,
@@ -2349,7 +2345,7 @@ namespace SystemAvailabilityManager {
                         } else {
                             AvailStatus = NoAction;
                         }
-                    } else if (SELECT_CASE_var == CycleOnControlZone) {
+                    } else if (SELECT_CASE_var == NightCycleControlType::OnControlZone) {
                         if (HeatingZoneOutOfTolerance(state,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
                                                       state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones,
@@ -2364,7 +2360,7 @@ namespace SystemAvailabilityManager {
                 } // end select type of night cycle control
 
                 if ((AvailStatus == CycleOn) || (AvailStatus == CycleOnZoneFansOnly)) { // reset the start and stop times
-                    if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType == ZoneFansOnly)
+                    if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType == NightCycleControlType::OnZoneFansOnly)
                         AvailStatus = CycleOnZoneFansOnly;
                     // issue #6151
                     if (cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored

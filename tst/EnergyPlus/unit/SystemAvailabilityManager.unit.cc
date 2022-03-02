@@ -678,7 +678,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
 
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData.allocate(NumZones);
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).Name = "System Avail";
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlType = SystemAvailabilityManager::CycleOnAny;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnAny;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).SchedPtr = 1;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).FanSchedPtr = 2;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).TempTolRange = 0.4;
@@ -715,7 +715,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
 
     // Cycling Run Time Control Type = Thermostat,  Run Time has no effect
     // starting time is less than stopping time, control is driven by temp differential
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlType = SystemAvailabilityManager::CycleOnControlZone;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnControlZone;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::Thermostat;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
     state->dataGlobal->SimTimeSteps = 0;
@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).Name = "System Avail";
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlType = SystemAvailabilityManager::CycleOnAny;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnAny;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).SchedPtr = 1;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).FanSchedPtr = 2;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).TempTolRange = 0.4;
@@ -848,7 +848,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
 
     // Cycling Run Time Control Type = Thermostat,  Run Time has no effect
     // starting time is less than stopping time, control is driven by temp differential
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlType = SystemAvailabilityManager::CycleOnControlZone;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnControlZone;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::Thermostat;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
     state->dataGlobal->SimTimeSteps = 0;
