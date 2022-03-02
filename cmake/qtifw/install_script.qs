@@ -199,10 +199,22 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
   gui.clickButton(buttons.NextButton);
 };
 
-Controller.prototype.LicenseAgreementPageCallback = function() {
+Controller.prototype.LicenseAgreementPageCallback = function () {
   console.log("---- LICENSE AGREEMENT PAGE");
   logCurrentPage();
-  gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
+  var widget = gui.currentPageWidget();
+  // AcceptLicenseRadioButton was the previous name (up to 4.1.0), now it's AcceptLicenseCheckBox
+  // In case this newer script is used for a previous installer, we try a fallback to old name
+  var box = widget.AcceptLicenseCheckBox;
+  if (box) {
+    box.setChecked(true);
+  } else {
+    box = widget.AcceptLicenseRadioButton;
+    if (box) {
+      box.setChecked(true);
+    }
+  }
+
   gui.clickButton(buttons.NextButton);
 };
 
