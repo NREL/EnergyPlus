@@ -125,11 +125,11 @@ namespace ChillerGasAbsorption {
         Real64 DesHeatMassFlowRate; // design nominal mass flow rate of water through the hot water side [kg/s]
         Real64 DesEvapMassFlowRate; // design nominal mass flow rate of water through chilled water side [kg/s]
         // other values used during simulation
-        int DeltaTempCoolErrCount; // error count for Delta Temp = 0 while cooling
-        int DeltaTempHeatErrCount; // error count for Delta Temp = 0 while heating
-        int CondErrCount;          // error count for poor Condenser Supply Estimate
-        int lCondWaterMassFlowRate_Index; // index for condenser water mass flow rate too low recurring severe warning 
-        bool PossibleSubcooling;   // Flag to determine whether plant is overcooled
+        int DeltaTempCoolErrCount;        // error count for Delta Temp = 0 while cooling
+        int DeltaTempHeatErrCount;        // error count for Delta Temp = 0 while heating
+        int CondErrCount;                 // error count for poor Condenser Supply Estimate
+        int lCondWaterMassFlowRate_Index; // index for condenser water mass flow rate too low recurring severe warning
+        bool PossibleSubcooling;          // Flag to determine whether plant is overcooled
         // loop topology variables
         PlantLocation CWplantLoc; // chilled water plant loop component index
         PlantLocation CDplantLoc; // condenser water plant loop component index
