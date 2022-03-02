@@ -1653,6 +1653,7 @@ namespace SimulationManager {
             ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
+                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Annual") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
