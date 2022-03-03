@@ -9455,14 +9455,13 @@ namespace WeatherManager {
         Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
 
         if (!this->OADryBulbWeatherDataProcessed) {
-            const auto statFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
+            const auto statFileExists = FileSystem::fileExists(state.files.inStatFilePath.filePath);
             const auto epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
             if (statFileExists) {
-                auto statFile = state.files.inputWeatherFilePath.try_open();
+                auto statFile = state.files.inStatFilePath.try_open();
                 if (!statFile.good()) {
                     ShowSevereError(state,
-                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
-                                        " for input (read).");
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + statFile.filePath.string() + " for input (read).");
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
@@ -9476,20 +9475,35 @@ namespace WeatherManager {
                         }
                         lineIn = statFile.readLine();
                         lineAvg = lineIn.data;
+                        break;
                     }
                 }
-                int AnnualNumberOfDays = 0;
-                for (int i = 1; i <= 12; ++i) {
-                    MonthlyAverageDryBulbTemp(i) = OutputReportTabular::StrToReal(OutputReportTabular::GetColumnUsingTabs(lineAvg, i + 2));
-                    AnnualDailyAverageDryBulbTempSum += MonthlyAverageDryBulbTemp(i) * state.dataWeatherManager->EndDayOfMonth(i);
-                    MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyAverageDryBulbTemp(i));
-                    MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyAverageDryBulbTemp(i));
-                    AnnualNumberOfDays += state.dataWeatherManager->EndDayOfMonth(i);
+                if (lineAvg.empty()) {
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + statFile.filePath.string() +
+                                        "' does not have Monthly Statistics for Dry Bulb temperatures.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
+                    return;
+                } else if (lineAvg.find("Daily Avg") == std::string::npos) {
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + statFile.filePath.string() +
+                                        "' does not have the 'Daily Avg' line in the Monthly Statistics for Dry Bulb temperatures.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
+                    return;
+                } else {
+                    int AnnualNumberOfDays = 0;
+                    for (int i = 1; i <= 12; ++i) {
+                        MonthlyAverageDryBulbTemp(i) = OutputReportTabular::StrToReal(OutputReportTabular::GetColumnUsingTabs(lineAvg, i + 2));
+                        AnnualDailyAverageDryBulbTempSum += MonthlyAverageDryBulbTemp(i) * state.dataWeatherManager->EndDayOfMonth(i);
+                        MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyAverageDryBulbTemp(i));
+                        MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyAverageDryBulbTemp(i));
+                        AnnualNumberOfDays += state.dataWeatherManager->EndDayOfMonth(i);
+                    }
+                    this->AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
+                    this->MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
+                    this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
+                    this->OADryBulbWeatherDataProcessed = true;
                 }
-                this->AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
-                this->MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
-                this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
-                this->OADryBulbWeatherDataProcessed = true;
             } else if (epwFileExists) {
                 auto epwFile = state.files.inputWeatherFilePath.try_open();
                 bool epwHasLeapYear(false);
