@@ -2129,77 +2129,80 @@ namespace SystemAvailabilityManager {
                 AvailStatus = NoAction;
             } else {
 
-                {
-                    auto const SELECT_CASE_var(
-                        state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).nightCycleControlType); // select type of night cycle control
+                switch (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum)
+                            .nightCycleControlType) { // select type of night cycle control
 
-                    if (SELECT_CASE_var == NightCycleControlType::Off) {
-                        AvailStatus = NoAction;
+                case NightCycleControlType::Off: {
+                    AvailStatus = NoAction;
+                    break;
+                }
+                case NightCycleControlType::OnControlZone: {
 
-                    } else if (SELECT_CASE_var == NightCycleControlType::OnControlZone) {
+                    ZoneNum = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(1);
 
-                        ZoneNum = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(1);
+                    {
+                        auto const SELECT_CASE_var1(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
 
-                        {
-                            auto const SELECT_CASE_var1(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
-
-                            if (SELECT_CASE_var1 == SingleHeatingSetPoint) {
-                                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
-                                    AvailStatus = CycleOn;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
-                            } else if (SELECT_CASE_var1 == SingleCoolingSetPoint) {
-                                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
-                                    AvailStatus = CycleOn;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
-                            } else if (SELECT_CASE_var1 == SingleHeatCoolSetPoint) {
-                                if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                     state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
-                                    (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                     state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
-                                    AvailStatus = CycleOn;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
-                            } else if (SELECT_CASE_var1 == DualSetPointWithDeadBand) {
-                                if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                     state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
-                                    (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                     state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
-                                    AvailStatus = CycleOn;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
+                        if (SELECT_CASE_var1 == SingleHeatingSetPoint) {
+                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
+                                AvailStatus = CycleOn;
                             } else {
                                 AvailStatus = NoAction;
                             }
-                        } // end select on thermostat control
 
-                    } else if ((SELECT_CASE_var == NightCycleControlType::OnAny) || (SELECT_CASE_var == NightCycleControlType::OnZoneFansOnly)) {
-                        if (ZoneCompNCControlType(SysAvailNum)) {
-                            ShowWarningError(
-                                state,
-                                "AvailabilityManager:NightCycle = " + state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).Name +
-                                    ", is specified for a ZoneHVAC component.");
-                            ShowContinueError(state, "The only valid Control Types for ZoneHVAC components are CycleOnControlZone and StayOff.");
-                            ShowContinueError(state,
-                                              "Night Cycle operation will not be modeled for ZoneHVAC components that reference this manager.");
-                            ZoneCompNCControlType(SysAvailNum) = false;
+                        } else if (SELECT_CASE_var1 == SingleCoolingSetPoint) {
+                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
+                                AvailStatus = CycleOn;
+                            } else {
+                                AvailStatus = NoAction;
+                            }
+
+                        } else if (SELECT_CASE_var1 == SingleHeatCoolSetPoint) {
+                            if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
+                                (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
+                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
+                                AvailStatus = CycleOn;
+                            } else {
+                                AvailStatus = NoAction;
+                            }
+
+                        } else if (SELECT_CASE_var1 == DualSetPointWithDeadBand) {
+                            if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                                 state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
+                                (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
+                                 state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
+                                AvailStatus = CycleOn;
+                            } else {
+                                AvailStatus = NoAction;
+                            }
+
+                        } else {
+                            AvailStatus = NoAction;
                         }
-                        AvailStatus = NoAction;
-
-                    } else {
-                        AvailStatus = NoAction;
+                    } // end select on thermostat control
+                    break;
+                }
+                case NightCycleControlType::OnAny:
+                case NightCycleControlType::OnZoneFansOnly: {
+                    if (ZoneCompNCControlType(SysAvailNum)) {
+                        ShowWarningError(
+                            state,
+                            "AvailabilityManager:NightCycle = " + state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).Name +
+                                ", is specified for a ZoneHVAC component.");
+                        ShowContinueError(state, "The only valid Control Types for ZoneHVAC components are CycleOnControlZone and StayOff.");
+                        ShowContinueError(state, "Night Cycle operation will not be modeled for ZoneHVAC components that reference this manager.");
+                        ZoneCompNCControlType(SysAvailNum) = false;
                     }
+                    AvailStatus = NoAction;
+                    break;
+                }
+                default: {
+                    AvailStatus = NoAction;
+                    break;
+                }
                 } // end select type of night cycle control
 
                 if (AvailStatus == CycleOn) {                      // reset the start and stop times
