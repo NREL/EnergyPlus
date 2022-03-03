@@ -1710,36 +1710,40 @@ namespace SystemAvailabilityManager {
             }
 
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs; ++SysAvailNum) {
-                {
-                    auto const SELECT_CASE_var(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType);
-                    if (SELECT_CASE_var == OptimumStartControlType::ControlZone) {
-                        // set the controlled zone numbers
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
-                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
-                                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneNum) {
-                                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
-                                    break;
-                                }
-                            }
-                        }
-                    } else if (SELECT_CASE_var == OptimumStartControlType::MaximumOfZoneList) {
-                        // a zone list
-                        ZoneListNum = UtilityRoutines::FindItemInList(
-                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneListName, state.dataHeatBal->ZoneList);
-                        if (ZoneListNum > 0) {
-                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).NumOfZones =
-                                state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
-                            if (!allocated(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs)) {
-                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum)
-                                    .ZonePtrs.allocate({1, state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones});
-                            }
-                            for (ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
-                                ZoneNum = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
-                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs(ScanZoneListNum) = ZoneNum;
+                switch (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).optimumStartControlType) {
+                case OptimumStartControlType::ControlZone: {
+                    // set the controlled zone numbers
+                    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+                        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
+                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneNum) {
+                                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
+                                break;
                             }
                         }
                     }
+                    break;
+                }
+                case OptimumStartControlType::MaximumOfZoneList: {
+                    // a zone list
+                    ZoneListNum = UtilityRoutines::FindItemInList(
+                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneListName, state.dataHeatBal->ZoneList);
+                    if (ZoneListNum > 0) {
+                        state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).NumOfZones =
+                            state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
+                        if (!allocated(state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs)) {
+                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum)
+                                .ZonePtrs.allocate({1, state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones});
+                        }
+                        for (ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
+                            ZoneNum = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
+                            state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs(ScanZoneListNum) = ZoneNum;
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
                 }
             }
 
