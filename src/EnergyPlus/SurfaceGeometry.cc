@@ -1222,7 +1222,6 @@ namespace SurfaceGeometry {
         int BlNumNew;
         int WinShadingControlPtr(0);
         int ErrCount;
-        Real64 diffp;
         bool izConstDiff;    // differences in construction for IZ surfaces
         bool izConstDiffMsg; // display message about hb diffs only once.
 
@@ -2389,10 +2388,9 @@ namespace SurfaceGeometry {
                 for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                      ++SurfNum) {
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea += state.dataSurface->Surface(SurfNum).Area;
                         state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
                         int spaceNum = state.dataSurface->Surface(SurfNum).spaceNum;
-                        state.dataHeatBal->space(spaceNum).floorArea += state.dataSurface->Surface(SurfNum).Area;
+                        state.dataHeatBal->space(spaceNum).calcFloorArea += state.dataSurface->Surface(SurfNum).Area;
                     }
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                         state.dataHeatBal->Zone(ZoneNum).CeilingArea += state.dataSurface->Surface(SurfNum).Area;
@@ -2401,53 +2399,13 @@ namespace SurfaceGeometry {
                 }
             }
             ErrCount = 0;
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                state.dataHeatBal->Zone(ZoneNum).CalcFloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
-                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
-                    // Check entered vs calculated
-                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
-                        // produce message if not near calculated
-                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
-                            diffp = std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
-                                    state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                            if (diffp > 0.05) {
-                                ++ErrCount;
-                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(
-                                        state, std::string{RoutineName} + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s).");
-                                    ShowContinueError(state,
-                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
-                                }
-                                if (state.dataGlobal->DisplayExtraWarnings) {
-                                    // Warn user of using specified Zone Floor Area
-                                    ShowWarningError(state,
-                                                     std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
-                                                         state.dataHeatBal->Zone(ZoneNum).Name +
-                                                         "\" significantly different from calculated Floor Area");
-                                    ShowContinueError(state,
-                                                      format("Entered Zone Floor Area value={:.2R}, Calculated Zone Floor Area value={:.2R}, entered "
-                                                             "Floor Area will be used in calculations.",
-                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
-                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
-                                }
-                            }
-                        }
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
-                    }
-                } else {
-                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea; // redundant, already done.
-                }
-            }
-
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                state.dataHeatBal->space(spaceNum).calcFloorArea = state.dataHeatBal->space(spaceNum).floorArea;
                 if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
                     // Check entered vs calculated
                     if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea > 0.0) { // User entered Space floor area,
                         // produce message if not near calculated
                         if (state.dataHeatBal->space(spaceNum).calcFloorArea > 0.0) {
-                            diffp =
+                            Real64 diffp =
                                 std::abs(state.dataHeatBal->space(spaceNum).calcFloorArea - state.dataHeatBal->space(spaceNum).userEnteredFloorArea) /
                                 state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
                             if (diffp > 0.05) {
@@ -2477,7 +2435,75 @@ namespace SurfaceGeometry {
                         state.dataHeatBal->space(spaceNum).hasFloor = true;
                     }
                 } else {
-                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea; // redundant, already done.
+                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea;
+                }
+            }
+            ErrCount = 0;
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                // Calculate zone floor area as sum of space floor areas
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    state.dataHeatBal->Zone(ZoneNum).CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                }
+                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                    // Check entered vs calculated
+                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
+                        // produce message if not near calculated
+                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            Real64 diffp =
+                                std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
+                                state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                            if (diffp > 0.05) {
+                                ++ErrCount;
+                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                    ShowWarningError(state,
+                                                     std::string{RoutineName} + "Entered Zone Floor Areas differ from sum of Space Floor Area(s).");
+                                    ShowContinueError(state,
+                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
+                                }
+                                if (state.dataGlobal->DisplayExtraWarnings) {
+                                    // Warn user of using specified Zone Floor Area
+                                    ShowWarningError(state,
+                                                     std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
+                                                         state.dataHeatBal->Zone(ZoneNum).Name +
+                                                         "\" significantly different from sum of Space Floor Areas");
+                                    ShowContinueError(state,
+                                                      format("Entered Zone Floor Area value={:.2R}, Sum of Space Floor Areas value={:.2R}, entered "
+                                                             "Entered Zone Floor Area will be used in calculations and Space Floor Areas will be "
+                                                             "adjusted proportionally.",
+                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
+                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
+                                }
+                            }
+                        }
+                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
+
+                        // Adjust space floor areas to match zone floor area
+                        if (state.dataHeatBal->Zone(ZoneNum).numSpaces == 1) {
+                            // If the zone contains only one space, then set the Space area to the Zone area
+                            int spaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
+                            state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
+                        } else if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            // Adjust space areas proportionately
+                            Real64 areaRatio = state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                                state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
+                            }
+                        } else {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
+                                // Warn if calculated floor area was zero and there is more than one Space
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
+                                                     state.dataHeatBal->Zone(ZoneNum).Name +
+                                                     "\" significantly different from sum of Space Floor Areas");
+                                ShowContinueError(state,
+                                                  "But the sum of the Space Floor Areas is zero and there is more than one Space in the zone."
+                                                  "Unable to apportion the zone floor area. Space Floor Areas are zero.");
+                            }
+                        }
+                    }
+                } else {
+                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
                 }
             }
         }

@@ -3929,7 +3929,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
+        "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from sum of Space Floor Area(s).",
         "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.",
         "   ** Warning ** The moisture penetration depth conduction transfer function algorithm is used but the input file includes no "
         "MaterialProperty:MoisturePenetrationDepth:Settings objects.",
