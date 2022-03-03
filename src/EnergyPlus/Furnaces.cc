@@ -10977,7 +10977,7 @@ namespace Furnaces {
         int i;                      // Speed index
         int ErrCountCyc(0);         // Counter used to minimize the occurrence of output warnings
         int ErrCountVar(0);         // Counter used to minimize the occurrence of output warnings
-        IHPOperationMode IHPMode(IHPOperationMode::IdleMode);
+        IHPOperationMode IHPMode(IHPOperationMode::Idle);
 
         SupHeaterLoad = 0.0;
         PartLoadFrac = 0.0;
@@ -11007,7 +11007,7 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
             IHPMode = GetCurWorkMode(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex);
-            if ((IHPOperationMode::DWHMode == IHPMode) || (IHPOperationMode::SCWHMatchWHMode == IHPMode)) { // cooling capacity is a resultant
+            if ((IHPOperationMode::DedicatedWaterHtg == IHPMode) || (IHPOperationMode::SCWHMatchWH == IHPMode)) { // cooling capacity is a resultant
                 return;
             }
         }
@@ -12416,7 +12416,7 @@ namespace Furnaces {
                 }
             }
 
-            if (IHPOperationMode::SCWHMatchWHMode ==
+            if (IHPOperationMode::SCWHMatchWH ==
                 state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CurMode) {
                 state.dataFurnaces->CompOnMassFlow =
                     GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, SpeedRatio, false);
