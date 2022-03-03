@@ -2224,7 +2224,13 @@ namespace UnitVentilator {
                 }
             } else {
                 CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
-                OutAirVolFlowDes = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
+                if (state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType == FixedOAControl) {
+                    OutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA,
+                                           state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow);
+                } else {
+                    OutAirVolFlowDes = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
+                }
+
                 if (IsAutoSize) {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = OutAirVolFlowDes;
                     BaseSizer::reportSizerOutput(state,

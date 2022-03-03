@@ -70,6 +70,9 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
 
+#include <array>
+#include <numeric>
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::ScheduleManager;
@@ -410,6 +413,45 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.0452, 0.0001);
 }
 
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest_Actual)
+{
+
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_TRUE(
+        compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    EXPECT_TRUE(state->dataWeatherManager->WaterMainsParameterReport);
+
+    // CalcAnnualAndMonthlyDryBulbTemp was the one that was faulty
+    state->dataWeatherManager->OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp(*state);
+
+    EXPECT_TRUE(state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp, 7.31, 0.01);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 27.94, 0.01);
+
+    // January 15th water mains temperature test
+    state->dataEnvrn->DayOfYear = 15; // January 15th
+    WeatherManager::CalcWaterMainsTemp(*state);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 5.8439, 0.0001);
+}
+
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
 {
 
@@ -469,6 +511,91 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     WeatherManager::CalcWaterMainsTemp(*state);
     EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.33812, 0.00001);
 }
+
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_Actual)
+{
+
+    state->files.inStatFilePath.filePath =
+        configured_source_directory() / "tst/EnergyPlus/unit/Resources/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.stat";
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile;  !- Calculation Method",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_TRUE(
+        compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    EXPECT_TRUE(state->dataWeatherManager->WaterMainsParameterReport);
+
+    // CalcAnnualAndMonthlyDryBulbTemp was the one that was faulty
+    state->dataWeatherManager->OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp(*state);
+
+    std::array<int, 12> nDaysInMonth{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    std::array<double, 12> monthlyDryBulbTemps{-4.6, -2.5, 3.8, 10.0, 15.3, 21.1, 24.1, 21.8, 18.1, 11.0, 4.7, -3.7};
+    int totDays = std::accumulate(nDaysInMonth.begin(), nDaysInMonth.end(), 0);
+    double annualAvgOADryBulbTemp =
+        std::inner_product(std::begin(nDaysInMonth), std::end(nDaysInMonth), std::begin(monthlyDryBulbTemps), 0.0) / totDays;
+
+    const auto [min, max] = std::minmax_element(std::begin(monthlyDryBulbTemps), std::end(monthlyDryBulbTemps));
+    double monthlyAvgOADryBulbTempMaxDiff = (*max) - (*min);
+
+    EXPECT_TRUE(state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp, 9.988219178082193, 0.01);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 28.7, 0.01);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp, annualAvgOADryBulbTemp, 0.01);
+    EXPECT_NEAR(state->dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, monthlyAvgOADryBulbTempMaxDiff, 0.01);
+
+    // January 15th water mains temperature test
+    state->dataEnvrn->DayOfYear = 15; // January 15th
+    WeatherManager::CalcWaterMainsTemp(*state);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 7.5295, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_ActualBroken)
+{
+
+    state->files.inStatFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/broken.stat";
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile;  !- Calculation Method",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_TRUE(
+        compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    EXPECT_TRUE(state->dataWeatherManager->WaterMainsParameterReport);
+
+    // CalcAnnualAndMonthlyDryBulbTemp was the one that was faulty
+    state->dataWeatherManager->OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp(*state);
+    EXPECT_FALSE(state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + state->files.inStatFilePath.filePath.string() +
+            "' does not have Monthly Statistics for Dry Bulb "
+            "temperatures.",
+        "   **   ~~~   ** Water Mains Temperature will be set to a fixed default value of 10.0 C.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
 TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest)
 {
 
