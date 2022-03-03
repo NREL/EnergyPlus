@@ -59,12 +59,41 @@ struct EnergyPlusData;
 
 namespace CostEstimateManager {
 
+    enum class ParentObject
+    {
+        Invalid = -1,
+        General,
+        Construction,
+        CoilDX,
+        CoilCoolingDX,
+        CoilCoolingDXSingleSpeed,
+        CoilHeatingFuel,
+        ChillerElectric,
+        DaylightingControls,
+        ShadingZoneDetailed,
+        Lights,
+        GeneratorPhotovoltaic,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(ParentObject::Num)> ParentObjectNamesUC{"GENERAL",
+                                                                                                    "CONSTRUCTION",
+                                                                                                    "COIL:DX",
+                                                                                                    "COIL:COOLING:DX",
+                                                                                                    "COIL:COOLING:DX:SINGLESPEED",
+                                                                                                    "COIL:HEATING:FUEL",
+                                                                                                    "CHILLER:ELECTRIC",
+                                                                                                    "DAYLIGHTING:CONTROLS",
+                                                                                                    "SHADING:ZONE:DETAILED",
+                                                                                                    "LIGHTS",
+                                                                                                    "GENERATOR:PHOTOVOLTAIC"};
+
     struct CostLineItemStruct
     {
         // Members
-        std::string LineName;      // object name (needed ?)
-        std::string ParentObjType; // parent reference to IDD object type
-        std::string ParentObjName; // parent instance in IDF
+        std::string LineName;       // object name (needed ?)
+        ParentObject ParentObjType; // parent reference to IDD object type
+        std::string ParentObjName;  // parent instance in IDF
         int ParentObjIDinList;
         Real64 PerSquareMeter;     // cost per square meter
         Real64 PerEach;            // cost per each

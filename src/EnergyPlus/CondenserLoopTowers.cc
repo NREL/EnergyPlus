@@ -506,19 +506,14 @@ namespace CondenserLoopTowers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
                 state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl = CapacityCtrl::FanCycling; // FanCycling
             } else {
-                {
-                    auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(11)));
-                    if (SELECT_CASE_var == "FANCYCLING") {
-                        state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl = CapacityCtrl::FanCycling;
-                    } else if (SELECT_CASE_var == "FLUIDBYPASS") {
-                        state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl = CapacityCtrl::FluidBypass;
-                    } else {
-                        state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl = CapacityCtrl::FanCycling;
-                        ShowWarningError(state,
-                                         cCurrentModuleObject + ", \"" + state.dataCondenserLoopTowers->towers(TowerNum).Name +
-                                             "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
-                    }
-                }
+                state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl =
+                    static_cast<CapacityCtrl>(getEnumerationValue(CapacityCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+                if (state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl == CapacityCtrl::Invalid) {
+                    state.dataCondenserLoopTowers->towers(TowerNum).CapacityControl = CapacityCtrl::FanCycling;
+                    ShowWarningError(state,
+                                     cCurrentModuleObject + ", \"" + state.dataCondenserLoopTowers->towers(TowerNum).Name +
+                                         "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
+                };
             }
 
             // added for multi-cell

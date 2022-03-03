@@ -235,12 +235,9 @@ namespace CoolTower {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(5)); // Type of flow control
-                if (SELECT_CASE_var == "WATERFLOWSCHEDULE") {
-                    state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType = FlowCtrl::FlowSchedule;
-                } else if ((SELECT_CASE_var == "WINDDRIVENFLOW") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var.empty())) {
-                    state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType = FlowCtrl::WindDriven;
-                } else {
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType =
+                    static_cast<FlowCtrl>(getEnumerationValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
+                if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::Invalid) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" +
                                         state.dataIPShortCut->cAlphaArgs(5) + "\".");
