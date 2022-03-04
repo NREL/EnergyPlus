@@ -875,38 +875,37 @@ namespace SystemAvailabilityManager {
                     }
                 }
 
-                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType =
+                state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).controlAlgorithm =
                     static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(7))));
 
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::Invalid) {
-                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ControlAlgorithm::AdaptiveASHRAE;
+                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).controlAlgorithm == ControlAlgorithm::Invalid) {
+                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).controlAlgorithm = ControlAlgorithm::AdaptiveASHRAE;
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                     ErrorsFound = true;
                 }
 
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::ConstantTemperatureGradient) {
+                switch (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).controlAlgorithm) {
+                case ControlAlgorithm::ConstantTemperatureGradient: {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ConstTGradCool = rNumericArgs(2);
-                }
-
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::ConstantTemperatureGradient) {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ConstTGradHeat = rNumericArgs(3);
+                    break;
                 }
 
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::AdaptiveTemperatureGradient) {
+                case ControlAlgorithm::AdaptiveTemperatureGradient: {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).InitTGradCool = rNumericArgs(4);
-                }
-
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::AdaptiveTemperatureGradient) {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).InitTGradHeat = rNumericArgs(5);
-                }
-
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::ConstantStartTime) {
-                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ConstStartTime = rNumericArgs(6);
-                }
-
-                if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType == ControlAlgorithm::AdaptiveTemperatureGradient) {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).NumPreDays = rNumericArgs(7);
+                    break;
+                }
+
+                case ControlAlgorithm::ConstantStartTime: {
+                    state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ConstStartTime = rNumericArgs(6);
+                    break;
+                }
+
+                default:
+                    break;
                 }
 
                 SetupOutputVariable(state,
@@ -2530,7 +2529,7 @@ namespace SystemAvailabilityManager {
         OverNightStartFlag = OptStartMgr.OverNightStartFlag;
         OSReportVarFlag = OptStartMgr.OSReportVarFlag;
 
-        if (OptStartMgr.CtrlAlgType == ControlAlgorithm::AdaptiveTemperatureGradient) {
+        if (OptStartMgr.controlAlgorithm == ControlAlgorithm::AdaptiveTemperatureGradient) {
             NumPreDays = OptStartMgr.NumPreDays;
             if (!allocated(state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat)) {
                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat.allocate(NumPreDays);
@@ -2633,7 +2632,7 @@ namespace SystemAvailabilityManager {
             }
 
             {
-                auto const SELECT_CASE_var(OptStartMgr.CtrlAlgType);
+                auto const SELECT_CASE_var(OptStartMgr.controlAlgorithm);
                 if (SELECT_CASE_var == ControlAlgorithm::ConstantStartTime) {
                     if (OptStartMgr.optimumStartControlType == OptimumStartControlType::Off) {
                         AvailStatus = NoAction;
@@ -3589,7 +3588,7 @@ namespace SystemAvailabilityManager {
         OptStartMgr.FirstTimeATGFlag = FirstTimeATGFlag;
         OptStartMgr.OverNightStartFlag = OverNightStartFlag;
         OptStartMgr.OSReportVarFlag = OSReportVarFlag;
-        if (OptStartMgr.CtrlAlgType == ControlAlgorithm::AdaptiveTemperatureGradient) {
+        if (OptStartMgr.controlAlgorithm == ControlAlgorithm::AdaptiveTemperatureGradient) {
             OptStartMgr.AdaTempGradTrdHeat = state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat;
             OptStartMgr.AdaTempGradTrdCool = state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool;
             OptStartMgr.AdaTempGradHeat = AdaTempGradHeat;
