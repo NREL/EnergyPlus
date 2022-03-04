@@ -88,6 +88,8 @@ namespace CoolTower {
 
     // Using/Aliasing
     using namespace DataHeatBalance;
+        
+    constexpr std::array<std::string_view, static_cast<int>(FlowCtrl::Num)> FlowCtrlNamesUC{"WATERFLOWSCHEDULE", "WINDDRIVENFLOW"};
 
     void ManageCoolTower(EnergyPlusData &state)
     {

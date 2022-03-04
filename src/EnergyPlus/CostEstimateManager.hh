@@ -76,18 +76,6 @@ namespace CostEstimateManager {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(ParentObject::Num)> ParentObjectNamesUC{"GENERAL",
-                                                                                                    "CONSTRUCTION",
-                                                                                                    "COIL:DX",
-                                                                                                    "COIL:COOLING:DX",
-                                                                                                    "COIL:COOLING:DX:SINGLESPEED",
-                                                                                                    "COIL:HEATING:FUEL",
-                                                                                                    "CHILLER:ELECTRIC",
-                                                                                                    "DAYLIGHTING:CONTROLS",
-                                                                                                    "SHADING:ZONE:DETAILED",
-                                                                                                    "LIGHTS",
-                                                                                                    "GENERATOR:PHOTOVOLTAIC"};
-
     struct CostLineItemStruct
     {
         // Members

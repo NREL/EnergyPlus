@@ -71,8 +71,6 @@ namespace CoolTower {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(FlowCtrl::Num)> FlowCtrlNamesUC{"WATERFLOWSCHEDULE", "WINDDRIVENFLOW"};
-
     enum class WaterSupplyMode
     {
         Invalid = -1,

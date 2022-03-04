@@ -93,6 +93,19 @@ namespace CostEstimateManager {
     // Create report using utility subroutines taken from OutputReportTabular (by J.Glazer)
 
     // Using/Aliasing
+        
+    constexpr std::array<std::string_view, static_cast<int>(ParentObject::Num)> ParentObjectNamesUC{"GENERAL",
+                                                                                                    "CONSTRUCTION",
+                                                                                                    "COIL:DX",
+                                                                                                    "COIL:COOLING:DX",
+                                                                                                    "COIL:COOLING:DX:SINGLESPEED",
+                                                                                                    "COIL:HEATING:FUEL",
+                                                                                                    "CHILLER:ELECTRIC",
+                                                                                                    "DAYLIGHTING:CONTROLS",
+                                                                                                    "SHADING:ZONE:DETAILED",
+                                                                                                    "LIGHTS",
+                                                                                                    "GENERATOR:PHOTOVOLTAIC"};
+
     void SimCostEstimate(EnergyPlusData &state)
     {
 
