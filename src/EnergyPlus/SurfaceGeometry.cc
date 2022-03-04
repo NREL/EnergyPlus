@@ -2469,7 +2469,7 @@ namespace SurfaceGeometry {
                                     ShowContinueError(state,
                                                       format("Entered Zone Floor Area value={:.2R}, Sum of Space Floor Areas value={:.2R}, entered "
                                                              "Entered Zone Floor Area will be used in calculations and Space Floor Areas will be "
-                                                             "adjusted proportionally.",
+                                                             "adjusted proportionately.",
                                                              state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
                                                              state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
                                 }
