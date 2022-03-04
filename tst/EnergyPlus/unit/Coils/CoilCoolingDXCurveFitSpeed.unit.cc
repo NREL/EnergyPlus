@@ -85,6 +85,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest)
 
     thisSpeed.PLR = 1.0;
     thisSpeed.ambPressure = 101325.0;
+    inletNode.Press = thisSpeed.ambPressure;
     thisSpeed.AirFF = 1.0;
     thisSpeed.rated_total_capacity = 3000.0;
     thisSpeed.RatedAirMassFlowRate = 1.0;
