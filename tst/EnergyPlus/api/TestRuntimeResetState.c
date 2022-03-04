@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,34 +45,42 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/api/state.h>
+#include <stdio.h>
+#include <string.h>
 
-#include <EnergyPlus/Data/CommonIncludes.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/InputProcessing/IdfParser.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/InputProcessing/InputValidation.hh>
+#ifdef _WIN32
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
 
-EnergyPlusState stateNew()
+int numWarnings = 0;
+int oneTimeHalfway = 0;
+
+void BeginNewEnvironmentHandler1(EnergyPlusState state)
 {
-    auto *state = new EnergyPlus::EnergyPlusData;
-    return reinterpret_cast<EnergyPlusState>(state);
+    printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
 }
 
-EnergyPlusState stateNewPython()
+void BeginNewEnvironmentHandler2(EnergyPlusState state)
 {
-    auto *state = new EnergyPlus::EnergyPlusData;
-    state->dataPluginManager->eplusRunningViaPythonAPI = true;
-    return reinterpret_cast<EnergyPlusState>(state);
+    printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
 }
 
-void stateReset(EnergyPlusState state)
+int main(int argc, const char *argv[])
 {
-    auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    this_state->clear_state();
-}
 
-void stateDelete(EnergyPlusState state)
-{
-    delete reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlusState state = stateNew();
+    callbackBeginNewEnvironment(state, BeginNewEnvironmentHandler1);
+    energyplus(state, argc, argv);
+
+    // reset and run again
+    stateReset(state); // note previous callbacks are cleared here
+    callbackBeginNewEnvironment(state, BeginNewEnvironmentHandler2);
+    printf("Running EnergyPlus with Console Output Muted...\n");
+    setConsoleOutputState(state, 0);
+    energyplus(state, argc, argv);
+    printf("...and it is done.\n");
+
+    return 0;
 }

@@ -402,7 +402,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 #endif
 }
 
-PluginManager::PluginManager(EnergyPlusData &state)
+PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
 {
 #if LINK_WITH_PYTHON
     // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
@@ -432,7 +432,10 @@ PluginManager::PluginManager(EnergyPlusData &state)
     // now that we have set the path, we can initialize python
     // from https://docs.python.org/3/c-api/init.html
     // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
-    Py_InitializeEx(0);
+    bool alreadyInitialized = (Py_IsInitialized() != 0);
+    if (!alreadyInitialized) {
+        Py_InitializeEx(0);
+    }
 
     // Take control of the global interpreter lock while we are here, make sure to release it...
     PyGILState_STATE gil = PyGILState_Ensure();
@@ -648,7 +651,14 @@ PluginManager::PluginManager(EnergyPlusData &state)
 PluginManager::~PluginManager()
 {
 #if LINK_WITH_PYTHON
-    Py_FinalizeEx();
+    if (!this->eplusRunningViaPythonAPI) {
+        bool alreadyInitialized = (Py_IsInitialized() != 0);
+        if (alreadyInitialized) {
+            if (Py_FinalizeEx() < 0) {
+                exit(120);
+            }
+        }
+    }
 #endif // LINK_WITH_PYTHON
 }
 
