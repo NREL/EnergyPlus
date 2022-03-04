@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantAvailManager.hh>
 
 namespace EnergyPlus {
 
@@ -331,7 +332,7 @@ namespace DataHVACGlobals {
         int StopTime;                     // cycle off time (in SimTimeSteps)
         std::string AvailManagerListName; // name of each availability manager
         Array1D_string AvailManagerName;  // name of each availability manager
-        Array1D_int AvailManagerType;     // type of availability manager
+        Array1D<DataPlant::SystemAvailabilityType>  AvailManagerType;     // type of availability manager
         Array1D_int AvailManagerNum;      // index for availability manager
         int ZoneNum;                      // cycle off time (in SimTimeSteps)
         bool Input;                       // starts off as true to initialize zone equipment availability manager data

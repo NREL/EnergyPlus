@@ -51,6 +51,24 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
+    enum class SystemAvailabilityType
+    {
+        Invalid = -1,
+        Scheduled,
+        ScheduledOn,
+        ScheduledOff,
+        NightCycle,
+        DiffThermo,
+        HiTempTOff,
+        HiTempTOn,
+        LoTempTOff,
+        LoTempTOn,
+        NightVent,
+        HybridVent,
+        OptimumStart,
+        Num
+    };
+
     struct PlantAvailMgrData
     {
         // Members
@@ -59,7 +77,7 @@ namespace DataPlant {
         int StartTime;                   // cycle on time (in SimTimeSteps)
         int StopTime;                    // cycle off time (in SimTimeSteps)
         Array1D_string AvailManagerName; // name of each availability manager
-        Array1D_int AvailManagerType;    // type of availability manager
+        Array1D<SystemAvailabilityType> AvailManagerType;    // type of availability manager
         Array1D_int AvailManagerNum;     // index of availability manager
 
         // Default Constructor

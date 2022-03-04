@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantAvailManager.hh>
 
 namespace EnergyPlus {
 
@@ -108,31 +109,16 @@ namespace SystemAvailabilityManager {
         Num
     };
 
-    int constexpr NumValidSysAvailManagerTypes = 12;
-
-    int constexpr SysAvailMgr_Scheduled = 1;
-    int constexpr SysAvailMgr_ScheduledOn = 2;
-    int constexpr SysAvailMgr_ScheduledOff = 3;
-    int constexpr SysAvailMgr_NightCycle = 4;
-    int constexpr SysAvailMgr_DiffThermo = 5;
-    int constexpr SysAvailMgr_HiTempTOff = 6;
-    int constexpr SysAvailMgr_HiTempTOn = 7;
-    int constexpr SysAvailMgr_LoTempTOff = 8;
-    int constexpr SysAvailMgr_LoTempTOn = 9;
-    int constexpr SysAvailMgr_NightVent = 10;
-    int constexpr SysAvailMgr_HybridVent = 11;
-    int constexpr SysAvailMgr_OptimumStart = 12;
-
     struct DefineSchedSysAvailManager // Derived type for Scheduled Sys Avail Managers
     {
         // Members
         std::string Name; // Name of the manager object
-        int MgrType;      // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;      // Integer equivalent of availability manager type
         int SchedPtr;     // Schedule pointer
         int AvailStatus;  // reports status of availability manager
 
         // Default Constructor
-        DefineSchedSysAvailManager() : MgrType(0), SchedPtr(0), AvailStatus(0)
+        DefineSchedSysAvailManager() :  SchedPtr(0), AvailStatus(0)
         {
         }
     };
@@ -141,12 +127,12 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name; // Name of the manager object
-        int MgrType;      // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;      // Integer equivalent of availability manager type
         int SchedPtr;     // Schedule pointer
         int AvailStatus;  // reports status of availability manager
 
         // Default Constructor
-        DefineSchedOnSysAvailManager() : MgrType(0), SchedPtr(0), AvailStatus(0)
+        DefineSchedOnSysAvailManager() :  SchedPtr(0), AvailStatus(0)
         {
         }
     };
@@ -155,12 +141,12 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name; // Name of the manager object
-        int MgrType;      // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;      // Integer equivalent of availability manager type
         int SchedPtr;     // Schedule pointer
         int AvailStatus;  // reports status of availability manager
 
         // Default Constructor
-        DefineSchedOffSysAvailManager() : MgrType(0), SchedPtr(0), AvailStatus(0)
+        DefineSchedOffSysAvailManager() :  SchedPtr(0), AvailStatus(0)
         {
         }
     };
@@ -169,7 +155,7 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name;     // Name of the manager object
-        int MgrType;          // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;          // Integer equivalent of availability manager type
         int SchedPtr;         // Applicability schedule pointer
         std::string FanSched; // Fan schedule name
         int FanSchedPtr;      // Fan schedule pointer
@@ -195,7 +181,7 @@ namespace SystemAvailabilityManager {
 
         // Default Constructor
         DefineNightCycSysAvailManager()
-            : MgrType(0), SchedPtr(0), FanSchedPtr(0), TempTolRange(1.0), CyclingTimeSteps(1), AvailStatus(0),
+            :  SchedPtr(0), FanSchedPtr(0), TempTolRange(1.0), CyclingTimeSteps(1), AvailStatus(0),
               PriorAvailStatus(0), NumOfCtrlZones(0), NumOfCoolingZones(0), NumOfHeatingZones(0), NumOfHeatZnFanZones(0)
         {
         }
@@ -205,7 +191,7 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name;         // Name of the manager object
-        int MgrType;              // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;              // Integer equivalent of availability manager type
         bool isSimulated;         // true after availability manager is simulated
         int SchedPtr;             // Applicability schedule pointer
         std::string FanSched;     // Fan schedule name
@@ -252,7 +238,7 @@ namespace SystemAvailabilityManager {
 
         // Default Constructor
         DefineOptStartSysAvailManager()
-            : MgrType(0), isSimulated(false), SchedPtr(0), FanSchedPtr(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0),
+            :  isSimulated(false), SchedPtr(0), FanSchedPtr(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0),
               MaxOptStartTime(6.0),
               controlAlgorithm(ControlAlgorithm::Invalid), ConstTGradCool(1.0), ConstTGradHeat(1.0), InitTGradCool(1.0), InitTGradHeat(1.0),
               AdaptiveTGradCool(1.0), AdaptiveTGradHeat(1.0), ConstStartTime(2.0), NumPreDays(1), AvailStatus(0), NumHoursBeforeOccupancy(0.0),
@@ -284,7 +270,7 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name;   // Name of the manager object
-        int MgrType;        // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;        // Integer equivalent of availability manager type
         int HotNode;        // "Hot" sensor node
         int ColdNode;       // "Cold" sensor node
         Real64 TempDiffOn;  // Temperature difference for turn on (delta C)
@@ -292,7 +278,7 @@ namespace SystemAvailabilityManager {
         int AvailStatus;    // reports status of availability manager
 
         // Default Constructor
-        DefineDiffTSysAvailManager() : MgrType(0), HotNode(0), ColdNode(0), TempDiffOn(0.0), TempDiffOff(0.0), AvailStatus(0)
+        DefineDiffTSysAvailManager() :  HotNode(0), ColdNode(0), TempDiffOn(0.0), TempDiffOff(0.0), AvailStatus(0)
         {
         }
     };
@@ -301,14 +287,14 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name; // Name of the manager object
-        int MgrType;      // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;      // Integer equivalent of availability manager type
         int Node;         // Sensor node
         Real64 Temp;      // Temperature for on/off (C)
         int SchedPtr;     // Applicability schedule pointer
         int AvailStatus;  // reports status of availability manager
 
         // Default Constructor
-        DefineHiLoSysAvailManager() : MgrType(0), Node(0), Temp(0.0), SchedPtr(0), AvailStatus(0)
+        DefineHiLoSysAvailManager() :  Node(0), Temp(0.0), SchedPtr(0), AvailStatus(0)
         {
         }
     };
@@ -317,7 +303,7 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name;          // Name of the manager object
-        int MgrType;               // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;               // Integer equivalent of availability manager type
         int SchedPtr;              // Applicability schedule pointer
         std::string FanSched;      // Fan schedule name
         int FanSchedPtr;           // Fan schedule pointer
@@ -333,7 +319,7 @@ namespace SystemAvailabilityManager {
 
         // Default Constructor
         DefineNightVentSysAvailManager()
-            : MgrType(0), SchedPtr(0), FanSchedPtr(0), VentTempSchedPtr(0), VentDelT(0.0), VentTempLowLim(0.0), ZoneNum(0), ControlledZoneNum(0),
+            :  SchedPtr(0), FanSchedPtr(0), VentTempSchedPtr(0), VentDelT(0.0), VentTempLowLim(0.0), ZoneNum(0), ControlledZoneNum(0),
               VentFlowFrac(0.0), AvailStatus(0)
         {
         }
@@ -343,7 +329,7 @@ namespace SystemAvailabilityManager {
     {
         // Members
         std::string Name;            // Name of the object
-        int MgrType;                 // Integer equivalent of availability manager type
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;                 // Integer equivalent of availability manager type
         std::string AirLoopName;     // Name of HVAC Air Loop
         int AirLoopNum;              // HVAC Air Loop number
         std::string ControlZoneName; // Controlled zone name
@@ -392,7 +378,7 @@ namespace SystemAvailabilityManager {
 
         // Default Constructor
         DefineHybridVentSysAvailManager()
-            : MgrType(0), AirLoopNum(0), NodeNumOfControlledZone(0), ActualZoneNum(0), ControlledZoneNum(0), ControlModeSchedPtr(0), ControlMode(0),
+            :  AirLoopNum(0), NodeNumOfControlledZone(0), ActualZoneNum(0), ControlledZoneNum(0), ControlModeSchedPtr(0), ControlMode(0),
               VentilationCtrl(0), MinOutdoorTemp(-100.0), MaxOutdoorTemp(100.0), MinOutdoorEnth(0.1), MaxOutdoorEnth(300000.0),
               MinOutdoorDewPoint(-100.0), MaxOutdoorDewPoint(100.0), MaxWindSpeed(0.0), UseRainIndicator(true), MinOASchedPtr(0),
               DewPointNoRHErrCount(0), DewPointNoRHErrIndex(0), DewPointErrCount(0), DewPointErrIndex(0), SingleHCErrCount(0), SingleHCErrIndex(0),
@@ -410,7 +396,7 @@ namespace SystemAvailabilityManager {
         int NumItems;
         Array1D_string AvailManagerName;
         Array1D_string cAvailManagerType;
-        Array1D_int AvailManagerType;
+        Array1D<DataPlant::SystemAvailabilityType> AvailManagerType;
 
         // Default Constructor
         SysAvailManagerList() : NumItems(0)
@@ -447,7 +433,7 @@ namespace SystemAvailabilityManager {
     void InitSysAvailManagers(EnergyPlusData &state);
 
     void SimSysAvailManager(EnergyPlusData &state,
-                            int const SysAvailType,
+                            const DataPlant::SystemAvailabilityType SysAvailType,
                             std::string const &SysAvailName,
                             int &SysAvailNum,
                             int const PriAirSysNum, // Primary Air System index. If being called for a ZoneHVAC:* component
@@ -532,8 +518,6 @@ namespace SystemAvailabilityManager {
                                  int const SysAvailNum, // Number of the current scheduled system availability manager
                                  int &AvailStatus       // System status indicator
     );
-
-    int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName); // name to validate
 
     void ManageHybridVentilation(EnergyPlusData &state);
 

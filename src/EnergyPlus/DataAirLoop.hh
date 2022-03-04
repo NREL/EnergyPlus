@@ -58,6 +58,7 @@
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/Plant/PlantAvailManager.hh>
 
 namespace EnergyPlus {
 
@@ -113,7 +114,7 @@ namespace DataAirLoop {
         int StopTime;                    // cycle off time (in SimTimeSteps)
         Real64 ReqSupplyFrac;            // required system flow rate (as a fraction)
         Array1D_string AvailManagerName; // name of each availability manager
-        Array1D_int AvailManagerType;    // type of availability manager
+        Array1D<DataPlant::SystemAvailabilityType> AvailManagerType;    // type of availability manager
         Array1D_int AvailManagerNum;     // index for availability manager
 
         // Default Constructor
