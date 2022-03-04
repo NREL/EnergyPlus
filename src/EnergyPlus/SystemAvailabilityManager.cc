@@ -2140,48 +2140,47 @@ namespace SystemAvailabilityManager {
 
                     ZoneNum = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(1);
 
-                    {
-                        auto const SELECT_CASE_var1(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
+                    switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) { // select on thermostat control
 
-                        if (SELECT_CASE_var1 == SingleHeatingSetPoint) {
-                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
-                                AvailStatus = CycleOn;
-                            } else {
-                                AvailStatus = NoAction;
-                            }
-
-                        } else if (SELECT_CASE_var1 == SingleCoolingSetPoint) {
-                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
-                                AvailStatus = CycleOn;
-                            } else {
-                                AvailStatus = NoAction;
-                            }
-
-                        } else if (SELECT_CASE_var1 == SingleHeatCoolSetPoint) {
-                            if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
-                                (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
-                                AvailStatus = CycleOn;
-                            } else {
-                                AvailStatus = NoAction;
-                            }
-
-                        } else if (SELECT_CASE_var1 == DualSetPointWithDeadBand) {
-                            if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                 state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
-                                (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                 state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
-                                AvailStatus = CycleOn;
-                            } else {
-                                AvailStatus = NoAction;
-                            }
-
+                    case SingleHeatingSetPoint: {
+                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
+                            AvailStatus = CycleOn;
                         } else {
                             AvailStatus = NoAction;
                         }
+
+                    } break;
+                    case SingleCoolingSetPoint: {
+                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
+                            AvailStatus = CycleOn;
+                        } else {
+                            AvailStatus = NoAction;
+                        }
+
+                    } break;
+                    case SingleHeatCoolSetPoint: {
+                        if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                             state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
+                            (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
+                             state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
+                            AvailStatus = CycleOn;
+                        } else {
+                            AvailStatus = NoAction;
+                        }
+
+                    } break;
+                    case DualSetPointWithDeadBand: {
+                        if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
+                            (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
+                            AvailStatus = CycleOn;
+                        } else {
+                            AvailStatus = NoAction;
+                        }
+
+                    } break;
+                    default: {
+                        AvailStatus = NoAction;
+                    }
                     } // end select on thermostat control
                     break;
                 }
