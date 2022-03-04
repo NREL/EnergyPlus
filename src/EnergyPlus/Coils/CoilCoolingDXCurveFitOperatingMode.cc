@@ -290,6 +290,17 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
+    if (((speedNum == 1) && (PLR == 0.0)) || (inletNode.MassFlowRate == 0.0)) {
+        outletNode.Temp = inletNode.Temp;
+        outletNode.HumRat = inletNode.HumRat;
+        outletNode.Enthalpy = inletNode.Enthalpy;
+        outletNode.Press = inletNode.Press;
+        OpModeRTF = 0.0;
+        OpModePower = 0.0;
+        OpModeWasteHeat = 0.0;
+        return;
+    }
+
     if (condInletNode.Press <= 0.0) {
         condInletNode.Press = state.dataEnvrn->OutBaroPress;
     }
@@ -350,8 +361,15 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
         outletNode.HumRat = outletNode.HumRat * plr1 + (1.0 - plr1) * inletNode.HumRat;
         outletNode.Enthalpy = outletNode.Enthalpy * plr1 + (1.0 - plr1) * inletNode.Enthalpy;
+        outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+
+        // Check for saturation error and modify temperature at constant enthalpy
+        Real64 tsat = Psychrometrics::PsyTsatFnHPb(state, outletNode.Enthalpy, inletNode.Press, RoutineName);
+        if (outletNode.Temp < tsat) {
+            outletNode.Temp = tsat;
+            outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, tsat, outletNode.Enthalpy);
+        }
     }
-    outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
     OpModeRTF = thisspeed.RTF;
     OpModePower = thisspeed.fullLoadPower * thisspeed.RTF;
