@@ -1606,6 +1606,22 @@ namespace SteamCoils {
         return IndexNum;
     }
 
+    int GetCompIndex(EnergyPlusData &state, std::string_view const coilName)
+    {
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
+            GetSteamCoilInput(state);
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
+        }
+
+        int indexNum = UtilityRoutines::FindItemInList(coilName, state.dataSteamCoils->SteamCoil);
+
+        if (indexNum == 0) { // may not find coil name
+            ShowSevereError(state, format("GetSteamCoilIndex: Could not find CoilType = Coil:Heating:Steam with Name = \"{}\"", coilName));
+        }
+
+        return indexNum;
+    }
+
     void CheckSteamCoilSchedule(
         EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex)
     {
