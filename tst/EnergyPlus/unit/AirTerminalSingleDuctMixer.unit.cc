@@ -8044,7 +8044,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
     EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
     EXPECT_EQ("NIGHTCYCLE AVAILMGR", thisAvaiManager.Name);
-    EXPECT_EQ(SystemAvailabilityManager::SysAvailMgr_NightCycle, thisAvaiManager.MgrType);
+    EXPECT_EQ(DataPlant::SystemAvailabilityType::NightCycle, thisAvaiManager.MgrType);
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);

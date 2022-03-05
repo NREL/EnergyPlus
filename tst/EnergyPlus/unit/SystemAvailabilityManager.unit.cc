@@ -220,15 +220,15 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataAirLoop->PriAirSysAvailMgr(3).AvailManagerNum.allocate(1);
 
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerType(1) =
-        12; // cValidSysAvailManagerTypes( { ......., "AvailabilityManager:OptimumStart" } );
+        DataPlant::SystemAvailabilityType::OptimumStart;
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerName(1) = "OptStart Availability 1";
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerNum(1) = 1;
     state->dataAirLoop->PriAirSysAvailMgr(2).AvailManagerType(1) =
-        12; // cValidSysAvailManagerTypes( { ......., "AvailabilityManager:OptimumStart" } );
+        DataPlant::SystemAvailabilityType::OptimumStart;
     state->dataAirLoop->PriAirSysAvailMgr(2).AvailManagerName(1) = "OptStart Availability 2";
     state->dataAirLoop->PriAirSysAvailMgr(2).AvailManagerNum(1) = 2;
     state->dataAirLoop->PriAirSysAvailMgr(3).AvailManagerType(1) =
-        12; // cValidSysAvailManagerTypes( { ......., "AvailabilityManager:OptimumStart" } );
+        DataPlant::SystemAvailabilityType::OptimumStart;
     state->dataAirLoop->PriAirSysAvailMgr(3).AvailManagerName(1) = "OptStart Availability 3";
     state->dataAirLoop->PriAirSysAvailMgr(3).AvailManagerNum(1) = 3;
 
@@ -520,7 +520,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerName.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerNum.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailStatus = 1;
-    state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerType(1) = 1; // Scheduled
+    state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerType(1) = DataPlant::SystemAvailabilityType::Scheduled; // Scheduled
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerName(1) = "Avail 1";
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerNum(1) = 1;
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData(1).SchedPtr = 1;
