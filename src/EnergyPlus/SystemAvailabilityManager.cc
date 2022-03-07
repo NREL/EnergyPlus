@@ -1384,28 +1384,10 @@ namespace SystemAvailabilityManager {
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType(listItem) = availManagerObjType;
-                        const auto& AvailManagerType = static_cast<DataPlant::SystemAvailabilityType>(
+                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
                             getEnumerationValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::MakeUPPERCase(availManagerObjType)));
-                        switch (AvailManagerType) {
-                        case DataPlant::SystemAvailabilityType::Scheduled:
-                        case DataPlant::SystemAvailabilityType::ScheduledOn:
-                        case DataPlant::SystemAvailabilityType::ScheduledOff:
-                        case DataPlant::SystemAvailabilityType::NightCycle:
-                        case DataPlant::SystemAvailabilityType::DiffThermo:
-                        case DataPlant::SystemAvailabilityType::HiTempTOff:
-                        case DataPlant::SystemAvailabilityType::HiTempTOn:
-                        case DataPlant::SystemAvailabilityType::LoTempTOff:
-                        case DataPlant::SystemAvailabilityType::LoTempTOn:
-                        case DataPlant::SystemAvailabilityType::NightVent:
-                        case DataPlant::SystemAvailabilityType::HybridVent:
-                        case DataPlant::SystemAvailabilityType::OptimumStart:
-                            state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) = AvailManagerType;
-                            break;
-                        default:
-                            state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) =
-                                DataPlant::SystemAvailabilityType::Invalid;
-                            break;
-                        }
+                        if (state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
+                            state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem)  = DataPlant::SystemAvailabilityType::Invalid;
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
                     }
                 }
