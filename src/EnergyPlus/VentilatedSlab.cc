@@ -2641,8 +2641,7 @@ namespace VentilatedSlab {
 
             switch (ventSlab.hCoilType) {
             case HeatingCoilType::Water: {
-                CheckWaterCoilSchedule(
-                    state,  ventSlab.heatingCoilName, ventSlab.heatingCoilSchedValue, ventSlab.heatingCoil_Index);
+                CheckWaterCoilSchedule(state, ventSlab.heatingCoilName, ventSlab.heatingCoilSchedValue, ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Steam: {
@@ -2666,8 +2665,8 @@ namespace VentilatedSlab {
 
             switch (ventSlab.cCoilType) {
             case CoolingCoilType::WaterCooling:
-            case CoolingCoilType::DetailedCooling:{
-                CheckWaterCoilSchedule(state,  ventSlab.coolingCoilName, ventSlab.coolingCoilSchedValue, ventSlab.coolingCoil_Index);
+            case CoolingCoilType::DetailedCooling: {
+                CheckWaterCoilSchedule(state, ventSlab.coolingCoilName, ventSlab.coolingCoilSchedValue, ventSlab.coolingCoil_Index);
                 break;
             }
             case CoolingCoilType::HXAssisted: {
@@ -2687,8 +2686,7 @@ namespace VentilatedSlab {
 
             switch (ventSlab.hCoilType) {
             case HeatingCoilType::Water: {
-                CheckWaterCoilSchedule(
-                    state,  ventSlab.heatingCoilName, ventSlab.heatingCoilSchedValue, ventSlab.heatingCoil_Index);
+                CheckWaterCoilSchedule(state, ventSlab.heatingCoilName, ventSlab.heatingCoilSchedValue, ventSlab.heatingCoil_Index);
                 break;
             }
             case HeatingCoilType::Steam: {
@@ -2715,7 +2713,7 @@ namespace VentilatedSlab {
 
             switch (ventSlab.cCoilType) {
             case CoolingCoilType::WaterCooling:
-            case CoolingCoilType::DetailedCooling:{
+            case CoolingCoilType::DetailedCooling: {
                 CheckWaterCoilSchedule(state, ventSlab.coolingCoilName, ventSlab.coolingCoilSchedValue, ventSlab.coolingCoil_Index);
                 break;
             }
