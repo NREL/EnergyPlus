@@ -165,8 +165,7 @@ namespace WaterUse {
                     if (!state.dataGlobal->WarmupFlag) {
                         if (waterConnection.MaxIterationsErrorIndex == 0) {
                             ShowWarningError(state,
-                                             "WaterUse:Connections = " + waterConnection.Name +
-                                                 ":  Heat recovery temperature did not converge");
+                                             "WaterUse:Connections = " + waterConnection.Name + ":  Heat recovery temperature did not converge");
                             ShowContinueErrorTimeStamp(state, "");
                         }
                         ShowRecurringWarningErrorAtEnd(state,
@@ -292,17 +291,10 @@ namespace WaterUse {
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int AlphaNum;
 
-        constexpr std::array<std::string_view, static_cast<int>(HeatRecovHX::Num)> HeatRecoverHXNamesUC {
-            "IDEAL",
-            "COUNTERFLOW",
-            "CROSSFLOW"
-        };
+        constexpr std::array<std::string_view, static_cast<int>(HeatRecovHX::Num)> HeatRecoverHXNamesUC{"IDEAL", "COUNTERFLOW", "CROSSFLOW"};
 
-        constexpr std::array<std::string_view, static_cast<int>(HeatRecovConfig::Num)>  HeatRecoveryConfigNamesUC {
-            "PLANT",
-            "EQUIPMENT",
-            "PLANTANDEQUIPMENT"
-        };
+        constexpr std::array<std::string_view, static_cast<int>(HeatRecovConfig::Num)> HeatRecoveryConfigNamesUC{
+            "PLANT", "EQUIPMENT", "PLANTANDEQUIPMENT"};
 
         state.dataIPShortCut->cCurrentModuleObject = "WaterUse:Equipment";
         state.dataWaterUse->numWaterEquipment =
@@ -449,26 +441,24 @@ namespace WaterUse {
                 waterConnection.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(2)) || (!state.dataIPShortCut->lAlphaFieldBlanks(3))) {
-                    waterConnection.InletNode =
-                        NodeInputManager::GetOnlySingleNode(state,
-                                                            state.dataIPShortCut->cAlphaArgs(2),
-                                                            ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::WaterUseConnections,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
-                                                            DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::ConnectionType::Inlet,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            DataLoopNode::ObjectIsNotParent);
-                    waterConnection.OutletNode =
-                        NodeInputManager::GetOnlySingleNode(state,
-                                                            state.dataIPShortCut->cAlphaArgs(3),
-                                                            ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::WaterUseConnections,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
-                                                            DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::ConnectionType::Outlet,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            DataLoopNode::ObjectIsNotParent);
+                    waterConnection.InletNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                                    state.dataIPShortCut->cAlphaArgs(2),
+                                                                                    ErrorsFound,
+                                                                                    DataLoopNode::ConnectionObjectType::WaterUseConnections,
+                                                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                                                    DataLoopNode::NodeFluidType::Water,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                                    DataLoopNode::ObjectIsNotParent);
+                    waterConnection.OutletNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                                     state.dataIPShortCut->cAlphaArgs(3),
+                                                                                     ErrorsFound,
+                                                                                     DataLoopNode::ConnectionObjectType::WaterUseConnections,
+                                                                                     state.dataIPShortCut->cAlphaArgs(1),
+                                                                                     DataLoopNode::NodeFluidType::Water,
+                                                                                     DataLoopNode::ConnectionType::Outlet,
+                                                                                     NodeInputManager::CompFluidStream::Primary,
+                                                                                     DataLoopNode::ObjectIsNotParent);
 
                     // Check plant connections
                     BranchNodeConnections::TestCompSet(state,
@@ -503,8 +493,7 @@ namespace WaterUse {
                 }
 
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    waterConnection.HotTempSchedule =
-                        ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+                    waterConnection.HotTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                     // If no HotTempSchedule, there is no hot water.
                     // HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
@@ -517,8 +506,7 @@ namespace WaterUse {
                 }
 
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    waterConnection.ColdTempSchedule =
-                        ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+                    waterConnection.ColdTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
                     // If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
                     if (waterConnection.ColdTempSchedule == 0) {
@@ -575,8 +563,7 @@ namespace WaterUse {
                             state.dataWaterUse->WaterEquipment(WaterEquipNum).Connections = WaterConnNum;
 
                             ++waterConnection.NumWaterEquipment;
-                            waterConnection
-                                .myWaterEquipArr(waterConnection.NumWaterEquipment) = WaterEquipNum;
+                            waterConnection.myWaterEquipArr(waterConnection.NumWaterEquipment) = WaterEquipNum;
 
                             waterConnection.PeakVolFlowRate +=
                                 state.dataWaterUse->WaterEquipment(WaterEquipNum).PeakVolFlowRate; // this does not include possible multipliers
@@ -608,15 +595,12 @@ namespace WaterUse {
                             state.dataHeatBal->Zone(state.dataWaterUse->WaterEquipment(thisWaterEquipNum).Zone).Multiplier *
                             state.dataHeatBal->Zone(state.dataWaterUse->WaterEquipment(thisWaterEquipNum).Zone).ListMultiplier;
                     } else { // can't have multipliers
-                        waterConnection.PeakMassFlowRate +=
-                            state.dataWaterUse->WaterEquipment(thisWaterEquipNum).PeakVolFlowRate *
-                            Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+                        waterConnection.PeakMassFlowRate += state.dataWaterUse->WaterEquipment(thisWaterEquipNum).PeakVolFlowRate *
+                                                            Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
                     }
                 }
-                PlantUtilities::RegisterPlantCompDesignFlow(state,
-                                                            waterConnection.InletNode,
-                                                            waterConnection.PeakMassFlowRate /
-                                                                Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp));
+                PlantUtilities::RegisterPlantCompDesignFlow(
+                    state, waterConnection.InletNode, waterConnection.PeakMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp));
             }
         }
     }

@@ -66,7 +66,7 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace WindowComplexManager {
-    
+
     enum class RayIdentificationType
     {
         Invalid = -1,
@@ -200,30 +200,30 @@ namespace WindowComplexManager {
     BSDFDaylghtPosition DaylghtAltAndAzimuth(Vector const &UnitVect); // vector which needs to be converted
 
     Vector WorldVectFromW6(EnergyPlusData &state,
-                           Real64 const Theta, // Polar angle in W6 Coords
-                           Real64 const Phi,   // Azimuthal angle in W6 Coords
-                           const RayIdentificationType RadType,  // Type of radiation: Front_Incident, etc.
-                           Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
-                           Real64 const Alpha  // Surface azimuth, radians, world coordinate system
+                           Real64 const Theta,                  // Polar angle in W6 Coords
+                           Real64 const Phi,                    // Azimuthal angle in W6 Coords
+                           const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                           Real64 const Gamma,                  // Surface tilt angle, radians, world coordinate system
+                           Real64 const Alpha                   // Surface azimuth, radians, world coordinate system
     );
 
     int FindInBasis(EnergyPlusData &state,
-                    Vector const &RayToFind,  // Ray vector direction in world CS
-                    const RayIdentificationType RadType,        // Type of radiation: Front_Incident, etc.
-                    int const ISurf,          // Window Surface number
-                    int const IState,         // Complex Fenestration state number
-                    BasisStruct const &Basis, // Complex Fenestration basis root
-                    Real64 &Theta,            // Theta value for ray
-                    Real64 &Phi               // Phi value for ray
+                    Vector const &RayToFind,             // Ray vector direction in world CS
+                    const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                    int const ISurf,                     // Window Surface number
+                    int const IState,                    // Complex Fenestration state number
+                    BasisStruct const &Basis,            // Complex Fenestration basis root
+                    Real64 &Theta,                       // Theta value for ray
+                    Real64 &Phi                          // Phi value for ray
     );
 
     void W6CoordsFromWorldVect(EnergyPlusData &state,
-                               Vector const &RayVect, // Ray vector direction in world CS
-                               const RayIdentificationType RadType,     // Type of radiation: Front_Incident, etc.
-                               Real64 const Gamma,    // Surface tilt angle, world coordinate system
-                               Real64 const Alpha,    // Surface azimuth, world coordinate system
-                               Real64 &Theta,         // Polar angle in W6 Coords
-                               Real64 &Phi            // Azimuthal angle in W6 Coords
+                               Vector const &RayVect,               // Ray vector direction in world CS
+                               const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                               Real64 const Gamma,                  // Surface tilt angle, world coordinate system
+                               Real64 const Alpha,                  // Surface azimuth, world coordinate system
+                               Real64 &Theta,                       // Polar angle in W6 Coords
+                               Real64 &Phi                          // Azimuthal angle in W6 Coords
     );
 
     void CalcComplexWindowThermal(EnergyPlusData &state,

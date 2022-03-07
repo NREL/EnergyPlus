@@ -304,8 +304,7 @@ namespace WindTurbine {
                 }
             }
 
-            windTurbine.RatedRotorSpeed =
-                state.dataIPShortCut->rNumericArgs(1); // Maximum rotor speed in rpm
+            windTurbine.RatedRotorSpeed = state.dataIPShortCut->rNumericArgs(1); // Maximum rotor speed in rpm
             if (windTurbine.RatedRotorSpeed <= 0.0) {
                 if (lNumericBlanks(1)) {
                     ShowSevereError(state,
@@ -401,8 +400,7 @@ namespace WindTurbine {
                 ErrorsFound = true;
             }
 
-            windTurbine.CutInSpeed =
-                state.dataIPShortCut->rNumericArgs(7); // Minimum wind speed for system operation
+            windTurbine.CutInSpeed = state.dataIPShortCut->rNumericArgs(7); // Minimum wind speed for system operation
             if (windTurbine.CutInSpeed == 0.0) {
                 if (lNumericBlanks(7)) {
                     ShowSevereError(state,
@@ -419,15 +417,13 @@ namespace WindTurbine {
                 ErrorsFound = true;
             }
 
-            windTurbine.CutOutSpeed =
-                state.dataIPShortCut->rNumericArgs(8); // Minimum wind speed for system operation
+            windTurbine.CutOutSpeed = state.dataIPShortCut->rNumericArgs(8); // Minimum wind speed for system operation
             if (windTurbine.CutOutSpeed == 0.0) {
                 if (lNumericBlanks(8)) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(8) +
                                         " is required but input is blank.");
-                } else if (windTurbine.CutOutSpeed <=
-                           windTurbine.RatedWindSpeed) {
+                } else if (windTurbine.CutOutSpeed <= windTurbine.RatedWindSpeed) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than {}=[{:.2R}].",
                                            CurrentModuleObject,
@@ -447,10 +443,8 @@ namespace WindTurbine {
                 ErrorsFound = true;
             }
 
-            windTurbine.SysEfficiency =
-                state.dataIPShortCut->rNumericArgs(9); // Overall wind turbine system efficiency
-            if (lNumericBlanks(9) || windTurbine.SysEfficiency == 0.0 ||
-                windTurbine.SysEfficiency > 1.0) {
+            windTurbine.SysEfficiency = state.dataIPShortCut->rNumericArgs(9); // Overall wind turbine system efficiency
+            if (lNumericBlanks(9) || windTurbine.SysEfficiency == 0.0 || windTurbine.SysEfficiency > 1.0) {
                 windTurbine.SysEfficiency = SysEffDefault;
                 ShowWarningError(state,
                                  format("{}=\"{}\" invalid {}=[{:.2R}].",
@@ -461,8 +455,7 @@ namespace WindTurbine {
                 ShowContinueError(state, format("...The default value of {:.3R} was assumed. for {}", SysEffDefault, cNumericFields(9)));
             }
 
-            windTurbine.MaxTipSpeedRatio =
-                state.dataIPShortCut->rNumericArgs(10); // Maximum tip speed ratio
+            windTurbine.MaxTipSpeedRatio = state.dataIPShortCut->rNumericArgs(10); // Maximum tip speed ratio
             if (windTurbine.MaxTipSpeedRatio == 0.0) {
                 if (lNumericBlanks(10)) {
                     ShowSevereError(state,
@@ -490,8 +483,7 @@ namespace WindTurbine {
             }
 
             windTurbine.MaxPowerCoeff = state.dataIPShortCut->rNumericArgs(11); // Maximum power coefficient
-            if (windTurbine.rotorType == RotorType::HorizontalAxis &&
-                windTurbine.MaxPowerCoeff == 0.0) {
+            if (windTurbine.rotorType == RotorType::HorizontalAxis && windTurbine.MaxPowerCoeff == 0.0) {
                 if (lNumericBlanks(11)) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(11) +
@@ -517,8 +509,7 @@ namespace WindTurbine {
                 ShowContinueError(state, format("...The default value of {:.2R} will be used. for {}", DefaultPC, cNumericFields(11)));
             }
 
-            windTurbine.LocalAnnualAvgWS =
-                state.dataIPShortCut->rNumericArgs(12); // Local wind speed annually averaged
+            windTurbine.LocalAnnualAvgWS = state.dataIPShortCut->rNumericArgs(12); // Local wind speed annually averaged
             if (windTurbine.LocalAnnualAvgWS == 0.0) {
                 if (lNumericBlanks(12)) {
                     ShowWarningError(state,
@@ -535,8 +526,7 @@ namespace WindTurbine {
                 }
             }
 
-            windTurbine.HeightForLocalWS =
-                state.dataIPShortCut->rNumericArgs(13); // Height of local meteorological station
+            windTurbine.HeightForLocalWS = state.dataIPShortCut->rNumericArgs(13); // Height of local meteorological station
             if (windTurbine.HeightForLocalWS == 0.0) {
                 if (windTurbine.LocalAnnualAvgWS == 0.0) {
                     windTurbine.HeightForLocalWS = 0.0;
@@ -559,10 +549,8 @@ namespace WindTurbine {
                 }
             }
 
-            windTurbine.ChordArea =
-                state.dataIPShortCut->rNumericArgs(14); // Chord area of a single blade for VAWTs
-            if (windTurbine.rotorType == RotorType::VerticalAxis &&
-                windTurbine.ChordArea == 0.0) {
+            windTurbine.ChordArea = state.dataIPShortCut->rNumericArgs(14); // Chord area of a single blade for VAWTs
+            if (windTurbine.rotorType == RotorType::VerticalAxis && windTurbine.ChordArea == 0.0) {
                 if (lNumericBlanks(14)) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(14) +
@@ -579,8 +567,7 @@ namespace WindTurbine {
             }
 
             windTurbine.DragCoeff = state.dataIPShortCut->rNumericArgs(15); // Blade drag coefficient
-            if (windTurbine.rotorType == RotorType::VerticalAxis &&
-                windTurbine.DragCoeff == 0.0) {
+            if (windTurbine.rotorType == RotorType::VerticalAxis && windTurbine.DragCoeff == 0.0) {
                 if (lNumericBlanks(15)) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(15) +
@@ -597,8 +584,7 @@ namespace WindTurbine {
             }
 
             windTurbine.LiftCoeff = state.dataIPShortCut->rNumericArgs(16); // Blade lift coefficient
-            if (windTurbine.rotorType == RotorType::VerticalAxis &&
-                windTurbine.LiftCoeff == 0.0) {
+            if (windTurbine.rotorType == RotorType::VerticalAxis && windTurbine.LiftCoeff == 0.0) {
                 if (lNumericBlanks(16)) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cNumericFields(16) +
@@ -614,33 +600,27 @@ namespace WindTurbine {
                 ErrorsFound = true;
             }
 
-            windTurbine.PowerCoeffC1 =
-                state.dataIPShortCut->rNumericArgs(17); // Empirical power coefficient C1
+            windTurbine.PowerCoeffC1 = state.dataIPShortCut->rNumericArgs(17); // Empirical power coefficient C1
             if (lNumericBlanks(17)) {
                 windTurbine.PowerCoeffC1 = 0.0;
             }
-            windTurbine.PowerCoeffC2 =
-                state.dataIPShortCut->rNumericArgs(18); // Empirical power coefficient C2
+            windTurbine.PowerCoeffC2 = state.dataIPShortCut->rNumericArgs(18); // Empirical power coefficient C2
             if (lNumericBlanks(18)) {
                 windTurbine.PowerCoeffC2 = 0.0;
             }
-            windTurbine.PowerCoeffC3 =
-                state.dataIPShortCut->rNumericArgs(19); // Empirical power coefficient C3
+            windTurbine.PowerCoeffC3 = state.dataIPShortCut->rNumericArgs(19); // Empirical power coefficient C3
             if (lNumericBlanks(19)) {
                 windTurbine.PowerCoeffC3 = 0.0;
             }
-            windTurbine.PowerCoeffC4 =
-                state.dataIPShortCut->rNumericArgs(20); // Empirical power coefficient C4
+            windTurbine.PowerCoeffC4 = state.dataIPShortCut->rNumericArgs(20); // Empirical power coefficient C4
             if (lNumericBlanks(20)) {
                 windTurbine.PowerCoeffC4 = 0.0;
             }
-            windTurbine.PowerCoeffC5 =
-                state.dataIPShortCut->rNumericArgs(21); // Empirical power coefficient C5
+            windTurbine.PowerCoeffC5 = state.dataIPShortCut->rNumericArgs(21); // Empirical power coefficient C5
             if (lNumericBlanks(21)) {
                 windTurbine.PowerCoeffC5 = 0.0;
             }
-            windTurbine.PowerCoeffC6 =
-                state.dataIPShortCut->rNumericArgs(22); // Empirical power coefficient C6
+            windTurbine.PowerCoeffC6 = state.dataIPShortCut->rNumericArgs(22); // Empirical power coefficient C6
             if (lNumericBlanks(22)) {
                 windTurbine.PowerCoeffC6 = 0.0;
             }
@@ -845,18 +825,14 @@ namespace WindTurbine {
         windTurbine.AnnualTMYWS = state.dataWindTurbine->AnnualTMYWS;
 
         // Factor differences between TMY wind data and local wind data once
-        if (state.dataWindTurbine->AnnualTMYWS > 0.0 && windTurbine.WSFactor == 0.0 &&
-            windTurbine.LocalAnnualAvgWS > 0) {
+        if (state.dataWindTurbine->AnnualTMYWS > 0.0 && windTurbine.WSFactor == 0.0 && windTurbine.LocalAnnualAvgWS > 0) {
             // Convert the annual wind speed to the local wind speed at the height of the local station, then factor
             LocalTMYWS = state.dataWindTurbine->AnnualTMYWS * state.dataEnvrn->WeatherFileWindModCoeff *
-                         std::pow(windTurbine.HeightForLocalWS / state.dataEnvrn->SiteWindBLHeight,
-                                  state.dataEnvrn->SiteWindExp);
-            windTurbine.WSFactor =
-                LocalTMYWS / windTurbine.LocalAnnualAvgWS;
+                         std::pow(windTurbine.HeightForLocalWS / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
+            windTurbine.WSFactor = LocalTMYWS / windTurbine.LocalAnnualAvgWS;
         }
         // Assign factor of 1.0 if no stat file or no input of local average wind speed
-        if (windTurbine.WSFactor == 0.0)
-            windTurbine.WSFactor = 1.0;
+        if (windTurbine.WSFactor == 0.0) windTurbine.WSFactor = 1.0;
 
         // Do every time step initialization
         windTurbine.Power = 0.0;
@@ -954,8 +930,7 @@ namespace WindTurbine {
         LocalWindSpeed /= windTurbine.WSFactor;
 
         // Check wind conditions for system operation
-        if (GetCurrentScheduleValue(state, windTurbine.SchedPtr) > 0 &&
-            LocalWindSpeed > windTurbine.CutInSpeed &&
+        if (GetCurrentScheduleValue(state, windTurbine.SchedPtr) > 0 && LocalWindSpeed > windTurbine.CutInSpeed &&
             LocalWindSpeed < windTurbine.CutOutSpeed) {
 
             // System is on
@@ -999,8 +974,7 @@ namespace WindTurbine {
                     PowerCoeff = MaxPowerCoeff;
                 }
                 // Maximum of rated power
-                if (LocalWindSpeed >= windTurbine.RatedWindSpeed ||
-                    WTPower > windTurbine.RatedPower) {
+                if (LocalWindSpeed >= windTurbine.RatedWindSpeed || WTPower > windTurbine.RatedPower) {
                     WTPower = windTurbine.RatedPower;
                     PowerCoeff = WTPower / (0.5 * LocalAirDensity * SweptArea * LocalWindSpeed_3);
                 }
@@ -1040,10 +1014,8 @@ namespace WindTurbine {
                 // Force coefficients
                 Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians));
                 Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians));
-                TanForceCoeff = std::abs(windTurbine.LiftCoeff * sin_AngOfAttack -
-                                         windTurbine.DragCoeff * cos_AngOfAttack);
-                NorForceCoeff = windTurbine.LiftCoeff * cos_AngOfAttack +
-                                windTurbine.DragCoeff * sin_AngOfAttack;
+                TanForceCoeff = std::abs(windTurbine.LiftCoeff * sin_AngOfAttack - windTurbine.DragCoeff * cos_AngOfAttack);
+                NorForceCoeff = windTurbine.LiftCoeff * cos_AngOfAttack + windTurbine.DragCoeff * sin_AngOfAttack;
 
                 // Net tangential and normal forces
                 Real64 const RelFlowVel_2(pow_2(RelFlowVel));
@@ -1123,8 +1095,7 @@ namespace WindTurbine {
         auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
 
-        windTurbine.Energy =
-            windTurbine.Power * TimeStepSys * DataGlobalConstants::SecInHour;
+        windTurbine.Energy = windTurbine.Power * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     //*****************************************************************************************
