@@ -85,10 +85,10 @@ namespace WindowManager {
         Real64 Gamma = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Tilt;
         Real64 Alpha = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Azimuth;
 
-        int RadType = state.dataWindowComplexManager->Front_Incident;
+        RayIdentificationType RadType = RayIdentificationType::Front_Incident;
 
         if (t_Direction == BSDFDirection::Outgoing) {
-            RadType = state.dataWindowComplexManager->Back_Incident;
+            RadType = RayIdentificationType::Back_Incident;
         }
 
         // get the corresponding local Theta, Phi for ray
