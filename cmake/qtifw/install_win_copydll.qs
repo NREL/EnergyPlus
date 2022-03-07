@@ -38,10 +38,20 @@ function Component()
 
       var regdll = systemTargetDir + "regsvr32.exe";
 
+      console.log("regdll=" + regdll);
+
+      // We'll need "temp" directory extracted from the installer
+      // Based on the @TargetDir@ property, which uses forward slashes by default
+      // Make it use windows native separators
+      var targetDir = installer.value("TargetDir").replace(/\//g, '\\');
+      console.log("targetDir=" + targetDir);
+      var tempDir = targetDir + '\\temp';
+      console.log("tempDir=" + tempDir);
+
       // Store ocx to be registered
       var dllsToReg = [];
-      for (i = 0; i < systemArray.length; i++) {
-        var sourceFile = "@TargetDir@\\temp\\" + systemArray[i];
+      for (var i = 0; i < systemArray.length; i++) {
+        var sourceFile = `${tempDir}\\${systemArray[i]}`;
         var targetFile = systemTargetDir + systemArray[i];
         if (!installer.fileExists(targetFile)) {
           console.log("Copying DLL: " + targetFile);
@@ -61,8 +71,8 @@ function Component()
         }
       }
 
-      for (i = 0; i < dllsToReg.length; i++) {
-        targetFile = dllsToReg[i];
+      for (var i = 0; i < dllsToReg.length; i++) {
+        var targetFile = dllsToReg[i];
         // Mind the "/s" flag which avoids displaying a [Yes/No] prompt
         // that you can't answer and making the installer freeze
         console.log("Registering DLL: " + [regdll, "/s", targetFile].join(" "));
@@ -75,8 +85,7 @@ function Component()
       // the opposite (= Mkdir), plus it doesn't delete an empty directory anyways and we use copy (not move) above...
       // component.addElevatedOperation("Rmdir", "@TargetDir@/temp");
       // /S = recursive, /Q = quiet
-      component.addElevatedOperation("Execute", "cmd" , "/C",  "rmdir", "/S", "/Q", "@TargetDir@\\temp");
-
+      component.addElevatedOperation("Execute", "cmd", "/C", "rmdir", "/S", "/Q", tempDir);
     }
   }
 }

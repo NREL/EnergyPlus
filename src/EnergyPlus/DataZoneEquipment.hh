@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SystemReports.hh>
 
@@ -512,6 +513,8 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     int GetZoneEquipmentDataFound = 0;
     int NumSupplyAirPaths = 0;
     int NumReturnAirPaths = 0;
+    int NumExhaustAirSystems = 0;
+    int NumZoneExhaustControls = 0;
     bool ZoneEquipInputsFilled = false;
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
@@ -526,6 +529,8 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
     Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
+    Array1D<ExhaustAirSystemManager::ExhaustAir> ExhaustAirSystem;
+    Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
 
     void clear_state() override
     {
@@ -533,6 +538,8 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->GetZoneEquipmentDataFound = 0;
         this->NumSupplyAirPaths = 0;
         this->NumReturnAirPaths = 0;
+        this->NumExhaustAirSystems = 0;
+        this->NumZoneExhaustControls = 0;
         this->ZoneEquipInputsFilled = false;
         this->ZoneEquipSimulatedOnce = false;
         this->NumOfZoneEquipLists = 0;
@@ -547,6 +554,8 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->ZoneEquipList.deallocate();
         this->SupplyAirPath.deallocate();
         this->ReturnAirPath.deallocate();
+        this->ExhaustAirSystem.deallocate();
+        this->ZoneExhaustControlSystem.deallocate();
     }
 };
 

@@ -92,7 +92,7 @@ namespace SpectralAveraging
     ///////////////////////////////////////////////////////////////////////////
     enum class PVM
     {
-        EQE,
+        JSC,
         VOC,
         FF
     };
@@ -102,7 +102,7 @@ namespace SpectralAveraging
 
     inline EnumPVM::Iterator begin(EnumPVM)
     {
-        return EnumPVM::Iterator(static_cast<int>(PVM::EQE));
+        return EnumPVM::Iterator(static_cast<int>(PVM::JSC));
     }
 
     inline EnumPVM::Iterator end(EnumPVM)
@@ -111,56 +111,23 @@ namespace SpectralAveraging
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// PVMeasurement
-    ///////////////////////////////////////////////////////////////////////////
-    struct PVMeasurement
-    {
-        PVMeasurement(double eqe, double voc, double ff);
-
-        double EQE;
-        double VOC;
-        double FF;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// PVMeasurementRow
-    ///////////////////////////////////////////////////////////////////////////
-    struct PVMeasurementRow
-    {
-        PVMeasurementRow(double wavelength,
-                         const PVMeasurement & front,
-                         const PVMeasurement & back);
-
-        double wavelength;
-        PVMeasurement front;
-        PVMeasurement back;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     /// PhotovoltaicSampleData
     ///////////////////////////////////////////////////////////////////////////
     class PhotovoltaicSampleData : public CSpectralSampleData
     {
     public:
         PhotovoltaicSampleData(const CSpectralSampleData & spectralSampleData);
-        PhotovoltaicSampleData(const CSpectralSampleData & spectralSampleData,
-                               const std::vector<PVMeasurementRow> & pvMeasurements);
-
-        void interpolate(const std::vector<double> & t_Wavelengths) override;
+        PhotovoltaicSampleData(
+          const CSpectralSampleData & spectralSampleData,
+          const FenestrationCommon::CSeries & eqeValuesFront,
+          const FenestrationCommon::CSeries & eqeValuesBack);
 
         void cutExtraData(double minLambda, double maxLambda) override;
 
-        void addRecord(double m_Wavelength,
-                       const PVMeasurement frontSide,
-                       const PVMeasurement backSide);
-
-        void addRecord(const PVMeasurementRow & pvRow);
-
-        FenestrationCommon::CSeries pvProperty(const FenestrationCommon::Side side,
-                                               const PVM prop) const;
+        [[nodiscard]] FenestrationCommon::CSeries eqe(const FenestrationCommon::Side side) const;
 
     private:
-        std::map<std::pair<FenestrationCommon::Side, PVM>, FenestrationCommon::CSeries> m_PVData;
+        std::map<FenestrationCommon::Side, FenestrationCommon::CSeries> m_EQE;
     };
 
 }   // namespace SpectralAveraging

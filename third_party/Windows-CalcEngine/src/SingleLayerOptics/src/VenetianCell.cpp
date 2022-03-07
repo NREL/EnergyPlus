@@ -19,9 +19,10 @@ namespace SingleLayerOptics
     ////////////////////////////////////////////////////////////////////////////////////////////
 
     CVenetianBase::CVenetianBase(const std::shared_ptr<CMaterial> & t_MaterialProperties,
-                                 const std::shared_ptr<ICellDescription> & t_Cell) :
-        CUniformDiffuseCell(t_MaterialProperties, t_Cell),
-        CDirectionalDiffuseCell(t_MaterialProperties, t_Cell)
+                                 const std::shared_ptr<ICellDescription> & t_Cell,
+                                 double rotation) :
+        CUniformDiffuseCell(t_MaterialProperties, t_Cell, rotation),
+        CDirectionalDiffuseCell(t_MaterialProperties, t_Cell, rotation)
     {}
 
     std::shared_ptr<CVenetianCellDescription> CVenetianBase::getCellAsVenetian() const
@@ -120,12 +121,7 @@ namespace SingleLayerOptics
     //  CVenetianCellEnergy
     ////////////////////////////////////////////////////////////////////////////////////////////
     CVenetianCellEnergy::CVenetianCellEnergy() :
-        m_Cell(nullptr),
-        m_Tf(0),
-        m_Tb(0),
-        m_Rf(0),
-        m_Rb(0),
-        m_Energy(nullptr)
+        m_Cell(nullptr), m_Tf(0), m_Tb(0), m_Rf(0), m_Rb(0), m_Energy(nullptr)
     {}
 
     CVenetianCellEnergy::CVenetianCellEnergy(
@@ -134,11 +130,7 @@ namespace SingleLayerOptics
       const double Tb,
       const double Rf,
       const double Rb) :
-        m_Cell(t_Cell),
-        m_Tf(Tf),
-        m_Tb(Tb),
-        m_Rf(Rf),
-        m_Rb(Rb)
+        m_Cell(t_Cell), m_Tf(Tf), m_Tb(Tb), m_Rf(Rf), m_Rb(Rb)
     {
         createSlatsMapping();
         formEnergyMatrix();
@@ -350,7 +342,7 @@ namespace SingleLayerOptics
     {
         assert(m_Cell != nullptr);
 
-        std::shared_ptr<SquareMatrix> aViewFactors = m_Cell->viewFactors();
+        SquareMatrix aViewFactors{m_Cell->viewFactors()};
         size_t numSeg = int(m_Cell->numberOfSegments() / 2);
 
         // Create energy matrix
@@ -367,8 +359,7 @@ namespace SingleLayerOptics
             {
                 if(i != numSeg - 1)
                 {
-                    double value =
-                      (*aViewFactors)(b[i + 1], f[j]) * T + (*aViewFactors)(f[i], f[j]) * R;
+                    double value = aViewFactors(b[i + 1], f[j]) * T + aViewFactors(f[i], f[j]) * R;
                     if(i == j)
                     {
                         value -= 1;
@@ -397,7 +388,7 @@ namespace SingleLayerOptics
                 if(i != numSeg - 1)
                 {
                     const double value =
-                      (*aViewFactors)(b[i + 1], b[j]) * T + (*aViewFactors)(f[i], b[j]) * R;
+                      aViewFactors(b[i + 1], b[j]) * T + aViewFactors(f[i], b[j]) * R;
                     (*m_Energy)(j + numSeg, i) = value;
                 }
                 else
@@ -418,7 +409,7 @@ namespace SingleLayerOptics
                 if(i != 0)
                 {
                     const double value =
-                      (*aViewFactors)(f[i - 1], f[j]) * T + (*aViewFactors)(b[i], f[j]) * R;
+                      aViewFactors(f[i - 1], f[j]) * T + aViewFactors(b[i], f[j]) * R;
                     (*m_Energy)(j, i + numSeg) = value;
                 }
                 else
@@ -435,8 +426,7 @@ namespace SingleLayerOptics
             {
                 if(i != 0)
                 {
-                    double value =
-                      (*aViewFactors)(f[i - 1], b[j]) * T + (*aViewFactors)(b[i], b[j]) * R;
+                    double value = aViewFactors(f[i - 1], b[j]) * T + aViewFactors(b[i], b[j]) * R;
                     if(i == j)
                     {
                         value -= 1;
@@ -480,13 +470,13 @@ namespace SingleLayerOptics
     std::shared_ptr<std::vector<double>> CVenetianCellEnergy::diffuseVector()
     {
         size_t numSeg = int(m_Cell->numberOfSegments() / 2);
-        std::shared_ptr<SquareMatrix> aViewFactors = m_Cell->viewFactors();
+        SquareMatrix aViewFactors{m_Cell->viewFactors()};
 
         std::shared_ptr<std::vector<double>> B = std::make_shared<std::vector<double>>(2 * numSeg);
         for(size_t i = 0; i < numSeg; ++i)
         {
-            (*B)[i] = -(*aViewFactors)(b[0], f[i]);
-            (*B)[i + numSeg] = -(*aViewFactors)(b[0], b[i]);
+            (*B)[i] = -aViewFactors(b[0], f[i]);
+            (*B)[i + numSeg] = -aViewFactors(b[0], b[i]);
         }
 
         return B;
@@ -585,13 +575,14 @@ namespace SingleLayerOptics
     ////////////////////////////////////////////////////////////////////////////////////////////
     //  CVenetianCell
     ////////////////////////////////////////////////////////////////////////////////////////////
-    CVenetianCell::CVenetianCell(const std::shared_ptr<CMaterial> & t_Material,
-                                 const std::shared_ptr<ICellDescription> & t_Cell) :
-        CBaseCell(t_Material, t_Cell),
-        CVenetianBase(t_Material, t_Cell)
+    CVenetianCell::CVenetianCell(const std::shared_ptr<CMaterial> & t_MaterialProperties,
+                                 const std::shared_ptr<ICellDescription> & t_Cell,
+                                 const double rotation) :
+        CBaseCell(t_MaterialProperties, t_Cell, rotation),
+        CVenetianBase(t_MaterialProperties, t_Cell, rotation)
     {
         assert(t_Cell != nullptr);
-        assert(t_Material != nullptr);
+        assert(t_MaterialProperties != nullptr);
 
         generateVenetianEnergy();
     }
@@ -628,6 +619,10 @@ namespace SingleLayerOptics
     double CVenetianCell::T_dir_dir(const Side t_Side, const CBeamDirection & t_Direction)
     {
         std::shared_ptr<CVenetianCellEnergy> aCell = m_Energy.getCell(t_Side);
+        if(m_CellRotation != 0)
+        {
+            return aCell->T_dir_dir(t_Direction.rotate(m_CellRotation));
+        }
         return aCell->T_dir_dir(t_Direction);
     }
 
@@ -639,7 +634,14 @@ namespace SingleLayerOptics
         for(size_t i = 0; i < size; ++i)
         {
             CVenetianCellEnergy aCell = *m_EnergiesBand[i].getCell(t_Side);
-            aProperties.push_back(aCell.T_dir_dir(t_Direction));
+            if(m_CellRotation != 0)
+            {
+                aProperties.push_back(aCell.T_dir_dir(t_Direction.rotate(m_CellRotation)));
+            }
+            else
+            {
+                aProperties.push_back(aCell.T_dir_dir(t_Direction));
+            }
         }
 
         return aProperties;
@@ -648,6 +650,10 @@ namespace SingleLayerOptics
     double CVenetianCell::T_dir_dif(const Side t_Side, const CBeamDirection & t_Direction)
     {
         std::shared_ptr<CVenetianCellEnergy> aCell = m_Energy.getCell(t_Side);
+        if(m_CellRotation != 0)
+        {
+            return aCell->T_dir_dif(t_Direction.rotate(m_CellRotation));
+        }
         return aCell->T_dir_dif(t_Direction);
     }
 
@@ -659,7 +665,14 @@ namespace SingleLayerOptics
         for(size_t i = 0; i < size; ++i)
         {
             CVenetianCellEnergy aCell = *m_EnergiesBand[i].getCell(t_Side);
-            aProperties.push_back(aCell.T_dir_dif(t_Direction));
+            if(m_CellRotation != 0)
+            {
+                aProperties.push_back(aCell.T_dir_dif(t_Direction.rotate(m_CellRotation)));
+            }
+            else
+            {
+                aProperties.push_back(aCell.T_dir_dif(t_Direction));
+            }
         }
         return aProperties;
     }
@@ -667,6 +680,10 @@ namespace SingleLayerOptics
     double CVenetianCell::R_dir_dif(const Side t_Side, const CBeamDirection & t_Direction)
     {
         std::shared_ptr<CVenetianCellEnergy> aCell = m_Energy.getCell(t_Side);
+        if(m_CellRotation != 0)
+        {
+            return aCell->R_dir_dif(t_Direction.rotate(m_CellRotation));
+        }
         return aCell->R_dir_dif(t_Direction);
     }
 
@@ -678,7 +695,14 @@ namespace SingleLayerOptics
         for(size_t i = 0; i < size; ++i)
         {
             std::shared_ptr<CVenetianCellEnergy> aCell = m_EnergiesBand[i].getCell(t_Side);
-            aProperties.push_back(aCell->R_dir_dif(t_Direction));
+            if(m_CellRotation != 0)
+            {
+                aProperties.push_back(aCell->R_dir_dif(t_Direction.rotate(m_CellRotation)));
+            }
+            else
+            {
+                aProperties.push_back(aCell->R_dir_dif(t_Direction));
+            }
         }
         return aProperties;
     }
@@ -688,6 +712,11 @@ namespace SingleLayerOptics
                                     const CBeamDirection & t_OutgoingDirection)
     {
         std::shared_ptr<CVenetianCellEnergy> aCell = m_Energy.getCell(t_Side);
+        if(m_CellRotation != 0)
+        {
+            return aCell->T_dir_dir(t_IncomingDirection.rotate(m_CellRotation),
+                                    t_OutgoingDirection.rotate(m_CellRotation));
+        }
         return aCell->T_dir_dir(t_IncomingDirection, t_OutgoingDirection);
     }
 
@@ -700,7 +729,14 @@ namespace SingleLayerOptics
         for(size_t i = 0; i < size; ++i)
         {
             std::shared_ptr<CVenetianCellEnergy> aCell = m_EnergiesBand[i].getCell(t_Side);
-            aProperties.push_back(aCell->T_dir_dir(t_IncomingDirection, t_OutgoingDirection));
+            if(m_CellRotation != 0)
+            {
+                aProperties.push_back(aCell->T_dir_dir(t_IncomingDirection.rotate(m_CellRotation),
+                                        t_OutgoingDirection.rotate(m_CellRotation)));
+            } else
+            {
+                aProperties.push_back(aCell->T_dir_dir(t_IncomingDirection, t_OutgoingDirection));
+            }
         }
         return aProperties;
     }
@@ -710,6 +746,11 @@ namespace SingleLayerOptics
                                     const CBeamDirection & t_OutgoingDirection)
     {
         std::shared_ptr<CVenetianCellEnergy> aCell = m_Energy.getCell(t_Side);
+        if(m_CellRotation != 0)
+        {
+            return aCell->R_dir_dir(t_IncomingDirection.rotate(m_CellRotation),
+                                    t_OutgoingDirection.rotate(m_CellRotation));
+        }
         return aCell->R_dir_dir(t_IncomingDirection, t_OutgoingDirection);
     }
 
@@ -722,7 +763,15 @@ namespace SingleLayerOptics
         for(size_t i = 0; i < size; ++i)
         {
             std::shared_ptr<CVenetianCellEnergy> aCell = m_EnergiesBand[i].getCell(t_Side);
-            aProperties.push_back(aCell->R_dir_dir(t_IncomingDirection, t_OutgoingDirection));
+            if(m_CellRotation != 0)
+            {
+                aProperties.push_back(aCell->R_dir_dir(t_IncomingDirection.rotate(m_CellRotation),
+                                                       t_OutgoingDirection.rotate(m_CellRotation)));
+            } else
+            {
+                aProperties.push_back(aCell->R_dir_dir(t_IncomingDirection, t_OutgoingDirection));
+            }
+
         }
         return aProperties;
     }

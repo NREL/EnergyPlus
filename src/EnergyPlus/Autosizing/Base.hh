@@ -271,7 +271,7 @@ struct BaseSizer
 
     std::string getLastErrorMessages();
 
-    void overrideSizingString(std::string &string);
+    void overrideSizingString(std::string_view const string);
 
 protected:
     std::string lastErrorMessages;

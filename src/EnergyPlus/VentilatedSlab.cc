@@ -2774,7 +2774,6 @@ namespace VentilatedSlab {
 
                     if (SELECT_CASE_var1 == Heating_WaterCoilType) {
                         CheckWaterCoilSchedule(state,
-                                               "Coil:Heating:Water",
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
@@ -2805,13 +2804,11 @@ namespace VentilatedSlab {
 
                     if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
                         CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water",
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
                         CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water:DetailedGeometry",
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
@@ -2832,7 +2829,6 @@ namespace VentilatedSlab {
 
                     if (SELECT_CASE_var1 == Heating_WaterCoilType) {
                         CheckWaterCoilSchedule(state,
-                                               "Coil:Heating:Water",
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).HCoil_Index);
@@ -2865,13 +2861,11 @@ namespace VentilatedSlab {
 
                     if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
                         CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water",
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
                         CheckWaterCoilSchedule(state,
-                                               "Coil:Cooling:Water:DetailedGeometry",
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilName,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoilSchedValue,
                                                state.dataVentilatedSlab->VentSlab(Item).CCoil_Index);

@@ -242,6 +242,8 @@ struct ReportCoilSelectionData;
 struct ReportFlagData;
 struct ResultsFrameworkData;
 struct ReturnAirPathMgr;
+struct ExhaustAirSystemMgr;
+struct ExhaustControlSystemMgr;
 struct RoomAirModelAirflowNetworkData;
 struct RoomAirModelData;
 struct RoomAirModelManagerData;
@@ -502,6 +504,8 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ReportFlagData> dataReportFlag;
     std::unique_ptr<ResultsFrameworkData> dataResultsFramework;
     std::unique_ptr<ReturnAirPathMgr> dataRetAirPathMrg;
+    std::unique_ptr<ExhaustAirSystemMgr> dataExhAirSystemMrg;
+    std::unique_ptr<ExhaustControlSystemMgr> dataExhCtrlSystemMrg;
     std::unique_ptr<RoomAirModelAirflowNetworkData> dataRoomAirflowNetModel;
     std::unique_ptr<RoomAirModelData> dataRoomAirMod;
     std::unique_ptr<RoomAirModelManagerData> dataRoomAirModelMgr;
