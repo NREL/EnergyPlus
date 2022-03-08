@@ -3589,7 +3589,7 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    void DefineOptStartSysAvailManager::SetOptStartFlag(EnergyPlusData &state, int const AirLoopNum)
+    void OptimumStart::SetOptStartFlag(EnergyPlusData &state, int const AirLoopNum)
     {
         // Set the OptStartFlag true for all zones on the air loop
         auto const &thisAirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum));
@@ -4637,7 +4637,7 @@ namespace SystemAvailabilityManager {
                     if (std::any_of(
                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData.begin(),
                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData.end(),
-                            [](SystemAvailabilityManager::DefineHybridVentSysAvailManager const &e) { return e.HybridVentMgrConnectedToAirLoop; })) {
+                            [](SystemAvailabilityManager::HybridVent const &e) { return e.HybridVentMgrConnectedToAirLoop; })) {
                         for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) ==
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum &&
