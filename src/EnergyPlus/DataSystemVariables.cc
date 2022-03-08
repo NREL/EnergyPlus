@@ -156,8 +156,9 @@ namespace DataSystemVariables {
             state.files.audit.ensure_open(state, "CheckForActualFilePath", state.files.outputControl.audit);
             std::string tmp;
 
+            // epin is passed from Epl-run.bat as the path to the IDF file minus its extension, so take the parent directory
             get_environment_variable(cInputPath1, tmp);
-            state.dataSysVars->envinputpath1 = fs::path(tmp);
+            state.dataSysVars->envinputpath1 = FileSystem::getParentDirectoryPath(fs::path(tmp));
 
             get_environment_variable(cInputPath2, tmp);
             state.dataSysVars->envinputpath2 = fs::path(tmp);
