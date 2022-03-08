@@ -330,45 +330,45 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataGlobal->BeginDayFlag = true; // initialize optimum start data to beginning of day data
     state->dataGlobal->CurrentTime = 1.0;   // set the current time to 1 AM
     SystemAvailabilityManager::ManageSystemAvailability(*state);
-    EXPECT_EQ(3, state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
+    EXPECT_EQ(3, state->dataSystemAvailabilityManager->OptimumStartData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
     EXPECT_EQ(1,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1)
+              state->dataSystemAvailabilityManager->OptimumStartData(1)
                   .ATGWCZoneNumHi); // zone 1 is default for cooling set point when heating load exists
-    EXPECT_EQ(-3.0, state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).TempDiffLo); // zone 3 is 3C below set point
-    EXPECT_EQ(0.0, state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).TempDiffHi);  // cooling data did not get set so is 0
+    EXPECT_EQ(-3.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffLo); // zone 3 is 3C below set point
+    EXPECT_EQ(0.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffHi);  // cooling data did not get set so is 0
     EXPECT_EQ(DataHVACGlobals::NoAction,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).AvailStatus); // avail manager should not yet be set
+              state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should not yet be set
 
     EXPECT_EQ(DataHVACGlobals::NoAction,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(2).AvailStatus); // avail manager should not be set until 6 AM
+              state->dataSystemAvailabilityManager->OptimumStartData(2).AvailStatus); // avail manager should not be set until 6 AM
 
     state->dataGlobal->WarmupFlag = false;
     state->dataGlobal->BeginDayFlag = false; // start processing temp data to find optimum start time
     state->dataGlobal->CurrentTime = 2.0;    // set the current time to 2 AM
     SystemAvailabilityManager::ManageSystemAvailability(*state);
     // same data as before since zone temps are unchanged
-    EXPECT_EQ(3, state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
+    EXPECT_EQ(3, state->dataSystemAvailabilityManager->OptimumStartData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
     EXPECT_EQ(1,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1)
+              state->dataSystemAvailabilityManager->OptimumStartData(1)
                   .ATGWCZoneNumHi); // zone 1 is default for cooling set point when heating load exists
-    EXPECT_EQ(-3.0, state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).TempDiffLo); // zone 3 is 3C below set point
-    EXPECT_EQ(0.0, state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).TempDiffHi);  // cooling data did not get set so is 0
+    EXPECT_EQ(-3.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffLo); // zone 3 is 3C below set point
+    EXPECT_EQ(0.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffHi);  // cooling data did not get set so is 0
     EXPECT_EQ(DataHVACGlobals::NoAction,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).AvailStatus); // avail manager should not yet be set
+              state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should not yet be set
 
     EXPECT_EQ(DataHVACGlobals::NoAction,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(2).AvailStatus); // avail manager should not be set until 6 AM
+              state->dataSystemAvailabilityManager->OptimumStartData(2).AvailStatus); // avail manager should not be set until 6 AM
 
     state->dataGlobal->CurrentTime = 7.0; // set the current time to 7 AM which is past time to pre-start HVAC
     SystemAvailabilityManager::ManageSystemAvailability(*state);
 
     EXPECT_EQ(DataHVACGlobals::CycleOn,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).AvailStatus); // avail manager should be set to cycle on
+              state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should be set to cycle on
     EXPECT_EQ(1.5,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).NumHoursBeforeOccupancy); // 1.5 hours = 3C from SP divided by 2C/hour
+              state->dataSystemAvailabilityManager->OptimumStartData(1).NumHoursBeforeOccupancy); // 1.5 hours = 3C from SP divided by 2C/hour
 
     EXPECT_EQ(DataHVACGlobals::CycleOn,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(2).AvailStatus); // avail manager should be set at 6 AM
+              state->dataSystemAvailabilityManager->OptimumStartData(2).AvailStatus); // avail manager should be set at 6 AM
 
     // #8013 - Check that the optimum start is available during the correct times when using a partial hour fan start
     state->dataGlobal->CurrentTime = 5.00; // set the current time to 5:00 AM, before max optimum start time
@@ -388,7 +388,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     ZoneTempPredictorCorrector::CalcZoneAirTempSetPoints(*state);
 
     EXPECT_EQ(DataHVACGlobals::NoAction,
-              state->dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).AvailStatus); // avail manager should be set to no action
+              state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should be set to no action
     EXPECT_EQ(15.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));                  // 15.0C is the unoccupied heating setpoint
     EXPECT_EQ(29.4, state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1));                  // 29.4C is the unoccupied cooling setpoint
 }
@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance)
 TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
 {
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData.allocate(1);
+    state->dataSystemAvailabilityManager->HybridVentData.allocate(1);
     state->dataHVACGlobal->HybridVentSysAvailVentCtrl.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
@@ -459,62 +459,62 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
-    state->dataSystemAvailabilityManager->SchedSysAvailMgrData.allocate(1);
+    state->dataSystemAvailabilityManager->SchedData.allocate(1);
     state->dataScheduleMgr->Schedule.allocate(1);
     state->dataHVACGlobal->ZoneComp.allocate(DataZoneEquipment::NumValidSysAvailZoneComponents);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(1);
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).Name = "HybridControl";
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ActualZoneNum = 1;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).AirLoopNum = 1;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlModeSchedPtr = 1;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).UseRainIndicator = false;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MaxWindSpeed = 40.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MinOutdoorTemp = 15.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MaxOutdoorTemp = 35.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MinOutdoorEnth = 20000.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MaxOutdoorEnth = 30000.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MinOutdoorDewPoint = 15.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MaxOutdoorDewPoint = 35.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MinOASched = 2;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MinOperTime = 10.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).MinVentTime = 10.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).Name = "HybridControl";
+    state->dataSystemAvailabilityManager->HybridVentData(1).ActualZoneNum = 1;
+    state->dataSystemAvailabilityManager->HybridVentData(1).AirLoopNum = 1;
+    state->dataSystemAvailabilityManager->HybridVentData(1).ControlModeSchedPtr = 1;
+    state->dataSystemAvailabilityManager->HybridVentData(1).UseRainIndicator = false;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MaxWindSpeed = 40.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MinOutdoorTemp = 15.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MaxOutdoorTemp = 35.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MinOutdoorEnth = 20000.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MaxOutdoorEnth = 30000.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MinOutdoorDewPoint = 15.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MaxOutdoorDewPoint = 35.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MinOASched = 2;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MinOperTime = 10.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).MinVentTime = 10.0;
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeVentDuration = 0.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeOperDuration = 0.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).TimeVentDuration = 0.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).TimeOperDuration = 0.0;
 
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     state->dataHeatBal->Zone(1).WindSpeed = 5.0;
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 5; // 80% acceptance
+    state->dataSystemAvailabilityManager->HybridVentData(1).ControlMode = 5; // 80% acceptance
     state->dataThermalComforts->runningAverageASH = 20.0;
     state->dataHeatBalFanSys->MAT(1) = 23.0;
     state->dataHeatBal->ZoneMRT(1) = 27.0;
 
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
+    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Vent open
 
     state->dataHeatBalFanSys->MAT(1) = 26.0;
     state->dataHeatBal->ZoneMRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
+    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // System operation
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 6; // 90% acceptance
+    state->dataSystemAvailabilityManager->HybridVentData(1).ControlMode = 6; // 90% acceptance
     state->dataHeatBalFanSys->MAT(1) = 23.0;
     state->dataHeatBal->ZoneMRT(1) = 27.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
+    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Vent open
 
     state->dataHeatBalFanSys->MAT(1) = 26.0;
     state->dataHeatBal->ZoneMRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
+    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // System operation
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 7; // CO2 control with an AirLoop
+    state->dataSystemAvailabilityManager->HybridVentData(1).ControlMode = 7; // CO2 control with an AirLoop
     state->dataContaminantBalance->ZoneAirCO2(1) = 900.0;
     state->dataContaminantBalance->ZoneCO2SetPoint(1) = 800.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).HybridVentMgrConnectedToAirLoop = true;
+    state->dataSystemAvailabilityManager->HybridVentData(1).HybridVentMgrConnectedToAirLoop = true;
     state->dataAirLoop->PriAirSysAvailMgr(1).NumAvailManagers = 1;
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerType.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerName.allocate(1);
@@ -523,55 +523,55 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerType(1) = DataPlant::SystemAvailabilityType::Scheduled; // Scheduled
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerName(1) = "Avail 1";
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerNum(1) = 1;
-    state->dataSystemAvailabilityManager->SchedSysAvailMgrData(1).SchedPtr = 1;
+    state->dataSystemAvailabilityManager->SchedData(1).SchedPtr = 1;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
+    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // System operation
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
+    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Vent open
 
     state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
     state->dataContaminantBalance->ZoneCO2SetPoint(1) = 800.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(0, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // No action
+    EXPECT_EQ(0, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // No action
 
     state->dataHVACGlobal->ZoneComp(1).TotalNumComp = 1; //  CO2 control with zone equipment
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs.allocate(1);
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).AvailStatus = 2;
     state->dataContaminantBalance->ZoneAirCO2(1) = 900.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).HybridVentMgrConnectedToAirLoop = false;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).SimHybridVentSysAvailMgr = true;
+    state->dataSystemAvailabilityManager->HybridVentData(1).HybridVentMgrConnectedToAirLoop = false;
+    state->dataSystemAvailabilityManager->HybridVentData(1).SimHybridVentSysAvailMgr = true;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
+    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // System operation
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).AvailStatus = 1;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
+    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Vent open
 
     // time duration test
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 40.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 1;     // Temperature control
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl = 1; // Open
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeOperDuration = 5.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).ControlMode = 1;     // Temperature control
+    state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl = 1; // Open
+    state->dataSystemAvailabilityManager->HybridVentData(1).TimeOperDuration = 5.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // No change
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeOperDuration = 11.0;
+    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // No change
+    state->dataSystemAvailabilityManager->HybridVentData(1).TimeOperDuration = 11.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Can change
+    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Can change
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl = 2; // close
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeOperDuration = 0.0;
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeVentDuration = 5.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl = 2; // close
+    state->dataSystemAvailabilityManager->HybridVentData(1).TimeOperDuration = 0.0;
+    state->dataSystemAvailabilityManager->HybridVentData(1).TimeVentDuration = 5.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // No change
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeVentDuration = 11.0;
+    EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // No change
+    state->dataSystemAvailabilityManager->HybridVentData(1).TimeVentDuration = 11.0;
     state->dataHeatBalFanSys->TempControlType(1) = 1;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
-    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Can change
+    EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Can change
 
-    state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData.deallocate();
+    state->dataSystemAvailabilityManager->HybridVentData.deallocate();
     state->dataHVACGlobal->HybridVentSysAvailVentCtrl.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
     state->dataHeatBal->Zone.deallocate();
@@ -580,7 +580,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
     state->dataContaminantBalance->ZoneCO2SetPoint.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
-    state->dataSystemAvailabilityManager->SchedSysAvailMgrData.deallocate();
+    state->dataSystemAvailabilityManager->SchedData.deallocate();
     state->dataScheduleMgr->Schedule.deallocate();
     state->dataHVACGlobal->ZoneComp.deallocate();
     state->dataHeatBalFanSys->TempControlType.deallocate();
@@ -646,10 +646,10 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
     SystemAvailabilityManager::GetSysAvailManagerInputs(*state);
     // check the three cycling run time control types
     EXPECT_EQ(3, state->dataSystemAvailabilityManager->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl));
-    EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::Thermostat, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(2).cyclingRunTimeControl));
+    EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime, state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl));
+    EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::Thermostat, state->dataSystemAvailabilityManager->NightCycleData(2).cyclingRunTimeControl));
     EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime,
-                              state->dataSystemAvailabilityManager->NCycSysAvailMgrData(3).cyclingRunTimeControl));
+                              state->dataSystemAvailabilityManager->NightCycleData(3).cyclingRunTimeControl));
 }
 
 TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
@@ -676,20 +676,20 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
 
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData.allocate(NumZones);
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).Name = "System Avail";
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnAny;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).SchedPtr = 1;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).FanSchedPtr = 2;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).TempTolRange = 0.4;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CyclingTimeSteps = 4;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZoneListName = state->dataHeatBal->Zone(1).Name;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCtrlZones = NumZones;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs.allocate(1);
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs(1) = 1;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCoolingZones = NumZones;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZonePtrs = NumZones;
+    state->dataSystemAvailabilityManager->NightCycleData.allocate(NumZones);
+    state->dataSystemAvailabilityManager->NightCycleData(1).Name = "System Avail";
+    state->dataSystemAvailabilityManager->NightCycleData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnAny;
+    state->dataSystemAvailabilityManager->NightCycleData(1).SchedPtr = 1;
+    state->dataSystemAvailabilityManager->NightCycleData(1).FanSchedPtr = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).TempTolRange = 0.4;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CyclingTimeSteps = 4;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CtrlZoneListName = state->dataHeatBal->Zone(1).Name;
+    state->dataSystemAvailabilityManager->NightCycleData(1).NumOfCtrlZones = NumZones;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CtrlZonePtrs.allocate(1);
+    state->dataSystemAvailabilityManager->NightCycleData(1).CtrlZonePtrs(1) = 1;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
+    state->dataSystemAvailabilityManager->NightCycleData(1).NumOfCoolingZones = NumZones;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CoolingZonePtrs = NumZones;
     state->dataScheduleMgr->Schedule.allocate(2);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
@@ -699,83 +699,83 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataGlobal->SimTimeSteps = 0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is cycling On
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // starting time is equal to stopping time
     state->dataGlobal->SimTimeSteps = 4;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 4.0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is no action mode
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat,  Run Time has no effect
     // starting time is less than stopping time, control is driven by temp differential
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnControlZone;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::Thermostat;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnControlZone;
+    state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::Thermostat;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     state->dataGlobal->SimTimeSteps = 0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is cycling On, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // starting time and stopping time are the same, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 4.0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     // the unit still cycles on because of high zone air temp
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // Check that the system is cycling On, run time has no effect, // 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // Reduce zone air temperature, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 4.0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     // Reduce zone air temperature within the tolerance (0.05) to turn off night cycling
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // Check that the system is no action mode, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // current time is the end of run time period
     state->dataGlobal->SimTimeSteps = 4;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 4.0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is cycling On, zone air temp is outside T tolerance limits of 0.05, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // current time is the end of run time period
     state->dataGlobal->SimTimeSteps = 4;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 4.0;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     // Reduce zone air temperature within the tolerance (0.05) to turn off night cycling
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is no action mode, zone air temp is outside T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Test cycle time reset at beginning of day during warmup
     state->dataGlobal->WarmupFlag = true;
     state->dataGlobal->BeginDayFlag = true;
     state->dataGlobal->SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime);
 }
@@ -789,7 +789,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
 
     state->dataGlobal->NumOfZones = 1;
     state->dataAirLoop->PriAirSysAvailMgr.allocate(PriAirSysNum);
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData.allocate(NumZones);
+    state->dataSystemAvailabilityManager->NightCycleData.allocate(NumZones);
     state->dataHeatBalFanSys->TempControlType.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
@@ -808,19 +808,19 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).Name = "System Avail";
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnAny;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).SchedPtr = 1;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).FanSchedPtr = 2;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).TempTolRange = 0.4;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CyclingTimeSteps = 4;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZoneListName = state->dataHeatBal->Zone(1).Name;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCtrlZones = NumZones;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs.allocate(1);
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs(1) = 1;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCoolingZones = NumZones;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZonePtrs = NumZones;
+    state->dataSystemAvailabilityManager->NightCycleData(1).Name = "System Avail";
+    state->dataSystemAvailabilityManager->NightCycleData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnAny;
+    state->dataSystemAvailabilityManager->NightCycleData(1).SchedPtr = 1;
+    state->dataSystemAvailabilityManager->NightCycleData(1).FanSchedPtr = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).TempTolRange = 0.4;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CyclingTimeSteps = 4;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CtrlZoneListName = state->dataHeatBal->Zone(1).Name;
+    state->dataSystemAvailabilityManager->NightCycleData(1).NumOfCtrlZones = NumZones;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CtrlZonePtrs.allocate(1);
+    state->dataSystemAvailabilityManager->NightCycleData(1).CtrlZonePtrs(1) = 1;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
+    state->dataSystemAvailabilityManager->NightCycleData(1).NumOfCoolingZones = NumZones;
+    state->dataSystemAvailabilityManager->NightCycleData(1).CoolingZonePtrs = NumZones;
     state->dataScheduleMgr->Schedule.allocate(2);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
@@ -830,88 +830,88 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataGlobal->SimTimeSteps = 0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 0.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).PriorAvailStatus = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).PriorAvailStatus = 2;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Starting time is equal to stopping time
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 4.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::FixedRunTime;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is no action mode because of run time limit
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat,  Run Time has no effect
     // starting time is less than stopping time, control is driven by temp differential
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnControlZone;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::Thermostat;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).nightCycleControlType = SystemAvailabilityManager::NightCycleControlType::OnControlZone;
+    state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::Thermostat;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     state->dataGlobal->SimTimeSteps = 0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 0.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // starting time and stopping time are the same, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 4.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     // reduce zone air temperature within the tolerance (0.05) to turn off night cycling
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On, run time has no effect, // 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // starting time and stopping time are the same, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 4.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     // Reduce zone air temperature within the tolerance (0.05) to turn off night cycling
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is no action mode, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // starting time and stopping time are the same, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 4.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
+    state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl = SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On, zone air temp is outside T tolerance limits of 0.05, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // starting time and stopping time are the same, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 4.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 2;
+    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     // Reduce zone air temperature within the tolerance (0.05) to turn off night cycling
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is no action mode, zone air temp is within T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Test cycle time reset at beginning of day during warmup
     state->dataGlobal->WarmupFlag = true;
     state->dataGlobal->BeginDayFlag = true;
     state->dataGlobal->SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime);
 }

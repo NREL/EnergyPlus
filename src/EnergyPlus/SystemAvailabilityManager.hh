@@ -351,7 +351,7 @@ namespace SystemAvailabilityManager {
         }
     };
 
-    struct SysAvailManagerList
+    struct List
     {
         // Members
         std::string Name; // Availability Manager List Name
@@ -361,7 +361,7 @@ namespace SystemAvailabilityManager {
         Array1D<DataPlant::SystemAvailabilityType> AvailManagerType;
 
         // Default Constructor
-        SysAvailManagerList() : NumItems(0)
+        List() : NumItems(0)
         {
         }
     };
@@ -519,19 +519,19 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
     Array1D<Real64> OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
     Array1D<Real64> OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
 
-    EPVector<SystemAvailabilityManager::Scheduled> SchedSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::ScheduledOn> SchedOnSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::ScheduledOff> SchedOffSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::NightCycle> NCycSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::DiffThermo> DiffTSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> HiTurnOffSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> HiTurnOnSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> LoTurnOffSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> LoTurnOnSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::NightVent> NVentSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::HybridVent> HybridVentSysAvailMgrData;
-    EPVector<SystemAvailabilityManager::SysAvailManagerList> SysAvailMgrListData;
-    EPVector<SystemAvailabilityManager::OptimumStart> OptStartSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::Scheduled> SchedData;
+    EPVector<SystemAvailabilityManager::ScheduledOn> SchedOnData;
+    EPVector<SystemAvailabilityManager::ScheduledOff> SchedOffData;
+    EPVector<SystemAvailabilityManager::NightCycle> NightCycleData;
+    EPVector<SystemAvailabilityManager::DiffThermo> DiffThermoData;
+    EPVector<SystemAvailabilityManager::HiLoTemp> HiTurnOffData;
+    EPVector<SystemAvailabilityManager::HiLoTemp> HiTurnOnData;
+    EPVector<SystemAvailabilityManager::HiLoTemp> LoTurnOffData;
+    EPVector<SystemAvailabilityManager::HiLoTemp> LoTurnOnData;
+    EPVector<SystemAvailabilityManager::NightVent> NightVentData;
+    EPVector<SystemAvailabilityManager::HybridVent> HybridVentData;
+    EPVector<SystemAvailabilityManager::List> ListData;
+    EPVector<SystemAvailabilityManager::OptimumStart> OptimumStartData;
     EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
     EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
 
@@ -564,19 +564,19 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
         InitSysAvailManagers_MyOneTimeFlag = true;
         CalcNCycSysAvailMgr_OneTimeFlag = true;
         NumOptStartSysAvailMgrs = 0;
-        SchedSysAvailMgrData.deallocate();
-        SchedOnSysAvailMgrData.deallocate();
-        SchedOffSysAvailMgrData.deallocate();
-        NCycSysAvailMgrData.deallocate();
-        DiffTSysAvailMgrData.deallocate();
-        HiTurnOffSysAvailMgrData.deallocate();
-        HiTurnOnSysAvailMgrData.deallocate();
-        LoTurnOffSysAvailMgrData.deallocate();
-        LoTurnOnSysAvailMgrData.deallocate();
-        NVentSysAvailMgrData.deallocate();
-        HybridVentSysAvailMgrData.deallocate();
-        SysAvailMgrListData.deallocate();
-        OptStartSysAvailMgrData.deallocate();
+        SchedData.deallocate();
+        SchedOnData.deallocate();
+        SchedOffData.deallocate();
+        NightCycleData.deallocate();
+        DiffThermoData.deallocate();
+        HiTurnOffData.deallocate();
+        HiTurnOnData.deallocate();
+        LoTurnOffData.deallocate();
+        LoTurnOnData.deallocate();
+        NightVentData.deallocate();
+        HybridVentData.deallocate();
+        ListData.deallocate();
+        OptimumStartData.deallocate();
         ASHRAEOptSCoeffCooling.deallocate();
         ASHRAEOptSCoeffHeating.deallocate();
         BeginOfDayResetFlag = true;
