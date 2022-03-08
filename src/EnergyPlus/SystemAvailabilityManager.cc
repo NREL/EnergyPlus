@@ -1346,35 +1346,36 @@ namespace SystemAvailabilityManager {
                 auto const &objectFields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).Name = thisObjectName;
+                auto &sysAvailManList = state.dataSystemAvailabilityManager->SysAvailMgrListData(Item);
+                sysAvailManList.Name = thisObjectName;
 
                 auto extensibles = objectFields.find("managers");
                 auto const &extensionSchemaProps = objectSchemaProps["managers"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
                     auto extensiblesArray = extensibles.value();
                     int numExtensibles = extensiblesArray.size();
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems = numExtensibles;
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName.allocate(numExtensibles);
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType.allocate(numExtensibles);
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType.allocate(numExtensibles);
+                    sysAvailManList.NumItems = numExtensibles;
+                    sysAvailManList.AvailManagerName.allocate(numExtensibles);
+                    sysAvailManList.cAvailManagerType.allocate(numExtensibles);
+                    sysAvailManList.AvailManagerType.allocate(numExtensibles);
                     for (int extItem = 1; extItem <= numExtensibles; ++extItem) {
-                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName = "";
-                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType = "";
-                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType = DataPlant::SystemAvailabilityType::Invalid;
+                        sysAvailManList.AvailManagerName = "";
+                        sysAvailManList.cAvailManagerType = "";
+                        sysAvailManList.AvailManagerType = DataPlant::SystemAvailabilityType::Invalid;
                     }
 
                     int listItem = 0;
                     for (const auto& extensibleInstance : extensiblesArray) {
                         ++listItem;
-                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName(listItem) =
+                        sysAvailManList.AvailManagerName(listItem) =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_name");
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
-                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType(listItem) = availManagerObjType;
-                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
+                        sysAvailManList.cAvailManagerType(listItem) = availManagerObjType;
+                        sysAvailManList.AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
                             getEnumerationValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::MakeUPPERCase(availManagerObjType)));
-                        if (state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
-                            state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem)  = DataPlant::SystemAvailabilityType::Invalid;
+                        if (sysAvailManList.AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
+                            sysAvailManList.AvailManagerType(listItem)  = DataPlant::SystemAvailabilityType::Invalid;
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
                     }
                 }
