@@ -139,20 +139,6 @@ namespace SystemAvailabilityManager {
         "AVAILABILITYMANAGER:HYBRIDVENTILATION",
         "AVAILABILITYMANAGER:OPTIMUMSTART"};
 
-    static constexpr std::array<DataPlant::SystemAvailabilityType, static_cast<int>(DataPlant::SystemAvailabilityType::Num)> ValidSysAvailManagerTypes = {
-        DataPlant::SystemAvailabilityType::Scheduled,
-        DataPlant::SystemAvailabilityType::ScheduledOn,
-        DataPlant::SystemAvailabilityType::ScheduledOff,
-        DataPlant::SystemAvailabilityType::NightCycle,
-        DataPlant::SystemAvailabilityType::DiffThermo,
-        DataPlant::SystemAvailabilityType::HiTempTOff,
-        DataPlant::SystemAvailabilityType::HiTempTOn,
-        DataPlant::SystemAvailabilityType::LoTempTOff,
-        DataPlant::SystemAvailabilityType::LoTempTOn,
-        DataPlant::SystemAvailabilityType::NightVent,
-        DataPlant::SystemAvailabilityType::HybridVent,
-        DataPlant::SystemAvailabilityType::OptimumStart};
-
     void ManageSystemAvailability(EnergyPlusData &state)
     {
 
