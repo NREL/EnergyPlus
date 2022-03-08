@@ -357,7 +357,6 @@ namespace SystemAvailabilityManager {
         std::string Name; // Availability Manager List Name
         int NumItems;
         Array1D_string AvailManagerName;
-        Array1D_string cAvailManagerType;
         Array1D<DataPlant::SystemAvailabilityType> AvailManagerType;
 
         // Default Constructor

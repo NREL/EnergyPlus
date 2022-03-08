@@ -1356,11 +1356,9 @@ namespace SystemAvailabilityManager {
                     int numExtensibles = extensiblesArray.size();
                     sysAvailManList.NumItems = numExtensibles;
                     sysAvailManList.AvailManagerName.allocate(numExtensibles);
-                    sysAvailManList.cAvailManagerType.allocate(numExtensibles);
                     sysAvailManList.AvailManagerType.allocate(numExtensibles);
                     for (int extItem = 1; extItem <= numExtensibles; ++extItem) {
                         sysAvailManList.AvailManagerName = "";
-                        sysAvailManList.cAvailManagerType = "";
                         sysAvailManList.AvailManagerType = DataPlant::SystemAvailabilityType::Invalid;
                     }
 
@@ -1371,7 +1369,6 @@ namespace SystemAvailabilityManager {
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_name");
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
-                        sysAvailManList.cAvailManagerType(listItem) = availManagerObjType;
                         sysAvailManList.AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
                             getEnumerationValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::MakeUPPERCase(availManagerObjType)));
                         if (sysAvailManList.AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
@@ -1440,8 +1437,8 @@ namespace SystemAvailabilityManager {
                     state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num);
                 if (state.dataPlnt->PlantAvailMgr(Loop).AvailManagerType(Num) == DataPlant::SystemAvailabilityType::Invalid) {
                     ShowSevereError(state,
-                                    "GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"" +
-                                        state.dataSystemAvailabilityManager->ListData(Found).cAvailManagerType(Num) + "\".");
+                                    format("GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"{}\".",
+                                        SystemAvailabilityTypeNamesUC[static_cast<int>(state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num))]));
                     ShowContinueError(state, "Occurs in AvailabilityManagerAssignmentList=\"" + AvailabilityListName + "\".");
                     ErrorsFound = true;
                 }
@@ -1457,8 +1454,8 @@ namespace SystemAvailabilityManager {
                 if (state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num) == SystemAvailabilityType::NightVent ||
                     state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num) == SystemAvailabilityType::NightCycle) {
                     ShowSevereError(state,
-                                    "GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"" +
-                                        state.dataSystemAvailabilityManager->ListData(Found).cAvailManagerType(Num) + "\".");
+                                    format("GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"{}\".",
+                                        SystemAvailabilityTypeNamesUC[static_cast<int>(state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num))]));
                     ShowContinueError(state, "...this manager is not used in a Plant Loop.");
                     ShowContinueError(state, "Occurs in AvailabilityManagerAssignmentList=\"" + AvailabilityListName + "\".");
                     ErrorsFound = true;
@@ -1535,8 +1532,8 @@ namespace SystemAvailabilityManager {
                     state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num);
                 if (state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailManagerType(Num) == DataPlant::SystemAvailabilityType::Invalid) {
                     ShowSevereError(state,
-                                    "GetAirPathData/GetAirLoopAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" +
-                                        state.dataSystemAvailabilityManager->ListData(Found).cAvailManagerType(Num) + "\".");
+                                    format("GetAirPathData/GetAirLoopAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"{}\".",
+                                        SystemAvailabilityTypeNamesUC[static_cast<int>(state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num))]));
                     ShowContinueError(state,
                                       "Occurs in AvailabilityManagerAssignmentList=\"" +
                                           state.dataSystemAvailabilityManager->ListData(Found).AvailManagerName(Num) + "\".");
@@ -1628,8 +1625,8 @@ namespace SystemAvailabilityManager {
                         state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num);
                     if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerType(Num) == DataPlant::SystemAvailabilityType::Invalid) {
                         ShowSevereError(state,
-                                        "GetZoneEqAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" +
-                                            state.dataSystemAvailabilityManager->ListData(Found).cAvailManagerType(Num) + "\".");
+                                        format("GetZoneEqAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"{}\".",
+                                            SystemAvailabilityTypeNamesUC[static_cast<int>(state.dataSystemAvailabilityManager->ListData(Found).AvailManagerType(Num))]));
                         ShowContinueError(state,
                                           "Occurs in AvailabilityManagerAssignmentList=\"" +
                                               state.dataSystemAvailabilityManager->ListData(Found).AvailManagerName(Num) + "\".");
