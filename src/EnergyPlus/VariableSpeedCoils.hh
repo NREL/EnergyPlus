@@ -378,7 +378,7 @@ namespace VariableSpeedCoils {
                           int const SpeedNum                  // compressor speed number
     );
 
-    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum);
+    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum, bool &ErrorsFound);
 
     void CalcVarSpeedCoilCooling(EnergyPlusData &state,
                                  int const DXCoilNum,       // Heat Pump Number

@@ -107,6 +107,9 @@ void GetInputTabularAnnual(EnergyPlusData &state)
 
     objCount = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, currentModuleObject);
     if (objCount > 0) {
+
+        state.dataOutRptTab->WriteTabularFiles = true;
+
         // if not a run period using weather do not create reports
         if (!state.dataGlobal->DoWeathSim) {
             ShowWarningError(state,

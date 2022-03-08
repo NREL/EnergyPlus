@@ -117,7 +117,7 @@ using namespace EnergyPlus::ZoneTempPredictorCorrector;
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
+TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
 {
     std::string const idf_objects = delimited_string({
 
