@@ -472,11 +472,12 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
-                state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).MgrType = DataPlant::SystemAvailabilityType::Scheduled;
+                auto &sysAvailMan = state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum);
+                sysAvailMan.Name = cAlphaArgs(1);
+                sysAvailMan.MgrType = DataPlant::SystemAvailabilityType::Scheduled;
 
-                state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
-                if (state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
+                sysAvailMan.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                if (sysAvailMan.SchedPtr == 0) {
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
@@ -485,10 +486,10 @@ namespace SystemAvailabilityManager {
                 SetupOutputVariable(state,
                                     "Availability Manager Scheduled Control Status",
                                     OutputProcessor::Unit::None,
-                                    state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    sysAvailMan.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).Name);
+                                    sysAvailMan.Name);
 
             } // SysAvailNum
         }
