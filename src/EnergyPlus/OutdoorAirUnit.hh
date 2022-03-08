@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,12 +66,10 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace OutdoorAirUnit {
-    // component types addressed by this module
-    extern std::string const cMO_OutdoorAirUnit;
 
     enum class CompType : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         WaterCoil_Cooling,       // "COIL:COOLING:WATER",
         WaterCoil_SimpleHeat,    // "COIL:HEATING:WATER",
         SteamCoil_AirHeat,       // "COIL:HEATING:STEAM",
@@ -88,7 +86,7 @@ namespace OutdoorAirUnit {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNames{
+    static constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNames{
         "Coil:Cooling:Water",
         "Coil:Heating:Water",
         "Coil:Heating:Steam",
@@ -104,7 +102,7 @@ namespace OutdoorAirUnit {
         "AirLoopHVAC:UnitarySystem",
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNamesUC{
+    static constexpr std::array<std::string_view, static_cast<int>(CompType::Num)> CompTypeNamesUC{
 
         "COIL:COOLING:WATER",
         "COIL:HEATING:WATER",
@@ -121,38 +119,23 @@ namespace OutdoorAirUnit {
         "AIRLOOPHVAC:UNITARYSYSTEM",
     };
 
-    enum class Control
+    enum class OAUnitCtrlType
     {
-        Unassigned,
+        Invalid = -1,
         Neutral,
         Unconditioned,
-        Temperature
+        Temperature,
+        Num
     };
 
     enum class Operation
     {
-        Unassigned,
+        Invalid = -1,
         HeatingMode, // normal heating coil operation
         CoolingMode, // normal cooling coil operation
-        NeutralMode  // signal coil shouldn't run
+        NeutralMode, // signal coil shouldn't run
+        Num
     };
-
-    enum class CurrentObject
-    {
-        OAUnit,
-        EqList
-    };
-
-    constexpr const char *CurrentModuleObjects(CurrentObject const co)
-    {
-        switch (co) {
-        case CurrentObject::OAUnit:
-            return "ZoneHVAC:OutdoorAirUnit";
-        case CurrentObject::EqList:
-            return "ZoneHVAC:OutdoorAirUnit:EquipmentList";
-        }
-        return "";
-    }
 
     struct OAEquipList
     {
@@ -167,10 +150,7 @@ namespace OutdoorAirUnit {
         int CoilWaterInletNode;
         int CoilWaterOutletNode;
         DataPlant::PlantEquipmentType CoilType;
-        int LoopNum;
-        int LoopSideNum;
-        int BranchNum;
-        int CompNum;
+        PlantLocation plantLoc;
         int FluidIndex; // used in Steam...
         Real64 MaxVolWaterFlow;
         Real64 MaxWaterMassFlow;
@@ -181,9 +161,9 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAEquipList()
-            : Type(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
-              CoilType(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
-              MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
+            : Type(CompType::Invalid), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
+              CoilType(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, FluidIndex(0), MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0),
+              MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }
     };
@@ -200,7 +180,7 @@ namespace OutdoorAirUnit {
         int ZoneNodeNum;             // index of zone air node in node structure
         std::string UnitControlType; // Control type for the system
         // (Neutral and setpoint temperatrue)
-        Control ControlType;         // Unit Control type indicator
+        OAUnitCtrlType controlType;  // Unit Control type indicator
         int AirInletNode;            // inlet air node number
         int AirOutletNode;           // outlet air node number
         std::string SFanName;        // name of supply fan
@@ -263,11 +243,11 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAUnitData()
-            : SchedPtr(0), ZonePtr(0), ZoneNodeNum(0), ControlType(Control::Unassigned), AirInletNode(0), AirOutletNode(0), SFan_Index(0),
+            : SchedPtr(0), ZonePtr(0), ZoneNodeNum(0), controlType(OAUnitCtrlType::Invalid), AirInletNode(0), AirOutletNode(0), SFan_Index(0),
               SFanType(0), SFanAvailSchedPtr(0), FanPlace(0), FanCorTemp(0.0), FanEffect(false), SFanOutletNode(0), ExtFan_Index(0), ExtFanType(0),
               ExtFanAvailSchedPtr(0), ExtFan(false), OutAirSchedPtr(0), OutsideAirNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
               ExtAirVolFlow(0.0), ExtAirMassFlow(0.0), ExtOutAirSchedPtr(0), SMaxAirMassFlow(0.0), EMaxAirMassFlow(0.0), SFanMaxAirVolFlow(0.0),
-              EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0), LoCtrlTempSchedPtr(0), OperatingMode(Operation::Unassigned), ControlCompTypeNum(0),
+              EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0), LoCtrlTempSchedPtr(0), OperatingMode(Operation::Invalid), ControlCompTypeNum(0),
               CompErrIndex(0), AirMassFlow(0.0), FlowError(false), NumComponents(0), CompOutSetTemp(0.0), AvailStatus(0), TotCoolingRate(0.0),
               TotCoolingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0),
               ElecFanEnergy(0.0), SensHeatingEnergy(0.0), SensHeatingRate(0.0), LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0),

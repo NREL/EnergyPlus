@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -380,21 +380,21 @@ namespace SolarCollectors {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(4),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlateWater,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ConnectionType::Inlet,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(5),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlateWater,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ConnectionType::Outlet,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
@@ -672,21 +672,21 @@ namespace SolarCollectors {
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(6),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorIntegralCollectorStorage,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ConnectionType::Inlet,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(7),
                                                         ErrorsFound,
-                                                        CurrentModuleObject,
+                                                        DataLoopNode::ConnectionObjectType::SolarCollectorIntegralCollectorStorage,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        DataLoopNode::ConnectionType::Outlet,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
@@ -887,16 +887,17 @@ namespace SolarCollectors {
     {
         this->initialize(state);
 
-        {
-            auto const SELECT_CASE_var(this->Type);
+        switch (this->Type) {
             // Select and CALL models based on collector type
-            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
-                this->CalcSolarCollector(state);
-            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorICS) {
-                this->CalcICSSolarCollector(state);
-            } else {
-                assert(false); // LCOV_EXCL_LINE
-            }
+        case DataPlant::PlantEquipmentType::SolarCollectorFlatPlate: {
+            this->CalcSolarCollector(state);
+        } break;
+        case DataPlant::PlantEquipmentType::SolarCollectorICS: {
+            this->CalcICSSolarCollector(state);
+        } break;
+        default: {
+            assert(false); // LCOV_EXCL_LINE
+        } break;
         }
 
         this->update(state);
@@ -931,9 +932,9 @@ namespace SolarCollectors {
             // Clear node initial conditions
             if (this->VolFlowRateMax > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                DataGlobalConstants::InitConvTemp,
-                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
                 this->MassFlowRateMax = this->VolFlowRateMax * rho;
@@ -941,15 +942,7 @@ namespace SolarCollectors {
                 this->MassFlowRateMax = BigNumber;
             }
 
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->MassFlowRateMax,
-                                               this->InletNode,
-                                               this->OutletNode,
-                                               this->WLoopNum,
-                                               this->WLoopSideNum,
-                                               this->WLoopBranchNum,
-                                               this->WLoopCompNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->MassFlowRateMax, this->InletNode, this->OutletNode);
 
             this->Init = false;
 
@@ -1023,14 +1016,7 @@ namespace SolarCollectors {
         this->MassFlowRate = this->MassFlowRateMax;
 
         // Request the mass flow rate from the plant component flow utility routine
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->MassFlowRate,
-                                             this->InletNode,
-                                             this->OutletNode,
-                                             this->WLoopNum,
-                                             this->WLoopSideNum,
-                                             this->WLoopBranchNum,
-                                             this->WLoopCompNum);
+        PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
 
         if (this->InitICS) {
 
@@ -1125,8 +1111,11 @@ namespace SolarCollectors {
         Real64 massFlowRate = this->MassFlowRate;
 
         // Specific heat of collector fluid (J/kg-K)
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                           inletTemp,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
 
         // Gross area of collector (m2)
         Real64 area = state.dataSurface->Surface(SurfNum).Area;
@@ -1160,24 +1149,25 @@ namespace SolarCollectors {
             Real64 FRULpTest = 0.0;
 
             // Modify coefficients depending on test correlation type
-            {
-                auto const SELECT_CASE_var(state.dataSolarCollectors->Parameters(ParamNum).TestType);
-                if (SELECT_CASE_var == TestTypeEnum::INLET) {
-                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
-                    TestTypeMod = 1.0;
-
-                } else if (SELECT_CASE_var == TestTypeEnum::AVERAGE) {
-                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                                state.dataSolarCollectors->Parameters(ParamNum).eff2 *
-                                    ((inletTemp + outletTemp) * 0.5 - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
-                    TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
-
-                } else if (SELECT_CASE_var == TestTypeEnum::OUTLET) {
-                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
-                    TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
-                }
+            switch (state.dataSolarCollectors->Parameters(ParamNum).TestType) {
+            case TestTypeEnum::INLET: {
+                FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                            state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                TestTypeMod = 1.0;
+            } break;
+            case TestTypeEnum::AVERAGE: {
+                FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                            state.dataSolarCollectors->Parameters(ParamNum).eff2 *
+                                ((inletTemp + outletTemp) * 0.5 - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
+            } break;
+            case TestTypeEnum::OUTLET: {
+                FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                            state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
+            } break;
+            default:
+                break;
             }
 
             // FR * tau * alpha at normal incidence = Y-intercept of collector efficiency
@@ -1409,12 +1399,18 @@ namespace SolarCollectors {
         Real64 massFlowRate = this->MassFlowRate;
 
         // Specific heat of collector fluid (J/kg-K)
-        Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+        Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(state,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                            inletTemp,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                            RoutineName);
 
         // density of collector fluid (kg/m3)
-        Real64 Rhow = FluidProperties::GetDensityGlycol(
-            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+        Real64 Rhow = FluidProperties::GetDensityGlycol(state,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                        inletTemp,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                        RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
         this->CalcHeatTransCoeffAndCoverTemp(state);
@@ -1955,51 +1951,50 @@ namespace SolarCollectors {
         Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
 
         int constexpr NumOfPropDivisions(11);
-        static Array1D<Real64> const Temps(NumOfPropDivisions,
-                                           {-23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(
-            NumOfPropDivisions,
-            {0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}); // Viscosity, in
-                                                                                                                                      // kg/(m.s)
-        static Array1D<Real64> const Conductivity(
-            NumOfPropDivisions, {0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(
-            NumOfPropDivisions, {0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703}); // Prandtl number (dimensionless)
-        static Array1D<Real64> const Density(NumOfPropDivisions,
-                                             {1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}); // Density, in kg/m3
+        static constexpr std::array<Real64, NumOfPropDivisions> Temps = {
+            -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}; // Temperature, in C
+        static constexpr std::array<Real64, NumOfPropDivisions> Mu = {
+            0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}; // Viscosity, in
+                                                                                                                                    // kg/(m.s)
+        static constexpr std::array<Real64, NumOfPropDivisions> Conductivity = {
+            0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}; // Conductivity, in W/mK
+        static constexpr std::array<Real64, NumOfPropDivisions> Pr = {
+            0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703}; // Prandtl number (dimensionless)
+        static constexpr std::array<Real64, NumOfPropDivisions> Density = {
+            1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}; // Density, in kg/m3
 
         Real64 CondOfAir; // thermal conductivity of air [W/mK]
         Real64 VisDOfAir; // dynamic viscosity of air [kg/m.s]
         Real64 DensOfAir; // density of air [W/mK]
-        Real64 PrOfAir;   // Prantle number of air [W/mK]
+        Real64 PrOfAir;   // Prandtl number of air [W/mK]
         Real64 VolExpAir; // volumetric expansion of air [1/K]
 
         Real64 DeltaT = std::abs(TempSurf1 - TempSurf2);
         Real64 Tref = 0.5 * (TempSurf1 + TempSurf2);
-        int Index = 1;
-        while (Index <= NumOfPropDivisions) {
-            if (Tref < Temps(Index)) break; // DO loop
+        int Index = 0;
+        while (Index < NumOfPropDivisions) {
+            if (Tref < Temps[Index]) break; // DO loop
             ++Index;
         }
 
         // Initialize thermal properties of air
-        if (Index == 1) {
-            VisDOfAir = Mu(Index);
-            CondOfAir = Conductivity(Index);
-            PrOfAir = Pr(Index);
-            DensOfAir = Density(Index);
+        if (Index == 0) {
+            VisDOfAir = Mu[Index];
+            CondOfAir = Conductivity[Index];
+            PrOfAir = Pr[Index];
+            DensOfAir = Density[Index];
         } else if (Index > NumOfPropDivisions) {
-            Index = NumOfPropDivisions;
-            VisDOfAir = Mu(Index);
-            CondOfAir = Conductivity(Index);
-            PrOfAir = Pr(Index);
-            DensOfAir = Density(Index);
+            Index = NumOfPropDivisions - 1;
+            VisDOfAir = Mu[Index];
+            CondOfAir = Conductivity[Index];
+            PrOfAir = Pr[Index];
+            DensOfAir = Density[Index];
         } else {
-            Real64 InterpFrac = (Tref - Temps(Index - 1)) / (Temps(Index) - Temps(Index - 1));
-            VisDOfAir = Mu(Index - 1) + InterpFrac * (Mu(Index) - Mu(Index - 1));
-            CondOfAir = Conductivity(Index - 1) + InterpFrac * (Conductivity(Index) - Conductivity(Index - 1));
-            PrOfAir = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
-            DensOfAir = Density(Index - 1) + InterpFrac * (Density(Index) - Density(Index - 1));
+            Real64 InterpFrac = (Tref - Temps[Index - 1]) / (Temps[Index] - Temps[Index - 1]);
+            VisDOfAir = Mu[Index - 1] + InterpFrac * (Mu[Index] - Mu[Index - 1]);
+            CondOfAir = Conductivity[Index - 1] + InterpFrac * (Conductivity[Index] - Conductivity[Index - 1]);
+            PrOfAir = Pr[Index - 1] + InterpFrac * (Pr[Index] - Pr[Index - 1]);
+            DensOfAir = Density[Index - 1] + InterpFrac * (Density[Index] - Density[Index - 1]);
         }
 
         VolExpAir = 1.0 / (Tref + DataGlobalConstants::KelvinConv);
@@ -2125,9 +2120,9 @@ namespace SolarCollectors {
         // Set outlet node variables that are possibly changed
         state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            this->OutletTemp,
-                                                           state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
         state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
     }
@@ -2202,19 +2197,7 @@ namespace SolarCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->Type,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
                 }

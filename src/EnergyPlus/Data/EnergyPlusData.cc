@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -228,6 +228,8 @@ EnergyPlusData::EnergyPlusData()
     this->dataReportFlag = std::make_unique<ReportFlagData>();
     this->dataResultsFramework = std::make_unique<ResultsFrameworkData>();
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
+    this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
+    this->dataExhCtrlSystemMrg = std::make_unique<ExhaustControlSystemMgr>();
     this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
@@ -485,6 +487,8 @@ void EnergyPlusData::clear_state()
     this->dataReportFlag->clear_state();
     this->dataResultsFramework->clear_state();
     this->dataRetAirPathMrg->clear_state();
+    this->dataExhAirSystemMrg->clear_state();
+    this->dataExhCtrlSystemMrg->clear_state();
     this->dataRoomAirMod->clear_state();
     this->dataRoomAirModelMgr->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();

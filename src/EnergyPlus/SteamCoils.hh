@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -118,10 +118,7 @@ namespace SteamCoils {
         int TempSetPointNodeNum;                // If applicable : node number that the temp setpoint exists.
         int TypeOfCoil;                         // Control of Coil , temperature or Zone load
         int FluidIndex;                         // Fluid index for FluidProperties (Steam)
-        int LoopNum;                            // index for plant loop with steam coil
-        int LoopSide;                           // index for plant loop side for steam coil
-        int BranchNum;                          // index for plant branch for steam coil
-        int CompNum;                            // index for plant component for steam coil
+        PlantLocation plantLoc;                 // Location object for plant component for steam coil
         DataPlant::PlantEquipmentType CoilType; // plant level index for coil type
         Real64 OperatingCapacity;               // capacity of steam coil at operating conditions (W)
         bool DesiccantRegenerationCoil;         // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
@@ -143,9 +140,9 @@ namespace SteamCoils {
               InletSteamMassFlowRate(0.0), OutletSteamMassFlowRate(0.0), MaxSteamVolFlowRate(0.0), MaxSteamMassFlowRate(0.0), InletSteamEnthalpy(0.0),
               OutletWaterEnthalpy(0.0), InletSteamPress(0.0), InletSteamQuality(0.0), OutletSteamQuality(0.0), DegOfSubcooling(0.0),
               LoopSubcoolReturn(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), SteamInletNodeNum(0), SteamOutletNodeNum(0), TempSetPointNodeNum(0),
-              TypeOfCoil(0), FluidIndex(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), CoilType(DataPlant::PlantEquipmentType::Invalid),
-              OperatingCapacity(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
-              FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), DesCoilCapacity(0.0), DesAirVolFlow(0.0)
+              TypeOfCoil(0), FluidIndex(0), plantLoc{}, CoilType(DataPlant::PlantEquipmentType::Invalid), OperatingCapacity(0.0),
+              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
+              reportCoilFinalSizes(true), DesCoilCapacity(0.0), DesAirVolFlow(0.0)
         {
         }
     };
@@ -182,6 +179,7 @@ namespace SteamCoils {
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
+    int GetCompIndex(EnergyPlusData &state, std::string_view const coilName);
 
     void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
 

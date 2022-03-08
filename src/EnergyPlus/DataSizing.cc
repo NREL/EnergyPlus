@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -86,8 +86,8 @@ Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
 //  using user input system flow rates.
 //  before applying user input sys flow rates.
 
-Real64 TermUnitSizingData::applyTermUnitSizingCoolFlow(Real64 const &coolFlowWithOA, // Cooling flow rate with MinOA limit applied
-                                                       Real64 const &coolFlowNoOA    // Cooling flow rate without MinOA limit applied
+Real64 TermUnitSizingData::applyTermUnitSizingCoolFlow(Real64 const coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+                                                       Real64 const coolFlowNoOA    // Cooling flow rate without MinOA limit applied
 )
 {
     // Apply DesignSpecification:AirTerminal:Sizing to cooling flow (could be vol flow or mass flow)
@@ -101,8 +101,8 @@ Real64 TermUnitSizingData::applyTermUnitSizingCoolFlow(Real64 const &coolFlowWit
     return adjustedFlow;
 }
 
-Real64 TermUnitSizingData::applyTermUnitSizingHeatFlow(Real64 const &heatFlowWithOA, // Heating flow rate with MinOA limit applied
-                                                       Real64 const &heatFlowNoOA    // Heating flow rate without MinOA limit applied
+Real64 TermUnitSizingData::applyTermUnitSizingHeatFlow(Real64 const heatFlowWithOA, // Heating flow rate with MinOA limit applied
+                                                       Real64 const heatFlowNoOA    // Heating flow rate without MinOA limit applied
 )
 {
     // Apply DesignSpecification:AirTerminal:Sizing to heating flow (could be vol flow or mass flow)
@@ -316,7 +316,7 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataWaterCoilSizCoolDeltaT = 0.0;
     state.dataSize->DataWaterCoilSizHeatDeltaT = 0.0;
     state.dataSize->DataNomCapInpMeth = false;
-    state.dataSize->DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
+    state.dataSize->DataFanPlacement = ZoneFanPlacement::NotSet;
     state.dataSize->DataDXSpeedNum = 0;
     state.dataSize->DataCoilSizingAirInTemp = 0.0;
     state.dataSize->DataCoilSizingAirInHumRat = 0.0;
@@ -517,9 +517,11 @@ Real64 calcDesignSpecificationOutdoorAir(EnergyPlusData &state,
 
     auto &thisDSOA = state.dataSize->OARequirements(DSOAPtr);
 
-    if (thisDSOA.numDSOA == 1) {
+    if (thisDSOA.numDSOA == 0) {
+        // This is a simple DesignSpecification:OutdoorAir
         return thisDSOA.calcOAFlowRate(state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag);
     } else {
+        // This is a DesignSpecification:OutdoorAir:SpaceList
         for (int dsoaCount = 1; dsoaCount <= thisDSOA.numDSOA; ++dsoaCount) {
             totOAFlowRate += state.dataSize->OARequirements(thisDSOA.dsoaIndexes(dsoaCount))
                                  .calcOAFlowRate(state,
@@ -539,11 +541,13 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
 )
 {
     Real64 desFlowPA = 0.0;
-    if (this->numDSOA == 1) {
+    if (this->numDSOA == 0) {
+        // This is a simple DesignSpecification:OutdoorAir
         if (this->OAFlowMethod != DataSizing::OAFlowPPer && this->OAFlowMethod != DataSizing::OAFlow && this->OAFlowMethod != DataSizing::OAFlowACH) {
             desFlowPA = this->OAFlowPerArea;
         }
     } else {
+        // This is a DesignSpecification:OutdoorAir:SpaceList
         Real64 sumAreaOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
@@ -565,12 +569,14 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
 )
 {
     Real64 desFlowPP = 0.0;
-    if (this->numDSOA == 1) {
+    if (this->numDSOA == 0) {
+        // This is a simple DesignSpecification:OutdoorAir
         if (this->OAFlowMethod != DataSizing::OAFlowPerArea && this->OAFlowMethod != DataSizing::OAFlow &&
             this->OAFlowMethod != DataSizing::OAFlowACH) {
             desFlowPP = this->OAFlowPerPerson;
         }
     } else {
+        // This is a DesignSpecification:OutdoorAir:SpaceList
         Real64 sumPeopleOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
@@ -639,7 +645,11 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (spaceNum > 0) {
         floorArea = state.dataHeatBal->space(spaceNum).floorArea;
         // TODO MJW: For now just proportion space volume by floor area
-        volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+        if (thisZone.FloorArea > 0.0) {
+            volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+        } else {
+            volume = 0.0;
+        }
         nomTotOccupants = state.dataHeatBal->space(spaceNum).totOccupants;
         curNumOccupants = state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
         maxOccupants = state.dataHeatBal->space(spaceNum).maxOccupants;

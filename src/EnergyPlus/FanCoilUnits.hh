@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -72,37 +73,36 @@ namespace FanCoilUnits {
 
     Real64 constexpr Small5WLoad = 5.0; // load threshold 5.0 W
 
-    // coil operation
-    constexpr int On(1);  // normal coil operation
-    constexpr int Off(0); // signal coil shouldn't run
-
     // coil type units supported in this module
     constexpr int FanCoilUnit_4Pipe(1);
 
     enum class CCoil
     {
-        Unassigned,
+        Invalid = -1,
         Water,
         Detailed,
-        HXAssist
+        HXAssist,
+        Num
     };
 
     enum class HCoil
     {
-        Unassigned,
+        Invalid = -1,
         Water,
-        Electric
+        Electric,
+        Num
     };
 
     enum class CCM // capacity control method supported in this module
     {
-        Unassigned,
+        Invalid = -1,
         ConsFanVarFlow,
         CycFan,
         VarFanVarFlow,
         VarFanConsFlow,
         MultiSpeedFan,
-        ASHRAE
+        ASHRAE,
+        Num
     };
 
     struct FanCoilData
@@ -224,14 +224,8 @@ namespace FanCoilUnits {
         int CoolCoilFluidOutletNodeNum;  // chilled water coil outlet plant node
         int HeatCoilFluidInletNode;      // hot water control node
         int HeatCoilFluidOutletNodeNum;  // hot water coil outlet plant node
-        int CoolCoilLoopNum;             // index for plant loop with chilled water coil
-        int CoolCoilLoopSide;            // index for plant loop side for chilled water coil
-        int CoolCoilBranchNum;           // index for plant branch for chilled water coil
-        int CoolCoilCompNum;             // index for plant component for chilled water coil
-        int HeatCoilLoopNum;             // index for plant loop with hot water coil
-        int HeatCoilLoopSide;            // index for plant loop side for hot water coil
-        int HeatCoilBranchNum;           // index for plant branch for hot water coil
-        int HeatCoilCompNum;             // index for plant component for hot water coil
+        PlantLocation CoolCoilPlantLoc;  // index for plant location for chilled water coil
+        PlantLocation HeatCoilPlantLoc;  // index for plant location for hot water coil
         int CoolCoilInletNodeNum;        // index of cooling coil inlet node number
         int CoolCoilOutletNodeNum;       // index of cooling coil outlet node number
         int HeatCoilInletNodeNum;        // index of heating coil inlet node number
@@ -247,13 +241,13 @@ namespace FanCoilUnits {
         int RegulaFalsiFailedIndex;      // iteration loop warning
 
         FanCoilData() // Default Constructor
-            : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(CCM::Unassigned), PLR(0.0),
+            : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(CCM::Invalid), PLR(0.0),
               MaxIterIndexH(0), BadMassFlowLimIndexH(0), MaxIterIndexC(0), BadMassFlowLimIndexC(0), FanAirVolFlow(0.0), MaxAirVolFlow(0.0),
               MaxAirMassFlow(0.0), LowSpeedRatio(0.0), MedSpeedRatio(0.0), SpeedFanRatSel(0.0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), AirInNode(0),
               AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanIndex(0), CCoilName_Index(0),
-              CCoilType_Num(CCoil::Unassigned), CCoilPlantType(DataPlant::PlantEquipmentType::Invalid), ControlCompTypeNum(0), CompErrIndex(0),
+              CCoilType_Num(CCoil::Invalid), CCoilPlantType(DataPlant::PlantEquipmentType::Invalid), ControlCompTypeNum(0), CompErrIndex(0),
               MaxColdWaterVolFlow(0.0), MinColdWaterVolFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), HCoilName_Index(0),
-              HCoilType_Num(HCoil::Unassigned), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0), MinHotWaterFlow(0.0), HotControlOffset(0.0),
+              HCoilType_Num(HCoil::Invalid), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0), MinHotWaterFlow(0.0), HotControlOffset(0.0),
               DesignHeatingCapacity(0.0), AvailStatus(0), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), HVACSizingIndex(0),
               SpeedRatio(0.0), FanOpModeSchedPtr(0), FanOpMode(1), ASHRAETempControl(false), QUnitOutNoHC(0.0), QUnitOutMaxH(0.0), QUnitOutMaxC(0.0),
               LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
@@ -261,8 +255,7 @@ namespace FanCoilUnits {
               DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0), FirstPass(true), fanAvailSchIndex(0), MaxCoolCoilFluidFlow(0.0),
               MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), MaxNoCoolHeatAirMassFlow(0.0), MaxCoolAirMassFlow(0.0),
               MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0),
-              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0),
-              CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilInletNodeNum(0),
+              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilPlantLoc{}, HeatCoilPlantLoc{}, CoolCoilInletNodeNum(0),
               CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ControlZoneNum(0), NodeNumOfControlledZone(0),
               ATMixerExists(false), ATMixerOutNode(0), FanPartLoadRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneMassFlowFrac(1.0),
               MaxIterIndex(0), RegulaFalsiFailedIndex(0)

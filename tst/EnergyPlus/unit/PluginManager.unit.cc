@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -92,5 +92,15 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(*state, trendVarIndex, 1), 0.001);
     EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(*state, trendVarIndex, 2), 0.001);
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, 3));
+}
+
+TEST_F(EnergyPlusFixture, MultiplePluginVariableObjects)
+{
+    std::string const idf_objects =
+        ("PythonPlugin:Variables, Variables1, VariableA, VariableB;  PythonPlugin:Variables, Variables2, VariableA, VariableC;");
+    ASSERT_TRUE(process_idf(idf_objects));
+    PluginManagement::PluginManager p{*this->state};
+    EXPECT_EQ(p.maxGlobalVariableIndex, 2);
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** Found duplicate variable name in PythonPLugin:Variables objects, ignoring: \"VariableA\"\n"));
 }
 } // namespace EnergyPlus

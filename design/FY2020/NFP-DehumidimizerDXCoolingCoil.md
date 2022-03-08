@@ -899,7 +899,7 @@ A new function will be created to perform coil simulations with possible argumen
                                      Real64 const CycRatio,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
                                      int const FanOpMode,     // Sets fan control to CycFanCycCoil or ContFanCycCoil
-                                     int const CompOp        // Compressor on/off; 1=on, 0=off
+                                     int const CompressorOp        // Compressor on/off; 1=on, 0=off
                                     )
 
 It should be pointed out that this function will handle both single speed and multispeed DX cooling coils. The trigger is SpeedNum. If SoeedNum = 1, the function treats the coil as a single speed or the first speed of the multispeed coling coil. When the SpeedNum is greater than 1, the function will handle it as a multispeed coil. The algorithms for single speed and multispeed coils are provided above. The code will be written in the same way.
@@ -911,7 +911,7 @@ It should be pointed out that this function will handle both single speed and mu
                                      Real64 const LatentLoad,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
                                      int const FanOpMode,     // Sets fan control to CycFanCycCoil or ContFanCycCoil
-                                     int const CompOp        // Compressor on/off; 1=on, 0=off
+                                     int const CompressorOp        // Compressor on/off; 1=on, 0=off
                                     )
 
 The function outputs coil capacity based on sensible and latent loads, and SpeedNum. Here is a possible calculation procedure:

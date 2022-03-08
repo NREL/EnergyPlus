@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -730,7 +730,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                     }
                 }
             } else {
-                for (auto i = surface.Vertex.size() - 1; i <= 0; --i) {
+                for (int i = surface.Vertex.size() - 1; i >= 0; --i) {
                     auto &v = surface.Vertex[i];
                     floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
                     if (!userSetExposedPerimeter) {

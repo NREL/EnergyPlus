@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
@@ -68,15 +69,17 @@ namespace IntegratedHeatPump {
     // operation mode
     enum class IHPOperationMode : int
     {
-        IdleMode,
-        SCMode,
-        SHMode,
-        DWHMode,
-        SCWHMatchSCMode,
-        SCWHMatchWHMode,
-        SCDWHMode,
-        SHDWHElecHeatOffMode,
-        SHDWHElecHeatOnMode
+        Invalid = -1,
+        Idle,
+        SpaceClg,          // Space Cooling
+        SpaceHtg,          // Space Heating
+        DedicatedWaterHtg, // Dedicated Water Heating
+        SCWHMatchSC,       // Space Cooling Water Heating
+        SCWHMatchWH,
+        SpaceClgDedicatedWaterHtg,
+        SHDWHElecHeatOff,
+        SHDWHElecHeatOn,
+        Num
     };
 
     struct IntegratedHeatPumpData // variable speed coil
@@ -214,9 +217,9 @@ namespace IntegratedHeatPump {
               WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
               TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0), TimeLimitSHDWH(0.0),
               WHtankType(DataPlant::PlantEquipmentType::Invalid), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false),
-              CurMode(IHPOperationMode::IdleMode), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0),
-              HeatVolFlowScale(0), MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false),
-              IDFanID(0), IDFanPlace(0), ODAirInletNodeNum(0),                                                        // oudoor coil inlet Nod
+              CurMode(IHPOperationMode::Idle), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0), HeatVolFlowScale(0),
+              MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false), IDFanID(0),
+              IDFanPlace(0), ODAirInletNodeNum(0),                                                                    // oudoor coil inlet Nod
               ODAirOutletNodeNum(0),                                                                                  // oudoor coil outlet Nod
               TankSourceWaterMassFlowRate(0), AirFlowSavInWaterLoop(0), AirFlowSavInAirLoop(0), AirLoopFlowRate(0.0), // air loop mass flow rate
               TotalCoolingRate(0.0),                                                                                  // total cooling rate [w]
@@ -237,13 +240,13 @@ namespace IntegratedHeatPump {
     };
 
     void SimIHP(EnergyPlusData &state,
-                std::string_view CompName,     // Coil Name
-                int &CompIndex,                // Index for Component name
-                int const CyclingScheme,       // Continuous fan OR cycling compressor
-                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                Real64 &HPTimeConstant,        // Heat pump time constant [s]
-                Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
-                int const CompOp,              // compressor on/off. 0 = off; 1= on
+                std::string_view CompName,                         // Coil Name
+                int &CompIndex,                                    // Index for Component name
+                int const CyclingScheme,                           // Continuous fan OR cycling compressor
+                Real64 &MaxONOFFCyclesperHour,                     // Maximum cycling rate of heat pump [cycles/hr]
+                Real64 &HPTimeConstant,                            // Heat pump time constant [s]
+                Real64 &FanDelayTime,                              // Fan delay time, time delay for the HP's fan to
+                DataHVACGlobals::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
                 Real64 const PartLoadFrac,
                 int const SpeedNum,                        // compressor speed number
                 Real64 const SpeedRatio,                   // compressor speed ratio
@@ -281,12 +284,7 @@ namespace IntegratedHeatPump {
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
-                                  int const DXCoilNum,
-                                  int const SpeedNum,
-                                  Real64 const SpeedRatio,
-                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
-    );
+    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio);
 
     Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
                                  int const DXCoilNum,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,7 +99,7 @@ void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iC
         cb((void *)&state);
         anyRan = true;
     }
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
     for (auto &plugin : state.dataPluginManager->plugins) {
         if (plugin.runDuringWarmup || !state.dataGlobal->WarmupFlag) {
             bool const didOneRun = plugin.run(state, iCalledFrom);
@@ -109,7 +109,7 @@ void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iC
 #endif
 }
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 std::string pythonStringForUsage(EnergyPlusData &state)
 {
     if (state.dataGlobal->errorCallback) {
@@ -130,7 +130,7 @@ std::string pythonStringForUsage([[maybe_unused]] EnergyPlusData &state)
 
 void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 {
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
     // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
     std::string const sOutputVariable = "PythonPlugin:OutputVariable";
     int outputVarInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sOutputVariable);
@@ -402,9 +402,9 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 #endif
 }
 
-PluginManager::PluginManager(EnergyPlusData &state)
+PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
 {
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
     // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
     Py_FrozenFlag = 1;
 
@@ -432,7 +432,10 @@ PluginManager::PluginManager(EnergyPlusData &state)
     // now that we have set the path, we can initialize python
     // from https://docs.python.org/3/c-api/init.html
     // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
-    Py_InitializeEx(0);
+    bool alreadyInitialized = (Py_IsInitialized() != 0);
+    if (!alreadyInitialized) {
+        Py_InitializeEx(0);
+    }
 
     // Take control of the global interpreter lock while we are here, make sure to release it...
     PyGILState_STATE gil = PyGILState_Ensure();
@@ -496,6 +499,34 @@ PluginManager::PluginManager(EnergyPlusData &state)
                 fs::path sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPath);
                 PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
             }
+
+            std::string epInDirFlagUC = "YES";
+            try {
+                epInDirFlagUC =
+                    EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_epin_environment_variable_to_search_path").get<std::string>());
+            } catch (nlohmann::json::out_of_range &e) {
+                // defaulted to YES
+            }
+            if (epInDirFlagUC == "YES") {
+                std::string epin_path;
+                get_environment_variable("epin", epin_path);
+                fs::path epinPathObject = fs::path(epin_path);
+                if (epinPathObject.empty()) {
+                    EnergyPlus::ShowWarningMessage(
+                        state,
+                        "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping.");
+                } else {
+                    if (FileSystem::pathExists(epinPathObject)) {
+                        fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinPathObject);
+                        PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
+                    } else {
+                        EnergyPlus::ShowWarningMessage(state,
+                                                       "PluginManager: Search path inputs requested adding epin variable to Python path, but epin "
+                                                       "variable value is not a valid existent path, skipping.");
+                    }
+                }
+            }
+
             try {
                 auto const vars = fields.at("py_search_paths");
                 for (const auto &var : vars) {
@@ -550,6 +581,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             ShowSevereError(state, sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
         }
+        std::set<std::string> uniqueNames;
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
@@ -557,7 +589,14 @@ PluginManager::PluginManager(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
             auto const vars = fields.at("global_py_vars");
             for (const auto &var : vars) {
-                this->addGlobalVariable(state, var.at("variable_name").get<std::string>());
+                std::string const varNameToAdd = var.at("variable_name").get<std::string>();
+                if (uniqueNames.find(varNameToAdd) == uniqueNames.end()) {
+                    this->addGlobalVariable(state, varNameToAdd);
+                    uniqueNames.insert(varNameToAdd);
+                } else {
+                    ShowWarningMessage(state,
+                                       format("Found duplicate variable name in PythonPLugin:Variables objects, ignoring: \"{}\"", varNameToAdd));
+                }
             }
         }
     }
@@ -612,11 +651,18 @@ PluginManager::PluginManager(EnergyPlusData &state)
 PluginManager::~PluginManager()
 {
 #if LINK_WITH_PYTHON
-    Py_FinalizeEx();
+    if (!this->eplusRunningViaPythonAPI) {
+        bool alreadyInitialized = (Py_IsInitialized() != 0);
+        if (alreadyInitialized) {
+            if (Py_FinalizeEx() < 0) {
+                exit(120);
+            }
+        }
+    }
 #endif // LINK_WITH_PYTHON
 }
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 fs::path PluginManager::sanitizedPath(fs::path const &path)
 {
     // there are parts of this program that need to write out a string to execute in Python
@@ -651,7 +697,7 @@ fs::path PluginManager::sanitizedPath([[maybe_unused]] fs::path const &path)
 
 void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
 {
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
     PyObject *exc_type = nullptr;
     PyObject *exc_value = nullptr;
     PyObject *exc_tb = nullptr;
@@ -675,7 +721,7 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
     Py_DECREF(pModuleName);
 
     if (pyth_module == nullptr) {
-        EnergyPlus::ShowFatalError(state, "Cannot find 'traceback' module in reportPythonError(), this is weird");
+        EnergyPlus::ShowContinueError(state, "Cannot find 'traceback' module in reportPythonError(), this is weird");
         return;
     }
 
@@ -688,12 +734,13 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
 
         // traceback.format_exception returns a list, so iterate on that
         if (!pyth_val || !PyList_Check(pyth_val)) { // NOLINT(hicpp-signed-bitwise)
-            EnergyPlus::ShowFatalError(state, "In reportPythonError(), traceback.format_exception did not return a list.");
+            EnergyPlus::ShowContinueError(state, "In reportPythonError(), traceback.format_exception did not return a list.");
+            return;
         }
 
         unsigned long numVals = PyList_Size(pyth_val);
         if (numVals == 0) {
-            EnergyPlus::ShowFatalError(state, "No traceback available");
+            EnergyPlus::ShowContinueError(state, "No traceback available");
             return;
         }
 
@@ -724,7 +771,7 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
 
 void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
 {
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
     // this first section is really all about just ultimately getting a full Python class instance
     // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
@@ -910,7 +957,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
 
 void PluginInstance::shutdown() const
 {
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
     Py_DECREF(this->pClassInstance);
     Py_DECREF(this->pModule); // PyImport_Import returns a new reference, decrement it
     if (this->bHasBeginNewEnvironment) Py_DECREF(this->pBeginNewEnvironment);
@@ -933,7 +980,7 @@ void PluginInstance::shutdown() const
 #endif
 }
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom) const
 {
     // returns true if a plugin actually ran
@@ -1086,7 +1133,7 @@ bool PluginInstance::run([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 void PluginManager::addToPythonPath(EnergyPlusData &state, const fs::path &path, bool userDefinedPath)
 {
     if (path.empty()) return;
@@ -1109,7 +1156,7 @@ void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state,
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 void PluginManager::addGlobalVariable(EnergyPlusData &state, const std::string &name)
 {
     std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
@@ -1123,7 +1170,7 @@ void PluginManager::addGlobalVariable([[maybe_unused]] EnergyPlusData &state, [[
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 int PluginManager::getGlobalVariableHandle(EnergyPlusData &state, const std::string &name, bool const suppress_warning)
 { // note zero is a valid handle
     std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
@@ -1153,7 +1200,7 @@ int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &stat
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 int PluginManager::getTrendVariableHandle(EnergyPlusData &state, const std::string &name)
 {
     std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
@@ -1172,7 +1219,7 @@ int PluginManager::getTrendVariableHandle([[maybe_unused]] EnergyPlusData &state
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 Real64 PluginManager::getTrendVariableValue(EnergyPlusData &state, int handle, int timeIndex)
 {
     return state.dataPluginManager->trends[handle].values[timeIndex];
@@ -1184,7 +1231,7 @@ Real64 PluginManager::getTrendVariableValue([[maybe_unused]] EnergyPlusData &sta
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 Real64 PluginManager::getTrendVariableAverage(EnergyPlusData &state, int handle, int count)
 {
     Real64 sum = 0;
@@ -1200,7 +1247,7 @@ Real64 PluginManager::getTrendVariableAverage([[maybe_unused]] EnergyPlusData &s
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 Real64 PluginManager::getTrendVariableMin(EnergyPlusData &state, int handle, int count)
 {
     Real64 minimumValue = 9999999999999;
@@ -1218,7 +1265,7 @@ Real64 PluginManager::getTrendVariableMin([[maybe_unused]] EnergyPlusData &state
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 Real64 PluginManager::getTrendVariableMax(EnergyPlusData &state, int handle, int count)
 {
     Real64 maximumValue = -9999999999999;
@@ -1236,7 +1283,7 @@ Real64 PluginManager::getTrendVariableMax([[maybe_unused]] EnergyPlusData &state
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 Real64 PluginManager::getTrendVariableSum(EnergyPlusData &state, int handle, int count)
 {
     Real64 sum = 0.0;
@@ -1252,7 +1299,7 @@ Real64 PluginManager::getTrendVariableSum([[maybe_unused]] EnergyPlusData &state
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 Real64 PluginManager::getTrendVariableDirection(EnergyPlusData &state, int handle, int count)
 {
     auto &trend = state.dataPluginManager->trends[handle];
@@ -1277,7 +1324,7 @@ Real64 PluginManager::getTrendVariableDirection([[maybe_unused]] EnergyPlusData 
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 size_t PluginManager::getTrendVariableHistorySize(EnergyPlusData &state, int handle)
 {
     return state.dataPluginManager->trends[handle].values.size();
@@ -1291,7 +1338,7 @@ size_t PluginManager::getTrendVariableHistorySize([[maybe_unused]] EnergyPlusDat
 
 void PluginManager::updatePluginValues([[maybe_unused]] EnergyPlusData &state)
 {
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
     for (auto &trend : state.dataPluginManager->trends) {
         Real64 newVarValue = PluginManager::getGlobalVariableValue(state, trend.indexOfPluginVariable);
         trend.values.push_front(newVarValue);
@@ -1300,7 +1347,7 @@ void PluginManager::updatePluginValues([[maybe_unused]] EnergyPlusData &state)
 #endif
 }
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 Real64 PluginManager::getGlobalVariableValue(EnergyPlusData &state, int handle)
 {
     if (state.dataPluginManager->globalVariableValues.empty()) {
@@ -1325,7 +1372,7 @@ Real64 PluginManager::getGlobalVariableValue([[maybe_unused]] EnergyPlusData &st
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 void PluginManager::setGlobalVariableValue(EnergyPlusData &state, int handle, Real64 value)
 {
     if (state.dataPluginManager->globalVariableValues.empty()) {
@@ -1348,7 +1395,7 @@ void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &stat
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 int PluginManager::getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName)
 {
     for (size_t handle = 0; handle < state.dataPluginManager->plugins.size(); handle++) {
@@ -1366,7 +1413,7 @@ int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] EnergyPlusDat
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &state, int index)
 {
     state.dataPluginManager->plugins[index].run(state, EMSManager::EMSCallFrom::UserDefinedComponentModel);
@@ -1377,7 +1424,7 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 }
 #endif
 
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
 bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
 {
     int numTotalThings = 0;

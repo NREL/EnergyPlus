@@ -117,7 +117,11 @@ There is an actuator that is available for overriding the operating mode of the 
 
 \subsection{Unitary Equipment}\label{unitary-equipment}
 
+\subsubsection{Unitary Equipment Load Request Control}\label{unitary-equipment-load-request-ctrl}
+
 Actuators called ``Unitary HVAC'' are available with the control types ``Sensible Load Request'' and ``Moisture Load Request.''~ These control the operation of unitary equipment. Normally these systems operate to meet zone loads, but these actuators allow you to override the controls of unitary systems. The units are in Watts. The unique identifier is the name of the unitary equipment in the input objects.
+
+\subsubsection{Unitary System Sizing}\label{unitary-system-sizing}
 
 Actuators are available for overriding the autosize values related to supply air flow rates some unitary HVAC equipment.~ These actuators allow selectively altering the outcome of sizing routines and are used from the calling point named AfterComponentInputReadIn.~ The units are m\(^{3}\)/s.
 
@@ -133,6 +137,8 @@ Actuators are available for overriding the autosize values related to supply air
 \item
   An actuator called ``AirLoopHVAC:UnitaryHeatPump:WaterToAir'' is available with control type ``Autosized Supply Air Flow Rate.''
 \end{itemize}
+
+\subsubsection{Unitary System Coil Speed Control}\label{unitary-system-coil-speed-ctrl}
 
 An actuator called ``Coil Speed Control'' is available with control type ``Unitary System DX Coil Speed Value''. This actuator is only available for the `AirLoopHVAC:UnitarySystem` or `AirLoopHVAC:UnitaryHeatPump:AirToAir:Multispeed` object, referencing multispeed DX coils.
 

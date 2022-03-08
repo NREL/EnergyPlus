@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -249,15 +249,16 @@ namespace SurfaceGroundHeatExchanger {
 
             // get inlet node data
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum = GetOnlySingleNode(state,
-                                                                                                     state.dataIPShortCut->cAlphaArgs(3),
-                                                                                                     ErrorsFound,
-                                                                                                     cCurrentModuleObject,
-                                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                     NodeInputManager::compFluidStream::Primary,
-                                                                                                     ObjectIsNotParent);
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::GroundHeatExchangerSurface,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -266,15 +267,16 @@ namespace SurfaceGroundHeatExchanger {
 
             // get outlet node data
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum = GetOnlySingleNode(state,
-                                                                                                      state.dataIPShortCut->cAlphaArgs(4),
-                                                                                                      ErrorsFound,
-                                                                                                      cCurrentModuleObject,
-                                                                                                      state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                      NodeInputManager::compFluidStream::Primary,
-                                                                                                      ObjectIsNotParent);
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::GroundHeatExchangerSurface,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -544,11 +546,9 @@ namespace SurfaceGroundHeatExchanger {
 
         // If loop operation is controlled by an environmental variable (DBtemp, WBtemp, etc)
         // then shut branch down when equipment is not scheduled to run.
-        DesignFlow =
-            RegulateCondenserCompFlowReqOp(state, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
+        DesignFlow = RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->DesignMassFlowRate);
 
-        SetComponentFlowRate(
-            state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        SetComponentFlowRate(state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
         // get the current flow rate - module variable
         state.dataSurfaceGroundHeatExchangers->FlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
@@ -1075,26 +1075,25 @@ namespace SurfaceGroundHeatExchanger {
 
         Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         int constexpr NumOfPropDivisions(13);  // intervals in property correlation
-        static Array1D<Real64> const Temps(
-            NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(NumOfPropDivisions,
-                                        {0.001652,
-                                         0.001422,
-                                         0.001225,
-                                         0.00108,
-                                         0.000959,
-                                         0.000855,
-                                         0.000769,
-                                         0.000695,
-                                         0.000631,
-                                         0.000577,
-                                         0.000528,
-                                         0.000489,
-                                         0.000453}); // Viscosity, in Ns/m2
-        static Array1D<Real64> const Conductivity(
-            NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(
-            NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
+        static constexpr std::array<Real64, NumOfPropDivisions> Temps = {
+            1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}; // Temperature, in C
+        static constexpr std::array<Real64, NumOfPropDivisions> Mu = {0.001652,
+                                                                      0.001422,
+                                                                      0.001225,
+                                                                      0.00108,
+                                                                      0.000959,
+                                                                      0.000855,
+                                                                      0.000769,
+                                                                      0.000695,
+                                                                      0.000631,
+                                                                      0.000577,
+                                                                      0.000528,
+                                                                      0.000489,
+                                                                      0.000453}; // Viscosity, in Ns/m2
+        static constexpr std::array<Real64, NumOfPropDivisions> Conductivity = {
+            0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}; // Conductivity, in W/mK
+        static constexpr std::array<Real64, NumOfPropDivisions> Pr = {
+            12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}; // Prandtl number (dimensionless)
         int constexpr WaterIndex(1);
         static constexpr std::string_view RoutineName("SurfaceGroundHeatExchanger:CalcHXEffectTerm");
 
@@ -1111,31 +1110,31 @@ namespace SurfaceGroundHeatExchanger {
         Real64 PipeLength;
 
         // First find out where we are in the range of temperatures
-        Index = 1;
-        while (Index <= NumOfPropDivisions) {
-            if (Temperature < Temps(Index)) break; // DO loop
+        Index = 0;
+        while (Index < NumOfPropDivisions) {
+            if (Temperature < Temps[Index]) break; // DO loop
             ++Index;
         }
 
         // Initialize thermal properties of water
-        if (Index == 1) {
-            MUactual = Mu(Index);
-            Kactual = Conductivity(Index);
-            PRactual = Pr(Index);
-        } else if (Index > NumOfPropDivisions) {
-            Index = NumOfPropDivisions;
-            MUactual = Mu(Index);
-            Kactual = Conductivity(Index);
-            PRactual = Pr(Index);
+        if (Index == 0) {
+            MUactual = Mu[Index];
+            Kactual = Conductivity[Index];
+            PRactual = Pr[Index];
+        } else if (Index > NumOfPropDivisions - 1) {
+            Index = NumOfPropDivisions - 1;
+            MUactual = Mu[Index];
+            Kactual = Conductivity[Index];
+            PRactual = Pr[Index];
         } else {
-            InterpFrac = (Temperature - Temps(Index - 1)) / (Temps(Index) - Temps(Index - 1));
-            MUactual = Mu(Index - 1) + InterpFrac * (Mu(Index) - Mu(Index - 1));
-            Kactual = Conductivity(Index - 1) + InterpFrac * (Conductivity(Index) - Conductivity(Index - 1));
-            PRactual = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
+            InterpFrac = (Temperature - Temps[Index - 1]) / (Temps[Index] - Temps[Index - 1]);
+            MUactual = Mu[Index - 1] + InterpFrac * (Mu[Index] - Mu[Index - 1]);
+            Kactual = Conductivity[Index - 1] + InterpFrac * (Conductivity[Index] - Conductivity[Index - 1]);
+            PRactual = Pr[Index - 1] + InterpFrac * (Pr[Index] - Pr[Index - 1]);
         }
         // arguments are glycol name, temperature, and concentration
         if (Temperature < 0.0) { // check if fluid is water and would be freezing
-            if (state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex == WaterIndex) {
+            if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex == WaterIndex) {
                 if (this->FrozenErrIndex1 == 0) {
                     ShowWarningMessage(
                         state,
@@ -1155,8 +1154,11 @@ namespace SurfaceGroundHeatExchanger {
                 this->InletTemp = max(this->InletTemp, 0.0);
             }
         }
-        CpWater = GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+        CpWater = GetSpecificHeatGlycol(state,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                        Temperature,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                        RoutineName);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
         ReD = 4.0 * WaterMassFlow / (DataGlobalConstants::Pi * MUactual * this->TubeDiameter * this->TubeCircuits);
@@ -1367,7 +1369,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // Calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
-        if (state.dataPlnt->PlantLoop(this->LoopNum).FluidName == "WATER") {
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName == "WATER") {
             if (InletTemp < 0.0) {
                 ShowRecurringWarningErrorAtEnd(state,
                                                "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + this->Name,
@@ -1379,9 +1381,9 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         CpFluid = GetSpecificHeatGlycol(state,
-                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                         this->InletTemp,
-                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                         RoutineName);
 
         SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum);
@@ -1442,38 +1444,18 @@ namespace SurfaceGroundHeatExchanger {
 
         // Locate the hx on the plant loops for later usage
         errFlag = false;
-        ScanPlantLoopsForObject(state,
-                                this->Name,
-                                DataPlant::PlantEquipmentType::GrndHtExchgSurface,
-                                this->LoopNum,
-                                this->LoopSideNum,
-                                this->BranchNum,
-                                this->CompNum,
-                                errFlag,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _);
+        ScanPlantLoopsForObject(state, this->Name, DataPlant::PlantEquipmentType::GrndHtExchgSurface, this->plantLoc, errFlag, _, _, _, _, _);
 
         if (errFlag) {
             ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
         }
         rho = GetDensityGlycol(state,
-                               state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                DataPrecisionGlobals::constant_zero,
-                               state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                RoutineName);
         this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
-        InitComponentNodes(state,
-                           0.0,
-                           this->DesignMassFlowRate,
-                           this->InletNodeNum,
-                           this->OutletNodeNum,
-                           this->LoopNum,
-                           this->LoopSideNum,
-                           this->BranchNum,
-                           this->CompNum);
+        InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
         RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)

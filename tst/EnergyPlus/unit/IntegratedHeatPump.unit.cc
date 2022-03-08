@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,13 +68,13 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
 
     // don't size for this test
     IHP.IHPCoilsSized = true;
-    IHP.CurMode = IHPOperationMode::DWHMode;
+    IHP.CurMode = IHPOperationMode::DedicatedWaterHtg;
 
     state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
     EXPECT_ANY_THROW(GetCurWorkMode(*state, 0););
 
-    EXPECT_TRUE(compare_enums(IHPOperationMode::DWHMode, GetCurWorkMode(*state, 1)));
+    EXPECT_TRUE(compare_enums(IHPOperationMode::DedicatedWaterHtg, GetCurWorkMode(*state, 1)));
 }
 
 TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)
@@ -142,31 +142,31 @@ TEST_F(EnergyPlusFixture, ASIHP_GetLowSpeedNumIHP)
 
     auto &instance(state->dataIntegratedHP->IntegratedHeatPumps(1));
 
-    instance.CurMode = IHPOperationMode::IdleMode;
+    instance.CurMode = IHPOperationMode::Idle;
     EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCMode;
+    instance.CurMode = IHPOperationMode::SpaceClg;
     EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SHMode;
+    instance.CurMode = IHPOperationMode::SpaceHtg;
     EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::DWHMode;
+    instance.CurMode = IHPOperationMode::DedicatedWaterHtg;
     EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCWHMatchSCMode;
+    instance.CurMode = IHPOperationMode::SCWHMatchSC;
     EXPECT_EQ(IHP.MinSpedSCWH, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCWHMatchWHMode;
+    instance.CurMode = IHPOperationMode::SCWHMatchWH;
     EXPECT_EQ(IHP.MinSpedSCWH, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCDWHMode;
+    instance.CurMode = IHPOperationMode::SpaceClgDedicatedWaterHtg;
     EXPECT_EQ(IHP.MinSpedSCDWH, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SHDWHElecHeatOffMode;
+    instance.CurMode = IHPOperationMode::SHDWHElecHeatOff;
     EXPECT_EQ(IHP.MinSpedSHDWH, GetLowSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SHDWHElecHeatOnMode;
+    instance.CurMode = IHPOperationMode::SHDWHElecHeatOn;
     EXPECT_EQ(IHP.MinSpedSHDWH, GetLowSpeedNumIHP(*state, 1));
 }
 
@@ -200,31 +200,31 @@ TEST_F(EnergyPlusFixture, ASIHP_GetMaxSpeedNumIHP)
 
     auto &instance(state->dataIntegratedHP->IntegratedHeatPumps(1));
 
-    instance.CurMode = IHPOperationMode::IdleMode;
+    instance.CurMode = IHPOperationMode::Idle;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCMode;
+    instance.CurMode = IHPOperationMode::SpaceClg;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SHMode;
+    instance.CurMode = IHPOperationMode::SpaceHtg;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::DWHMode;
+    instance.CurMode = IHPOperationMode::DedicatedWaterHtg;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCWHMatchSCMode;
+    instance.CurMode = IHPOperationMode::SCWHMatchSC;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCWHMatchWHMode;
+    instance.CurMode = IHPOperationMode::SCWHMatchWH;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SCDWHMode;
+    instance.CurMode = IHPOperationMode::SpaceClgDedicatedWaterHtg;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SHDWHElecHeatOffMode;
+    instance.CurMode = IHPOperationMode::SHDWHElecHeatOff;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
-    instance.CurMode = IHPOperationMode::SHDWHElecHeatOnMode;
+    instance.CurMode = IHPOperationMode::SHDWHElecHeatOn;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 }
 

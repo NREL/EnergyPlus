@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -534,10 +534,10 @@ namespace ThermalComfort {
                 state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
                 // UCSD-CV
             } else if (state.dataRoomAirMod->IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Jet) {
+                if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::Jet) {
                     state.dataThermalComforts->AirTemp = state.dataRoomAirMod->ZTJET(state.dataThermalComforts->ZoneNum);
                 } else if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort ==
-                           DataRoomAirModel::Comfort::VComfort_Recirculation) {
+                           DataRoomAirModel::Comfort::Recirculation) {
                     state.dataThermalComforts->AirTemp = state.dataRoomAirMod->ZTJET(state.dataThermalComforts->ZoneNum);
                 } else {
                     // Thermal comfort control uses Tset to determine PMV setpoint value, otherwise use zone temp
@@ -621,10 +621,10 @@ namespace ThermalComfort {
             }
 
             if (state.dataRoomAirMod->IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Jet) {
+                if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::Jet) {
                     state.dataThermalComforts->AirVel = state.dataRoomAirMod->Ujet(state.dataThermalComforts->ZoneNum);
                 } else if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort ==
-                           DataRoomAirModel::Comfort::VComfort_Recirculation) {
+                           DataRoomAirModel::Comfort::Recirculation) {
                     state.dataThermalComforts->AirVel = state.dataRoomAirMod->Urec(state.dataThermalComforts->ZoneNum);
                 } else {
                     state.dataThermalComforts->AirVel = 0.2;
@@ -1869,7 +1869,7 @@ namespace ThermalComfort {
         int J;
         Real64 B;
         Real64 H2;
-        static Array1D<Real64> const A(2, {0.29289321881345, 1.70710678118654});
+        static constexpr std::array<Real64, 2> A = {0.29289321881345, 1.70710678118654};
 
         H2 = 0.5 * H;
 
@@ -1882,12 +1882,12 @@ namespace ThermalComfort {
 
         X += H2;
 
-        for (J = 1; J <= 2; ++J) {
+        for (J = 0; J < 2; ++J) {
             DERIV(state, NEQ, Y, DY);
             for (I = 1; I <= NEQ; ++I) {
-                B = A(J) * (H * DY(I) - C(I));
+                B = A[J] * (H * DY(I) - C(I));
                 Y(I) += B;
-                C(I) += 3.0 * B - A(J) * H * DY(I);
+                C(I) += 3.0 * B - A[J] * H * DY(I);
             }
         }
 
@@ -2236,19 +2236,21 @@ namespace ThermalComfort {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneRadTemp;
 
-        {
-            auto const SELECT_CASE_var(state.dataHeatBal->People(PeopleListNum).MRTCalcType);
-
-            if (SELECT_CASE_var == DataHeatBalance::CalcMRT::ZoneAveraged) {
-                state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::SurfaceWeighted) {
-                ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-                SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
-                state.dataThermalComforts->RadTemp =
-                    CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
-            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::AngleFactor) {
-                state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
-            }
+        switch (state.dataHeatBal->People(PeopleListNum).MRTCalcType) {
+        case DataHeatBalance::CalcMRT::ZoneAveraged: {
+            state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
+        } break;
+        case DataHeatBalance::CalcMRT::SurfaceWeighted: {
+            ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
+            SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
+            state.dataThermalComforts->RadTemp =
+                CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
+        } break;
+        case DataHeatBalance::CalcMRT::AngleFactor: {
+            state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
+        } break;
+        default:
+            break;
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
@@ -2457,15 +2459,18 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
             state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
             // report how the aggregation is conducted
-            {
-                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
-                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
-                }
+            switch (state.dataGlobal->KindOfSim) {
+            case DataGlobalConstants::KindOfSim::DesignDay: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the Design Days");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodDesign: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodWeather: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
+            } break;
+            default:
+                break;
             }
             // report number of occupied hours per week for LEED report
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
@@ -2655,15 +2660,18 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied = 0.0;
             state.dataThermalComforts->TotalAnyZoneNotMetOccupied = 0.0;
             // report how the aggregation is conducted
-            {
-                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
-                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
-                }
+            switch (state.dataGlobal->KindOfSim) {
+            case DataGlobalConstants::KindOfSim::DesignDay: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the Design Days");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodDesign: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodWeather: {
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
+            } break;
+            default:
+                break;
             }
         }
     }
@@ -2957,7 +2965,7 @@ namespace ThermalComfort {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 constexpr alpha(0.8);
-        static Array1D<Real64> const alpha_pow({pow_6(alpha), pow_5(alpha), pow_4(alpha), pow_3(alpha), pow_2(alpha), alpha, 1.0}); // alpha^(7-i)
+        static constexpr std::array<Real64, 7> alpha_pow = {0.262144, 0.32768, 0.4096, 0.512, 0.64, 0.8, 1.0}; // alpha^(6-0)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string epwLine;
@@ -3013,7 +3021,7 @@ namespace ThermalComfort {
                         epwFile.readLine();
                     }
                     state.dataThermalComforts->runningAverageCEN = 0.0;
-                    for (i = 1; i <= 7; ++i) {
+                    for (i = 0; i < 7; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
@@ -3025,7 +3033,7 @@ namespace ThermalComfort {
                             dryBulb = StrToReal(epwLine.substr(0, pos));
                             state.dataThermalComforts->avgDryBulbCEN += (dryBulb / 24.0);
                         }
-                        state.dataThermalComforts->runningAverageCEN += alpha_pow(i) * state.dataThermalComforts->avgDryBulbCEN;
+                        state.dataThermalComforts->runningAverageCEN += alpha_pow[i] * state.dataThermalComforts->avgDryBulbCEN;
                     }
                 } else { // Do special things for wrapping the epw
                     calcEndDay = jStartDay;
@@ -3049,7 +3057,7 @@ namespace ThermalComfort {
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
                         epwFile.readLine();
                     }
-                    for (i = 1; i <= 7 - calcEndDay; ++i) {
+                    for (i = 0; i < 7 - calcEndDay; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
                             epwLine = epwFile.readLine().data;
@@ -3061,7 +3069,7 @@ namespace ThermalComfort {
                             dryBulb = StrToReal(epwLine.substr(0, pos));
                             state.dataThermalComforts->avgDryBulbCEN += (dryBulb / 24.0);
                         }
-                        state.dataThermalComforts->runningAverageCEN += alpha_pow(i) * state.dataThermalComforts->avgDryBulbCEN;
+                        state.dataThermalComforts->runningAverageCEN += alpha_pow[i] * state.dataThermalComforts->avgDryBulbCEN;
                     }
                 }
                 state.dataThermalComforts->runningAverageCEN *= (1.0 - alpha);

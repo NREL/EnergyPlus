@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -132,20 +132,12 @@ namespace PlantComponentTemperatureSources {
         if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->MassFlowRateMax,
-                                               this->InletNodeNum,
-                                               this->OutletNodeNum,
-                                               this->Location.loopNum,
-                                               this->Location.loopSideNum,
-                                               this->Location.branchNum,
-                                               this->Location.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->MassFlowRateMax, this->InletNodeNum, this->OutletNodeNum);
 
             this->MyEnvironFlag = false;
         }
@@ -156,15 +148,15 @@ namespace PlantComponentTemperatureSources {
 
         // OK, so we can set up the inlet and boundary temperatures now
         this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
-        if (this->TempSpecType == iTempSpecType::Schedule) {
+        if (this->tempSpecType == TempSpecType::Schedule) {
             this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TempSpecScheduleNum);
         }
 
         // Calculate specific heat
         Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            this->BoundaryTemp,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
         // Calculate deltaT
@@ -204,14 +196,7 @@ namespace PlantComponentTemperatureSources {
             }
         }
 
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->MassFlowRate,
-                                             this->InletNodeNum,
-                                             this->OutletNodeNum,
-                                             this->Location.loopNum,
-                                             this->Location.loopSideNum,
-                                             this->Location.branchNum,
-                                             this->Location.compNum);
+        PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
         // at this point the mass flow rate, inlet temp, and boundary temp structure vars have been updated
         // the calc routine will update the outlet temp and heat transfer rate/energies
@@ -292,7 +277,7 @@ namespace PlantComponentTemperatureSources {
         bool ErrorsFound(false);   // If errors detected in input
         Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
         Real64 tmpVolFlowRate = this->DesVolFlowRate;
-        int PltSizNum = state.dataPlnt->PlantLoop(this->Location.loopNum).PlantSizNum;
+        int PltSizNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
@@ -378,9 +363,9 @@ namespace PlantComponentTemperatureSources {
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                this->BoundaryTemp,
-                                                               state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             this->HeatRate = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             this->HeatEnergy = this->HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -436,19 +421,8 @@ namespace PlantComponentTemperatureSources {
             this->setupOutputVars(state);
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::WaterSource,
-                                                    this->Location.loopNum,
-                                                    this->Location.loopSideNum,
-                                                    this->Location.branchNum,
-                                                    this->Location.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->InletNodeNum,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::WaterSource, this->plantLoc, errFlag, _, _, _, this->InletNodeNum, _);
             if (errFlag) {
                 ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
             }
@@ -521,21 +495,21 @@ namespace PlantComponentTemperatureSources {
                 NodeInputManager::GetOnlySingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(2),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::PlantComponentTemperatureSource,
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ConnectionType::Inlet,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(3),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::PlantComponentTemperatureSource,
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    DataLoopNode::ConnectionType::Outlet,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                cCurrentModuleObject,
@@ -550,10 +524,10 @@ namespace PlantComponentTemperatureSources {
             }
 
             if (state.dataIPShortCut->cAlphaArgs(4) == "CONSTANT") {
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Constant;
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).tempSpecType = TempSpecType::Constant;
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).BoundaryTemp = state.dataIPShortCut->rNumericArgs(2);
             } else if (state.dataIPShortCut->cAlphaArgs(4) == "SCHEDULED") {
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecType = iTempSpecType::Schedule;
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).tempSpecType = TempSpecType::Schedule;
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleName = state.dataIPShortCut->cAlphaArgs(5);
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));

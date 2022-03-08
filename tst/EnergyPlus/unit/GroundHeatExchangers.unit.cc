@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -182,10 +182,10 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
     GLHESlinky thisGLHE;
 
     state->dataPlnt->PlantLoop.allocate(1);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
 
-    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(thisGLHE.plantLoc.loopNum).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(thisGLHE.plantLoc.loopNum).FluidIndex = 1;
 
     thisGLHE.inletTemp = 5.0;
     thisGLHE.massFlowRate = 0.01;
@@ -1287,7 +1287,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UHF)
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20;
     thisGLHE.designFlow = 0.00075708;
 
@@ -1641,7 +1641,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UBHWT)
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20;
     thisGLHE.designFlow = 0.00075708;
 
@@ -2126,7 +2126,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
@@ -2431,7 +2431,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
@@ -2690,7 +2690,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
         "    0.6,                !- Grout Thermal Conductivity {W/m-K}",
         "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
         "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
-        "   8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
         "    0.032,              !- Pipe Outer Diameter {m}",
         "    0.001627,           !- Pipe Thickness {m}",
         "    0.032;              !- U-Tube Distance {m}",
@@ -2728,7 +2728,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3027,7 +3027,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3288,7 +3288,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
         "    1.8,                !- Grout Thermal Conductivity {W/m-K}",
         "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
         "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
-        "   8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
         "    0.032,              !- Pipe Outer Diameter {m}",
         "    0.001627,           !- Pipe Thickness {m}",
         "    0.10666667;        !- U-Tube Distance {m}",
@@ -3326,7 +3326,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3587,7 +3587,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    0.6,                !- Grout Thermal Conductivity {W/m-K}",
         "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
         "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
-        "   8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
         "    0.032,              !- Pipe Outer Diameter {m}",
         "    0.0016279,          !- Pipe Thickness {m}",
         "    0.032;              !- U-Tube Distance {m}",
@@ -3625,7 +3625,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3924,7 +3924,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -4185,7 +4185,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    3.0,                !- Grout Thermal Conductivity {W/m-K}",
         "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
         "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
-        "   8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
         "    0.032,              !- Pipe Outer Diameter {m}",
         "    0.0016279,          !- Pipe Thickness {m}",
         "    0.1066667;          !- U-Tube Distance {m}",
@@ -4223,7 +4223,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -4235,4 +4235,314 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
     EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
     EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(*state), 0.31582, tolerance);
+}
+
+TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_GetVertProps)
+{
+    std::string const idf_objects = delimited_string({
+        "GroundHeatExchanger:Vertical:Properties,",
+        "    GHE-1 Props,        !- Name",
+        "    1,                  !- Depth of Top of Borehole {m}",
+        "    76.2,               !- Borehole Length {m}",
+        "    0.288,              !- Borehole Diameter {m}",
+        "    3.0,                !- Grout Thermal Conductivity {W/m-K}",
+        "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
+        "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    0.032,              !- Pipe Outer Diameter {m}",
+        "    0.0016279,          !- Pipe Thickness {m}",
+        "    0.1066667;          !- U-Tube Distance {m}",
+
+        "GroundHeatExchanger:Vertical:Array,",
+        "    GHE-Array,          !- Name",
+        "    GHE-1 Props,        !- GHE Properties",
+        "    2,                  !- Number of Boreholes in X Direction",
+        "    2,                  !- Number of Boreholes in Y Direction",
+        "    2;                  !- Borehole Spacing {m}",
+
+        "GroundHeatExchanger:System,",
+        "    Vertical GHE 1x4 Std,  !- Name",
+        "    GHLE Inlet,         !- Inlet Node Name",
+        "    GHLE Outlet,        !- Outlet Node Name",
+        "    0.1,                !- Design Flow Rate {m3/s}",
+        "    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+        "    KATemps,            !- Undisturbed Ground Temperature Model Name",
+        "    1.0,                !- Ground Thermal Conductivity {W/m-K}",
+        "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
+        "    GHE-Array;          !- GHE Array Object Name",
+
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "    KATemps,                 !- Name",
+        "    1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+        "    920,                     !- Soil Density {kg/m3}",
+        "    2200,                    !- Soil Specific Heat {J/kg-K}",
+        "    15.5,                    !- Average Soil Surface Temperature {C}",
+        "    3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+        "    8;                       !- Phase Shift of Minimum Surface Temperature {days}",
+    });
+
+    // Envr variable
+    state->dataSysVars->DisableGLHECaching = true;
+
+    // Setup
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetGroundHeatExchangerInput(*state);
+
+    // good object name
+    constexpr std::string_view goodObjName = "GHE-1 PROPS";
+    auto foundObject = GetVertProps(*state, std::string(goodObjName));
+    ASSERT_EQ(foundObject->name, goodObjName);
+
+    // bad object name
+    ASSERT_THROW(GetVertProps(*state, "BAD NAME"), std::runtime_error);
+
+    std::string const errorString = delimited_string({
+        "   ** Severe  ** Object=GroundHeatExchanger:Vertical:Properties, Name=BAD NAME - not found.",
+        "   **  Fatal  ** Preceding errors cause program termination",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Object=GroundHeatExchanger:Vertical:Properties, Name=BAD NAME - not found.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(errorString, true));
+}
+
+TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_GetSingleBH)
+{
+    std::string const idf_objects = delimited_string({
+        "GroundHeatExchanger:Vertical:Properties,",
+        "    GHE-1 Props,        !- Name",
+        "    1,                  !- Depth of Top of Borehole {m}",
+        "    76.2,               !- Borehole Length {m}",
+        "    0.288,              !- Borehole Diameter {m}",
+        "    3.0,                !- Grout Thermal Conductivity {W/m-K}",
+        "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
+        "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    0.032,              !- Pipe Outer Diameter {m}",
+        "    0.0016279,          !- Pipe Thickness {m}",
+        "    0.1066667;          !- U-Tube Distance {m}",
+
+        "GroundHeatExchanger:Vertical:Array,",
+        "    GHE-Array,          !- Name",
+        "    GHE-1 Props,        !- GHE Properties",
+        "    2,                  !- Number of Boreholes in X Direction",
+        "    2,                  !- Number of Boreholes in Y Direction",
+        "    2;                  !- Borehole Spacing {m}",
+
+        "GroundHeatExchanger:Vertical:Single,",
+        "    GHE-1,              !- Name",
+        "    GHE-1 Props,        !- GHE Properties",
+        "    0,                  !- X Location {m}",
+        "    0;                  !- Y Location {m}",
+
+        "GroundHeatExchanger:System,",
+        "    Vertical GHE 1x4 Std,  !- Name",
+        "    GHLE Inlet,         !- Inlet Node Name",
+        "    GHLE Outlet,        !- Outlet Node Name",
+        "    0.1,                !- Design Flow Rate {m3/s}",
+        "    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+        "    KATemps,            !- Undisturbed Ground Temperature Model Name",
+        "    1.0,                !- Ground Thermal Conductivity {W/m-K}",
+        "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
+        "    GHE-Array;          !- GHE Array Object Name",
+
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "    KATemps,                 !- Name",
+        "    1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+        "    920,                     !- Soil Density {kg/m3}",
+        "    2200,                    !- Soil Specific Heat {J/kg-K}",
+        "    15.5,                    !- Average Soil Surface Temperature {C}",
+        "    3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+        "    8;                       !- Phase Shift of Minimum Surface Temperature {days}",
+    });
+
+    // Envr variable
+    state->dataSysVars->DisableGLHECaching = true;
+
+    // Setup
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetGroundHeatExchangerInput(*state);
+
+    // good object name
+    constexpr std::string_view goodObjName = "GHE-1";
+    auto foundObject = GetSingleBH(*state, std::string(goodObjName));
+    ASSERT_EQ(foundObject->name, goodObjName);
+
+    // bad object name
+    ASSERT_THROW(GetSingleBH(*state, "BAD NAME"), std::runtime_error);
+
+    std::string const errorString = delimited_string({
+        "   ** Severe  ** Object=GroundHeatExchanger:Vertical:Single, Name=BAD NAME - not found.",
+        "   **  Fatal  ** Preceding errors cause program termination",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Object=GroundHeatExchanger:Vertical:Single, Name=BAD NAME - not found.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(errorString, true));
+}
+
+TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_GetVertArray)
+{
+    std::string const idf_objects = delimited_string({
+        "GroundHeatExchanger:Vertical:Properties,",
+        "    GHE-1 Props,        !- Name",
+        "    1,                  !- Depth of Top of Borehole {m}",
+        "    76.2,               !- Borehole Length {m}",
+        "    0.288,              !- Borehole Diameter {m}",
+        "    3.0,                !- Grout Thermal Conductivity {W/m-K}",
+        "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
+        "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    0.032,              !- Pipe Outer Diameter {m}",
+        "    0.0016279,          !- Pipe Thickness {m}",
+        "    0.1066667;          !- U-Tube Distance {m}",
+
+        "GroundHeatExchanger:Vertical:Array,",
+        "    GHE-Array,          !- Name",
+        "    GHE-1 Props,        !- GHE Properties",
+        "    2,                  !- Number of Boreholes in X Direction",
+        "    2,                  !- Number of Boreholes in Y Direction",
+        "    2;                  !- Borehole Spacing {m}",
+
+        "GroundHeatExchanger:System,",
+        "    Vertical GHE 1x4 Std,  !- Name",
+        "    GHLE Inlet,         !- Inlet Node Name",
+        "    GHLE Outlet,        !- Outlet Node Name",
+        "    0.1,                !- Design Flow Rate {m3/s}",
+        "    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+        "    KATemps,            !- Undisturbed Ground Temperature Model Name",
+        "    1.0,                !- Ground Thermal Conductivity {W/m-K}",
+        "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
+        "    GHE-Array;          !- GHE Array Object Name",
+
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "    KATemps,                 !- Name",
+        "    1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+        "    920,                     !- Soil Density {kg/m3}",
+        "    2200,                    !- Soil Specific Heat {J/kg-K}",
+        "    15.5,                    !- Average Soil Surface Temperature {C}",
+        "    3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+        "    8;                       !- Phase Shift of Minimum Surface Temperature {days}",
+    });
+
+    // Envr variable
+    state->dataSysVars->DisableGLHECaching = true;
+
+    // Setup
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetGroundHeatExchangerInput(*state);
+
+    // good object name
+    constexpr std::string_view goodObjName = "GHE-ARRAY";
+    auto foundObject = GetVertArray(*state, std::string(goodObjName));
+    ASSERT_EQ(foundObject->name, goodObjName);
+
+    // bad object name
+    ASSERT_THROW(GetVertArray(*state, "BAD NAME"), std::runtime_error);
+
+    std::string const errorString = delimited_string({
+        "   ** Severe  ** Object=GroundHeatExchanger:Vertical:Array, Name=BAD NAME - not found.",
+        "   **  Fatal  ** Preceding errors cause program termination",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Object=GroundHeatExchanger:Vertical:Array, Name=BAD NAME - not found.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(errorString, true));
+}
+
+TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_GetResponseFactor)
+{
+    std::string const idf_objects = delimited_string({
+        "GroundHeatExchanger:Vertical:Properties,",
+        "    GHE-1 Props,        !- Name",
+        "    1,                  !- Depth of Top of Borehole {m}",
+        "    76.2,               !- Borehole Length {m}",
+        "    0.288,              !- Borehole Diameter {m}",
+        "    3.0,                !- Grout Thermal Conductivity {W/m-K}",
+        "    1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
+        "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+        "    8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+        "    0.032,              !- Pipe Outer Diameter {m}",
+        "    0.0016279,          !- Pipe Thickness {m}",
+        "    0.1066667;          !- U-Tube Distance {m}",
+
+        "GroundHeatExchanger:Vertical:Array,",
+        "    GHE-Array,          !- Name",
+        "    GHE-1 Props,        !- GHE Properties",
+        "    2,                  !- Number of Boreholes in X Direction",
+        "    2,                  !- Number of Boreholes in Y Direction",
+        "    2;                  !- Borehole Spacing {m}",
+
+        "GroundHeatExchanger:System,",
+        "    Vertical GHE 1x4 Std,  !- Name",
+        "    GHLE Inlet,         !- Inlet Node Name",
+        "    GHLE Outlet,        !- Outlet Node Name",
+        "    0.1,                !- Design Flow Rate {m3/s}",
+        "    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+        "    KATemps,            !- Undisturbed Ground Temperature Model Name",
+        "    1.0,                !- Ground Thermal Conductivity {W/m-K}",
+        "    2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
+        "    ,                   !- Response Factors Object Name",
+        "    UHFCalc,            !- g-Function Calculation Method",
+        "    GHE-Array;          !- GHE Array Object Name",
+
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "    KATemps,                 !- Name",
+        "    1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+        "    920,                     !- Soil Density {kg/m3}",
+        "    2200,                    !- Soil Specific Heat {J/kg-K}",
+        "    15.5,                    !- Average Soil Surface Temperature {C}",
+        "    3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+        "    8;                       !- Phase Shift of Minimum Surface Temperature {days}",
+
+        "GroundHeatExchanger:ResponseFactors,",
+        "GHE-1 Response Factors,      !- Name",
+        "GHE-1 Props,                 !- GHE:Vertical:Properties Object Name",
+        "120,                         !- Number of Boreholes",
+        "0.0005,                      !- G-Function Reference Ratio {dimensionless}",
+        "-15.2996,                    !- g-Function Ln(T/Ts) Value 1",
+        "-0.348322,                   !- g-Function g Value 1",
+        "-14.201,                     !- g-Function Ln(T/Ts) Value 2",
+        "0.022208,                    !- g-Function g Value 2",
+        "-13.2202,                    !- g-Function Ln(T/Ts) Value 3",
+        "0.412345;                    !- g-Function g Value 3",
+    });
+
+    // Envr variable
+    state->dataSysVars->DisableGLHECaching = true;
+
+    // Setup
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetGroundHeatExchangerInput(*state);
+
+    // good object name
+    constexpr std::string_view goodObjName = "GHE-1 RESPONSE FACTORS";
+    auto foundObject = GetResponseFactor(*state, std::string(goodObjName));
+    ASSERT_EQ(foundObject->name, goodObjName);
+
+    // bad object name
+    ASSERT_THROW(GetResponseFactor(*state, "BAD NAME"), std::runtime_error);
+
+    std::string const errorString = delimited_string({
+        "   ** Severe  ** Object=GroundHeatExchanger:ResponseFactors, Name=BAD NAME - not found.",
+        "   **  Fatal  ** Preceding errors cause program termination",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Object=GroundHeatExchanger:ResponseFactors, Name=BAD NAME - not found.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(errorString, true));
 }

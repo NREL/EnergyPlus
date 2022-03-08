@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -628,7 +628,7 @@ namespace ScheduleManager {
                 if (state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum > state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum) {
                     if (state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal) {
                         ShowSevereError(state,
-                                        format("{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
+                                        format("{}{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
                                                RoutineName,
                                                CurrentModuleObject,
                                                Alphas(1),
@@ -639,7 +639,7 @@ namespace ScheduleManager {
                         ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
                     } else {
                         ShowSevereError(state,
-                                        format("{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
+                                        format("{}{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
                                                RoutineName,
                                                CurrentModuleObject,
                                                Alphas(1),
@@ -1649,6 +1649,11 @@ namespace ScheduleManager {
                 FileIntervalInterpolated = true;
             }
 
+            state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = true;
+            if ((Alphas(6)) == "NO") {
+                state.dataScheduleMgr->Schedule(SchNum).UseDaylightSaving = false;
+            }
+
             // is it a sub-hourly schedule or not?
             MinutesPerItem = 60;
             if (NumNumbers > 3) {
@@ -2384,6 +2389,8 @@ namespace ScheduleManager {
                     case ScheduleInterpolation::No:
                         NoAverageLinear = "No";
                         break;
+                    default:
+                        assert(false);
                     }
                     for (Hr = 1; Hr <= 24; ++Hr) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
@@ -2631,24 +2638,6 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (!state.dataScheduleMgr->ScheduleDSTSFileWarningIssued) {
-            if (state.dataEnvrn->DSTIndicator == 1) {
-                if (state.dataScheduleMgr->Schedule(ScheduleIndex).SchType == SchedType::ScheduleInput_file) {
-                    ShowWarningError(state,
-                                     "GetCurrentScheduleValue: Schedule=\"" + state.dataScheduleMgr->Schedule(ScheduleIndex).Name +
-                                         "\" is a Schedule:File");
-                    ShowContinueError(state, "...Use of Schedule:File when DaylightSavingTime is in effect is not recommended.");
-                    ShowContinueError(state, "...1) Remove RunperiodControl:DaylightSavingTime object or remove DST period from Weather File.");
-                    ShowContinueError(state, "...2) Configure other schedules and Schedule:File to account for occupant behavior during DST.");
-                    ShowContinueError(state, "...   If you have already done this, you can ignore this message.");
-                    ShowContinueError(state,
-                                      "...When active, DaylightSavingTime will shift all scheduled items by one hour, retaining the same day type as "
-                                      "the original.");
-                    state.dataScheduleMgr->ScheduleDSTSFileWarningIssued = true;
-                }
-            }
-        }
-
         // Checking if valid index is passed is necessary
         if (ScheduleIndex == -1) {
             return 1.0;
@@ -2774,7 +2763,8 @@ namespace ScheduleManager {
         //  so, current date, but maybe TimeStep added
 
         // Hourly Value
-        int thisHour = ThisHour + state.dataEnvrn->DSTIndicator;
+        int thisHour = ThisHour + state.dataEnvrn->DSTIndicator * state.dataScheduleMgr->Schedule(ScheduleIndex).UseDaylightSaving;
+
         int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
         int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
         int thisHolidayIndex = state.dataEnvrn->HolidayIndex;
@@ -4256,11 +4246,11 @@ namespace ScheduleManager {
     }
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,        // Which Day Schedule being tested
-                                     Real64 const Minimum,           // Minimum desired value
-                                     std::string const &MinString,   // Minimum indicator ('>', '>=')
-                                     Optional<Real64 const> Maximum, // Maximum desired value
-                                     Optional_string_const MaxString // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin, // Minimum indicator ('>', '>=')
+                                     Real64 const Maximum,    // Maximum desired value
+                                     bool const exclusiveMax  // Maximum indicator ('<', ',=')
     )
     {
 
@@ -4325,22 +4315,16 @@ namespace ScheduleManager {
         MinValueOk = true;
         MaxValueOk = true;
 
-        if (MinString == ">") {
+        if (exclusiveMin) {
             MinValueOk = (MinValue > Minimum);
         } else {
             MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
         }
 
-        if (present(Maximum)) {
-            if (present(MaxString)) {
-                if (MaxString() == "<") {
-                    MaxValueOk = (MaxValue < Maximum);
-                } else {
-                    MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-                }
-            } else {
-                MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-            }
+        if (exclusiveMax) {
+            MaxValueOk = (MaxValue < Maximum);
+        } else {
+            MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
         }
 
         CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
@@ -4349,11 +4333,9 @@ namespace ScheduleManager {
     }
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,        // Which Day Schedule being tested
-                                     Real32 const Minimum,           // Minimum desired value
-                                     std::string const &MinString,   // Minimum indicator ('>', '>=')
-                                     Optional<Real32 const> Maximum, // Maximum desired value
-                                     Optional_string_const MaxString // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin  // Minimum indicator ('>', '>=')
     )
     {
 
@@ -4395,47 +4377,30 @@ namespace ScheduleManager {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
-        Real64 MaxValue(0.0); // For total maximum
         bool MinValueOk;
-        bool MaxValueOk;
 
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
-            MaxValue = 1.0;
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
-            MaxValue = 0.0;
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumDaySchedules) {
             ShowFatalError(state, "CheckDayScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
             MinValue = minval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
-            MaxValue = maxval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
         }
 
         //  Min/max for schedule has been set.  Test.
         MinValueOk = true;
-        MaxValueOk = true;
-        if (MinString == ">") {
+
+        if (exclusiveMin) {
             MinValueOk = (MinValue > Minimum);
         } else {
             MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
         }
 
-        if (present(Maximum)) {
-            if (present(MaxString)) {
-                if (MaxString() == "<") {
-                    MaxValueOk = (MaxValue < Maximum);
-                } else {
-                    MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-                }
-            } else {
-                MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-            }
-        }
-
-        CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
+        CheckDayScheduleValueMinMax = MinValueOk;
 
         return CheckDayScheduleValueMinMax;
     }

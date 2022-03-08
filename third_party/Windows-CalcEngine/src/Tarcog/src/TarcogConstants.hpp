@@ -25,6 +25,11 @@ namespace Tarcog
         const double CONVERGENCE_TOLERANCE_AIRFLOW = 1e-6;
     }   // namespace IterationConstants
 
+    namespace MaterialConstants
+    {
+        const double GLASSDENSITY = 2500;
+    }
+
     namespace DeflectionConstants
     {
         const double YOUNGSMODULUS = 7.2e10;
