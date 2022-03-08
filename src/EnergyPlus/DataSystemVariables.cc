@@ -174,12 +174,13 @@ namespace DataSystemVariables {
              {state.dataStrGlobals->exeDirectoryPath / InputFilePath, "EnergyPlus Executable Directory"},
              {state.dataSysVars->envinputpath1 / InputFilePath, R"("epin" Environment Variable)"},
              {state.dataSysVars->envinputpath2 / InputFilePath, R"("input_path" Environment Variable)"},
+             // These two only tested if `TestAllPaths` is true
              {state.dataStrGlobals->CurrentWorkingFolder / InputFilePath, "INI File Directory"},
              {state.dataStrGlobals->ProgramPath / InputFilePath, R"("program", "dir" from INI File)"}}};
 
-        std::size_t numPathsToNotTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size() - 2 : pathsToCheck.size();
+        std::size_t numPathsToTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size() : pathsToCheck.size() - 2;
 
-        for (std::size_t i = 0; i < numPathsToNotTest; i++) {
+        for (std::size_t i = 0; i < numPathsToTest; ++i) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 foundFilePath = pathsToCheck[i].first;
                 print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second + ")", FileSystem::getAbsolutePath(foundFilePath).string());
