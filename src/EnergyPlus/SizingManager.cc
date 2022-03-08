@@ -2809,7 +2809,12 @@ void GetSizingParams(EnergyPlusData &state)
     } else {
         ShowFatalError(state, cCurrentModuleObject + ": More than 1 occurrence of this object; only 1 allowed");
     }
-    if (state.dataGlobal->OverrideTimestep) state.dataSize->NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
+    if (state.dataGlobal->OverrideTimestep) {
+        state.dataSize->NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
+        ShowWarningError(state,
+                         "Due to the use of the fast simulation mode, the time step for simulation and averaging window of sizing is overwritten to "
+                         "one hour. Original user inputs for averaging window and timestep are no longer used.");
+    }
     if (state.dataSize->NumTimeStepsInAvg < state.dataGlobal->NumOfTimeStepInHour) {
         ShowWarningError(state,
                          format("{}: note {} entered value=[{}] is less than 1 hour (i.e., {} timesteps).",

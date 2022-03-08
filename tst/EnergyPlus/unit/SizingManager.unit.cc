@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -590,4 +591,36 @@ TEST_F(EnergyPlusFixture, SizingManager_ReportTemperatureInputError)
                                                      "   **   ~~~   ** ... incorrect Zone Heating Design Supply Air Temperature=[-2.00] is less than "
                                                      "Zone Cooling Design Supply Air Temperature=[-1.00]",
                                                      "   **   ~~~   ** This is not allowed.  Please check and revise your input."})));
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_OverrideAvgWindowInSizing)
+{
+
+    std::string const idf_objects = delimited_string({
+        "SimulationControl,",
+        "  No,                      !- Do Zone Sizing Calculation",
+        "  No,                      !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  No,                      !- Run Simulation for Sizing Periods",
+        "  Yes;                     !- Run Simulation for Weather File Run Periods",
+        "PerformancePrecisionTradeoffs,",
+        ",                          !- Coil Direct Solutions",
+        ",                          !- Zone Radiant Exchange Algorithm",
+        "Mode01,                    !- Override Mode",
+        ",                          !- MaxZoneTempDiff",
+        ",                          !- MaxAllowedDelTemp",
+        ";                          !- Use Representative Surfaces for Calculations",
+        "Sizing:Parameters,",
+        ",                          !- Heating Sizing Factor",
+        ",                          !- Cooling Sizing Factor",
+        "6;                         !- Timesteps in Averaging Window",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+    EXPECT_TRUE(state->dataGlobal->OverrideTimestep);
+    SizingManager::GetSizingParams(*state);
+    EXPECT_EQ(state->dataGlobal->NumOfTimeStepInHour, 1);
+    EXPECT_EQ(state->dataSize->NumTimeStepsInAvg, 1);
 }
