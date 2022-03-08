@@ -83,42 +83,51 @@ namespace WaterToAirHeatPumpSimple {
         Real64 WaterVolFlowRate;                     // Water Volumetric Flow Rate [m3/s]
         Real64 WaterMassFlowRate;                    // Water Mass Flow Rate [kg/s]
         Real64 DesignWaterMassFlowRate;
-        Real64 InletWaterTemp;        // Inlet Water Temperature [C]
-        Real64 InletWaterEnthalpy;    // Inlet Water Enthalpy [J/kg]
-        Real64 OutletWaterTemp;       // Outlet Water Temperature [C]
-        Real64 OutletWaterEnthalpy;   // Outlet Water Enthalpy [J/kg]
-        Real64 Power;                 // Power Consumption [W]
-        Real64 QLoadTotal;            // Load Side Total Heat Transfer Rate [W]
-        Real64 QLoadTotalReport;      // Load side total heat transfer rate for reporting[W]
-        Real64 QSensible;             // Sensible Load Side Heat Transfer Rate [W]
-        Real64 QLatent;               // Latent Load Side Heat Transfer Rate [W]
-        Real64 QSource;               // Source Side Heat Transfer Rate [W]
-        Real64 Energy;                // Energy Consumption [J]
-        Real64 EnergyLoadTotal;       // Load Side Total Heat Transferred [J]
-        Real64 EnergySensible;        // Sensible Load Side Heat Transferred [J]
-        Real64 EnergyLatent;          // Latent Load Side Heat Transferred [J]
-        Real64 EnergySource;          // Source Side Heat Transferred [J]
-        Real64 COP;                   // Heat Pump Coefficient of Performance [-]
-        Real64 RunFrac;               // Duty Factor
-        Real64 PartLoadRatio;         // Part Load Ratio
-        Real64 RatedWaterVolFlowRate; // Rated/Ref Water Volumetric Flow Rate [m3/s]
-        Real64 RatedAirVolFlowRate;   // Rated/Ref Air Volumetric Flow Rate [m3/s]
-        Real64 RatedCapHeat;          // Rated/Ref Heating Capacity [W]
-        Real64 RatedPowerHeat;        // Rated/Ref Heating Power Consumption[W]
-        Real64 RatedCOPHeat;          // Rated/Ref Heating COP [W/W]
-        Real64 RatedCapCoolTotal;     // Rated/Ref Total Cooling Capacity [W]
-        Real64 RatedCapCoolSens;      // Rated/Ref Sensible Cooling Capacity [W]
-        Real64 RatedPowerCool;        // Rated/Ref Cooling Power Consumption[W]
-        Real64 RatedCOPCool;          // Rated/Ref Cooling COP [W/W]
-        int HeatCapCurveIndex;        // Index of the heating capacity performance curve
-        int HeatPowCurveIndex;        // Index of the heating power consumption curve
-        int TotalCoolCapCurveIndex;   // Index of the Total Cooling capacity performance curve
-        int SensCoolCapCurveIndex;    // Index of the Sensible Cooling capacity performance curve
-        int CoolPowCurveIndex;        // Index of the Cooling power consumption curve
-        int AirInletNodeNum;          // Node Number of the Air Inlet
-        int AirOutletNodeNum;         // Node Number of the Air Outlet
-        int WaterInletNodeNum;        // Node Number of the Water Onlet
-        int WaterOutletNodeNum;       // Node Number of the Water Outlet
+        Real64 InletWaterTemp;                   // Inlet Water Temperature [C]
+        Real64 InletWaterEnthalpy;               // Inlet Water Enthalpy [J/kg]
+        Real64 OutletWaterTemp;                  // Outlet Water Temperature [C]
+        Real64 OutletWaterEnthalpy;              // Outlet Water Enthalpy [J/kg]
+        Real64 Power;                            // Power Consumption [W]
+        Real64 QLoadTotal;                       // Load Side Total Heat Transfer Rate [W]
+        Real64 QLoadTotalReport;                 // Load side total heat transfer rate for reporting[W]
+        Real64 QSensible;                        // Sensible Load Side Heat Transfer Rate [W]
+        Real64 QLatent;                          // Latent Load Side Heat Transfer Rate [W]
+        Real64 QSource;                          // Source Side Heat Transfer Rate [W]
+        Real64 Energy;                           // Energy Consumption [J]
+        Real64 EnergyLoadTotal;                  // Load Side Total Heat Transferred [J]
+        Real64 EnergySensible;                   // Sensible Load Side Heat Transferred [J]
+        Real64 EnergyLatent;                     // Latent Load Side Heat Transferred [J]
+        Real64 EnergySource;                     // Source Side Heat Transferred [J]
+        Real64 COP;                              // Heat Pump Coefficient of Performance [-]
+        Real64 RunFrac;                          // Duty Factor
+        Real64 PartLoadRatio;                    // Part Load Ratio
+        Real64 ReferenceWaterVolFlowRate;        // Reference Water Volumetric Flow Rate [m3/s]
+        Real64 ReferenceAirVolFlowRate;          // Reference Air Volumetric Flow Rate [m3/s]
+        Real64 ReferenceCapHeat;                 // Reference Heating Capacity [W]
+        Real64 ReferenceCapHeatAtRefCdts;        // Reference Heating Capacity at Reference Conditions [W]
+        Real64 ReferenceCapCoolAtRefCdts;        // Reference Cooling Capacity at Reference Conditions [W]
+        Real64 ReferenceCapCoolSensDesAtRefCdts; // Reference Sensible Capacity at Reference Conditions [W]
+        Real64 ReferencePowerHeat;               // Reference Heating Power Consumption [W]
+        Real64 ReferencePowerHeatAtRefCdts;      // Reference Heating Power Consumption at Reference Conditions[W]
+        Real64 ReferenceCOPHeatAtRefCdts;        // Refrence Heating COP at Reference Conditions [W/w]
+        Real64 ReferenceCapCoolTotal;            // Reference Total Cooling Capacity [W]
+        Real64 ReferenceCapCoolSens;             // Reference Sensible Cooling Capacity [W]
+        Real64 ReferencePowerCool;               // Reference Cooling Power Consumption[W]
+        Real64 ReferencePowerCoolAtRefCdts;      // Reference Cooling Power Consumption at Reference Conditions [W]
+        Real64 ReferenceCOPCoolAtRefCdts;        // Refrence Cooling COP at Reference Conditions [W/W]
+        Real64 RefEntWaterTemp;                  // Reference Entering Water Temperature [C]
+        Real64 RefEntAirWetbulbTemp;             // Reference Entering Air Wetbulb Temperature [C]
+        Real64 RefEntAirDrybulbTemp;             // Reference Entering Air Drybulb Temperature [C]
+        Real64 RatioRefHeatRefTotCoolCap;        // Ratio of Reference Heating Capacity to Reference Cooling Capacity [-]
+        int HeatCapCurveIndex;                   // Index of the heating capacity performance curve
+        int HeatPowCurveIndex;                   // Index of the heating power consumption curve
+        int TotalCoolCapCurveIndex;              // Index of the Total Cooling capacity performance curve
+        int SensCoolCapCurveIndex;               // Index of the Sensible Cooling capacity performance curve
+        int CoolPowCurveIndex;                   // Index of the Cooling power consumption curve
+        int AirInletNodeNum;                     // Node Number of the Air Inlet
+        int AirOutletNodeNum;                    // Node Number of the Air Outlet
+        int WaterInletNodeNum;                   // Node Number of the Water Onlet
+        int WaterOutletNodeNum;                  // Node Number of the Water Outlet
         PlantLocation plantLoc;
         int WaterCyclingMode; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
@@ -132,8 +141,8 @@ namespace WaterToAirHeatPumpSimple {
         // set by parent object and "pushed" to this structure in SetSimpleWSHPData subroutine
         int CompanionCoolingCoilNum; // Heating coil companion cooling coil index
         int CompanionHeatingCoilNum; // Cooling coil companion heating coil index
-        Real64 Twet_Rated;           // Nominal Time for Condensate Removal to Begin [s]
-        Real64 Gamma_Rated;          // Ratio of Initial Moisture Evaporation Rate
+        Real64 Twet_Reference;       // Nominal Time for Condensate Removal to Begin [s]
+        Real64 Gamma_Reference;      // Ratio of Initial Moisture Evaporation Rate
         // and Steady-state Latent Capacity
         Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
         Real64 HPTimeConstant;        // Heat pump time constant [s]
@@ -146,12 +155,13 @@ namespace WaterToAirHeatPumpSimple {
               WaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
               OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QLoadTotalReport(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0),
               EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
-              RatedWaterVolFlowRate(0.0), RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0),
-              RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0),
-              SensCoolCapCurveIndex(0), CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0),
-              WaterOutletNodeNum(0), plantLoc{}, WaterCyclingMode(0), LastOperatingMode(DataHVACGlobals::WaterCycling), WaterFlowMode(false),
-              CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0),
-              HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
+              ReferenceWaterVolFlowRate(0.0), ReferenceAirVolFlowRate(0.0), ReferenceCapHeat(0.0), ReferenceCapHeatAtRefCdts(0.0),
+              ReferenceCapCoolAtRefCdts(0.0), ReferencePowerHeat(0.0), ReferenceCOPHeatAtRefCdts(0.0), ReferenceCapCoolTotal(0.0),
+              ReferenceCapCoolSens(0.0), ReferencePowerCool(0.0), ReferenceCOPCoolAtRefCdts(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0),
+              TotalCoolCapCurveIndex(0), SensCoolCapCurveIndex(0), CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0),
+              WaterInletNodeNum(0), WaterOutletNodeNum(0), plantLoc{}, WaterCyclingMode(0), LastOperatingMode(DataHVACGlobals::WaterCycling),
+              WaterFlowMode(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Reference(0.0), Gamma_Reference(0.0),
+              MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
         {
         }
     };
@@ -221,14 +231,14 @@ namespace WaterToAirHeatPumpSimple {
     // *****************************************************************************
 
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
-                            int const HPNum,         // Index number for cooling coil
-                            Real64 const SHRss,      // Steady-state sensible heat ratio
-                            int const CyclingScheme, // Fan/compressor cycling scheme indicator
-                            Real64 const RTF,        // Compressor run-time fraction
-                            Real64 const QLatRated,  // Rated latent capacity
-                            Real64 const QLatActual, // Actual latent capacity
-                            Real64 const EnteringDB, // Entering air dry-bulb temperature
-                            Real64 const EnteringWB  // Entering air wet-bulb temperature
+                            int const HPNum,            // Index number for cooling coil
+                            Real64 const SHRss,         // Steady-state sensible heat ratio
+                            int const CyclingScheme,    // Fan/compressor cycling scheme indicator
+                            Real64 const RTF,           // Compressor run-time fraction
+                            Real64 const QLatReference, // Reference latent capacity
+                            Real64 const QLatActual,    // Actual latent capacity
+                            Real64 const EnteringDB,    // Entering air dry-bulb temperature
+                            Real64 const EnteringWB     // Entering air wet-bulb temperature
     );
 
     int GetCoilIndex(EnergyPlusData &state,
@@ -293,7 +303,7 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     Real64 LoadSideInletEnth;      // Load Side Inlet Enthalpy [J/kg]
     Real64 LoadSideOutletDBTemp;   // Load Side Outlet Dry Bulb Temp [C]
     Real64 LoadSideOutletHumRat;   // Load Side Outlet Humidity ratio
-    Real64 QLatRated;              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
+    Real64 QLatReference;          // Latent Capacity [W] reference at entering air conditions [Tdb=26.7C Twb=19.4C]
     Real64 QLatActual;             // Actual Latent Capacity [W]
     Real64 Winput;                 // Power Consumption [W]
     bool MyOneTimeFlag = true;     // one time allocation flag
@@ -304,11 +314,11 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
     Array1D_bool MyPlantScanFlag;
 
-    Real64 LoadSideInletDBTemp_Init = 0; // rated conditions
-    Real64 LoadSideInletWBTemp_Init = 0; // rated conditions
-    Real64 LoadSideInletHumRat_Init = 0; // rated conditions
-    Real64 LoadSideInletEnth_Init = 0;   // rated conditions
-    Real64 CpAir_Init = 0;               // rated conditions
+    Real64 LoadSideInletDBTemp_Init = 0; // reference conditions
+    Real64 LoadSideInletWBTemp_Init = 0; // reference conditions
+    Real64 LoadSideInletHumRat_Init = 0; // reference conditions
+    Real64 LoadSideInletEnth_Init = 0;   // reference conditions
+    Real64 CpAir_Init = 0;               // reference conditions
 
     void clear_state() override
     {
@@ -333,7 +343,7 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     WaterToAirHeatPumpSimpleData()
         : CelsiustoKelvin(DataGlobalConstants::KelvinConv), NumWatertoAirHPs(0), AirflowErrPointer(0), GetCoilsInputFlag(true),
           SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0),
-          LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QLatRated(0.0), QLatActual(0.0),
+          LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QLatReference(0.0), QLatActual(0.0),
           Winput(0.0), MyOneTimeFlag(true), firstTime(true)
     {
     }

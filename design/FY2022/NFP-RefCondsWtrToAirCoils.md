@@ -58,7 +58,7 @@ simpleWatertoAirHP.RatedPowerCool = simpleWatertoAirHP.RatedCapCoolTotal / simpl
 This approach assumes that the reference or rated capacity is calculated using the coil's peak mixed-air wet-bulb temperature and an entering water temperature of 85&deg;F. The proposed approach would calculate the reference (we propose to drop the _rated_ term) capacity and power using the user specified reference conditions, the input for gross rated COP would be changed to gross reference COP and would correspond to the coil's efficiency at these reference conditions. Below is a pseudo-code that illustrates how the code would be modified:
 
 ```
-RefCapCoolTotalDes = CoolCapAtPeak * RefTotCapTempModFac / PeakTotCapTempModFac
+RefCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac
 CapCoolTotalDesAtRefCdts = RefCapCoolTotalDes * RefTotCapTempModFac
 RefPowerCool = CapCoolTotalDesAtRefCdts / (RefCOPCool * RefPowerTempModFac)
 PowerCoolAtRefCdts = RefPowerCool * RefPowerTempModFac
@@ -99,10 +99,10 @@ _Note: The proposed variable names are used below._
 - `PeakTotCapTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 15.6&deg;C (60&deg;F) EAWT and is about 0.869
 - `RefTotCapTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F) EAWT and is about 0.956 which corresponds to the total capacity modifier at the reference conditions which are the actual rating condition in this example.
 - `RefPowerTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F) EAWT and is about 1.006 which corresponds to the power modifier at the reference conditions which are the actual rating condition in this example.
-- `RefCapCoolTotalDes` = 1000 * 0.956 / 0.869 = 1101 W
-- `RatedPowerCool` = 1101 * 0.956 / (4.2 * 1.006) = 249 W
+- `RefCapCoolTotalDes` = 1000 / 0.869 = 1151 W
+- `RatedPowerCool` = 1151 * 0.956 / (4.2 * 1.006) = 260 W
 
-The rating conditions for water-to-air water loop heat pumps are 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F), at these conditions the `TotCapTempModFac` is 0.956 and `PowerTempModFac` is 1.006. When using these modifiers to calculate the operating capacity and power at these conditions we get a capacity (`CapCoolTotalDesAtRefCdts`) of 1101 * 0.956 = 1052 W and a power (`PowerCoolAtRefCdts`) of 249 * 1.006 ~= 251 W which correspond to a COP of 1052 / 251 ~= 4.2 which aligns with the user-specified COP of 4.2.
+The rating conditions for water-to-air water loop heat pumps are 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F), at these conditions the `TotCapTempModFac` is 0.956 and `PowerTempModFac` is 1.006. When using these modifiers to calculate the operating capacity and power at these conditions we get a capacity (`CapCoolTotalDesAtRefCdts`) of 1151 * 0.956 = 1101 W and a power (`PowerCoolAtRefCdts`) of 260 * 1.006 ~= 262 W which correspond to a COP of 1101 / 262 ~= 4.2 which aligns with the user-specified COP of 4.2.
 
 ### Additional Proposed Changes ###
 #### Coil:*:WaterToAirHeatPump:VariableSpeedEquationFit ####
@@ -171,8 +171,8 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \type real
         \minimum> 0
         \default 20
-   N*,  \field Reference or Rated Entering Air Wet-Bulb Temperature
-        \note Reference or rated entering air wet-bulb temperature corresponding to the
+   N*,  \field Reference or Rated Entering Air Dry-Bulb Temperature
+        \note Reference or rated entering air dry-bulb temperature corresponding to the
         \note water-to-air application for which this coil is used. For example: for
         \note water loop applications, the rated temperature is 15 degree Celsius.
         \units C
@@ -269,7 +269,7 @@ Heating capacity will not be just set to be the reference cooling capacity as it
 The following adjustments will be made to the current approach where `RatedCapCoolTotalDes` will be changed to `RefCapCoolTotalDes` and `RatedPowerCool` to `RefPowerCool`.
 
 ```
-RefCapCoolTotalDes = CoolCapAtPeak * RefTotCapTempModFac / PeakTotCapTempModFac
+RefCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac
 CapCoolTotalDesAtRefCdts = RefCapCoolTotalDes * RefTotCapTempModFac
 RefPowerCool = CapCoolTotalDesAtRefCdts / (RefCOPCool * RefPowerTempModFac)
 PowerCoolAtRefCdts = RefPowerCool * RefPowerTempModFac

@@ -356,6 +356,21 @@ namespace OutputReportPredefined {
         s->pdchDXCoolCoilNetCapSID = newPreDefColumn(state, s->pdstDXCoolCoil2, "Rated Net Cooling Capacity Test D [W]");
         s->pdchDXCoolCoilElecPowerD = newPreDefColumn(state, s->pdstDXCoolCoil2, "Rated Electric Power Test D [W]");
 
+        // Water-to-Air HP report
+        s->pdstWAHP = newPreDefSubTable(state, s->pdrEquip, "Water-to-Air Heat Pumps");
+        s->pdchWAHPType = newPreDefColumn(state, s->pdstWAHP, "Coil Type");
+        s->pdchWAHPRefCap = newPreDefColumn(state, s->pdstWAHP, "Reference Total Capacity [W]");
+        s->pdchWAHPRefSensCap = newPreDefColumn(state, s->pdstWAHP, "Reference Sensible Capacity [W]");
+        s->pdchWAHPRefPower = newPreDefColumn(state, s->pdstWAHP, "Reference Power [W]");
+        s->pdchWAHPRefCapatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Total Capacity at Reference Conditions [W]");
+        s->pdchWAHPRefSensCapatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Sensible Capacity at Reference Conditions [W]");
+        s->pdchWAHPRefPoweratRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Power at Reference Conditions [W]");
+        s->pdchWAHPRefCOPatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference COP at Reference Conditions [W/W]");
+        s->pdchWAHPRefAirDBT = newPreDefColumn(state, s->pdstWAHP, "Reference Air Dry-bulb Temperature [C]");
+        s->pdchWAHPRefAirWBT = newPreDefColumn(state, s->pdstWAHP, "Reference Air Wet-bulb Temperature [C]");
+        s->pdchWAHPRefWtrT = newPreDefColumn(state, s->pdstWAHP, "Reference Water Temperature [C]");
+        s->pdchWAHPDD = newPreDefColumn(state, s->pdstWAHP, "Design Day used for Sizing");
+
         s->pdstDXHeatCoil = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils");
         s->pdchDXHeatCoilType = newPreDefColumn(state, s->pdstDXHeatCoil, "DX Heating Coil Type");
         s->pdchDXHeatCoilHighCap = newPreDefColumn(state, s->pdstDXHeatCoil, "High Temperature Heating (net) Rating Capacity [W]");
