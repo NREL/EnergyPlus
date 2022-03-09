@@ -139,6 +139,19 @@ namespace SystemAvailabilityManager {
         "AVAILABILITYMANAGER:HYBRIDVENTILATION",
         "AVAILABILITYMANAGER:OPTIMUMSTART"};
 
+    static constexpr std::array<std::string_view, static_cast<int>(DataPlant::SystemAvailabilityType::Num)> SystemAvailabilityTypeNamesCC {"AvailabilityManager:Scheduled",
+                                                     "AvailabilityManager:ScheduledOn",
+                                                     "AvailabilityManager:ScheduledOff",
+                                                     "AvailabilityManager:NightCycle",
+                                                     "AvailabilityManager:DifferentialThermostat",
+                                                     "AvailabilityManager:HighTemperatureTurnOff",
+                                                     "AvailabilityManager:HighTemperatureTurnOn",
+                                                     "AvailabilityManager:LowTemperatureTurnOff",
+                                                     "AvailabilityManager:LowTemperatureTurnOn",
+                                                     "AvailabilityManager:NightVentilation",
+                                                     "AvailabilityManager:HybridVentilation",
+                                                     "AvailabilityManager:OptimumStart"};
+
     void ManageSystemAvailability(EnergyPlusData &state)
     {
 
