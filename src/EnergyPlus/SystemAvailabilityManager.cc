@@ -446,7 +446,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &schedMgr = state.dataSystemAvailabilityManager->SchedData(SysAvailNum);
                 schedMgr.Name = cAlphaArgs(1);
                 schedMgr.MgrType = DataPlant::SystemAvailabilityType::Scheduled;
@@ -491,7 +491,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &schedOnMgr = state.dataSystemAvailabilityManager->SchedOnData(SysAvailNum);
                 schedOnMgr.Name = cAlphaArgs(1);
                 schedOnMgr.MgrType = DataPlant::SystemAvailabilityType::ScheduledOn;
@@ -536,7 +536,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &schedOffMgr = state.dataSystemAvailabilityManager->SchedOffData(SysAvailNum);
                 schedOffMgr.Name = cAlphaArgs(1);
                 schedOffMgr.MgrType = DataPlant::SystemAvailabilityType::ScheduledOff;
@@ -582,7 +582,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &nightCycleMgr = state.dataSystemAvailabilityManager->NightCycleData(SysAvailNum);
                 nightCycleMgr.Name = cAlphaArgs(1);
                 nightCycleMgr.MgrType = DataPlant::SystemAvailabilityType::NightCycle;
@@ -789,7 +789,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &optimumStartMgr = state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum);
                 optimumStartMgr.Name = cAlphaArgs(1);
                 optimumStartMgr.MgrType = DataPlant::SystemAvailabilityType::OptimumStart;
@@ -927,7 +927,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &diffThermoMgr = state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum);
                 diffThermoMgr.Name = cAlphaArgs(1);
                 diffThermoMgr.MgrType = DataPlant::SystemAvailabilityType::DiffThermo;
@@ -1009,7 +1009,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &hiTurnOffMgr = state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum);
                 hiTurnOffMgr.Name = cAlphaArgs(1);
                 hiTurnOffMgr.MgrType = DataPlant::SystemAvailabilityType::HiTempTOff;
@@ -1065,7 +1065,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &hiTurnOnMgr = state.dataSystemAvailabilityManager->HiTurnOnData(SysAvailNum);
                 hiTurnOnMgr.Name = cAlphaArgs(1);
                 hiTurnOnMgr.MgrType = DataPlant::SystemAvailabilityType::HiTempTOn;
@@ -1121,7 +1121,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &loTurnOffMgr = state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum);
                 loTurnOffMgr.Name = cAlphaArgs(1);
                 loTurnOffMgr.MgrType = DataPlant::SystemAvailabilityType::LoTempTOff;
@@ -1188,7 +1188,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &loTurnOnMgr = state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum);
                 loTurnOnMgr.Name = cAlphaArgs(1);
                 loTurnOnMgr.MgrType = DataPlant::SystemAvailabilityType::LoTempTOn;
@@ -1244,7 +1244,7 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                if (ErrorsFound = cAlphaArgs(1).empty()) ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
                 auto &nightVentMgr = state.dataSystemAvailabilityManager->NightVentData(SysAvailNum);
                 nightVentMgr.Name = cAlphaArgs(1);
                 nightVentMgr.MgrType = DataPlant::SystemAvailabilityType::NightVent;
@@ -3942,7 +3942,8 @@ namespace SystemAvailabilityManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            if (ErrorsFound = state.dataIPShortCut->cAlphaArgs(1).empty())
+                ShowSevereError(state, format("{} Name, cannot be blank", cCurrentModuleObject));
             auto &hybridVentMgr = state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum);
             hybridVentMgr.Name = state.dataIPShortCut->cAlphaArgs(1);
             hybridVentMgr.MgrType = DataPlant::SystemAvailabilityType::HybridVent;
