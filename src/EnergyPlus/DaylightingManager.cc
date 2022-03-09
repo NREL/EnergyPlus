@@ -10148,6 +10148,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         }
     } // End of primary enclosure loop
 
+    std::size_t maxShadeDeployOrderExtWinsSize(0);
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
         if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
@@ -10240,10 +10241,33 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         } // End of check if thisEnclNumRefPoints > 0
 
         if (state.dataSurface->TotWinShadingControl > 0) {
-            CreateShadeDeploymentOrder(state, enclNum);
-            MapShadeDeploymentOrderToLoopNumber(state, enclNum);
+            std::size_t maxSize = CreateShadeDeploymentOrder(state, enclNum);
+            if (maxSize > maxShadeDeployOrderExtWinsSize) maxShadeDeployOrderExtWinsSize = maxSize;
         }
     } // End of primary enclosure loop
+
+    // size these for the maximum of the shade deployment order
+    state.dataDaylightingManager->DILLSW.allocate(maxShadeDeployOrderExtWinsSize);
+    state.dataDaylightingManager->DILLUN.allocate(maxShadeDeployOrderExtWinsSize);
+    state.dataDaylightingManager->WDAYIL.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+    state.dataDaylightingManager->WBACLU.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+    state.dataDaylightingManager->RDAYIL.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+    state.dataDaylightingManager->RBACLU.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+
+    state.dataDaylightingManager->TVIS1.allocate(maxShadeDeployOrderExtWinsSize);
+    state.dataDaylightingManager->TVIS2.allocate(maxShadeDeployOrderExtWinsSize);
+    state.dataDaylightingManager->ASETIL.allocate(maxShadeDeployOrderExtWinsSize);
+
+    for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+        if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
+        int thisEnclNumRefPoints = state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints;
+        if (thisEnclNumRefPoints > 0) {
+            if (state.dataSurface->TotWinShadingControl > 0) {
+                MapShadeDeploymentOrderToLoopNumber(state, enclNum);
+            }
+        }
+    }
 
     for (int mapNum = 1; mapNum <= state.dataDaylightingData->TotIllumMaps; ++mapNum) {
         int numExtWin = enclExtWin(state.dataDaylightingData->IllumMapCalc(mapNum).enclIndex);
@@ -10317,7 +10341,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     enclExtWin.deallocate();
 }
 
-void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
+std::size_t CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
 {
     // J. Glazer - 2018
     // create sorted list for shade deployment order
@@ -10337,7 +10361,7 @@ void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
     // now make the deployment list of lists.
     // each sublist is a group of surfaces that should be deployed together
     // often the sublist is just a single item.
-    int maxShadeDeployOrderExtWinsSize = 0;
+    std::size_t maxShadeDeployOrderExtWinsSize = 0;
     for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
         auto &thisDaylightCtrl = state.dataDaylightingData->daylightControl(controlNum);
         for (auto sequence : shadeControlSequence) {
@@ -10358,26 +10382,15 @@ void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
                 }
             }
         }
-        maxShadeDeployOrderExtWinsSize = max(maxShadeDeployOrderExtWinsSize, int(thisDaylightCtrl.ShadeDeployOrderExtWins.size()));
+        maxShadeDeployOrderExtWinsSize = max(maxShadeDeployOrderExtWinsSize, thisDaylightCtrl.ShadeDeployOrderExtWins.size());
     }
-    if (state.dataDaylightingManager->DILLSW.size() < maxShadeDeployOrderExtWinsSize) {
-        state.dataDaylightingManager->DILLSW.allocate(maxShadeDeployOrderExtWinsSize);
-        state.dataDaylightingManager->DILLUN.allocate(maxShadeDeployOrderExtWinsSize);
-        state.dataDaylightingManager->WDAYIL.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
-        state.dataDaylightingManager->WBACLU.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
-        state.dataDaylightingManager->RDAYIL.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
-        state.dataDaylightingManager->RBACLU.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
-
-        state.dataDaylightingManager->TVIS1.allocate(maxShadeDeployOrderExtWinsSize);
-        state.dataDaylightingManager->TVIS2.allocate(maxShadeDeployOrderExtWinsSize);
-        state.dataDaylightingManager->ASETIL.allocate(maxShadeDeployOrderExtWinsSize);
-    }
-
     int maxNumOfDayltgExtWins = 0;
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         maxNumOfDayltgExtWins = max(maxNumOfDayltgExtWins, state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins);
     }
     state.dataDaylightingManager->previously_shaded.allocate(maxNumOfDayltgExtWins);
+
+    return maxShadeDeployOrderExtWinsSize;
 }
 
 void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNum)
