@@ -617,7 +617,7 @@ bool BaseSizer::checkInitialized(EnergyPlusData &state, bool &errorsFound)
     return true;
 }
 
-void BaseSizer::overrideSizingString(std::string &string)
+void BaseSizer::overrideSizingString(std::string_view const string)
 {
     this->sizingString = string;
     this->overrideSizeString = false;

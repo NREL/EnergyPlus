@@ -424,11 +424,7 @@ namespace WaterCoils {
                           int &icvg                         // Iteration convergence flag
     );
 
-    void CheckWaterCoilSchedule(EnergyPlusData &state,
-                                std::string const &CompType, // unused1208
-                                std::string_view CompName,
-                                Real64 &Value,
-                                int &CompIndex);
+    void CheckWaterCoilSchedule(EnergyPlusData &state, std::string_view CompName, Real64 &Value, int &CompIndex);
 
     Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
                                    std::string_view CoilType,   // must match coil types in this module
@@ -503,6 +499,7 @@ namespace WaterCoils {
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
+    int GetCompIndex(EnergyPlusData &state, CoilModel coilType, std::string_view const coilName);
 
     Real64 GetWaterCoilCapacity(EnergyPlusData &state,
                                 std::string const &CoilType, // must match coil types in this module

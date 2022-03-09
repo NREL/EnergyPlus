@@ -53,53 +53,31 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from ctypes import cdll, c_void_p
+import sys
+from pyenergyplus.api import EnergyPlusAPI
 
+def progress_handler(progress: int) -> None:
+    if 49 < progress < 51:
+        print("HALFWAY THERE!!")
+        sys.stdout.flush()
 
-class StateManager:
-    """
-    This API class enables a client to create and manage state instances for using EnergyPlus API methods.
-    Nearly all EnergyPlus API methods require a state object to be passed in, and when callbacks are made, the current
-    state is passed as the only argument.  This allows client code to close the loop and pass the current state when
-    making API calls inside callbacks.
+api = EnergyPlusAPI()
+state = api.state_manager.new_state()
+api.runtime.callback_progress(state, progress_handler)
+v = api.runtime.run_energyplus(state, sys.argv[1:])
+if v != 0:
+    print("EnergyPlus Failed!")
+    sys.exit(1)
 
-    The state object is at the heart of accessing EnergyPlus via API, however, the client code should simply be a
-    courier of this object, and never attempt to manipulate the object.  State manipulation occurs inside EnergyPlus,
-    and attempting to modify it manually will likely not end well for the workflow.
+print("MUTED E+ RUN 1 DONE")
 
-    This class allows a client to create a new state, reset it, and free the object when finished with it.
-    """
+print("RESETTING STATE")
+api.state_manager.reset_state(state)
 
-    def __init__(self, api: cdll):
-        self.api = api
-        self.api.stateNewPython.argtypes = []
-        self.api.stateNewPython.restype = c_void_p
-        self.api.stateReset.argtypes = [c_void_p]
-        self.api.stateReset.restype = c_void_p
-        self.api.stateDelete.argtypes = [c_void_p]
-        self.api.stateDelete.restype = c_void_p
+api.runtime.callback_progress(state, progress_handler)
+v = api.runtime.run_energyplus(state, sys.argv[1:])
+if v != 0:
+    print("EnergyPlus Failed!")
+    sys.exit(1)
 
-    def new_state(self) -> c_void_p:
-        """
-        This function creates a new state object that is required to pass into EnergyPlus Runtime API function calls
-
-        :return: A pointer to a new state object in memory
-        """
-        return self.api.stateNewPython()
-
-    def reset_state(self, state: c_void_p) -> None:
-        """
-        This function resets an existing state instance, thus resetting the simulation, including any registered
-        callback functions.
-
-        :return: Nothing
-        """
-        self.api.stateReset(state)
-
-    def delete_state(self, state: c_void_p) -> None:
-        """
-        This function deletes an existing state instance, freeing the memory.
-
-        :return: Nothing
-        """
-        self.api.stateDelete(state)
+print("MUTED E+ RUN 2 DONE")
