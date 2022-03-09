@@ -206,7 +206,7 @@ namespace CondenserLoopTowers {
         static constexpr std::string_view OutputFormat("{:5.2F}");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int TowerNum(0);                   // Tower number, reference counter for towers data array
+        int TowerNum;                      // Tower number, reference counter for towers data array
         int NumSingleSpeedTowers;          // Total number of single-speed cooling towers
         int SingleSpeedTowerNumber;        // Specific single-speed tower of interest
         int NumTwoSpeedTowers;             // Number of two-speed cooling towers
@@ -260,7 +260,7 @@ namespace CondenserLoopTowers {
         }
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
+
         // Load data structures with cooling tower input data
         cCurrentModuleObject = cCoolingTower_SingleSpeed;
         for (SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber) {
@@ -283,6 +283,7 @@ namespace CondenserLoopTowers {
                                                      cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
             tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_SingleSpd;
@@ -659,6 +660,7 @@ namespace CondenserLoopTowers {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
 
+            auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
             tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_TwoSpd;
@@ -1081,6 +1083,7 @@ namespace CondenserLoopTowers {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
 
+            auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.VSTower = VariableSpeedTowerNumber;
             tower.Name = AlphArray(1);
             tower.thisTowerNum = TowerNum;
@@ -1618,6 +1621,7 @@ namespace CondenserLoopTowers {
                                                      cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
+            auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
             tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel;
