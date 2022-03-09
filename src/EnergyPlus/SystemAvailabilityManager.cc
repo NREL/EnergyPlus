@@ -941,10 +941,11 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).Name = cAlphaArgs(1);
-                state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).MgrType = DataPlant::SystemAvailabilityType::DiffThermo;
+                auto &diffThermoSysAvailMan = state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum);
+                diffThermoSysAvailMan.Name = cAlphaArgs(1);
+                diffThermoSysAvailMan.MgrType = DataPlant::SystemAvailabilityType::DiffThermo;
 
-                state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).HotNode =
+                diffThermoSysAvailMan.HotNode =
                     GetOnlySingleNode(state,
                                       cAlphaArgs(2),
                                       ErrorsFound,
@@ -955,11 +956,11 @@ namespace SystemAvailabilityManager {
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
-                         state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).HotNode,
+                         diffThermoSysAvailMan.HotNode,
                          DataLoopNode::ConnectionObjectType::AvailabilityManagerDifferentialThermostat,
                          cAlphaArgs(1),
                          "Hot Node");
-                state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).ColdNode =
+                diffThermoSysAvailMan.ColdNode =
                     GetOnlySingleNode(state,
                                       cAlphaArgs(3),
                                       ErrorsFound,
@@ -970,22 +971,22 @@ namespace SystemAvailabilityManager {
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
-                         state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).ColdNode,
+                         diffThermoSysAvailMan.ColdNode,
                          DataLoopNode::ConnectionObjectType::AvailabilityManagerDifferentialThermostat,
                          cAlphaArgs(1),
                          "Cold Node");
 
-                state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOn = rNumericArgs(1);
+                diffThermoSysAvailMan.TempDiffOn = rNumericArgs(1);
 
                 if (NumNumbers > 1) {
-                    state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOff = rNumericArgs(2);
+                    diffThermoSysAvailMan.TempDiffOff = rNumericArgs(2);
                 } else {
-                    state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOff =
-                        state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOn;
+                    diffThermoSysAvailMan.TempDiffOff =
+                        diffThermoSysAvailMan.TempDiffOn;
                 }
 
-                if (state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOff >
-                    state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOn) {
+                if (diffThermoSysAvailMan.TempDiffOff >
+                    diffThermoSysAvailMan.TempDiffOn) {
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError(state, "The " + cNumericFieldNames(2) + " is greater than the " + cNumericFieldNames(1) + '.');
                     ErrorsFound = true;
@@ -994,10 +995,10 @@ namespace SystemAvailabilityManager {
                 SetupOutputVariable(state,
                                     "Availability Manager Differential Thermostat Control Status",
                                     OutputProcessor::Unit::None,
-                                    state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).AvailStatus,
+                                    diffThermoSysAvailMan.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).Name);
+                                    diffThermoSysAvailMan.Name);
 
             } // SysAvailNum
         }
@@ -3729,12 +3730,13 @@ namespace SystemAvailabilityManager {
 
         Real64 DeltaTemp;
 
-        DeltaTemp = state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).HotNode).Temp -
-                    state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).ColdNode).Temp;
+        auto &diffThermoSysAvailMan = state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum);
+        DeltaTemp = state.dataLoopNodes->Node(diffThermoSysAvailMan.HotNode).Temp -
+                    state.dataLoopNodes->Node(diffThermoSysAvailMan.ColdNode).Temp;
 
-        if (DeltaTemp >= state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOn) {
+        if (DeltaTemp >= diffThermoSysAvailMan.TempDiffOn) {
             AvailStatus = CycleOn;
-        } else if (DeltaTemp <= state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).TempDiffOff) {
+        } else if (DeltaTemp <= diffThermoSysAvailMan.TempDiffOff) {
             AvailStatus = ForceOff;
         } else {
 
@@ -3745,7 +3747,7 @@ namespace SystemAvailabilityManager {
             }
         }
 
-        state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum).AvailStatus = AvailStatus;
+        diffThermoSysAvailMan.AvailStatus = AvailStatus;
     }
 
     void CalcHiTurnOffSysAvailMgr(EnergyPlusData &state,
