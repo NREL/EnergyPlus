@@ -10360,16 +10360,18 @@ void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
         }
         maxShadeDeployOrderExtWinsSize = max(maxShadeDeployOrderExtWinsSize, int(thisDaylightCtrl.ShadeDeployOrderExtWins.size()));
     }
-    state.dataDaylightingManager->DILLSW.allocate(maxShadeDeployOrderExtWinsSize);
-    state.dataDaylightingManager->DILLUN.allocate(maxShadeDeployOrderExtWinsSize);
-    state.dataDaylightingManager->WDAYIL.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
-    state.dataDaylightingManager->WBACLU.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
-    state.dataDaylightingManager->RDAYIL.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
-    state.dataDaylightingManager->RBACLU.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+    if (state.dataDaylightingManager->DILLSW.size() < maxShadeDeployOrderExtWinsSize) {
+        state.dataDaylightingManager->DILLSW.allocate(maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->DILLUN.allocate(maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->WDAYIL.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->WBACLU.allocate(2, state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->RDAYIL.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->RBACLU.allocate(state.dataDaylightingData->maxRefPointsPerControl, maxShadeDeployOrderExtWinsSize);
 
-    state.dataDaylightingManager->TVIS1.allocate(maxShadeDeployOrderExtWinsSize);
-    state.dataDaylightingManager->TVIS2.allocate(maxShadeDeployOrderExtWinsSize);
-    state.dataDaylightingManager->ASETIL.allocate(maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->TVIS1.allocate(maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->TVIS2.allocate(maxShadeDeployOrderExtWinsSize);
+        state.dataDaylightingManager->ASETIL.allocate(maxShadeDeployOrderExtWinsSize);
+    }
 
     int maxNumOfDayltgExtWins = 0;
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
