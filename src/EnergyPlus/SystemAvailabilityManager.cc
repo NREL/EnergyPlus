@@ -2056,7 +2056,6 @@ namespace SystemAvailabilityManager {
         int ZoneNum;
         Real64 TempTol;
         auto &ZoneCompNCControlType = state.dataSystemAvailabilityManager->ZoneCompNCControlType;
-        CyclingRunTimeControl cyclingRunTimeControl;
 
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         if (present(ZoneEquipType)) {
@@ -2091,9 +2090,7 @@ namespace SystemAvailabilityManager {
             return;
         }
 
-        cyclingRunTimeControl = nightCycleMgr.cyclingRunTimeControl;
-
-        if (cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) {
+        if (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) {
             TempTol = 0.5 * nightCycleMgr.TempTolRange;
         } else {
             TempTol = 0.05;
@@ -2101,10 +2098,10 @@ namespace SystemAvailabilityManager {
 
         if (present(ZoneEquipType)) {
             if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
-                (cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime || cyclingRunTimeControl == CyclingRunTimeControl::ThermostatWithMinimumRunTime)) { // if cycled on
+                (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime || nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::ThermostatWithMinimumRunTime)) { // if cycled on
                 AvailStatus = CycleOn;
             } else if (state.dataGlobal->SimTimeSteps == StopTime &&
-                       cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) { // if end of cycle run time, shut down if fan off
+                       nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) { // if end of cycle run time, shut down if fan off
                 AvailStatus = NoAction;
             } else {
 
@@ -2187,7 +2184,7 @@ namespace SystemAvailabilityManager {
                 } // end select type of night cycle control
 
                 if (AvailStatus == CycleOn) {                      // reset the start and stop times
-                    if (cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
+                    if (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
                     } else {
@@ -2199,11 +2196,11 @@ namespace SystemAvailabilityManager {
             }
         } else {
             if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
-                (cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime || cyclingRunTimeControl == CyclingRunTimeControl::ThermostatWithMinimumRunTime)) { // if cycled on
+                (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime || nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::ThermostatWithMinimumRunTime)) { // if cycled on
                 AvailStatus = nightCycleMgr.PriorAvailStatus;
                 if (nightCycleMgr.nightCycleControlType == NightCycleControlType::OnZoneFansOnly) AvailStatus = CycleOnZoneFansOnly;
             } else if (state.dataGlobal->SimTimeSteps == StopTime &&
-                       cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) { // if end of cycle run time, shut down if fan off
+                       nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) { // if end of cycle run time, shut down if fan off
                 AvailStatus = NoAction;
             } else {
 
@@ -2339,7 +2336,7 @@ namespace SystemAvailabilityManager {
                     if (nightCycleMgr.nightCycleControlType == NightCycleControlType::OnZoneFansOnly)
                         AvailStatus = CycleOnZoneFansOnly;
                     // issue #6151
-                    if (cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
+                    if (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
                         state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = state.dataGlobal->SimTimeSteps;
                         state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = state.dataGlobal->SimTimeSteps;
                     } else {
