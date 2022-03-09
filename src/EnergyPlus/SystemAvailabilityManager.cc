@@ -1025,10 +1025,11 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum).Name = cAlphaArgs(1);
-                state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum).MgrType = DataPlant::SystemAvailabilityType::HiTempTOff;
+                auto &hiTurnOffSysAvailMan = state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum);
+                hiTurnOffSysAvailMan.Name = cAlphaArgs(1);
+                hiTurnOffSysAvailMan.MgrType = DataPlant::SystemAvailabilityType::HiTempTOff;
 
-                state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum).Node =
+                hiTurnOffSysAvailMan.Node =
                     GetOnlySingleNode(state,
                                       cAlphaArgs(2),
                                       ErrorsFound,
@@ -1039,20 +1040,20 @@ namespace SystemAvailabilityManager {
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
-                         state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum).Node,
+                         hiTurnOffSysAvailMan.Node,
                          DataLoopNode::ConnectionObjectType::AvailabilityManagerHighTemperatureTurnOff,
                          cAlphaArgs(1),
                          "Sensor Node");
 
-                state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum).Temp = rNumericArgs(1);
+                hiTurnOffSysAvailMan.Temp = rNumericArgs(1);
 
                 SetupOutputVariable(state,
                                     "Availability Manager High Temperature Turn Off Control Status",
                                     OutputProcessor::Unit::None,
-                                    state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum).AvailStatus,
+                                    hiTurnOffSysAvailMan.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum).Name);
+                                    hiTurnOffSysAvailMan.Name);
 
             } // SysAvailNum
         }
