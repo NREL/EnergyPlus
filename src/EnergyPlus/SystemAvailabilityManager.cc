@@ -1137,10 +1137,11 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).Name = cAlphaArgs(1);
-                state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).MgrType = DataPlant::SystemAvailabilityType::LoTempTOff;
+                auto &loTurnOffSysAvailMan = state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum);
+                loTurnOffSysAvailMan.Name = cAlphaArgs(1);
+                loTurnOffSysAvailMan.MgrType = DataPlant::SystemAvailabilityType::LoTempTOff;
 
-                state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).Node =
+                loTurnOffSysAvailMan.Node =
                     GetOnlySingleNode(state,
                                       cAlphaArgs(2),
                                       ErrorsFound,
@@ -1151,31 +1152,31 @@ namespace SystemAvailabilityManager {
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
-                         state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).Node,
+                         loTurnOffSysAvailMan.Node,
                          DataLoopNode::ConnectionObjectType::AvailabilityManagerLowTemperatureTurnOff,
                          cAlphaArgs(1),
                          "Sensor Node");
 
-                state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).Temp = rNumericArgs(1);
+                loTurnOffSysAvailMan.Temp = rNumericArgs(1);
 
                 if (!lAlphaFieldBlanks(3)) {
-                    state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                    if (state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).SchedPtr == 0) {
+                    loTurnOffSysAvailMan.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                    if (loTurnOffSysAvailMan.SchedPtr == 0) {
                         ShowSevereError(state, std::string{RoutineName} + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\" not found.");
                         ShowContinueError(state, "Occurs in " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).SchedPtr = 0;
+                    loTurnOffSysAvailMan.SchedPtr = 0;
                 }
 
                 SetupOutputVariable(state,
                                     "Availability Manager Low Temperature Turn Off Control Status",
                                     OutputProcessor::Unit::None,
-                                    state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).AvailStatus,
+                                    loTurnOffSysAvailMan.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).Name);
+                                    loTurnOffSysAvailMan.Name);
 
             } // SysAvailNum
         }
@@ -3818,23 +3819,24 @@ namespace SystemAvailabilityManager {
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
 
         // If applicability schedule is off, then availability manager is inactive, return no action
-        if (state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).SchedPtr > 0) {
-            if (GetCurrentScheduleValue(state, state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).SchedPtr) <= 0.0) {
+        auto &loTurnOffSysAvailMan = state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum);
+        if (loTurnOffSysAvailMan.SchedPtr > 0) {
+            if (GetCurrentScheduleValue(state, loTurnOffSysAvailMan.SchedPtr) <= 0.0) {
                 AvailStatus = NoAction;
-                state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).AvailStatus = AvailStatus;
+                loTurnOffSysAvailMan.AvailStatus = AvailStatus;
                 return;
             }
         }
 
         // Availability manager is active, check temperature limit
-        if (state.dataLoopNodes->Node(state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).Node).Temp <=
-            state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(loTurnOffSysAvailMan.Node).Temp <=
+            loTurnOffSysAvailMan.Temp) {
             AvailStatus = ForceOff;
         } else {
             AvailStatus = NoAction;
         }
 
-        state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum).AvailStatus = AvailStatus;
+        loTurnOffSysAvailMan.AvailStatus = AvailStatus;
     }
 
     void CalcLoTurnOnSysAvailMgr(EnergyPlusData &state,
