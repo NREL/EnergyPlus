@@ -1204,10 +1204,11 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum).Name = cAlphaArgs(1);
-                state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum).MgrType = DataPlant::SystemAvailabilityType::LoTempTOn;
+                auto &loTurnOnSysAvailMan = state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum);
+                loTurnOnSysAvailMan.Name = cAlphaArgs(1);
+                loTurnOnSysAvailMan.MgrType = DataPlant::SystemAvailabilityType::LoTempTOn;
 
-                state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum).Node =
+                loTurnOnSysAvailMan.Node =
                     GetOnlySingleNode(state,
                                       cAlphaArgs(2),
                                       ErrorsFound,
@@ -1218,20 +1219,20 @@ namespace SystemAvailabilityManager {
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
-                         state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum).Node,
+                         loTurnOnSysAvailMan.Node,
                          DataLoopNode::ConnectionObjectType::AvailabilityManagerLowTemperatureTurnOn,
                          cAlphaArgs(1),
                          "Sensor Node");
 
-                state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum).Temp = rNumericArgs(1);
+                loTurnOnSysAvailMan.Temp = rNumericArgs(1);
 
                 SetupOutputVariable(state,
                                     "Availability Manager Low Temperature Turn On Control Status",
                                     OutputProcessor::Unit::None,
-                                    state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum).AvailStatus,
+                                    loTurnOnSysAvailMan.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum).Name);
+                                    loTurnOnSysAvailMan.Name);
 
             } // SysAvailNum
         }
