@@ -4,7 +4,7 @@ Reference Temperature Inputs for Water To Air Coils
 **Jeremy Lerond, Wooyoung Jung, and Jian Zhang, PNNL**
 
  - Original Date: 10/21/2021
- - Revision Date: 11/10/2021
+ - Revision Date: 03/08/2021
 
 
 ## Justification for New Feature ##
@@ -200,14 +200,6 @@ The "Rated Total Cooling Capacity" subsection of the "Coil:Cooling:WaterToAirHea
 > The calculation for coil operating temperatures (inlet and outlet) are identical to that done for \emph{Coil:Cooling:Water}. The following calculations are then performed to determine the rated total cooling capacity.
 >
 > \begin{equation}
->   T_{WB,ratio,ref} = \frac{T_{WB,air,in,ref}+273.15C}{283.15C}
-> \end{equation}
->
-> \begin{equation}
->   T_{S,ratio,ref} = \frac{T_{water,in,ref}+273.15C}{283.15C}
-> \end{equation}
->
-> \begin{equation}
 >   T_{WB,ratio,peak} = \frac{T_{WB,air,in,peak}+273.15C}{283.15C}
 > \end{equation}
 >
@@ -217,38 +209,29 @@ The "Rated Total Cooling Capacity" subsection of the "Coil:Cooling:WaterToAirHea
 >
 > where:
 >
-> $T_{WB,ratio,ref} = $ ratio of reference load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
->
-> $T_{S,ratio,ref} = $ ratio of reference source-side inlet water temperature in Kelvin to a reference temperature
->
 > $T_{WB,ratio,peak} = $ ratio of peak load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
 >
 > $T_{S,ratio,peak} = $ ratio of peak source-side inlet water temperature in Kelvin to a reference temperature
->
-> $T_{WB,air,in,ref} = $ the reference load-side inlet air wet-bulb temperature, if not specified by the user, 19&deg;C (66.2&deg;F; the peak value) is used which corresponds to the rating conditions of a water loop water-source heat pump according to ISO-13256-1
->
-> $T_{S,air,in,ref} = $ the reference source-side inlet water temperature, if not specified by the user, 30&deg;C (86&deg;F; the peak value) is used which corresponds to the rating conditions of a water loop water-source heat pump according to ISO-13256-1
 >
 > $T_{WB,air,in,peak} = $ the peak load-side inlet air wet-bulb temperature, if not specified by the user, the peak design mixed air entering the coil will be used
 >
 > $T_{S,air,in,peak} = $ the peak source-side inlet water temperature, if not specified by the user, 30&deg;C (86&deg;F; the peak value) is used which corresponds to the rating conditions of a water loop water-source heat pump according to ISO-13256-1
 >
 > \begin{equation}
-> TotCapTempModFacRef = \,TCC1 + TCC2\left( {{T_{WB,ratio,ref}}} \right) + TCC3\left( {{T_{S,ratio,ref}}} \right) + TCC4 + TCC5
 > TotCapTempModFacPeak = \,TCC1 + TCC2\left( {{T_{WB,ratio,peak}}} \right) + TCC3\left( {{T_{S,ratio,peak}}} \right) + TCC4 + TCC5
 > \end{equation}
 >
 > [...]
 >
 >\begin{equation}
->   \dot{Q}_{coil,des,total}   = \frac{\dot{m}_{air,des}\PB{H_{in}-H_{out}}TotCapTempModFacRef}{TotCapTempModFacPeak} + \dot{Q}_{fan,heat,des}
+>   \dot{Q}_{coil,des,total}   = \frac{\dot{m}_{air,des}\PB{H_{in}-H_{out}}}{TotCapTempModFacPeak} + \dot{Q}_{fan,heat,des}
 >\end{equation}
 
 ## Example File and Transition Changes ##
 
 Two existing example files will be modified to illustrate the proposed changes: a Ground Source Heat Pump (GSHP) application and a Water Source Heat Pump (WSHP) application.
 
-The proposed approach plans on adding two new inputs in the middle of the `Coil:*:WaterToAirHeatPump:EquationFit` objects (and variable speed versions), so transition rules will be needed. Additionally, all mentions of "Rated" will be replaced by "Reference". The transition rule will set the new fields to the old hard-wired values.
+The proposed approach plans on adding three new inputs in the middle of the `Coil:*:WaterToAirHeatPump:EquationFit` objects (and variable speed versions), so transition rules will be needed. Additionally, all mentions of "Rated" will be replaced by "Reference". The transition rule will set the new fields to the old hard-wired values.
 
 ## References ##
 * ASHRAE. 2019. ANSI/ASHRAE/IES 90.1-2019, Energy Standard for Buildings Except Low-Rise

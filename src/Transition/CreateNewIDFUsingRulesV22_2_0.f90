@@ -9,7 +9,7 @@ CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
       ! TODO: Update this section as appropriate
-      VerString='Conversion 9.6 => 22.1'
+      VerString='Conversion 22.1 => 22.2'
       VersionNum=22.1
       ! Starting with version 22.1, the version string requires 4 characters
       ! The original sVersionNum variable is a 3 character length string
@@ -17,10 +17,10 @@ SUBROUTINE SetThisVersionVariables()
       ! So instead, let's just move forward with a new 4 character string and use that in this file and the future
       ! If we get to version 100.1 and we are still using this Fortran transition then well....we can deal with it then
       sVersionNum = '***'
-      sVersionNumFourChars='22.1'
-      IDDFileNameWithPath=TRIM(ProgramPath)//'V9-6-0-Energy+.idd'
-      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V22-1-0-Energy+.idd'
-      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 9-6-0 to 22-1-0.csv'
+      sVersionNumFourChars='22.2'
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V22-1-0-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V22-2-0-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 22-1-0 to 22-2-0.csv'
 END SUBROUTINE
 
 END MODULE
