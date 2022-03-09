@@ -215,6 +215,15 @@ namespace DataSurfaces {
         "OnIfHighZoneAirTempAndHighSolarOnWindow",
         "OnIfHighZoneAirTempAndHighHorizontalSolar"};
 
+    enum RefAirTemp // Parameters to indicate reference air temperatures for inside surface temperature calculations
+    {
+        Invalid = -1,
+        ZoneMeanAirTemp,   // mean air temperature of the zone => MAT
+        AdjacentAirTemp,   // air temperature adjacent ot surface => TempEffBulkAir
+        ZoneSupplyAirTemp, // supply air temperature of the zone
+        Num
+    };
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -235,11 +244,6 @@ namespace DataSurfaces {
     constexpr int LowerLeftCorner(2);
     constexpr int LowerRightCorner(3);
     constexpr int UpperRightCorner(4);
-
-    // Parameters to indicate reference air temperatures for inside surface temperature calculations
-    constexpr int ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
-    constexpr int AdjacentAirTemp(2);   // air temperature adjacent ot surface => TempEffBulkAir
-    constexpr int ZoneSupplyAirTemp(3); // supply air temperature of the zone
 
     constexpr int AltAngStepsForSolReflCalc(10); // Number of steps in altitude angle for solar reflection calc
     constexpr int AzimAngStepsForSolReflCalc(9); // Number of steps in azimuth angle of solar reflection calc

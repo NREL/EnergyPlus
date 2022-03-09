@@ -229,11 +229,11 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     // determine reference air temperature for this surface
     {
         const auto SELECT_CASE_var(state.dataSurface->SurfTAirRef(t_SurfNum));
-        if (SELECT_CASE_var == ZoneMeanAirTemp) {
+        if (SELECT_CASE_var == RefAirTemp::ZoneMeanAirTemp) {
             RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
-        } else if (SELECT_CASE_var == AdjacentAirTemp) {
+        } else if (SELECT_CASE_var == RefAirTemp::AdjacentAirTemp) {
             RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
-        } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
+        } else if (SELECT_CASE_var == RefAirTemp::ZoneSupplyAirTemp) {
             // determine ZoneEquipConfigNum for this zone
             //            ControlledZoneAirFlag = .FALSE.
             // ZoneEquipConfigNum = ZoneNum;
