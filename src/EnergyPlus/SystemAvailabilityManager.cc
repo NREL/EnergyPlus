@@ -878,20 +878,17 @@ namespace SystemAvailabilityManager {
                 case ControlAlgorithm::ConstantTemperatureGradient: {
                     optimumStartMgr.ConstTGradCool = rNumericArgs(2);
                     optimumStartMgr.ConstTGradHeat = rNumericArgs(3);
-                    break;
-                }
+                } break;
 
                 case ControlAlgorithm::AdaptiveTemperatureGradient: {
                     optimumStartMgr.InitTGradCool = rNumericArgs(4);
                     optimumStartMgr.InitTGradHeat = rNumericArgs(5);
                     optimumStartMgr.NumPreDays = rNumericArgs(7);
-                    break;
-                }
+                } break;
 
                 case ControlAlgorithm::ConstantStartTime: {
                     optimumStartMgr.ConstStartTime = rNumericArgs(6);
-                    break;
-                }
+                } break;
 
                 default:
                     break;
@@ -1714,8 +1711,8 @@ namespace SystemAvailabilityManager {
                             }
                         }
                     }
-                    break;
                 }
+                break;
                 case OptimumStartControlType::MaximumOfZoneList: {
                     // a zone list
                     ZoneListNum = UtilityRoutines::FindItemInList(optimumStartMgr.ZoneListName, state.dataHeatBal->ZoneList);
@@ -1730,8 +1727,8 @@ namespace SystemAvailabilityManager {
                             optimumStartMgr.ZonePtrs(ScanZoneListNum) = ZoneNum;
                         }
                     }
-                    break;
                 }
+                break;
                 default:
                     break;
                 }
@@ -2124,8 +2121,8 @@ namespace SystemAvailabilityManager {
 
                 case NightCycleControlType::Off: {
                     AvailStatus = NoAction;
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnControlZone: {
 
                     ZoneNum = nightCycleMgr.CtrlZonePtrs(1);
@@ -2139,7 +2136,8 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                         }
 
-                    } break;
+                    }
+                    break;
                     case SingleCoolingSetPoint: {
                         if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
                             AvailStatus = CycleOn;
@@ -2147,7 +2145,8 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                         }
 
-                    } break;
+                    }
+                    break;
                     case SingleHeatCoolSetPoint: {
                         if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
                              state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
@@ -2158,7 +2157,8 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                         }
 
-                    } break;
+                    }
+                    break;
                     case DualSetPointWithDeadBand: {
                         if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
                             (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
@@ -2167,7 +2167,8 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                         }
 
-                    } break;
+                    }
+                    break;
                     default: {
                         AvailStatus = NoAction;
                     }
@@ -2219,8 +2220,8 @@ namespace SystemAvailabilityManager {
 
                 case NightCycleControlType::Off: {
                     AvailStatus = NoAction;
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnAny:
                 case NightCycleControlType::OnZoneFansOnly: {
 
@@ -2282,8 +2283,8 @@ namespace SystemAvailabilityManager {
                         } // end select on thermostat control
 
                     } // end loop over zones in system
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnControlZone: {
                     AvailStatus = NoAction;
                     if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CtrlZonePtrs, nightCycleMgr.NumOfCtrlZones,
@@ -2292,8 +2293,8 @@ namespace SystemAvailabilityManager {
                     if (HeatingZoneOutOfTolerance(state, nightCycleMgr.CtrlZonePtrs, nightCycleMgr.NumOfCtrlZones,
                                                   TempTol))
                         AvailStatus = CycleOn;
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnAnyCoolingOrHeatingZone: {
                     if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CoolingZonePtrs, nightCycleMgr.NumOfCoolingZones,
                                                   TempTol)) {
@@ -2307,8 +2308,8 @@ namespace SystemAvailabilityManager {
                     } else {
                         AvailStatus = NoAction;
                     }
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnAnyCoolingZone: {
                     if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CoolingZonePtrs, nightCycleMgr.NumOfCoolingZones,
                                                   TempTol)) {
@@ -2316,8 +2317,8 @@ namespace SystemAvailabilityManager {
                     } else {
                         AvailStatus = NoAction;
                     }
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnAnyHeatingZone: {
                     if (HeatingZoneOutOfTolerance(state, nightCycleMgr.HeatingZonePtrs, nightCycleMgr.NumOfHeatingZones,
                                                   TempTol)) {
@@ -2328,8 +2329,8 @@ namespace SystemAvailabilityManager {
                     } else {
                         AvailStatus = NoAction;
                     }
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnAnyHeatingZoneFansOnly: {
                     if (HeatingZoneOutOfTolerance(state, nightCycleMgr.HeatZnFanZonePtrs, nightCycleMgr.NumOfHeatZnFanZones,
                                                   TempTol)) {
@@ -2337,11 +2338,10 @@ namespace SystemAvailabilityManager {
                     } else {
                         AvailStatus = NoAction;
                     }
-                    break;
                 }
-                default: {
+                break;
+                default:
                     AvailStatus = NoAction;
-                }
                 } // end select type of night cycle control
 
                 if ((AvailStatus == CycleOn) || (AvailStatus == CycleOnZoneFansOnly)) { // reset the start and stop times
@@ -2653,8 +2653,8 @@ namespace SystemAvailabilityManager {
                         }
                     }
                 }
-                break;
             }
+            break;
             case ControlAlgorithm::ConstantTemperatureGradient: {
                 if (OptStartMgr.optimumStartControlType == OptimumStartControlType::ControlZone) {
                     ZoneNum = OptStartMgr.ZoneNum;
@@ -2962,8 +2962,8 @@ namespace SystemAvailabilityManager {
                 } else {
                     AvailStatus = NoAction;
                 }
-                break;
             }
+            break;
             case ControlAlgorithm::AdaptiveTemperatureGradient: {
 
                 if (OptStartMgr.optimumStartControlType == OptimumStartControlType::ControlZone) {
@@ -3537,12 +3537,12 @@ namespace SystemAvailabilityManager {
                 } else {
                     AvailStatus = NoAction;
                 }
-                break;
             }
+            break;
             case ControlAlgorithm::AdaptiveASHRAE: {
                 AvailStatus = NoAction;
-                break;
             }
+            break;
             default:
                 break;
             }
