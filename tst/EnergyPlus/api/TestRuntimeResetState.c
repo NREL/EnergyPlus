@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,61 +45,42 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// Google Test Headers
-#include <gtest/gtest.h>
+#include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/api/state.h>
+#include <stdio.h>
+#include <string.h>
 
-// EnergyPlus Headers
-#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
-#include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <EnergyPlus/DataLoopNode.hh>
+#ifdef _WIN32
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
 
-#include "../Coils/CoilCoolingDXFixture.hh"
+int numWarnings = 0;
+int oneTimeHalfway = 0;
 
-using namespace EnergyPlus;
-
-TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedInput)
+void BeginNewEnvironmentHandler1(EnergyPlusState state)
 {
-    std::string idf_objects = this->getSpeedObjectString("speed1");
-    EXPECT_TRUE(process_idf(idf_objects, false));
-    CoilCoolingDXCurveFitSpeed thisSpeed(*state, "speed1");
-    EXPECT_EQ("SPEED1", thisSpeed.name);
+    printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
 }
 
-TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest)
+void BeginNewEnvironmentHandler2(EnergyPlusState state)
 {
-    std::string idf_objects = this->getSpeedObjectString("speed1");
-    EXPECT_TRUE(process_idf(idf_objects, false));
-    CoilCoolingDXCurveFitSpeed thisSpeed(*state, "speed1");
-    EXPECT_EQ("SPEED1", thisSpeed.name);
+    printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
+}
 
-    CoilCoolingDXCurveFitOperatingMode thisMode;
-    thisMode.ratedGrossTotalCap = 12000;
-    thisMode.ratedEvapAirFlowRate = 100;
-    thisMode.ratedCondAirFlowRate = 200;
+int main(int argc, const char *argv[])
+{
 
-    DataLoopNode::NodeData inletNode;
-    inletNode.Temp = 20.0;
-    inletNode.HumRat = 0.008;
-    inletNode.Enthalpy = 40000.0;
-    DataLoopNode::NodeData outletNode;
+    EnergyPlusState state = stateNew();
+    callbackBeginNewEnvironment(state, BeginNewEnvironmentHandler1);
+    energyplus(state, argc, argv);
 
-    thisSpeed.PLR = 1.0;
-    thisSpeed.ambPressure = 101325.0;
-    inletNode.Press = thisSpeed.ambPressure;
-    thisSpeed.AirFF = 1.0;
-    thisSpeed.rated_total_capacity = 3000.0;
-    thisSpeed.RatedAirMassFlowRate = 1.0;
-    thisSpeed.grossRatedSHR = 0.75;
-    thisSpeed.RatedCBF = 0.09;
-    thisSpeed.RatedEIR = 0.30;
-    thisSpeed.AirMassFlow = 1.0;
-    int fanOpMode = 0;
-    Real64 condInletTemp = 24;
-    thisSpeed.CalcSpeedOutput(*state, inletNode, outletNode, thisSpeed.PLR, fanOpMode, condInletTemp);
+    // reset and run again
+    stateReset(state); // note previous callbacks are cleared here
+    callbackBeginNewEnvironment(state, BeginNewEnvironmentHandler2);
+    printf("Running EnergyPlus with Console Output Muted...\n");
+    setConsoleOutputState(state, 0);
+    energyplus(state, argc, argv);
+    printf("...and it is done.\n");
 
-    EXPECT_NEAR(outletNode.Temp, 17.791, 0.001);
-    EXPECT_NEAR(outletNode.HumRat, 0.00754, 0.0001);
-    EXPECT_NEAR(outletNode.Enthalpy, 37000.0, 0.1);
-    EXPECT_NEAR(thisSpeed.fullLoadPower, 900.0, 0.1);
-    EXPECT_NEAR(thisSpeed.RTF, 1.0, 0.01);
+    return 0;
 }

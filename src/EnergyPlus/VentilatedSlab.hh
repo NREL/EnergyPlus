@@ -65,15 +65,76 @@ struct EnergyPlusData;
 
 namespace VentilatedSlab {
 
+    enum class HeatingCoilType
+    {
+        Invalid = -1,
+        Electric,
+        Gas,
+        Water,
+        Steam,
+        Num
+    };
+
+    enum class CoolingCoilType
+    {
+        Invalid = -1,
+        WaterCooling,
+        DetailedCooling,
+        HXAssisted,
+        Num
+    };
+
+    // Parameters for outside air control types:
+    enum class OutsideAirControlType
+    {
+        Invalid = -1,
+        VariablePercent,
+        FixedTemperature,
+        FixedOAControl,
+        Num
+    };
+
+    enum class CoilType
+    {
+        Invalid = -1,
+        None,
+        Heating,
+        Cooling,
+        Both,
+        Num
+    };
+
+    //  Control Types
+    enum class ControlType
+    {
+        Invalid = -1,
+        MeanAirTemp,        // Controls system using mean air temperature
+        MeanRadTemp,        // Controls system using mean radiant temperature
+        OperativeTemp,      // Controls system using operative temperature
+        OutdoorDryBulbTemp, // Controls system using outside air dry-bulb temperature
+        OutdoorWetBulbTemp, // Controls system using outside air wet-bulb temperature
+        SurfaceTemp,        // Controls system using surface temperature !Phase2-A
+        DewPointTemp,       // Controls system using dew-point temperature of zone!Phase2-A
+        Num
+    };
+
+    // Ventilated Slab Configurations
+    enum class VentilatedSlabConfig
+    {
+        Invalid = -1,
+        SlabOnly,    // Air circulate through cores of slab only
+        SlabAndZone, // Circulated Air is introduced to zone
+        SeriesSlabs,
+        Num
+    };
+
     struct VentilatedSlabData
     {
         // Members
         // Input data
-        std::string Name;      // name of system
-        std::string SchedName; // availability schedule
-        int SchedPtr;          // index to schedule
-        std::string ZoneName;  // Name of zone the system is serving
-        int ZonePtr;           // Point to this zone in the Zone derived type
+        std::string Name; // name of system
+        int SchedPtr;     // index to schedule
+        int ZonePtr;      // Point to this zone in the Zone derived type
         // Variables for Delivery Config.
         Array1D_string ZName;            // Name of zone the system is serving
         Array1D_int ZPtr;                // Point to this zone in the Zone derived type
@@ -91,7 +152,7 @@ namespace VentilatedSlab {
         Real64 CoreDiameter;             // tube diameter for embedded tubing
         Real64 CoreLength;               // tube length embedded in radiant surface
         Real64 CoreNumbers;              // tube length embedded in radiant surface
-        int ControlType;                 // Control type for the system
+        ControlType controlType;         // Control type for the system
         // (MAT, MRT, Op temp, ODB, OWB, DPTZ, Surf Temp.)
         int ReturnAirNode; // inlet air node number
         int RadInNode;     // outlet air node number
@@ -105,89 +166,76 @@ namespace VentilatedSlab {
         int FanType_Num;     // type of fan
         int ControlCompTypeNum;
         int CompErrIndex;
-        Real64 MaxAirVolFlow;       // m3/s
-        Real64 MaxAirMassFlow;      // kg/s
-        int OAControlType;          // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-        std::string MinOASchedName; // schedule of fraction for minimum outside air (all controls)
-        int MinOASchedPtr;          // index to schedule
-        std::string MaxOASchedName; // schedule of percentages for maximum outside air fraction (variable %)
-        int MaxOASchedPtr;          // index to schedule
-        std::string TempSchedName;  // schedule of temperatures for desired "mixed air"
+        Real64 MaxAirVolFlow;                        // m3/s
+        Real64 MaxAirMassFlow;                       // kg/s
+        OutsideAirControlType outsideAirControlType; // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
+        int MinOASchedPtr;                           // index to schedule
+        int MaxOASchedPtr;                           // index to schedule
         // temperature (fixed temp.)
-        int TempSchedPtr;         // index to schedule
-        int OutsideAirNode;       // outside air node number
-        int AirReliefNode;        // relief air node number
-        int OAMixerOutNode;       // outlet node after the outside air mixer (inlet to coils if present)
-        Real64 OutAirVolFlow;     // m3/s
-        Real64 OutAirMassFlow;    // kg/s
-        Real64 MinOutAirVolFlow;  // m3/s
-        Real64 MinOutAirMassFlow; // kg/s
-        int SysConfg;             // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
-        int CoilOption;           // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
-        bool HCoilPresent;        // .TRUE. if ventilated slab has a heating coil
-        int HCoilType;            // type of heating coil (water, gas, electric, etc.)
-        std::string HCoilName;    // name of heating coil
-        std::string HCoilTypeCh;  // type of heating coil (character string)
-        int HCoil_Index;
-        DataPlant::PlantEquipmentType HeatingCoilType;
-        int HCoil_FluidIndex;
-        std::string HCoilSchedName; // availability schedule for the heating coil
-        int HCoilSchedPtr;          // index to schedule
-        Real64 HCoilSchedValue;
+        int TempSchedPtr;              // index to schedule
+        int OutsideAirNode;            // outside air node number
+        int AirReliefNode;             // relief air node number
+        int OAMixerOutNode;            // outlet node after the outside air mixer (inlet to coils if present)
+        Real64 OutAirVolFlow;          // m3/s
+        Real64 OutAirMassFlow;         // kg/s
+        Real64 MinOutAirVolFlow;       // m3/s
+        Real64 MinOutAirMassFlow;      // kg/s
+        VentilatedSlabConfig SysConfg; // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
+        CoilType coilOption;           // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
+        bool heatingCoilPresent;       // .TRUE. if ventilated slab has a heating coil
+        HeatingCoilType hCoilType;     // type of heating coil (water, gas, electric, etc.)
+        std::string heatingCoilName;   // name of heating coil
+        std::string heatingCoilTypeCh; // type of heating coil (character string)
+        int heatingCoil_Index;
+        DataPlant::PlantEquipmentType heatingCoilType;
+        int heatingCoil_FluidIndex;
+        int heatingCoilSchedPtr; // index to schedule
+        Real64 heatingCoilSchedValue;
         Real64 MaxVolHotWaterFlow; // m3/s
         Real64 MaxVolHotSteamFlow; // m3/s
         Real64 MaxHotWaterFlow;    // kg/s
         Real64 MaxHotSteamFlow;
         Real64 MinHotSteamFlow;
-        Real64 MinVolHotWaterFlow;      // m3/s
-        Real64 MinVolHotSteamFlow;      // m3/s
-        Real64 MinHotWaterFlow;         // kg/s
-        int HotControlNode;             // hot water control node
-        int HotCoilOutNodeNum;          // outlet of coil
-        Real64 HotControlOffset;        // control tolerance
-        PlantLocation HWPlantLoc;       // index for plant component for hot water coil
-        std::string HotAirHiTempSched;  // Schedule name for the highest Air temperature
-        int HotAirHiTempSchedPtr;       // Schedule index for the highest Air temperature
-        std::string HotAirLoTempSched;  // Schedule name for the lowest Air temperature
-        int HotAirLoTempSchedPtr;       // Schedule index for the lowest Air temperature
-        std::string HotCtrlHiTempSched; // Schedule name for the highest control temperature
+        Real64 MinVolHotWaterFlow; // m3/s
+        Real64 MinVolHotSteamFlow; // m3/s
+        Real64 MinHotWaterFlow;    // kg/s
+        int HotControlNode;        // hot water control node
+        int HotCoilOutNodeNum;     // outlet of coil
+        Real64 HotControlOffset;   // control tolerance
+        PlantLocation HWPlantLoc;  // index for plant component for hot water coil
+        int HotAirHiTempSchedPtr;  // Schedule index for the highest Air temperature
+        int HotAirLoTempSchedPtr;  // Schedule index for the lowest Air temperature
         // (where the lowest Air temperature is requested)
         int HotCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
         // (where the lowest Air temperature is requested)
-        std::string HotCtrlLoTempSched; // Schedule name for the lowest control temperature
         // (where the highest Air temperature is requested)
         int HotCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
         // (where the highest Air temperature is requested)
-        bool CCoilPresent;       // .TRUE. if ventilated slab has a cooling coil
-        std::string CCoilName;   // name of cooling coil
-        std::string CCoilTypeCh; // type of cooling coil (character string)
-        int CCoil_Index;
-        std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-        std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-        DataPlant::PlantEquipmentType CoolingCoilType;
-        int CCoilType; // type of cooling coil:
+        bool coolingCoilPresent;       // .TRUE. if ventilated slab has a cooling coil
+        std::string coolingCoilName;   // name of cooling coil
+        std::string coolingCoilTypeCh; // type of cooling coil (character string)
+        int coolingCoil_Index;
+        std::string coolingCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+        std::string coolingCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
+        DataPlant::PlantEquipmentType coolingCoilType;
+        CoolingCoilType cCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-        std::string CCoilSchedName; // availability schedule for the cooling coil
-        int CCoilSchedPtr;          // index to schedule
-        Real64 CCoilSchedValue;
-        Real64 MaxVolColdWaterFlow;      // m3/s
-        Real64 MaxColdWaterFlow;         // kg/s
-        Real64 MinVolColdWaterFlow;      // m3/s
-        Real64 MinColdWaterFlow;         // kg/s
-        int ColdControlNode;             // chilled water control node
-        int ColdCoilOutNodeNum;          // chilled water coil out nod
-        Real64 ColdControlOffset;        // control tolerance
-        PlantLocation CWPlantLoc;        // index for plant component for chilled water coil
-        std::string ColdAirHiTempSched;  // Schedule name for the highest air temperature
-        int ColdAirHiTempSchedPtr;       // Schedule index for the highest Air temperature
-        std::string ColdAirLoTempSched;  // Schedule name for the lowest Air temperature
-        int ColdAirLoTempSchedPtr;       // Schedule index for the lowest Air temperature
-        std::string ColdCtrlHiTempSched; // Schedule name for the highest control temperature
+        int coolingCoilSchedPtr; // index to schedule
+        Real64 coolingCoilSchedValue;
+        Real64 MaxVolColdWaterFlow; // m3/s
+        Real64 MaxColdWaterFlow;    // kg/s
+        Real64 MinVolColdWaterFlow; // m3/s
+        Real64 MinColdWaterFlow;    // kg/s
+        int ColdControlNode;        // chilled water control node
+        int ColdCoilOutNodeNum;     // chilled water coil out nod
+        Real64 ColdControlOffset;   // control tolerance
+        PlantLocation CWPlantLoc;   // index for plant component for chilled water coil
+        int ColdAirHiTempSchedPtr;  // Schedule index for the highest Air temperature
+        int ColdAirLoTempSchedPtr;  // Schedule index for the lowest Air temperature
         // (where the lowest Air temperature is requested)
         int ColdCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
         // (where the lowest Air temperature is requested)
-        std::string ColdCtrlLoTempSched; // Schedule name for the lowest control temperature
         // (where the highest Air temperature is requested)
         int ColdCtrlLoTempSchedPtr; // Schedule index for the lowest control temperature
         // (where the highest Air temperature is requested)
@@ -196,8 +244,6 @@ namespace VentilatedSlab {
         int RadSurfNum;         // Radiant Surface Number
         int MSlabIn;            // Internal Slab Inlet Node Number
         int MSlabOut;           // INternal Slab Outlet Node Number
-        std::string DSSlabInNodeName;
-        std::string DSSlabOutNodeName;
         // Report data
         Real64 DirectHeatLossPower;  // system direct heat loss in W
         Real64 DirectHeatLossEnergy; // system direct heat loss in J
@@ -231,25 +277,26 @@ namespace VentilatedSlab {
         bool FirstPass;      // detects first time through for resetting sizing data
         // Default Constructor
         VentilatedSlabData()
-            : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0), ControlType(0),
-              ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
-              ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0), MaxOASchedPtr(0),
-              TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
-              MinOutAirMassFlow(0.0), SysConfg(0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0),
-              HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
-              MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
-              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
+            : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0),
+              controlType(ControlType::Invalid), ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0),
+              Fan_Index(0), FanType_Num(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
+              outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0),
+              AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0),
+              SysConfg(VentilatedSlabConfig::Invalid), coilOption(CoilType::Invalid), heatingCoilPresent(false), hCoilType(HeatingCoilType::Invalid),
+              heatingCoil_Index(0), heatingCoilType(DataPlant::PlantEquipmentType::Invalid), heatingCoil_FluidIndex(0), heatingCoilSchedPtr(0),
+              heatingCoilSchedValue(0.0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0),
+              MinHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
               HotControlOffset(0.0), HWPlantLoc{}, HotAirHiTempSchedPtr(0), HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0),
-              HotCtrlLoTempSchedPtr(0), CCoilPresent(false), CCoil_Index(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0),
-              CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
-              MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWPlantLoc{}, ColdAirHiTempSchedPtr(0),
-              ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0), ColdCtrlLoTempSchedPtr(0), CondErrIndex(0), EnrgyImbalErrIndex(0), RadSurfNum(0),
-              MSlabIn(0), MSlabOut(0), DirectHeatLossPower(0.0), DirectHeatLossEnergy(0.0), DirectHeatGainPower(0.0), DirectHeatGainEnergy(0.0),
-              TotalVentSlabRadPower(0.0), RadHeatingPower(0.0), RadHeatingEnergy(0.0), RadCoolingPower(0.0), RadCoolingEnergy(0.0),
-              HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0), TotCoolCoilEnergy(0.0), SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0),
-              LateCoolCoilPower(0.0), LateCoolCoilEnergy(0.0), ElecFanPower(0.0), ElecFanEnergy(0.0), AirMassFlowRate(0.0), AirVolFlow(0.0),
-              SlabInTemp(0.0), SlabOutTemp(0.0), ReturnAirTemp(0.0), FanOutletTemp(0.0), ZoneInletTemp(0.0), AvailStatus(0), HVACSizingIndex(0),
-              FirstPass(true)
+              HotCtrlLoTempSchedPtr(0), coolingCoilPresent(false), coolingCoil_Index(0), coolingCoilType(DataPlant::PlantEquipmentType::Invalid),
+              cCoilType(CoolingCoilType::Invalid), coolingCoilSchedPtr(0), coolingCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
+              MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
+              ColdControlOffset(0.0), CWPlantLoc{}, ColdAirHiTempSchedPtr(0), ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0),
+              ColdCtrlLoTempSchedPtr(0), CondErrIndex(0), EnrgyImbalErrIndex(0), RadSurfNum(0), MSlabIn(0), MSlabOut(0), DirectHeatLossPower(0.0),
+              DirectHeatLossEnergy(0.0), DirectHeatGainPower(0.0), DirectHeatGainEnergy(0.0), TotalVentSlabRadPower(0.0), RadHeatingPower(0.0),
+              RadHeatingEnergy(0.0), RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0),
+              TotCoolCoilEnergy(0.0), SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0), LateCoolCoilPower(0.0), LateCoolCoilEnergy(0.0),
+              ElecFanPower(0.0), ElecFanEnergy(0.0), AirMassFlowRate(0.0), AirVolFlow(0.0), SlabInTemp(0.0), SlabOutTemp(0.0), ReturnAirTemp(0.0),
+              FanOutletTemp(0.0), ZoneInletTemp(0.0), AvailStatus(0), HVACSizingIndex(0), FirstPass(true)
         {
         }
     };
