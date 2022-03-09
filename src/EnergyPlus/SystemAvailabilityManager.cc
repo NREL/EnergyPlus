@@ -4222,14 +4222,13 @@ namespace SystemAvailabilityManager {
                         ErrorsFound = true;
                     }
                     // Check curve type
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        state,
-                                                                hybridVentMgr.OpeningFactorFWS, // Curve index
-                        {1},                                                                                          // Valid dimensions
-                        RoutineName,                                                                                  // Routine name
-                        cCurrentModuleObject,                                                                         // Object Type
-                                                                hybridVentMgr.Name,             // Object Name
-                        state.dataIPShortCut->cAlphaFieldNames(7));                                                   // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                                hybridVentMgr.OpeningFactorFWS,             // Curve index
+                                                                {1},                                        // Valid dimensions
+                                                                RoutineName,                                // Routine name
+                                                                cCurrentModuleObject,                       // Object Type
+                                                                hybridVentMgr.Name,                         // Object Name
+                                                                state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
                 }
             }
 
@@ -4528,7 +4527,6 @@ namespace SystemAvailabilityManager {
         int ControlledZoneNum;   // Index into the ZoneEquipConfig array
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int AirLoopNum;          // Air loop number
-        int ControlMode;         // Hybrid control mode
         int AirLoopCount;        // Air loop name count
         Real64 SchedMax;         // Maximum value specified in a schedule
         int SysAvailIndex;       // Hybrid Ventilation Sys Avail Manager index
@@ -4701,9 +4699,7 @@ namespace SystemAvailabilityManager {
 
         for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             auto &hybridVentMgr = state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum);
-            ControlMode =
-                GetCurrentScheduleValue(state, hybridVentMgr.ControlModeSchedPtr);
-            hybridVentMgr.ControlMode = ControlMode;
+            hybridVentMgr.ControlMode = GetCurrentScheduleValue(state, hybridVentMgr.ControlModeSchedPtr);
             // -1 means that the value will be determined inside CalcHybridVentSysAvailMgr.
             // IF the value is still -1, the program will stop.
             HybridVentSysAvailVentCtrl(SysAvailNum) = -1;
