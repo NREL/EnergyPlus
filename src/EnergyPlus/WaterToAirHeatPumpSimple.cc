@@ -2664,13 +2664,17 @@ namespace WaterToAirHeatPumpSimple {
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
                             .ReferencePowerCoolAtRefCdts);
-                    OutputReportPredefined::PreDefTableEntry(
-                        state,
-                        state.dataOutRptPredefined->pdchWAHPRefCOPatRefCdts,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).ReferenceCapCoolAtRefCdts /
+                    if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
+                            .ReferencePowerCoolAtRefCdts > 0) {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state,
+                            state.dataOutRptPredefined->pdchWAHPRefCOPatRefCdts,
+                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                                .ReferencePowerCoolAtRefCdts);
+                                    .ReferenceCapCoolAtRefCdts /
+                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
+                                    .ReferencePowerCoolAtRefCdts);
+                    }
                 }
             }
         }
