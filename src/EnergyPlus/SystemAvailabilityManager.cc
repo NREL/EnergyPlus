@@ -799,97 +799,98 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).Name = cAlphaArgs(1);
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).MgrType = DataPlant::SystemAvailabilityType::OptimumStart;
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
-                if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).SchedPtr == 0) {
+                auto &optimumStartSysAvailMan = state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum);
+                optimumStartSysAvailMan.Name = cAlphaArgs(1);
+                optimumStartSysAvailMan.MgrType = DataPlant::SystemAvailabilityType::OptimumStart;
+                optimumStartSysAvailMan.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
+                if (optimumStartSysAvailMan.SchedPtr == 0) {
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).FanSched = cAlphaArgs(3);
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).FanSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).FanSchedPtr == 0) {
+                optimumStartSysAvailMan.FanSched = cAlphaArgs(3);
+                optimumStartSysAvailMan.FanSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (optimumStartSysAvailMan.FanSchedPtr == 0) {
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
 
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).MaxOptStartTime = rNumericArgs(1);
+                optimumStartSysAvailMan.MaxOptStartTime = rNumericArgs(1);
 
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).optimumStartControlType =
+                optimumStartSysAvailMan.optimumStartControlType =
                     static_cast<OptimumStartControlType>(
                         getEnumerationValue(OptimumStartControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
 
-                if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).optimumStartControlType ==
+                if (optimumStartSysAvailMan.optimumStartControlType ==
                     OptimumStartControlType::Invalid) {
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).optimumStartControlType =
+                    optimumStartSysAvailMan.optimumStartControlType =
                         OptimumStartControlType::ControlZone;
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
 
-                if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).optimumStartControlType == OptimumStartControlType::ControlZone) {
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).CtrlZoneName = cAlphaArgs(5);
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZoneNum =
+                if (optimumStartSysAvailMan.optimumStartControlType == OptimumStartControlType::ControlZone) {
+                    optimumStartSysAvailMan.CtrlZoneName = cAlphaArgs(5);
+                    optimumStartSysAvailMan.ZoneNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
-                    if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZoneNum == 0) {
+                    if (optimumStartSysAvailMan.ZoneNum == 0) {
                         ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                         ShowSevereError(state, "not found: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                         ErrorsFound = true;
                     }
                 }
 
-                if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).optimumStartControlType == OptimumStartControlType::MaximumOfZoneList) {
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZoneListName = cAlphaArgs(6);
+                if (optimumStartSysAvailMan.optimumStartControlType == OptimumStartControlType::MaximumOfZoneList) {
+                    optimumStartSysAvailMan.ZoneListName = cAlphaArgs(6);
                     for (int zoneListNum = 1; zoneListNum <= state.dataHeatBal->NumOfZoneLists; ++zoneListNum) {
                         if (state.dataHeatBal->ZoneList(zoneListNum).Name == cAlphaArgs(6)) {
-                            state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).NumOfZones =
+                            optimumStartSysAvailMan.NumOfZones =
                                 state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
-                            state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum)
+                            optimumStartSysAvailMan
                                 .ZonePtrs.allocate(state.dataHeatBal->ZoneList(zoneListNum).NumOfZones);
                             for (int zoneNumInList = 1; zoneNumInList <= state.dataHeatBal->ZoneList(zoneListNum).NumOfZones; ++zoneNumInList) {
-                                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZonePtrs(zoneNumInList) =
+                                optimumStartSysAvailMan.ZonePtrs(zoneNumInList) =
                                     state.dataHeatBal->ZoneList(zoneListNum).Zone(zoneNumInList);
                             }
                         }
                     }
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).NumOfZones =
+                    optimumStartSysAvailMan.NumOfZones =
                         UtilityRoutines::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
-                    if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).NumOfZones == 0) {
+                    if (optimumStartSysAvailMan.NumOfZones == 0) {
                         ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                         ShowSevereError(state, "not found: " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                         ErrorsFound = true;
                     }
                 }
 
-                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).controlAlgorithm =
+                optimumStartSysAvailMan.controlAlgorithm =
                     static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(7))));
 
-                if (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).controlAlgorithm == ControlAlgorithm::Invalid) {
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).controlAlgorithm = ControlAlgorithm::AdaptiveASHRAE;
+                if (optimumStartSysAvailMan.controlAlgorithm == ControlAlgorithm::Invalid) {
+                    optimumStartSysAvailMan.controlAlgorithm = ControlAlgorithm::AdaptiveASHRAE;
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                     ErrorsFound = true;
                 }
 
-                switch (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).controlAlgorithm) {
+                switch (optimumStartSysAvailMan.controlAlgorithm) {
                 case ControlAlgorithm::ConstantTemperatureGradient: {
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ConstTGradCool = rNumericArgs(2);
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ConstTGradHeat = rNumericArgs(3);
+                    optimumStartSysAvailMan.ConstTGradCool = rNumericArgs(2);
+                    optimumStartSysAvailMan.ConstTGradHeat = rNumericArgs(3);
                     break;
                 }
 
                 case ControlAlgorithm::AdaptiveTemperatureGradient: {
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).InitTGradCool = rNumericArgs(4);
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).InitTGradHeat = rNumericArgs(5);
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).NumPreDays = rNumericArgs(7);
+                    optimumStartSysAvailMan.InitTGradCool = rNumericArgs(4);
+                    optimumStartSysAvailMan.InitTGradHeat = rNumericArgs(5);
+                    optimumStartSysAvailMan.NumPreDays = rNumericArgs(7);
                     break;
                 }
 
                 case ControlAlgorithm::ConstantStartTime: {
-                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ConstStartTime = rNumericArgs(6);
+                    optimumStartSysAvailMan.ConstStartTime = rNumericArgs(6);
                     break;
                 }
 
@@ -900,19 +901,19 @@ namespace SystemAvailabilityManager {
                 SetupOutputVariable(state,
                                     "Availability Manager Optimum Start Control Status",
                                     OutputProcessor::Unit::None,
-                                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).AvailStatus,
+                                    optimumStartSysAvailMan.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).Name);
+                                    optimumStartSysAvailMan.Name);
 
                 // add
                 SetupOutputVariable(state,
                                     "Availability Manager Optimum Start Time Before Occupancy",
                                     OutputProcessor::Unit::hr,
-                                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).NumHoursBeforeOccupancy,
+                                    optimumStartSysAvailMan.NumHoursBeforeOccupancy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).Name,
+                                    optimumStartSysAvailMan.Name,
                                     "Daily");
             }
         }
@@ -1699,14 +1700,15 @@ namespace SystemAvailabilityManager {
             }
 
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs; ++SysAvailNum) {
-                switch (state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).optimumStartControlType) {
+                auto &optimumStartSysAvailMan = state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum);
+                switch (optimumStartSysAvailMan.optimumStartControlType) {
                 case OptimumStartControlType::ControlZone: {
                     // set the controlled zone numbers
                     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
                             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
-                                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZoneNum) {
-                                state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
+                                optimumStartSysAvailMan.ZoneNum) {
+                                optimumStartSysAvailMan.ControlledZoneNum = ControlledZoneNum;
                                 break;
                             }
                         }
@@ -1716,17 +1718,17 @@ namespace SystemAvailabilityManager {
                 case OptimumStartControlType::MaximumOfZoneList: {
                     // a zone list
                     ZoneListNum = UtilityRoutines::FindItemInList(
-                        state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZoneListName, state.dataHeatBal->ZoneList);
+                        optimumStartSysAvailMan.ZoneListName, state.dataHeatBal->ZoneList);
                     if (ZoneListNum > 0) {
-                        state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).NumOfZones =
+                        optimumStartSysAvailMan.NumOfZones =
                             state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
-                        if (!allocated(state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZonePtrs)) {
-                            state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum)
+                        if (!allocated(optimumStartSysAvailMan.ZonePtrs)) {
+                            optimumStartSysAvailMan
                                 .ZonePtrs.allocate({1, state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones});
                         }
                         for (ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
                             ZoneNum = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
-                            state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum).ZonePtrs(ScanZoneListNum) = ZoneNum;
+                            optimumStartSysAvailMan.ZonePtrs(ScanZoneListNum) = ZoneNum;
                         }
                     }
                     break;
