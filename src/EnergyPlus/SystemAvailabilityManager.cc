@@ -4790,7 +4790,6 @@ namespace SystemAvailabilityManager {
         using Psychrometrics::PsyWFnTdbRhPb;
 
         int ZoneNum;                        // actual zone number of the control zone
-        int ControlMode;                    // Hybrid control mode
         int HStatZoneNum;                   // Humidity control zone number
         Real64 ZoneAirEnthalpy;             // Zone air enthalpy
         Real64 ZoneAirDewPoint;             // Zone air dew point temperature
@@ -4825,8 +4824,6 @@ namespace SystemAvailabilityManager {
             KeepStatus = true;
         }
 
-        ControlMode = hybridVentMgr.ControlMode;
-
         ZoneNum = hybridVentMgr.ActualZoneNum;
         if (!KeepStatus) hybridVentMgr.VentilationCtrl = HybridVentCtrl_NoAction;
         TempExt = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
@@ -4837,7 +4834,7 @@ namespace SystemAvailabilityManager {
 
         if (!KeepStatus) {
             {
-                auto const SELECT_CASE_var(ControlMode);
+                auto const SELECT_CASE_var(hybridVentMgr.ControlMode);
 
                 if (SELECT_CASE_var == HybridVentMode_No) {
                     hybridVentMgr.VentilationCtrl = HybridVentCtrl_NoAction;
