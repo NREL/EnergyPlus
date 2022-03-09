@@ -139,18 +139,19 @@ namespace SystemAvailabilityManager {
         "AVAILABILITYMANAGER:HYBRIDVENTILATION",
         "AVAILABILITYMANAGER:OPTIMUMSTART"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataPlant::SystemAvailabilityType::Num)> SystemAvailabilityTypeNamesCC {"AvailabilityManager:Scheduled",
-                                                     "AvailabilityManager:ScheduledOn",
-                                                     "AvailabilityManager:ScheduledOff",
-                                                     "AvailabilityManager:NightCycle",
-                                                     "AvailabilityManager:DifferentialThermostat",
-                                                     "AvailabilityManager:HighTemperatureTurnOff",
-                                                     "AvailabilityManager:HighTemperatureTurnOn",
-                                                     "AvailabilityManager:LowTemperatureTurnOff",
-                                                     "AvailabilityManager:LowTemperatureTurnOn",
-                                                     "AvailabilityManager:NightVentilation",
-                                                     "AvailabilityManager:HybridVentilation",
-                                                     "AvailabilityManager:OptimumStart"};
+    static constexpr std::array<std::string_view, static_cast<int>(DataPlant::SystemAvailabilityType::Num)> SystemAvailabilityTypeNamesCC{
+        "AvailabilityManager:Scheduled",
+        "AvailabilityManager:ScheduledOn",
+        "AvailabilityManager:ScheduledOff",
+        "AvailabilityManager:NightCycle",
+        "AvailabilityManager:DifferentialThermostat",
+        "AvailabilityManager:HighTemperatureTurnOff",
+        "AvailabilityManager:HighTemperatureTurnOn",
+        "AvailabilityManager:LowTemperatureTurnOff",
+        "AvailabilityManager:LowTemperatureTurnOn",
+        "AvailabilityManager:NightVentilation",
+        "AvailabilityManager:HybridVentilation",
+        "AvailabilityManager:OptimumStart"};
 
     void ManageSystemAvailability(EnergyPlusData &state)
     {
@@ -382,11 +383,10 @@ namespace SystemAvailabilityManager {
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
-        std::string cCurrentModuleObject;
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
-        int maxAlphas;           // maximum number of alphas for this set of objects
-        int maxNumbers;          // maximum number of numbers for this set of objects
+        int maxAlphas = 0;           // maximum number of alphas for this set of objects
+        int maxNumbers = 0;          // maximum number of numbers for this set of objects
         int numArgs;             // maximum number of arguments for this set of objects
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -396,50 +396,12 @@ namespace SystemAvailabilityManager {
         int TotalNumComp;
 
         // Get the number of occurrences of each type of manager and read in data
-        cCurrentModuleObject = "AvailabilityManager:Scheduled";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = NumNumbers;
-        maxAlphas = NumAlphas;
-        cCurrentModuleObject = "AvailabilityManager:ScheduledOn";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:ScheduledOff";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:NightCycle";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:DifferentialThermostat";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOff";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOn";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOff";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOn";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:NightVentilation";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
-        cCurrentModuleObject = "AvailabilityManager:OptimumStart";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        maxNumbers = max(maxNumbers, NumNumbers);
-        maxAlphas = max(maxAlphas, NumAlphas);
+        for (int currentModuleObjectCount = 0; currentModuleObjectCount < static_cast<int>(DataPlant::SystemAvailabilityType::Num); ++currentModuleObjectCount) {
+            std::string_view cCurrentModuleObject = SystemAvailabilityTypeNamesCC[currentModuleObjectCount];
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+            maxNumbers = max(maxNumbers, NumNumbers);
+            maxAlphas = max(maxAlphas, NumAlphas);
+        }
 
         cAlphaFieldNames.allocate(maxAlphas);
         cAlphaArgs.allocate(maxAlphas);
@@ -462,7 +424,7 @@ namespace SystemAvailabilityManager {
             }
         }
 
-        cCurrentModuleObject = "AvailabilityManager:Scheduled";
+        std::string_view cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::Scheduled)];
         state.dataSystemAvailabilityManager->NumSchedSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -491,7 +453,7 @@ namespace SystemAvailabilityManager {
 
                 schedMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (schedMgr.SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -507,7 +469,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:ScheduledOn";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::ScheduledOn)];
         state.dataSystemAvailabilityManager->NumSchedOnSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -536,7 +498,7 @@ namespace SystemAvailabilityManager {
 
                 schedOnMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (schedOnMgr.SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format("{}{} = \"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -552,7 +514,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:ScheduledOff";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::ScheduledOff)];
         state.dataSystemAvailabilityManager->NumSchedOffSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -581,7 +543,7 @@ namespace SystemAvailabilityManager {
 
                 schedOffMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (schedOffMgr.SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -597,7 +559,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:NightCycle";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::NightCycle)];
         state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         CyclingTimeSteps = 0;
@@ -630,14 +592,14 @@ namespace SystemAvailabilityManager {
                 nightCycleMgr.CyclingTimeSteps = CyclingTimeSteps;
                 nightCycleMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (nightCycleMgr.SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
                 nightCycleMgr.FanSched = cAlphaArgs(3);
                 nightCycleMgr.FanSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (nightCycleMgr.FanSchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
@@ -646,7 +608,7 @@ namespace SystemAvailabilityManager {
                     getEnumerationValue(NightCycleControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
 
                 if (nightCycleMgr.nightCycleControlType == NightCycleControlType::Invalid) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
@@ -656,7 +618,7 @@ namespace SystemAvailabilityManager {
                     getEnumerationValue(CyclingRunTimeControlNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(5))));
 
                 if (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::Invalid) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -683,8 +645,12 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                                cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\" not found.");
+                                            format(R"({}{}="{}" invalid {}="{}" not found.)",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   cAlphaFieldNames(6),
+                                                   cAlphaArgs(6)));
                             ErrorsFound = true;
                         }
                     }
@@ -712,8 +678,12 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                                cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\" not found.");
+                                            format(R"({}{}="{}" invalid {}="{}" not found.)",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   cAlphaFieldNames(7),
+                                                   cAlphaArgs(7)));
                             ErrorsFound = true;
                         }
                     }
@@ -741,8 +711,12 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                                cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\" not found.");
+                                            format(R"({}{}="{}" invalid {}="{}" not found.)",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   cAlphaFieldNames(8),
+                                                   cAlphaArgs(8)));
                             ErrorsFound = true;
                         }
                     }
@@ -770,8 +744,12 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
-                                                cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\" not found.");
+                                            format(R"({}{}="{}" invalid {}="{}" not found.)",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   cAlphaFieldNames(9),
+                                                   cAlphaArgs(9)));
                             ErrorsFound = true;
                         }
                     }
@@ -788,7 +766,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:OptimumStart";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::OptimumStart)];
         state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         CyclingTimeSteps = 0;
@@ -817,14 +795,14 @@ namespace SystemAvailabilityManager {
                 optimumStartMgr.MgrType = DataPlant::SystemAvailabilityType::OptimumStart;
                 optimumStartMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (optimumStartMgr.SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
                 optimumStartMgr.FanSched = cAlphaArgs(3);
                 optimumStartMgr.FanSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (optimumStartMgr.FanSchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
@@ -839,7 +817,7 @@ namespace SystemAvailabilityManager {
                     OptimumStartControlType::Invalid) {
                     optimumStartMgr.optimumStartControlType =
                         OptimumStartControlType::ControlZone;
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
@@ -849,7 +827,7 @@ namespace SystemAvailabilityManager {
                     optimumStartMgr.ZoneNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
                     if (optimumStartMgr.ZoneNum == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                        ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                         ShowSevereError(state, "not found: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                         ErrorsFound = true;
                     }
@@ -871,7 +849,7 @@ namespace SystemAvailabilityManager {
                     optimumStartMgr.NumOfZones =
                         UtilityRoutines::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
                     if (optimumStartMgr.NumOfZones == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                        ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                         ShowSevereError(state, "not found: " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                         ErrorsFound = true;
                     }
@@ -882,7 +860,7 @@ namespace SystemAvailabilityManager {
 
                 if (optimumStartMgr.controlAlgorithm == ControlAlgorithm::Invalid) {
                     optimumStartMgr.controlAlgorithm = ControlAlgorithm::AdaptiveASHRAE;
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                     ErrorsFound = true;
                 }
@@ -927,7 +905,7 @@ namespace SystemAvailabilityManager {
             }
         }
 
-        cCurrentModuleObject = "AvailabilityManager:DifferentialThermostat";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::DiffThermo)];
         state.dataSystemAvailabilityManager->NumDiffTSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -994,7 +972,7 @@ namespace SystemAvailabilityManager {
                 }
 
                 if (diffThermoMgr.TempDiffOff > diffThermoMgr.TempDiffOn) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "The " + cNumericFieldNames(2) + " is greater than the " + cNumericFieldNames(1) + '.');
                     ErrorsFound = true;
                 }
@@ -1010,7 +988,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOff";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::HiTempTOff)];
         state.dataSystemAvailabilityManager->NumHiTurnOffSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -1065,7 +1043,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOn";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::HiTempTOn)];
         state.dataSystemAvailabilityManager->NumHiTurnOnSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -1121,7 +1099,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOff";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::LoTempTOff)];
         state.dataSystemAvailabilityManager->NumLoTurnOffSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -1170,7 +1148,7 @@ namespace SystemAvailabilityManager {
                     loTurnOffMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (loTurnOffMgr.SchedPtr == 0) {
                         ShowSevereError(state, std::string{RoutineName} + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\" not found.");
-                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, format("Occurs in {}=\"{}\".", cCurrentModuleObject, cAlphaArgs(1)));
                         ErrorsFound = true;
                     }
                 } else {
@@ -1188,7 +1166,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOn";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::LoTempTOn)];
         state.dataSystemAvailabilityManager->NumLoTurnOnSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -1244,7 +1222,7 @@ namespace SystemAvailabilityManager {
             } // SysAvailNum
         }
 
-        cCurrentModuleObject = "AvailabilityManager:NightVentilation";
+        cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::NightVent)];
         state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -1273,21 +1251,21 @@ namespace SystemAvailabilityManager {
 
                 nightVentMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (nightVentMgr.SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
                 nightVentMgr.FanSched = cAlphaArgs(3);
                 nightVentMgr.FanSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (nightVentMgr.FanSchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
                 nightVentMgr.VentTempSched = cAlphaArgs(4);
                 nightVentMgr.VentTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (nightVentMgr.VentTempSchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
@@ -1298,7 +1276,7 @@ namespace SystemAvailabilityManager {
                 nightVentMgr.ZoneNum =
                     UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
                 if (nightVentMgr.ZoneNum == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, "not found: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -3935,10 +3913,9 @@ namespace SystemAvailabilityManager {
         auto &HybridVentSysAvailANCtrlStatus = state.dataHVACGlobal->HybridVentSysAvailANCtrlStatus;
         auto &HybridVentSysAvailMaster = state.dataHVACGlobal->HybridVentSysAvailMaster;
         auto &HybridVentSysAvailWindModifier = state.dataHVACGlobal->HybridVentSysAvailWindModifier;
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         // Get the number of occurrences of each type of System Availability Manager
-        cCurrentModuleObject = "AvailabilityManager:HybridVentilation";
+        std::string_view cCurrentModuleObject = SystemAvailabilityTypeNamesCC[static_cast<int>(DataPlant::SystemAvailabilityType::HybridVent)];
         NumHybridVentSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumHybridVentSysAvailMgrs == 0) return;
@@ -3983,7 +3960,7 @@ namespace SystemAvailabilityManager {
             hybridVentMgr.ActualZoneNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (hybridVentMgr.ActualZoneNum == 0) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   "not found: " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
@@ -3992,7 +3969,7 @@ namespace SystemAvailabilityManager {
             hybridVentMgr.ControlModeSchedPtr =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (hybridVentMgr.ControlModeSchedPtr == 0) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   "not found: " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
@@ -4002,7 +3979,7 @@ namespace SystemAvailabilityManager {
             SchedMin = GetScheduleMinValue(state, hybridVentMgr.ControlModeSchedPtr);
             SchedMax = GetScheduleMaxValue(state, hybridVentMgr.ControlModeSchedPtr);
             if (SchedMin == 0 && SchedMax == 0) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                       "\" specifies control mode 0 for all entries.");
@@ -4010,7 +3987,7 @@ namespace SystemAvailabilityManager {
                                   "All zones using this " + state.dataIPShortCut->cAlphaFieldNames(4) + " have no hybrid ventilation control.");
             }
             if (SchedMax > 7.0) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                       "\", the maximum schedule value should be 7. However, ");
@@ -4018,7 +3995,7 @@ namespace SystemAvailabilityManager {
                 ErrorsFound = true;
             }
             if (SchedMin < 0.0) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                       "the minimum schedule value should be 0. However, ");
@@ -4026,7 +4003,7 @@ namespace SystemAvailabilityManager {
                 ErrorsFound = true;
             }
             if (SchedMax == 7.0 && !state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                       "\", When the schedule value is 7, carbon dioxide (CO2) control is requested. ");
@@ -4039,7 +4016,7 @@ namespace SystemAvailabilityManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "NO")) {
                 hybridVentMgr.UseRainIndicator = false;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
                     state, "..invalid value: " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
                 ShowContinueError(state, "Valid choices are Yes or No.");
@@ -4050,7 +4027,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 0) {
                 hybridVentMgr.MaxWindSpeed = state.dataIPShortCut->rNumericArgs(1);
                 if (state.dataIPShortCut->rNumericArgs(1) > 40.0 || state.dataIPShortCut->rNumericArgs(1) < 0.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " is beyond the range.");
                     ShowContinueError(
                         state,
@@ -4063,7 +4040,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 1) {
                 hybridVentMgr.MinOutdoorTemp = state.dataIPShortCut->rNumericArgs(2);
                 if (state.dataIPShortCut->rNumericArgs(2) > 100.0 || state.dataIPShortCut->rNumericArgs(2) < -100.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(2) + " is beyond the range.");
                     ShowContinueError(state,
                                       format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
@@ -4074,7 +4051,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 2) {
                 hybridVentMgr.MaxOutdoorTemp = state.dataIPShortCut->rNumericArgs(3);
                 if (state.dataIPShortCut->rNumericArgs(3) > 100.0 || state.dataIPShortCut->rNumericArgs(3) < -100.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(3) + " is beyond the range.");
                     ShowContinueError(state,
                                       format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
@@ -4085,9 +4062,12 @@ namespace SystemAvailabilityManager {
             // Ensure MaxTemp >= MinTemp
             if (state.dataIPShortCut->rNumericArgs(2) >= state.dataIPShortCut->rNumericArgs(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" The " +
-                                    state.dataIPShortCut->cNumericFieldNames(2) + " must be less than the " +
-                                    state.dataIPShortCut->cNumericFieldNames(3));
+                                format("{}{}=\"{}\" The {} must be less than the {}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2),
+                                       state.dataIPShortCut->cNumericFieldNames(3)));
                 ShowContinueError(state,
                                   format("The {} is {:.0T}. The {} is {:.0T}.",
                                          state.dataIPShortCut->cNumericFieldNames(2),
@@ -4101,7 +4081,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 3) {
                 hybridVentMgr.MinOutdoorEnth = state.dataIPShortCut->rNumericArgs(4);
                 if (state.dataIPShortCut->rNumericArgs(4) > 300000.0 || state.dataIPShortCut->rNumericArgs(4) < 0.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(4) + " is beyond the range.");
                     ShowContinueError(state,
                                       format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg",
@@ -4112,7 +4092,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 4) {
                 hybridVentMgr.MaxOutdoorEnth = state.dataIPShortCut->rNumericArgs(5);
                 if (state.dataIPShortCut->rNumericArgs(5) > 300000.0 || state.dataIPShortCut->rNumericArgs(5) < 0.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(5) + " is beyond the range.");
                     ShowContinueError(state,
                                       format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg",
@@ -4123,9 +4103,12 @@ namespace SystemAvailabilityManager {
             // Ensure MaxEnth >= MiniEnth
             if (state.dataIPShortCut->rNumericArgs(4) >= state.dataIPShortCut->rNumericArgs(5)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" The " +
-                                    state.dataIPShortCut->cNumericFieldNames(4) + " must be less than the " +
-                                    state.dataIPShortCut->cNumericFieldNames(5));
+                                format("{}{}=\"{}\" The {} must be less than the {}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(4),
+                                       state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state,
                                   format("The {} is {:.0T}. The {} is {:.0T}.",
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -4140,7 +4123,7 @@ namespace SystemAvailabilityManager {
                 hybridVentMgr.MinOutdoorDewPoint =
                     state.dataIPShortCut->rNumericArgs(6);
                 if (state.dataIPShortCut->rNumericArgs(6) > 100.0 || state.dataIPShortCut->rNumericArgs(6) < -100.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(6) + " is beyond the range.");
                     ShowContinueError(state,
                                       format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
@@ -4152,7 +4135,7 @@ namespace SystemAvailabilityManager {
                 hybridVentMgr.MaxOutdoorDewPoint =
                     state.dataIPShortCut->rNumericArgs(7);
                 if (state.dataIPShortCut->rNumericArgs(7) > 100.0 || state.dataIPShortCut->rNumericArgs(7) < -100.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(7) + " is beyond the range.");
                     ShowContinueError(state,
                                       format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
@@ -4163,9 +4146,12 @@ namespace SystemAvailabilityManager {
             // Ensure MaxTemp >= MinTemp
             if (state.dataIPShortCut->rNumericArgs(6) >= state.dataIPShortCut->rNumericArgs(7)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" The " +
-                                    state.dataIPShortCut->cNumericFieldNames(6) + " must be less than the " +
-                                    state.dataIPShortCut->cNumericFieldNames(7));
+                                format("{}{}=\"{}\" The {} must be less than the {}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(6),
+                                       state.dataIPShortCut->cNumericFieldNames(7)));
                 ShowContinueError(state,
                                   format("The {} is {:.0T}. The {} is {:.0T}.",
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -4179,7 +4165,7 @@ namespace SystemAvailabilityManager {
             hybridVentMgr.MinOASchedPtr =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             if (hybridVentMgr.MinOASchedPtr == 0) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid");
+                ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   "..not found: " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) + "\".");
                 ErrorsFound = true;
@@ -4187,9 +4173,12 @@ namespace SystemAvailabilityManager {
             SchedMin = GetScheduleMinValue(state, hybridVentMgr.MinOASchedPtr);
             if (SchedMin < 0.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", Schedule value must be >= 0 in " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(6) + "\".");
+                                format(R"({}{}="{}", Schedule value must be >= 0 in {}="{}".)",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(6),
+                                       state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, format("The minimum schedule value is {:.1T}", SchedMin));
                 ErrorsFound = true;
             }
@@ -4198,7 +4187,7 @@ namespace SystemAvailabilityManager {
                 hybridVentMgr.OpeningFactorFWS =
                     GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
                 if (hybridVentMgr.OpeningFactorFWS <= 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
                         state, " not found: " + state.dataIPShortCut->cAlphaFieldNames(7) + "=\"" + state.dataIPShortCut->cAlphaArgs(7) + "\".");
                     ErrorsFound = true;
@@ -4206,7 +4195,7 @@ namespace SystemAvailabilityManager {
                     GetCurveMinMaxValues(
                         state, hybridVentMgr.OpeningFactorFWS, CurveMin, CurveMax);
                     if (CurveMin < 0.0) {
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                        ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           "The minimum wind speed used in " + state.dataIPShortCut->cAlphaFieldNames(7) + "=\"" +
                                               state.dataIPShortCut->cAlphaArgs(7) + "should be greater than or equal to 0.0 (m/s)");
@@ -4216,7 +4205,7 @@ namespace SystemAvailabilityManager {
                     CurveVal =
                         CurveValue(state, hybridVentMgr.OpeningFactorFWS, CurveMin);
                     if (CurveVal < 0.0) {
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                        ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           "The minimum value of " + state.dataIPShortCut->cAlphaFieldNames(7) +
                                               " must be greater than or equal to 0.0 at the minimum value of wind speed.");
@@ -4227,7 +4216,7 @@ namespace SystemAvailabilityManager {
                     CurveVal =
                         CurveValue(state, hybridVentMgr.OpeningFactorFWS, CurveMax);
                     if (CurveVal > 1.0) {
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                        ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           "The maximum value of " + state.dataIPShortCut->cAlphaFieldNames(7) +
                                               " must be less than or equal to 1.0 at the maximum value of wind speed.");
@@ -4258,7 +4247,7 @@ namespace SystemAvailabilityManager {
                     GetScheduleMaxValue(state, hybridVentMgr.ANControlTypeSchedPtr);
                 HybridVentSysAvailANCtrlStatus(SysAvailNum) = hybridVentMgr.ANControlTypeSchedPtr;
                 if (SchedMax > 1.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       " For " + state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\",");
                     ShowContinueError(state, "the maximum schedule value should be 1. However, ");
@@ -4266,7 +4255,7 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       "For " + state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\",");
                     ShowContinueError(state, "the minimum schedule value should be 0. However, ");
@@ -4278,7 +4267,7 @@ namespace SystemAvailabilityManager {
             hybridVentMgr.SimpleControlTypeSchedPtr =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
             if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && hybridVentMgr.ANControlTypeSchedPtr > 0) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   "The inputs for" + state.dataIPShortCut->cAlphaFieldNames(8) + " and " + state.dataIPShortCut->cAlphaFieldNames(9) +
                                       " are valid.");
@@ -4291,7 +4280,7 @@ namespace SystemAvailabilityManager {
                 SchedMax =
                     GetScheduleMaxValue(state, hybridVentMgr.SimpleControlTypeSchedPtr);
                 if (SchedMax > 1.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       "For " + state.dataIPShortCut->cAlphaFieldNames(9) + "=\"" + state.dataIPShortCut->cAlphaArgs(9) + "\",");
                     ShowContinueError(state, "the maximum schedule value should be 1. However, ");
@@ -4299,7 +4288,7 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       "For " + state.dataIPShortCut->cAlphaFieldNames(9) + "=\"" + state.dataIPShortCut->cAlphaArgs(9) + "\",");
                     ShowContinueError(state, "the minimum schedule value should be 0. However, ");
@@ -4317,7 +4306,7 @@ namespace SystemAvailabilityManager {
                     SchedMax = GetScheduleMaxValue(
                         state, hybridVentMgr.SimpleControlTypeSchedPtr);
                     if (hybridVentMgr.VentilationPtr <= 0 && int(SchedMax) == 1) {
-                        ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                        ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state,
                                           state.dataIPShortCut->cAlphaFieldNames(10) + "=\"" + state.dataIPShortCut->cAlphaArgs(10) +
                                               "\" is required and not found.");
@@ -4331,7 +4320,7 @@ namespace SystemAvailabilityManager {
                 if (hybridVentMgr.ActualZoneNum !=
                     state.dataHeatBal->Ventilation(hybridVentMgr.VentilationPtr)
                         .ZonePtr) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                    ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
                         state,
                         "The Zone name specified in the Ventilation object " +
@@ -4349,8 +4338,7 @@ namespace SystemAvailabilityManager {
 
             if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 &&
                 state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + hybridVentMgr.Name + "\"");
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                 ShowContinueError(state, "The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError(state,
                                   "The Airflow Network model is not allowed to perform. Please set the control type = NoMultizoneOrDistribution");
@@ -4359,12 +4347,10 @@ namespace SystemAvailabilityManager {
 
             if (hybridVentMgr.SimpleControlTypeSchedPtr == 0) {
                 if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + hybridVentMgr.Name + "\"");
+                    ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
                 } else if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + hybridVentMgr.Name + "\"");
+                    ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError(state, "The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");
                 }
@@ -4373,7 +4359,7 @@ namespace SystemAvailabilityManager {
             // Disallow combination of simple control and OA control mode
             SchedMax = GetScheduleMaxValue(state, hybridVentMgr.ControlModeSchedPtr);
             if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && SchedMax == 4.0) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   "The outdoor ventilation air control type defined in " + state.dataIPShortCut->cAlphaArgs(4) +
                                       " cannot work together with " + state.dataIPShortCut->cAlphaFieldNames(9));
@@ -4394,11 +4380,13 @@ namespace SystemAvailabilityManager {
                 if (state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum - 1).ANControlTypeSchedPtr > 0) {
                     if (state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).SimpleControlTypeSchedPtr > 0) {
                         ShowSevereError(state,
-                                        "The AirflowNetwork model is used for natural ventilation calculation in " + cCurrentModuleObject + "=\"" +
-                                            state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum - 1).Name + "\"");
+                                        format("The AirflowNetwork model is used for natural ventilation calculation in {}=\"{}\"",
+                                               cCurrentModuleObject,
+                                               state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum - 1).Name));
                         ShowContinueError(state,
-                                          "The simple airflow objects are used for natural ventilation calculation in " + cCurrentModuleObject +
-                                              "=\"" + state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).Name + "\"");
+                                          format("The simple airflow objects are used for natural ventilation calculation in {}=\"{}\"",
+                                                 cCurrentModuleObject,
+                                                 state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).Name));
                         ShowContinueError(state, "The hybrid ventilation control requires the same models to calculate natural ventilation");
                         ErrorsFound = true;
                     }
@@ -4406,11 +4394,13 @@ namespace SystemAvailabilityManager {
                 if (state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum - 1).SimpleControlTypeSchedPtr > 0) {
                     if (state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).ANControlTypeSchedPtr > 0) {
                         ShowSevereError(state,
-                                        "The Airflow Network model is used for natural ventilation calculation in " + cCurrentModuleObject + "=\"" +
-                                            state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).Name + "\"");
+                                        format("The Airflow Network model is used for natural ventilation calculation in {}=\"{}\"",
+                                               cCurrentModuleObject,
+                                               state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).Name));
                         ShowContinueError(state,
-                                          "The simple airflow objects are used for natural ventilation calculation in " + cCurrentModuleObject +
-                                              "=\"" + state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum - 1).Name + "\"");
+                                          format("The simple airflow objects are used for natural ventilation calculation in {}=\"{}\"",
+                                                 cCurrentModuleObject,
+                                                 state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum - 1).Name));
                         ShowContinueError(state, "The hybrid ventilation control requires the same models to calculate natural ventilation");
                         ErrorsFound = true;
                     }
