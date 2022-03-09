@@ -62,7 +62,7 @@ void progress_callback_handler(int const progress)
 int main(int argc, char *argv[])
 {
     std::cout << "Using EnergyPlus as a library." << std::endl;
-    EnergyPlus::EnergyPlusData *state {reinterpret_cast<EnergyPlus::EnergyPlusData *>(stateNew())};
+    EnergyPlus::EnergyPlusData *state{reinterpret_cast<EnergyPlus::EnergyPlusData *>(stateNew())};
     StoreMessageCallback(*state, message_callback_handler);
     StoreProgressCallback(*state, progress_callback_handler);
 

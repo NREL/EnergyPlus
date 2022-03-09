@@ -255,6 +255,8 @@ set(test_src
 set(test_dependencies energypluslib)
 
 if(LINK_WITH_PYTHON)
+  # Python integration tests access API functions directly, so energyplusapi must be linked just for this single test.
+  list(APPEND test_dependencies energyplusapi)
   add_definitions("-DLINK_WITH_PYTHON")
   find_package(PythonLibs 3 REQUIRED)
   include_directories(${Python_INCLUDE_DIRS})
