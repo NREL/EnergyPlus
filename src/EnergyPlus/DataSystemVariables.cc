@@ -183,7 +183,8 @@ namespace DataSystemVariables {
         for (std::size_t i = 0; i < numPathsToTest; ++i) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 foundFilePath = pathsToCheck[i].first;
-                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second + ")", FileSystem::getAbsolutePath(foundFilePath).string());
+                print(state.files.audit, "found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(foundFilePath).string());
+
                 return foundFilePath;
             } else {
                 std::pair<fs::path, std::string> currentPath(FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
@@ -197,10 +198,7 @@ namespace DataSystemVariables {
                 if (!found) {
                     pathsChecked.push_back(currentPath);
                 }
-                print(state.files.audit,
-                      "{}={}\n",
-                      "not found (" + pathsToCheck[i].second + ")\"",
-                      FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
+                print(state.files.audit, "not found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
             }
         }
 
