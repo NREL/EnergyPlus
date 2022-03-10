@@ -36,12 +36,20 @@ namespace Tarcog
             return std::make_shared<CIGUGapLayer>(thickness, pressure, gas);
         }
 
-        std::shared_ptr<CIGUSolidLayer>
-          Layers::makeDeflectable(const std::shared_ptr<CIGUSolidLayer> & layer,
-                                  const double youngsModulus,
-                                  const double poissonRatio)
+        std::shared_ptr<CIGUSolidLayer> Layers::updateMaterialData(
+          const std::shared_ptr<CIGUSolidLayer> & layer, double density, double youngsModulus)
         {
-            return std::make_shared<CIGUSolidLayerDeflection>(*layer, youngsModulus, poissonRatio);
+            // Deflection cannot be applied to shading layers
+            if(std::dynamic_pointer_cast<CIGUShadeLayer>(layer) == nullptr)
+            {
+                static const double poissonRatio{0.22};
+                return std::make_shared<CIGUSolidLayerDeflection>(
+                  *layer, youngsModulus, poissonRatio, density);
+            }
+            else
+            {
+                return layer;
+            }
         }
 
         std::shared_ptr<CIGUSolidLayer>

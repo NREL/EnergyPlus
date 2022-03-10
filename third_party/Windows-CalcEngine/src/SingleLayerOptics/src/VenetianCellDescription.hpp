@@ -3,15 +3,10 @@
 #include <memory>
 #include <vector>
 
+#include <WCEViewer.hpp>
+
 #include "CellDescription.hpp"
-
-namespace Viewer
-{
-    class CGeometry2D;
-    struct BeamViewFactor;
-    class CGeometry2DBeam;
-
-}   // namespace Viewer
+#include "VenetianSlat.hpp"
 
 namespace FenestrationCommon
 {
@@ -39,7 +34,7 @@ namespace SingleLayerOptics
         double segmentLength(const size_t Index) const;
 
         // View factors of enclosure slats
-        std::shared_ptr<FenestrationCommon::SquareMatrix> viewFactors();
+        FenestrationCommon::SquareMatrix viewFactors();
 
         // view factor of the beam entering the cell with profile angle
         std::shared_ptr<std::vector<Viewer::BeamViewFactor>>
@@ -65,14 +60,14 @@ namespace SingleLayerOptics
         size_t m_NumOfSegments;
 
         // Top and bottom slats of venetian cell
-        std::shared_ptr<CVenetianSlat> m_Top;
-        std::shared_ptr<CVenetianSlat> m_Bottom;
+        CVenetianSlat m_Top;
+        CVenetianSlat m_Bottom;
 
         // Complete enclosure from venetian cell
-        std::shared_ptr<Viewer::CGeometry2D> m_Geometry;
+        Viewer::CGeometry2D m_Geometry;
 
         // Geometry to handle direct to direct beam component
-        std::shared_ptr<Viewer::CGeometry2DBeam> m_BeamGeometry;
+        Viewer::CGeometry2DBeam m_BeamGeometry;
     };
 
 }   // namespace SingleLayerOptics

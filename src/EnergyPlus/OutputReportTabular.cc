@@ -4350,6 +4350,11 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
         state.dataHeatBal->SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
     }
 
+    // Airloop HVAC Exhaust System
+    for (int iExhSys = 1; iExhSys < state.dataZoneEquip->NumExhaustAirSystems; ++iExhSys) {
+        state.dataHeatBal->SysTotalHVACReliefHeatLoss += state.dataZoneEquip->ExhaustAirSystem(iExhSys).exhTotalHVACReliefHeatLoss;
+    }
+
     // Condenser water loop
     for (int iCooler = 1; iCooler <= state.dataCondenserLoopTowers->NumSimpleTowers; ++iCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec +

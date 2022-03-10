@@ -3028,8 +3028,11 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
 
     bool ErrorsFound(false);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(34, 1.0);
     WindowManager::InitGlassOpticalCalculations(*state);
 
     Real64 SHGC;         // Center-of-glass solar heat gain coefficient for ASHRAE
