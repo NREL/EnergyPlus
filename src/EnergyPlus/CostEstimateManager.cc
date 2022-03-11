@@ -93,7 +93,7 @@ namespace CostEstimateManager {
     // Create report using utility subroutines taken from OutputReportTabular (by J.Glazer)
 
     // Using/Aliasing
-        
+
     constexpr std::array<std::string_view, static_cast<int>(ParentObject::Num)> ParentObjectNamesUC{"GENERAL",
                                                                                                     "CONSTRUCTION",
                                                                                                     "COIL:DX",
@@ -368,10 +368,11 @@ namespace CostEstimateManager {
                         }
                     }
                     if (!coilFound) {
-                        ShowWarningError(state,
-                                         format("ComponentCost:LineItem: \"{}\", {}, invalid coil specified",
-                                                state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                                                format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                        ShowWarningError(
+                            state,
+                            format("ComponentCost:LineItem: \"{}\", {}, invalid coil specified",
+                                   state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                   format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
                         ShowContinueError(state,
                                           format("Coil Specified=\"{}\", calculations will not be completed for this item.",
                                                  state.dataCostEstimateManager->CostLineItem(Item).ParentObjName));
