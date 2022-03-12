@@ -76,6 +76,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
 using namespace EnergyPlus;
@@ -4302,6 +4303,54 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
     EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
     EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).InletNodeNum(2), 2);
     EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).OutletNodeNum(2), 23);
+}
+
+TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
+{
+    AirLoopHVACDOAS::AirLoopDOAS thisDOAS;
+    state->dataAirLoopHVACDOAS->airloopDOAS.push_back(thisDOAS);
+
+    int constexpr summerDesignDayTypeIndex(9);
+    int constexpr winterDesignDayTypeIndex(10);
+    state->dataWeatherManager->DesDayInput.allocate(4);
+    state->dataWeatherManager->DesDayInput(1).DayType = summerDesignDayTypeIndex;
+    state->dataWeatherManager->DesDayInput(1).MaxDryBulb = 27.0;
+    state->dataWeatherManager->DesDayInput(1).HumIndType = WeatherManager::DDHumIndType::HumRatio;
+    state->dataWeatherManager->DesDayInput(1).HumIndValue = 0.008;
+    state->dataWeatherManager->DesDayInput(2).DayType = summerDesignDayTypeIndex;
+    state->dataWeatherManager->DesDayInput(2).MaxDryBulb = 31.0;
+    state->dataWeatherManager->DesDayInput(2).HumIndType = WeatherManager::DDHumIndType::HumRatio;
+    state->dataWeatherManager->DesDayInput(2).HumIndValue = 0.01;
+    state->dataWeatherManager->DesDayInput(3).DayType = winterDesignDayTypeIndex;
+    state->dataWeatherManager->DesDayInput(3).MaxDryBulb = 9.0;
+    state->dataWeatherManager->DesDayInput(3).HumIndType = WeatherManager::DDHumIndType::HumRatio;
+    state->dataWeatherManager->DesDayInput(3).HumIndValue = 0.006;
+    state->dataWeatherManager->DesDayInput(4).DayType = winterDesignDayTypeIndex;
+    state->dataWeatherManager->DesDayInput(4).MaxDryBulb = 6.0;
+    state->dataWeatherManager->DesDayInput(4).HumIndType = WeatherManager::DDHumIndType::HumRatio;
+    state->dataWeatherManager->DesDayInput(4).HumIndValue = 0.004;
+
+    // test peak conditions used for sizing
+    thisDOAS.GetDesignDayConditions(*state);
+
+    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
+    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, state->dataWeatherManager->DesDayInput(2).HumIndValue, 0.000001);
+    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->DesDayInput(4).MaxDryBulb, 0.000001);
+    EXPECT_NEAR(thisDOAS.HeatOutHumRat, state->dataWeatherManager->DesDayInput(4).HumIndValue, 0.000001);
+
+    // note in these descriptions that DOAS systems do not use time of peak to select weather data used for sizing
+    // test higher summer humidity ratio for non-peak summer day (non-peak summer design day has lower OAT than peak summer day)
+    state->dataWeatherManager->DesDayInput(1).HumIndValue = 0.012;
+    // lower winter humidity ratio for non-peak winter day (non-peak winter design day has higher OAT then winter peak day)
+    state->dataWeatherManager->DesDayInput(3).HumIndValue = 0.002;
+
+    thisDOAS.GetDesignDayConditions(*state);
+
+    // humidity ratios are still from same design day as peak temperature (i.e., peak T and w are from same design day object)
+    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
+    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, state->dataWeatherManager->DesDayInput(2).HumIndValue, 0.000001);
+    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->DesDayInput(4).MaxDryBulb, 0.000001);
+    EXPECT_NEAR(thisDOAS.HeatOutHumRat, state->dataWeatherManager->DesDayInput(4).HumIndValue, 0.000001);
 }
 
 } // namespace EnergyPlus
