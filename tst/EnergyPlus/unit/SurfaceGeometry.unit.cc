@@ -8554,3 +8554,30 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
     EXPECT_NEAR(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_expected, 1e-6);
     EXPECT_NE(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_old);
 }
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetKivaFoundationTest)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Foundation:Kiva:Settings,",
+        "  1.8,                     !- Soil Conductivity {W / m - K}",
+        "  3200,                    !- Soil Density {kg / m3}",
+        "  836,                     !- Soil Specific Heat {J / kg - K}",
+        "  0.9,                     !- Ground Solar Absorptivity {dimensionless}",
+        "  0.9,                     !- Ground Thermal Absorptivity {dimensionless}",
+        "  0.03,                    !- Ground Surface Roughness {m}",
+        "  40,                      !- Far - Field Width {m}",
+        "  ZeroFlux,                !- Deep - Ground Boundary Condition",
+        "  AutoCalculate;           !- Deep - Ground Depth",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetFoundationData(*state, ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Warning ** Foundation:Kiva:Settings, Deep-Ground Depth should not be set to the default or Autocalculate unless ZEROFLUX is set to Autoselect",
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}

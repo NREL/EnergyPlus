@@ -1267,6 +1267,7 @@ void KivaManager::defineDefaultFoundation(EnergyPlusData &state)
     Real64 waterTableDepth = 0.1022 * state.dataEnvrn->Elevation;
 
     if (settings.deepGroundBoundary == Settings::AUTO) {
+        // TODO: if depth is set to a number, AUTO is setting defFnd.deepGroundDepth
         if (waterTableDepth <= 40.) {
             defFnd.deepGroundDepth = waterTableDepth;
             defFnd.deepGroundBoundary = Kiva::Foundation::DGB_FIXED_TEMPERATURE;

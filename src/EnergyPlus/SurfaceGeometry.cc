@@ -10745,6 +10745,12 @@ namespace SurfaceGeometry {
 
             if (state.dataIPShortCut->lNumericFieldBlanks(numF) || state.dataIPShortCut->rNumericArgs(numF) == DataGlobalConstants::AutoCalculate) {
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = 40.0;
+                if (state.dataSurfaceGeometry->kivaManager.settings.deepGroundBoundary != HeatBalanceKivaManager::KivaManager::Settings::AUTO) {
+                    ShowWarningMessage(state,
+                                       "Foundation:Kiva:Settings, " + state.dataIPShortCut->cNumericFieldNames(numF) +
+                                           " should not be set to the default or Autocalculate unless " + state.dataIPShortCut->cAlphaArgs(alpF - 1) +
+                                           " is set to Autoselect");
+                }
             } else {
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = state.dataIPShortCut->rNumericArgs(numF);
             }
