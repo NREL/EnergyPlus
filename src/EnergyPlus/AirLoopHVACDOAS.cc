@@ -1023,37 +1023,34 @@ namespace AirLoopHVACDOAS {
         int constexpr winterDesignDayTypeIndex(10);
 
         for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
+            auto &desDayInput = state.dataWeatherManager->DesDayInput(i);
             // Summer design day
-            if (state.dataWeatherManager->DesDayInput(i).DayType == summerDesignDayTypeIndex) {
+            if (desDayInput.DayType == summerDesignDayTypeIndex) {
                 // keep design day humiditiy ratio from the same peak temperature design day (i.e., don't use a humrat from a different day)
-                if (state.dataWeatherManager->DesDayInput(i).MaxDryBulb > this->SizingCoolOATemp) {
-                    this->SizingCoolOATemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
-                    if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
-                        this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
-                                                                                  this->SizingCoolOATemp,
-                                                                                  state.dataWeatherManager->DesDayInput(i).HumIndValue,
-                                                                                  DataEnvironment::StdPressureSeaLevel);
-                    } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                        this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(
-                            state, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                    } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
-                        this->SizingCoolOAHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
+                if (desDayInput.MaxDryBulb > this->SizingCoolOATemp) {
+                    this->SizingCoolOATemp = desDayInput.MaxDryBulb;
+                    if (desDayInput.HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
+                        this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdbTwbPb(
+                            state, this->SizingCoolOATemp, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
+                        this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(state, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::HumRatio) {
+                        this->SizingCoolOAHumRat = desDayInput.HumIndValue;
                     } // else { // What about other cases?
                 }
             }
             // Winter design day
-            if (state.dataWeatherManager->DesDayInput(i).DayType == winterDesignDayTypeIndex) {
+            if (desDayInput.DayType == winterDesignDayTypeIndex) {
                 // keep design day humiditiy ratio from the same peak temperature design day (i.e., don't use a humrat from a different day)
-                if (state.dataWeatherManager->DesDayInput(i).MaxDryBulb < this->HeatOutTemp) {
-                    this->HeatOutTemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
-                    if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
-                        this->HeatOutHumRat = Psychrometrics::PsyWFnTdbTwbPb(
-                            state, this->HeatOutTemp, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                    } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                        this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(
-                            state, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                    } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
-                        this->HeatOutHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
+                if (desDayInput.MaxDryBulb < this->HeatOutTemp) {
+                    this->HeatOutTemp = desDayInput.MaxDryBulb;
+                    if (desDayInput.HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
+                        this->HeatOutHumRat =
+                            Psychrometrics::PsyWFnTdbTwbPb(state, this->HeatOutTemp, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
+                        this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(state, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::HumRatio) {
+                        this->HeatOutHumRat = desDayInput.HumIndValue;
                     } // else { // What about other cases?
                 }
             }
