@@ -8577,7 +8577,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetKivaFoundationTest)
 
     GetFoundationData(*state, ErrorsFound);
     std::string const error_string = delimited_string({
-    "   ** Warning ** Foundation:Kiva:Settings, Deep-Ground Depth should not be set to the default or Autocalculate unless ZEROFLUX is set to Autoselect",
-        });
+        "   ** Warning ** Foundation:Kiva:Settings, Deep-Ground Depth should not be set to the default or Autocalculate unless ZEROFLUX is set to "
+        "Autoselect",
+    });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
