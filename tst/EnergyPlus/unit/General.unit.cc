@@ -402,8 +402,8 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
     //    */
 }
 
-TEST_F(EnergyPlusFixture, General_MovingAvg) {
-
+TEST_F(EnergyPlusFixture, General_MovingAvg)
+{
     int numItem = 12;
     Array1D<Real64> inputData;
     Array1D<Real64> outputData;
