@@ -88,6 +88,8 @@ namespace CondenserLoopTowers {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> EvapLossNamesUC{"LOSSFACTOR", "SATURATEDEXIT"};
+
     enum class Blowdown
     {
         Invalid = -1,
@@ -103,6 +105,8 @@ namespace CondenserLoopTowers {
         UFactor,
         Num
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"UFACTORTIMESAREAANDDESIGNWATERFLOWRATE", "NOMINALCAPACITY"};
 
     enum class CapacityCtrl
     {

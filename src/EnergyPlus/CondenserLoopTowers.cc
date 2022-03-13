@@ -292,7 +292,7 @@ namespace CondenserLoopTowers {
                                                                           AlphArray(2),
                                                                           ErrorsFound,
                                                                           DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
-                                                                          AlphArray(1),
+                                                                          tower.Name,
                                                                           DataLoopNode::NodeFluidType::Water,
                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                           NodeInputManager::CompFluidStream::Primary,
@@ -301,12 +301,12 @@ namespace CondenserLoopTowers {
                                                                            AlphArray(3),
                                                                            ErrorsFound,
                                                                            DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
-                                                                           AlphArray(1),
+                                                                           tower.Name,
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
+            BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, tower.Name, AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             tower.DesignWaterFlowRate = NumArray(1);
             if (tower.DesignWaterFlowRate == DataSizing::AutoSize) {
                 tower.DesignWaterFlowRateWasAutoSized = true;
@@ -344,15 +344,7 @@ namespace CondenserLoopTowers {
             }
             tower.TowerFreeConvNomCapSizingFactor = NumArray(12);
             if (NumAlphas >= 4) {
-                if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
-                    tower.PerformanceInputMethod_Num = PIM::UFactor;
-                } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
-                    tower.PerformanceInputMethod_Num = PIM::NominalCapacity;
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
-                    ErrorsFound = true;
-                }
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
             } else {
                 // Since Performance Input Method has been omitted then assume it to be UA and DESIGN WATER FLOW RATE
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
@@ -397,8 +389,10 @@ namespace CondenserLoopTowers {
                 }
                 if (tower.BasinHeaterSetPointTemp < 2.0) {
                     ShowWarningError(state,
-                                     cCurrentModuleObject + ":\"" + tower.Name + "\", " + state.dataIPShortCut->cNumericFieldNames(18) +
-                                         " is less than 2 deg C. Freezing could occur.");
+                                     format("{}:\"{}\", {} is less than 2 deg C. Freezing could occur.",
+                                            cCurrentModuleObject,
+                                            tower.Name,
+                                            state.dataIPShortCut->cNumericFieldNames(18)));
                 }
             }
 
@@ -406,23 +400,16 @@ namespace CondenserLoopTowers {
                 tower.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, AlphArray(5));
                 if (tower.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(state,
-                                     cCurrentModuleObject + ", \"" + tower.Name + "\" basin heater schedule name \"" + AlphArray(5) +
-                                         "\" was not found. Basin heater operation will not be modeled and the simulation continues");
+                                     format("{}, \"{}\" basin heater schedule name \"{}\" was not found. Basin heater operation will not be modeled "
+                                            "and the simulation continues",
+                                            cCurrentModuleObject,
+                                            tower.Name,
+                                            AlphArray(5)));
                 }
             }
 
             // begin water use and systems get input
-            if (UtilityRoutines::SameString(AlphArray(6), "LossFactor")) {
-                tower.EvapLossMode = EvapLoss::UserFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(6), "SaturatedExit")) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else if (AlphArray(6).empty()) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
-                ErrorsFound = true;
-            }
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
@@ -669,7 +656,7 @@ namespace CondenserLoopTowers {
                                                                           AlphArray(2),
                                                                           ErrorsFound,
                                                                           DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
-                                                                          AlphArray(1),
+                                                                          tower.Name,
                                                                           DataLoopNode::NodeFluidType::Water,
                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                           NodeInputManager::CompFluidStream::Primary,
@@ -678,7 +665,7 @@ namespace CondenserLoopTowers {
                                                                            AlphArray(3),
                                                                            ErrorsFound,
                                                                            DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
-                                                                           AlphArray(1),
+                                                                           tower.Name,
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
@@ -686,15 +673,7 @@ namespace CondenserLoopTowers {
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (NumAlphas >= 4) {
-                if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
-                    tower.PerformanceInputMethod_Num = PIM::UFactor;
-                } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
-                    tower.PerformanceInputMethod_Num = PIM::NominalCapacity;
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
-                    ErrorsFound = true;
-                }
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
             } else {
                 // Since Performance Input Method has been omitted then assume it to be UA and DESIGN WATER FLOW RATE
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
@@ -808,17 +787,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            if (UtilityRoutines::SameString(AlphArray(6), "LossFactor")) {
-                tower.EvapLossMode = EvapLoss::UserFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(6), "SaturatedExit")) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ErrorsFound = true;
-            }
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
 
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
@@ -1141,99 +1110,101 @@ namespace CondenserLoopTowers {
 
             state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff.allocate(35);
             state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff = 0.0;
-
+            
+            auto &vstower = state.dataCondenserLoopTowers->towers(tower.VSTower);
+            
             if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 tower.TowerModelType = ModelType::CoolToolsXFModel;
                 //     set cross-flow model coefficients
                 //       Outputs approach in C
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(1) = 0.52049709836241;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(2) = -10.617046395344;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(3) = 10.7292974722538;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(4) = -2.74988377158227;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(5) = 4.73629943913743;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(6) = -8.25759700874711;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(7) = 1.57640938114136;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(8) = 6.51119643791324;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(9) = 1.50433525206692;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(10) = -3.2888529287801;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(11) = 0.0257786145353773;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(12) = 0.182464289315254;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(13) = -0.0818947291400898;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(14) = -0.215010003996285;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(15) = 0.0186741309635284;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(16) = 0.0536824177590012;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(17) = -0.00270968955115031;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(18) = 0.00112277498589279;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(19) = -0.00127758497497718;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(20) = 0.0000760420796601607;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(21) = 1.43600088336017;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(22) = -0.5198695909109;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(23) = 0.117339576910507;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(24) = 1.50492810819924;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(25) = -0.135898905926974;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(26) = -0.152577581866506;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(27) = -0.0533843828114562;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(28) = 0.00493294869565511;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(29) = -0.00796260394174197;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(30) = 0.000222619828621544;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(31) = -0.0543952001568055;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(32) = 0.00474266879161693;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(33) = -0.0185854671815598;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(34) = 0.00115667701293848;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(35) = 0.000807370664460284;
+                vstower.Coeff(1) = 0.52049709836241;
+                vstower.Coeff(2) = -10.617046395344;
+                vstower.Coeff(3) = 10.7292974722538;
+                vstower.Coeff(4) = -2.74988377158227;
+                vstower.Coeff(5) = 4.73629943913743;
+                vstower.Coeff(6) = -8.25759700874711;
+                vstower.Coeff(7) = 1.57640938114136;
+                vstower.Coeff(8) = 6.51119643791324;
+                vstower.Coeff(9) = 1.50433525206692;
+                vstower.Coeff(10) = -3.2888529287801;
+                vstower.Coeff(11) = 0.0257786145353773;
+                vstower.Coeff(12) = 0.182464289315254;
+                vstower.Coeff(13) = -0.0818947291400898;
+                vstower.Coeff(14) = -0.215010003996285;
+                vstower.Coeff(15) = 0.0186741309635284;
+                vstower.Coeff(16) = 0.0536824177590012;
+                vstower.Coeff(17) = -0.00270968955115031;
+                vstower.Coeff(18) = 0.00112277498589279;
+                vstower.Coeff(19) = -0.00127758497497718;
+                vstower.Coeff(20) = 0.0000760420796601607;
+                vstower.Coeff(21) = 1.43600088336017;
+                vstower.Coeff(22) = -0.5198695909109;
+                vstower.Coeff(23) = 0.117339576910507;
+                vstower.Coeff(24) = 1.50492810819924;
+                vstower.Coeff(25) = -0.135898905926974;
+                vstower.Coeff(26) = -0.152577581866506;
+                vstower.Coeff(27) = -0.0533843828114562;
+                vstower.Coeff(28) = 0.00493294869565511;
+                vstower.Coeff(29) = -0.00796260394174197;
+                vstower.Coeff(30) = 0.000222619828621544;
+                vstower.Coeff(31) = -0.0543952001568055;
+                vstower.Coeff(32) = 0.00474266879161693;
+                vstower.Coeff(33) = -0.0185854671815598;
+                vstower.Coeff(34) = 0.00115667701293848;
+                vstower.Coeff(35) = 0.000807370664460284;
 
                 //       set minimum and maximum boundaries for CoolTools crossflow model input variables
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinInletAirWBTemp = -1.0;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxInletAirWBTemp = 26.6667;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp = 1.1111;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxRangeTemp = 11.1111;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp = 1.1111;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxApproachTemp = 11.1111;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinWaterFlowRatio = 0.75;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxWaterFlowRatio = 1.25;
+                vstower.MinInletAirWBTemp = -1.0;
+                vstower.MaxInletAirWBTemp = 26.6667;
+                vstower.MinRangeTemp = 1.1111;
+                vstower.MaxRangeTemp = 11.1111;
+                vstower.MinApproachTemp = 1.1111;
+                vstower.MaxApproachTemp = 11.1111;
+                vstower.MinWaterFlowRatio = 0.75;
+                vstower.MaxWaterFlowRatio = 1.25;
 
             } else if (UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) {
                 tower.TowerModelType = ModelType::YorkCalcModel;
                 //     set counter-flow model coefficients
                 //       Outputs approach in C
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(1) = -0.359741205;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(2) = -0.055053608;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(3) = 0.0023850432;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(4) = 0.173926877;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(5) = -0.0248473764;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(6) = 0.00048430224;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(7) = -0.005589849456;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(8) = 0.0005770079712;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(9) = -0.00001342427256;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(10) = 2.84765801111111;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(11) = -0.121765149;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(12) = 0.0014599242;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(13) = 1.680428651;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(14) = -0.0166920786;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(15) = -0.0007190532;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(16) = -0.025485194448;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(17) = 0.0000487491696;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(18) = 0.00002719234152;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(19) = -0.0653766255555556;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(20) = -0.002278167;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(21) = 0.0002500254;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(22) = -0.0910565458;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(23) = 0.00318176316;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(24) = 0.000038621772;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(25) = -0.0034285382352;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(26) = 0.00000856589904;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(27) = -0.000001516821552;
+                vstower.Coeff(1) = -0.359741205;
+                vstower.Coeff(2) = -0.055053608;
+                vstower.Coeff(3) = 0.0023850432;
+                vstower.Coeff(4) = 0.173926877;
+                vstower.Coeff(5) = -0.0248473764;
+                vstower.Coeff(6) = 0.00048430224;
+                vstower.Coeff(7) = -0.005589849456;
+                vstower.Coeff(8) = 0.0005770079712;
+                vstower.Coeff(9) = -0.00001342427256;
+                vstower.Coeff(10) = 2.84765801111111;
+                vstower.Coeff(11) = -0.121765149;
+                vstower.Coeff(12) = 0.0014599242;
+                vstower.Coeff(13) = 1.680428651;
+                vstower.Coeff(14) = -0.0166920786;
+                vstower.Coeff(15) = -0.0007190532;
+                vstower.Coeff(16) = -0.025485194448;
+                vstower.Coeff(17) = 0.0000487491696;
+                vstower.Coeff(18) = 0.00002719234152;
+                vstower.Coeff(19) = -0.0653766255555556;
+                vstower.Coeff(20) = -0.002278167;
+                vstower.Coeff(21) = 0.0002500254;
+                vstower.Coeff(22) = -0.0910565458;
+                vstower.Coeff(23) = 0.00318176316;
+                vstower.Coeff(24) = 0.000038621772;
+                vstower.Coeff(25) = -0.0034285382352;
+                vstower.Coeff(26) = 0.00000856589904;
+                vstower.Coeff(27) = -0.000001516821552;
 
                 //       set minimum and maximum boundaries for YorkCalc model input variables
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinInletAirWBTemp = -34.4;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxInletAirWBTemp = 29.4444;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp = 1.1111;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxRangeTemp = 22.2222;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp = 1.1111;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxApproachTemp = 40.0;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinWaterFlowRatio = 0.75;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxWaterFlowRatio = 1.25;
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MaxLiquidToGasRatio = 8.0;
+                vstower.MinInletAirWBTemp = -34.4;
+                vstower.MaxInletAirWBTemp = 29.4444;
+                vstower.MinRangeTemp = 1.1111;
+                vstower.MaxRangeTemp = 22.2222;
+                vstower.MinApproachTemp = 1.1111;
+                vstower.MaxApproachTemp = 40.0;
+                vstower.MinWaterFlowRatio = 0.75;
+                vstower.MaxWaterFlowRatio = 1.25;
+                vstower.MaxLiquidToGasRatio = 8.0;
 
             } else if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined")) {
                 tower.TowerModelType = ModelType::CoolToolsUserDefined;
@@ -1242,7 +1213,7 @@ namespace CondenserLoopTowers {
                     state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
                     if (!UtilityRoutines::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
-                    state.dataCondenserLoopTowers->towers(tower.VSTower).FoundModelCoeff = true;
+                    vstower.FoundModelCoeff = true;
                     // verify the correct number of coefficients for the CoolTools model
                     if (NumNums2 != 43) {
                         ShowSevereError(state,
@@ -1252,22 +1223,22 @@ namespace CondenserLoopTowers {
                         ErrorsFound = true;
                     } else {
 
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinInletAirWBTemp = NumArray2(1);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxInletAirWBTemp = NumArray2(2);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp = NumArray2(3);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxRangeTemp = NumArray2(4);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp = NumArray2(5);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxApproachTemp = NumArray2(6);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinWaterFlowRatio = NumArray2(7);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxWaterFlowRatio = NumArray2(8);
+                        vstower.MinInletAirWBTemp = NumArray2(1);
+                        vstower.MaxInletAirWBTemp = NumArray2(2);
+                        vstower.MinRangeTemp = NumArray2(3);
+                        vstower.MaxRangeTemp = NumArray2(4);
+                        vstower.MinApproachTemp = NumArray2(5);
+                        vstower.MaxApproachTemp = NumArray2(6);
+                        vstower.MinWaterFlowRatio = NumArray2(7);
+                        vstower.MaxWaterFlowRatio = NumArray2(8);
 
                         for (CoeffNum = 9; CoeffNum <= NumNums2; ++CoeffNum) {
-                            state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(CoeffNum - 8) = NumArray2(CoeffNum);
+                            vstower.Coeff(CoeffNum - 8) = NumArray2(CoeffNum);
                         }
                     }
                     break;
                 }
-                if (!state.dataCondenserLoopTowers->towers(tower.VSTower).FoundModelCoeff) {
+                if (!vstower.FoundModelCoeff) {
                     ShowSevereError(state,
                                     "CoolingTower:VariableSpeed \"" + tower.Name +
                                         "\". User defined name for variable speed cooling tower model coefficients object not found = " +
@@ -1281,7 +1252,7 @@ namespace CondenserLoopTowers {
                     state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
                     if (!UtilityRoutines::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
-                    state.dataCondenserLoopTowers->towers(tower.VSTower).FoundModelCoeff = true;
+                    vstower.FoundModelCoeff = true;
                     // verify the correct number of coefficients for the YorkCalc model
                     if (NumNums2 != 36) {
                         ShowSevereError(state,
@@ -1291,24 +1262,24 @@ namespace CondenserLoopTowers {
                         ErrorsFound = true;
                     } else {
 
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinInletAirWBTemp = NumArray2(1);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxInletAirWBTemp = NumArray2(2);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp = NumArray2(3);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxRangeTemp = NumArray2(4);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp = NumArray2(5);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxApproachTemp = NumArray2(6);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MinWaterFlowRatio = NumArray2(7);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxWaterFlowRatio = NumArray2(8);
-                        state.dataCondenserLoopTowers->towers(tower.VSTower).MaxLiquidToGasRatio = NumArray2(9);
+                        vstower.MinInletAirWBTemp = NumArray2(1);
+                        vstower.MaxInletAirWBTemp = NumArray2(2);
+                        vstower.MinRangeTemp = NumArray2(3);
+                        vstower.MaxRangeTemp = NumArray2(4);
+                        vstower.MinApproachTemp = NumArray2(5);
+                        vstower.MaxApproachTemp = NumArray2(6);
+                        vstower.MinWaterFlowRatio = NumArray2(7);
+                        vstower.MaxWaterFlowRatio = NumArray2(8);
+                        vstower.MaxLiquidToGasRatio = NumArray2(9);
 
                         for (CoeffNum = 10; CoeffNum <= NumNums2; ++CoeffNum) {
-                            state.dataCondenserLoopTowers->towers(tower.VSTower).Coeff(CoeffNum - 9) = NumArray2(CoeffNum);
+                            vstower.Coeff(CoeffNum - 9) = NumArray2(CoeffNum);
                         }
                     }
                     break;
                 }
 
-                if (!state.dataCondenserLoopTowers->towers(tower.VSTower).FoundModelCoeff) {
+                if (!vstower.FoundModelCoeff) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + " \"" + tower.Name +
                                         "\". User defined name for variable speed cooling tower model coefficients object not found = " +
@@ -1322,39 +1293,39 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            tower.TowerMassFlowRateMultiplier = state.dataCondenserLoopTowers->towers(tower.VSTower).MaxWaterFlowRatio;
+            tower.TowerMassFlowRateMultiplier = vstower.MaxWaterFlowRatio;
 
             //   check user defined minimums to be greater than 0
-            if (state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp < 0.0) {
+            if (vstower.MinApproachTemp < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + tower.Name + "\". User defined minimum approach temperature must be > 0");
                 ErrorsFound = true;
             }
-            if (state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp < 0.0) {
+            if (vstower.MinRangeTemp < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + tower.Name + "\". User defined minimum range temperature must be > 0");
                 ErrorsFound = true;
             }
-            if (state.dataCondenserLoopTowers->towers(tower.VSTower).MinWaterFlowRatio < 0.0) {
+            if (vstower.MinWaterFlowRatio < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + tower.Name + "\". User defined minimum water flow rate ratio must be > 0");
                 ErrorsFound = true;
             }
 
             //   check that the user defined maximums are greater than the minimums
-            if (state.dataCondenserLoopTowers->towers(tower.VSTower).MaxApproachTemp <
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp) {
+            if (vstower.MaxApproachTemp <
+                vstower.MinApproachTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + " \"" + tower.Name +
                                     "\". User defined maximum approach temperature must be > the minimum approach temperature");
                 ErrorsFound = true;
             }
-            if (state.dataCondenserLoopTowers->towers(tower.VSTower).MaxRangeTemp <
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp) {
+            if (vstower.MaxRangeTemp <
+                vstower.MinRangeTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + " \"" + tower.Name +
                                     "\". User defined maximum range temperature must be > the minimum range temperature");
                 ErrorsFound = true;
             }
-            if (state.dataCondenserLoopTowers->towers(tower.VSTower).MaxWaterFlowRatio <
-                state.dataCondenserLoopTowers->towers(tower.VSTower).MinWaterFlowRatio) {
+            if (vstower.MaxWaterFlowRatio <
+                vstower.MinWaterFlowRatio) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + " \"" + tower.Name +
                                     "\". User defined maximum water flow rate ratio must be > the minimum water flow rate ratio");
@@ -1362,49 +1333,49 @@ namespace CondenserLoopTowers {
             }
 
             tower.DesignInletWB = NumArray(1);
-            if (NumArray(1) < state.dataCondenserLoopTowers->towers(tower.VSTower).MinInletAirWBTemp ||
-                NumArray(1) > state.dataCondenserLoopTowers->towers(tower.VSTower).MaxInletAirWBTemp) {
+            if (NumArray(1) < vstower.MinInletAirWBTemp ||
+                NumArray(1) > vstower.MaxInletAirWBTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject.append(", \"")
                                     .append(tower.Name)
                                     .append("\" the design inlet air wet-bulb temperature of ")
                                     .append(format(OutputFormat, tower.DesignInletWB))
                                     .append(" must be within the model limits of ")
-                                    .append(format(OutputFormat, state.dataCondenserLoopTowers->towers(tower.VSTower).MinInletAirWBTemp))
+                                    .append(format(OutputFormat, vstower.MinInletAirWBTemp))
                                     .append(" and ")
-                                    .append(format(OutputFormat, state.dataCondenserLoopTowers->towers(tower.VSTower).MaxInletAirWBTemp))
+                                    .append(format(OutputFormat, vstower.MaxInletAirWBTemp))
                                     .append(" degrees C"));
                 ErrorsFound = true;
             }
 
             tower.DesignApproach = NumArray(2);
-            if (NumArray(2) < state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp ||
-                NumArray(2) > state.dataCondenserLoopTowers->towers(tower.VSTower).MaxApproachTemp) {
+            if (NumArray(2) < vstower.MinApproachTemp ||
+                NumArray(2) > vstower.MaxApproachTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject.append(", \"")
                                     .append(tower.Name)
                                     .append("\" the design approach temperature of ")
                                     .append(format(OutputFormat, tower.DesignApproach))
                                     .append(" must be within the model limits of ")
-                                    .append(format(OutputFormat, state.dataCondenserLoopTowers->towers(tower.VSTower).MinApproachTemp))
+                                    .append(format(OutputFormat, vstower.MinApproachTemp))
                                     .append(" and ")
-                                    .append(format(OutputFormat, state.dataCondenserLoopTowers->towers(tower.VSTower).MaxApproachTemp))
+                                    .append(format(OutputFormat, vstower.MaxApproachTemp))
                                     .append(" degrees C"));
                 ErrorsFound = true;
             }
 
             tower.DesignRange = NumArray(3);
-            if (NumArray(3) < state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp ||
-                NumArray(3) > state.dataCondenserLoopTowers->towers(tower.VSTower).MaxRangeTemp) {
+            if (NumArray(3) < vstower.MinRangeTemp ||
+                NumArray(3) > vstower.MaxRangeTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject.append(", \"")
                                     .append(tower.Name)
                                     .append("\" the design range temperature of ")
                                     .append(format(OutputFormat, tower.DesignRange))
                                     .append(" must be within the model limits of ")
-                                    .append(format(OutputFormat, state.dataCondenserLoopTowers->towers(tower.VSTower).MinRangeTemp))
+                                    .append(format(OutputFormat, vstower.MinRangeTemp))
                                     .append(" and ")
-                                    .append(format(OutputFormat, state.dataCondenserLoopTowers->towers(tower.VSTower).MaxRangeTemp))
+                                    .append(format(OutputFormat, vstower.MaxRangeTemp))
                                     .append(" degrees C"));
                 ErrorsFound = true;
             }

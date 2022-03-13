@@ -455,19 +455,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
         thisChiller.PumpPowerCoef(3) = state.dataIPShortCut->rNumericArgs(14);
         thisChiller.TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(15);
 
-        {
-            thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(8)));
-            if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
-                thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
-            };
-        }
+        thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(8)));
 
         if (NumNums > 15) {
             thisChiller.GeneratorVolFlowRate = state.dataIPShortCut->rNumericArgs(16);

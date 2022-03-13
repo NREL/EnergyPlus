@@ -456,19 +456,8 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                "Condenser (unknown?) Nodes");
         }
 
-        {
-            thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
-            if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
-                thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
-            };
-        }
+        thisChiller.FlowMode =
+            static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
 
         //   Chiller rated performance data
         thisChiller.RefCap = state.dataIPShortCut->rNumericArgs(1);
