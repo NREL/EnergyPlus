@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 
 namespace EnergyPlus {
@@ -270,6 +271,79 @@ TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
 
     EXPECT_NEAR(ExpectedResult, mdot, 0.0001);
     EXPECT_NEAR(QCoilReq, QZnReq, 0.1);
+}
+
+TEST_F(EnergyPlusFixture, UnitVentilatorOASizing)
+{
+    int UnitVentNum = 1;
+    int numNumericFields = 5;
+    state->dataUnitVentilators->UnitVent.allocate(UnitVentNum);
+    state->dataSize->ZoneEqSizing.allocate(UnitVentNum);
+    state->dataSize->FinalZoneSizing.allocate(UnitVentNum);
+    state->dataSize->ZoneHVACSizing.allocate(UnitVentNum);
+    state->dataUnitVentilators->UnitVentNumericFields.allocate(UnitVentNum);
+    state->dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames.allocate(numNumericFields);
+
+    state->dataSize->CurZoneEqNum = UnitVentNum;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA = 0.1;
+
+    state->dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex = 1;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow = 1.0;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = UnitVentilator::CoilsUsed::None;
+
+    // test fixed OA control
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedAmount;
+    UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
+
+    EXPECT_NEAR(state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow,
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA,
+                0.001);
+
+    // test variable percent OA control
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::VariablePercent;
+    UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
+
+    EXPECT_NEAR(
+        state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow, state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 0.001);
+
+    // test fixed temperature OA control
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedTemperature;
+    UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
+
+    EXPECT_NEAR(
+        state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow, state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 0.001);
+
+    // retest without HVAC sizing object
+    state->dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex = 0;
+
+    // test fixed OA control
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedAmount;
+    UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
+
+    EXPECT_NEAR(state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow,
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA,
+                0.001);
+
+    // test variable percent OA control
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::VariablePercent;
+    UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
+
+    EXPECT_NEAR(
+        state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow, state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 0.001);
+
+    // test fixed temperature OA control
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = DataSizing::AutoSize;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = UnitVentilator::OAControl::FixedTemperature;
+    UnitVentilator::SizeUnitVentilator(*state, UnitVentNum);
+
+    EXPECT_NEAR(
+        state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow, state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 0.001);
 }
 
 } // namespace EnergyPlus
