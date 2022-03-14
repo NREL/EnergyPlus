@@ -2330,9 +2330,7 @@ namespace WeatherManager {
         state.dataEnvrn->OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 
         if (state.dataWeatherManager->UseRainValues) {
-            state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount > 0.8 / 1000.0 / double(state.dataGlobal->NumOfTimeStepInHour);
-            // state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount > 0.0;
-            // state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+            state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= 0.8 / 1000.0 / double(state.dataGlobal->NumOfTimeStepInHour);
         } else {
             state.dataEnvrn->IsRain = false;
         }
