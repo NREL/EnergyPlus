@@ -10409,10 +10409,13 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
                 for (auto listOfExtWin : thisDaylightCtrl.ShadeDeployOrderExtWins) {
                     for (auto IWinShdOrd : listOfExtWin) {
                         ++count;
-                        if (count > thisEnclDaylight.NumOfDayltgExtWins)
+                        if (count > thisEnclDaylight.NumOfDayltgExtWins) {
                             ShowWarningError(state,
                                              "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in enclosure " +
                                                  thisSolEnclosureName);
+                            ShowContinueError(state, "Check the list of surfaces in WindowShadingControl:" + thisDaylightCtrl.Name);
+                            ShowContinueError(state, "The last fenestration surface identified is: " + state.dataSurface->Surface(IWinShdOrd).Name);
+                        }
                         bool found = false;
                         for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
                             int IWinLoop = thisEnclDaylight.DayltgExtWinSurfNums(loop);
