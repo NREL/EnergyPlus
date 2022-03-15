@@ -4013,11 +4013,8 @@ namespace SurfaceGeometry {
                     // Find foundation object, if blank use default
                     if (state.dataIPShortCut->lAlphaFieldBlanks(ArgPointer + 1)) {
 
-                        if (!state.dataSurfaceGeometry->kivaManager.defaultSet) {
-                            // Apply default foundation if no other foundation object specified
-                            if (state.dataSurfaceGeometry->kivaManager.foundationInputs.size() == 0) {
-                                state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
-                            }
+                        if (!state.dataSurfaceGeometry->kivaManager.defaultAdded) {
+                            // Add default foundation if no other foundation object specified
                             state.dataSurfaceGeometry->kivaManager.addDefaultFoundation();
                         }
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OSCPtr =
@@ -10737,22 +10734,29 @@ namespace SurfaceGeometry {
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    "Foundation:Kiva:Settings, " + state.dataIPShortCut->cAlphaArgs(alpF) + " is not a valid choice for " +
-                                        state.dataIPShortCut->cAlphaFieldNames(alpF));
+                                    format("{}, {} is not a valid choice for {}",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(alpF),
+                                           state.dataIPShortCut->cAlphaFieldNames(alpF)));
                 }
             }
             alpF++;
 
             if (state.dataIPShortCut->lNumericFieldBlanks(numF) || state.dataIPShortCut->rNumericArgs(numF) == DataGlobalConstants::AutoCalculate) {
+                // Autocalculate deep-ground depth (see KivaManager::defineDefaultFoundation() for actual calculation)
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = 40.0;
+                state.dataSurfaceGeometry->kivaManager.settings.autocalculateDeepGroundDepth = true;
                 if (state.dataSurfaceGeometry->kivaManager.settings.deepGroundBoundary != HeatBalanceKivaManager::KivaManager::Settings::AUTO) {
-                    ShowWarningMessage(state,
-                                       "Foundation:Kiva:Settings, " + state.dataIPShortCut->cNumericFieldNames(numF) +
-                                           " should not be set to the default or Autocalculate unless " + state.dataIPShortCut->cAlphaArgs(alpF - 1) +
-                                           " is set to Autoselect");
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    format("{}, {} should not be set to Autocalculate unless {} is set to Autoselect",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cNumericFieldNames(numF),
+                                           state.dataIPShortCut->cAlphaFieldNames(alpF - 1)));
                 }
             } else {
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = state.dataIPShortCut->rNumericArgs(numF);
+                state.dataSurfaceGeometry->kivaManager.settings.autocalculateDeepGroundDepth = false;
             }
             numF++;
             if (!state.dataIPShortCut->lNumericFieldBlanks(numF)) {
@@ -10776,17 +10780,18 @@ namespace SurfaceGeometry {
             alpF++;
         }
 
+        // Set default foundation (probably doesn't need to be called if there are no Kiva
+        // surfaces, but we don't know that yet). We call this here so that the default
+        // foundation is available for 1) the starting copy for user-defined Foundation:Kiva
+        // object default inputs, and 2) the actual default Foundation object if a
+        // user-defined Foundation:Kiva name is not referenced by a surface.
+        state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
+
         // Read Foundation objects
         cCurrentModuleObject = "Foundation:Kiva";
         int TotKivaFnds = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaFnds > 0) {
-            state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
-
-            Array1D_string fndNames;
-            fndNames.allocate(TotKivaFnds + 1);
-            fndNames(1) = "<Default Foundation>";
-
             for (int Loop = 1; Loop <= TotKivaFnds; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
@@ -10814,8 +10819,6 @@ namespace SurfaceGeometry {
                 if (ErrorInName) {
                     ErrorsFound = true;
                     continue;
-                } else {
-                    fndNames(Loop) = fndInput.name;
                 }
 
                 // Start with copy of default

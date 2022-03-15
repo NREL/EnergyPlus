@@ -54,6 +54,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
@@ -8577,8 +8578,38 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetKivaFoundationTest)
 
     GetFoundationData(*state, ErrorsFound);
     std::string const error_string = delimited_string({
-        "   ** Warning ** Foundation:Kiva:Settings, Deep-Ground Depth should not be set to the default or Autocalculate unless ZEROFLUX is set to "
-        "Autoselect",
+        "   ** Severe  ** Foundation:Kiva:Settings, Deep-Ground Depth should not be set to Autocalculate unless Deep-Ground Boundary Condition is "
+        "set to Autoselect",
     });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetKivaFoundationTest2)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Foundation:Kiva:Settings,",
+        "  1.8,                     !- Soil Conductivity {W / m - K}",
+        "  3200,                    !- Soil Density {kg / m3}",
+        "  836,                     !- Soil Specific Heat {J / kg - K}",
+        "  0.9,                     !- Ground Solar Absorptivity {dimensionless}",
+        "  0.9,                     !- Ground Thermal Absorptivity {dimensionless}",
+        "  0.03,                    !- Ground Surface Roughness {m}",
+        "  40,                      !- Far-Field Width {m}",
+        "  Autoselect,              !- Deep-Ground Boundary Condition",
+        "  20;                      !- Deep-Ground Depth",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataEnvrn->Elevation = 600.;
+
+    GetFoundationData(*state, ErrorsFound);
+    std::string const error_string =
+        delimited_string({"   ** Warning ** Foundation:Kiva:Settings, when Deep-Ground Boundary Condition is Autoselect,\n"
+                          "   **   ~~~   ** the user-specified Deep-Ground Depth (20.0 m)\n"
+                          "   **   ~~~   ** will be overridden with the Autoselected depth (40.0 m)"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

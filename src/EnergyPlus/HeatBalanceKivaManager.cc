@@ -422,7 +422,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
 
 KivaManager::Settings::Settings()
     : soilK(0.864), soilRho(1510), soilCp(1260), groundSolarAbs(0.9), groundThermalAbs(0.9), groundRoughness(0.9), farFieldWidth(40.0),
-      deepGroundBoundary(AUTO), deepGroundDepth(40.0), minCellDim(0.02), maxGrowthCoeff(1.5), timestepType(HOURLY)
+      deepGroundBoundary(AUTO), deepGroundDepth(40.0), autocalculateDeepGroundDepth(true), minCellDim(0.02), maxGrowthCoeff(1.5), timestepType(HOURLY)
 {
 }
 
@@ -434,7 +434,7 @@ KivaManager::WallGroup::WallGroup() : exposedPerimeter(0.0)
 {
 }
 
-KivaManager::KivaManager() : timestep(3600), defaultSet(false), defaultIndex(0)
+KivaManager::KivaManager() : timestep(3600), defaultAdded(false), defaultIndex(0)
 {
 }
 
@@ -1267,13 +1267,19 @@ void KivaManager::defineDefaultFoundation(EnergyPlusData &state)
     Real64 waterTableDepth = 0.1022 * state.dataEnvrn->Elevation;
 
     if (settings.deepGroundBoundary == Settings::AUTO) {
-        // TODO: if depth is set to a number, AUTO is setting defFnd.deepGroundDepth
         if (waterTableDepth <= 40.) {
             defFnd.deepGroundDepth = waterTableDepth;
             defFnd.deepGroundBoundary = Kiva::Foundation::DGB_FIXED_TEMPERATURE;
         } else {
             defFnd.deepGroundDepth = 40.;
             defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
+        }
+        if (!settings.autocalculateDeepGroundDepth) {
+            if (defFnd.deepGroundDepth != settings.deepGroundDepth) {
+                ShowWarningError(state, "Foundation:Kiva:Settings, when Deep-Ground Boundary Condition is Autoselect,");
+                ShowContinueError(state, format("the user-specified Deep-Ground Depth ({:.1R} m)", settings.deepGroundDepth));
+                ShowContinueError(state, format("will be overridden with the Autoselected depth ({:.1R} m)", defFnd.deepGroundDepth));
+            }
         }
     } else if (settings.deepGroundBoundary == Settings::ZERO_FLUX) {
         defFnd.deepGroundDepth = settings.deepGroundDepth;
@@ -1318,7 +1324,7 @@ void KivaManager::addDefaultFoundation()
 {
     foundationInputs.push_back(defaultFoundation);
     defaultIndex = static_cast<int>(foundationInputs.size() - 1u);
-    defaultSet = true;
+    defaultAdded = true;
 }
 
 int KivaManager::findFoundation(std::string const &name)
