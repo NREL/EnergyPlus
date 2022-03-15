@@ -22,19 +22,19 @@ function Component()
       // Note: The old stuff also installed things in "HKCR\.idf" etc, but I'm wary
       // of touching these since they might have been set to something else
       // manually like a text editor for eg
-      var reg = installer.environmentVariable("SystemRoot") + "\\System32\\reg.exe";
+      var reg = installer.environmentVariable("SystemRoot").replace(/\//g, '\\') + "\\System32\\reg.exe";
 
       var keyNamesToDelete = [
         "EP-Launch.epg", "EP-Launch.idf", "EP-Launch.imf",
         "IDFEditor.ddy", "IDFEditor.expidf"
       ];
 
-      for (i = 0; i < keyNamesToDelete.length; i++) {
-        var keyName = "HKEY_CLASSES_ROOT\\" + keyNamesToDelete[i];
+      keyNamesToDelete.forEach( key => {
+        var keyName = "HKEY_CLASSES_ROOT\\" + key;
         // Delete the entry, silently (/f).
         // We specify the return codes to ignore the error when the key didn't exist to begin with (which returns 1)
         component.addOperation("Execute", "{0,1}", reg, "DELETE", keyName, "/f");
-      }
+      });
 
       var targetDir = installer.value("TargetDir").replace(/\//g, '\\');
       console.log("RegisterFileType: targetDir=" + targetDir);
