@@ -57,8 +57,6 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
-#include <GSL/span.h>
-
 // EnergyPlus Headers
 #include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>

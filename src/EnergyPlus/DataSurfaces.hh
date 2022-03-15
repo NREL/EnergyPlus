@@ -150,19 +150,6 @@ namespace DataSurfaces {
         Num
     }; // Valid window shading types: IntShade <= Type <= BGBlind; the rest are shading status
 
-    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
-        "No Shade",  // 0
-        "Shade Off", // 1
-        "Interior Shade",
-        "Switchable Glazing",
-        "Exterior Shade",
-        "Exterior Screen",
-        "Interior Blind",
-        "Exterior Blind",
-        "Between Glass Shade",
-        "Between Glass Blind",
-    };
-
     enum class WindowShadingControlType : int
     {
         Invalid = -1,
@@ -190,30 +177,6 @@ namespace DataSurfaces {
         OnHiZoneTemp_HiHorzSolar = 21,
         Num
     };
-
-    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
-        "Uncontrolled",
-        "AlwaysOn",
-        "AlwaysOff",
-        "OnIfScheduleAllows",
-        "OnIfHighSolarOnWindow",
-        "OnIfHighHorizontalSolar",
-        "OnIfHighOutdoorAirTemperature",
-        "OnIfHighZoneAirTemperature",
-        "OnIfHighZoneCooling",
-        "OnIfHighGlare",
-        "MeetDaylightIlluminanceSetpoint",
-        "OnNightIfLowOutdoorTempAndOffDay",
-        "OnNightIfLowInsideTempAndOffDay",
-        "OnNightIfHeatingAndOffDay",
-        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
-        "OnNightIfHeatingAndOnDayIfCooling",
-        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
-        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
-        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
-        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
-        "OnIfHighZoneAirTempAndHighSolarOnWindow",
-        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
 
     enum RefAirTemp // Parameters to indicate reference air temperatures for inside surface temperature calculations
     {
@@ -912,7 +875,7 @@ namespace DataSurfaces {
         "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
         "VERTICALSLIDER"};
 
-    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
         // width in meters from Table 4-3 of NFRC 100-2020
         1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
         1.200, 2.134, 1.500, //  Fixed,           Garage,            Greenhouse,
@@ -924,7 +887,7 @@ namespace DataSurfaces {
         1.200                //  VerticalSlider,
     };
 
-    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
         // height in meters from Table 4-3 of NFRC 100-2020
         1.500, 1.500, 1.500, //  CasementDouble,  CasementSingle,    DualAction,
         1.500, 2.134, 1.200, //  Fixed,           Garage,            Greenhouse,
