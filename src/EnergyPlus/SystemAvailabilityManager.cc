@@ -607,21 +607,13 @@ namespace SystemAvailabilityManager {
                 nightCycleMgr.nightCycleControlType = static_cast<NightCycleControlType>(
                     getEnumerationValue(NightCycleControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
 
-                if (nightCycleMgr.nightCycleControlType == NightCycleControlType::Invalid) {
-                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
-                    ErrorsFound = true;
-                }
+                assert(nightCycleMgr.nightCycleControlType != NightCycleControlType::Invalid);
 
                 // Cycling Run Time Control Type
                 nightCycleMgr.cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(
                     getEnumerationValue(CyclingRunTimeControlNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(5))));
 
-                if (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::Invalid) {
-                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
-                    ErrorsFound = true;
-                }
+                assert(nightCycleMgr.cyclingRunTimeControl != CyclingRunTimeControl::Invalid);
 
                 // Control zone or zonelist
                 if (!lAlphaFieldBlanks(6)) {
@@ -858,12 +850,7 @@ namespace SystemAvailabilityManager {
                 optimumStartMgr.controlAlgorithm =
                     static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(7))));
 
-                if (optimumStartMgr.controlAlgorithm == ControlAlgorithm::Invalid) {
-                    optimumStartMgr.controlAlgorithm = ControlAlgorithm::AdaptiveASHRAE;
-                    ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
-                    ErrorsFound = true;
-                }
+                assert(optimumStartMgr.controlAlgorithm != ControlAlgorithm::Invalid);
 
                 switch (optimumStartMgr.controlAlgorithm) {
                 case ControlAlgorithm::ConstantTemperatureGradient: {
