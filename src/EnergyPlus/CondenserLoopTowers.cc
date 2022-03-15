@@ -1110,9 +1110,9 @@ namespace CondenserLoopTowers {
 
             state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff.allocate(35);
             state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff = 0.0;
-            
+
             auto &vstower = state.dataCondenserLoopTowers->towers(tower.VSTower);
-            
+
             if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 tower.TowerModelType = ModelType::CoolToolsXFModel;
                 //     set cross-flow model coefficients
@@ -1310,22 +1310,19 @@ namespace CondenserLoopTowers {
             }
 
             //   check that the user defined maximums are greater than the minimums
-            if (vstower.MaxApproachTemp <
-                vstower.MinApproachTemp) {
+            if (vstower.MaxApproachTemp < vstower.MinApproachTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + " \"" + tower.Name +
                                     "\". User defined maximum approach temperature must be > the minimum approach temperature");
                 ErrorsFound = true;
             }
-            if (vstower.MaxRangeTemp <
-                vstower.MinRangeTemp) {
+            if (vstower.MaxRangeTemp < vstower.MinRangeTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + " \"" + tower.Name +
                                     "\". User defined maximum range temperature must be > the minimum range temperature");
                 ErrorsFound = true;
             }
-            if (vstower.MaxWaterFlowRatio <
-                vstower.MinWaterFlowRatio) {
+            if (vstower.MaxWaterFlowRatio < vstower.MinWaterFlowRatio) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + " \"" + tower.Name +
                                     "\". User defined maximum water flow rate ratio must be > the minimum water flow rate ratio");
@@ -1333,8 +1330,7 @@ namespace CondenserLoopTowers {
             }
 
             tower.DesignInletWB = NumArray(1);
-            if (NumArray(1) < vstower.MinInletAirWBTemp ||
-                NumArray(1) > vstower.MaxInletAirWBTemp) {
+            if (NumArray(1) < vstower.MinInletAirWBTemp || NumArray(1) > vstower.MaxInletAirWBTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject.append(", \"")
                                     .append(tower.Name)
@@ -1349,8 +1345,7 @@ namespace CondenserLoopTowers {
             }
 
             tower.DesignApproach = NumArray(2);
-            if (NumArray(2) < vstower.MinApproachTemp ||
-                NumArray(2) > vstower.MaxApproachTemp) {
+            if (NumArray(2) < vstower.MinApproachTemp || NumArray(2) > vstower.MaxApproachTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject.append(", \"")
                                     .append(tower.Name)
@@ -1365,8 +1360,7 @@ namespace CondenserLoopTowers {
             }
 
             tower.DesignRange = NumArray(3);
-            if (NumArray(3) < vstower.MinRangeTemp ||
-                NumArray(3) > vstower.MaxRangeTemp) {
+            if (NumArray(3) < vstower.MinRangeTemp || NumArray(3) > vstower.MaxRangeTemp) {
                 ShowSevereError(state,
                                 cCurrentModuleObject.append(", \"")
                                     .append(tower.Name)
