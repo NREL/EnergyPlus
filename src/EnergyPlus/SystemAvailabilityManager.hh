@@ -122,19 +122,19 @@ namespace SystemAvailabilityManager {
         }
     };
 
-    struct Scheduled : SysAvailManager // Derived type for Scheduled Sys Avail Managers
+    struct SysAvailManagerScheduled : SysAvailManager // Derived type for Scheduled Sys Avail Managers
     {
     };
 
-    struct ScheduledOn : SysAvailManager // Derived type for Scheduled On Sys Avail Managers
+    struct SysAvailManagerScheduledOn : SysAvailManager // Derived type for Scheduled On Sys Avail Managers
     {
     };
 
-    struct ScheduledOff : SysAvailManager // Derived type for Scheduled Off Sys Avail Managers
+    struct SysAvailManagerScheduledOff : SysAvailManager // Derived type for Scheduled Off Sys Avail Managers
     {
     };
 
-    struct NightCycle : SysAvailManager  // Derived type for Night Cycle Sys Avail Managers
+    struct SysAvailManagerNightCycle : SysAvailManager  // Derived type for Night Cycle Sys Avail Managers
     {
         // Members
         std::string FanSched; // Fan schedule name
@@ -159,14 +159,14 @@ namespace SystemAvailabilityManager {
         NightCycleControlType nightCycleControlType = NightCycleControlType::Invalid;         // type of control: Stay Off, Cycle On Any,
 
         // Default Constructor
-        NightCycle()
+        SysAvailManagerNightCycle()
             :   FanSchedPtr(0), TempTolRange(1.0), CyclingTimeSteps(1),
               PriorAvailStatus(0), NumOfCtrlZones(0), NumOfCoolingZones(0), NumOfHeatingZones(0), NumOfHeatZnFanZones(0)
         {
         }
     };
 
-    struct OptimumStart : SysAvailManager // Derived type for Optimal Start Sys Avail Managers
+    struct SysAvailManagerOptimumStart : SysAvailManager // Derived type for Optimal Start Sys Avail Managers
     {
         // Members
         bool isSimulated;         // true after availability manager is simulated
@@ -212,7 +212,7 @@ namespace SystemAvailabilityManager {
             OptimumStartControlType::Invalid; // Type of control: Stay Off, ControlZone, MaximumofZoneList
 
         // Default Constructor
-        OptimumStart()
+        SysAvailManagerOptimumStart()
             :  isSimulated(false),  FanSchedPtr(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0),
               MaxOptStartTime(6.0),
               controlAlgorithm(ControlAlgorithm::Invalid), ConstTGradCool(1.0), ConstTGradHeat(1.0), InitTGradCool(1.0), InitTGradHeat(1.0),
@@ -241,7 +241,7 @@ namespace SystemAvailabilityManager {
         }
     };
 
-    struct DiffThermo : SysAvailManager // Derived type for Differential Thermostat Sys Avail Managers
+    struct SysAvailManagerDiffThermo : SysAvailManager // Derived type for Differential Thermostat Sys Avail Managers
     {
         // Members
         int HotNode;        // "Hot" sensor node
@@ -250,25 +250,25 @@ namespace SystemAvailabilityManager {
         Real64 TempDiffOff; // Temperature difference for turn off (delta C)
 
         // Default Constructor
-        DiffThermo()
+        SysAvailManagerDiffThermo()
             :  HotNode(0), ColdNode(0), TempDiffOn(0.0), TempDiffOff(0.0)
         {
         }
     };
 
-    struct HiLoTemp : SysAvailManager // Derived type for High/Low Temperature On/Off Sys Avail Managers
+    struct SysAvailManagerHiLoTemp : SysAvailManager // Derived type for High/Low Temperature On/Off Sys Avail Managers
     {
         // Members
         int Node;         // Sensor node
         Real64 Temp;      // Temperature for on/off (C)
 
         // Default Constructor
-        HiLoTemp() :  Node(0), Temp(0.0)
+        SysAvailManagerHiLoTemp() :  Node(0), Temp(0.0)
         {
         }
     };
 
-    struct NightVent: SysAvailManager
+    struct SysAvailManagerNightVent : SysAvailManager
     {
         // Members
         std::string FanSched;      // Fan schedule name
@@ -283,14 +283,14 @@ namespace SystemAvailabilityManager {
         Real64 VentFlowFrac;       // the night venting flow fraction
 
         // Default Constructor
-        NightVent()
+        SysAvailManagerNightVent()
             :   FanSchedPtr(0), VentTempSchedPtr(0), VentDelT(0.0), VentTempLowLim(0.0), ZoneNum(0), ControlledZoneNum(0),
               VentFlowFrac(0.0)
         {
         }
     };
 
-    struct HybridVent: SysAvailManager
+    struct SysAvailManagerHybridVent : SysAvailManager
     {
         // Members
         std::string AirLoopName;     // Name of HVAC Air Loop
@@ -339,7 +339,7 @@ namespace SystemAvailabilityManager {
         Real64 maxAdaTem;        // maximum adaptive temperature for adaptive temperature control [C]
 
         // Default Constructor
-        HybridVent()
+        SysAvailManagerHybridVent()
             :  AirLoopNum(0), NodeNumOfControlledZone(0), ActualZoneNum(0), ControlledZoneNum(0), ControlModeSchedPtr(0), ControlMode(0),
               VentilationCtrl(0), MinOutdoorTemp(-100.0), MaxOutdoorTemp(100.0), MinOutdoorEnth(0.1), MaxOutdoorEnth(300000.0),
               MinOutdoorDewPoint(-100.0), MaxOutdoorDewPoint(100.0), MaxWindSpeed(0.0), UseRainIndicator(true), MinOASchedPtr(0),
@@ -518,19 +518,19 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
     Array1D<Real64> OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
     Array1D<Real64> OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
 
-    EPVector<SystemAvailabilityManager::Scheduled> SchedData;
-    EPVector<SystemAvailabilityManager::ScheduledOn> SchedOnData;
-    EPVector<SystemAvailabilityManager::ScheduledOff> SchedOffData;
-    EPVector<SystemAvailabilityManager::NightCycle> NightCycleData;
-    EPVector<SystemAvailabilityManager::DiffThermo> DiffThermoData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> HiTurnOffData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> HiTurnOnData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> LoTurnOffData;
-    EPVector<SystemAvailabilityManager::HiLoTemp> LoTurnOnData;
-    EPVector<SystemAvailabilityManager::NightVent> NightVentData;
-    EPVector<SystemAvailabilityManager::HybridVent> HybridVentData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerScheduled> SchedData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerScheduledOn> SchedOnData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerScheduledOff> SchedOffData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerNightCycle> NightCycleData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerDiffThermo> DiffThermoData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerHiLoTemp> HiTurnOffData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerHiLoTemp> HiTurnOnData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerHiLoTemp> LoTurnOffData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerHiLoTemp> LoTurnOnData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerNightVent> NightVentData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerHybridVent> HybridVentData;
     EPVector<SystemAvailabilityManager::List> ListData;
-    EPVector<SystemAvailabilityManager::OptimumStart> OptimumStartData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerOptimumStart> OptimumStartData;
     EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
     EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
 
