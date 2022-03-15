@@ -247,6 +247,7 @@ add_subdirectory(third_party)
 
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/fmt-8.0.1/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/btwxt/src)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/re2)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/doj)
