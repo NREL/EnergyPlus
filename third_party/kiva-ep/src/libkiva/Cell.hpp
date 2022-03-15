@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Cell_HPP
@@ -177,13 +177,17 @@ public:
                                         const std::vector<std::shared_ptr<Cell>> &cell_v) override;
 
 private:
-  inline void zfCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign, double &A, double &Alt,
-                        double &bVal);
-  inline void ifCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t dir, double &A, double &Alt, double &bVal);
-  inline void efCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign, double &A, double &Alt, double &bVal);
+  inline void zfCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign,
+                        double &A, double &Alt, double &bVal);
+  inline void ifCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t dir,
+                        double &A, double &Alt, double &bVal);
+  inline void efCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign,
+                        double &A, double &Alt, double &bVal);
   inline void zfCellMatrix(double &A, double &Alt, double &bVal);
-  inline void ifCellMatrix(const std::size_t dim, const std::size_t dir, double &A, double &Alt, double &bVal);
-  inline void efCellMatrix(const std::size_t dim, const std::size_t dir, double &A, double &Alt, double &bVal);
+  inline void ifCellMatrix(const std::size_t dim, const std::size_t dir, double &A, double &Alt,
+                           double &bVal);
+  inline void efCellMatrix(const std::size_t dim, const std::size_t dir, double &A, double &Alt,
+                           double &bVal);
   inline void zfCellADEUp(const std::size_t dim, const std::size_t &dir, double &U);
   inline void ifCellADEUp(const std::size_t dim, const std::size_t dir, double &U);
   inline void efCellADEUp(const std::size_t dim, const std::size_t dir, double &U);

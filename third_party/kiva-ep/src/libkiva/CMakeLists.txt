@@ -23,7 +23,7 @@ set(KIVA_BUILD_CONFIG ${KIVA_BUILD_CONFIG} PARENT_SCOPE)
 # Default version number
 set( libkiva_VERSION_MAJOR 0 )
 set( libkiva_VERSION_MINOR 6 )
-set( libkiva_VERSION_PATCH 2 )
+set( libkiva_VERSION_PATCH 3 )
 
 if(EXISTS "${kiva_SOURCE_DIR}/.git")
   file(WRITE ${CMAKE_BINARY_DIR}/arch.txt ${KIVA_BUILD_CONFIG})

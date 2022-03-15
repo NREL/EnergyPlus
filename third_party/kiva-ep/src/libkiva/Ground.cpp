@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Ground_CPP
@@ -392,12 +392,12 @@ void Ground::calculateSurfaceAverages() {
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_AVG_TEMP}] = TA / totalArea;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_FLUX}] = totalQ / totalArea;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_RATE}] =
-        totalQ / totalArea * surfaceArea;
+          totalQ / totalArea * surfaceArea;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_CONV}] = hcAvg;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_RAD}] = hrAvg;
 
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_EFF_TEMP}] =
-        Tconv - (totalQ / totalArea) * (constructionRValue + 1 / hAvg) - 273.15;
+          Tconv - (totalQ / totalArea) * (constructionRValue + 1 / hAvg) - 273.15;
     } else {
       double Tconv = bcs.slabConvectiveTemp;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_TEMP}] = Tconv;
@@ -423,7 +423,8 @@ void Ground::calculateBoundaryLayer() {
   BoundaryConditions preBCs;
   preBCs.localWindSpeed = 0;
   preBCs.outdoorTemp = 273.15;
-  preBCs.slabConvectiveTemp = preBCs.wallConvectiveTemp = preBCs.slabRadiantTemp = preBCs.wallRadiantTemp = 293.15;
+  preBCs.slabConvectiveTemp = preBCs.wallConvectiveTemp = preBCs.slabRadiantTemp =
+      preBCs.wallRadiantTemp = 293.15;
   fd.coordinateSystem = Foundation::CS_CARTESIAN;
   fd.numberOfDimensions = 2;
   fd.reductionStrategy = Foundation::RS_AP;
@@ -701,7 +702,8 @@ void Ground::setBoundaryConditions() {
 
       // convection
       ForcedConvectionTerm hfFunc = isWall ? bcs.extWallForcedTerm : bcs.gradeForcedTerm;
-      surface.hfTerm = hfFunc(surface.cosTilt, surface.azimuth, bcs.windDirection, bcs.localWindSpeed);
+      surface.hfTerm =
+          hfFunc(surface.cosTilt, surface.azimuth, bcs.windDirection, bcs.localWindSpeed);
 
       surface.convectionAlgorithm =
           isWall ? bcs.extWallConvectionAlgorithm : bcs.gradeConvectionAlgorithm;

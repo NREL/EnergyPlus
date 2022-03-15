@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #include "Instance.hpp"
@@ -39,12 +39,8 @@ void Instance::create() {
   ground->buildDomain();
 }
 
-void Instance::calculate(double ts) {
-	ground->calculate(*bcs, ts);
-}
+void Instance::calculate(double ts) { ground->calculate(*bcs, ts); }
 
-void Instance::calculate_surface_averages() {
-	ground->calculateSurfaceAverages();
-}
+void Instance::calculate_surface_averages() { ground->calculateSurfaceAverages(); }
 
 } // namespace Kiva
