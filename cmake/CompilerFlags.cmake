@@ -16,13 +16,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   endif()
 endif()
 
-if(APPLE)
-  # Force no auto ptr
-  # TODO remove this after kiva/boost is updated to a version that supports
-  # C++17
-  target_compile_definitions(project_options INTERFACE -DBOOST_NO_AUTO_PTR)
-endif()
-
 if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 2013)
 
   # COMPILER FLAGS

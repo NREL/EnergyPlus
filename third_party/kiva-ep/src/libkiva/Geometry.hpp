@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GEOMETRY_H_
@@ -40,6 +40,7 @@ MultiPolygon mirrorY(MultiPolygon poly, double y);
 Polygon symmetricUnit(Polygon poly);
 bool isXSymmetric(Polygon poly);
 bool isYSymmetric(Polygon poly);
+bool isCounterClockWise(Polygon poly);
 double getXmin(Polygon poly, std::size_t vertex);
 double getYmin(Polygon poly, std::size_t vertex);
 double getXmax(Polygon poly, std::size_t vertex);

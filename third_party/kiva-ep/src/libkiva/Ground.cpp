@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Ground_CPP
@@ -199,7 +199,7 @@ void Ground::calculate(BoundaryConditions &boundaryConditions, double ts) {
   }
 }
 
-void Ground::setAmatValue(const int i, const int j, const double val) {
+void Ground::setAmatValue(const std::size_t i, const std::size_t j, const double val) {
   if ((foundation.numericalScheme == Foundation::NS_ADI || foundation.numberOfDimensions == 1) &&
       TDMA) {
     if (j < i)
@@ -209,11 +209,11 @@ void Ground::setAmatValue(const int i, const int j, const double val) {
     else
       a3[i] = val;
   } else {
-    tripletList.emplace_back(i, j, val);
+    tripletList.emplace_back(static_cast<int>(i), static_cast<int>(j), val);
   }
 }
 
-void Ground::setbValue(const int i, const double val) {
+void Ground::setbValue(const std::size_t i, const double val) {
   if ((foundation.numericalScheme == Foundation::NS_ADI || foundation.numberOfDimensions == 1) &&
       TDMA) {
     b_[i] = val;
@@ -249,7 +249,7 @@ void Ground::solveLinearSystem() {
     //    Eigen::saveMarketVector(b, "b.mtx");
     success = status == Eigen::Success;
     if (!success) {
-      iters = pSolver->iterations();
+      iters = static_cast<int>(pSolver->iterations());
       residual = pSolver->error();
 
       std::stringstream ss;
@@ -383,7 +383,7 @@ void Ground::calculateSurfaceAverages() {
 
     if (totalArea > 0.0) {
       double Tconv = TAconv / totalArea;
-      double Tavg = Tconv - totalQc / hcA;
+      double Tavg = hcA == 0 ? Tconv : Tconv - totalQc / hcA;
       double hcAvg = hcA / totalArea;
       double hrAvg = hrA / totalArea;
       double hAvg = hA / totalArea;

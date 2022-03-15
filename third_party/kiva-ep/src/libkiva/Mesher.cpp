@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Mesher_CPP
@@ -38,7 +38,7 @@ Mesher::Mesher(MeshData &data) : data(data) {
     } else {
       // Uniform Meshing
       if (data.intervals[i].growthDir == Interval::UNIFORM) {
-        numCells = length / data.intervals[i].minCellDim;
+        numCells = static_cast<int>(length / data.intervals[i].minCellDim);
 
         // Make sure that there is at least one cell
         if (numCells == 0)

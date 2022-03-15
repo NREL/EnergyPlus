@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #include <cmath>
@@ -58,7 +58,7 @@ void Aggregator::calc_weighted_results() {
     validate();
   }
   results.reset();
-  double Tz{}, Tr{};
+  double Tz, Tr;
   for (auto &instance : instances) {
     Ground *grnd = instance.first;
     Tz = surface_type == Surface::ST_WALL_INT ? grnd->bcs.wallConvectiveTemp
@@ -84,8 +84,8 @@ void Aggregator::calc_weighted_results() {
     results.Tavg += p * Ta;
   }
 
-  results.Tconv = Tz - results.qconv / results.hconv;
-  results.Trad = Tr - results.qrad / results.hrad;
+  results.Tconv = results.hconv == 0 ? Tz : Tz - results.qconv / results.hconv;
+  results.Trad = results.hrad == 0 ? Tr : Tr - results.qrad / results.hrad;
 
   return;
 }

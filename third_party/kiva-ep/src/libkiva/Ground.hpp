@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2021 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GROUND_HPP_
@@ -91,8 +91,8 @@ private:
   void calculateADI(int dim);
 
   // Misc. Functions
-  void setAmatValue(const int i, const int j, const double val);
-  void setbValue(const int i, const double val);
+  void setAmatValue(const std::size_t i, const std::size_t j, const double val);
+  void setbValue(const std::size_t i, const double val);
   void setValuesADI(const std::size_t &index, const double &A, const double (&Alt)[2],
                     const double &bVal);
   void solveLinearSystem();

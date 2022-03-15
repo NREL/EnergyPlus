@@ -1,4 +1,5 @@
 # unused kiva repo directories/files
+kiva-ep/.github/
 kiva-ep/bin
 kiva-ep/docs
 kiva-ep/examples
@@ -14,12 +15,14 @@ kiva-ep/vendor/boost-1.61.0/boost/filesystem*
 kiva-ep/vendor/boost-1.61.0/boost/program_options*
 kiva-ep/vendor/boost-1.61.0/boost/system
 kiva-ep/vendor/boost-1.61.0/boost/typeof/vector*
-kiva-ep/vendor/eigen-da9b4e14c255
-kiva-ep/vendor/gtest
+kiva-ep/vendor/eigen
+kiva-ep/vendor/fmt
+kiva-ep/vendor/googletest
 kiva-ep/vendor/libpng-1.6.23
-kiva-ep/vendor/mathgl-2.3.5.1
-kiva-ep/vendor/yaml-cpp-0.5.3
-kiva-ep/vendor/zlib-1.2.8
+kiva-ep/vendor/mathgl-2.4.4
+kiva-ep/vendor/yaml-cpp
+kiva-ep/vendor/zlib-ng
+kiva-ep/vendor/libpng
 kiva-ep/weather
 kiva-ep/.codecov.yml
 kiva-ep/.gitignore
@@ -29,6 +32,7 @@ kiva-ep/ChangeLog.md
 kiva-ep/README.md
 
 # submodules
+kiva-ep/.gitmodules
 penumbra/.gitmodules
 btwxt/.gitmodules
 
