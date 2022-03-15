@@ -106,7 +106,7 @@ namespace CondenserLoopTowers {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"UFACTORTIMESAREAANDDESIGNWATERFLOWRATE", "NOMINALCAPACITY"};
+    constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"NOMINALCAPACITY", "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"};
 
     enum class CapacityCtrl
     {
