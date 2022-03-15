@@ -810,7 +810,7 @@ namespace SystemAvailabilityManager {
                     optimumStartMgr.optimumStartControlType =
                         OptimumStartControlType::ControlZone;
                     ShowSevereError(state, format( "{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                    ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                    ShowSevereError(state, format("{} incorrect value: {} =\"{}\".", RoutineName, cAlphaFieldNames(4), cAlphaArgs(4)));
                     ErrorsFound = true;
                 }
 
@@ -1134,7 +1134,7 @@ namespace SystemAvailabilityManager {
                 if (!lAlphaFieldBlanks(3)) {
                     loTurnOffMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (loTurnOffMgr.SchedPtr == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\" not found.");
+                        ShowSevereError(state, format("{}{}=\"{}\" not found.", RoutineName, cAlphaFieldNames(3), cAlphaArgs(3)));
                         ShowContinueError(state, format("Occurs in {}=\"{}\".", cCurrentModuleObject, cAlphaArgs(1)));
                         ErrorsFound = true;
                     }
@@ -1287,7 +1287,7 @@ namespace SystemAvailabilityManager {
         lNumericFieldBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, format("{}Errors found in input.  Preceding condition(s) cause termination.", RoutineName));
         }
     }
 
@@ -4393,7 +4393,7 @@ namespace SystemAvailabilityManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, format("{} Errors found in input.  Preceding condition(s) cause termination.", RoutineName));
         }
 
         // Set up output variables
