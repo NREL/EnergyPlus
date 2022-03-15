@@ -72,13 +72,13 @@ namespace DataPlant {
     struct PlantAvailMgrData
     {
         // Members
-        int NumAvailManagers;            // number of availability managers for this plant loop
-        int AvailStatus;                 // system availability status
-        int StartTime;                   // cycle on time (in SimTimeSteps)
-        int StopTime;                    // cycle off time (in SimTimeSteps)
-        Array1D_string AvailManagerName; // name of each availability manager
-        Array1D<SystemAvailabilityType> AvailManagerType;    // type of availability manager
-        Array1D_int AvailManagerNum;     // index of availability manager
+        int NumAvailManagers;                             // number of availability managers for this plant loop
+        int AvailStatus;                                  // system availability status
+        int StartTime;                                    // cycle on time (in SimTimeSteps)
+        int StopTime;                                     // cycle off time (in SimTimeSteps)
+        Array1D_string AvailManagerName;                  // name of each availability manager
+        Array1D<SystemAvailabilityType> AvailManagerType; // type of availability manager
+        Array1D_int AvailManagerNum;                      // index of availability manager
 
         // Default Constructor
         PlantAvailMgrData() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0)

@@ -109,15 +109,16 @@ namespace SystemAvailabilityManager {
         Num
     };
 
-    struct SysAvailManager {
+    struct SysAvailManager
+    {
         // Members
-        std::string Name; // Name of the manager object
-        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid;      // Integer equivalent of availability manager type
-        int SchedPtr;     // Schedule pointer
-        int AvailStatus;  // reports status of availability manager
+        std::string Name;                                                                       // Name of the manager object
+        DataPlant::SystemAvailabilityType MgrType = DataPlant::SystemAvailabilityType::Invalid; // Integer equivalent of availability manager type
+        int SchedPtr;                                                                           // Schedule pointer
+        int AvailStatus;                                                                        // reports status of availability manager
 
         // Default Constructor
-        SysAvailManager() :  SchedPtr(0), AvailStatus(0)
+        SysAvailManager() : SchedPtr(0), AvailStatus(0)
         {
         }
     };
@@ -134,34 +135,34 @@ namespace SystemAvailabilityManager {
     {
     };
 
-    struct SysAvailManagerNightCycle : SysAvailManager  // Derived type for Night Cycle Sys Avail Managers
+    struct SysAvailManagerNightCycle : SysAvailManager // Derived type for Night Cycle Sys Avail Managers
     {
         // Members
         std::string FanSched; // Fan schedule name
         int FanSchedPtr;      // Fan schedule pointer
         //   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
-        Real64 TempTolRange;               // range in degrees C of thermostat tolerance
-        int CyclingTimeSteps;              // period (in Loads time steps) system will cycle on.
-        int PriorAvailStatus;              // prior status of availability manager
-        std::string CtrlZoneListName;      // controlled zone or zonelist name
-        int NumOfCtrlZones;                // number of controlled zones
-        Array1D_int CtrlZonePtrs;          // pointers to controlled zone(s)
-        std::string CoolingZoneListName;   // coolin zone or zonelist name
-        int NumOfCoolingZones;             // number of cooling zones
-        Array1D_int CoolingZonePtrs;       // pointers to cooling zone(s)
-        std::string HeatingZoneListName;   // heatig zone or zonelist name
-        int NumOfHeatingZones;             // number of heatig zones
-        Array1D_int HeatingZonePtrs;       // pointers to heating zone(s)
-        std::string HeatZnFanZoneListName; // heating zone fans only zone or zonelist name
-        int NumOfHeatZnFanZones;           // number of heating zone fans only zones
-        Array1D_int HeatZnFanZonePtrs;     // pointers to heating zone fans only zone(s)
-        CyclingRunTimeControl cyclingRunTimeControl = CyclingRunTimeControl::Invalid;           // Cycling Run Time Control Type
-        NightCycleControlType nightCycleControlType = NightCycleControlType::Invalid;         // type of control: Stay Off, Cycle On Any,
+        Real64 TempTolRange;                                                          // range in degrees C of thermostat tolerance
+        int CyclingTimeSteps;                                                         // period (in Loads time steps) system will cycle on.
+        int PriorAvailStatus;                                                         // prior status of availability manager
+        std::string CtrlZoneListName;                                                 // controlled zone or zonelist name
+        int NumOfCtrlZones;                                                           // number of controlled zones
+        Array1D_int CtrlZonePtrs;                                                     // pointers to controlled zone(s)
+        std::string CoolingZoneListName;                                              // coolin zone or zonelist name
+        int NumOfCoolingZones;                                                        // number of cooling zones
+        Array1D_int CoolingZonePtrs;                                                  // pointers to cooling zone(s)
+        std::string HeatingZoneListName;                                              // heatig zone or zonelist name
+        int NumOfHeatingZones;                                                        // number of heatig zones
+        Array1D_int HeatingZonePtrs;                                                  // pointers to heating zone(s)
+        std::string HeatZnFanZoneListName;                                            // heating zone fans only zone or zonelist name
+        int NumOfHeatZnFanZones;                                                      // number of heating zone fans only zones
+        Array1D_int HeatZnFanZonePtrs;                                                // pointers to heating zone fans only zone(s)
+        CyclingRunTimeControl cyclingRunTimeControl = CyclingRunTimeControl::Invalid; // Cycling Run Time Control Type
+        NightCycleControlType nightCycleControlType = NightCycleControlType::Invalid; // type of control: Stay Off, Cycle On Any,
 
         // Default Constructor
         SysAvailManagerNightCycle()
-            :   FanSchedPtr(0), TempTolRange(1.0), CyclingTimeSteps(1),
-              PriorAvailStatus(0), NumOfCtrlZones(0), NumOfCoolingZones(0), NumOfHeatingZones(0), NumOfHeatZnFanZones(0)
+            : FanSchedPtr(0), TempTolRange(1.0), CyclingTimeSteps(1), PriorAvailStatus(0), NumOfCtrlZones(0), NumOfCoolingZones(0),
+              NumOfHeatingZones(0), NumOfHeatZnFanZones(0)
         {
         }
     };
@@ -169,17 +170,17 @@ namespace SystemAvailabilityManager {
     struct SysAvailManagerOptimumStart : SysAvailManager // Derived type for Optimal Start Sys Avail Managers
     {
         // Members
-        bool isSimulated;         // true after availability manager is simulated
-        std::string FanSched;     // Fan schedule name
-        int FanSchedPtr;          // Fan schedule pointer
-        std::string CtrlZoneName; // Name of the control zone
-        int ZoneNum;              // zone number of control zone
-        int ControlledZoneNum;    // controlled zone number of control zone
-        std::string ZoneListName; // Zone List name
-        int NumOfZones;           // Number of zones in the list
-        Array1D_int ZonePtrs;     // Pointers to zones in the list
-        Real64 MaxOptStartTime;   // Maximum value of start time in hours
-        ControlAlgorithm controlAlgorithm;          // Control algorithm: ConstantTemperatureGradient,
+        bool isSimulated;                  // true after availability manager is simulated
+        std::string FanSched;              // Fan schedule name
+        int FanSchedPtr;                   // Fan schedule pointer
+        std::string CtrlZoneName;          // Name of the control zone
+        int ZoneNum;                       // zone number of control zone
+        int ControlledZoneNum;             // controlled zone number of control zone
+        std::string ZoneListName;          // Zone List name
+        int NumOfZones;                    // Number of zones in the list
+        Array1D_int ZonePtrs;              // Pointers to zones in the list
+        Real64 MaxOptStartTime;            // Maximum value of start time in hours
+        ControlAlgorithm controlAlgorithm; // Control algorithm: ConstantTemperatureGradient,
         // AdaptiveTemperatureGradient, AdaptiveASHRAE, ConstantStartTime
         Real64 ConstTGradCool;    // Constant temperature gradient in cooling mode, unit: degC per hour
         Real64 ConstTGradHeat;    // Constant temperature gradient in heating mode, unit: degC per hour
@@ -213,13 +214,12 @@ namespace SystemAvailabilityManager {
 
         // Default Constructor
         SysAvailManagerOptimumStart()
-            :  isSimulated(false),  FanSchedPtr(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0),
-              MaxOptStartTime(6.0),
+            : isSimulated(false), FanSchedPtr(0), ZoneNum(0), ControlledZoneNum(0), NumOfZones(0), MaxOptStartTime(6.0),
               controlAlgorithm(ControlAlgorithm::Invalid), ConstTGradCool(1.0), ConstTGradHeat(1.0), InitTGradCool(1.0), InitTGradHeat(1.0),
-              AdaptiveTGradCool(1.0), AdaptiveTGradHeat(1.0), ConstStartTime(2.0), NumPreDays(1),  NumHoursBeforeOccupancy(0.0),
-              TempDiffHi(0.0), TempDiffLo(0.0), ATGWCZoneNumLo(0), ATGWCZoneNumHi(0), CycleOnFlag(false), ATGUpdateFlag1(false),
-              ATGUpdateFlag2(false), FirstTimeATGFlag(true), OverNightStartFlag(false), OSReportVarFlag(false), AdaTempGradHeat(0.0),
-              AdaTempGradCool(0.0), ATGUpdateTime1(0.0), ATGUpdateTime2(0.0), ATGUpdateTemp1(0.0), ATGUpdateTemp2(0.0)
+              AdaptiveTGradCool(1.0), AdaptiveTGradHeat(1.0), ConstStartTime(2.0), NumPreDays(1), NumHoursBeforeOccupancy(0.0), TempDiffHi(0.0),
+              TempDiffLo(0.0), ATGWCZoneNumLo(0), ATGWCZoneNumHi(0), CycleOnFlag(false), ATGUpdateFlag1(false), ATGUpdateFlag2(false),
+              FirstTimeATGFlag(true), OverNightStartFlag(false), OSReportVarFlag(false), AdaTempGradHeat(0.0), AdaTempGradCool(0.0),
+              ATGUpdateTime1(0.0), ATGUpdateTime2(0.0), ATGUpdateTemp1(0.0), ATGUpdateTemp2(0.0)
         {
         }
 
@@ -250,8 +250,7 @@ namespace SystemAvailabilityManager {
         Real64 TempDiffOff; // Temperature difference for turn off (delta C)
 
         // Default Constructor
-        SysAvailManagerDiffThermo()
-            :  HotNode(0), ColdNode(0), TempDiffOn(0.0), TempDiffOff(0.0)
+        SysAvailManagerDiffThermo() : HotNode(0), ColdNode(0), TempDiffOn(0.0), TempDiffOff(0.0)
         {
         }
     };
@@ -259,11 +258,11 @@ namespace SystemAvailabilityManager {
     struct SysAvailManagerHiLoTemp : SysAvailManager // Derived type for High/Low Temperature On/Off Sys Avail Managers
     {
         // Members
-        int Node;         // Sensor node
-        Real64 Temp;      // Temperature for on/off (C)
+        int Node;    // Sensor node
+        Real64 Temp; // Temperature for on/off (C)
 
         // Default Constructor
-        SysAvailManagerHiLoTemp() :  Node(0), Temp(0.0)
+        SysAvailManagerHiLoTemp() : Node(0), Temp(0.0)
         {
         }
     };
@@ -284,8 +283,7 @@ namespace SystemAvailabilityManager {
 
         // Default Constructor
         SysAvailManagerNightVent()
-            :   FanSchedPtr(0), VentTempSchedPtr(0), VentDelT(0.0), VentTempLowLim(0.0), ZoneNum(0), ControlledZoneNum(0),
-              VentFlowFrac(0.0)
+            : FanSchedPtr(0), VentTempSchedPtr(0), VentDelT(0.0), VentTempLowLim(0.0), ZoneNum(0), ControlledZoneNum(0), VentFlowFrac(0.0)
         {
         }
     };
@@ -340,13 +338,13 @@ namespace SystemAvailabilityManager {
 
         // Default Constructor
         SysAvailManagerHybridVent()
-            :  AirLoopNum(0), NodeNumOfControlledZone(0), ActualZoneNum(0), ControlledZoneNum(0), ControlModeSchedPtr(0), ControlMode(0),
+            : AirLoopNum(0), NodeNumOfControlledZone(0), ActualZoneNum(0), ControlledZoneNum(0), ControlModeSchedPtr(0), ControlMode(0),
               VentilationCtrl(0), MinOutdoorTemp(-100.0), MaxOutdoorTemp(100.0), MinOutdoorEnth(0.1), MaxOutdoorEnth(300000.0),
               MinOutdoorDewPoint(-100.0), MaxOutdoorDewPoint(100.0), MaxWindSpeed(0.0), UseRainIndicator(true), MinOASchedPtr(0),
               DewPointNoRHErrCount(0), DewPointNoRHErrIndex(0), DewPointErrCount(0), DewPointErrIndex(0), SingleHCErrCount(0), SingleHCErrIndex(0),
-              OpeningFactorFWS(0), ANControlTypeSchedPtr(0), SimpleControlTypeSchedPtr(0), VentilationPtr(0),
-              HybridVentMgrConnectedToAirLoop(true), SimHybridVentSysAvailMgr(false), OperativeTemp(0.0), CO2(0.0), MinOperTime(0.0),
-              MinVentTime(0.0), TimeOperDuration(0.0), TimeVentDuration(0.0), minAdaTem(0.0), maxAdaTem(0.0)
+              OpeningFactorFWS(0), ANControlTypeSchedPtr(0), SimpleControlTypeSchedPtr(0), VentilationPtr(0), HybridVentMgrConnectedToAirLoop(true),
+              SimHybridVentSysAvailMgr(false), OperativeTemp(0.0), CO2(0.0), MinOperTime(0.0), MinVentTime(0.0), TimeOperDuration(0.0),
+              TimeVentDuration(0.0), minAdaTem(0.0), maxAdaTem(0.0)
         {
         }
     };

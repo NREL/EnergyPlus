@@ -326,17 +326,17 @@ namespace DataHVACGlobals {
     struct DefineZoneCompAvailMgrs
     {
         // Members
-        int NumAvailManagers;             // number of availability managers for this system
-        int AvailStatus;                  // system availability status
-        int StartTime;                    // cycle on time (in SimTimeSteps)
-        int StopTime;                     // cycle off time (in SimTimeSteps)
-        std::string AvailManagerListName; // name of each availability manager
-        Array1D_string AvailManagerName;  // name of each availability manager
-        Array1D<DataPlant::SystemAvailabilityType>  AvailManagerType;     // type of availability manager
-        Array1D_int AvailManagerNum;      // index for availability manager
-        int ZoneNum;                      // cycle off time (in SimTimeSteps)
-        bool Input;                       // starts off as true to initialize zone equipment availability manager data
-        int Count;                        // initialize twice to ensure zone equipment availability manager list name has been read in
+        int NumAvailManagers;                                        // number of availability managers for this system
+        int AvailStatus;                                             // system availability status
+        int StartTime;                                               // cycle on time (in SimTimeSteps)
+        int StopTime;                                                // cycle off time (in SimTimeSteps)
+        std::string AvailManagerListName;                            // name of each availability manager
+        Array1D_string AvailManagerName;                             // name of each availability manager
+        Array1D<DataPlant::SystemAvailabilityType> AvailManagerType; // type of availability manager
+        Array1D_int AvailManagerNum;                                 // index for availability manager
+        int ZoneNum;                                                 // cycle off time (in SimTimeSteps)
+        bool Input;                                                  // starts off as true to initialize zone equipment availability manager data
+        int Count; // initialize twice to ensure zone equipment availability manager list name has been read in
 
         // Default Constructor
         DefineZoneCompAvailMgrs() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0), ZoneNum(0), Input(true), Count(0)
