@@ -273,7 +273,7 @@ namespace WindowManager {
         }         // End of surface loop
     }
 
-    double GetSolarTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
+    Real64 GetSolarTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
     {
         const auto aWinConstSimp =
             CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
@@ -281,7 +281,7 @@ namespace WindowManager {
             0.3, 2.5, FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front, FenestrationCommon::Scattering::DirectHemispherical);
     }
 
-    double GetVisibleTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
+    Real64 GetVisibleTransDirectHemispherical(EnergyPlusData &state, int ConstrNum)
     {
         const auto aWinConstSimp =
             CWindowConstructionsSimplified::instance().getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Visible, ConstrNum);
