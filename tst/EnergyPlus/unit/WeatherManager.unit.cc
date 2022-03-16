@@ -1774,8 +1774,22 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     // setting up end ------------------------------------------------------------------------------
 
     state->dataWeatherManager->TodayIsRain.allocate(state->dataGlobal->NumOfTimeStepInHour, 24);
-    state->dataWeatherManager->TodayIsRain(1, 1) = false;
+    state->dataWeatherManager->TodayIsRain(1, 24) = false;
+    state->dataEnvrn->RunPeriodEnvironment = true;
     WeatherManager::SetCurrentWeather(*state);
     // when TodayIsRain is false, IsRain is still true as site:precipitation has non-zero rain fall
     ASSERT_TRUE(state->dataEnvrn->IsRain);
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataWeatherManager->TodayIsRain(1, 24) = false;
+    state->dataEnvrn->RunPeriodEnvironment = true;
+    WeatherManager::SetCurrentWeather(*state);
+    ASSERT_FALSE(state->dataEnvrn->IsRain);
+
+    // site:precipitation overwritten of rain flag does not take effect during sizing period
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->TodayIsRain(1, 24) = false;
+    state->dataEnvrn->RunPeriodEnvironment = false;
+    WeatherManager::SetCurrentWeather(*state);
+    ASSERT_FALSE(state->dataEnvrn->IsRain);
 }
