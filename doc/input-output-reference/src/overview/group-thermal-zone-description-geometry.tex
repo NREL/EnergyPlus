@@ -27,9 +27,9 @@ The name of the \hyperref[zone]{Zone} this Space is a part of. This field is req
 
 \paragraph{Field: Floor Area}\label{space-field-floor-area}
 
-Space floor area is used in many places within EnergyPlus. EnergyPlus automatically calculates the space floor area (\SI{}{\area}) as the total area of surfaces with Surface Type = Floor. If this field is 0.0, negative or \textbf{autocalculate} (the default), then the calculated space floor area will be used in subsequent calculations. If this field is positive, then it will be used as the space floor area. If this number differs significantly from the calculated space floor area a warning message will be issued. 
+Space floor area is used in many places within EnergyPlus. EnergyPlus automatically calculates the space floor area (\SI{}{\area}) as the total area of surfaces with Surface Type = Floor. If this field is 0.0, negative or \textbf{autocalculate} (the default), then the calculated space floor area will be used in subsequent calculations. If this field is positive, then it will be used as the space floor area. If the calculated floor area differs from the user input floor area by more than 5%, a warning message will be issued.
 
-For each Zone, the calculated floor area is the sum of the space floor areas belonging to the zone. If the input for \hyperref[field-floor-area]{Zone Floor Area} differs from the sum of the space floor areas, the zone floor area will take precedence. A warning message will be issued, and the space floor areas will be adjusted proportionately.
+For each Zone, the calculated floor area is the sum of the space floor areas belonging to the zone. If the input for \hyperref[field-floor-area]{Zone Floor Area} does not equal the calculated floor area, the input zone floor area will take precedence, and the space floor areas will be adjusted proportionately.  If the calculated floor area differs from the user input floor area by more than 5%, a warning message will be issued.
 
 \paragraph{Field: Space Type}\label{space-type}
 
