@@ -185,6 +185,7 @@ namespace HeatBalanceKivaManager {
 
             DGType deepGroundBoundary;
             Real64 deepGroundDepth;
+            bool autocalculateDeepGroundDepth;
             Real64 minCellDim;
             Real64 maxGrowthCoeff;
 
@@ -206,7 +207,7 @@ namespace HeatBalanceKivaManager {
         };
 
         Settings settings;
-        bool defaultSet;
+        bool defaultAdded;
         int defaultIndex;
     };
 
