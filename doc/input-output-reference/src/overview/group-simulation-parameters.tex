@@ -1100,7 +1100,9 @@ The Override Mode field provides a single field that will override other inputs 
     \endfirsthead
 
     Normal & No overrides\tabularnewline
-    Mode01 & Zone time step (TimeStep object) will be set to one timestep per hour\tabularnewline
+    Mode01 & Zone time step (TimeStep object) and the number of timesteps in averaging windows
+    will be set to one timestep per hour. The averaging windows are used in data smoothing
+    during sizing periods.\tabularnewline
     Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
     Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
     Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
