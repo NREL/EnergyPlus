@@ -1243,8 +1243,8 @@ void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
 {
     for (int surfNum = 1; surfNum <= (int)state.dataSurface->Surface.size(); ++surfNum) {
         if (state.dataSurface->Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            std::string contextStr = "Surface=\"" + state.dataSurface->Surface(surfNum).Name + "\"";
-            Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
+            std::pair<EnergyPlusData *, std::string> contextPair{&state, "Surface=\"" + state.dataSurface->Surface(surfNum).Name + "\""};
+            Kiva::setMessageCallback(kivaErrorCallback, &contextPair);
             surfaceMap[surfNum].calc_weighted_results();
             state.dataHeatBalSurf->SurfHConvInt(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
         }
