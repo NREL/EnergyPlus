@@ -1783,123 +1783,130 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
 
-        {
-            auto const SELECT_CASE_var(SysAvailType);
-            if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::Scheduled) { // 'AvailabilityManager:Scheduled'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcSchedSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:Scheduled not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::ScheduledOn) { // 'AvailabilityManager:ScheduledOn'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOnData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcSchedOnSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOn not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::ScheduledOff) { // 'AvailabilityManager:ScheduledOff'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOffData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcSchedOffSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOff not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::NightCycle) { // 'AvailabilityManager:NightCycle'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightCycleData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightCycle not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::OptimumStart) { // 'AvailabilityManager:OptimumStart'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->OptimumStartData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcOptStartSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:OptimumStart not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::NightVent) { // 'AvailabilityManager:NightVentilation'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightVentData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightVentilation not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::DiffThermo) { // 'AvailabilityManager:DifferentialThermostat'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->DiffThermoData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcDiffTSysAvailMgr(state, SysAvailNum, PreviousStatus, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::HiTempTOff) { // 'AvailabilityManager:HighTemperatureTurnOff'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOffData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcHiTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOff not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::HiTempTOn) { // 'AvailabilityManager:HighTemperatureTurnOn'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOnData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcHiTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOn not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::LoTempTOff) { // 'AvailabilityManager:LowTemperatureTurnOff'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOffData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcLoTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOff not found: " + SysAvailName);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::SystemAvailabilityType::LoTempTOn) { // 'AvailabilityManager:LowTemperatureTurnOn'
-                if (SysAvailNum == 0) {
-                    SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOnData);
-                }
-                if (SysAvailNum > 0) {
-                    CalcLoTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
-                } else {
-                    ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOn not found: " + SysAvailName);
-                }
-
-            } else {
-                ShowSevereError(state, format("AvailabilityManager Type not found: {}", SysAvailType));
-                ShowContinueError(state, "Occurs in Manager=" + SysAvailName);
-                ShowFatalError(state, "Preceding condition causes termination.");
+        switch (SysAvailType) {
+        case DataPlant::SystemAvailabilityType::Scheduled: { // 'AvailabilityManager:Scheduled'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedData);
             }
+            if (SysAvailNum > 0) {
+                CalcSchedSysAvailMgr(state, SysAvailNum, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:Scheduled not found: " + SysAvailName);
+            }
+
+        } break;
+        case DataPlant::SystemAvailabilityType::ScheduledOn: { // 'AvailabilityManager:ScheduledOn'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOnData);
+            }
+            if (SysAvailNum > 0) {
+                CalcSchedOnSysAvailMgr(state, SysAvailNum, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOn not found: " + SysAvailName);
+            }
+
+        } break;
+        case DataPlant::SystemAvailabilityType::ScheduledOff: { // 'AvailabilityManager:ScheduledOff'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOffData);
+            }
+            if (SysAvailNum > 0) {
+                CalcSchedOffSysAvailMgr(state, SysAvailNum, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:ScheduledOff not found: " + SysAvailName);
+            }
+
+        } break;
+        case DataPlant::SystemAvailabilityType::NightCycle: { // 'AvailabilityManager:NightCycle'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightCycleData);
+            }
+            if (SysAvailNum > 0) {
+                CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightCycle not found: " + SysAvailName);
+            }
+
+        } break;
+        case DataPlant::SystemAvailabilityType::OptimumStart: { // 'AvailabilityManager:OptimumStart'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->OptimumStartData);
+            }
+            if (SysAvailNum > 0) {
+                CalcOptStartSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:OptimumStart not found: " + SysAvailName);
+            }
+
+        } break;
+        case DataPlant::SystemAvailabilityType::NightVent: { // 'AvailabilityManager:NightVentilation'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightVentData);
+            }
+            if (SysAvailNum > 0) {
+                CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:NightVentilation not found: " + SysAvailName);
+            }
+
+        } break;
+        case DataPlant::SystemAvailabilityType::DiffThermo: { // 'AvailabilityManager:DifferentialThermostat'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->DiffThermoData);
+            }
+            if (SysAvailNum > 0) {
+                CalcDiffTSysAvailMgr(state, SysAvailNum, PreviousStatus, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: " + SysAvailName);
+            }
+        }
+        case DataPlant::SystemAvailabilityType::HiTempTOff: { // 'AvailabilityManager:HighTemperatureTurnOff'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOffData);
+            }
+            if (SysAvailNum > 0) {
+                CalcHiTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOff not found: " + SysAvailName);
+            }
+        } break;
+        case DataPlant::SystemAvailabilityType::HiTempTOn: { // 'AvailabilityManager:HighTemperatureTurnOn'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOnData);
+            }
+            if (SysAvailNum > 0) {
+                CalcHiTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOn not found: " + SysAvailName);
+            }
+        } break;
+        case DataPlant::SystemAvailabilityType::LoTempTOff: { // 'AvailabilityManager:LowTemperatureTurnOff'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOffData);
+            }
+            if (SysAvailNum > 0) {
+                CalcLoTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOff not found: " + SysAvailName);
+            }
+
+        } break;
+        case DataPlant::SystemAvailabilityType::LoTempTOn: { // 'AvailabilityManager:LowTemperatureTurnOn'
+            if (SysAvailNum == 0) {
+                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOnData);
+            }
+            if (SysAvailNum > 0) {
+                CalcLoTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
+            } else {
+                ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOn not found: " + SysAvailName);
+            }
+
+        } break;
+        default: {
+            ShowSevereError(state, format("AvailabilityManager Type not found: {}", SysAvailType));
+            ShowContinueError(state, "Occurs in Manager=" + SysAvailName);
+            ShowFatalError(state, "Preceding condition causes termination.");
+        }
         }
     }
 
