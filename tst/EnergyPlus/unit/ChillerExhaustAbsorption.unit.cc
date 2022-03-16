@@ -1399,7 +1399,6 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcChiller_Err_Msg_Test)
     auto &thisChillerHeater = state->dataChillerExhaustAbsorption->ExhaustAbsorber(1);
 
     Real64 loadinput = -5000.0;
-    bool runflaginput = true;
 
     thisChillerHeater.CoolingLoad = 100000.0;
     thisChillerHeater.CoolPartLoadRatio = 1.0;
@@ -1424,11 +1423,21 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcChiller_Err_Msg_Test)
 
     thisChillerHeater.calcChiller(*state, loadinput);
 
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors(1).Count, 1);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors(1).Message,
+              " ** Severe  ** CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=EXH CHILLER: Condenser flow rate = 0 "
+              "severe error warning continues...");
+
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 3);
     EXPECT_EQ(state->dataErrTracking->LastSevereError,
               "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=EXH CHILLER");
 
     thisChillerHeater.calcChiller(*state, loadinput);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors(1).Count, 2);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors(1).Message,
+              " ** Severe  ** CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=EXH CHILLER: Condenser flow rate = 0 "
+              "severe error warning continues...");
+
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 5);
     EXPECT_EQ(state->dataErrTracking->LastSevereError,
               "SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named=EXH CHILLER CONDENSER INLET NODE");
