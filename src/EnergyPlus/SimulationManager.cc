@@ -1280,6 +1280,7 @@ namespace SimulationManager {
                         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
                         state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                        state.dataGlobal->OverrideTimestep = true;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(
