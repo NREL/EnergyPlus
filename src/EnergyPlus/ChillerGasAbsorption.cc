@@ -1723,14 +1723,14 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                 lCondSupplyTemp = lCondReturnTemp + lTowerLoad / (lCondWaterMassFlowRate * Cp_CD);
             } else {
                 if (this->lCondWaterMassFlowRate_Index == 0) {
-                    ShowSevereError(state, "CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller=" + this->Name);
+                    ShowSevereError(state, format("CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     // ShowFatalError(state, "Program Terminates due to previous error condition.");
                 }
                 ShowRecurringSevereErrorAtEnd(state,
-                                              "CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller=" + this->Name +
-                                                  ": Condenser flow rate = 0 sever error warning continues...", // Message automatically written to
-                                                                                                                // "error file" at end of simulation
+                                              format("CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller={}: Condenser flow "
+                                                     "rate = 0 severe error warning continues...",
+                                                     this->Name),                // Message automatically written to "error file" at end of simulation
                                               this->lCondWaterMassFlowRate_Index // Recurring message index, if zero, next available index is assigned
                 );
             }
