@@ -4311,6 +4311,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
 
     int constexpr summerDesignDayTypeIndex(9);
     int constexpr winterDesignDayTypeIndex(10);
+
+    // set up design days that are incrementally a larger peak such that the latter ones should be chosen
     state->dataWeatherManager->DesDayInput.allocate(4);
     state->dataWeatherManager->DesDayInput(1).DayType = summerDesignDayTypeIndex;
     state->dataWeatherManager->DesDayInput(1).MaxDryBulb = 27.0;
@@ -4338,7 +4340,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
     EXPECT_NEAR(thisDOAS.HeatOutHumRat, state->dataWeatherManager->DesDayInput(4).HumIndValue, 0.000001);
 
     AirLoopHVACDOAS::AirLoopDOAS anotherDOAS;
-    // a second DOAS sytem should find the same sizing conditions
+    // a second DOAS system should find the same sizing conditions
     anotherDOAS.GetDesignDayConditions(*state);
 
     EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
@@ -4378,7 +4380,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
     state->dataWeatherManager->DesDayInput(3).HumIndType = WeatherManager::DDHumIndType::WetBulb;
     state->dataWeatherManager->DesDayInput(4).HumIndType = WeatherManager::DDHumIndType::WetBulb;
 
-    Real64 outdoorw1 = state->dataWeatherManager->DesDayInput(1).HumIndValue;
     Real64 outdoorWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state,
                                                            state->dataWeatherManager->DesDayInput(1).MaxDryBulb,
                                                            state->dataWeatherManager->DesDayInput(1).HumIndValue,
@@ -4392,7 +4393,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
                                                     DataEnvironment::StdPressureSeaLevel,
                                                     "AirLoopHVACDOAS_TestGetDesignDayConditions");
     state->dataWeatherManager->DesDayInput(2).HumIndValue = outdoorWetBulb;
-    Real64 outdoorw3 = state->dataWeatherManager->DesDayInput(3).HumIndValue;
     outdoorWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state,
                                                     state->dataWeatherManager->DesDayInput(3).MaxDryBulb,
                                                     state->dataWeatherManager->DesDayInput(3).HumIndValue,
