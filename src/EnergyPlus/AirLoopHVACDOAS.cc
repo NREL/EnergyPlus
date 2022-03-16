@@ -1042,7 +1042,7 @@ namespace AirLoopHVACDOAS {
             // Winter design day
             if (desDayInput.DayType == winterDesignDayTypeIndex) {
                 // keep design day humiditiy ratio from the same peak temperature design day (i.e., don't use a humrat from a different day)
-                if (desDayInput.MaxDryBulb < this->HeatOutTemp) {
+                if (desDayInput.MaxDryBulb < this->HeatOutTemp - desDayInput.DailyDBRange) {
                     this->HeatOutTemp = desDayInput.MaxDryBulb - desDayInput.DailyDBRange;
                     if (desDayInput.HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                         this->HeatOutHumRat =
