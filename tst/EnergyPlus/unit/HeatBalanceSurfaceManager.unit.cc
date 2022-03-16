@@ -1383,9 +1383,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     InitSurfaceHeatBalance(*state);
 
+    state->dataSurface->Surface(5).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::Kiva;
+    state->dataSurface->AllHTKivaSurfaceList = {5};
     CalcHeatBalanceInsideSurf(*state);
 
-    state->dataSurface->Surface(5).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::Kiva;
     ReportSurfaceHeatBalance(*state);
 
     // Check that the inside face surface conduction = -(convection + radiation)
