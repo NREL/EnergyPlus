@@ -962,13 +962,9 @@ namespace WaterManager {
         state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * state.dataGlobal->TimeStepZoneSec;
         state.dataEcoRoofMgr->CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
 
-        if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
-            int month = state.dataEnvrn->Month;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather.at(month - 1) += state.dataEnvrn->LiquidPrecipitation * 1000.0;
-            if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
-                state.dataWaterData->RainFall.numRainyHoursInWeather.at(month - 1) += 1;
-            }
-            if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
+            if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
+                int month = state.dataEnvrn->Month;
                 state.dataWaterData->RainFall.MonthlyTotalPrecInSitePrec.at(month - 1) += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
             }
         }

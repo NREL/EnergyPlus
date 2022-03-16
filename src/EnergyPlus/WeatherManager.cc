@@ -2309,6 +2309,13 @@ namespace WeatherManager {
         if (state.dataEnvrn->EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = state.dataEnvrn->EMSBeamSolarRadOverrideValue;
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
+        if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
+            int month = state.dataEnvrn->Month;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather.at(month - 1) += state.dataEnvrn->LiquidPrecipitation * 1000.0;
+            if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
+                state.dataWaterData->RainFall.numRainyHoursInWeather.at(month - 1) += 1;
+            }
+        }
 
         constexpr const Real64 defaultLiquidPrecip = 1.5 / 1000; // in [m]
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
