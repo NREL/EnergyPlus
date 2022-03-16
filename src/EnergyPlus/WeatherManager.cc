@@ -1864,6 +1864,7 @@ namespace WeatherManager {
             state.dataWeatherManager->OutOfRange.WindDir = 0;
             state.dataWeatherManager->OutOfRange.DirectRad = 0;
             state.dataWeatherManager->OutOfRange.DiffuseRad = 0;
+            state.dataWeatherManager->IsRainThreshold = 0.8 / 1000.0 / double(state.dataGlobal->NumOfTimeStepInHour);
 
             if (!state.dataWeatherManager->RPReadAllWeatherData) {
                 printEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
@@ -2338,8 +2339,9 @@ namespace WeatherManager {
 
         if (state.dataWeatherManager->UseRainValues) {
             // following the dev branch lower bound condition
-            if (state.dataWeatherManager->NumIntervalsPerHour == 1 && state.dataGlobal->NumOfTimeStepInHour > 1) {
-                state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= 0.8 / 1000.0 / double(state.dataGlobal->NumOfTimeStepInHour);
+            if (state.dataWeatherManager->NumIntervalsPerHour == 1 && state.dataGlobal->NumOfTimeStepInHour > 1 &&
+                state.dataEnvrn->RunPeriodEnvironment) {
+                state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= state.dataWeatherManager->IsRainThreshold;
             } else {
                 state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
             }
