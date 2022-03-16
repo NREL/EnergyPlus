@@ -14741,6 +14741,12 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
     EXPECT_NEAR(LatOutput, -1531, 0.1);
+    // Check outlet for temperature below saturation
+    Real64 coilOutletTemp = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirDryBulbTemp;
+    Real64 coilOutletHumRat = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirHumRat;
+    Real64 coilOutletEnthalpy = Psychrometrics::PsyHFnTdbW(coilOutletTemp, coilOutletHumRat);
+    Real64 coilOutletTSat = Psychrometrics::PsyTsatFnHPb(*state, coilOutletEnthalpy, state->dataEnvrn->OutBaroPress);
+    EXPECT_TRUE(coilOutletTemp >= coilOutletTSat);
 
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -14770,11 +14776,17 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       SenOutput,
                       LatOutput);
     EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.OperatingMode, 3);
-    EXPECT_NEAR(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.55356, 0.001);
+    EXPECT_NEAR(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.1991, 0.001);
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
-    EXPECT_NEAR(thisSys->CoilSHR, 0.4578, 0.001);
-    EXPECT_NEAR(SenOutput, -397.162, 0.1);
-    EXPECT_NEAR(LatOutput, -495.2, 0.1);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.5266, 0.001);
+    EXPECT_NEAR(SenOutput, -397.032, 0.1);
+    EXPECT_NEAR(LatOutput, -338.8, 0.1);
+    // Check outlet for temperature below saturation
+    coilOutletTemp = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirDryBulbTemp;
+    coilOutletHumRat = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirHumRat;
+    coilOutletEnthalpy = Psychrometrics::PsyHFnTdbW(coilOutletTemp, coilOutletHumRat);
+    coilOutletTSat = Psychrometrics::PsyTsatFnHPb(*state, coilOutletEnthalpy, state->dataEnvrn->OutBaroPress);
+    EXPECT_TRUE(coilOutletTemp >= coilOutletTSat);
 
     // OperatingMode 2
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -14797,9 +14809,14 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.OperatingMode, 1);
     EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.0);
     EXPECT_NEAR(thisSys->LoadSHR, 0.98533, 0.001);
-    EXPECT_NEAR(thisSys->CoilSHR, 0.97702, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.98246, 0.001);
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
-    EXPECT_NEAR(LatOutput, -346.1, 0.1);
+    EXPECT_NEAR(LatOutput, -1077.6, 0.1);
+    coilOutletTemp = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirDryBulbTemp;
+    coilOutletHumRat = state->dataCoilCooingDX->coilCoolingDXs[0].outletAirHumRat;
+    coilOutletEnthalpy = Psychrometrics::PsyHFnTdbW(coilOutletTemp, coilOutletHumRat);
+    coilOutletTSat = Psychrometrics::PsyTsatFnHPb(*state, coilOutletEnthalpy, state->dataEnvrn->OutBaroPress);
+    EXPECT_TRUE(coilOutletTemp >= coilOutletTSat);
 }
 
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where

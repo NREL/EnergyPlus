@@ -10,7 +10,7 @@ env:
   BUILD_TYPE: Release
   FC: /usr/local/bin/gfortran-9
   SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-  PYTHON_VERSION: 3.8
+  Python_REQUIRED_VERSION: 3.8
 
 jobs:
   mac_release:
@@ -28,11 +28,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
       id: setup-python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ env.PYTHON_VERSION }}
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
 
     - name: Setup QtIFW 4.x
       uses: jmarrec/setup-qtifw@v1
@@ -61,8 +61,8 @@ jobs:
       run: |
         cmake -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
               -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
-              -DPython_ROOT_DIR=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/ \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/ \
               -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
               ../
