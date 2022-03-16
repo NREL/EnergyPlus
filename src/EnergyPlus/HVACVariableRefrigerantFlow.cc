@@ -6412,8 +6412,16 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 if (state.dataHVACVarRefFlow->VRFTU(TUIndex).isSetPointControlled && state.dataAirLoop->AirLoopInputsFilled) {
                     bool missingSetPoint = false;
                     Real64 TUOutNodeSP = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
-                    Real64 coolCoilOutNodeSP = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint;
-                    Real64 heatCoilOutNodeSP = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint;
+                    Real64 coolCoilOutNodeSP = TUOutNodeSP;
+                    Real64 heatCoilOutNodeSP = TUOutNodeSP;
+                    if (state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolingCoilPresent) {
+                        Real64 coolCoilOutNodeSP =
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint;
+                    }
+                    if (state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatingCoilPresent) {
+                        Real64 heatCoilOutNodeSP =
+                            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint;
+                    }
                     // SP can be at outlet of TU or at outlet of coils
                     // if supp heat coil is present, a SP must be at the outlet of the TU
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).SuppHeatingCoilPresent) {

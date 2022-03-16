@@ -6,6 +6,7 @@ Class=App;App.rbbas;&h000000006C1267FF;&h0000000000000000;false
 Window=Window1;Window1.rbfrm;&h000000004F63FFFF;&h0000000000000000;false
 Window=DisplayText;DisplayText.rbfrm;&h000000004476DFFF;&h0000000000000000;false
 BuildSteps=Build Automation;Build Automation.xojo_code;&h000000002425EFFF;&h0000000000000000;false
+FileTypeSet=ReadFileTypeGroup;ReadFileTypeGroup.xojo_filetypeset;&h0000000039B407FF;&h0000000000000000;false
 DefaultWindow=Window1
 MajorVersion=0
 MinorVersion=15
