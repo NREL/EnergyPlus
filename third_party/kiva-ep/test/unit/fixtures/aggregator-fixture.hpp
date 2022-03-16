@@ -7,6 +7,7 @@
 #include "Aggregator.hpp"
 #include "Instance.hpp"
 #include "base-fixture.hpp"
+#include "foundation-fixture.hpp"
 
 using namespace Kiva;
 
