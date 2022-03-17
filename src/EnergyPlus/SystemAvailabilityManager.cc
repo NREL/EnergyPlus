@@ -1327,7 +1327,7 @@ namespace SystemAvailabilityManager {
                     }
 
                     int listItem = 0;
-                    for (nlohmann::json const & extensibleInstance : extensiblesArray) {
+                    for (nlohmann::json const &extensibleInstance : extensiblesArray) {
                         ++listItem;
                         mgrList.AvailManagerName(listItem) =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_name");
@@ -2133,8 +2133,7 @@ namespace SystemAvailabilityManager {
                         AvailStatus = NoAction;
                     }
                     } // end select on thermostat control
-                }
-                break;
+                } break;
                 case NightCycleControlType::OnAny:
                 case NightCycleControlType::OnZoneFansOnly: {
                     if (ZoneCompNCControlType(SysAvailNum)) {
@@ -2145,8 +2144,7 @@ namespace SystemAvailabilityManager {
                         ZoneCompNCControlType(SysAvailNum) = false;
                     }
                     AvailStatus = NoAction;
-                }
-                break;
+                } break;
                 default: {
                     AvailStatus = NoAction;
                     break;
@@ -2231,9 +2229,9 @@ namespace SystemAvailabilityManager {
                         default: {
                             AvailStatus = NoAction;
                         }
-                        } // end select on thermostat control
+                        }                                  // end select on thermostat control
                         if (AvailStatus == CycleOn) break; // loop break
-                    } // end loop over zones in system
+                    }                                      // end loop over zones in system
                 } break;
                 case NightCycleControlType::OnControlZone: {
                     AvailStatus = NoAction;
