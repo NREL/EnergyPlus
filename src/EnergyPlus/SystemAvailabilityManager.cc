@@ -2191,52 +2191,55 @@ namespace SystemAvailabilityManager {
                         CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
                         ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
 
-                        {
-                            auto const SELECT_CASE_var1(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
+                        switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
 
-                            if (SELECT_CASE_var1 == SingleHeatingSetPoint) {
-                                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
-                                    AvailStatus = CycleOn;
-                                    break;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
-                            } else if (SELECT_CASE_var1 == SingleCoolingSetPoint) {
-                                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
-                                    AvailStatus = CycleOn;
-                                    break;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
-                            } else if (SELECT_CASE_var1 == SingleHeatCoolSetPoint) {
-                                if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                     state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
-                                    (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                     state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
-                                    AvailStatus = CycleOn;
-                                    break;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
-                            } else if (SELECT_CASE_var1 == DualSetPointWithDeadBand) {
-                                if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
-                                     state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
-                                    (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                                     state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
-                                    AvailStatus = CycleOn;
-                                    break;
-                                } else {
-                                    AvailStatus = NoAction;
-                                }
-
+                        case SingleHeatingSetPoint: {
+                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
+                                AvailStatus = CycleOn;
+                                break;
                             } else {
                                 AvailStatus = NoAction;
                             }
+
+                        } break;
+                        case SingleCoolingSetPoint: {
+                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
+                                AvailStatus = CycleOn;
+                                break;
+                            } else {
+                                AvailStatus = NoAction;
+                            }
+
+                        } break;
+                        case SingleHeatCoolSetPoint: {
+                            if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
+                                (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
+                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
+                                AvailStatus = CycleOn;
+                                break;
+                            } else {
+                                AvailStatus = NoAction;
+                            }
+
+                        } break;
+                        case DualSetPointWithDeadBand: {
+                            if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
+                                 state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
+                                (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
+                                 state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
+                                AvailStatus = CycleOn;
+                                break;
+                            } else {
+                                AvailStatus = NoAction;
+                            }
+
+                        } break;
+                        default: {
+                            AvailStatus = NoAction;
+                        }
                         } // end select on thermostat control
 
                     } // end loop over zones in system
@@ -4875,46 +4878,49 @@ namespace SystemAvailabilityManager {
                 // Temperature and enthalpy control
                 if (hybridVentMgr.ControlMode == HybridVentMode_Temp || hybridVentMgr.ControlMode == HybridVentMode_Enth) {
 
-                    {
-                        auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
+                    switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
 
-                        if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                            if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
-                                hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                            }
-
-                        } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                            if (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
-                                hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                            }
-
-                        } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+                    case SingleHeatingSetPoint: {
+                        if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
                             hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                            ++hybridVentMgr.SingleHCErrCount;
-                            if (hybridVentMgr.SingleHCErrCount < 2) {
-                                ShowWarningError(state,
-                                                 "Hybrid ventilation control: " + hybridVentMgr.AirLoopName +
-                                                     ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling. Natural "
-                                                     "ventilation is not allowed.");
-                                ShowContinueErrorTimeStamp(state, "");
-                            } else {
-                                ShowRecurringWarningErrorAtEnd(
-                                    state,
-                                    "Hybrid ventilation control: " + hybridVentMgr.AirLoopName +
-                                        ": No natural ventilation continues with a ThermostatSetpoint:SingleHeatingOrCooling type...",
-                                    hybridVentMgr.SingleHCErrIndex,
-                                    double(hybridVentMgr.ControlMode),
-                                    double(hybridVentMgr.ControlMode));
-                            }
-
-                        } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                            if ((state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) ||
-                                (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum))) {
-                                hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                            }
-
-                        } else {
                         }
+
+                    } break;
+                    case SingleCoolingSetPoint: {
+                        if (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
+                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                        }
+
+                    } break;
+                    case SingleHeatCoolSetPoint: {
+                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                        ++hybridVentMgr.SingleHCErrCount;
+                        if (hybridVentMgr.SingleHCErrCount < 2) {
+                            ShowWarningError(state,
+                                             "Hybrid ventilation control: " + hybridVentMgr.AirLoopName +
+                                                 ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling. Natural "
+                                                 "ventilation is not allowed.");
+                            ShowContinueErrorTimeStamp(state, "");
+                        } else {
+                            ShowRecurringWarningErrorAtEnd(
+                                state,
+                                "Hybrid ventilation control: " + hybridVentMgr.AirLoopName +
+                                    ": No natural ventilation continues with a ThermostatSetpoint:SingleHeatingOrCooling type...",
+                                hybridVentMgr.SingleHCErrIndex,
+                                double(hybridVentMgr.ControlMode),
+                                double(hybridVentMgr.ControlMode));
+                        }
+
+                    } break;
+                    case DualSetPointWithDeadBand: {
+                        if ((state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) ||
+                            (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum))) {
+                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                        }
+
+                    } break;
+                    default:
+                        break;
                     } // end select on thermostat control
                 }
 
