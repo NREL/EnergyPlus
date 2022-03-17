@@ -1859,7 +1859,7 @@ namespace SystemAvailabilityManager {
             } else {
                 ShowFatalError(state, "SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: " + SysAvailName);
             }
-        }
+        } break;
         case DataPlant::SystemAvailabilityType::HiTempTOff: { // 'AvailabilityManager:HighTemperatureTurnOff'
             if (SysAvailNum == 0) {
                 SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOffData);
@@ -2133,8 +2133,8 @@ namespace SystemAvailabilityManager {
                         AvailStatus = NoAction;
                     }
                     } // end select on thermostat control
-                    break;
                 }
+                break;
                 case NightCycleControlType::OnAny:
                 case NightCycleControlType::OnZoneFansOnly: {
                     if (ZoneCompNCControlType(SysAvailNum)) {
@@ -2145,8 +2145,8 @@ namespace SystemAvailabilityManager {
                         ZoneCompNCControlType(SysAvailNum) = false;
                     }
                     AvailStatus = NoAction;
-                    break;
                 }
+                break;
                 default: {
                     AvailStatus = NoAction;
                     break;
@@ -2192,26 +2192,21 @@ namespace SystemAvailabilityManager {
                         ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
 
                         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-
                         case SingleHeatingSetPoint: {
                             if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
                                 AvailStatus = CycleOn;
-                                break;
                             } else {
                                 AvailStatus = NoAction;
                             }
-
                         } break;
                         case SingleCoolingSetPoint: {
                             if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
                                 AvailStatus = CycleOn;
-                                break;
                             } else {
                                 AvailStatus = NoAction;
                             }
-
                         } break;
                         case SingleHeatCoolSetPoint: {
                             if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
@@ -2219,11 +2214,9 @@ namespace SystemAvailabilityManager {
                                 (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
                                  state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
                                 AvailStatus = CycleOn;
-                                break;
                             } else {
                                 AvailStatus = NoAction;
                             }
-
                         } break;
                         case DualSetPointWithDeadBand: {
                             if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
@@ -2231,17 +2224,15 @@ namespace SystemAvailabilityManager {
                                 (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
                                  state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
                                 AvailStatus = CycleOn;
-                                break;
                             } else {
                                 AvailStatus = NoAction;
                             }
-
                         } break;
                         default: {
                             AvailStatus = NoAction;
                         }
                         } // end select on thermostat control
-
+                        if (AvailStatus == CycleOn) break; // loop break
                     } // end loop over zones in system
                 } break;
                 case NightCycleControlType::OnControlZone: {
