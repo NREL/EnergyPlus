@@ -3315,8 +3315,6 @@ namespace WeatherManager {
                         state.dataWeatherManager->LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(hour) * WtNow;
                     state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) /= double(state.dataGlobal->NumOfTimeStepInHour);
 
-                    state.dataWeatherManager->TomorrowIsRain(ts, hour) = state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >=
-                                                                         (0.8 / double(state.dataGlobal->NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
                     state.dataWeatherManager->TomorrowIsSnow(ts, hour) = Wthr.IsSnow(hour);
                 } // End of TS Loop
 
