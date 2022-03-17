@@ -174,7 +174,7 @@ namespace AirLoopHVACDOAS {
         // default constructor
         AirLoopDOAS() // constructor
             : SumMassFlowRate(0.0), PreheatTemp(-999.0), PrecoolTemp(-999.0), PreheatHumRat(-999.0), PrecoolHumRat(-999.0), SizingMassFlow(0.0),
-              SizingCoolOATemp(-999.0), SizingCoolOAHumRat(-999.0), HeatOutTemp(0.0), HeatOutHumRat(0.0), m_AirLoopDOASNum(0), m_OASystemNum(0),
+              SizingCoolOATemp(-999.0), SizingCoolOAHumRat(-999.0), HeatOutTemp(999.0), HeatOutHumRat(999.0), m_AirLoopDOASNum(0), m_OASystemNum(0),
               m_AvailManagerSchedPtr(0), m_AirLoopMixerIndex(-1), m_AirLoopSplitterIndex(-1), NumOfAirLoops(0), m_InletNodeNum(0), m_OutletNodeNum(0),
               m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(SimAirServingZones::CompType::Invalid), m_HeatCoilNum(0),
               m_CoolCoilNum(0), ConveCount(0), ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false),
@@ -214,8 +214,6 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
     std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
     std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
-    bool SummerDesignDayFlag = true;
-    bool WinterDesignDayFlag = true;
     void clear_state() override
     {
         this->GetInputOnceFlag = true;
@@ -225,8 +223,6 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
         this->airloopDOAS.clear();
         this->airloopMixer.clear();
         this->airloopSplitter.clear();
-        this->SummerDesignDayFlag = true;
-        this->WinterDesignDayFlag = true;
     }
 };
 
