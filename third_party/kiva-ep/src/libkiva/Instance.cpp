@@ -23,7 +23,8 @@ void Instance::create() {
     outputMap.push_back(Surface::ST_WALL_INT);
   }
 
-  if (!foundation->useDetailedExposedPerimeter || !isConvex(foundation->polygon)) {
+  if (!foundation->useDetailedExposedPerimeter || !isConvex(foundation->polygon) ||
+      foundation->exposedFraction == 0) {
     if (foundation->reductionStrategy == Foundation::RS_BOUNDARY) {
       foundation->reductionStrategy = Foundation::RS_AP;
     }
