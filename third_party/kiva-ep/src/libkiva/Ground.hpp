@@ -18,8 +18,16 @@
 #include <string>
 #include <vector>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4127) // Conditional expression is constant
+#pragma warning(disable : 4459) // Declaration hides global declaration
+#endif
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCore>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 namespace Kiva {
 

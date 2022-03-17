@@ -6,6 +6,7 @@
 
 #include "Functions.hpp"
 #include "libkiva_export.h"
+#include "Errors.hpp"
 #include <cmath>
 #include <math.h>
 #include <vector>

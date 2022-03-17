@@ -4,10 +4,32 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4100) // Unreferenced formal parameter
+#pragma warning(disable : 4127) // Conditional expression is constant
+#pragma warning(disable : 4244) // Possible loss of data from conversion
+#pragma warning(disable : 4702) // Unreachable code
+#elif defined(__APPLE__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__gnu_linux__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/multi/geometries/multi_point.hpp>
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__APPLE__)
+#pragma clang diagnostic pop
+#elif defined(__gnu_linux__)
+#pragma GCC diagnostic pop
+#endif
+
 
 #include "Functions.hpp"
 #include "libkiva_export.h"

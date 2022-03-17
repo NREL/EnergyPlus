@@ -6,9 +6,9 @@
 
 namespace Kiva {
 
-std::string getVersion() { return "@VERSION_NUMBER@"; };
+std::string getVersion() { return "@VERSION_NUMBER@"; }
 
-std::string getYear() { return "@YEAR@"; };
+std::string getYear() { return "@YEAR@"; }
 
 } // namespace Kiva
 

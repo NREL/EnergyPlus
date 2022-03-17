@@ -72,11 +72,17 @@ void Ground::buildDomain() {
 
 void Ground::calculateADE() {
 // Solve for new values (Main loop)
+#if defined(_OPENMP)
 #pragma omp parallel sections num_threads(2)
+#endif
   {
+#if defined(_OPENMP)
 #pragma omp section
+#endif
     calculateADEUpwardSweep();
+#if defined(_OPENMP)
 #pragma omp section
+#endif
     calculateADEDownwardSweep();
   }
   for (size_t index = 0; index < num_cells; ++index) {
@@ -97,7 +103,7 @@ void Ground::calculateADEUpwardSweep() {
 
 void Ground::calculateADEDownwardSweep() {
   // Downward sweep (Solve V Matrix starting from I, K)
-  for (size_t index = num_cells - 1; /* i >= 0 && */ index < num_cells; index--) {
+  for (int index = static_cast<int>(num_cells) - 1; index >= 0; index--) {
     auto this_cell = domain.cell[index];
     this_cell->calcCellADEDown(timestep, foundation, bcs, V[index]);
   }
@@ -546,50 +552,50 @@ void Ground::setNewBoundaryGeometry() {
     else
       vNext2 = v + 2;
 
-    Point a = foundation.polygon.outer()[vPrev];
-    Point b = foundation.polygon.outer()[v];
-    Point c = foundation.polygon.outer()[vNext];
-    Point d = foundation.polygon.outer()[vNext2];
+    Point p1 = foundation.polygon.outer()[vPrev];
+    Point p2 = foundation.polygon.outer()[v];
+    Point p3 = foundation.polygon.outer()[vNext];
+    Point p4 = foundation.polygon.outer()[vNext2];
 
     // Correct U-turns
     if (foundation.isExposedPerimeter[vPrev] && foundation.isExposedPerimeter[v] &&
         foundation.isExposedPerimeter[vNext]) {
-      if (isEqual(getAngle(a, b, c) + getAngle(b, c, d), PI)) {
-        double AB = getDistance(a, b);
-        double BC = getDistance(b, c);
-        double CD = getDistance(c, d);
-        double edgeDistance = BC;
-        double reductionDistance = std::min(AB, CD);
+      if (isEqual(getAngle(p1, p2, p3) + getAngle(p2, p3, p4), PI)) {
+        double d12 = getDistance(p1, p2);
+        double d23 = getDistance(p2, p3);
+        double d43 = getDistance(p3, p4);
+        double edgeDistance = d23;
+        double reductionDistance = std::min(d12, d43);
         double reductionValue = 1 - getBoundaryValue(edgeDistance);
         perimeter -= 2 * reductionDistance * reductionValue;
       }
     }
 
     if (foundation.isExposedPerimeter[vPrev] && foundation.isExposedPerimeter[v]) {
-      double alpha = getAngle(a, b, c);
-      double A = getDistance(a, b);
-      double B = getDistance(b, c);
+      double alpha = getAngle(p1, p2, p3);
+      double d12 = getDistance(p1, p2);
+      double d23 = getDistance(p2, p3);
 
       if (sin(alpha) > 0) {
         double f = getBoundaryDistance(1 - sin(alpha / 2) / (1 + cos(alpha / 2))) / sin(alpha / 2);
 
         // Chamfer
         double d = f / cos(alpha / 2);
-        if (A < d || B < d) {
-          A = std::min(A, B);
-          B = std::min(A, B);
+        if (d12 < d || d23 < d) {
+          d12 = std::min(d12, d23);
+          d23 = std::min(d12, d23);
         } else {
-          A = d;
-          B = d;
+          d12 = d;
+          d23 = d;
         }
-        double C = sqrt(A * A + B * B - 2 * A * B * cos(alpha));
+        double d13 = sqrt(d12 * d12 + d23 * d23 - 2 * d12 * d23 * cos(alpha));
 
-        perimeter += C - (A + B);
+        perimeter += d13 - (d12 + d23);
       }
     }
 
     if (!foundation.isExposedPerimeter[v]) {
-      interiorPerimeter += getDistance(b, c);
+      interiorPerimeter += getDistance(p2, p3);
     }
   }
 

@@ -23,7 +23,7 @@ set(KIVA_BUILD_CONFIG ${KIVA_BUILD_CONFIG} PARENT_SCOPE)
 # Default version number
 set( libkiva_VERSION_MAJOR 0 )
 set( libkiva_VERSION_MINOR 6 )
-set( libkiva_VERSION_PATCH 3 )
+set( libkiva_VERSION_PATCH 4 )
 
 if(EXISTS "${kiva_SOURCE_DIR}/.git")
   file(WRITE ${CMAKE_BINARY_DIR}/arch.txt ${KIVA_BUILD_CONFIG})
@@ -127,7 +127,7 @@ configure_file (
     "${PROJECT_BINARY_DIR}/Version.hpp"
 )
 
-set(kiva_src Aggregator.cpp
+set(libkiva_src Aggregator.cpp
              Aggregator.hpp
              Algorithms.cpp
              Algorithms.hpp
@@ -155,20 +155,15 @@ set(kiva_src Aggregator.cpp
 
 option( KIVA_STATIC_LIB "Make libkiva a static library" ON )
 
-if (MSVC)
-  # Remove "potential loss of data" warning in Boost
-  set_source_files_properties(Geometry.cpp PROPERTIES COMPILE_FLAGS /wd4244)
-endif()
-
 if (KIVA_STATIC_LIB)
-  add_library(libkiva STATIC ${kiva_src})
+  add_library(libkiva STATIC ${libkiva_src})
   target_compile_definitions(libkiva PRIVATE LIBKIVA_STATIC_DEFINE)
   if(UNIX)
     target_compile_options(libkiva PUBLIC -fPIC)
   endif()
 else()
   set(CMAKE_MACOSX_RPATH 1)
-  add_library(libkiva SHARED ${kiva_src})
+  add_library(libkiva SHARED ${libkiva_src})
   if(KIVA_EXE_BUILD)
     install(TARGETS libkiva DESTINATION bin/)
   endif()
@@ -184,6 +179,11 @@ target_include_directories(libkiva PUBLIC
   "${BOOST_SOURCE_DIR}"
   "${kiva_SOURCE_DIR}/vendor/eigen")
 
+target_compile_options(libkiva PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+  -Wall -Wextra -Wpedantic -Werror>
+)
 target_compile_features(libkiva PUBLIC cxx_std_17) # Should be PRIVATE once boost is cleaned out of public API
 
 include(GenerateExportHeader)
