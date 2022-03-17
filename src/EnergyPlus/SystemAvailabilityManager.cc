@@ -1327,7 +1327,7 @@ namespace SystemAvailabilityManager {
                     }
 
                     int listItem = 0;
-                    for (const auto &extensibleInstance : extensiblesArray) {
+                    for (nlohmann::json const & extensibleInstance : extensiblesArray) {
                         ++listItem;
                         mgrList.AvailManagerName(listItem) =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_name");
