@@ -10406,7 +10406,6 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
 
     auto const &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
     auto const &thisSolEnclosureName = state.dataViewFactor->EnclSolInfo(enclNum).Name;
-    bool foundUnassociated = false;
     if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0 && thisEnclDaylight.NumOfDayltgExtWins > 0) {
         for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
             auto &thisDaylightCtrl = state.dataDaylightingData->daylightControl(controlNum);
@@ -10422,8 +10421,7 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
                                                  "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in enclosure " +
                                                      thisSolEnclosureName);
                                 ShowContinueError(
-                                    state,
-                                    "Check the Zone Name in the WindowShadingControl that references the following fenestration surfaces:");
+                                    state, "Check the Zone Name in the WindowShadingControl that references the following fenestration surfaces:");
                                 showOnce = false;
                             }
                             ShowContinueError(state, "  -  " + state.dataSurface->Surface(IWinShdOrd).Name);
@@ -10437,13 +10435,10 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
                                 break;
                             }
                         }
-                        if (!found) foundUnassociated = true;
                     }
                 }
             }
         } // controlNum loop
-        if (foundUnassociated)
-            ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found unassociated window for enclosure " + thisSolEnclosureName);
     }
 }
 
