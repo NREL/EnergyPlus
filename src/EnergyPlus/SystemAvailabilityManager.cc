@@ -4744,133 +4744,139 @@ namespace SystemAvailabilityManager {
         hybridVentMgr.maxAdaTem = 0.0;
 
         if (!KeepStatus) {
-            {
-                auto const SELECT_CASE_var(hybridVentMgr.ControlMode);
+            switch (hybridVentMgr.ControlMode) {
 
-                if (SELECT_CASE_var == HybridVentMode_No) {
-                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_NoAction;
+            case HybridVentMode_No: {
+                hybridVentMgr.VentilationCtrl = HybridVentCtrl_NoAction;
 
-                    // Temperature control
-                } else if (SELECT_CASE_var == HybridVentMode_Temp) {
-                    if (TempExt >= hybridVentMgr.MinOutdoorTemp && TempExt <= hybridVentMgr.MaxOutdoorTemp) {
+                // Temperature control
+            } break;
+            case HybridVentMode_Temp: {
+                if (TempExt >= hybridVentMgr.MinOutdoorTemp && TempExt <= hybridVentMgr.MaxOutdoorTemp) {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                } else {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                }
+
+                // Enthalpy control
+            } break;
+            case HybridVentMode_Enth: {
+                ZoneAirEnthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                if (state.dataEnvrn->OutEnthalpy >= hybridVentMgr.MinOutdoorEnth && state.dataEnvrn->OutEnthalpy <= hybridVentMgr.MaxOutdoorEnth) {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                } else {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                }
+
+                // Dew point control
+            } break;
+            case HybridVentMode_DewPoint: {
+                if (state.dataEnvrn->OutDewPointTemp >= hybridVentMgr.MinOutdoorDewPoint &&
+                    state.dataEnvrn->OutDewPointTemp <= hybridVentMgr.MaxOutdoorDewPoint) {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                } else {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                }
+
+            } break;
+            case HybridVentMode_OA: {
+                OASetPoint = GetCurrentScheduleValue(state, hybridVentMgr.MinOASchedPtr);
+                ACH = 0.0;
+                HybridVentModeOA = true;
+                if (!hybridVentMgr.HybridVentMgrConnectedToAirLoop) {
+                    if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        HybridVentModeOA = false;
+                    }
+                }
+
+                if (hybridVentMgr.ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
+                    ManageAirflowNetworkBalance(state, true);
+                    ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum);
+                }
+                if (ACH > OASetPoint) {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                } else {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                }
+
+            } break;
+            case HybridVentMode_OperT80: {
+                if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
+                    hybridVentMgr.OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
+                    maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
+                    hybridVentMgr.minAdaTem = minAdaTem;
+                    hybridVentMgr.maxAdaTem = maxAdaTem;
+                    if (hybridVentMgr.OperativeTemp <= maxAdaTem && hybridVentMgr.OperativeTemp >= minAdaTem) {
                         hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
                     } else {
                         hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                    }
-
-                    // Enthalpy control
-                } else if (SELECT_CASE_var == HybridVentMode_Enth) {
-                    ZoneAirEnthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-                    if (state.dataEnvrn->OutEnthalpy >= hybridVentMgr.MinOutdoorEnth &&
-                        state.dataEnvrn->OutEnthalpy <= hybridVentMgr.MaxOutdoorEnth) {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                    } else {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                    }
-
-                    // Dew point control
-                } else if (SELECT_CASE_var == HybridVentMode_DewPoint) {
-                    if (state.dataEnvrn->OutDewPointTemp >= hybridVentMgr.MinOutdoorDewPoint &&
-                        state.dataEnvrn->OutDewPointTemp <= hybridVentMgr.MaxOutdoorDewPoint) {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                    } else {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                    }
-
-                } else if (SELECT_CASE_var == HybridVentMode_OA) {
-                    OASetPoint = GetCurrentScheduleValue(state, hybridVentMgr.MinOASchedPtr);
-                    ACH = 0.0;
-                    HybridVentModeOA = true;
-                    if (!hybridVentMgr.HybridVentMgrConnectedToAirLoop) {
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            HybridVentModeOA = false;
-                        }
-                    }
-
-                    if (hybridVentMgr.ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
-                        ManageAirflowNetworkBalance(state, true);
-                        ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum);
-                    }
-                    if (ACH > OASetPoint) {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                    } else {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                    }
-
-                } else if (SELECT_CASE_var == HybridVentMode_OperT80) {
-                    if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                        hybridVentMgr.OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-                        minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
-                        maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
-                        hybridVentMgr.minAdaTem = minAdaTem;
-                        hybridVentMgr.maxAdaTem = maxAdaTem;
-                        if (hybridVentMgr.OperativeTemp <= maxAdaTem && hybridVentMgr.OperativeTemp >= minAdaTem) {
-                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                        } else {
-                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                        }
-                    } else {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                    }
-
-                } else if (SELECT_CASE_var == HybridVentMode_OperT90) {
-                    if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                        hybridVentMgr.OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-                        minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
-                        maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
-                        hybridVentMgr.minAdaTem = minAdaTem;
-                        hybridVentMgr.maxAdaTem = maxAdaTem;
-                        if (hybridVentMgr.OperativeTemp <= maxAdaTem && hybridVentMgr.OperativeTemp >= minAdaTem) {
-                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                        } else {
-                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                        }
-                    } else {
-                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                    }
-
-                } else if (SELECT_CASE_var == HybridVentMode_CO2) {
-                    hybridVentMgr.CO2 = state.dataContaminantBalance->ZoneAirCO2(ZoneNum);
-                    if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) > state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum)) {
-                        if (hybridVentMgr.HybridVentMgrConnectedToAirLoop) {
-                            AirLoopNum = hybridVentMgr.AirLoopNum;
-                            for (Num = 1; Num <= state.dataAirLoop->PriAirSysAvailMgr(hybridVentMgr.AirLoopNum).NumAvailManagers; ++Num) {
-                                SimSysAvailManager(state,
-                                                   state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailManagerType(Num),
-                                                   state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailManagerName(Num),
-                                                   state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailManagerNum(Num),
-                                                   AirLoopNum,
-                                                   state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus,
-                                                   AvailStatus);
-                            }
-                            if (AvailStatus == CycleOn) {
-                                hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                            } else {
-                                hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                            }
-                        } else if (hybridVentMgr.SimHybridVentSysAvailMgr) {
-                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                            for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
-                                for (ZoneCompNum = 1; ZoneCompNum <= state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp; ++ZoneCompNum) {
-                                    if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
-                                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
-                                        break;
-                                    }
-                                }
-                            }
-                        } else {
-                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
-                        }
                     }
                 } else {
-                    ShowSevereError(state,
-                                    format("{}: incorrect Control Type: {}",
-                                           SystemAvailabilityTypeNamesUC[static_cast<int>(hybridVentMgr.MgrType)],
-                                           hybridVentMgr.AirLoopName));
-                    ShowFatalError(state,
-                                   format("Errors found in getting {} Control mode value",
-                                          SystemAvailabilityTypeNamesUC[static_cast<int>(hybridVentMgr.MgrType)]));
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                 }
+
+            } break;
+            case HybridVentMode_OperT90: {
+                if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
+                    hybridVentMgr.OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
+                    maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
+                    hybridVentMgr.minAdaTem = minAdaTem;
+                    hybridVentMgr.maxAdaTem = maxAdaTem;
+                    if (hybridVentMgr.OperativeTemp <= maxAdaTem && hybridVentMgr.OperativeTemp >= minAdaTem) {
+                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                    } else {
+                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                    }
+                } else {
+                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                }
+
+            } break;
+            case HybridVentMode_CO2: {
+                hybridVentMgr.CO2 = state.dataContaminantBalance->ZoneAirCO2(ZoneNum);
+                if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) > state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum)) {
+                    if (hybridVentMgr.HybridVentMgrConnectedToAirLoop) {
+                        AirLoopNum = hybridVentMgr.AirLoopNum;
+                        for (Num = 1; Num <= state.dataAirLoop->PriAirSysAvailMgr(hybridVentMgr.AirLoopNum).NumAvailManagers; ++Num) {
+                            SimSysAvailManager(state,
+                                               state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailManagerType(Num),
+                                               state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailManagerName(Num),
+                                               state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailManagerNum(Num),
+                                               AirLoopNum,
+                                               state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus,
+                                               AvailStatus);
+                        }
+                        if (AvailStatus == CycleOn) {
+                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                        } else {
+                            hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                        }
+                    } else if (hybridVentMgr.SimHybridVentSysAvailMgr) {
+                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                        for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
+                            for (ZoneCompNum = 1; ZoneCompNum <= state.dataHVACGlobal->ZoneComp(ZoneEquipType).TotalNumComp; ++ZoneCompNum) {
+                                if (state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
+                                    hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
+                    }
+                }
+            } break;
+            default: {
+                ShowSevereError(state,
+                                format("{}: incorrect Control Type: {}",
+                                       SystemAvailabilityTypeNamesUC[static_cast<int>(hybridVentMgr.MgrType)],
+                                       hybridVentMgr.AirLoopName));
+                ShowFatalError(
+                    state,
+                    format("Errors found in getting {} Control mode value", SystemAvailabilityTypeNamesUC[static_cast<int>(hybridVentMgr.MgrType)]));
+            }
             }
 
             if (hybridVentMgr.VentilationCtrl == HybridVentCtrl_Open) {
