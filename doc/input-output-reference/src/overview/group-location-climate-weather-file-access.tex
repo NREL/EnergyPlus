@@ -1777,9 +1777,14 @@ Precipitation includes both rain and the equivalent water content of snow.
 Precipitation is not yet described well enough in the many building weather data
 files. So this object can be used to provide the data using Schedule objects
 that define rates of precipitation in meters per hour. In 9.6 and later
-versions, site:precipitation is also used in the determination of the
-rain indicator during the run period. During the sizing period, the rain indicator
-defined in the SizingPeriod:DesignDay will be used instead.
+versions, Site:Precipitation is also used in the determination of the
+rain indicator during the run period. As the rain fall rate is determined by
+Site:Precipitation when it is defined. Otherwise, it takes value from liquid
+precipitation from the epw. During the run period, when the rain rate is
+no less than 0.8 mm per hour, then the rain flag is overwritten to true.
+This overwritten occurs during the run period when there is only one weather
+file data periods and the number of timesteps in an hour is 1. During the sizing
+period, the rain indicator defined in the SizingPeriod:DesignDay will be used instead.
 
 A set of schedules for site precipitation have been developed for USA weather locations and are provided with EnergyPlus in the data set called PrecipitationSchedulesUSA.idf. The user can develop schedules however they want. The schedules in the data set were developed using EnergyPlus' weather file (EPW) observations and the average monthly precipitation for the closest weather site provided by NOAA. EPW files for the USA that were based on TMY or TMY2 include weather observations for Light/Moderate/Heavy rainfall, however most international locations do not include these observations. The values were modeled by taking the middle of the ranges quoted in the EPW data dictionary. The assumed piecewise function is shown below.
 
