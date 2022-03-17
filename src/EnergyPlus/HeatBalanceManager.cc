@@ -6900,7 +6900,7 @@ namespace HeatBalanceManager {
         }
 
         // Get window name and check for match
-        readItem(DataLine(4).substr(19), W5Name);
+        W5Name = std::string{DataLine(4).substr(19)};
         WindowNameInW5DataFile = UtilityRoutines::MakeUPPERCase(W5Name);
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found

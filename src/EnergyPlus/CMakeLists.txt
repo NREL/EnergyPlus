@@ -841,7 +841,7 @@ else() # windows
   add_library(energyplusapi ${API_LIBRARY_TYPE} CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC}
                             "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc")
 endif()
-target_link_libraries(energyplusapi PUBLIC energypluslib)
+target_link_libraries(energyplusapi PRIVATE energypluslib)
 target_link_libraries(energyplusapi PRIVATE project_options project_fp_options project_warnings)
 
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
