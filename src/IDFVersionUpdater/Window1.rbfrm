@@ -805,7 +805,10 @@ End
 		  dim repcsvFileInOrig as FolderItem
 		  
 		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  if origVerIndx = -1 then origVerIndx = AllNewVersions.FirstIndex 'if not found just start at the beginning
+		  
 		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  if finalVerIndx = -1 then finalVerIndx = AllNewVersions.LastIndex 'if not found go until the last
 		  
 		  if inFile<>"" then
 		    origFile = new FolderItem(inFile)
@@ -861,7 +864,10 @@ End
 		  dim repcsvFileInOrig as FolderItem
 		  
 		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  if origVerIndx = -1 then origVerIndx = AllNewVersions.FirstIndex 'if not found just start at the beginning
+		  
 		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  if finalVerIndx = -1 then finalVerIndx = AllNewVersions.LastIndex 'if not found go until the last
 		  
 		  if inFile<>"" then
 		    origFile = new FolderItem(inFile)
@@ -1118,7 +1124,11 @@ End
 		        elseif versionFound.Len = 3 Then
 		          versionFound = versionFound + ".0"
 		        End If
-		        versionFound = versionFound.Left(5) 'trim build number if included, such as: 3.0.0.028 to 3.0.0
+		        if versionFound.instr(".") = 2 then
+		          versionFound = versionFound.Left(5) 'trim build number if included, such as: 3.0.0.028 to 3.0.0
+		        Else
+		          versionFound = versionFound.Left(6) 'trim build number if included, such as: 23.0.0.028 to 23.0.0
+		        End if
 		      Else
 		        versionFound = ""
 		      End If
@@ -1181,29 +1191,23 @@ End
 #tag Events cmdChooseFile
 	#tag Event
 		Sub Action()
-		  dim idfType as new FileType
-		  dim idmType as new FileType
-		  dim lstType as new FileType
 		  dim f as FolderItem
-		  dim dlg as new OpenDialog
 		  dim curVersion as string = ""
+		  dim filepath as string = ""
 		  dim auditFile as FolderItem
-		  idfType.Name = "EnergyPlus Input File"
-		  idfType.MacType = "idf"
-		  idfType.Extensions = "idf"
-		  idmType.Name = "EnergyPlus Macro File"
-		  idmType.MacType = "imf"
-		  idmType.Extensions = "imf"
-		  lstType.Name = "Text File With List of EnergyPlus Files"
-		  lstType.MacType = "lst"
-		  lstType.Extensions = "lst"
-		  dlg.Title = "Select Old EnergyPlus File to Update"
-		  dlg.filter = idfType  + idmType + lstType
-		  f = dlg.ShowModal()
+		  'dlg.Title = "Select Old EnergyPlus File to Update"
+		  f = FolderItem.ShowOpenFileDialog(ReadFileTypeGroup.all)
 		  if f<>nil then
-		    txtFileName.Text = f.NativePath
+		    filepath = f.NativePath
+		    #if TargetMacOS then
+		      if ExtensionOnly(filepath) = "txt" then
+		        filepath = filepath.left(filepath.length - 4)
+		      end if
+		    #EndIf
+		    txtFileName.Text = filepath
+		    'msgbox "cmdChooseFile-Action-1: " + filepath + " extension " + ExtensionOnly(filepath)
 		    txtFileName.Enabled = True
-		    if extensionOnly(f.NativePath) <> "LST" then 'IDF or IDM files are processed
+		    if extensionOnly(filepath) <> "lst" then 'IDF or IDM files are processed
 		      curVersion =  getCurrentFileVersion(f)
 		      if curVersion<>"" then
 		        txtCurrentVersion.Text = curVersion
@@ -1239,7 +1243,8 @@ End
 		  dim curLine as string = ""
 		  dim curFile as FolderItem
 		  dim curVersion as String =""
-		  dim listFile as FolderItem
+		  dim activeFile as FolderItem
+		  dim activeFileName as String = ""
 		  
 		  'Called when the CONVERT button is pressed
 		  me.MouseCursor = system.Cursors.Wait
@@ -1248,10 +1253,21 @@ End
 		  #if TargetWindows or TargetLinux then
 		    call CopyIDDandCSV(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text)
 		  #EndIf
-		  if ExtensionOnly(txtFileName.Text) = "LST" then
-		    listFile = new FolderItem(txtFileName.Text )
-		    IF listFile.Exists then
-		      SourceStream = TextInputStream.Open(listFile)
+		  
+		  activeFileName = txtFileName.Text
+		  activeFile = new FolderItem(activeFileName)
+		  'on MacOS the file name sometime has an extra extension of .txt
+		  #if TargetMacOS then
+		    if not activeFile.Exists then
+		      activeFileName = activeFileName + ".txt"
+		      activeFile = new FolderItem(activeFileName)
+		    end if
+		  #endif
+		  'MsgBox "cmdConvert-Action-2: " + activeFileName + " extension " + ExtensionOnly(activeFileName)
+		  
+		  if ExtensionOnly(txtFileName.Text) = "lst" then
+		    IF activeFile.Exists then
+		      SourceStream = TextInputStream.Open(activeFile)
 		      While Not SourceStream.EOF
 		        curLine = LTrim(SourceStream.ReadLine)
 		        If curLine.Len>0 and  curLine.Left(1) <>"!" then 'skip lines with comments and blank lines
@@ -1271,9 +1287,11 @@ End
 		        end if
 		      wend
 		      MsgBox "All conversions complete"
+		    else
+		      MsgBox "Could not file file: " + txtFileName.Text + " or " + txtFileName.Text + ".txt"
 		    end if
 		  else
-		    call ConvertFile(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text,True)
+		    call ConvertFile(activeFileName, txtCurrentVersion.Text, pmnuNewVersion.Text,True)
 		    cmdViewAudit.Enabled = True
 		  end if
 		  ' for Windows and Linux copy the IDD and CSV to current file location

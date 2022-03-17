@@ -664,6 +664,17 @@ if(WIN32 AND NOT UNIX)
   # This is meaningful only with MSVC from Visual Studio 2015 or higher, which is our case
   set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 
+
+  # ConvertInputFormat is added via add_subdirectory, and in there we set CMAKE_INSTALL_OPENMP_LIBRARIES at parent scope already
+  # Otherwise, if either cpgfunctionEP (yes by default) or kiva (no by default) **actually** linked to OpenMP, we need to ship the libs
+  if (NOT ${CMAKE_INSTALL_OPENMP_LIBRARIES} AND (${USE_OpenMP} OR ${ENABLE_OPENMP}))
+    # Need to install vcomp140.dll or similar
+    find_package(OpenMP COMPONENTS CXX)
+    if(OpenMP_CXX_FOUND)
+      set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
+    endif()
+  endif()
+
   include(InstallRequiredSystemLibraries)
   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
     install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
