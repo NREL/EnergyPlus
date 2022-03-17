@@ -10406,20 +10406,27 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
 
     auto const &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
     auto const &thisSolEnclosureName = state.dataViewFactor->EnclSolInfo(enclNum).Name;
+    bool foundUnassociated = false;
     if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0 && thisEnclDaylight.NumOfDayltgExtWins > 0) {
         for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
             auto &thisDaylightCtrl = state.dataDaylightingData->daylightControl(controlNum);
             if (thisDaylightCtrl.ShadeDeployOrderExtWins.size() > 0) {
                 int count = 0;
+                bool showOnce = true;
                 for (auto listOfExtWin : thisDaylightCtrl.ShadeDeployOrderExtWins) {
                     for (auto IWinShdOrd : listOfExtWin) {
                         ++count;
                         if (count > thisEnclDaylight.NumOfDayltgExtWins) {
-                            ShowWarningError(state,
-                                             "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in enclosure " +
-                                                 thisSolEnclosureName);
-                            ShowContinueError(state, "Check the list of surfaces in WindowShadingControl: " + thisDaylightCtrl.Name);
-                            ShowContinueError(state, "The last fenestration surface identified is: " + state.dataSurface->Surface(IWinShdOrd).Name);
+                            if (showOnce) {
+                                ShowWarningError(state,
+                                                 "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in enclosure " +
+                                                     thisSolEnclosureName);
+                                ShowContinueError(
+                                    state,
+                                    "Check the Zone Name in the WindowShadingControl that references the following fenestration surfaces:");
+                                showOnce = false;
+                            }
+                            ShowContinueError(state, "  -  " + state.dataSurface->Surface(IWinShdOrd).Name);
                         }
                         bool found = false;
                         for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
@@ -10430,14 +10437,13 @@ void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNu
                                 break;
                             }
                         }
-                        // this should never occur.
-                        if (!found)
-                            ShowWarningError(state,
-                                             "MapShadeDeploymentOrderToLoopNumber: found unassociated window for enclosure " + thisSolEnclosureName);
+                        if (!found) foundUnassociated = true;
                     }
                 }
             }
         } // controlNum loop
+        if (foundUnassociated)
+            ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found unassociated window for enclosure " + thisSolEnclosureName);
     }
 }
 
