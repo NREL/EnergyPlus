@@ -6283,7 +6283,6 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     Real64 HorIllSkyFac; // Ratio between horizontal illuminance from sky horizontal irradiance and
     //   luminous efficacy and horizontal illuminance from averaged sky
     bool GlareFlag; // True if maximum glare is exceeded
-    int loop;       // Loop index
 
     Real64 VTRatio;  // VT (visible transmittance) ratio = VTNow / VTMaster
     Real64 VTNow;    // VT of the time step actual TC window
@@ -6352,7 +6351,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     // the zone or an exterior window in an adjacent zone that shares an interior window with the zone.
     // Find contribution of each window to the daylight illum and to the glare numerator at each reference point.
     // Use shading flags set in WindowShadingManager.
-    for (loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
+    for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
         int IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
 
         // Added TH 6/29/2009 for thermochromic windows
@@ -6655,7 +6654,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     // This illuminance excludes contribution of inter-reflected illuminance produced by solar
     // entering the zone through interior windows (which is calculated in DayltgInterReflIllFrIntWins.
 
-    for (loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
+    for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
         int IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
         ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
         if (state.dataSurface->Surface(IWin).HasShadeControl && ISWFLG == 0) {
@@ -6705,7 +6704,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             for (const auto IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
-                loop = thisDaylightControl.MapShdOrdToLoopNum(count);
+                int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
                 if (loop > 0) {
                     ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                     int IS = findWinShadingStatus(state, IWin);
@@ -6749,7 +6748,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             for (const auto IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
-                loop = thisDaylightControl.MapShdOrdToLoopNum(count);
+                int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
                 if (loop > 0) {
                     if (thisASETIL < 1.0) {
 
@@ -6867,7 +6866,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             for (const auto IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
-                loop = thisDaylightControl.MapShdOrdToLoopNum(count);
+                int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
                 if (loop > 0) {
                     // Check if window is eligible for glare control
                     // TH 1/21/2010. Switchable glazings already in partially switched state
@@ -7002,7 +7001,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             for (const auto IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
-                loop = thisDaylightControl.MapShdOrdToLoopNum(count);
+                int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
                 if (loop > 0) {
                     // if (SurfWinShadingFlag(IWin) <= BGBlind && SurfWinShadingFlag(IWin) != SwitchableGlazing) {
                     if (NOT_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(IWin)) ||
