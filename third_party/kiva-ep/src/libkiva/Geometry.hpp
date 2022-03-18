@@ -10,10 +10,10 @@
 #pragma warning(disable : 4127) // Conditional expression is constant
 #pragma warning(disable : 4244) // Possible loss of data from conversion
 #pragma warning(disable : 4702) // Unreachable code
-#elif defined(__APPLE__)
+#elif defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(__gnu_linux__)
+#elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -25,12 +25,11 @@
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>
 #if defined(_MSC_VER)
 #pragma warning(pop)
-#elif defined(__APPLE__)
+#elif defined(__clang__)
 #pragma clang diagnostic pop
-#elif defined(__gnu_linux__)
+#elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic pop
 #endif
-
 
 #include "Functions.hpp"
 #include "libkiva_export.h"

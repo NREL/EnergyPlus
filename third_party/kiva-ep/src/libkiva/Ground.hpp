@@ -22,7 +22,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4127) // Conditional expression is constant
 #pragma warning(disable : 4459) // Declaration hides global declaration
-#elif defined(__gnu_linux__)
+#elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #endif
@@ -30,7 +30,7 @@
 #include <Eigen/SparseCore>
 #if defined(_MSC_VER)
 #pragma warning(pop)
-#elif defined(__gnu_linux__)
+#elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic pop
 #endif
 
