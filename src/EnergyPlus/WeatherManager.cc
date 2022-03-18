@@ -2045,6 +2045,29 @@ namespace WeatherManager {
                     }
                 }
             }
+
+            // at the beginning of each day find the min/max weather used for DOAS sizing
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn ==
+                    DataGlobalConstants::KindOfSim::RunPeriodDesign ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
+                for (int i = 0; i < state.dataWeatherManager->TodayOutDryBulbTemp.size(); ++i) {
+                    if (state.dataWeatherManager->TodayOutDryBulbTemp[i] >
+                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOATSizing) {
+                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOATSizing =
+                            state.dataWeatherManager->TodayOutDryBulbTemp[i];
+                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOADPSizing =
+                            state.dataWeatherManager->TodayOutDewPointTemp[i];
+                    }
+                    if (state.dataWeatherManager->TodayOutDryBulbTemp[i] <
+                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).minHeatingOATSizing) {
+                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).minHeatingOATSizing =
+                            state.dataWeatherManager->TodayOutDryBulbTemp[i];
+                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).minHeatingOADPSizing =
+                            state.dataWeatherManager->TodayOutDewPointTemp[i];
+                    }
+                }
+            }
+
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
         if (!state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&

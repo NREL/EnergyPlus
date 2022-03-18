@@ -198,6 +198,10 @@ namespace WeatherManager {
         bool ActualWeather;              // true when using actual weather data
         int RawSimDays;                  // number of basic sim days.
         bool firstHrInterpUseHr1;        // true when using Hour 1 for first hour interpolations; false to use Hour 24
+        Real64 maxCoolingOATSizing;      // max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 maxCoolingOADPSizing;     // max outdoor dew point for DesignDay or RunPeriodDesign type weather
+        Real64 minHeatingOATSizing;      // min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 minHeatingOADPSizing;     // min outdoor dew point for DesignDay or RunPeriodDesign type weather
 
         // Default Constructor
         EnvironmentData()
@@ -207,7 +211,8 @@ namespace WeatherManager {
               UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),
               SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
               RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0),
-              firstHrInterpUseHr1(false)
+              firstHrInterpUseHr1(false), maxCoolingOATSizing(-999.0), maxCoolingOADPSizing(-999.0), minHeatingOATSizing(999.0),
+              minHeatingOADPSizing(999.0)
         {
         }
     };

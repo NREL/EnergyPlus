@@ -1019,40 +1019,27 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
     {
 
-        int constexpr summerDesignDayTypeIndex(9);
-        int constexpr winterDesignDayTypeIndex(10);
-
-        for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
-            auto &desDayInput = state.dataWeatherManager->DesDayInput(i);
-            // Summer design day
-            if (desDayInput.DayType == summerDesignDayTypeIndex) {
-                // keep design day humiditiy ratio from the same peak temperature design day (i.e., don't use a humrat from a different day)
-                if (desDayInput.MaxDryBulb > this->SizingCoolOATemp) {
-                    this->SizingCoolOATemp = desDayInput.MaxDryBulb;
-                    if (desDayInput.HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
-                        this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdbTwbPb(
-                            state, this->SizingCoolOATemp, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                        this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(state, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::HumRatio) {
-                        this->SizingCoolOAHumRat = desDayInput.HumIndValue;
-                    } // else { // What about other cases?
+        // int constexpr summerDesignDayTypeIndex(9);
+        // int constexpr winterDesignDayTypeIndex(10);
+        for (size_t env = 1; env <= state.dataWeatherManager->Environment.size(); ++env) {
+            switch (state.dataWeatherManager->Environment(env).KindOfEnvrn) {
+            case DataGlobalConstants::KindOfSim::DesignDay:
+            case DataGlobalConstants::KindOfSim::RunPeriodDesign: {
+                if (state.dataWeatherManager->Environment(env).maxCoolingOATSizing > this->SizingCoolOATemp) {
+                    this->SizingCoolOATemp = state.dataWeatherManager->Environment(env).maxCoolingOATSizing;
+                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(
+                        state, state.dataWeatherManager->Environment(env).maxCoolingOADPSizing, DataEnvironment::StdPressureSeaLevel);
                 }
-            }
-            // Winter design day
-            if (desDayInput.DayType == winterDesignDayTypeIndex) {
-                // keep design day humiditiy ratio from the same peak temperature design day (i.e., don't use a humrat from a different day)
-                if (desDayInput.MaxDryBulb - desDayInput.DailyDBRange < this->HeatOutTemp) {
-                    this->HeatOutTemp = desDayInput.MaxDryBulb - desDayInput.DailyDBRange;
-                    if (desDayInput.HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
-                        this->HeatOutHumRat =
-                            Psychrometrics::PsyWFnTdbTwbPb(state, this->HeatOutTemp, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                        this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(state, desDayInput.HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                    } else if (desDayInput.HumIndType == WeatherManager::DDHumIndType::HumRatio) {
-                        this->HeatOutHumRat = desDayInput.HumIndValue;
-                    } // else { // What about other cases?
+                if (state.dataWeatherManager->Environment(env).minHeatingOATSizing < this->HeatOutTemp) {
+                    this->HeatOutTemp = state.dataWeatherManager->Environment(env).minHeatingOATSizing;
+                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(
+                        state, state.dataWeatherManager->Environment(env).minHeatingOADPSizing, DataEnvironment::StdPressureSeaLevel);
                 }
+            } break;
+            case DataGlobalConstants::KindOfSim::RunPeriodWeather: {
+            } break;
+            default: {
+            } break;
             }
         }
     }
