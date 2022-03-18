@@ -1038,9 +1038,11 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     state->dataHeatBal->space.allocate(zn);
     state->dataHeatBal->space(1).solarEnclosureNum = 1;
 
-    CreateShadeDeploymentOrder(*state, zn);
+    std::size_t maxShadeDeployOrderSize = 0;
+    maxShadeDeployOrderSize = CreateShadeDeploymentOrder(*state, zn);
 
     EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(maxShadeDeployOrderSize, 6ul);
 
     std::vector<int> compare1;
     compare1.push_back(8);
@@ -1117,9 +1119,11 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataHeatBal->space(zn).solarEnclosureNum = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->NumOfZones);
 
-    CreateShadeDeploymentOrder(*state, zn);
+    std::size_t maxShadeDeployOrderSize = 0;
+    maxShadeDeployOrderSize = CreateShadeDeploymentOrder(*state, zn);
 
     EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(maxShadeDeployOrderSize, 6ul);
 
     state->dataDaylightingData->daylightControl(zn).TotalDaylRefPoints = 1;
     state->dataViewFactor->EnclSolInfo(zn).TotalEnclosureDaylRefPoints = 1;
