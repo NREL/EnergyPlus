@@ -672,6 +672,43 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 intVistranArea(0.0);
     bool isNorth;
 
+    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
+        "No Shade",  // 0
+        "Shade Off", // 1
+        "Interior Shade",
+        "Switchable Glazing",
+        "Exterior Shade",
+        "Exterior Screen",
+        "Interior Blind",
+        "Exterior Blind",
+        "Between Glass Shade",
+        "Between Glass Blind",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
+        "Uncontrolled",
+        "AlwaysOn",
+        "AlwaysOff",
+        "OnIfScheduleAllows",
+        "OnIfHighSolarOnWindow",
+        "OnIfHighHorizontalSolar",
+        "OnIfHighOutdoorAirTemperature",
+        "OnIfHighZoneAirTemperature",
+        "OnIfHighZoneCooling",
+        "OnIfHighGlare",
+        "MeetDaylightIlluminanceSetpoint",
+        "OnNightIfLowOutdoorTempAndOffDay",
+        "OnNightIfLowInsideTempAndOffDay",
+        "OnNightIfHeatingAndOffDay",
+        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+        "OnNightIfHeatingAndOnDayIfCooling",
+        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+        "OnIfHighZoneAirTempAndHighSolarOnWindow",
+        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
+
     auto &Surface(state.dataSurface->Surface);
 
     numSurfaces = 0;
@@ -794,9 +831,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
 
-                    double uValueAssembly{0.0};
-                    double shgcAssembly{0.0};
-                    double vtAssembly{0.0};
+                    Real64 uValueAssembly{0.0};
+                    Real64 shgcAssembly{0.0};
+                    Real64 vtAssembly{0.0};
 
                     GetWindowAssemblyNfrcForReport(
                         state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueAssembly, shgcAssembly, vtAssembly);
@@ -883,9 +920,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                          state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
                                          3);
 
-                        double stateAssemblyUValue{0.0};
-                        double stateAssemblySHGC{0.0};
-                        double stateAssemblyVT{0.0};
+                        Real64 stateAssemblyUValue{0.0};
+                        Real64 stateAssemblySHGC{0.0};
+                        Real64 stateAssemblyVT{0.0};
 
                         GetWindowAssemblyNfrcForReport(
                             state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
@@ -2226,13 +2263,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
         }
-
-        // Initialize Kiva convection algorithms
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
-        }
+    }
+    // Initialize Kiva convection algorithms
+    for (auto SurfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
     }
     if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -4741,6 +4777,13 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum);
         }
     }
+    // Inside face conduction calculation for Kiva surfaces
+    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
+            -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
+    }
 }
 
 void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
@@ -6932,8 +6975,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
         if (state.dataHeatBal->AnyKiva) {
             for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
-                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) =
-                    kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv; // TODO: Use average radiant temp? Trad?
+                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - DataGlobalConstants::KelvinConv;
             }
         }
 
@@ -7263,8 +7305,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         // Read Kiva results for each surface
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
                             state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
-                        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) =
-                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
 
                         TH11 = 0.0;
                     }

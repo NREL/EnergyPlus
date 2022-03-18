@@ -82,6 +82,9 @@ typedef void *EnergyPlusState;
 /// \see stateReset
 /// \see stateDelete
 ENERGYPLUSLIB_API EnergyPlusState stateNew();
+
+ENERGYPLUSLIB_API EnergyPlusState stateNewPython();
+
 /// \brief Resets the simulation state of EnergyPlus
 /// \details A simulation state is created by calling the `stateNew` function.  After a simulation is complete, if a
 ///          second is to be run using the same memory space, the simulation state must be cleared with this function,

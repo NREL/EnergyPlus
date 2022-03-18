@@ -258,8 +258,8 @@ namespace WindowManager {
         }
     }
 
-    double
-    GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const double windowWidth, const double windowHeight)
+    Real64
+    GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const Real64 windowWidth, const Real64 windowHeight)
     {
         const auto tilt{90.0};
 
@@ -271,7 +271,7 @@ namespace WindowManager {
         return winterGlassUnit->getUValue();
     }
 
-    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight)
+    Real64 GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, Real64 windowWidth, Real64 windowHeight)
     {
         const auto tilt{90.0};
 
@@ -285,12 +285,12 @@ namespace WindowManager {
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
                                         int constrNum,
-                                        double windowWidth,
-                                        double windowHeight,
+                                        Real64 windowWidth,
+                                        Real64 windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
-                                        double &uvalue,
-                                        double &shgc,
-                                        double &vt)
+                                        Real64 &uvalue,
+                                        Real64 &shgc,
+                                        Real64 &vt)
     {
         auto &surface(state.dataSurface->Surface(surfNum));
         auto &frameDivider(state.dataSurface->FrameDivider(surface.FrameDivider));
@@ -451,7 +451,7 @@ namespace WindowManager {
     }
 
     std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(
-        EnergyPlusData &state, bool const useSummerConditions, const double width, const double height, const double tilt)
+        EnergyPlusData &state, bool const useSummerConditions, const Real64 width, const Real64 height, const Real64 tilt)
     {
         auto Indoor = getIndoorNfrc(useSummerConditions);
         auto Outdoor = getOutdoorNfrc(useSummerConditions);

@@ -1060,10 +1060,10 @@ Williamson, 1989):
 
 \[d_{wt}=0.1022\cdot d_{elev}\]
 
-If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied, otherwise
+If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied at this depth, otherwise
 a ZeroFlux boundary is applied at 40 m. If the calculated ground water depth is
-shallower than any element of the foundation construction, then the GroundWater
-is applied at 1 m below the lowest element.
+shallower than any element of a foundation construction, then the GroundWater
+is applied at 1 m below the lowest element for that foundation.
 
 Default: Autoselect.
 
@@ -1073,8 +1073,13 @@ The distance from the exterior grade to the deep ground boundary, in m.
 This distance represents either the distance to the ground water level,
 or a distance adequately far from the foundation such that it is
 isolated from the effects of the boundary (typically \textgreater{}= 40
-m). Default 40 m, or the distance determined by the ``Auto'' Deep-Ground
-Boundary Condition.
+m). Default 40 m, or the distance determined by the ``Autoselect'' Deep-Ground
+Boundary Condition. If the Deep-Ground Boundary Condition is set to ``Autoselect'', this field
+should be set to ``Autocalculate''. If the Deep-Ground Boundary Condition is not set
+to ``Autoselect'', but this field is set to ``Autocalculate'' (or allowed to default), an error
+will be issued.
+
+Default: Autocalculate.
 
 \paragraph{Field: Minimum Cell Dimension}\label{foundation-kiva-settings-minimum-cell-dimension}
 

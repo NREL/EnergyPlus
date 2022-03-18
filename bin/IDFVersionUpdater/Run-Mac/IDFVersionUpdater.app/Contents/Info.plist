@@ -29,5 +29,75 @@
 <key>NSHighResolutionCapable</key><false/>
 <key>NSRequiresAquaSystemAppearance</key><true/>
 <key>CFBundleSupportedPlatforms</key><array><string>MacOSX</string></array>
+   <key>CFBundleDocumentTypes</key>
+   <array>
+      <dict>
+         <key>CFBundleTypeName</key>
+         <string>EnergyPlus Input Files (*.idf)</string>
+         <key>CFBundleTypeExtensions</key>
+         <array>
+            <string>idf</string>
+         </array>
+         <key>LSItemContentTypes</key>
+         <array>
+            <string>public.data</string>
+         </array>
+         <key>CFBundleTypeRole</key>
+         <string>Editor</string>
+         <key>LSHandlerRank</key>
+         <string>Default</string>
+      </dict>
+      <dict>
+         <key>CFBundleTypeName</key>
+         <string>Text file with list of EnergyPlus Input Files (*.lst)</string>
+         <key>CFBundleTypeExtensions</key>
+         <array>
+            <string>lst</string>
+         </array>
+         <key>LSItemContentTypes</key>
+         <array>
+            <string>public.data</string>
+         </array>
+         <key>CFBundleTypeRole</key>
+         <string>Editor</string>
+         <key>LSHandlerRank</key>
+         <string>Default</string>
+      </dict>
+   </array>
+
+   <key>UTImportedTypeDeclarations</key>
+   <array>
+      <dict>
+         <key>UTTypeIdentifier</key>
+         <string>public.data</string>
+         <key>UTTypeTagSpecification</key>
+         <dict>
+            <key>public.filename-extension</key>
+            <array>
+            <string>idf</string>
+            </array>
+            <key>com.apple.ostype</key>
+            <array>
+               <string>????</string>
+            </array>
+         </dict>
+      </dict>
+      <dict>
+         <key>UTTypeIdentifier</key>
+         <string>public.data</string>
+         <key>UTTypeTagSpecification</key>
+         <dict>
+            <key>public.filename-extension</key>
+            <array>
+            <string>lst</string>
+            </array>
+            <key>com.apple.ostype</key>
+            <array>
+               <string>????</string>
+            </array>
+         </dict>
+      </dict>
+   </array>
+
 </dict>
 </plist>
