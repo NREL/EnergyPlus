@@ -1791,9 +1791,18 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
             if (lCondWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 lCondSupplyTemp = lCondReturnTemp + lTowerLoad / (lCondWaterMassFlowRate * Cp_CD);
             } else {
-                ShowSevereError(state, "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=" + this->Name);
-                ShowContinueErrorTimeStamp(state, "");
-                // ShowFatalError(state, "Program Terminates due to previous error condition.");
+                if (this->lCondWaterMassFlowRate_Index == 0) {
+                    ShowSevereError(state,
+                                    format("CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller={}", this->Name));
+                    ShowContinueErrorTimeStamp(state, "");
+                    // ShowFatalError(state, "Program Terminates due to previous error condition.");
+                }
+                ShowRecurringSevereErrorAtEnd(state,
+                                              format("CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller={}: "
+                                                     "Condenser flow rate = 0 severe error warning continues...",
+                                                     this->Name),                // Message automatically written to "error file" at end of simulation
+                                              this->lCondWaterMassFlowRate_Index // Recurring message index, if zero, next available index is assigned
+                );
             }
         } else {
             lCondSupplyTemp = lCondReturnTemp; // if air cooled condenser just set supply and return to same temperature
