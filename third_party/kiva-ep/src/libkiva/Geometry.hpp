@@ -17,6 +17,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
 #endif
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
