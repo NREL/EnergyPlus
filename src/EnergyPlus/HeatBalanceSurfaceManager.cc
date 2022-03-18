@@ -672,6 +672,43 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 intVistranArea(0.0);
     bool isNorth;
 
+    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
+        "No Shade",  // 0
+        "Shade Off", // 1
+        "Interior Shade",
+        "Switchable Glazing",
+        "Exterior Shade",
+        "Exterior Screen",
+        "Interior Blind",
+        "Exterior Blind",
+        "Between Glass Shade",
+        "Between Glass Blind",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
+        "Uncontrolled",
+        "AlwaysOn",
+        "AlwaysOff",
+        "OnIfScheduleAllows",
+        "OnIfHighSolarOnWindow",
+        "OnIfHighHorizontalSolar",
+        "OnIfHighOutdoorAirTemperature",
+        "OnIfHighZoneAirTemperature",
+        "OnIfHighZoneCooling",
+        "OnIfHighGlare",
+        "MeetDaylightIlluminanceSetpoint",
+        "OnNightIfLowOutdoorTempAndOffDay",
+        "OnNightIfLowInsideTempAndOffDay",
+        "OnNightIfHeatingAndOffDay",
+        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+        "OnNightIfHeatingAndOnDayIfCooling",
+        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+        "OnIfHighZoneAirTempAndHighSolarOnWindow",
+        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
+
     auto &Surface(state.dataSurface->Surface);
 
     numSurfaces = 0;
@@ -794,9 +831,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
 
-                    double uValueAssembly{0.0};
-                    double shgcAssembly{0.0};
-                    double vtAssembly{0.0};
+                    Real64 uValueAssembly{0.0};
+                    Real64 shgcAssembly{0.0};
+                    Real64 vtAssembly{0.0};
 
                     GetWindowAssemblyNfrcForReport(
                         state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueAssembly, shgcAssembly, vtAssembly);
@@ -883,9 +920,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                          state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
                                          3);
 
-                        double stateAssemblyUValue{0.0};
-                        double stateAssemblySHGC{0.0};
-                        double stateAssemblyVT{0.0};
+                        Real64 stateAssemblyUValue{0.0};
+                        Real64 stateAssemblySHGC{0.0};
+                        Real64 stateAssemblyVT{0.0};
 
                         GetWindowAssemblyNfrcForReport(
                             state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
