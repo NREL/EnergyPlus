@@ -233,6 +233,9 @@ namespace CondenserLoopTowers {
         Array1D_string AlphArray(16);      // Character string input data array
         Array1D_string AlphArray2(1);      // Character string input data array for VS tower coefficients
 
+        constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> EvapLossNamesUC{"LOSSFACTOR", "SATURATEDEXIT"};
+        constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"NOMINALCAPACITY", "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"};
+
         // Get number of all cooling towers specified in the input data file (idf)
         NumSingleSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
         NumTwoSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
@@ -345,6 +348,11 @@ namespace CondenserLoopTowers {
             tower.TowerFreeConvNomCapSizingFactor = NumArray(12);
             if (NumAlphas >= 4) {
                 tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                if (tower.PerformanceInputMethod_Num == PIM::Invalid) {
+                    ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ErrorsFound = true;
+                }
             } else {
                 // Since Performance Input Method has been omitted then assume it to be UA and DESIGN WATER FLOW RATE
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
@@ -410,6 +418,9 @@ namespace CondenserLoopTowers {
 
             // begin water use and systems get input
             tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+            if (AlphArray(6).empty()) {
+                tower.EvapLossMode = EvapLoss::MoistTheory;
+            }
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
@@ -788,6 +799,9 @@ namespace CondenserLoopTowers {
 
             // begin water use and systems get input
             tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+            if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                tower.EvapLossMode = EvapLoss::MoistTheory;
+            }
 
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
