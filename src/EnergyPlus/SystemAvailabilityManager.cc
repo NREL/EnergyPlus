@@ -447,8 +447,6 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto &schedMgr = state.dataSystemAvailabilityManager->SchedData(SysAvailNum);
                 schedMgr.Name = cAlphaArgs(1);
                 schedMgr.MgrType = DataPlant::SystemAvailabilityType::Scheduled;
@@ -493,8 +491,6 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 auto &schedOnMgr = state.dataSystemAvailabilityManager->SchedOnData(SysAvailNum);
                 schedOnMgr.Name = cAlphaArgs(1);
@@ -541,8 +537,6 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto &schedOffMgr = state.dataSystemAvailabilityManager->SchedOffData(SysAvailNum);
                 schedOffMgr.Name = cAlphaArgs(1);
                 schedOffMgr.MgrType = DataPlant::SystemAvailabilityType::ScheduledOff;
@@ -588,8 +582,6 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 auto &nightCycleMgr = state.dataSystemAvailabilityManager->NightCycleData(SysAvailNum);
                 nightCycleMgr.Name = cAlphaArgs(1);
@@ -786,8 +778,6 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto &optimumStartMgr = state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum);
                 optimumStartMgr.Name = cAlphaArgs(1);
                 optimumStartMgr.MgrType = DataPlant::SystemAvailabilityType::OptimumStart;
@@ -914,8 +904,6 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto &diffThermoMgr = state.dataSystemAvailabilityManager->DiffThermoData(SysAvailNum);
                 diffThermoMgr.Name = cAlphaArgs(1);
                 diffThermoMgr.MgrType = DataPlant::SystemAvailabilityType::DiffThermo;
@@ -996,8 +984,6 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto &hiTurnOffMgr = state.dataSystemAvailabilityManager->HiTurnOffData(SysAvailNum);
                 hiTurnOffMgr.Name = cAlphaArgs(1);
                 hiTurnOffMgr.MgrType = DataPlant::SystemAvailabilityType::HiTempTOff;
@@ -1053,8 +1039,6 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto &hiTurnOnMgr = state.dataSystemAvailabilityManager->HiTurnOnData(SysAvailNum);
                 hiTurnOnMgr.Name = cAlphaArgs(1);
                 hiTurnOnMgr.MgrType = DataPlant::SystemAvailabilityType::HiTempTOn;
@@ -1109,8 +1093,6 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 auto &loTurnOffMgr = state.dataSystemAvailabilityManager->LoTurnOffData(SysAvailNum);
                 loTurnOffMgr.Name = cAlphaArgs(1);
@@ -1178,8 +1160,6 @@ namespace SystemAvailabilityManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto &loTurnOnMgr = state.dataSystemAvailabilityManager->LoTurnOnData(SysAvailNum);
                 loTurnOnMgr.Name = cAlphaArgs(1);
                 loTurnOnMgr.MgrType = DataPlant::SystemAvailabilityType::LoTempTOn;
@@ -1234,8 +1214,6 @@ namespace SystemAvailabilityManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 auto &nightVentMgr = state.dataSystemAvailabilityManager->NightVentData(SysAvailNum);
                 nightVentMgr.Name = cAlphaArgs(1);
@@ -3900,8 +3878,6 @@ namespace SystemAvailabilityManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             auto &hybridVentMgr = state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum);
             hybridVentMgr.Name = state.dataIPShortCut->cAlphaArgs(1);
