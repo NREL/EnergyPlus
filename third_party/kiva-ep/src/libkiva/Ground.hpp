@@ -24,7 +24,9 @@
 #pragma warning(disable : 4459) // Declaration hides global declaration
 #elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic push
+#if __GNUC__ >= 9
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif
 #endif
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCore>
