@@ -1194,9 +1194,9 @@ namespace PhotovoltaicThermalCollectors {
                 CpInlet = Psychrometrics::CPHW(Tinlet);
             }
             Real64 Tcollector =
-                (2.0 * mdot * CpInlet * Tinlet +
-                 this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                  HrAir * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum) + HcExt * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum))) /
+                (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
+                                                                  HrAir * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum) +
+                                                                  HcExt * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum))) /
                 (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
             PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
@@ -1364,7 +1364,7 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         K. Haddad & S. Brideau
         //       DATE WRITTEN   March 2020
-        //       MODIFIED       Sept 2020
+        //       MODIFIED       Jan 2022
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -1374,37 +1374,98 @@ namespace PhotovoltaicThermalCollectors {
         // Numerical & Analytical
 
         const Real64 pi(3.14159);
-        // BIPVT system parameters
-        Real64 rpvg_pv = this->BIPVT.PVRTop;              // thermal resistance of glass (m2-K/W)
-        Real64 rpv_1 = this->BIPVT.PVRBot;                // thermal resistance of backing layer (m2-K/W)
-        Real64 w = this->BIPVT.EffCollWidth;              // width of BIPVT panel (m)
-        Real64 l = this->BIPVT.EffCollHeight;             // length of BIPVT panel (m)
-        Real64 depth_channel = this->BIPVT.PVEffGapWidth; // depth of air channel (m)
-        Real64 emiss_b = this->BIPVT.BackMatEmiss;        // emissivity of backing surface
-        Real64 emiss_2(0.85);                             // emissivity of bldg surface
-        Real64 emiss_pvg = this->BIPVT.PVGEmiss;          // emissivity of glass surface
+        // BIPVT system geometry
+        Real64 w = this->BIPVT.EffCollWidth;                                          // width of BIPVT panel (m)
+        Real64 l = this->BIPVT.EffCollHeight;                                         // length of BIPVT panel (m)
+        Real64 depth_channel = this->BIPVT.PVEffGapWidth;                             // depth of air channel (m)
+        Real64 slope = (pi / 180.0) * state.dataSurface->Surface(this->SurfNum).Tilt; // surface tilt in rad
+        Real64 beta(0); // surface tilt for calculating internal convective coefficient for stagnation condition
+        Real64 surf_azimuth = state.dataSurface->Surface(this->SurfNum).Azimuth; // surface azimuth (deg)
+        Real64 fcell = this->BIPVT.PVCellAreaFract;                              // area fraction of cells on pv module
+        Real64 glass_thickness = this->BIPVT.ThGlass;                            // glass thickness
+        Real64 area_pv = w * l * this->BIPVT.PVAreaFract;                        // total area of pv modules
+        Real64 area_wall_total = w * l;                                          // total area of wall
+        Real64 length_conv = l;                                                  // length for wind convection coefficient calc
 
-        // BIPVT model parameters
-        Real64 tsurr, tsurrK;            // surrouding temperature (DegC, DegK)
-        Real64 t1, t1K, t1_new;          // temperature of pv backing surface (DegC, DegK, DegC)
-        Real64 tpv_new;                  // temperature of pv surface (DegC, DegC)
-        Real64 tpvg, tpvgK, tpvg_new;    // temperature of pv glass cover (DegC, DegK,DegC)
-        Real64 tfavg(18.0);              // average fluid temperature (DegC)
-        Real64 tfout;                    // outlet fluid temperature from BIPVT channel (DegC)
-        Real64 hconvf1(100.0);           // heat transfer coefficient between fluid and backing surface (W/m2-K)
-        Real64 hconvf2(100.0);           // heat transfer coefficient between fluid and bldg surface (W/m2-K)
-        Real64 hconvt_nat(0.0);          // htc external natural
-        Real64 hconvt_forced(0.0);       // htc external forced
-        Real64 hconvt(0.0);              // htc external total
-        Real64 hpvg_pv;                  // conductance of pv glass cover (W/m2-K)
-        Real64 hpv_1;                    // conductance of pv backing (W/m2-K)
-        Real64 hrad12;                   // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
-        Real64 hrad_surr;                // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
-        const Real64 small_num(1.0e-10); // small real number
-        const Real64 sigma(5.67e-8);     // stephan bolzmann constant
-        Real64 eff_pv(0.0);              // efficiency pv panel
+        // BIPVT materials thermal properties
+        Real64 emiss_b = this->BIPVT.BackMatEmiss;                 // emissivity of backing surface
+        Real64 emiss_2(0.85);                                      // emissivity of bldg surface
+        Real64 emiss_pvg = this->BIPVT.PVGEmiss;                   // emissivity of glass surface
+        Real64 rpvg_pv = this->BIPVT.PVRTop;                       // thermal resistance of glass (m2-K/W)
+        Real64 rpv_1 = this->BIPVT.PVRBot;                         // thermal resistance of backing layer (m2-K/W)
+        Real64 taoalpha_back = this->BIPVT.BackMatTranAbsProduct;  // tao-alpha product normal back of PV panel
+        Real64 taoalpha_pv = this->BIPVT.PVCellTransAbsProduct;    // tao-aplha product normal PV cells
+        Real64 taoaplha_cladding = this->BIPVT.CladTranAbsProduct; // tao-alpha product normal cladding
+        Real64 refrac_index_glass = this->BIPVT.RIndGlass;         // glass refractive index
+        Real64 k_glass = this->BIPVT.ECoffGlass;                   // extinction coefficient pv glass
+
+        // PV panel efficiency
+        Real64 eff_pv(0.0); // efficiency pv panel
+
+        // Weather/thermodynamic state/air properties/heat transfer
+        Real64 g(0.0);                          // Solar incident on surface of BIPVT collector (W/m^2)
+        Real64 tsurr, tsurrK;                   // surrouding temperature (DegC, DegK)
+        Real64 t1, t1K, t1_new;                 // temperature of pv backing surface (DegC, DegK, DegC)
+        Real64 tpv_new;                         // temperature of pv surface (DegC, DegC)
+        Real64 tpvg, tpvgK, tpvg_new;           // temperature of pv glass cover (DegC, DegK,DegC)
+        Real64 tfavg(18.0);                     // average fluid temperature (DegC)
+        Real64 tfout;                           // outlet fluid temperature from BIPVT channel (DegC)
+        Real64 hconvf1(100.0);                  // heat transfer coefficient between fluid and backing surface (W/m2-K)
+        Real64 hconvf2(100.0);                  // heat transfer coefficient between fluid and bldg surface (W/m2-K)
+        Real64 hconvt_nat(0.0);                 // htc external natural
+        Real64 hconvt_forced(0.0);              // htc external forced
+        Real64 hconvt(0.0);                     // htc external total
+        Real64 hpvg_pv;                         // conductance of pv glass cover (W/m2-K)
+        Real64 hpv_1;                           // conductance of pv backing (W/m2-K)
+        Real64 hrad12;                          // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
+        Real64 hrad_surr;                       // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
+        const Real64 sigma(5.67e-8);            // stephan bolzmann constant
+        Real64 reynolds(0.0);                   // Reynolds inside collector
+        Real64 nusselt(0.0);                    // Nusselt inside collector
+        Real64 vel(0.0);                        // flow velocity (m/s)
+        Real64 raleigh(0.0);                    // Raleigh number for stagnation calculations
+        Real64 dhyd(0.0);                       // Hydraulic diameter of channel (m)
+        Real64 gravity(9.81);                   // gravity (m/s^2)
+        Real64 mu_air(22.7e-6);                 // dynamic viscosity (kg/m-s)
+        Real64 k_air(0.026);                    // thermal conductivity (W/m-K)
+        Real64 prandtl_air(0.7);                // Prandtl number
+        Real64 density_air(1.2);                // density (kg/m^3)
+        Real64 diffusivity_air(0.0);            // thermal diffusivity (m^2/s)
+        Real64 kin_viscosity_air(0.0);          // kinematic viscosity (m^2/s)
+        Real64 extHTCcoeff(0.0);                // coefficient for calculating external forced HTC
+        Real64 extHTCexp(0.0);                  // exponent for calculating external forced HTC
+        int InletNode = this->HVACInletNodeNum; // HVAC node associated with inlet of BIPVT
+        Real64 tfin = state.dataLoopNodes->Node(InletNode).Temp;            // inlet fluid temperature (DegC)
+        Real64 w_in = state.dataLoopNodes->Node(InletNode).HumRat;          // inlet air humidity ratio (kgda/kg)
+        Real64 cp_in = Psychrometrics::PsyCpAirFnW(w_in);                   // inlet air specific heat (J/kg-K)
+        Real64 tamb = state.dataEnvrn->OutDryBulbTemp;                      // ambient temperature (DegC)
+        Real64 wamb = state.dataEnvrn->OutHumRat;                           // ambient humidity ratio (kg/kg)
+        Real64 cp_amb = Psychrometrics::PsyCpAirFnW(wamb);                  // ambient air specific heat (J/kg-K)
+        Real64 t_film(20.0);                                                // film temperature to calculate htc at ambient/pv interface (DegC)
+        Real64 tsky = state.dataEnvrn->SkyTemp;                             // sky temperature (DegC)
+        Real64 v_wind = state.dataEnvrn->WindSpeed;                         // wind speed (m/s)
+        Real64 wind_dir = state.dataEnvrn->WindDir;                         // wind direction (deg)
+        Real64 t2 = state.dataHeatBalSurf->SurfTempOut(this->SurfNum), t2K; // temperature of bldg surface (DegC)
+        Real64 mdot = this->MassFlowRate;                                   // fluid mass flow rate (kg/s)
+        Real64 mdot_bipvt(mdot), mdot_bipvt_new(mdot);                      // mass flow rate through the bipvt duct (kg/s)
+        Real64 s(0.0);                                                      // solar radiation gain at pv surface (W/m2)
+        Real64 s1(0.0);                                                     // solar radiation gain at pv backing surface (W/m2)
+        Real64 k_taoalpha_beam(0.0);
+        Real64 k_taoalpha_sky(0.0);
+        Real64 k_taoalpha_ground(0.0);
+        Real64 iam_pv_beam(1.0);   // incident angle modifier pv cells
+        Real64 iam_back_beam(1.0); // incident angle modifier back
+        Real64 iam_pv_sky(1.0);
+        Real64 iam_back_sky(1.0);
+        Real64 iam_pv_ground(1.0);
+        Real64 iam_back_ground(1.0);
+        Real64 theta_sky(0.0 * pi / 180.0);                                                     // incident angle sky
+        Real64 theta_ground(0.0 * pi / 180.0);                                                  // incident angle ground
+        Real64 theta_beam = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(this->SurfNum)); // incident angle beam in rad
+        Real64 wind_incidence(0);                                                               // wind incidence angle on surface
 
         // other parameters
+        const Real64 small_num(1.0e-10);                                      // small real number
         Real64 a(0), b(0), c(0), d(0), e(0);                                  // variables used for solving average fluid temperature
         Real64 err_tpvg(1.0), err_tpv(1.0), err_t1(1.0), err_mdot_bipvt(1.0); // convergence errors for temperatures
         const Real64 tol(1.0e-3);                                             // temperature convergence tolerance
@@ -1418,59 +1479,9 @@ namespace PhotovoltaicThermalCollectors {
         int i;                                                                // index
         const int MaxNumIter(50);                                             // maximum number of iterations
         int iter(0);                                                          // iteration counter
-        Real64 reynolds(0.0);                                                 // Reynolds inside collector
-        Real64 nusselt(0.0);                                                  // Nusselt inside collector
-        Real64 vel(0.0);                                                      // flow velocity (m/s)
-        Real64 raleigh(0.0);                                                  // Raleigh number for stagnation calculations
-        Real64 dhyd(0.0);                                                     // Hydraulic diameter of channel (m)
-        Real64 gravity(9.81);                                                 // gravity m/s^2
-        Real64 mu_air(22.7e-6);
-        Real64 k_air(0.026);
-        Real64 prandtl_air(0.7);
-        Real64 density_air(1.2);
-        Real64 diffusivity_air(0.0);
-        Real64 kin_viscosity_air(0.0);
 
-        // boundary conditions parameters
-        int InletNode = this->HVACInletNodeNum;
-        Real64 tfin = state.dataLoopNodes->Node(InletNode).Temp;         // inlet fluid temperature (DegC)
-        Real64 w_in = state.dataLoopNodes->Node(InletNode).HumRat;       // inlet air humidity ratio (kgda/kg)
-        Real64 cp_in = Psychrometrics::PsyCpAirFnW(w_in);                // inlet air specific heat (J/kg-K)
-        Real64 tamb = state.dataEnvrn->OutDryBulbTemp;                   // ambient temperature (DegC)
-        Real64 tsky = state.dataEnvrn->SkyTemp;                          // sky temperature (DegC)
-        Real64 v_wind = state.dataEnvrn->WindSpeed;                      // wind speed (m/s)
-        Real64 t2 = state.dataHeatBalSurf->SurfTempOut(this->SurfNum), t2K; // temperature of bldg surface (DegC)
-        Real64 mdot = this->MassFlowRate;                                // fluid mass flow rate (kg/s)
-        Real64 mdot_bipvt(mdot), mdot_bipvt_new(mdot);                   // mass flow rate through the bipvt duct (kg/s)
-        Real64 s(0.0);                                                   // solar radiation gain at pv surface (W/m2)
-        Real64 s1(0.0);
-        Real64 k_taoalpha_beam(0.0);
-        Real64 k_taoalpha_sky(0.0);
-        Real64 k_taoalpha_ground(0.0); // solar radiation gain at pv backing surface (W/m2)
-        Real64 iam_pv_beam(1.0);       // incident angle modifier pv cells
-        Real64 iam_back_beam(1.0);     // incident angle modifier back
-        Real64 iam_pv_sky(1.0);
-        Real64 iam_back_sky(1.0);
-        Real64 iam_pv_ground(1.0);
-        Real64 iam_back_ground(1.0);
-        Real64 theta_sky(0.0 * pi / 180.0);                                                     // incident angle sky
-        Real64 theta_ground(0.0 * pi / 180.0);                                                  // incident angle ground
-        Real64 theta_beam = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(this->SurfNum)); // incident angle beam in rad
-
-        Real64 glass_thickness = this->BIPVT.ThGlass;                                 // glass thickness
-        Real64 refrac_index_glass = this->BIPVT.RIndGlass;                            // glass refractive index
-        Real64 k_glass = this->BIPVT.ECoffGlass;                                      // extinction coefficient pv glass
-        Real64 slope = (pi / 180.0) * state.dataSurface->Surface(this->SurfNum).Tilt; // surface tilt in rad
-        Real64 beta(0); // surface tilt for calculating internal convective coefficient for stagnation condition
-        Real64 taoalpha_back = this->BIPVT.BackMatTranAbsProduct;  // tao-alpha product normal back of PV panel
-        Real64 taoalpha_pv = this->BIPVT.PVCellTransAbsProduct;    // tao-aplha product normal PV cells
-        Real64 taoaplha_cladding = this->BIPVT.CladTranAbsProduct; // tao-alpha product normal cladding
-        Real64 g(0.0);                                             // Solar incident on surface
-        Real64 fcell = this->BIPVT.PVCellAreaFract;                // area fraction of cells on pv module
-        Real64 area_pv = w * l * this->BIPVT.PVAreaFract;          // total area of pv modules
-        Real64 area_wall_total = w * l;                            // total area of wall
-
-        emiss_2 = state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfNum).Construction).OutsideAbsorpThermal;
+        emiss_2 = state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfNum).Construction)
+                      .OutsideAbsorpThermal; // get emissivity of interior surface of channel from building properties
         theta_ground = (pi / 180) * (90 - 0.5788 * (slope * 180 / pi) + 0.002693 * std::pow((slope * 180 / pi), 2)); // incidence angle ground rad
         theta_sky = (pi / 180) * (59.7 - 0.1388 * (slope * 180 / pi) + 0.001497 * std::pow((slope * 180 / pi), 2));  // incidence angle sky rad
         t1 = (tamb + t2) / 2.0;
@@ -1500,14 +1511,64 @@ namespace PhotovoltaicThermalCollectors {
         dhyd = 4 * w * l / (2 * (w + l));
 
         while ((err_t1 > tol) || (err_tpv > tol) || (err_tpvg > tol) || (err_mdot_bipvt > tol)) {
+            // Properties of air required for external convective heat transfer coefficient calculations - function of exterior film temperature
+            t_film = (tamb + tpvg) * 0.5;
+            mu_air =
+                0.0000171 * (std::pow(((t_film + 273.15) / 273.0), 1.5)) *
+                ((273.0 + 110.4) /
+                 ((t_film + 273.15) +
+                  110.4)); // Sutherland's formula https://www.grc.nasa.gov/www/k-12/airplane/viscosity.html Sutherland's constant = 198.72 R
+                           // converted to K =>110.4. At 273.15, Viscosity is 1.71E-5 as per Incropera, et al 6th ed. Temp range approx 273K - 373K
+            k_air = 0.000000000015207 * std::pow(t_film + 273.15, 3.0) - 0.000000048574 * std::pow(t_film + 273.15, 2.0) +
+                    0.00010184 * (t_film + 273.15) - 0.00039333;                        // Dumas, A., and Trancossi, M., SAE Technical Papers, 2009
+            prandtl_air = 0.680 + 0.000000469 * std::pow(t_film + 273.15 - 540.0, 2.0); // The Schock Absorber Handbook, 2nd Ed. John C. Dixon 2007
+            density_air = 101.3 / (0.287 * (t_film + 273.15));                          // Ideal gas law
+            diffusivity_air = k_air / (cp_amb * density_air);                           // definition
+            kin_viscosity_air = mu_air / density_air;                                   // definition
+
             // duffie and beckman correlation for nat convection - This is for exterior
             raleigh = (gravity * (1.0 / (0.5 * (tamb + tpvg) + 273.15)) * (std::max((Real64)(0.000001), std::abs(tpvg - tamb))) * std::pow(dhyd, 3)) /
-                      (21.7E-6 * 1.71E-5);
-            hconvt_nat = 0.15 * std::pow(raleigh, 0.333) * 0.026 / dhyd;
+                      (diffusivity_air * kin_viscosity_air);             // definition
+            hconvt_nat = 0.15 * std::pow(raleigh, 0.333) * k_air / dhyd; // Incropera et al. 6th ed.
 
-            hconvt_forced = 5.622 * std::pow((v_wind), 0.657) / (std::pow(l, 0.343)); // derived correlation for forced convection leeward roof
-            // hconvt_forced = 7.729 * std::pow((v_wind), 0.759) / (std::pow(l, 0.0.241)); // derived correlation for forced convection windward
-            // roof
+            wind_incidence = std::abs(wind_dir - surf_azimuth);
+            if ((wind_incidence - 180.0) > 0.001) wind_incidence -= 360.0;
+
+            if (slope > 75.0 * pi / 180.0) { // If slope of surface if greater than 75deg, assume it's a wall and use wall external htc
+                if (wind_incidence <= 45) {
+                    extHTCcoeff = 10.9247; // Windward Vert
+                    extHTCexp = 0.6434;    // Windward Vert
+                    length_conv = dhyd;
+                } else if (wind_incidence > 45.0 && wind_incidence <= 135.0) {
+                    extHTCcoeff = 8.8505; // Sides
+                    extHTCexp = 0.6765;   // Sides
+                    length_conv = w;
+                } else {
+                    extHTCcoeff = 7.5141; // Leeward Vertical
+                    extHTCexp = 0.6235;   // Leeward Vertical
+                    length_conv = dhyd;
+                }
+
+            } else { // if not, it's a roof
+                if (wind_incidence <= 90.0) {
+
+                    extHTCcoeff = 7.7283; // Windward Roof
+                    extHTCexp = 0.7586;   // Windward Roof
+                    length_conv = l;
+                } else {
+
+                    extHTCcoeff = 5.6217; // Leeward Roof
+                    extHTCexp = 0.6569;   // Leeward Roof;
+                    length_conv = l;
+                }
+            }
+
+            // forced conv htc derived from results from Gorman et al 2019 - Charact. lenght is: Roof - length along flow direction, windward and
+            // leeawrd vert - hydraulic perimeter of surface, vert sides - length of surface along flow direction
+            hconvt_forced = extHTCcoeff * std::pow((v_wind), extHTCexp) / (std::pow(l, 1.0 - extHTCexp)); // derived correlation for forced convection
+
+            //"total" exterior htc is a combination of natural and forced htc - As described in Churchill and Usagi 1972, n=3 is a good value in most
+            // cases.
             hconvt = std::pow((std::pow(hconvt_forced, 3.0) + std::pow(hconvt_nat, 3.0)), 1.0 / 3.0);
 
             if (state.dataPhotovoltaic->PVarray(this->PVnum).PVModelType == DataPhotovoltaics::PVModel::Simple) {
@@ -1525,17 +1586,21 @@ namespace PhotovoltaicThermalCollectors {
             s = g * taoalpha_pv * fcell * area_pv / area_wall_total - g * eff_pv * area_pv / area_wall_total;
             s1 = taoalpha_back * g * (1.0 - fcell) * (area_pv / area_wall_total) + taoaplha_cladding * g * (1 - area_pv / area_wall_total);
 
-            // Properties of air required for convective heat transfer coefficient calculations inside channel - function of temperature and
-            // velocity (except for Cp_in, which is function of humidity ratio) (not moisture)
+            // Below are properties of air required for convective heat transfer coefficient calculations inside channel - function of avg channel
+            // temperature
 
-            mu_air = 0.0000171 * (std::pow(((tfavg + 273.15) / 273.0), 1.5)) * ((273.0 + 110.4) / ((tfavg + 273.15) + 110.4));
+            mu_air =
+                0.0000171 * (std::pow(((tfavg + 273.15) / 273.0), 1.5)) *
+                ((273.0 + 110.4) /
+                 ((tfavg + 273.15) +
+                  110.4)); // Sutherland's formula https://www.grc.nasa.gov/www/k-12/airplane/viscosity.html Sutherland's constant = 198.72 R
+                           // converted to K =>110.4. At 273.15, Viscosity is 1.71E-5 as per Incropera, et al 6th ed. Temp range approx 273K - 373K
             k_air = 0.000000000015207 * std::pow(tfavg + 273.15, 3.0) - 0.000000048574 * std::pow(tfavg + 273.15, 2.0) +
-                    0.00010184 * (tfavg + 273.15) - 0.00039333;
-            prandtl_air = (-2.1415e-12) * std::pow(tfavg, 4.0) + (1.6785e-9) * std::pow(tfavg, 3.0) + (4.8260e-8) * std::pow(tfavg, 2.0) -
-                          (2.4939e-4) * tfavg + 7.3506e-1;
-            density_air = 101.3 / (0.287 * (tfavg + 273.15));
-            diffusivity_air = k_air / (cp_in * density_air);
-            kin_viscosity_air = mu_air / density_air;
+                    0.00010184 * (tfavg + 273.15) - 0.00039333;                        // Dumas, A., and Trancossi, M., SAE Technical Papers, 2009
+            prandtl_air = 0.680 + 0.000000469 * std::pow(tfavg + 273.15 - 540.0, 2.0); // The Schock Absorber Handbook, 2nd Ed. John C. Dixon 2007
+            density_air = 101.3 / (0.287 * (tfavg + 273.15));                          // Ideal gas law
+            diffusivity_air = k_air / (cp_in * density_air);                           // definition
+            kin_viscosity_air = mu_air / density_air;                                  // definition
             t1K = t1 + degc_to_kelvin;
             t2K = t2 + degc_to_kelvin;
             tpvgK = tpvg + degc_to_kelvin;
