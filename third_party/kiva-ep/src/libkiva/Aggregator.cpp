@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #include <cmath>
@@ -42,12 +42,15 @@ void Aggregator::validate() {
   }
   if (!isEqual(check_weights, 1.0)) {
     if (isEqual(check_weights, 1.0, 0.01)) {
-      showMessage(MSG_WARN, "The weights of associated Kiva instances do not quite add to unity--check exposed perimeter values. Weights will be slightly modified to add to unity.");
+      showMessage(MSG_WARN,
+                  "The weights of associated Kiva instances do not quite add to unity--check "
+                  "exposed perimeter values. Weights will be slightly modified to add to unity.");
       for (auto &instance : instances) {
         instance.second /= check_weights;
       }
     } else {
-      showMessage(MSG_ERR, "The weights of associated Kiva instances do not add to unity--check exposed perimeter values.");
+      showMessage(MSG_ERR, "The weights of associated Kiva instances do not add to unity--check "
+                           "exposed perimeter values.");
     }
   }
   validated = true;
@@ -58,7 +61,7 @@ void Aggregator::calc_weighted_results() {
     validate();
   }
   results.reset();
-  double Tz{}, Tr{};
+  double Tz{293.15}, Tr{293.15};
   for (auto &instance : instances) {
     Ground *grnd = instance.first;
     Tz = surface_type == Surface::ST_WALL_INT ? grnd->bcs.wallConvectiveTemp
@@ -84,14 +87,12 @@ void Aggregator::calc_weighted_results() {
     results.Tavg += p * Ta;
   }
 
-  results.Tconv = Tz - results.qconv / results.hconv;
-  results.Trad = Tr - results.qrad / results.hrad;
+  results.Tconv = results.hconv == 0 ? Tz : Tz - results.qconv / results.hconv;
+  results.Trad = results.hrad == 0 ? Tr : Tr - results.qrad / results.hrad;
 
   return;
 }
 
-std::pair<Ground *, double> Aggregator::get_instance(std::size_t index) {
-  return instances[index];
-}
+std::pair<Ground *, double> Aggregator::get_instance(std::size_t index) { return instances[index]; }
 
 } // namespace Kiva
