@@ -150,19 +150,6 @@ namespace DataSurfaces {
         Num
     }; // Valid window shading types: IntShade <= Type <= BGBlind; the rest are shading status
 
-    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
-        "No Shade",  // 0
-        "Shade Off", // 1
-        "Interior Shade",
-        "Switchable Glazing",
-        "Exterior Shade",
-        "Exterior Screen",
-        "Interior Blind",
-        "Exterior Blind",
-        "Between Glass Shade",
-        "Between Glass Blind",
-    };
-
     enum class WindowShadingControlType : int
     {
         Invalid = -1,
@@ -190,30 +177,6 @@ namespace DataSurfaces {
         OnHiZoneTemp_HiHorzSolar = 21,
         Num
     };
-
-    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
-        "Uncontrolled",
-        "AlwaysOn",
-        "AlwaysOff",
-        "OnIfScheduleAllows",
-        "OnIfHighSolarOnWindow",
-        "OnIfHighHorizontalSolar",
-        "OnIfHighOutdoorAirTemperature",
-        "OnIfHighZoneAirTemperature",
-        "OnIfHighZoneCooling",
-        "OnIfHighGlare",
-        "MeetDaylightIlluminanceSetpoint",
-        "OnNightIfLowOutdoorTempAndOffDay",
-        "OnNightIfLowInsideTempAndOffDay",
-        "OnNightIfHeatingAndOffDay",
-        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
-        "OnNightIfHeatingAndOnDayIfCooling",
-        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
-        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
-        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
-        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
-        "OnIfHighZoneAirTempAndHighSolarOnWindow",
-        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
 
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
@@ -908,7 +871,7 @@ namespace DataSurfaces {
         "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
         "VERTICALSLIDER"};
 
-    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
         // width in meters from Table 4-3 of NFRC 100-2020
         1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
         1.200, 2.134, 1.500, //  Fixed,           Garage,            Greenhouse,
@@ -920,7 +883,7 @@ namespace DataSurfaces {
         1.200                //  VerticalSlider,
     };
 
-    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
         // height in meters from Table 4-3 of NFRC 100-2020
         1.500, 1.500, 1.500, //  CasementDouble,  CasementSingle,    DualAction,
         1.500, 2.134, 1.200, //  Fixed,           Garage,            Greenhouse,
@@ -1452,6 +1415,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     // Surface HB arrays
@@ -1849,6 +1813,7 @@ struct SurfacesData : BaseGlobalStruct
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
+        this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
 
         this->SurfOutDryBulbTemp.deallocate();

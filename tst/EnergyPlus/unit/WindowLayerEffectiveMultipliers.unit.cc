@@ -214,8 +214,8 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
 
         EXPECT_NEAR(Al_eff(1), 0, 1e-6);
         EXPECT_NEAR(Ar_eff(1), 0, 1e-6);
-        EXPECT_NEAR(Atop_eff(1), 0.05, 1e-6);
-        EXPECT_NEAR(Abot_eff(1), 0.05, 1e-6);
-        EXPECT_NEAR(Ah_eff(1), 0.008792, 1e-6);
+        EXPECT_NEAR(Atop_eff(1), 0.1, 1e-6);
+        EXPECT_NEAR(Abot_eff(1), 0.1, 1e-6);
+        EXPECT_NEAR(Ah_eff(1), 0.011307, 1e-6);
     }
 }

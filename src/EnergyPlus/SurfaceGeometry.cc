@@ -1222,7 +1222,6 @@ namespace SurfaceGeometry {
         int BlNumNew;
         int WinShadingControlPtr(0);
         int ErrCount;
-        Real64 diffp;
         bool izConstDiff;    // differences in construction for IZ surfaces
         bool izConstDiffMsg; // display message about hb diffs only once.
 
@@ -2384,15 +2383,16 @@ namespace SurfaceGeometry {
         }
 
         // Set up Floor Areas for Zones and Spaces
+        Real64 constexpr floorAreaTolerance(0.05);
+        Real64 constexpr floorAreaPercentTolerance(floorAreaTolerance * 100.0);
         if (!SurfError) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                      ++SurfNum) {
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea += state.dataSurface->Surface(SurfNum).Area;
                         state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
                         int spaceNum = state.dataSurface->Surface(SurfNum).spaceNum;
-                        state.dataHeatBal->space(spaceNum).floorArea += state.dataSurface->Surface(SurfNum).Area;
+                        state.dataHeatBal->space(spaceNum).calcFloorArea += state.dataSurface->Surface(SurfNum).Area;
                     }
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                         state.dataHeatBal->Zone(ZoneNum).CeilingArea += state.dataSurface->Surface(SurfNum).Area;
@@ -2401,75 +2401,40 @@ namespace SurfaceGeometry {
                 }
             }
             ErrCount = 0;
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                state.dataHeatBal->Zone(ZoneNum).CalcFloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
-                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
-                    // Check entered vs calculated
-                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
-                        // produce message if not near calculated
-                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
-                            diffp = std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
-                                    state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                            if (diffp > 0.05) {
-                                ++ErrCount;
-                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(
-                                        state, std::string{RoutineName} + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s).");
-                                    ShowContinueError(state,
-                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
-                                }
-                                if (state.dataGlobal->DisplayExtraWarnings) {
-                                    // Warn user of using specified Zone Floor Area
-                                    ShowWarningError(state,
-                                                     std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
-                                                         state.dataHeatBal->Zone(ZoneNum).Name +
-                                                         "\" significantly different from calculated Floor Area");
-                                    ShowContinueError(state,
-                                                      format("Entered Zone Floor Area value={:.2R}, Calculated Zone Floor Area value={:.2R}, entered "
-                                                             "Floor Area will be used in calculations.",
-                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
-                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
-                                }
-                            }
-                        }
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
-                    }
-                } else {
-                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea; // redundant, already done.
-                }
-            }
-
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                state.dataHeatBal->space(spaceNum).calcFloorArea = state.dataHeatBal->space(spaceNum).floorArea;
                 if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
                     // Check entered vs calculated
                     if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea > 0.0) { // User entered Space floor area,
                         // produce message if not near calculated
                         if (state.dataHeatBal->space(spaceNum).calcFloorArea > 0.0) {
-                            diffp =
+                            Real64 diffp =
                                 std::abs(state.dataHeatBal->space(spaceNum).calcFloorArea - state.dataHeatBal->space(spaceNum).userEnteredFloorArea) /
                                 state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
-                            if (diffp > 0.05) {
+                            if (diffp > floorAreaTolerance) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(
-                                        state, std::string(RoutineName) + "Entered Space Floor Areas differ from calculated Space Floor Area(s).");
+                                        state,
+                                        format("{}Entered Space Floor Area(s) differ more than {:.0R}% from calculated Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               floorAreaPercentTolerance));
                                     ShowContinueError(state,
                                                       "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.");
                                 }
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     // Warn user of using specified Space Floor Area
-                                    ShowWarningError(state,
-                                                     std::string(RoutineName) + "Entered Floor Area entered for Space=\"" +
-                                                         state.dataHeatBal->space(spaceNum).Name +
-                                                         "\" significantly different from calculated Floor Area");
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Floor Area for Space=\"{}\" is {:.1R}% different from the calculated Floor Area.",
+                                               std::string(RoutineName),
+                                               state.dataHeatBal->space(spaceNum).Name,
+                                               diffp * 100.0));
                                     ShowContinueError(
                                         state,
-                                        format("Entered Space Floor Area value={:.2R}, Calculated Space Floor Area value={:.2R}, entered "
-                                               "Floor Area will be used in calculations.",
-                                               state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
-                                               state.dataHeatBal->space(spaceNum).calcFloorArea));
+                                        format(
+                                            "Entered Space Floor Area={:.2R}, Calculated Space Floor Area={:.2R}, entered Floor Area will be used.",
+                                            state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
+                                            state.dataHeatBal->space(spaceNum).calcFloorArea));
                                 }
                             }
                         }
@@ -2477,7 +2442,80 @@ namespace SurfaceGeometry {
                         state.dataHeatBal->space(spaceNum).hasFloor = true;
                     }
                 } else {
-                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea; // redundant, already done.
+                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea;
+                }
+            }
+            ErrCount = 0;
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                // Calculate zone floor area as sum of space floor areas
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    state.dataHeatBal->Zone(ZoneNum).CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                }
+                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                    // Check entered vs calculated
+                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
+                        // produce message if not near calculated
+                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            Real64 diffp =
+                                std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
+                                state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                            if (diffp > 0.05) {
+                                ++ErrCount;
+                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Zone Floor Area(s) differ more than {:.0R}% from the sum of the Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               floorAreaPercentTolerance));
+                                    ShowContinueError(state,
+                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
+                                }
+                                if (state.dataGlobal->DisplayExtraWarnings) {
+                                    // Warn user of using specified Zone Floor Area
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Floor Area for Zone=\"{}\" is {:.1R}% different from the sum of the Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               state.dataHeatBal->Zone(ZoneNum).Name,
+                                               diffp * 100.0));
+                                    ShowContinueError(state,
+                                                      format("Entered Zone Floor Area={:.2R}, Sum of Space Floor Area(s)={:.2R}",
+                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
+                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
+                                    ShowContinueError(
+                                        state, "Entered Zone Floor Area will be used and Space Floor Area(s) will be adjusted proportionately.");
+                                }
+                            }
+                        }
+                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
+
+                        // Adjust space floor areas to match zone floor area
+                        if (state.dataHeatBal->Zone(ZoneNum).numSpaces == 1) {
+                            // If the zone contains only one space, then set the Space area to the Zone area
+                            int spaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
+                            state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
+                        } else if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            // Adjust space areas proportionately
+                            Real64 areaRatio = state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                                state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
+                            }
+                        } else {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
+                                // Warn if calculated floor area was zero and there is more than one Space
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
+                                                     state.dataHeatBal->Zone(ZoneNum).Name +
+                                                     "\" significantly different from sum of Space Floor Areas");
+                                ShowContinueError(state,
+                                                  "But the sum of the Space Floor Areas is zero and there is more than one Space in the zone."
+                                                  "Unable to apportion the zone floor area. Space Floor Areas are zero.");
+                            }
+                        }
+                    }
+                } else {
+                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
                 }
             }
         }
@@ -2677,6 +2715,7 @@ namespace SurfaceGeometry {
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) continue;
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == Ground) continue;
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == KivaFoundation) {
+                state.dataSurface->AllHTKivaSurfaceList.push_back(SurfNum);
                 if (!ErrorsFound)
                     state.dataSurfaceGeometry->kivaManager.foundationInputs[state.dataSurface->Surface(SurfNum).OSCPtr].surfaces.push_back(SurfNum);
                 continue;
@@ -4013,11 +4052,8 @@ namespace SurfaceGeometry {
                     // Find foundation object, if blank use default
                     if (state.dataIPShortCut->lAlphaFieldBlanks(ArgPointer + 1)) {
 
-                        if (!state.dataSurfaceGeometry->kivaManager.defaultSet) {
-                            // Apply default foundation if no other foundation object specified
-                            if (state.dataSurfaceGeometry->kivaManager.foundationInputs.size() == 0) {
-                                state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
-                            }
+                        if (!state.dataSurfaceGeometry->kivaManager.defaultAdded) {
+                            // Add default foundation if no other foundation object specified
                             state.dataSurfaceGeometry->kivaManager.addDefaultFoundation();
                         }
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OSCPtr =
@@ -10737,16 +10773,29 @@ namespace SurfaceGeometry {
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    "Foundation:Kiva:Settings, " + state.dataIPShortCut->cAlphaArgs(alpF) + " is not a valid choice for " +
-                                        state.dataIPShortCut->cAlphaFieldNames(alpF));
+                                    format("{}, {} is not a valid choice for {}",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(alpF),
+                                           state.dataIPShortCut->cAlphaFieldNames(alpF)));
                 }
             }
             alpF++;
 
             if (state.dataIPShortCut->lNumericFieldBlanks(numF) || state.dataIPShortCut->rNumericArgs(numF) == DataGlobalConstants::AutoCalculate) {
+                // Autocalculate deep-ground depth (see KivaManager::defineDefaultFoundation() for actual calculation)
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = 40.0;
+                state.dataSurfaceGeometry->kivaManager.settings.autocalculateDeepGroundDepth = true;
+                if (state.dataSurfaceGeometry->kivaManager.settings.deepGroundBoundary != HeatBalanceKivaManager::KivaManager::Settings::AUTO) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    format("{}, {} should not be set to Autocalculate unless {} is set to Autoselect",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cNumericFieldNames(numF),
+                                           state.dataIPShortCut->cAlphaFieldNames(alpF - 1)));
+                }
             } else {
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = state.dataIPShortCut->rNumericArgs(numF);
+                state.dataSurfaceGeometry->kivaManager.settings.autocalculateDeepGroundDepth = false;
             }
             numF++;
             if (!state.dataIPShortCut->lNumericFieldBlanks(numF)) {
@@ -10770,17 +10819,18 @@ namespace SurfaceGeometry {
             alpF++;
         }
 
+        // Set default foundation (probably doesn't need to be called if there are no Kiva
+        // surfaces, but we don't know that yet). We call this here so that the default
+        // foundation is available for 1) the starting copy for user-defined Foundation:Kiva
+        // object default inputs, and 2) the actual default Foundation object if a
+        // user-defined Foundation:Kiva name is not referenced by a surface.
+        state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
+
         // Read Foundation objects
         cCurrentModuleObject = "Foundation:Kiva";
         int TotKivaFnds = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaFnds > 0) {
-            state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
-
-            Array1D_string fndNames;
-            fndNames.allocate(TotKivaFnds + 1);
-            fndNames(1) = "<Default Foundation>";
-
             for (int Loop = 1; Loop <= TotKivaFnds; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
@@ -10808,8 +10858,6 @@ namespace SurfaceGeometry {
                 if (ErrorInName) {
                     ErrorsFound = true;
                     continue;
-                } else {
-                    fndNames(Loop) = fndInput.name;
                 }
 
                 // Start with copy of default

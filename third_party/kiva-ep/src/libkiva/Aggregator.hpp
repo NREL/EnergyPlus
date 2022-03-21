@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Aggregator_HPP
@@ -17,7 +17,6 @@ public:
   std::size_t size();
   void calc_weighted_results();
   std::pair<Ground *, double> get_instance(std::size_t index);
-
 
   struct Results {
     double hconv, hrad, qtot, qconv, qrad, Tconv, Tavg, Trad;

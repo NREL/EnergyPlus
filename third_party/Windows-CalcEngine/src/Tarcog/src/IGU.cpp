@@ -48,7 +48,8 @@ namespace Tarcog
 
             if(t_IGU.m_DeflectionFromE1300Curves != nullptr)
             {
-                m_DeflectionFromE1300Curves = std::make_unique<Deflection::DeflectionE1300>(*t_IGU.m_DeflectionFromE1300Curves);
+                m_DeflectionFromE1300Curves =
+                  std::make_unique<Deflection::DeflectionE1300>(*t_IGU.m_DeflectionFromE1300Curves);
             }
 
             return *this;
@@ -260,7 +261,6 @@ namespace Tarcog
 
         std::vector<double> CIGU::getPanesLoad() const
         {
-
             std::vector<double> paneLoad(getSolidLayers().size());
 
             if(m_DeflectionFromE1300Curves != nullptr)
@@ -310,9 +310,19 @@ namespace Tarcog
             auto result{0.0};
             if(size > 1u)
             {
-                std::map<Environment, size_t> envLayer = {{Environment::Indoor, size - 2},
-                                                          {Environment::Outdoor, 1}};
-                result = m_Layers[envLayer.at(t_Environment)]->getGainFlow();
+                // This is important in order to get correct gap numbering. It will return the gap
+                // that is connected with the environment.
+                const std::map<Environment, size_t> envLayer = {{Environment::Indoor, size - 2},
+                                                                {Environment::Outdoor, 1}};
+
+                // Need to make sure that solid layer is actually permeable as well
+                const std::map<Environment, size_t> solidLayerIndex = {{Environment::Indoor, size - 1},
+                                                                  {Environment::Outdoor, 0}};
+
+                if(m_Layers[solidLayerIndex.at(t_Environment)]->isPermeable())
+                {
+                    result = m_Layers[envLayer.at(t_Environment)]->getGainFlow();
+                }
             }
             return result;
         }
@@ -348,7 +358,8 @@ namespace Tarcog
             std::vector<Deflection::LayerData> layerData;
             for(const auto & layer : getSolidLayers())
             {
-                layerData.emplace_back(layer->getThickness(), layer->density(), layer->youngsModulus());
+                layerData.emplace_back(
+                  layer->getThickness(), layer->density(), layer->youngsModulus());
             }
 
             std::vector<Deflection::GapData> gapData;
@@ -476,7 +487,8 @@ namespace Tarcog
 
                 auto deflectionResults{m_DeflectionFromE1300Curves->results()};
 
-                // This is borrowed from Timschenko. It will be used till E1300 calculations are actually doing this.
+                // This is borrowed from Timschenko. It will be used till E1300 calculations are
+                // actually doing this.
                 const auto deflectionRatio = Ldmean() / Ldmax();
 
                 auto solidLayers{getSolidLayers()};
