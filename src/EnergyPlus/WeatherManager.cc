@@ -2331,6 +2331,8 @@ namespace WeatherManager {
                 // CurrentAmount unit: m
                 state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= (state.dataWeatherManager->IsRainThreshold / 1000.0);
             }
+        } else {
+            state.dataEnvrn->IsRain = false;
         }
         if (state.dataWeatherManager->UseSnowValues) {
             state.dataEnvrn->IsSnow = state.dataWeatherManager->TodayIsSnow(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
