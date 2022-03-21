@@ -1864,7 +1864,7 @@ namespace WeatherManager {
             state.dataWeatherManager->OutOfRange.WindDir = 0;
             state.dataWeatherManager->OutOfRange.DirectRad = 0;
             state.dataWeatherManager->OutOfRange.DiffuseRad = 0;
-            state.dataWeatherManager->IsRainThreshold = 0.8 / 1000.0 / double(state.dataGlobal->NumOfTimeStepInHour);
+            state.dataWeatherManager->IsRainThreshold = 0.8 / double(state.dataGlobal->NumOfTimeStepInHour); // [mm]
 
             if (!state.dataWeatherManager->RPReadAllWeatherData) {
                 printEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
@@ -2318,35 +2318,20 @@ namespace WeatherManager {
             }
         }
 
-        constexpr const Real64 defaultLiquidPrecip = 1.5 / 1000; // in [m]
-        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
-            // TodayIsRain is the Present Weather Codes field in epw. See column 1-3 in Table 2.16 Weather Codes Field Interpretation
-            if ((state.dataEnvrn->LiquidPrecipitation == 0) &&
-                (state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay)) &&
-                (state.dataWeatherManager->UseRainValues)) {
-                state.dataEnvrn->LiquidPrecipitation = defaultLiquidPrecip / state.dataGlobal->NumOfTimeStepInHour;
-                ShowRecurringWarningErrorAtEnd(state,
-                                               "Rain flag is on but precipitation depth in the weather file is missing or zero. Setting "
-                                               "precipitation depth to 1.5 mm for this hour.",
-                                               state.dataWaterData->PrecipOverwrittenByRainFlag);
-            }
-        }
-
         WaterManager::UpdatePrecipitation(state);
 
         state.dataEnvrn->TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 
         if (state.dataWeatherManager->UseRainValues) {
-            // following the dev branch lower bound condition
-            if (state.dataWeatherManager->NumIntervalsPerHour == 1 && state.dataGlobal->NumOfTimeStepInHour > 1 &&
-                state.dataEnvrn->RunPeriodEnvironment) {
-                state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= state.dataWeatherManager->IsRainThreshold;
-            } else {
+            if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
+                // It is set as LiquidPrecipitation >= .8 mm here: state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >=
+                // state.dataWeatherManager->IsRainThreshold;
                 state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+            } else if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign && state.dataEnvrn->RunPeriodEnvironment) {
+                // CurrentAmount unit: m
+                state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= (state.dataWeatherManager->IsRainThreshold / 1000);
             }
-        } else {
-            state.dataEnvrn->IsRain = false;
         }
         if (state.dataWeatherManager->UseSnowValues) {
             state.dataEnvrn->IsSnow = state.dataWeatherManager->TodayIsSnow(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
@@ -3314,7 +3299,8 @@ namespace WeatherManager {
                     state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) =
                         state.dataWeatherManager->LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(hour) * WtNow;
                     state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) /= double(state.dataGlobal->NumOfTimeStepInHour);
-
+                    state.dataWeatherManager->TomorrowIsRain(ts, hour) =
+                        state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >= state.dataWeatherManager->IsRainThreshold; // Wthr%IsRain(Hour)
                     state.dataWeatherManager->TomorrowIsSnow(ts, hour) = Wthr.IsSnow(hour);
                 } // End of TS Loop
 
