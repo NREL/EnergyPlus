@@ -2324,13 +2324,12 @@ namespace WeatherManager {
         state.dataEnvrn->OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 
         if (state.dataWeatherManager->UseRainValues) {
-            if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::EPWPrecipitation) {
-                // It is set as LiquidPrecipitation >= .8 mm here: state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >=
-                // state.dataWeatherManager->IsRainThreshold;
-                state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-            } else if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign && state.dataEnvrn->RunPeriodEnvironment) {
+            // It is set as LiquidPrecipitation >= .8 mm here: state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >=
+            // state.dataWeatherManager->IsRainThreshold;
+            state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+            if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign && state.dataEnvrn->RunPeriodEnvironment) {
                 // CurrentAmount unit: m
-                state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= (state.dataWeatherManager->IsRainThreshold / 1000);
+                state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= (state.dataWeatherManager->IsRainThreshold / 1000.0);
             }
         }
         if (state.dataWeatherManager->UseSnowValues) {

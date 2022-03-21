@@ -1751,6 +1751,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     ASSERT_TRUE(process_idf(idf_objects));
 
     SimulationManager::ManageSimulation(*state);
+    WaterManager::GetWaterManagerInput(*state);
     state->dataGlobal->DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
     state->dataWeatherManager->Envrn = 1;
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
@@ -1780,7 +1781,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     // when TodayIsRain is false, IsRain is still true as site:precipitation has non-zero rain fall
     ASSERT_TRUE(state->dataEnvrn->IsRain);
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::EPWPrecipitation;
     state->dataWeatherManager->TodayIsRain(1, 24) = false;
     state->dataEnvrn->RunPeriodEnvironment = true;
     WeatherManager::SetCurrentWeather(*state);
