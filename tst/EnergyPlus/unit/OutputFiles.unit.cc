@@ -174,11 +174,6 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     //    EXPECT_EQ(format("{:N}", 999.9), "           999.9    ");
     EXPECT_EQ(format("{:N}", 61677162.0987027), "61677162.0987027    ");
 
-    // Tested with E+ 9.3.0
-    EXPECT_EQ(format("{:N}", 0.03576388888888889), "          0.3576E-01");
-    EXPECT_EQ(format("{:.3N}", 0.03576388888888889), "0.358E-01");
-    EXPECT_EQ(format("{:.4N}", 0.03576388888888889), "0.3576E-01");
-
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
 

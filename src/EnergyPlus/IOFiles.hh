@@ -380,12 +380,6 @@ public:
                 // The Fortran 'G' format insists on a leading 0, even though
                 // that actually means losing data
                 specs_.type = 'Z';
-
-                // We'll be formating a number between -1 and 1 as scientific notation, so we want some amount of decimals to be meaningful
-                if (specs_.precision == -1) {
-                    specs_.precision = 4;
-                }
-
                 // Need to rerun with double wrapper since 'Z' is one of our custom ones
                 return fmt::format_to(ctx.out(), spec_builder(), doubleWrapper);
             }

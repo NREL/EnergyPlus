@@ -1084,7 +1084,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
         WriteReportIntegerData(*state, 1, "1", 25.75, StoreType::Averaged, 720, ReportingFrequency::Monthly, 0, 4010115, 1, 4011560);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.3576E-01,0, 1, 1,15,1, 1,15,60"}, "\n")));
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.3E-01,0, 1, 1,15,1, 1,15,60"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
