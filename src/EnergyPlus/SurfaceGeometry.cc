@@ -996,6 +996,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfIntConvCoeffIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtConvCoeffIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfTAirRef.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfTAirRefRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvClassification.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvClassificationRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvHcModelEq.allocate(state.dataSurface->TotSurfaces);
@@ -1022,6 +1023,7 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = ConvectionConstants::HcInt_SetByZone;
             state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::Invalid;
+            state.dataSurface->SurfTAirRef(SurfNum) = static_cast<int>(DataSurfaces::RefAirTemp::Invalid);
             state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::Invalid;
             state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(ConvectionConstants::InConvClass::Invalid);
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) = 0;

@@ -779,6 +779,8 @@ namespace MundtSimMgr {
                         state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).TMeanAir;
                     // set flag for reference air temperature
                     state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+                    state.dataSurface->SurfTAirRefRpt(SurfFirst + SurfNum - 1) =
+                        DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1)];
                 }
                 // b) Average zone air temperature -> ZT(ZoneNum)
                 // For Mundt model, average room air is the weighted value of floor and ceiling air temps
@@ -801,6 +803,8 @@ namespace MundtSimMgr {
                         state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                     // set flag for reference air temperature
                     state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+                    state.dataSurface->SurfTAirRefRpt(SurfFirst + SurfNum - 1) =
+                        DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1)];
                 }
                 // b) Average zone air temperature -> ZT(ZoneNum)
                 // For Mundt model, average room air is the weighted value of floor and ceiling air temps
@@ -824,6 +828,8 @@ namespace MundtSimMgr {
                 state.dataHeatBal->SurfTempEffBulkAir(SurfFirst + SurfNum - 1) = state.dataHeatBalFanSys->MAT(ZoneNum);
                 // set flag for reference air temperature
                 state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+                state.dataSurface->SurfTAirRefRpt(SurfFirst + SurfNum - 1) =
+                    DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1)];
             }
             // set flag to indicate that Mundt model is NOT used for this zone at the present time
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;

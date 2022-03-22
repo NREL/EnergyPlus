@@ -943,6 +943,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // set flag for reference air temperature mode
     for (int i = SurfFirst; i <= SurfLast; ++i) {
         state.dataSurface->SurfTAirRef(i) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+        state.dataSurface->SurfTAirRefRpt(i) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(i)];
     }
 }
 

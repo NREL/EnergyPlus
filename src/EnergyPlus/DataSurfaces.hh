@@ -182,10 +182,12 @@ namespace DataSurfaces {
     {
         Invalid = -1,
         ZoneMeanAirTemp,   // mean air temperature of the zone => MAT
-        AdjacentAirTemp,   // air temperature adjacent ot surface => TempEffBulkAir
+        AdjacentAirTemp,   // air temperature adjacent to surface => TempEffBulkAir
         ZoneSupplyAirTemp, // supply air temperature of the zone
         Num
     };
+
+    constexpr std::array<int, static_cast<int>(DataSurfaces::RefAirTemp::Num)> SurfTAirRefReportVals = {1, 2, 3};
 
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
@@ -1510,6 +1512,7 @@ struct SurfacesData : BaseGlobalStruct
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
+    Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
     Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<ConvectionConstants::InConvClass>
@@ -1888,6 +1891,7 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfICSPtr.deallocate();
         this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
         this->SurfTAirRef.deallocate();
+        this->SurfTAirRefRpt.deallocate();
         this->SurfIntConvCoeffIndex.deallocate();
         this->SurfExtConvCoeffIndex.deallocate();
         this->SurfIntConvClassification.deallocate();

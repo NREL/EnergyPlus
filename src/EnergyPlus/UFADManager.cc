@@ -702,6 +702,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         for (Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2); ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Wall(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
             if (SurfNum == 0) continue;
             Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
             Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
@@ -766,6 +767,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         for (Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Window(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
             if (SurfNum == 0) continue;
             if (state.dataSurface->Surface(SurfNum).Tilt > 10.0 && state.dataSurface->Surface(SurfNum).Tilt < 170.0) { // Window Wall
                 Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
@@ -850,6 +852,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
              ++Ctd) { // DOOR
             SurfNum = state.dataUCSDShared->APos_Door(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
             if (SurfNum == 0) continue;
             Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
             Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
@@ -905,6 +908,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
              ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Internal(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
             if (SurfNum == 0) continue;
             ZSupSurf = state.dataUFADManager->HeightIntMass;
             ZInfSurf = 0.0;
@@ -945,6 +949,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
              ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Ceiling(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
             if (SurfNum == 0) continue;
             state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
             CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->UFHcIn);
@@ -959,6 +964,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         for (Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2); ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Floor(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
             if (SurfNum == 0) continue;
             state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
             CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->UFHcIn);

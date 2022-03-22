@@ -3497,6 +3497,7 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
             }
             // set flag for reference air temperature
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
         }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -5304,6 +5305,8 @@ void EvaluateIntHcModels(EnergyPlusData &state,
     }
     }
 
+    state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
+
     if (tmpHc < ConvectionConstants::AdaptiveHcInsideLowLimit) tmpHc = ConvectionConstants::AdaptiveHcInsideLowLimit;
 
     Hc = tmpHc;
@@ -6935,6 +6938,8 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
     default:
         assert(false);
     }
+
+    state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
 
     Real64 HcFnTempDiff(0.0), HcFnTempDiffDivHeight(0.0), HcFnACH(0.0), HcFnACHDivPerimLength(0.0);
     Kiva::ConvectionAlgorithm HcFnTempDiffFn(KIVA_CONST_CONV(0.0)), HcFnTempDiffDivHeightFn(KIVA_CONST_CONV(0.0));
