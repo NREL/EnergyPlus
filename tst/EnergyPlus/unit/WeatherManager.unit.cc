@@ -60,10 +60,13 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 // Fixtures
@@ -1522,4 +1525,272 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(2, 4), 8.00, 1e-6);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(1, 4), 8.75, 1e-6);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(1, 4), 8.00, 1e-6);
+}
+
+TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
+{
+    // This unit test ensures that the WaterManager correctly calculates the Rainfall CurrentRate
+    std::string const idf_objects = delimited_string({
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "  SizingPeriod:DesignDay,",
+        "    SunnyWinterDay,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    5.0,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    4.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    83411.,                  !- Barometric Pressure {Pa}",
+        "    4,                       !- Wind Speed {m/s}",
+        "    120,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.00;                    !- Sky Clearness",
+
+        "  Site:Location,",
+        "    Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name",
+        "    39.77,                   !- Latitude {deg}",
+        "    -104.87,                 !- Longitude {deg}",
+        "    -7.00,                   !- Time Zone {hr}",
+        "    1611.00;                 !- Elevation {m}",
+        "Material,",
+        "  Concrete Block,          !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  0.3805070,               !- Conductivity {W/m-K}",
+        "  608.7016,                !- Density {kg/m3}",
+        "  836.8000;                !- Specific Heat {J/kg-K}",
+        "Construction,",
+        "  WallConstruction,        !- Name",
+        "  Concrete Block;          !- Outside Layer",
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS DARK STATE,!- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.111,                   !- Solar Transmittance at Normal Incidence",
+        "    0.179,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.179,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.128,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS LIGHT STATE,!- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.9,                   !- Solar Transmittance at Normal Incidence",
+        "    0.1,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.1,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.9,                   !- Visible Transmittance at Normal Incidence",
+        "    0.1,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.1,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+        "Construction,",
+        "  WindowConstruction1,      !- Name",
+        "  ELECTRO GLASS LIGHT STATE;          !- Outside Layer",
+        "Construction,",
+        "  WindowConstruction2,      !- Name",
+        "  ELECTRO GLASS DARK STATE;          !- Outside Layer",
+        "FenestrationSurface:Detailed,",
+        "  FenestrationSurface,     !- Name",
+        "  Window,                  !- Surface Type",
+        "  WindowConstruction1,      !- Construction Name",
+        "  Wall,                    !- Building Surface Name",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  0.5000000,               !- View Factor to Ground",
+        "  ,                        !- Frame and Divider Name",
+        "  1.0,                     !- Multiplier",
+        "  4,                       !- Number of Vertices",
+        "  0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,"
+        "  Wall,                    !- Name",
+        "  Wall,                    !- Surface Type",
+        "  WallConstruction,        !- Construction Name",
+        "  Zone,                    !- Zone Name",
+        "    ,                        !- Space Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  SunExposed,              !- Sun Exposure",
+        "  WindExposed,             !- Wind Exposure",
+        "  0.5000000,               !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,"
+        "  Floor,                   !- Name",
+        "  Floor,                   !- Surface Type",
+        "  WallConstruction,        !- Construction Name",
+        "  Zone,                    !- Zone Name",
+        "    ,                        !- Space Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  1.0,                     !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "Zone,"
+        "  Zone,                    !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  6.000000,                !- X Origin {m}",
+        "  6.000000,                !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+        "  Daylighting:Controls,",
+        "    Daylighting Control,!- Name",
+        "    Zone,          !- Zone Name",
+        "    SplitFlux,               !- Daylighting Method",
+        "    ,                        !- Availability Schedule Name",
+        "    Continuous,              !- Lighting Control Type",
+        "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
+        "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
+        "    1,                       !- Number of Stepped Control Steps",
+        "    1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
+        "    ,                        !- Glare Calculation Daylighting Reference Point Name",
+        "    ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "    22,                      !- Maximum Allowable Discomfort Glare Index",
+        "    ,                        !- DElight Gridding Resolution {m2}",
+        "    Reference Point 1,  !- Daylighting Reference Point 1 Name",
+        "    1,                       !- Fraction of Zone Controlled by Reference Point 1",
+        "    500;                     !- Illuminance Setpoint at Reference Point 1 {lux}",
+        "",
+        "  Daylighting:ReferencePoint,",
+        "    Reference Point 1,  !- Name",
+        "    Zone,          !- Zone Name",
+        "    12,                      !- X-Coordinate of Reference Point {m}",
+        "    2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "    0.8;                     !- Z-Coordinate of Reference Point {m}",
+        "  ShadowCalculation,",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Timestep,                !- Shading Calculation Update Frequency Method",
+        "    30,                       !- Shading Calculation Update Frequency",
+        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
+        "EnergyManagementSystem:ConstructionIndexVariable, Win_1, WINDOWCONSTRUCTION1;",
+        "EnergyManagementSystem:ConstructionIndexVariable, Win_2, WINDOWCONSTRUCTION2;",
+        "  EnergyManagementSystem:Actuator,",
+        "    Win1_Construct,          !- Name",
+        "    FenestrationSurface,  !- Actuated Component Unique Name",
+        "    Surface,                 !- Actuated Component Type",
+        "    Construction State;      !- Actuated Component Control Type",
+        "",
+        "  EnergyManagementSystem:ProgramCallingManager,",
+        "    Window Switcher,  !- Name",
+        "    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+        "    ZN_1_wall_south_Window_1_Control;  !- Program Name 1",
+        "",
+        "  EnergyManagementSystem:Program,",
+        "    ZN_1_wall_south_Window_1_Control,  !- Name",
+        "    IF Hour > 12,    !- Program Line 1",
+        "    Set Win1_Construct = Win_2,  !- Program Line 2",
+        "    ELSE,                    !- <none>",
+        "    SET Win1_Construct = Win_1,  !- <none>",
+        "    ENDIF;                   !- <none>",
+
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.80771;                 !- Average Total Annual Precipitation {m/yr}",
+
+        "Schedule:Compact,",
+        "  PrecipitationSchd,       !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+    });
+
+    // setting up start ------------------------------------------------------------------------------
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::ManageSimulation(*state);
+    WaterManager::GetWaterManagerInput(*state);
+    state->dataGlobal->DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
+    state->dataWeatherManager->Envrn = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 31;
+    state->dataGlobal->HourOfDay = 24;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->TimeStep = 1;
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    state->dataWeatherManager->Interpolation.allocate(state->dataGlobal->NumOfTimeStepInHour);
+    state->dataWeatherManager->Interpolation = 0;
+    // setting up end ------------------------------------------------------------------------------
+
+    state->dataWeatherManager->TodayIsRain.allocate(state->dataGlobal->NumOfTimeStepInHour, 24);
+    state->dataWeatherManager->TodayIsRain(1, 24) = false;
+    state->dataEnvrn->RunPeriodEnvironment = true;
+    WeatherManager::SetCurrentWeather(*state);
+    // when TodayIsRain is false, IsRain is still true as site:precipitation has non-zero rain fall
+    ASSERT_TRUE(state->dataEnvrn->IsRain);
+
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::EPWPrecipitation;
+    state->dataWeatherManager->TodayIsRain(1, 24) = false;
+    state->dataEnvrn->RunPeriodEnvironment = true;
+    WeatherManager::SetCurrentWeather(*state);
+    ASSERT_FALSE(state->dataEnvrn->IsRain);
+
+    // site:precipitation overwritten of rain flag does not take effect during sizing period
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->TodayIsRain(1, 24) = false;
+    state->dataEnvrn->RunPeriodEnvironment = false;
+    WeatherManager::SetCurrentWeather(*state);
+    ASSERT_FALSE(state->dataEnvrn->IsRain);
 }
