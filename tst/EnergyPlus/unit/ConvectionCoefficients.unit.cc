@@ -1051,6 +1051,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface(SurfNum).Zone = 1;
     state->dataSurface->Surface(SurfNum).Construction = 1;
     state->dataSurface->SurfTAirRef.allocate(1);
+    state->dataSurface->SurfTAirRefRpt.allocate(1);
     state->dataSurface->SurfTAirRef(SurfNum) = 0;
     state->dataConstruction->Construct(1).TypeIsWindow = false;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
