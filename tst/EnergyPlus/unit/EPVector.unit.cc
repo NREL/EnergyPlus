@@ -72,3 +72,21 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Basic)
     ASSERT_THROW(v(5) = 5, std::out_of_range);
 #endif // !NDEBUG
 }
+
+TEST_F(EnergyPlusFixture, EPVectorTest_Bools)
+{
+    EPVector<bool> v;
+    v.allocate(4);
+    v[0] = true;
+    v[1] = false;
+    v[2] = false;
+    v[3] = true;
+    EXPECT_TRUE(v(1));
+    EXPECT_FALSE(v(2));
+    EXPECT_FALSE(v(3));
+    EXPECT_TRUE(v(4));
+#ifndef NDEBUG
+    ASSERT_THROW(v[4] = true, std::out_of_range);
+    ASSERT_THROW(v(5) = false, std::out_of_range);
+#endif // !NDEBUG
+}
