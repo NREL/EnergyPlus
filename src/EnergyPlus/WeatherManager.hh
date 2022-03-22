@@ -1014,6 +1014,7 @@ struct WeatherManagerData : BaseGlobalStruct
     Real64 NextHrBeamSolarRad;
     Real64 NextHrDifSolarRad;
     Real64 NextHrLiquidPrecip;
+    Real64 IsRainThreshold; // precipitation threshold (m) for a rainy day
 
     // ProcessEPWHeader static vars
     std::string EPWHeaderTitle;

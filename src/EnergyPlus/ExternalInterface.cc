@@ -871,13 +871,13 @@ void InstantiateInitializeFMUImport(EnergyPlusData &state)
     // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int i, j; // Loop counters
 
     // Instantiate FMUs
-    for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-        for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+    for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+        for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+            auto folderStr = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string();
             state.dataExternalInterface->FMU(i).Instance(j).fmicomponent =
-                fmiEPlusInstantiateSlave((char *)state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.c_str(),
+                fmiEPlusInstantiateSlave((char *)folderStr.c_str(),
                                          &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder,
                                          &state.dataExternalInterface->FMU(i).TimeOut,
                                          &state.dataExternalInterface->FMU(i).Visible,
@@ -898,8 +898,8 @@ void InstantiateInitializeFMUImport(EnergyPlusData &state)
 
     // Initialize FMUs
     int localfmiTrue(fmiTrue);
-    for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-        for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+    for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+        for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
             state.dataExternalInterface->FMU(i).Instance(j).fmistatus =
                 fmiEPlusInitializeSlave(&state.dataExternalInterface->FMU(i).Instance(j).fmicomponent,
                                         &state.dataExternalInterface->tStart,

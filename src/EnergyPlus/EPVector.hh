@@ -58,7 +58,9 @@ namespace EnergyPlus {
 template <typename T> struct EPVector : private std::vector<T>
 {
     using std::vector<T>::size;
+#ifdef NDEBUG
     using std::vector<T>::operator[];
+#endif
     using std::vector<T>::empty;
     using std::vector<T>::begin;
     using std::vector<T>::end;
@@ -71,6 +73,18 @@ template <typename T> struct EPVector : private std::vector<T>
 
     using value_type = T;
     using size_type = typename std::vector<T>::size_type;
+
+#ifndef NDEBUG
+    [[nodiscard]] T &operator[](std::size_t n)
+    {
+        return std::vector<T>::at(n);
+    }
+
+    [[nodiscard]] const T &operator[](std::size_t n) const
+    {
+        return std::vector<T>::at(n);
+    }
+#endif
 
     [[nodiscard]] T &operator()(std::size_t n)
     {
@@ -126,7 +140,9 @@ private:
 template <> struct EPVector<bool> : private std::vector<std::uint8_t>
 {
     using std::vector<std::uint8_t>::size;
+#ifdef NDEBUG
     using std::vector<std::uint8_t>::operator[];
+#endif
     using std::vector<std::uint8_t>::empty;
     using std::vector<std::uint8_t>::begin;
     using std::vector<std::uint8_t>::end;
@@ -140,6 +156,27 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     using value_type = std::uint8_t;
     using size_type = typename std::vector<std::uint8_t>::size_type;
 
+#ifndef NDEBUG
+    [[nodiscard]] std::uint8_t &operator[](std::size_t n)
+    {
+        return std::vector<std::uint8_t>::at(n);
+    }
+
+    [[nodiscard]] const std::uint8_t &operator[](std::size_t n) const
+    {
+        return std::vector<std::uint8_t>::at(n);
+    }
+
+    [[nodiscard]] std::uint8_t &operator()(std::size_t n)
+    {
+        return (*this)[n - 1];
+    }
+
+    [[nodiscard]] const std::uint8_t &operator()(std::size_t n) const
+    {
+        return (*this)[n - 1];
+    }
+#else
     [[nodiscard]] std::uint8_t &operator()(std::size_t n) noexcept
     {
         return (*this)[n - 1];
@@ -149,6 +186,7 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     {
         return (*this)[n - 1];
     }
+#endif
 
     [[nodiscard]] bool allocated() const noexcept
     {
