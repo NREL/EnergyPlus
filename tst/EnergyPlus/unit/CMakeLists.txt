@@ -92,6 +92,7 @@ set(test_src
     DesiccantDehumidifiers.unit.cc
     DisplacementVentMgr.unit.cc
     DualDuct.unit.cc
+    EPVector.unit.cc
     EMSManager.unit.cc
     EarthTube.unit.cc
     EcoRoofManager.unit.cc

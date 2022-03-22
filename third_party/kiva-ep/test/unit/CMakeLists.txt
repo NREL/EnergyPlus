@@ -4,8 +4,6 @@ set(kiva_test_src
       cell_test.cpp
    )
 
-include_directories(${kiva_BINARY_DIR}/src/libkiva/)
-
 add_executable(kiva_tests ${kiva_test_src})
 
 target_link_libraries(kiva_tests gtest libkiva)
