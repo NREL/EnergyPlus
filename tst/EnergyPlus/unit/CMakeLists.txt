@@ -1,9 +1,9 @@
 if(USE_GLYCOL_CACHING)
-  add_definitions("-DEP_cache_GlycolSpecificHeat")
+  add_compile_definitions(EP_cache_GlycolSpecificHeat)
 endif()
 
 if(USE_PSYCH_ERRORS)
-  add_definitions("-DEP_psych_errors")
+  add_compile_definitions(EP_psych_errors)
 endif()
 
 set(test_src
@@ -102,6 +102,7 @@ set(test_src
     ElectricPowerServiceManager.unit.cc
     EvaporativeCoolers.unit.cc
     EvaporativeFluidCoolers.unit.cc
+    ExhaustSystem.unit.cc
     ExteriorEnergyUse.unit.cc
     FanCoilUnits.unit.cc
     Fans.unit.cc
@@ -244,6 +245,7 @@ set(test_src
     WindowAC.unit.cc
     WindowEquivalentLayer.unit.cc
     WindowLayerEffectiveMultipliers.unit.cc
+    WindowManagerExteriorThermal.unit.cc
     WindowManager.unit.cc
     XingGroundTemperatureModel.unit.cc
     ZoneContaminantPredictorCorrector.unit.cc
@@ -253,14 +255,13 @@ set(test_src
     ZoneTempPredictorCorrector.unit.cc
     main.cc)
 
-set(test_dependencies energyplusapi)
+set(test_dependencies energypluslib)
 
 if(LINK_WITH_PYTHON)
-  add_definitions("-DLINK_WITH_PYTHON")
-  find_package(PythonLibs 3 REQUIRED)
+  add_compile_definitions(LINK_WITH_PYTHON)
   include_directories(${Python_INCLUDE_DIRS})
   if(CMAKE_HOST_UNIX)
-    list(APPEND test_src api/datatransfer.unit.cc)
+    #list(APPEND test_src api/datatransfer.unit.cc) # Requires API; will be moved
     list(APPEND test_src PluginManager.unit.cc)
     list(APPEND test_dependencies ${Python_LIBRARIES})
   endif()

@@ -2196,6 +2196,9 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataEnvrn->Year = 2000;
+    state->dataEnvrn->EndYear = 2000;
+
     SimulationManager::ManageSimulation(*state);
 
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);

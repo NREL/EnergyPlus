@@ -85,7 +85,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 
     state->dataGlobal->DoWeathSim = true;
 
+    EXPECT_FALSE(state->dataOutRptTab->WriteTabularFiles);
     GetInputTabularAnnual(*state);
+    EXPECT_TRUE(state->dataOutRptTab->WriteTabularFiles);
 
     EXPECT_EQ(state->dataOutputReportTabularAnnual->annualTables.size(), 1u);
 

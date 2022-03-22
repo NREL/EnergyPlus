@@ -125,10 +125,11 @@ namespace ChillerGasAbsorption {
         Real64 DesHeatMassFlowRate; // design nominal mass flow rate of water through the hot water side [kg/s]
         Real64 DesEvapMassFlowRate; // design nominal mass flow rate of water through chilled water side [kg/s]
         // other values used during simulation
-        int DeltaTempCoolErrCount; // error count for Delta Temp = 0 while cooling
-        int DeltaTempHeatErrCount; // error count for Delta Temp = 0 while heating
-        int CondErrCount;          // error count for poor Condenser Supply Estimate
-        bool PossibleSubcooling;   // Flag to determine whether plant is overcooled
+        int DeltaTempCoolErrCount;        // error count for Delta Temp = 0 while cooling
+        int DeltaTempHeatErrCount;        // error count for Delta Temp = 0 while heating
+        int CondErrCount;                 // error count for poor Condenser Supply Estimate
+        int lCondWaterMassFlowRate_Index; // index for condenser water mass flow rate too low recurring severe warning
+        bool PossibleSubcooling;          // Flag to determine whether plant is overcooled
         // loop topology variables
         PlantLocation CWplantLoc; // chilled water plant loop component index
         PlantLocation CDplantLoc; // condenser water plant loop component index
@@ -182,7 +183,7 @@ namespace ChillerGasAbsorption {
               HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), FuelCoolFTCurve(0), FuelCoolFPLRCurve(0), ElecCoolFTCurve(0),
               ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), FuelHeatFHPLRCurve(0), isEnterCondensTemp(false), isWaterCooled(false),
               CHWLowLimitTemp(0.0), FuelHeatingValue(0.0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
-              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0),
+              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), lCondWaterMassFlowRate_Index(0),
               PossibleSubcooling(false), CWplantLoc{}, CDplantLoc{}, HWplantLoc{}, envrnFlag(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0),
               CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), FuelUseRate(0.0), FuelEnergy(0.0),
               CoolFuelUseRate(0.0), CoolFuelEnergy(0.0), HeatFuelUseRate(0.0), HeatFuelEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0),

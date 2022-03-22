@@ -11,6 +11,7 @@
 #include "BeamDirection.hpp"
 #include "WCESpectralAveraging.hpp"
 #include "WCECommon.hpp"
+#include "SpecularBSDFLayer.hpp"
 
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
@@ -64,17 +65,13 @@ namespace SingleLayerOptics
     CScatteringLayer::CScatteringLayer(const std::shared_ptr<CMaterial> & t_Material,
                                        std::shared_ptr<ICellDescription> t_Description,
                                        const DistributionMethod t_Method) :
-        m_BSDFLayer(nullptr),
-        m_Cell(nullptr),
-        m_Theta(0),
-        m_Phi(0)
+        m_BSDFLayer(nullptr), m_Theta(0), m_Phi(0)
     {
         // Scattering layer can also be created from material and cell desctiption in which case
         // integration will be performed using BSDF distribution while direct-direct component will
         // be taken directly from cell.
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         auto aMaker = CBSDFLayerMaker(t_Material, aBSDF, t_Description, t_Method);
-        m_Cell = aMaker.getCell();
         m_BSDFLayer = aMaker.getLayer();
     }
 
@@ -302,7 +299,8 @@ namespace SingleLayerOptics
                                             const double slatTiltAngle,
                                             const double curvatureRadius,
                                             const size_t numOfSlatSegments,
-                                            const DistributionMethod method)
+                                            const DistributionMethod method,
+                                            const bool isHorizontal)
     {
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
         return CScatteringLayer(CBSDFLayerMaker::getVenetianLayer(t_Material,
@@ -312,7 +310,8 @@ namespace SingleLayerOptics
                                                                   slatTiltAngle,
                                                                   curvatureRadius,
                                                                   numOfSlatSegments,
-                                                                  method));
+                                                                  method,
+                                                                  isHorizontal));
     }
 
     CScatteringLayer
@@ -340,21 +339,51 @@ namespace SingleLayerOptics
           t_Material, aBSDF, x, y, thickness, xHole, yHole));
     }
 
-    double CScatteringLayer::normalToHemisphericalEmissivity(FenestrationCommon::Side t_Side,
-                                                             EmissivityPolynomials type)
+    bool CScatteringLayer::canApplyEmissivityPolynomial() const
     {
-        return normalToHemisphericalEmissivity(t_Side, emissPolynomial.at(type));
+        return m_BSDFLayer != nullptr
+               && std::dynamic_pointer_cast<CSpecularBSDFLayer>(m_BSDFLayer) != nullptr
+               && m_BSDFLayer->getBandWavelengths().size() > 2;
     }
 
-    double CScatteringLayer::normalToHemisphericalEmissivity(FenestrationCommon::Side t_Side,
-                                                             const std::vector<double> & polynomial)
+    ////////////////////////////////////////////////////////////////////////////////////
+    /// CScatteringLayerIR
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    CScatteringLayerIR::CScatteringLayerIR(CScatteringLayer layer) : m_Layer(std::move(layer))
+    {}
+
+    double CScatteringLayerIR::emissivity(Side t_Side, EmissivityPolynomials type)
     {
-        double abs = getAbsorptance(t_Side, ScatteringSimple::Direct, 0, 0);
+        return emissivity(t_Side, emissPolynomial.at(type));
+    }
+
+    double CScatteringLayerIR::emissivity(Side t_Side, const std::vector<double> & polynomial)
+    {
         double value = 0;
-        for(size_t i = 0; i < polynomial.size(); ++i)
+        if(m_Layer.canApplyEmissivityPolynomial())
         {
-            value += std::pow(abs, i + 1) * polynomial[i];
+            double abs = m_Layer.getAbsorptance(t_Side, ScatteringSimple::Direct, 0, 0);
+            for(size_t i = 0; i < polynomial.size(); ++i)
+            {
+                value += std::pow(abs, i + 1) * polynomial[i];
+            }
+        }
+        else
+        {
+            value = m_Layer.getAbsorptance(t_Side, ScatteringSimple::Diffuse, 0, 0);
         }
         return value;
     }
+
+    double CScatteringLayerIR::transmittance(Side t_Side)
+    {
+        CWavelengthRange wrIR{WavelengthRange::IR};
+        return m_Layer.getPropertySimple(wrIR.minLambda(),
+                                         wrIR.maxLambda(),
+                                         PropertySimple::T,
+                                         t_Side,
+                                         Scattering::DiffuseDiffuse);
+    }
+
 }   // namespace SingleLayerOptics

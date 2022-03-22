@@ -83,6 +83,7 @@
 #include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
@@ -3625,6 +3626,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         }
 
     } // end of the Supply Air Path DO Loop
+
+    ExhaustAirSystemManager::SimZoneHVACExhaustControls(state);
+
+    ExhaustAirSystemManager::SimExhaustAirSystem(state, FirstHVACIteration);
 
     CalcZoneMassBalance(state, FirstHVACIteration);
 

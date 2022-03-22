@@ -179,6 +179,7 @@ namespace SteamCoils {
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
+    int GetCompIndex(EnergyPlusData &state, std::string_view const coilName);
 
     void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex);
 
