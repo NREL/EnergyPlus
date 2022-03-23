@@ -1771,7 +1771,18 @@ Site:WaterMainsTemperature,
 
 \subsection{Site:Precipitation}\label{siteprecipitation}
 
-The Site:Precipitation object is used to describe the amount of water precipitation at the building site over the course of the simulation run period. Precipitation includes both rain and the equivalent water content of snow. Precipitation is not yet described well enough in the many building weather data files. So this object can be used to provide the data using Schedule objects that define rates of precipitation in meters per hour.
+The Site:Precipitation object is used to describe the amount of water
+precipitation at the building site over the course of the simulation run period.
+Precipitation includes both rain and the equivalent water content of snow.
+Precipitation is not yet described well enough in the many building weather data
+files. So this object can be used to provide the data using Schedule objects
+that define rates of precipitation in meters per hour. In 22.1 and later
+versions, Site::Precipitation is also used to set the rain indicator. During a
+weather file simulation (RunPeriod), if Use Weather File Rain Indicators is Yes
+and the precipitation rate is no less than 0.8 mm per hour, then the rain flag
+is set to true. During a sizing simulation, the rain indicator defined in
+SizingPeriod:DesignDay, SizingPeriod:WeatherFileDays, or
+SizingPeriod:WeatherFileConditionType will be used instead.
 
 A set of schedules for site precipitation have been developed for USA weather locations and are provided with EnergyPlus in the data set called PrecipitationSchedulesUSA.idf. The user can develop schedules however they want. The schedules in the data set were developed using EnergyPlus' weather file (EPW) observations and the average monthly precipitation for the closest weather site provided by NOAA. EPW files for the USA that were based on TMY or TMY2 include weather observations for Light/Moderate/Heavy rainfall, however most international locations do not include these observations. The values were modeled by taking the middle of the ranges quoted in the EPW data dictionary. The assumed piecewise function is shown below.
 

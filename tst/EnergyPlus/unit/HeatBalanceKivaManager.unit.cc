@@ -814,7 +814,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_setMessageCallback)
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(SurfNum).ExtBoundCond = DataSurfaces::KivaFoundation;
     state->dataSurface->Surface(SurfNum).Name = "Kiva Floor";
-
+    state->dataSurface->AllHTKivaSurfaceList = {1};
     HeatBalanceKivaManager::KivaManager km;
 
     EXPECT_THROW(km.calcKivaSurfaceResults(*state), std::runtime_error);

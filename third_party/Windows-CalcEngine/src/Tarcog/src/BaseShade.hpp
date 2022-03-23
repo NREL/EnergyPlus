@@ -35,7 +35,9 @@ namespace Tarcog
             double Aeq_bot();
             double Aeq_top();
 
-            double frontPorositiy() const;
+            [[nodiscard]] double frontPorositiy() const;
+
+            [[nodiscard]] bool isOpen() const;
 
         private:
             void initialize();
@@ -65,6 +67,8 @@ namespace Tarcog
             CIGUShadeLayer(double t_Thickness, double t_Conductivity);
 
             std::shared_ptr<CBaseLayer> clone() const override;
+
+            bool isPermeable() const override;
 
         private:
             void calculateConvectionOrConductionFlow() override;

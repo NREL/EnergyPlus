@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantAvailManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
@@ -107,14 +108,14 @@ namespace DataAirLoop {
     struct DefinePriAirSysAvailMgrs
     {
         // Members
-        int NumAvailManagers;            // number of availability managers for this system
-        int AvailStatus;                 // system availability status
-        int StartTime;                   // cycle on time (in SimTimeSteps)
-        int StopTime;                    // cycle off time (in SimTimeSteps)
-        Real64 ReqSupplyFrac;            // required system flow rate (as a fraction)
-        Array1D_string AvailManagerName; // name of each availability manager
-        Array1D_int AvailManagerType;    // type of availability manager
-        Array1D_int AvailManagerNum;     // index for availability manager
+        int NumAvailManagers;                                        // number of availability managers for this system
+        int AvailStatus;                                             // system availability status
+        int StartTime;                                               // cycle on time (in SimTimeSteps)
+        int StopTime;                                                // cycle off time (in SimTimeSteps)
+        Real64 ReqSupplyFrac;                                        // required system flow rate (as a fraction)
+        Array1D_string AvailManagerName;                             // name of each availability manager
+        Array1D<DataPlant::SystemAvailabilityType> AvailManagerType; // type of availability manager
+        Array1D_int AvailManagerNum;                                 // index for availability manager
 
         // Default Constructor
         DefinePriAirSysAvailMgrs() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0), ReqSupplyFrac(0.0)
