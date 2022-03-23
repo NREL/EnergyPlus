@@ -137,7 +137,7 @@ Documentation for the new inputs will be added for both coil objects. The propos
 
 > This numeric field contains the entering water temperature. This field along with the previous one is only used when the capacity is set to be autosized and is used to determine the coil's reference capacity. The COP should be entered at these conditions. If left blank, 30&deg;C is used (rating temperature for water loop water-to-air heat pumps in ISO-13256-1-2021).
 
-> This numeric field contains the ratio of reference heating capacity to the reference cooling capacity. It is used to determine the autosized reference heating capacity from the reference cooling capacity. It is also used to determine the autosized reference cooling capacity when peak heating loads are dominating during sizing calculations. If both this object's and its associated cooling coil's capacity are provided by the user, this field not used. Typical value for this field depends on the application in which the coils are used. Here are some suggested values 1.23 for water loop applications, 0.89 for ground water applications, and 0.76 for ground loop applications (source: 2021 AHRI directory).
+> This numeric field contains the ratio of reference heating capacity to the reference cooling capacity at reference conditions. It is used to determine the autosized reference heating capacity from the reference cooling capacity. It is also used to determine the autosized reference cooling capacity when peak heating loads are dominating during sizing calculations. If both this object's and its associated cooling coil's capacity are provided by the user, this field not used. Typical value for this field depends on the application in which the coils are used. Here are some suggested values 1.23 for water loop applications, 0.89 for ground water applications, and 0.76 for ground loop applications (source: 2021 AHRI directory).
 ## Input Description ##
 
 The following inputs will be added to the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects (and variable speed versions of them):
@@ -178,10 +178,13 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \units C
         \type real
         \minimum> 0
-   N*,  \field Ratio of Reference Heating Capacity to Reference Cooling Capacity
+   N*,  \field Ratio of Reference Heating Capacity to Reference Cooling Capacity at Reference Conditions
         \note Ratio of reference heating capacity to reference cooling capacity. This
-        \note input is used to calculate the heating or cooling capacity when autosizing
-        \note one of them or both.
+        \note input is used to calculate the heating or cooling capacity when autosizing.
+        \note This input is only used if a companion cooling coil of the same type 
+        \note (Coil:Cooling:WaterToAirHeatPump:EquationFit) is used. This input is only
+        \note used when a sizing run for the system which uses this object is requested
+        \note and when the coil capacity is autosized.
         \type real
         \minimum> 0
         \default 1.0
@@ -244,7 +247,7 @@ Residential Buildings. ASHRAE, Atlanta, GA
 The changes below are described for the equation fit objects but similar changes will be made for the variable speed objects.
 
 ### Modification to Cooling Coil Peak Load Calculation and Heating Reference Capacity ###
-Calculations of a reference heating capacity based on peak heating conditions will be added to the cooling coil section of `SizeHVACWaterToAir`. A reference cooling capacity will be calculated based on that reference heating capacity using the new proposed input ("Ratio of Reference Heating Capacity to Reference Cooling Capacity") by dividing the reference heating capacity by the new input. The actual autosized reference cooling capacity will be the maximum of the latter and the reference cooling capacity calculated based on the peak cooling conditions.
+Calculations of a reference heating capacity based on peak heating conditions will be added to the cooling coil section of `SizeHVACWaterToAir`. A reference cooling capacity will be calculated based on that reference heating capacity using the new proposed input ("Ratio of Reference Heating Capacity to Reference Cooling Capacity at Reference Conditions") by dividing the reference heating capacity by the new input. The actual autosized reference cooling capacity will be the maximum of the latter and the reference cooling capacity calculated based on the peak cooling conditions.
 
 Heating capacity will not be just set to be the reference cooling capacity as it is currently done but to be the reference cooling capacity multiplied by the new input.
 
@@ -258,7 +261,7 @@ RefPowerCool = CapCoolTotalDesAtRefCdts / (RefCOPCool * RefPowerTempModFac)
 PowerCoolAtRefCdts = RefPowerCool * RefPowerTempModFac
 ```
 
-Similarly `RefCapHeatDes` (currently `RatedCapHeatDes`) and `RefPowerHeat` (currently `RatedPowerHeat`) will be calculated as follows. Where `HeatToCoolRefCapRatio` is the new "Ratio of Reference Heating Capacity to Reference Cooling Capacity" user input.
+Similarly `RefCapHeatDes` (currently `RatedCapHeatDes`) and `RefPowerHeat` (currently `RatedPowerHeat`) will be calculated as follows. Where `HeatToCoolRefCapRatio` is the new "Ratio of Reference Heating Capacity to Reference Cooling Capacity at Reference Conditions" user input.
 
 ```
 RefCapHeatDes = RefCapCoolTotalDes * HeatToCoolRefCapRatio

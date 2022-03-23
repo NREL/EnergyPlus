@@ -357,7 +357,7 @@ namespace OutputReportPredefined {
         s->pdchDXCoolCoilElecPowerD = newPreDefColumn(state, s->pdstDXCoolCoil2, "Rated Electric Power Test D [W]");
 
         // Water-to-Air HP report
-        s->pdstWAHP = newPreDefSubTable(state, s->pdrEquip, "Water-to-Air Heat Pumps");
+        s->pdstWAHP = newPreDefSubTable(state, s->pdrEquip, "Water-to-Air Heat Pumps Sizing Report");
         s->pdchWAHPType = newPreDefColumn(state, s->pdstWAHP, "Coil Type");
         s->pdchWAHPRefCap = newPreDefColumn(state, s->pdstWAHP, "Reference Total Capacity [W]");
         s->pdchWAHPRefSensCap = newPreDefColumn(state, s->pdstWAHP, "Reference Sensible Capacity [W]");
