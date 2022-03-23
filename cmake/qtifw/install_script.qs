@@ -148,8 +148,8 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
   var components = installer.components();
   console.log("There are " + components.length + " available components.");
   console.log("Components selection for installation:");
-  for (var i = 0; i < components.length; i++) {
-    var compName = components[i].name;
+  components.forEach(component => {
+    var compName = component.name;
     var installStatus = "Yes";
 
     // Get command line args passed
@@ -177,7 +177,7 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
       }
     }
     console.log("* " + compName + ": " + installStatus);
-  }
+  });
 
   // widget.deselectAll();
 

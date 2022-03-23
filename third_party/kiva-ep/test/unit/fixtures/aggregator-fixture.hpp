@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef AGGREGATOR_FIXTURE_HPP_
@@ -7,6 +7,7 @@
 #include "Aggregator.hpp"
 #include "Instance.hpp"
 #include "base-fixture.hpp"
+#include "foundation-fixture.hpp"
 
 using namespace Kiva;
 
@@ -22,7 +23,8 @@ public:
 
     bcs.localWindSpeed = 0;
     bcs.outdoorTemp = 283.15;
-    bcs.slabConvectiveTemp = bcs.wallConvectiveTemp = bcs.slabRadiantTemp = bcs.wallRadiantTemp = 310.15;
+    bcs.slabConvectiveTemp = bcs.wallConvectiveTemp = bcs.slabRadiantTemp = bcs.wallRadiantTemp =
+        310.15;
 
     for (auto &instance : instances) {
       Foundation::NumericalScheme tempNS = instance.ground->foundation.numericalScheme;
