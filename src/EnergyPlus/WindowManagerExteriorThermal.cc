@@ -406,7 +406,14 @@ namespace WindowManager {
         : m_Surface(surface), m_Window(state.dataSurface->SurfaceWindow(t_SurfNum)), m_ShadePosition(ShadePosition::NoShade), m_SurfNum(t_SurfNum),
           m_SolidLayerIndex(0), m_ConstructionNumber(t_ConstrNum), m_TotLay(getNumOfLayers(state)), m_InteriorBSDFShade(false), m_ExteriorShade(false)
     {
-        const auto ShadeFlag{getShadeType(state, t_ConstrNum)};
+        if (!state.dataConstruction->Construct(m_ConstructionNumber).WindowTypeBSDF &&
+            state.dataSurface->SurfWinShadingFlag.size() >= static_cast<size_t>(m_SurfNum)) {
+            if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
+                m_ConstructionNumber = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
+                m_TotLay = getNumOfLayers(state);
+            }
+        }
+        const auto ShadeFlag{getShadeType(state, m_ConstructionNumber)};
 
         if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
             m_ShadePosition = ShadePosition::Interior;
@@ -484,14 +491,15 @@ namespace WindowManager {
         auto ConstrNum = m_ConstructionNumber;
 
         // BSDF window do not have special shading flag
-        if (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) {
+        if (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF &&
+            state.dataSurface->SurfWinShadingFlag.size() >= static_cast<size_t>(m_SurfNum)) {
             if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
                 ConstrNum = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
             }
         }
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));
-        auto LayPtr = construction.LayerPoint(t_Index);
+        const auto LayPtr = construction.LayerPoint(t_Index);
         return &state.dataMaterial->Material(LayPtr);
     }
 
