@@ -4856,7 +4856,7 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_c
                 state.dataHeatBalSurf->SurfHGrdExt(surfNum) = state.dataHeatBalSurf->SurfHGrdExt(repSurfNum);
 
                 state.dataSurface->SurfTAirRef(surfNum) = state.dataSurface->SurfTAirRef(repSurfNum);
-                if (state.dataSurface->SurfTAirRef(surfNum) >= 0) {
+                if (state.dataSurface->SurfTAirRef(surfNum) != DataSurfaces::RefAirTemp::Invalid) {
                     state.dataSurface->SurfTAirRefRpt(surfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(surfNum)];
                 }
 
