@@ -2819,10 +2819,12 @@ namespace WaterToAirHeatPumpSimple {
             if (simpleWatertoAirHP.WatertoAirHPType == "HEATING") {
                 PlantUtilities::RegisterPlantCompDesignFlow(
                     state, simpleWatertoAirHP.WaterInletNodeNum, 0.5 * simpleWatertoAirHP.ReferenceWaterVolFlowRate);
-                PlantUtilities::RegisterPlantCompDesignFlow(
-                    state,
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterInletNodeNum,
-                    0.5 * simpleWatertoAirHP.ReferenceWaterVolFlowRate);
+                if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
+                    PlantUtilities::RegisterPlantCompDesignFlow(
+                        state,
+                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterInletNodeNum,
+                        0.5 * simpleWatertoAirHP.ReferenceWaterVolFlowRate);
+                }
             } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING") {
                 PlantUtilities::RegisterPlantCompDesignFlow(
                     state, simpleWatertoAirHP.WaterInletNodeNum, 0.5 * simpleWatertoAirHP.ReferenceWaterVolFlowRate);
