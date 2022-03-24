@@ -1,4 +1,4 @@
-Initial Ruleset Model Description Output File
+Initial Ruleset Model Description Report
 ================
 
 **Jason Glazer, GARD Analytics**
