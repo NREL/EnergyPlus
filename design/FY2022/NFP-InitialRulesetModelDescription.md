@@ -159,6 +159,14 @@ No changes
 
 None required.
 
+## Design Document ##
+
+Some challenges of this task that I would like feedback on:
+
+- what data structure would make the most sense for ultimately outputing a JSON file
+- how can we reduce the footprint of adding to the data structure since it will appear in many places in the code
+- are there any recommendations since we know we will be making many changes in the future since the 229 schema is still undergoing revisions
+
 ## References ##
 
 https://github.com/open229/ruleset-model-description-schema
