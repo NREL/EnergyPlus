@@ -101,24 +101,25 @@ have been approved by the SPC 229P committee including:
 Elements in the Zone data group related to HVAC are unlikely to be implemetned since 
 many other HVAC portions of the schema have not been approved by SPC 229P yet.
 
-For each RMD data group added an analysis of the values in the field need to be performed 
+For each RMD data group added an analysis of the values in the field need to be performed. 
+The following is an example for the Surface data group.
 
-| RMD Data Element             | Data Type                   | Input/Output | EnergyPlus Input Object      | EnergyPlus Field                   | Output Table     | Output Row/Column| Notes                                                                  |
-| ---------------------------- | ----------------------------| ------------ | ---------------------------- | ---------------------------------- | ---------------- | -----------------| ---------------------------------------------------------------------- |
-| id                           | ID                          | Input        | BuildingSurface:Detailed     | Name                               |                  |                  | Many other input objects could contain this (Wall:Exterior, Roof, etc… |
-| reporting\_name              | String                      | Input        | BuildingSurface:Detailed     | Name                               |                  |                  |                                                                        |
-| notes                        | String                      | Input        | Compliance:Surface           | Notes                              |                  |                  | New object and field                                                   |
-| subsurfaces                  | \[{Subsurface}\]            | Input        | FenestrationSurface:Detailed | Building Surface Name              |                  |                  | Many other input objects could contain this (Window, Door, GlazedDoor, etc.)
-| classification               | enumeration                 | Input        | BuildingSurface:Detailed     | Surface Type                       |                  |                  |
-| area                         | Numeric                     | Output       |                              |                                    | Envelope Summary | Gross Area       |                                                                        |
-| tilt                         | Numeric                     | Output       |                              |                                    | Envelope Summary | Tilt             |                                                                        |
-| azimuth                      | Numeric                     | Output       |                              |                                    | Envelope Summary | Azimuth          |                                                                        |
-| adjacent\_to                 | enumeration                 | Complicated  |                              |                                    |                  |                  | 
-| adjacent\_zone               | $ID                         | Input        | BuildingSurface:Detailed     | Outside Boundary Condition Object  |                  |                  |
-| does\_cast\_shade            | Boolean                     | Input        | ShadowCalculation            | Shading Zone Group 1 ZoneList Name |                  |                  |
-| construction                 | {Construction}              | Input        | BuildingSurface:Detailed     | Construction Name                  |                  |                  |
-| surface\_optical\_properties | {SurfaceOpticalProperties}  | Input        | Construction                 | Outside Layer                      |                  |                  |
-| status\_type                 | enumeration                 | Input        | Compliance:Surface           | Status Type                        |                  |                  | New object and field                                                                       |
+| RMD Data Element             | Data Type                   | EnergyPlus Input Object      | EnergyPlus Field                   | Output Table     | Output Row/Column| Notes                                                                  |
+| ---------------------------- | ----------------------------| ---------------------------- | ---------------------------------- | ---------------- | -----------------| ---------------------------------------------------------------------- |
+| id                           | ID                          | BuildingSurface:Detailed     | Name                               |                  |                  | Many other input objects could contain this (Wall:Exterior, Roof, etc… |
+| reporting\_name              | String                      | BuildingSurface:Detailed     | Name                               |                  |                  |                                                                        |
+| notes                        | String                      | Compliance:Surface           | Notes                              |                  |                  | New object and field                                                   |
+| subsurfaces                  | \[{Subsurface}\]            | FenestrationSurface:Detailed | Building Surface Name              |                  |                  | Many other input objects could contain this (Window, Door, GlazedDoor, etc.) |
+| classification               | enumeration                 | BuildingSurface:Detailed     | Surface Type                       |                  |                  |                                                                        |
+| area                         | Numeric                     |                              |                                    | Envelope Summary | Gross Area       |                                                                        |
+| tilt                         | Numeric                     |                              |                                    | Envelope Summary | Tilt             |                                                                        |
+| azimuth                      | Numeric                     |                              |                                    | Envelope Summary | Azimuth          |                                                                        |
+| adjacent\_to                 | enumeration                 |                              |                                    |                  |                  |This would be complicated to implement                                  |
+| adjacent\_zone               | $ID                         | BuildingSurface:Detailed     | Outside Boundary Condition Object  |                  |                  |                                                                        |
+| does\_cast\_shade            | Boolean                     | ShadowCalculation            | Shading Zone Group 1 ZoneList Name |                  |                  |                                                                        |
+| construction                 | {Construction}              | BuildingSurface:Detailed     | Construction Name                  |                  |                  |                                                                        |
+| surface\_optical\_properties | {SurfaceOpticalProperties}  | Construction                 | Outside Layer                      |                  |                  |                                                                        |
+| status\_type                 | enumeration                 | Compliance:Surface           | Status Type                        |                  |                  | New object and field                                                   |
 
 ## Testing/Validation/Data Sources ##
 
