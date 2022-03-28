@@ -10147,10 +10147,10 @@ SUBROUTINE CalcHeatMassTransCoeffs (VEGHTCM,WND,AVGWND,TDB,TG,DH,DW)
 !*** SPEED IS ZERO, USE DAILY AVERAGE WIND)
      IF (WND.EQ.0.) THEN
        WND2=AVGWND*(LOG(200.d0-ZEROD)/ZOM)/(LOG(1000.d0-ZEROD)/ZOM)
-       WRITE (DebugOutFile,*) ' AVGWND=', AVGWND,' ZOM=', ZOM
+       ! WRITE (DebugOutFile,*) ' AVGWND=', AVGWND,' ZOM=', ZOM
      ELSE
        WND2=WND*(LOG(200.d0-ZEROD)/ZOM)/(LOG(1000.d0-ZEROD)/ZOM)
-       WRITE (DebugOutFile,*) ' WND=', WND,' ZOM=', ZOM
+       ! WRITE (DebugOutFile,*) ' WND=', WND,' ZOM=', ZOM
      END IF
 
 !*** COMPUTE THE NEUTRAL STABILITY MOMENTUM TRANSFER COEFFICIENT
@@ -10176,12 +10176,12 @@ SUBROUTINE CalcHeatMassTransCoeffs (VEGHTCM,WND,AVGWND,TDB,TG,DH,DW)
      IF (TDB.LE.TG) THEN
        DH=DM
        DW=DM
-       WRITE (DebugOutFile,*) ' DH=', DH,' DW=', DW, 'DM=', DM
+       WRITE (DebugOutFile,*) 'CalcHeatMassTransCoeffs: DH=', DH,' DW=', DW, 'DM=', DM
      ELSE
        DH=DM*(1.d0-14.d0*(TG-TDB)/WND2/WND2)**(monethird)
        DW=DH
-       WRITE (DebugOutFile,*) ' DH=', DH,' DW=', DW, 'DM=', DM
-       WRITE (DebugOutFile,*) ' TG=', TG,' TDB=', TDB, 'WND2=', WND2, 'monethird', monethird
+       WRITE (DebugOutFile,*) 'CalcHeatMassTransCoeffs: DH=', DH,' DW=', DW, 'DM=', DM
+       WRITE (DebugOutFile,*) 'CalcHeatMassTransCoeffs: TG=', TG,' TDB=', TDB, 'WND2=', WND2, 'monethird', monethird
      END IF
      RETURN
 END SUBROUTINE CalcHeatMassTransCoeffs
@@ -10436,6 +10436,9 @@ SUBROUTINE TRIDI1D (A,B,C,X,R,N)
      X(1)=R(1)
      DO COUNT1=2,N
        X(COUNT1)=R(COUNT1)-A(COUNT1)*X(COUNT1-1)
+       IF (isnan(X(COUNT1))) THEN
+         WRITE (DebugOutFile,*) ' TRIDI1D: X(COUNT1)=', COUNT1,' X(Count1)=', X(COUNT1), ' R(COUNT1)=', R(COUNT1), ' A(COUNT1)=', A(COUNT1)
+       ENDIF
      END DO
 END SUBROUTINE TRIDI1D
 
@@ -13278,6 +13281,7 @@ IMPLICIT NONE
        TG(COUNT1)=Tm-As*EXP(-0.4464*ZFACEUsed(COUNT1))*         &
          & COSD(.5236*(-1.-.8525*ZFACEUsed(COUNT1)))
        IF (COUNT1.EQ.20) TG(COUNT1)=Tm
+       WRITE (DebugOutFile,*) ' InitializeTG: COUNT1=', COUNT1,' TG(Count1)=', TG(COUNT1), ' ZFACEUsed(COUNT1)=', ZFACEUsed(COUNT1), ' Tm=', Tm, ' As=', As
      END DO
 !     CLOSE(TempInit)
      RETURN
