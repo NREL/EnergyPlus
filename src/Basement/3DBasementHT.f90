@@ -10147,8 +10147,10 @@ SUBROUTINE CalcHeatMassTransCoeffs (VEGHTCM,WND,AVGWND,TDB,TG,DH,DW)
 !*** SPEED IS ZERO, USE DAILY AVERAGE WIND)
      IF (WND.EQ.0.) THEN
        WND2=AVGWND*(LOG(200.d0-ZEROD)/ZOM)/(LOG(1000.d0-ZEROD)/ZOM)
+       WRITE (DebugOutFile,*) ' AVGWND=', AVGWND,' ZOM=', ZOM
      ELSE
        WND2=WND*(LOG(200.d0-ZEROD)/ZOM)/(LOG(1000.d0-ZEROD)/ZOM)
+       WRITE (DebugOutFile,*) ' WND=', WND,' ZOM=', ZOM
      END IF
 
 !*** COMPUTE THE NEUTRAL STABILITY MOMENTUM TRANSFER COEFFICIENT
@@ -10174,9 +10176,12 @@ SUBROUTINE CalcHeatMassTransCoeffs (VEGHTCM,WND,AVGWND,TDB,TG,DH,DW)
      IF (TDB.LE.TG) THEN
        DH=DM
        DW=DM
+       WRITE (DebugOutFile,*) ' DH=', DH,' DW=', DW, 'DM=', DM
      ELSE
        DH=DM*(1.d0-14.d0*(TG-TDB)/WND2/WND2)**(monethird)
        DW=DH
+       WRITE (DebugOutFile,*) ' DH=', DH,' DW=', DW, 'DM=', DM
+       WRITE (DebugOutFile,*) ' TG=', TG,' TDB=', TDB, 'WND2=', WND2, 'monethird', monethird
      END IF
      RETURN
 END SUBROUTINE CalcHeatMassTransCoeffs
