@@ -9932,6 +9932,7 @@ SUBROUTINE CalcTearth(IEXT,JEXT,DZ,DZP,TG,CVG)
              IF (CVG) THEN
                WRITE (GroundTemp,*) RSKY, RHOA*CPA*DH, RHOA*CPA*DW, DODPG
                WRITE (GroundTemp,*) (TG(COUNT1), COUNT1=0,NZBG)
+               WRITE (DebugOutFile,*) 'RHOA=',RHOA,' CPA=', CPA,' DH=', DH,' DW=', DW
              END IF
 !*** COMPUTE THE SUM OF HOURLY GROUND TEMPERATURES FOR ONE DAY
              DO COUNT1=0,NZBG
