@@ -1202,7 +1202,9 @@ This is the demand placed on the cooling fluid plant loop connection serving the
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design}\label{zonehvaclowtemperatureradiantvariableflowdesign}
 
-This object contains the design fields for ZoneHVAC:LowTemperatureRadiant:VariableFlow. The information from one ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design object can be shared with several ZoneHVAC:LowTemperatureRadiant:VariableFlow objects.
+This object contains the design fields for \hyperref[ZoneHVAC:LowTemperatureRadiant:VariableFlow]{zonehvaclowtemperatureradiantvariableflow}. The information from one ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design object can be shared with several ZoneHVAC:LowTemperatureRadiant:VariableFlow objects.
+
+\subsubsection{Inputs}
 
 \paragraph{Field: Name}\label{hydrDesignObj}
 
@@ -1235,7 +1237,7 @@ This field is the thermal conductivity of the pipe/tube that is used in this rad
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
 
-This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperture. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperature. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
 
 \begin{itemize}
 	\item
@@ -1243,7 +1245,7 @@ This field specifies along with setpoint (control) and water schedules how the u
 	\item
 	MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 	\item
-	OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.
+	OperativeTemperature - The operative temperature of the zone being controlled by the radiant system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.
 	\item
 	OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 	\item
@@ -1261,8 +1263,7 @@ This field specifies along with setpoint (control) and water schedules how the u
 	should consult the input for Field: Temperature Calculation Requested
 	After Layer Number for more information.  Note that for the
 	SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being
-	used for control is the surface listed above in the field for Surface
-	Name.  If the user enters a group of surfaces for that input, the
+	used for control is the surface listed in \hyperref[field-surface-name-or-radiant-surface-group-name]{Field: Surface Name or Radiant Surface Group Name}.  If the user enters a group of surfaces for that input, the
 	\emph{first} surface in the radiant group is the surface for control
 	purposes.
 \end{itemize}
@@ -1638,7 +1639,9 @@ This field reports the average of the outdoor dry-bulb temperature for the previ
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design}\label{ConstFlowDesign}
 
-This object contains the design fields for ZoneHVAC:LowTemperatureRadiant:ConstantFlow. The information from one ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design object can be shared with several ZoneHVAC:LowTemperatureRadiant:ConstantFlow objects.
+This object contains the design fields for \hyperref[ZoneHVAC:LowTemperatureRadiant:ConstantFlow]{zonehvaclowtemperatureradiantconstantflow}. The information from one ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design object can be shared with several ZoneHVAC:LowTemperatureRadiant:ConstantFlow objects.
+
+\subsubsection{Inputs}
 
 \paragraph{Field: Name}\label{ConstFlowDesignName}
 
@@ -1657,7 +1660,7 @@ This field is provides the opportunity to control how the heat transfer between 
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
 
-This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of eight different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, the radiant surface interior temperture, or the running mean outdoor dry-bulb temperature. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of eight different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, the radiant surface interior temperature, or the running mean outdoor dry-bulb temperature. The choice of temperature is controlled by the current field---temperature control type. The user must select from the following options:
 
 \begin{itemize}
 	\item
@@ -1665,7 +1668,7 @@ This field specifies along with setpoint (control) and water schedules how the u
 	\item
 	MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 	\item
-	OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.
+	OperativeTemperature - The operative temperature of the zone being controlled by the radiant system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.
 	\item
 	OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 	\item
@@ -1673,7 +1676,7 @@ This field specifies along with setpoint (control) and water schedules how the u
 	\item
 	SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
 	\item
-	SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+	SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed in \hyperref[field-surface-name-or-radiant-surface-group-name-1]{Field: Surface Name or Radiant Surface Group Name}.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
 	\item
 	RunningMeanOutdoorDryBulbTemperature - This option will allow the user to control the inlet water temperature to the system as a function of the running mean outdoor air temperature.  The next field (\hyperref[field-running-mean-outdoor-dry-bulb-temperature-weighting-factor]{Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}) will define how this temperature is actually calculated within EnergyPlus.
 \end{itemize}
@@ -1802,7 +1805,7 @@ Enter the heating capacity as a fraction of the autosized heating capacity of lo
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-2}
 
-This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperture. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperature. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
 
 \begin{itemize}
 \item
@@ -1810,7 +1813,7 @@ This field specifies along with setpoint (control) and water schedules how the u
 \item
   MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 \item
-  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
+  OperativeTemperature - The operative temperature of the zone being controlled by the radiant system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
 \item
   OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 \item
@@ -1828,8 +1831,7 @@ This field specifies along with setpoint (control) and water schedules how the u
       should consult the input for Field: Temperature Calculation Requested
       After Layer Number for more information.  Note that for the
       SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being
-      used for control is the surface listed above in the field for Surface
-      Name.  If the user enters a group of surfaces for that input, the
+      used for control is the surface listed in \hyperref[field-surface-name-or-radiant-surface-group-name-2]{Field: Surface Name or Radiant Surface Group Name}.  If the user enters a group of surfaces for that input, the
       \emph{first} surface in the radiant group is the surface for control
       purposes.
 \end{itemize}
