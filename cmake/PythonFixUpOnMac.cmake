@@ -46,7 +46,9 @@ execute_process(COMMAND "chmod" "+w" "${LOCAL_PYTHON_LIBRARY}")
 execute_process(COMMAND "install_name_tool" -id "@executable_path/${PYTHON_LIB_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
 
 # for the energyplus executable, just find the python dynamic library right next to it for sure
-get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
+get_filename_component(exepath ${EXECUTABLE_PATH} DIRECTORY)
+#  <exepath> is the path to the top level executable used for @executable_path replacement on the Mac. We must pass it to silence a warning
+get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 ${exepath} "")
 foreach(PREREQ IN LISTS PREREQUISITES)
   string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
   if(NOT PYTHON_IN_PREREQ EQUAL -1)
