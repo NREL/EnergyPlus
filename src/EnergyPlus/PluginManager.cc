@@ -516,8 +516,9 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
                         state,
                         "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping.");
                 } else {
-                    if (FileSystem::pathExists(epinPathObject)) {
-                        fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinPathObject);
+                    auto epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
+                    if (FileSystem::pathExists(epinRootDir)) {
+                        fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinRootDir);
                         PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
                     } else {
                         EnergyPlus::ShowWarningMessage(state,
@@ -539,6 +540,21 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             } catch (nlohmann::json::out_of_range &e) {
                 // catch when no paths are passed
                 // nothing to do here
+            }
+        }
+    } else {
+        // if no search path objects exist, we still need to do the default searching
+        PluginManager::addToPythonPath(state, ".", false);
+        fs::path sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPath);
+        PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
+        std::string epin_path;
+        get_environment_variable("epin", epin_path);
+        fs::path epinPathObject = fs::path(epin_path);
+        if (!epinPathObject.empty()) {
+            auto epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
+            if (FileSystem::pathExists(epinRootDir)) {
+                fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinRootDir);
+                PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
             }
         }
     }
