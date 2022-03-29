@@ -26,6 +26,7 @@
 #pragma clang diagnostic push
 #if __clang_major__ >= 13
 #pragma clang diagnostic ignored "-Wdeprecated-copy"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic push
