@@ -180,7 +180,6 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
     bool GetInputOnceFlag = true;
     bool getAirLoopMixerInputOnceFlag = true;
     bool getAirLoopSplitterInputOnceFlag = true;
-    int numAirLoopDOAS = 0;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
     std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
     std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;

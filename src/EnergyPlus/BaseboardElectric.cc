@@ -115,11 +115,12 @@ namespace BaseboardElectric {
             CompIndex = BaseboardNum;
         } else {
             BaseboardNum = CompIndex;
-            if (BaseboardNum > baseboard->NumBaseboards || BaseboardNum < 1) {
+            int numBaseboards = (int)baseboard->Baseboard.size();
+            if (BaseboardNum > numBaseboards || BaseboardNum < 1) {
                 ShowFatalError(state,
                                format("SimElectricBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       BaseboardNum,
-                                      baseboard->NumBaseboards,
+                                      numBaseboards,
                                       EquipName));
             }
             if (baseboard->Baseboard(BaseboardNum).CheckEquipName) {
@@ -197,10 +198,7 @@ namespace BaseboardElectric {
 
         NumConvElecBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        // Calculate total number of baseboard units
-        baseboard->NumBaseboards = NumConvElecBaseboards;
-
-        baseboard->Baseboard.allocate(baseboard->NumBaseboards);
+        baseboard->Baseboard.allocate(NumConvElecBaseboards);
 
         if (NumConvElecBaseboards > 0) { // Get the data for cooling schemes
             BaseboardNum = 0;
@@ -350,7 +348,7 @@ namespace BaseboardElectric {
             }
         }
 
-        for (BaseboardNum = 1; BaseboardNum <= baseboard->NumBaseboards; ++BaseboardNum) {
+        for (BaseboardNum = 1; BaseboardNum <= NumConvElecBaseboards; ++BaseboardNum) {
 
             // Setup Report variables for the Electric Baseboards
             // CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Electric'
@@ -412,30 +410,15 @@ namespace BaseboardElectric {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        using DataZoneEquipment::CheckZoneEquipmentList;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNode;
-        int Loop;
-
         auto &baseboard = state.dataBaseboardElectric;
 
-        // Do the one time initializations
-        if (baseboard->MyOneTimeFlag) {
-            // initialize the environment and sizing flags
-            state.dataBaseboardElectric->MyEnvrnFlag.allocate(baseboard->NumBaseboards);
-            state.dataBaseboardElectric->MyEnvrnFlag = true;
-
-            baseboard->MyOneTimeFlag = false;
-        }
-
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!baseboard->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            baseboard->ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= baseboard->NumBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(state, baseboard->Baseboard(Loop).EquipType, baseboard->Baseboard(Loop).EquipName)) continue;
+        if (!baseboard->Baseboard(BaseboardNum).ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            baseboard->Baseboard(BaseboardNum).ZoneEquipmentListChecked = true;
+            if (!DataZoneEquipment::CheckZoneEquipmentList(state, baseboard->Baseboard(BaseboardNum).EquipType, baseboard->Baseboard(BaseboardNum).EquipName)) {
                 ShowSevereError(state,
-                                "InitBaseboard: Unit=[" + baseboard->Baseboard(Loop).EquipType + ',' + baseboard->Baseboard(Loop).EquipName +
+                                "InitBaseboard: Unit=[" + baseboard->Baseboard(BaseboardNum).EquipType + ',' +
+                                    baseboard->Baseboard(BaseboardNum).EquipName +
                                     "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
@@ -453,7 +436,7 @@ namespace BaseboardElectric {
         baseboard->Baseboard(BaseboardNum).ElecUseRate = 0.0;
 
         // Do the every time step initializations
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         baseboard->Baseboard(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
         baseboard->Baseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
     }

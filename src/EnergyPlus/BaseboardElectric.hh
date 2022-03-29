@@ -86,6 +86,7 @@ namespace BaseboardElectric {
         bool MySizeFlag = true;
         bool CheckEquipName = true;
         Array1D_string FieldNames;
+        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     };
 
     void SimElectricBaseboard(
@@ -103,12 +104,8 @@ namespace BaseboardElectric {
 
 struct BaseboardElectricData : BaseGlobalStruct
 {
-    int NumBaseboards = 0;
     bool getInputFlag = true;
     EPVector<BaseboardElectric::BaseboardParams> Baseboard;
-    bool MyOneTimeFlag = true;
-    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
-    Array1D_bool MyEnvrnFlag;
 
     void clear_state() override
     {
