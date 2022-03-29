@@ -201,7 +201,6 @@ namespace BaseboardElectric {
         baseboard->NumBaseboards = NumConvElecBaseboards;
 
         baseboard->Baseboard.allocate(baseboard->NumBaseboards);
-        baseboard->BaseboardNumericFields.allocate(baseboard->NumBaseboards);
 
         if (NumConvElecBaseboards > 0) { // Get the data for cooling schemes
             BaseboardNum = 0;
@@ -220,9 +219,9 @@ namespace BaseboardElectric {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames.allocate(NumNums);
-                baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames = "";
-                baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+                baseboard->Baseboard(ConvElecBBNum).FieldNames.allocate(NumNums);
+                baseboard->Baseboard(ConvElecBBNum).FieldNames = "";
+                baseboard->Baseboard(ConvElecBBNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
@@ -512,7 +511,7 @@ namespace BaseboardElectric {
             SizingMethod = HeatingCapacitySizing;
             FieldNum = 1;
             PrintFlag = true;
-            SizingString = baseboard->BaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
+            SizingString = baseboard->Baseboard(BaseboardNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = baseboard->Baseboard(BaseboardNum).HeatingCapMethod;
             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
