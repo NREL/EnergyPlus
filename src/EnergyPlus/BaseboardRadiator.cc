@@ -145,11 +145,12 @@ namespace BaseboardRadiator {
             CompIndex = BaseboardNum;
         } else {
             BaseboardNum = CompIndex;
-            if (BaseboardNum > baseboard->NumBaseboards || BaseboardNum < 1) {
+            int numBaseboards = (int)baseboard->Baseboard.size();
+            if (BaseboardNum > numBaseboards || BaseboardNum < 1) {
                 ShowFatalError(state,
                                format("SimBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       BaseboardNum,
-                                      baseboard->NumBaseboards,
+                                      numBaseboards,
                                       EquipName));
             }
             if (baseboard->Baseboard(BaseboardNum).CheckEquipName) {
@@ -273,10 +274,8 @@ namespace BaseboardRadiator {
         NumConvHWBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // Calculate total number of baseboard units
-        baseboard->NumBaseboards = NumConvHWBaseboards;
 
-        baseboard->Baseboard.allocate(baseboard->NumBaseboards);
-        baseboard->BaseboardParamsNumericFields.allocate(baseboard->NumBaseboards);
+        baseboard->Baseboard.allocate(NumConvHWBaseboards);
 
         if (NumConvHWBaseboards > 0) { // Get the data for cooling schemes
             BaseboardNum = 0;
@@ -295,9 +294,9 @@ namespace BaseboardRadiator {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                baseboard->BaseboardParamsNumericFields(ConvHWBaseboardNum).FieldNames.allocate(NumNums);
-                baseboard->BaseboardParamsNumericFields(ConvHWBaseboardNum).FieldNames = "";
-                baseboard->BaseboardParamsNumericFields(ConvHWBaseboardNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+                baseboard->Baseboard(ConvHWBaseboardNum).FieldNames.allocate(NumNums);
+                baseboard->Baseboard(ConvHWBaseboardNum).FieldNames = "";
+                baseboard->Baseboard(ConvHWBaseboardNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
@@ -453,7 +452,7 @@ namespace BaseboardRadiator {
             }
         }
 
-        for (BaseboardNum = 1; BaseboardNum <= baseboard->NumBaseboards; ++BaseboardNum) {
+        for (BaseboardNum = 1; BaseboardNum <= NumConvHWBaseboards; ++BaseboardNum) {
 
             // Setup Report variables for the unit
             // CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Water'
@@ -564,7 +563,6 @@ namespace BaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int ZoneNode;
-        int Loop;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
@@ -592,14 +590,13 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).SetLoopIndexFlag = false;
         }
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!baseboard->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            baseboard->ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= baseboard->NumBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, baseboard->Baseboard(Loop).EquipID)) continue;
-                ShowSevereError(state,
-                                "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + baseboard->Baseboard(Loop).EquipID +
-                                    "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
-            }
+        if (!baseboard->Baseboard(BaseboardNum).ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            baseboard->Baseboard(BaseboardNum).ZoneEquipmentListChecked = true;
+                if (!CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, baseboard->Baseboard(BaseboardNum).EquipID)) {
+                    ShowSevereError(state,
+                                    "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + baseboard->Baseboard(BaseboardNum).EquipID +
+                                        "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                }
         }
 
         if (!state.dataGlobal->SysSizingCalc && baseboard->Baseboard(BaseboardNum).MySizeFlag &&
@@ -747,7 +744,7 @@ namespace BaseboardRadiator {
                     SizingMethod = HeatingCapacitySizing;
                     FieldNum = 1;
                     PrintFlag = false;
-                    SizingString = baseboard->BaseboardParamsNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
+                    SizingString = baseboard->Baseboard(BaseboardNum).FieldNames(FieldNum) + " [W]";
                     CapSizingMethod = baseboard->Baseboard(BaseboardNum).HeatingCapMethod;
                     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
@@ -874,7 +871,7 @@ namespace BaseboardRadiator {
                     SizingMethod = HeatingCapacitySizing;
                     FieldNum = 1;
                     PrintFlag = false;
-                    SizingString = baseboard->BaseboardParamsNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
+                    SizingString = baseboard->Baseboard(BaseboardNum).FieldNames(FieldNum) + " [W]";
                     CapSizingMethod = baseboard->Baseboard(BaseboardNum).HeatingCapMethod;
                     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
@@ -1155,11 +1152,6 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).WaterOutletEnthalpy =
                 baseboard->Baseboard(BaseboardNum).WaterInletEnthalpy - LoadMet / WaterMassFlowRate;
         } else {
-            CapacitanceWater = 0.0;
-            CapacitanceMax = CapacitanceAir;
-            CapacitanceMin = 0.0;
-            NTU = 0.0;
-            Effectiveness = 0.0;
             AirOutletTemp = AirInletTemp;
             WaterOutletTemp = WaterInletTemp;
             LoadMet = 0.0;
