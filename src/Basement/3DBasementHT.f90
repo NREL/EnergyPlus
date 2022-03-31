@@ -9768,23 +9768,14 @@ SUBROUTINE CalcTearth(IEXT,JEXT,DZ,DZP,TG,CVG)
 
      DO COUNT1=1,NZBG-1
        CONST(COUNT1,1)=TCOND*3600.d0/SoilDens/CG/DZ(COUNT1)/DZP(COUNT1-1)
-       IF (isnan(CONST(COUNT1,1))) THEN
-         WRITE (DebugOutFile,*) ' CalcTearth: COUNT1=', COUNT1,' CONST(COUNT1,1)=', CONST(COUNT1,1), ' TCOND=', TCOND, ' SoilDens=', SoilDens, ' CG=', CG, ' DZ(COUNT1)=', DZ(COUNT1), ' DZP(COUNT1-1)=', DZP(COUNT1-1)
-       ENDIF
      END DO
 !*** CONSTANTS IN POSITIVE CELL DIRECTION
      DO COUNT1=0,NZBG-2
        CONST(COUNT1,2)=TCOND*3600.d0/SoilDens/CG/DZ(COUNT1)/DZP(COUNT1)
-       IF (isnan(CONST(COUNT1,2))) THEN
-         WRITE (DebugOutFile,*) ' CalcTearth: COUNT1=', COUNT1,' CONST(COUNT1,2)=', CONST(COUNT1,2), ' TCOND=', TCOND, ' SoilDens=', SoilDens, ' CG=', CG, ' DZ(COUNT1)=', DZ(COUNT1), ' DZP(COUNT1)=', DZP(COUNT1)
-       ENDIF
      END DO
 
 !*** CONSTANT IN POSITIVE CELL DIRECTION FOR DEEP GROUND CONDITION
      CONST(NZBG-1,2)=TCOND*7200.d0/SoilDens/CG/DZ(NZBG-1)/DZ(NZBG-1)
-       IF (isnan(CONST(COUNT1,2))) THEN
-         WRITE (DebugOutFile,*) ' CalcTearth: NZBG-1=', (NZBG-1),' CONST(NZBG-1,2)=', CONST(NZBG-1,2), ' TCOND=', TCOND, ' SoilDens=', SoilDens, ' CG=', CG, ' DZ(NZBG-1)=', DZ(NZBG-1)
-       ENDIF
 !*** FOR FIXED TEMPERATURE LOWER BOUNDARY CONDITION, SET
 !*** BOUNDARY VALUE
      IF (.not. SameString(FIXBC,'FALSE')) TDEEP=TG(NZBG)
@@ -9941,7 +9932,6 @@ SUBROUTINE CalcTearth(IEXT,JEXT,DZ,DZP,TG,CVG)
              IF (CVG) THEN
                WRITE (GroundTemp,*) RSKY, RHOA*CPA*DH, RHOA*CPA*DW, DODPG
                WRITE (GroundTemp,*) (TG(COUNT1), COUNT1=0,NZBG)
-               WRITE (DebugOutFile,*) 'RHOA=',RHOA,' CPA=', CPA,' DH=', DH,' DW=', DW
              END IF
 !*** COMPUTE THE SUM OF HOURLY GROUND TEMPERATURES FOR ONE DAY
              DO COUNT1=0,NZBG
@@ -10156,10 +10146,8 @@ SUBROUTINE CalcHeatMassTransCoeffs (VEGHTCM,WND,AVGWND,TDB,TG,DH,DW)
 !*** SPEED IS ZERO, USE DAILY AVERAGE WIND)
      IF (WND.EQ.0.) THEN
        WND2=AVGWND*(LOG(200.d0-ZEROD)/ZOM)/(LOG(1000.d0-ZEROD)/ZOM)
-       ! WRITE (DebugOutFile,*) ' AVGWND=', AVGWND,' ZOM=', ZOM
      ELSE
        WND2=WND*(LOG(200.d0-ZEROD)/ZOM)/(LOG(1000.d0-ZEROD)/ZOM)
-       ! WRITE (DebugOutFile,*) ' WND=', WND,' ZOM=', ZOM
      END IF
 
 !*** COMPUTE THE NEUTRAL STABILITY MOMENTUM TRANSFER COEFFICIENT
@@ -10185,12 +10173,9 @@ SUBROUTINE CalcHeatMassTransCoeffs (VEGHTCM,WND,AVGWND,TDB,TG,DH,DW)
      IF (TDB.LE.TG) THEN
        DH=DM
        DW=DM
-       WRITE (DebugOutFile,*) 'CalcHeatMassTransCoeffs: DH=', DH,' DW=', DW, 'DM=', DM
      ELSE
        DH=DM*(1.d0-14.d0*(TG-TDB)/WND2/WND2)**(monethird)
        DW=DH
-       WRITE (DebugOutFile,*) 'CalcHeatMassTransCoeffs: DH=', DH,' DW=', DW, 'DM=', DM
-       WRITE (DebugOutFile,*) 'CalcHeatMassTransCoeffs: TG=', TG,' TDB=', TDB, 'WND2=', WND2, 'monethird', monethird
      END IF
      RETURN
 END SUBROUTINE CalcHeatMassTransCoeffs
@@ -13287,7 +13272,6 @@ IMPLICIT NONE
        TG(COUNT1)=Tm-As*EXP(-0.4464*ZFACEUsed(COUNT1))*         &
          & COSD(.5236*(-1.-.8525*ZFACEUsed(COUNT1)))
        IF (COUNT1.EQ.20) TG(COUNT1)=Tm
-       WRITE (DebugOutFile,*) ' InitializeTG: COUNT1=', COUNT1,' TG(Count1)=', TG(COUNT1), ' ZFACEUsed(COUNT1)=', ZFACEUsed(COUNT1), ' Tm=', Tm, ' As=', As
      END DO
 !     CLOSE(TempInit)
      RETURN
