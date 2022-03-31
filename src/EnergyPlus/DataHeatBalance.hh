@@ -263,6 +263,7 @@ namespace DataHeatBalance {
     {
         Invalid = -1,
         People,
+        Pets,
         Lights,
         ElectricEquipment,
         GasEquipment,
@@ -870,6 +871,43 @@ namespace DataHeatBalance {
               SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0),
               LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0), TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0),
               TimeNotMetCEN15251CatII(0.0), TimeNotMetCEN15251CatIII(0.0)
+        {
+        }
+    };
+
+    struct PetsData
+    {
+        // Members
+        std::string Name;         // Pets object name
+        int ZonePtr;              // Zone index for this pets statement
+        int spaceIndex;           // Space index for this pets statement
+        Real64 NumberOfPets;    // Maximum number of pets for this statement
+        bool EMSPetsOn;         // EMS actuating number of people if .TRUE.
+        Real64 EMSNumberOfPets; // Value EMS is directing to use for override
+        // Note that the schedule and maximum number was kept for people since it seemed likely that
+        // users would want to assign the same schedule to multiple people statements.
+        int ActivityLevelPtr; // Pointer to schedule for activity level
+        Real64 CO2RateFactor; // Carbon Dioxide Generation Rate [m3/s-W]
+        // Report variables
+        Real64 TemperatureInZone;      // Temperature in zone (C)
+        Real64 RelativeHumidityInZone; // Relative humidity in zone
+        Real64 RadGainRate;            // Radiant heat gain [W]
+        Real64 ConGainRate;            // Convective heat gain [W]
+        Real64 SenGainRate;            // Sensible heat gain [W]
+        Real64 LatGainRate;            // Latent heat gain [W]
+        Real64 TotGainRate;            // Total heat gain [W]
+        Real64 CO2GainRate;            // Carbon Dioxide Gain Rate [m3/s]
+        Real64 RadGainEnergy;          // Radiant heat gain [J]
+        Real64 ConGainEnergy;          // Convective heat gain [J]
+        Real64 SenGainEnergy;          // Sensible heat gain [J]
+        Real64 LatGainEnergy;          // Latent heat gain [J]
+        Real64 TotGainEnergy;          // Total heat gain [J]
+
+        // Default Constructor
+        PetsData()
+            : ZonePtr(0), spaceIndex(0), NumberOfPets(0.0), EMSPetsOn(false), EMSNumberOfPets(0.0), ActivityLevelPtr(-1), CO2RateFactor(0.0),
+              TemperatureInZone(0.0), RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0), SenGainRate(0.0), LatGainRate(0.0),
+              TotGainRate(0.0), CO2GainRate(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0), LatGainEnergy(0.0), TotGainEnergy(0.0)
         {
         }
     };
@@ -2258,6 +2296,7 @@ struct HeatBalanceData : BaseGlobalStruct
     int NumOfZoneLists = 0;             // Total number of zone lists
     int NumOfZoneGroups = 0;            // Total number of zone groups
     int NumPeopleStatements = 0;        // Number of People objects in input - possibly global assignments
+    int NumPetsStatements = 0;          // Number of Pets objects in input - possibly global assignment
     int NumLightsStatements = 0;        // Number of Lights objects in input - possibly global assignments
     int NumZoneElectricStatements = 0;  // Number of ZoneElectric objects in input - possibly global assignments
     int NumZoneGasStatements = 0;       // Number of ZoneGas objects in input - possibly global assignments
@@ -2269,6 +2308,7 @@ struct HeatBalanceData : BaseGlobalStruct
     int NumZoneITEqStatements = 0;      // number of Other Equipment objects in input. - possibly global assignments
     int NumZoneBBHeatStatements = 0;    // number of ZoneBaseboard heat objects in input. - possibly global assignments
     int TotPeople = 0;                  // Total People instances after expansion to spaces
+    int TotPets = 0;                    // Total Number of Pets instances after expansion to spaces
     int TotLights = 0;                  // Total Lights instances after expansion to spaces
     int TotElecEquip = 0;               // Total Electric Equipment instances after expansion to spaces
     int TotGasEquip = 0;                // Total Gas Equipment instances after expansion to spaces
@@ -2479,6 +2519,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::ZoneListData> ZoneList;
     EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
     EPVector<DataHeatBalance::PeopleData> People;
+    EPVector<DataHeatBalance::PetsData> Pets;
     EPVector<DataHeatBalance::LightsData> Lights;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneElectric;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneGas;
@@ -2509,6 +2550,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> PetsObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;

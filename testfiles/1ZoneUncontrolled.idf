@@ -255,6 +255,19 @@
     autocalculate,           !- Ceiling Height {m}
     autocalculate;           !- Volume {m3}
 
+  Schedule:Compact,
+    Hyper Doggo,             !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,131.80;     !- Field 3
+
+  Pets,
+    Hawk the Dog,            !- Name
+    ZONE ONE,                !- Zone Name
+    1,                       !- Number of Pets
+    Hyper Doggo;             !- Activity Level Schedule Name
+
   ScheduleTypeLimits,
     Fraction,                !- Name
     0.0,                     !- Lower Limit Value

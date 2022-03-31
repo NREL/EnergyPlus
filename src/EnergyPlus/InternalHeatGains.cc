@@ -266,6 +266,7 @@ namespace InternalHeatGains {
         }
 
         const std::string peopleModuleObject = "People";
+        const std::string petsModuleObject = "Pets";
         const std::string lightsModuleObject = "Lights";
         const std::string elecEqModuleObject = "ElectricEquipment";
         const std::string gasEqModuleObject = "GasEquipment";
@@ -1054,6 +1055,196 @@ namespace InternalHeatGains {
                 }
             }
         } // TotPeople > 0
+
+        // Pets START
+        if (state.dataHeatBal->TotPets > 0) {
+            state.dataHeatBal->Pets.allocate(state.dataHeatBal->TotPets);
+            int petsNum = 0;
+            for (int petsInputNum = 1; petsInputNum <= state.dataHeatBal->NumPetsStatements; ++petsInputNum) {
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         petsModuleObject,
+                                                                         petsInputNum,
+                                                                         AlphaName,
+                                                                         NumAlpha,
+                                                                         IHGNumbers,
+                                                                         NumNumber,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
+
+                // Create one Pets instance for every space associated with this Pets input object
+                auto &thisPetsInput = state.dataHeatBal->PetsObjects(petsInputNum);
+                for (int Item1 = 1; Item1 <= thisPetsInput.numOfSpaces; ++Item1) {
+                    ++petsNum;
+                    auto &thisPets = state.dataHeatBal->Pets(petsNum);
+                    int const spaceNum = thisPetsInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisPets.Name = thisPetsInput.names(Item1);
+                    thisPets.spaceIndex = spaceNum;
+                    thisPets.ZonePtr = zoneNum;
+                    thisPets.NumberOfPets = IHGNumbers(1);
+
+                    if (zoneNum > 0) {
+                        state.dataHeatBal->Zone(zoneNum).TotOccupants += thisPets.NumberOfPets;
+                    }
+
+                    if (spaceNum > 0) {
+                        state.dataHeatBal->space(spaceNum).totOccupants += thisPets.NumberOfPets;
+                    }
+
+                    if (NumNumber == 6 && !state.dataIPShortCut->lNumericFieldBlanks(2)) {
+                        thisPets.CO2RateFactor = IHGNumbers(2);
+                    } else {
+                        thisPets.CO2RateFactor = 3.82e-8; // m3/s-W
+                    }
+                    if (thisPets.CO2RateFactor < 0.0) {
+                        ShowSevereError(state,
+                                        format("{}{}=\"{}\", {} < 0.0, value ={:.2R}",
+                                               RoutineName,
+                                               petsModuleObject,
+                                               AlphaName(1),
+                                               state.dataIPShortCut->cNumericFieldNames(2),
+                                               IHGNumbers(2)));
+                        ErrorsFound = true;
+                    }
+
+                    thisPets.ActivityLevelPtr = GetScheduleIndex(state, AlphaName(3));
+                    if (thisPets.ActivityLevelPtr == 0) {
+                        if (Item1 == 1) {
+                            if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + petsModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
+                            } else {
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + petsModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(5));
+                            }
+                            ErrorsFound = true;
+                        }
+                    } else { // Check values in Schedule
+                        SchMin = GetScheduleMinValue(state, thisPets.ActivityLevelPtr);
+                        SchMax = GetScheduleMaxValue(state, thisPets.ActivityLevelPtr);
+                        if (SchMin < 0.0 || SchMax < 0.0) {
+                            if (Item1 == 1) {
+                                if (SchMin < 0.0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + petsModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + " minimum is < 0.0");
+                                    ShowContinueError(state,
+                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
+                                    ErrorsFound = true;
+                                }
+                            }
+                            if (Item1 == 1) {
+                                if (SchMax < 0.0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + petsModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + " maximum is < 0.0");
+                                    ShowContinueError(state,
+                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
+                                    ErrorsFound = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (thisPets.ZonePtr <= 0) continue; // Error, will be caught and terminated later
+                }
+            }
+
+            for (int petLoopIndex = 1; petLoopIndex <= state.dataHeatBal->TotPets; ++petLoopIndex) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                    SetupEMSActuator(state,
+                                     "Pets",
+                                     state.dataHeatBal->Pets(petLoopIndex).Name,
+                                     "Number of Pets",
+                                     "[each]",
+                                     state.dataHeatBal->Pets(petLoopIndex).EMSPetsOn,
+                                     state.dataHeatBal->Pets(petLoopIndex).EMSNumberOfPets);
+                    SetupEMSInternalVariable(state,
+                                             "Pets Count Design Level",
+                                             state.dataHeatBal->Pets(petLoopIndex).Name,
+                                             "[each]",
+                                             state.dataHeatBal->Pets(petLoopIndex).NumberOfPets);
+                }
+
+                // setup internal gains
+                if (!ErrorsFound) {
+                    SetupSpaceInternalGain(state,
+                                           state.dataHeatBal->Pets(petLoopIndex).spaceIndex,
+                                           1.0,
+                                           state.dataHeatBal->Pets(petLoopIndex).Name,
+                                           DataHeatBalance::IntGainType::Pets,
+                                           &state.dataHeatBal->Pets(petLoopIndex).ConGainRate,
+                                           nullptr,
+                                           &state.dataHeatBal->Pets(petLoopIndex).RadGainRate,
+                                           &state.dataHeatBal->Pets(petLoopIndex).LatGainRate,
+                                           nullptr,
+                                           &state.dataHeatBal->Pets(petLoopIndex).CO2GainRate);
+                }
+            }
+
+            // transfer the nominal number of people in a zone to the tabular reporting
+            for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+                if (state.dataHeatBal->Zone(Loop).TotOccupants > 0.0) {
+                    if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0 &&
+                        state.dataHeatBal->Zone(Loop).FloorArea / state.dataHeatBal->Zone(Loop).TotOccupants < 0.1) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + "Zone=\"" + state.dataHeatBal->Zone(Loop).Name +
+                                             "\" occupant density is extremely high.");
+                        if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0) {
+                            ShowContinueError(state,
+                                              format("Occupant Density=[{:.0R}] person/m2.",
+                                                     state.dataHeatBal->Zone(Loop).TotOccupants / state.dataHeatBal->Zone(Loop).FloorArea));
+                        }
+                        ShowContinueError(state,
+                                          format("Occupant Density=[{:.3R}] m2/person. Problems in Temperature Out of Bounds may result.",
+                                                 state.dataHeatBal->Zone(Loop).FloorArea / state.dataHeatBal->Zone(Loop).TotOccupants));
+                    }
+                    Real64 maxOccupLoad = 0.0;
+                    int OptionNum = 0;
+                    for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotPets; ++Loop1) {
+                        if (state.dataHeatBal->Pets(Loop1).ZonePtr != Loop) continue;
+                        if (maxOccupLoad < state.dataHeatBal->Pets(Loop1).NumberOfPets) {
+                            maxOccupLoad = state.dataHeatBal->Pets(Loop1).NumberOfPets;
+                            OptionNum = Loop1;
+                        }
+                    }
+                    if (maxOccupLoad > state.dataHeatBal->Zone(Loop).TotOccupants) {
+                        if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0 && state.dataHeatBal->Zone(Loop).FloorArea / maxOccupLoad < 0.1) {
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + "Zone=\"" + state.dataHeatBal->Zone(Loop).Name +
+                                                 "\" occupant density at a maximum schedule value is extremely high.");
+                            if (state.dataHeatBal->Zone(Loop).FloorArea > 0.0) {
+                                ShowContinueError(
+                                    state, format("Occupant Density=[{:.0R}] person/m2.", maxOccupLoad / state.dataHeatBal->Zone(Loop).FloorArea));
+                            }
+                            ShowContinueError(state,
+                                              format("Occupant Density=[{:.3R}] m2/person. Problems in Temperature Out of Bounds may result.",
+                                                     state.dataHeatBal->Zone(Loop).FloorArea / maxOccupLoad));
+                        }
+                    }
+                }
+
+                if (state.dataHeatBal->Zone(Loop).isNominalControlled) { // conditioned zones only
+                    if (state.dataHeatBal->Zone(Loop).TotOccupants > 0.0) {
+                        state.dataHeatBal->Zone(Loop).isNominalOccupied = true;
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchOaoNomNumOcc1,
+                                         state.dataHeatBal->Zone(Loop).Name,
+                                         state.dataHeatBal->Zone(Loop).TotOccupants);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchOaoNomNumOcc2,
+                                         state.dataHeatBal->Zone(Loop).Name,
+                                         state.dataHeatBal->Zone(Loop).TotOccupants);
+                    }
+                }
+            }
+        } // TotPets > 0
+        // Pets END
 
         setupIHGZonesAndSpaces(state,
                                lightsModuleObject,
