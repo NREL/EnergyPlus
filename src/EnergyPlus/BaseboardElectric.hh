@@ -79,9 +79,9 @@ namespace BaseboardElectric {
         Real64 Energy = 0.0;
         Real64 ElecUseLoad = 0.0;
         Real64 ElecUseRate = 0.0;
-        int ZonePtr = 0;                  // point to the zone where the basebaord is located
-        int HeatingCapMethod = 0;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
+        int ZonePtr = 0;                    // point to the zone where the basebaord is located
+        int HeatingCapMethod = 0;           // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
+                                            // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
         bool MySizeFlag = true;
         bool CheckEquipName = true;

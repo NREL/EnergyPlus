@@ -415,7 +415,8 @@ namespace BaseboardElectric {
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked = true;
-            if (!DataZoneEquipment::CheckZoneEquipmentList(state, baseboard->baseboards(BaseboardNum).EquipType, baseboard->baseboards(BaseboardNum).EquipName)) {
+            if (!DataZoneEquipment::CheckZoneEquipmentList(
+                    state, baseboard->baseboards(BaseboardNum).EquipType, baseboard->baseboards(BaseboardNum).EquipName)) {
                 ShowSevereError(state,
                                 "InitBaseboard: Unit=[" + baseboard->baseboards(BaseboardNum).EquipType + ',' +
                                     baseboard->baseboards(BaseboardNum).EquipName +

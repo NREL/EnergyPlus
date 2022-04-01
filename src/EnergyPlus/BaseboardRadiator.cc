@@ -592,11 +592,11 @@ namespace BaseboardRadiator {
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked = true;
-                if (!CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, baseboard->baseboards(BaseboardNum).EquipID)) {
-                    ShowSevereError(state,
-                                    "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + baseboard->baseboards(BaseboardNum).EquipID +
-                                        "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
-                }
+            if (!CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, baseboard->baseboards(BaseboardNum).EquipID)) {
+                ShowSevereError(state,
+                                "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + baseboard->baseboards(BaseboardNum).EquipID +
+                                    "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+            }
         }
 
         if (!state.dataGlobal->SysSizingCalc && baseboard->baseboards(BaseboardNum).MySizeFlag &&
@@ -1002,7 +1002,7 @@ namespace BaseboardRadiator {
                                                      baseboard->baseboards(BaseboardNum).EquipID,
                                                      "Design Size U-Factor Times Area Value [W/K]",
                                                      UADes);
-                    } else {                                            // Hard-sized with sizing data
+                    } else {                                             // Hard-sized with sizing data
                         baseboard->baseboards(BaseboardNum).UA = UAUser; // need to put this back as HWBaseboardUAResidual will have reset it, CR9377
                         if (UAUser > 0.0 && UADes > 0.0) {
                             BaseSizer::reportSizerOutput(state,
@@ -1038,7 +1038,8 @@ namespace BaseboardRadiator {
         }
 
         // save the design water flow rate for use by the water loop sizing algorithms
-        RegisterPlantCompDesignFlow(state, baseboard->baseboards(BaseboardNum).WaterInletNode, baseboard->baseboards(BaseboardNum).WaterVolFlowRateMax);
+        RegisterPlantCompDesignFlow(
+            state, baseboard->baseboards(BaseboardNum).WaterInletNode, baseboard->baseboards(BaseboardNum).WaterVolFlowRateMax);
 
         if (ErrorsFound) {
             ShowFatalError(state, "SizeBaseboard: Preceding sizing errors cause program termination");

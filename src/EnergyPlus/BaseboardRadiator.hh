@@ -95,9 +95,9 @@ namespace BaseboardRadiator {
         PlantLocation plantLoc;
         Array1D_string FieldNames;
         int HeatingCapMethod = 0; // - Method for water baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity,
-                              // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity = 0.0; // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC
-                                      // equipment, {-}, or {W/m2}
+                                  // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity = 0.0; // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone
+                                            // HVAC equipment, {-}, or {W/m2}
 
         bool MySizeFlag = true;
         bool CheckEquipName = true;

@@ -421,7 +421,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataBaseboardRadiator->baseboards(BaseboardNum).UA = DataSizing::AutoSize; // reset to autosize to test new calculation
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
     EXPECT_EQ(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP, 2000.0); // design load = 2000
-    EXPECT_EQ(state->dataBaseboardRadiator->baseboards(BaseboardNum).UA, 2000.0);                                  // UA = design load
+    EXPECT_EQ(state->dataBaseboardRadiator->baseboards(BaseboardNum).UA, 2000.0);                                 // UA = design load
 
     BaseboardNum = 2;
     CntrlZoneNum = 2;
