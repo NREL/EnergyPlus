@@ -5700,14 +5700,6 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
 
             if (ReportPeriodIdx > 0) {
-                // fixme: debug print
-                // fixme: move to outer loop
-                fmt::print("Environment {}, date {}/{} {}-{}\n",
-                           state.dataEnvrn->EnvironmentName,
-                           state.dataEnvrn->Year,
-                           state.dataEnvrn->CurMnDy,
-                           state.dataGlobal->HourOfDay,
-                           state.dataGlobal->TimeStep);
                 if (HI <= 26.7) {
                     state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
                 } else if (HI > 26.7 && HI <= 32.2) {

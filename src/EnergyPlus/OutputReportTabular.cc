@@ -3236,7 +3236,6 @@ void WriteTableOfContents(EnergyPlusData &state)
     static std::string const Annual_Thermal_Resilience_Summary("Annual Thermal Resilience Summary");
     static std::string const Annual_CO2_Resilience_Summary("Annual CO2 Resilience Summary");
     static std::string const Annual_Visual_Resilience_Summary("Annual Visual Resilience Summary");
-    static std::string const ReportPeriod_Thermal_Resilience_Summary("Reporting Period Thermal Resilience Summary");
 
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
@@ -3380,6 +3379,15 @@ void WriteTableOfContents(EnergyPlusData &state)
                             }
                         }
                     }
+                }
+            }
+            if (ort->displayThermalResilienceSummary) {
+                int nReportPeriods = state.dataWeatherManager->TotReportPers;
+                for (int i = 1; i <= nReportPeriods; i++) {
+                    static std::string const ReportPeriod_Thermal_Resilience_Summary(
+                        fmt::format("Thermal Resilience Summary for Reporting Period {}", i));
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility)
+                               << "\">Thermal Resilience Summary for Reporting Period " << i << "</a>\n";
                 }
             }
         }
@@ -5260,10 +5268,6 @@ void WriteTabularReports(EnergyPlusData &state)
         WriteEioTables(state);
         WriteLoadComponentSummaryTables(state);
         WriteHeatEmissionTable(state);
-        for (int i = 1; i <= state.dataWeatherManager->TotReportPers; i++) {
-            WriteThermalResilienceTablesRepPeriod(state, i);
-        }
-
         if (ort->displayThermalResilienceSummary) WriteThermalResilienceTables(state);
         if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
         if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
@@ -5276,6 +5280,10 @@ void WriteTabularReports(EnergyPlusData &state)
             WriteMonthlyTables(state);
             WriteTimeBinTables(state);
             OutputReportTabularAnnual::WriteAnnualTables(state);
+        }
+
+        for (int i = 1; i <= state.dataWeatherManager->TotReportPers; i++) {
+            WriteThermalResilienceTablesRepPeriod(state, i);
         }
     }
 
@@ -12379,18 +12387,33 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             rowHead.allocate(state.dataGlobal->NumOfZones + 4);
             tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
 
-            WriteReportHeaders(state, "Heat Index Hours", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            WriteReportHeaders(state,
+                               fmt::format("Thermal Resilience Summary for Reporting Period {}", periodIdx),
+                               "Entire Facility",
+                               OutputProcessor::StoreType::Averaged);
+            WriteSubtitle(state, "Heat Index Hours");
             // fixme: add reporting period data accessed with periodIdx
-            WriteSubtitle(state,
-                          format("Report period: {}/{}/{} {}:00 -- {}/{}/{} {}:00",
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endYear,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+            if (state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear != 0) {
+                WriteSubtitle(state,
+                              format("Reporting period: {}/{}/{} {}:00 -- {}/{}/{} {}:00",
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).endYear,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+            } else {
+                WriteSubtitle(state,
+                              format("Reporting period: {}/{} {}:00 -- {}/{} {}:00",
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
+                                     state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+            }
 
             columnWidth.allocate(5);
             columnWidth = 10;
@@ -12404,7 +12427,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
                 for (int j = 1; j <= columnNum; j++) {
-                    tableBody(j, ZoneNum) = RealToStr(state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, periodIdx)[j], 2);
+                    tableBody(j, ZoneNum) = RealToStr(state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, periodIdx)[j - 1], 2);
                 }
             }
 
@@ -12413,12 +12436,12 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             std::vector<Real64> columnSum(columnNum, 0);
 
             for (int j = 0; j < columnNum; j++) {
-                columnMin[j] = state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, periodIdx)[j + 1];
+                columnMin[j] = state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, periodIdx)[j];
             }
             for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                 std::string ZoneName = state.dataHeatBal->Zone(i).Name;
                 for (int j = 0; j < columnNum; j++) {
-                    Real64 curValue = state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(i, periodIdx)[j + 1];
+                    Real64 curValue = state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(i, periodIdx)[j];
                     if (curValue > columnMax[j]) columnMax[j] = curValue;
                     if (curValue < columnMin[j]) columnMin[j] = curValue;
                     columnSum[j] += curValue;
@@ -12441,12 +12464,13 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
 //            if (state.dataSQLiteProcedures->sqlite) {
 //                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-//                    tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+//                    tableBody, rowHead, columnHead, "Reporting Period Thermal Resilience Summary", "Entire Facility", "Heat Index Hours");
 //            }
 //            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
 //                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-//                    tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
+//                    tableBody, rowHead, columnHead, "Reporting Period Thermal Resilience Summary", "Entire Facility", "Heat Index Hours");
 //            }
+//            AddTOCEntry(state, "Reporting Period Thermal Resilience Summary", "Entire Facility");
         }
 }
 
