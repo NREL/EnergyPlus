@@ -5488,8 +5488,7 @@ void ReportThermalResilience(EnergyPlusData &state)
     int UnmetDegreeHourNoBins = 4;        // Unmet Degree Hour number of columns
     int DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
 
-    int ReportPeriodIdx =
-        findReportPeriodIdx(state, state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay);
+    int ReportPeriodIdx = findReportPeriodIdx(state);
 
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
@@ -5864,7 +5863,7 @@ void ReportVisualResilience(EnergyPlusData &state)
     } // loop over zones
 }
 
-int findReportPeriodIdx(EnergyPlusData &state, const int Year, const int Month, const int Day, const int Hour)
+int findReportPeriodIdx(EnergyPlusData &state)
 {
     // fixme: test case for returning -1 or not
     int nReportPeriods = state.dataWeatherManager->TotReportPers;
@@ -5879,7 +5878,7 @@ int findReportPeriodIdx(EnergyPlusData &state, const int Year, const int Month, 
         } else {
             currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
         }
-        if (General::BetweenDateHours(currentDate, Hour, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {
+        if (General::BetweenDateHours(currentDate, state.dataGlobal->HourOfDay, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {
             return i;
         };
     }

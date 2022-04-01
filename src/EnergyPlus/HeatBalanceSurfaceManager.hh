@@ -156,7 +156,7 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportVisualResilience(EnergyPlusData &state);
 
-    int findReportPeriodIdx(EnergyPlusData &state, const int Year, const int Month, const int Day, const int Hour);
+    int findReportPeriodIdx(EnergyPlusData &state);
 
     // End of Reporting subroutines for the HB Module
 
