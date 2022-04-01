@@ -37,8 +37,8 @@
             <div class="col-md-8 text-center">
                 <h1><img src="favicon.png" alt="EnergyPlus Logo" width="98" height="98"> EnergyPlus</h1>
                 <p>
-                    Version 9.6.0<br>
-                    30 September 2021<br>
+                    Version 22.1.0<br>
+                    31 March 2022<br>
                     <em>EnergyPlus is a trademark of the US Department of Energy.</em>
                 </p>
             </div>
@@ -88,30 +88,29 @@
         set – see below).
     </p>
 
-    <h2>* Future Version Numbers *</h2>
+    <h2>* Version Numbers *</h2>
     <p>
-        EnergyPlus has historically used version numbers that sometimes varied the major number and sometimes the minor
-        number. For the last 17 releases we have just incremented the minor number and we are now at 9.6. Since
-        EnergyPlus input files have some breaking changes in each release, the minor number change does not hold a
-        lot of meaning. We have decided to move forward with a more modern version numbering scheme starting next year.
-        The EnergyPlus version will be based on the year and the release number. The March release is expected to be
-        EnergyPlus 2022.1 and the Fall release will be EnergyPlus 2022.2. If additional major releases are created for
-        some reason, they would increment the release number further.
+        EnergyPlus historically used version numbers that varied the major number and sometimes the minor
+        number. Starting with the March 2022 release, we are moving forward with a more modern version numbering scheme.
+        The EnergyPlus version will be based on the year and the release number. The March 2022 release is
+        EnergyPlus 22.1 and the Fall release will be EnergyPlus 22.2. If additional major releases are created
+        for some reason, they would increment the release number further. Rare intermediate releases may be numbered
+        with a patch number such as 22.1.1.
     </p>
 
-    <h2><a id="Whats_going_on"></a>What’s going on in V9.6?</h2>
+    <h2><a id="Whats_going_on"></a>What’s going on in V22.1?</h2>
     <div class="row">
         <div class="col-md-12">
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#cDifferent" role="button"
                aria-expanded="false"
                aria-controls="cDifferent">
-                Is 9.6 different from 9.5? (Anything new on the library front?)
+                Is 22.1 different from 9.6?
             </a>
             <div class="collapse" id="cDifferent">
                 <div class="card card-body">
                     <h5 class="card-title">Yes... and no.</h5>
                     <p class="card-text">
-                        Put a pin in that library question for a moment. For a majority of users, EnergyPlus is still
+                        For a majority of users, EnergyPlus is still
                         basically the same tool, but with some great new features, bug fixes, and runtime performance
                         improvements. Running EnergyPlus can still be accomplished the same way, by creating an input
                         file in IDF or EpJSON syntax, running the EnergyPlus(.exe) binary, and gathering results of
@@ -124,8 +123,7 @@
                         A key effort completed with 9.5 was making EnergyPlus "thread-safe" by removing all global and
                         static data from the program. Now each running thread of EnergyPlus has a complete simulation
                         state, and no data is shared, so multiple runs can happen within a single process, opening the
-                        door for interesting new workflows and applications. Nothing major occurred on the library
-                        front for 9.6.<br>
+                        door for interesting new workflows and applications. <br>
                         See the full
                         <a href="https://github.com/NREL/EnergyPlus/releases/latest" class="card-link">ChangeLog</a>
                         for a complete list of new features added in this and previous versions.
@@ -140,14 +138,14 @@
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseIDDIDF" role="button"
                aria-expanded="false"
                aria-controls="collapseIDDIDF">
-                Are 9.6 and 9.5 IDD and IDF files the same?
+                Are 22.1 and 9.6 IDD and IDF files the same?
             </a>
             <div class="collapse" id="collapseIDDIDF">
                 <div class="card card-body">
                     <h5 class="card-title">No, they are different</h5>
-                    <p class="card-text">There are a few key changes in the V9.6 IDD. For best results, use the
+                    <p class="card-text">There are a few key changes in the V22.1 IDD. For best results, use the
                         transition program to
-                        transfer from the earlier V9.5 files. Use the IDFVersionUpdater program for best results.</p>
+                        transfer from the earlier V9.6 files. Use the IDFVersionUpdater program for best results.</p>
                 </div>
             </div>
         </div>
@@ -158,7 +156,7 @@
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseCompatible" role="button"
                aria-expanded="false"
                aria-controls="collapseCompatible">
-                Is version 9.5 backward compatible? Can I run v9.5 file in v9.6?
+                Is version 22.1 backward compatible? Can I run v9.6 file in v22.1?
             </a>
             <div class="collapse" id="collapseCompatible">
                 <div class="card card-body">
@@ -168,31 +166,10 @@
                     on
                     exact object changes that you can do by hand. The updater program is described more fully in the
                     Auxiliary
-                    Programs document. For the v9.6 release, the following objects require conversion (from V9.5):
+                    Programs document. For the v22.1 release, there is only one object that requires conversion
+                    (from V9.6)!
                     <ul class="list-group">
-                        <li class="list-group-item transition-object-name">
-                            AirflowNetwork:Multizone:ReferenceCrackConditions
-                        </li>
-                        <li class="list-group-item transition-object-name">AirLoopHVAC:OutdoorAirSystem</li>
-                        <li class="list-group-item transition-object-name">BuildingSurface:Detailed</li>
-                        <li class="list-group-item transition-object-name">Ceiling:Adiabatic</li>
-                        <li class="list-group-item transition-object-name">Ceiling:Interzone</li>
-                        <li class="list-group-item transition-object-name">Controller:MechanicalVentilation</li>
-                        <li class="list-group-item transition-object-name">Floor:Detailed</li>
-                        <li class="list-group-item transition-object-name">Floor:GroundContact</li>
-                        <li class="list-group-item transition-object-name">Floor:Adiabatic</li>
-                        <li class="list-group-item transition-object-name">Floor:Interzone</li>
-                        <li class="list-group-item transition-object-name">GroundHeatExchanger:System</li>
-                        <li class="list-group-item transition-object-name">InternalMass</li>
-                        <li class="list-group-item transition-object-name">RoofCeiling:Detailed</li>
-                        <li class="list-group-item transition-object-name">Sizing:System</li>
-                        <li class="list-group-item transition-object-name">Roof</li>
-                        <li class="list-group-item transition-object-name">PerformancePrecisionTradeOffs</li>
-                        <li class="list-group-item transition-object-name">Wall:Detailed</li>
-                        <li class="list-group-item transition-object-name">Wall:Exterior</li>
-                        <li class="list-group-item transition-object-name">Wall:Adiabatic</li>
-                        <li class="list-group-item transition-object-name">Wall:Underground</li>
-                        <li class="list-group-item transition-object-name">Wall:InterZone</li>
+                        <li class="list-group-item transition-object-name">PythonPlugin:SearchPaths</li>
                     </ul>
                 </div>
             </div>
@@ -223,8 +200,8 @@
         version (including .rvi and .mvi files) to the current version. The install also includes the necessary programs
         to convert from older versions back to v7.2.0. For versions older than v7.2.0, first we applaud your dedication
         to EnergyPlus that stretches for quite some time, and second you will need to visit the
-        helpdesk (<a href="https://energyplushelp.freshdesk.com/">energyplushelp.freshdesk.com</a>) to request multiple
-        conversion set of programs.
+        <a href="https://energyplushelp.freshdesk.com/support/solutions/folders/67000241428">Helpdesk</a> to request
+        multiple conversion set of programs.
     </p>
 
     <h2><a id="Documentation_55"></a>Documentation</h2>
@@ -253,10 +230,10 @@
         EnergyPlus uses these files directly for annual simulations. The Weather Converter program that is part of
         EnergyPlus can read these weather files and provide .csv (comma separated variable) as well as statistics
         reports
-        about the included (or other) files. Weather data for more than 2100 locations in more than 100 countries can be
+        about the included (or other) files. Weather data for more than 3000 locations in more than 100 countries can be
         downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
 
-    <h2>Highlights of this release (V9.6.0)</h2>
+    <h2>Highlights of this release (V22.1.0)</h2>
     <h3><a id="Highlights_of_this_release"></a>New Features</h3>
     <table class="table table-striped table-bordered">
         <tr>
@@ -264,44 +241,36 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8394">8394</a></td>
-            <td>Add Space Concept to EnergyPlus Zone Structure</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8740">8740</a></td>
+            <td>Add Window Assembly Factor Reporting and Fix Windows-CalcEngine U-value calculation with shade</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8466">8466</a></td>
-            <td>Waterside economizer coil new feature CoilSystem:Cooling:Water</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9151">9151</a></td>
+            <td>CondFD Surface Heat Source Actuators</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8495">8495</a></td>
-            <td>Add a Specified Flow Element to AirflowNetwork</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9169">9169</a></td>
+            <td>Change version numbering approach to YY.N</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8520">8520</a></td>
-            <td>New Feature Runaround Heat Recovery Loop</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9177">9177</a></td>
+            <td>Enhancement of Handling of Rainfall</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8686">8686</a></td>
-            <td>Update the DOE commercial prototype building models test files</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9185">9185</a></td>
+            <td>Enhancing Multi-speed Coil Speed Level Control Actuators</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8708">8708</a></td>
-            <td>GHE g-function calculation enhancements</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9209">9209</a></td>
+            <td>Dedicated general exhaust system</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8745">8745</a></td>
-            <td>Add API Endpoint to Mute Console Output</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9251">9251</a></td>
+            <td>Flag added to toggle daylight saving when used with Schedule:File</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8865">8865</a></td>
-            <td>Adding Multispeed Coil Speed Level Control Actuators</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8913">8913</a></td>
-            <td>Allow Plugin Plugins in Runtime API Calls</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9046">9046</a></td>
-            <td>Code compliant chiller performance curves</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9261">9261</a></td>
+            <td>Adding SetpointManager:SystemNodeReset objects</td>
         </tr>
     </table>
     <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
@@ -311,32 +280,16 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8692">8692</a></td>
-            <td>Multi-dimensional array reordering and refactoring</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9097">9097</a></td>
+            <td>Comment and cleanup of heat balance arrays</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8739">8739</a></td>
-            <td>Add ability to automatically detect groups of similar surfaces for efficient heat balance calculations</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9102">9102</a></td>
+            <td>Daylighting output revisions and other cleanup related to Enclosures vs Zones</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8819">8819</a></td>
-            <td>Replace readItem in ProcessNumber to speed-up SolarShadingTest_ImportedShading</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8949">8949</a></td>
-            <td>Profiling based refactoring in heat balance functions</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8960">8960</a></td>
-            <td>PVWatts Speed Up</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8996">8996</a></td>
-            <td>Improve performance for file reading/writing</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9028">9028</a></td>
-            <td>Eliminate excessive runtime associated with using ceiling diffuser algorithm in Kiva</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9255">9255</a></td>
+            <td>Speed up execution of test suite</td>
         </tr>
     </table>
     <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
@@ -346,16 +299,72 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8480">8480</a></td>
-            <td>Upgrade to C++17 std::filesystem library</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9013">9013</a></td>
+            <td>Refactor DataHeatBalance</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8729">8729</a></td>
-            <td>Simulate CoilSystem:Cooling:DX using AirloopHVAC:UnitarySystem code base</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9053">9053</a></td>
+            <td>Conversion to enum class - DataPlant::PlantEquipmentType</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/8874">8874</a></td>
-            <td>Increase use of string view</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9130">9130</a></td>
+            <td>Convert `const` `int`/`double` to `constexpr` Where Possible</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9137">9137</a></td>
+            <td>Clean up for PR: conv to enum DataPlant::PlantEquipmentType #9053</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9163">9163</a></td>
+            <td>Enum Refactor: DataZoneEquipment</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9166">9166</a></td>
+            <td>Convert remaining `const` `int`/`double` in `state` to `constexpr`</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9167">9167</a></td>
+            <td>Move `const` `Array1D`/`2D` to `constexpr std::array`</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9168">9168</a></td>
+            <td>Unify Enum Format - 1</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9170">9170</a></td>
+            <td>Convert `int constexpr` to `enum` : EconomicLifeCycleCost.*</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9199">9199</a></td>
+            <td>Convert compressor operation from int constexpr to enum</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9212">9212</a></td>
+            <td>Convert Plant LoopSides (Demand and Supply) to enum class</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9213">9213</a></td>
+            <td>Enum Refactor and follow-up for #9013</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9220">9220</a></td>
+            <td>Begin Passing ObjType enum</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9223">9223</a></td>
+            <td>Convert Plant Location to struct form</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9232">9232</a></td>
+            <td>Reduce Optional_string usage</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9235">9235</a></td>
+            <td>Cleanup interface manager</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9244">9244</a></td>
+            <td>enum-based SELECT_CASE_var</td>
         </tr>
     </table>
 
@@ -364,7 +373,7 @@
         <div class="col-md-10">
             <blockquote class="blockquote text-center">
                 <p class="mb-0">
-                    The changelog is no longer packaged with EnergyPlus, but can be found on the <a
+                    The full changelog is no longer packaged with EnergyPlus, but can be found on the <a
                         href="https://github.com/NREL/EnergyPlus/releases/latest">release page</a>.
                 </p>
             </blockquote>
@@ -377,16 +386,16 @@
         Packages changed slightly as of the 9.4 release.
         We began building our packages on a new system which adds better support
         for newer platforms. During the change, we stepped away from some older OS versions. For example, we are
-        not testing on Windows 7 or 8, only 10. However, both our 32-bit and 64-bit packages now include the new
+        not testing on Windows 7 or 8, only 10 and 11. However, both our 32-bit and 64-bit packages now include the new
         Python plugin system, rather than just the 64-bit as previously. We have also added packaging and testing
         with Ubuntu 20.04 <i>in addition to</i> Ubuntu 18.04. On Mac, we are officially releasing an installer for
-        OSX 10.15.
+        OSX 10.15 and moving toward OSX 11 as well.
     </p>
     <ul class="list-group">
-        <li class="list-group-item">Windows 10</li>
+        <li class="list-group-item">Windows 10 and 11</li>
         <li class="list-group-item">Linux (Ubuntu 18.04 and 20.04) 64 bit versions</li>
         <li class="list-group-item">Mac OSX 10.15 64 bit versions</li>
-        <li class="list-group-item">EnergyPlus V9.6 has been tested on all of these platforms</li>
+        <li class="list-group-item">EnergyPlus V22.1 has been tested on all of these platforms</li>
         <li class="list-group-item"><em>EnergyPlus does intensive computations, and based on configuration, can write
             massive amounts of data to
             disk. For best performance, computers should have a substantial amount of memory and high speed hard
@@ -404,7 +413,7 @@
         known (and even more unknown) probably remain. Specifics on the remaining known problems can be found on the
         GitHub repository <a href="https://github.com/NREL/EnergyPlus/issues">issues page</a>. If you are interested in
         what has been addressed, the issues resolved in this release are installed similarly in the
-        <a href="changelog.html">changelog</a>.
+        <a href="https://github.com/NREL/EnergyPlus/releases/latest">release details</a>.
     </p>
 
     <h2>Additional steps you may want to consider:</h2>
@@ -464,7 +473,7 @@
     <hr>
 
     <footer>
-        <p>Copyright © 1996-2021 The Board of Trustees of the University of Illinois, The Regents of the University of
+        <p>Copyright © 1996-2022 The Board of Trustees of the University of Illinois, The Regents of the University of
             California through Ernest Orlando Lawrence Berkeley National Laboratory, Oak Ridge National Laboratory,
             managed
             by
