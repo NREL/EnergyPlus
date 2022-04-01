@@ -135,7 +135,7 @@ struct BaseboardRadiatorData : BaseGlobalStruct
 {
 
     bool getInputFlag = true;
-    Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+    EPVector<BaseboardRadiator::BaseboardParams> baseboards;
 
     void clear_state() override
     {

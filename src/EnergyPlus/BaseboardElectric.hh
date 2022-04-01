@@ -105,7 +105,7 @@ namespace BaseboardElectric {
 struct BaseboardElectricData : BaseGlobalStruct
 {
     bool getInputFlag = true;
-    EPVector<BaseboardElectric::BaseboardParams> Baseboard;
+    EPVector<BaseboardElectric::BaseboardParams> baseboards;
 
     void clear_state() override
     {
