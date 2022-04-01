@@ -1212,7 +1212,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 MixHumRat;         // Mixed air humidity ratio at cooling design conditions
         Real64 HeatMixHumRat;     // Mixed air humidity ratio at heating design conditions
         Real64 MixEnth;           // Mixed air enthalpy at cooling design conditions
-        Real64 HeatMixEnth;       // Mixed air enthalpy at heating design conditions
         Real64 MixWetBulb;        // Mixed air wet-bulb temperature at cooling design conditions
         Real64 RefMixWetBulb;     // Reference mixed air wetbulb temperature
         Real64 RefMixDryBulb;     // Reference mixed air drybulb temperature
@@ -1221,9 +1220,7 @@ namespace WaterToAirHeatPumpSimple {
         Real64 HeatSupTemp;       // Supply air temperature at heating design conditions
         Real64 SupHumRat;         // Supply air humidity ratio at cooling design conditions
         Real64 SupEnth;           // Supply air enthalpy at cooling design conditions
-        Real64 HeatSupEnth;       // Supply air enthalpy at heating design conditions
         Real64 OutTemp;           // Outdoor aur dry-bulb temperature at cooling design conditions
-        Real64 HeatOutTemp;       // Outdoor air dry-bulb temperatureat heating design conditions
         Real64 ratioTDB;          // Load-side dry-bulb temperature ratio at cooling design conditions
         Real64 HeatratioTDB;      // Load-side dry-bulb temperature ratio at heating design conditions
         Real64 ratioTWB;          // Load-side wet-bulb temperature ratio at cooling design conditions
@@ -1262,6 +1259,8 @@ namespace WaterToAirHeatPumpSimple {
         bool IsAutoSize;                      // Indicator to autosize
         bool HardSizeNoDesRun;                // Indicator to hardsize and no sizing run
         Real64 ReferenceAirVolFlowRateDes;    // Autosized reference air flow for reporting
+        Real64 CoolingAirVolFlowRateDes;      // Cooling desing day air flow
+        Real64 HeatingAirVolFlowRateDes;      // Heating design day air flow
         Real64 ReferenceAirVolFlowRateUser;   // Hardsized reference air flow for reporting
         Real64 ReferenceCapCoolTotalDes;      // Autosized reference cooling capacity for reporting
         Real64 ReferenceCapCoolTotalUser;     // Hardsized reference cooling capacity for reporting
@@ -1295,6 +1294,8 @@ namespace WaterToAirHeatPumpSimple {
         }
         ReferenceAirVolFlowRateDes = 0.0;
         ReferenceAirVolFlowRateUser = 0.0;
+        CoolingAirVolFlowRateDes = 0.0;
+        HeatingAirVolFlowRateDes = 0.0;
         ReferenceCapCoolTotalDes = 0.0;
         ReferenceCapCoolTotalUser = 0.0;
         ReferenceCapCoolSensDes = 0.0;
@@ -1322,6 +1323,8 @@ namespace WaterToAirHeatPumpSimple {
                 CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
                 if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
                     ReferenceAirVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    CoolingAirVolFlowRateDes = state.dataSize->CalcSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                    HeatingAirVolFlowRateDes = state.dataSize->CalcSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                 } else {
                     ReferenceAirVolFlowRateDes = 0.0;
                 }
@@ -1340,6 +1343,8 @@ namespace WaterToAirHeatPumpSimple {
                 CheckZoneSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
                 ReferenceAirVolFlowRateDes = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow,
                                                  state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
+                CoolingAirVolFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                HeatingAirVolFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                 if (ReferenceAirVolFlowRateDes < DataHVACGlobals::SmallAirVolFlow) {
                     ReferenceAirVolFlowRateDes = 0.0;
                 }
@@ -1405,7 +1410,7 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 } else {
                     CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = simpleWatertoAirHP.ReferenceAirVolFlowRate;
+                    VolFlowRate = CoolingAirVolFlowRateDes;
                     // cooling design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
@@ -1521,7 +1526,7 @@ namespace WaterToAirHeatPumpSimple {
                 } else {
                     CheckZoneSizing(
                         state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = simpleWatertoAirHP.ReferenceAirVolFlowRate;
+                    VolFlowRate = CoolingAirVolFlowRateDes;
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         // cooling design calculations
                         if (state.dataSize->ZoneEqDXCoil) {
@@ -1639,7 +1644,7 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 } else {
                     CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = simpleWatertoAirHP.ReferenceAirVolFlowRate;
+                    VolFlowRate = CoolingAirVolFlowRateDes;
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
                             MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
@@ -1753,7 +1758,7 @@ namespace WaterToAirHeatPumpSimple {
                 } else {
                     CheckZoneSizing(
                         state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = simpleWatertoAirHP.ReferenceAirVolFlowRate;
+                    VolFlowRate = CoolingAirVolFlowRateDes;
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
@@ -2210,7 +2215,7 @@ namespace WaterToAirHeatPumpSimple {
             if (IsAutoSize) {
                 if (state.dataSize->CurSysNum > 0) {
                     CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = simpleWatertoAirHP.ReferenceAirVolFlowRate;
+                    VolFlowRate = HeatingAirVolFlowRateDes;
                     // heating design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
@@ -2298,7 +2303,7 @@ namespace WaterToAirHeatPumpSimple {
                 } else if (state.dataSize->CurZoneEqNum > 0) {
                     CheckZoneSizing(
                         state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = simpleWatertoAirHP.ReferenceAirVolFlowRate;
+                    VolFlowRate = HeatingAirVolFlowRateDes;
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
@@ -2444,7 +2449,7 @@ namespace WaterToAirHeatPumpSimple {
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Cooling");
                     }
                     ReferenceCapHeatDes =
-                        ReferenceCapCoolTotalDes * RefCoolPowerTempModFac * simpleWatertoAirHP.RatioRefHeatRefTotCoolCap / RefHeatCapTempModFac;
+                        ReferenceCapCoolTotalDes * RefTotCapTempModFac * simpleWatertoAirHP.RatioRefHeatRefTotCoolCap / RefHeatCapTempModFac;
                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).ReferenceCapCoolTotal =
                         ReferenceCapCoolTotalDes;
                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).ReferenceCapCoolAtRefCdts =
