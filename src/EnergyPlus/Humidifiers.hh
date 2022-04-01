@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,31 +63,34 @@ struct EnergyPlusData;
 
 namespace Humidifiers {
 
-    constexpr std::array<std::string_view, 2> HumidifierType = {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"};
+    static constexpr std::array<std::string_view, 2> HumidifierType = {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"};
     constexpr std::string_view fluidNameSteam = "STEAM";
     constexpr std::string_view fluidNameWater = "WATER";
 
     enum class HumidType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Electric,
-        Gas
+        Gas,
+        Num
     };
 
     // Humidifier normalized thermal efficiency curve types
     enum class EfficiencyCurve
     {
-        Unassigned = -1,
+        Invalid = -1,
         Linear,
         Quadratic,
-        Cubic
+        Cubic,
+        Num
     };
 
     enum class InletWaterTemp
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fixed,
-        Variable
+        Variable,
+        Num
     };
 
     class HumidifierData
@@ -145,8 +148,8 @@ namespace Humidifiers {
 
         // Default Constructor
         HumidifierData()
-            : HumType(HumidType::Unassigned), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0),
-              CurMakeupWaterTemp(0.0), EfficiencyCurvePtr(0), InletWaterTempOption(InletWaterTemp::Unassigned), FanPower(0.0), StandbyPower(0.0),
+            : HumType(HumidType::Invalid), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0),
+              CurMakeupWaterTemp(0.0), EfficiencyCurvePtr(0), InletWaterTempOption(InletWaterTemp::Invalid), FanPower(0.0), StandbyPower(0.0),
               AirInNode(0), AirOutNode(0), AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0),
               AirOutHumRat(0.0), AirOutEnthalpy(0.0), AirOutMassFlowRate(0.0), HumRatSet(0.0), WaterAdd(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0),
               WaterCons(0.0), WaterConsRate(0.0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), TankSupplyVdot(0.0),

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,7 +93,7 @@ struct DataGlobal : BaseGlobalStruct
     bool stopSimulation = false;
     std::function<void(void *)> externalHVACManager;
     bool externalHVACManagerInitialized = false;
-    DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+    DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Invalid;
     bool sizingAnalysisEioHeaderDoneOnce = false;
     bool EndDayFlag = false;                          // True at the end of each day (last time step of last hour of day)
     bool EndHourFlag = false;                         // True at the end of each hour (last time step of hour)
@@ -102,6 +102,7 @@ struct DataGlobal : BaseGlobalStruct
     Real64 WeightPreviousHour = 0.0;                  // Weighting of value for previous hour
     Real64 WeightNow = 0.0;                           // Weighting of value for current hour
     int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
+    bool OverrideTimestep = false;                    // True if PerformancePrecision object overrides the number of time steps in each hour
     int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
     int NumOfZones = 0;                               // Total number of Zones for simulation
     int numSpaces = 0;                                // Total number of Spaces for simulation
@@ -202,7 +203,7 @@ struct DataGlobal : BaseGlobalStruct
         this->externalHVACManager = nullptr;
         this->externalHVACManagerInitialized = false;
         this->sizingAnalysisEioHeaderDoneOnce = false;
-        this->KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+        this->KindOfSim = DataGlobalConstants::KindOfSim::Invalid;
         this->EndDayFlag = false;
         this->EndHourFlag = false;
         this->PreviousHour = 0;
@@ -210,6 +211,7 @@ struct DataGlobal : BaseGlobalStruct
         this->WeightPreviousHour = 0.0;
         this->WeightNow = 0.0;
         this->NumOfDayInEnvrn = 0;
+        this->OverrideTimestep = false;
         this->NumOfTimeStepInHour = 0;
         this->NumOfZones = 0;
         this->numSpaces = 0;

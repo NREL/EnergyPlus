@@ -678,7 +678,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1)=InArgs(1)
                 OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
                 OutArgs(3:5)=InArgs(2:4)
-                OutArgs(6)=OutArgs(8)
+                OutArgs(6)=InArgs(8)
                 OutArgs(7:10)=InArgs(12:15)
                 OutArgs(11:22)=InArgs(18:29)
                 OutArgs(23:24)=InArgs(32:33)
@@ -707,8 +707,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(3:7)=InArgs(2:6)
                 OutArgs(8)=InArgs(8)
                 OutArgs(9)=InArgs(11)
-                OutArgs(10:CurArgs-5)=InArgs(15:CurArgs)
-                CurArgs = CurArgs - 5
+                IF (CurArgs > 14) THEN
+                    OutArgs(10:CurArgs-5)=InArgs(15:CurArgs)
+                    CurArgs = CurArgs - 5
+                ELSE
+                    CurArgs = 9
+                ENDIF
 
                 CALL GetNewObjectDefInIDD('ZoneHVAC:Baseboard:RadiantConvective:Water:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
@@ -725,9 +729,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(3:5)=InArgs(2:4)
                 OutArgs(6)=InArgs(6)
                 OutArgs(7:8)=InArgs(9:10)
-                OutArgs(9)=InArgs(11)
-                OutArgs(9:CurArgs-5)=InArgs(14:CurArgs)
-                CurArgs = CurArgs - 5
+                ! OutArgs(9)=InArgs(11)
+                IF (CurArgs > 13) THEN
+                    OutArgs(9:CurArgs-5)=InArgs(14:CurArgs)
+                    CurArgs = CurArgs - 5
+                ELSE
+                    CurArgs = 8
+                ENDIF
 
                 CALL GetNewObjectDefInIDD('ZoneHVAC:Baseboard:RadiantConvective:Steam:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)

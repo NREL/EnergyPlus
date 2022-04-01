@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -605,8 +605,7 @@ namespace WindowComplexManager {
                     Theta = 0.0;
                     Phi = 0.0;
                     if (state.dataBSDFWindow->SUNCOSTS(TS, Hour)(3) > DataEnvironment::SunIsUpValue) {
-                        IncRay = FindInBasis(
-                            state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
+                        IncRay = FindInBasis(state, SunDir, RayIdentificationType::Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
                         complexWindowGeom.PhiBm[lHT] = Phi;
                     } else {
@@ -657,7 +656,7 @@ namespace WindowComplexManager {
             Theta = 0.0;
             Phi = 0.0;
             if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay)(3) > DataEnvironment::SunIsUpValue) {
-                IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
+                IncRay = FindInBasis(state, SunDir, RayIdentificationType::Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
             } else {
@@ -857,7 +856,7 @@ namespace WindowComplexManager {
             SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour);
             BkIncRay = FindInBasis(state,
                                    SunDir,
-                                   state.dataWindowComplexManager->Back_Incident,
+                                   RayIdentificationType::Back_Incident,
                                    ISurf,
                                    IState,
                                    state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Trn,
@@ -1317,7 +1316,7 @@ namespace WindowComplexManager {
             Phi = Geom.Inc.Grid(ElemNo).Phi;
             // The following puts in the vectors depending on
             // window orientation
-            Geom.sInc(ElemNo) = WorldVectFromW6(state, Theta, Phi, state.dataWindowComplexManager->Front_Incident, Tilt, Azimuth);
+            Geom.sInc(ElemNo) = WorldVectFromW6(state, Theta, Phi, RayIdentificationType::Front_Incident, Tilt, Azimuth);
             Geom.pInc(ElemNo) = DaylghtAltAndAzimuth(Geom.sInc(ElemNo));
 
             Geom.CosInc(ElemNo) = std::cos(Geom.Inc.Grid(ElemNo).Theta);
@@ -1335,7 +1334,7 @@ namespace WindowComplexManager {
             Phi = Geom.Trn.Grid(ElemNo).Phi;
             // The following puts in the vectors depending on
             // window orientation
-            Geom.sTrn(ElemNo) = WorldVectFromW6(state, Theta, Phi, state.dataWindowComplexManager->Front_Transmitted, Tilt, Azimuth);
+            Geom.sTrn(ElemNo) = WorldVectFromW6(state, Theta, Phi, RayIdentificationType::Front_Transmitted, Tilt, Azimuth);
             Geom.pTrn(ElemNo) = DaylghtAltAndAzimuth(Geom.sTrn(ElemNo));
         }
         //  Incident Basis:
@@ -2098,12 +2097,12 @@ namespace WindowComplexManager {
         return DayPos;
     }
 
-    Vector WorldVectFromW6(EnergyPlusData &state,
-                           Real64 const Theta, // Polar angle in W6 Coords
-                           Real64 const Phi,   // Azimuthal angle in W6 Coords
-                           int const RadType,  // Type of radiation: Front_Incident, etc.
-                           Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
-                           Real64 const Alpha  // Surface azimuth, radians, world coordinate system
+    Vector WorldVectFromW6([[maybe_unused]] EnergyPlusData &state,
+                           Real64 const Theta,                  // Polar angle in W6 Coords
+                           Real64 const Phi,                    // Azimuthal angle in W6 Coords
+                           const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                           Real64 const Gamma,                  // Surface tilt angle, radians, world coordinate system
+                           Real64 const Alpha                   // Surface azimuth, radians, world coordinate system
     )
     {
 
@@ -2126,7 +2125,7 @@ namespace WindowComplexManager {
 
         // Error tolerance is used to make small numbers equal to zero.  Due to precision of pi constant used in E+, performing
         // trigonometric operations on those constant will not cause absolutely accurate results
-        Real64 const ErrorTolerance(1.e-10);
+        Real64 constexpr ErrorTolerance(1.e-10);
 
         UnitVect = Vector(0.0, 0.0, 0.0);
 
@@ -2142,35 +2141,46 @@ namespace WindowComplexManager {
         Real64 const sin_Theta = std::sin(Theta);
         Real64 const cos_Theta = std::cos(Theta);
 
-        {
-            auto const SELECT_CASE_var(RadType);
-            if (SELECT_CASE_var == state.dataWindowComplexManager
-                                       ->Front_Incident) { // W6 vector will point in direction of propagation, must reverse to get world vector
-                //  after the W6 vector has been rotated into the world CS
-                UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
-                UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha;
-                UnitVect.z = -(sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma);
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Transmitted) {
-                UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
-                UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
-                UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Reflected) {
-                UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
-                UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
-                UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Incident) {
-                UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
-                UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * cos_Alpha;
-                UnitVect.z = -cos_Theta * cos_Gamma - sin_Theta * sin_Phi * sin_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Transmitted) { // This is same as front reflected
-                UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
-                UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
-                UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Reflected) { // This is same as front transmitted
-                UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
-                UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
-                UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
-            }
+        switch (RadType) {
+        case RayIdentificationType::Front_Incident: { // W6 vector will point in direction of propagation, must reverse to get world vector
+            //  after the W6 vector has been rotated into the world CS
+            UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+            UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha;
+            UnitVect.z = -(sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma);
+            break;
+        }
+        case RayIdentificationType::Front_Transmitted: {
+            UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+            UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
+            UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
+            break;
+        }
+        case RayIdentificationType::Front_Reflected: {
+            UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+            UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+            UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
+            break;
+        }
+        case RayIdentificationType::Back_Incident: {
+            UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+            UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * cos_Alpha;
+            UnitVect.z = -cos_Theta * cos_Gamma - sin_Theta * sin_Phi * sin_Gamma;
+            break;
+        }
+        case RayIdentificationType::Back_Transmitted: { // This is same as front reflected
+            UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+            UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+            UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
+            break;
+        }
+        case RayIdentificationType::Back_Reflected: { // This is same as front transmitted
+            UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+            UnitVect.y = -(sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha);
+            UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
+            break;
+        }
+        default:
+            break;
         }
 
         // Remove small numbers from evaluation (due to limited decimal points for pi)
@@ -2182,13 +2192,13 @@ namespace WindowComplexManager {
     }
 
     int FindInBasis(EnergyPlusData &state,
-                    Vector const &RayToFind,           // Ray vector direction in world CS
-                    int const RadType,                 // Type of radiation: Front_Incident, etc.
-                    int const ISurf,                   // Window Surface number
-                    [[maybe_unused]] int const IState, // Complex Fenestration state number
-                    BasisStruct const &Basis,          // Complex Fenestration basis root
-                    Real64 &Theta,                     // Theta value for ray
-                    Real64 &Phi                        // Phi value for ray
+                    Vector const &RayToFind,             // Ray vector direction in world CS
+                    const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                    int const ISurf,                     // Window Surface number
+                    [[maybe_unused]] int const IState,   // Complex Fenestration state number
+                    BasisStruct const &Basis,            // Complex Fenestration basis root
+                    Real64 &Theta,                       // Theta value for ray
+                    Real64 &Phi                          // Phi value for ray
     )
     {
 
@@ -2302,13 +2312,13 @@ namespace WindowComplexManager {
         return RayIndex;
     }
 
-    void W6CoordsFromWorldVect(EnergyPlusData &state,
-                               Vector const &RayVect, // Ray vector direction in world CS
-                               int const RadType,     // Type of radiation: Front_Incident, etc.
-                               Real64 const Gamma,    // Surface tilt angle, world coordinate system
-                               Real64 const Alpha,    // Surface azimuth, world coordinate system
-                               Real64 &Theta,         // Polar angle in W6 Coords
-                               Real64 &Phi            // Azimuthal angle in W6 Coords
+    void W6CoordsFromWorldVect([[maybe_unused]] EnergyPlusData &state,
+                               Vector const &RayVect,               // Ray vector direction in world CS
+                               const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                               Real64 const Gamma,                  // Surface tilt angle, world coordinate system
+                               Real64 const Alpha,                  // Surface azimuth, world coordinate system
+                               Real64 &Theta,                       // Polar angle in W6 Coords
+                               Real64 &Phi                          // Azimuthal angle in W6 Coords
     )
     {
 
@@ -2349,86 +2359,98 @@ namespace WindowComplexManager {
         W6z.x = -std::sin(Gamma) * std::sin(Alpha);
         W6z.y = -std::sin(Gamma) * std::cos(Alpha);
         W6z.z = -std::cos(Gamma);
-        {
-            auto const SELECT_CASE_var(RadType);
-            if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Incident) {
-                RdotZ = dot(W6z, RayVect);
-                Cost = -RdotZ;
-                Sint = std::sqrt(1.0 - pow_2(Cost));
-                Theta = std::acos(Cost);
-                RdotY = dot(W6y, RayVect);
-                RdotX = dot(W6x, RayVect);
-                Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
-                if (Psi < 0.0) {
-                    Phi = 2.0 * DataGlobalConstants::Pi + Psi;
-                } else {
-                    Phi = Psi;
-                }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Transmitted) {
-                Cost = dot(W6z, RayVect);
-                Sint = std::sqrt(1.0 - pow_2(Cost));
-                Theta = std::acos(Cost);
-                RdotY = dot(W6y, RayVect);
-                RdotX = dot(W6x, RayVect);
-                Psi = std::atan2(RdotY / Sint, RdotX / Sint);
-                if (Psi < 0.0) {
-                    Phi = 2.0 * DataGlobalConstants::Pi + Psi;
-                } else {
-                    Phi = Psi;
-                }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Front_Reflected) {
-                RdotZ = dot(W6z, RayVect);
-                Cost = -RdotZ;
-                Sint = std::sqrt(1.0 - pow_2(Cost));
-                Theta = std::acos(Cost);
-                RdotY = dot(W6y, RayVect);
-                RdotX = dot(W6x, RayVect);
-                Psi = std::atan2(RdotY / Sint, RdotX / Sint);
-                if (Psi < 0.0) {
-                    Phi = 2.0 * DataGlobalConstants::Pi + Psi;
-                } else {
-                    Phi = Psi;
-                }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Incident) {
-                Cost = dot(W6z, RayVect);
-                Sint = std::sqrt(1.0 - pow_2(Cost));
-                Theta = std::acos(Cost);
-                RdotY = dot(W6y, RayVect);
-                RdotX = dot(W6x, RayVect);
-                Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
-                if (Psi < 0.0) {
-                    Phi = 2 * DataGlobalConstants::Pi + Psi;
-                } else {
-                    Phi = Psi;
-                }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Transmitted) { // This is same as front reflected
-                RdotZ = dot(W6z, RayVect);
-                Cost = -RdotZ;
-                Sint = std::sqrt(1.0 - pow_2(Cost));
-                Theta = std::acos(Cost);
-                RdotY = dot(W6y, RayVect);
-                RdotX = dot(W6x, RayVect);
-                Psi = std::atan2(RdotY / Sint, RdotX / Sint);
-                if (Psi < 0.0) {
-                    Phi = 2.0 * DataGlobalConstants::Pi + Psi;
-                } else {
-                    Phi = Psi;
-                }
-            } else if (SELECT_CASE_var == state.dataWindowComplexManager->Back_Reflected) { // This is same as front transmitted
-                Cost = dot(W6z, RayVect);
-                Sint = std::sqrt(1.0 - pow_2(Cost));
-                Theta = std::acos(Cost);
-                RdotY = dot(W6y, RayVect);
-                RdotX = dot(W6x, RayVect);
-                Psi = std::atan2(RdotY / Sint, RdotX / Sint);
-                if (Psi < 0.0) {
-                    Phi = 2.0 * DataGlobalConstants::Pi + Psi;
-                } else {
-                    Phi = Psi;
-                }
+
+        switch (RadType) {
+        case RayIdentificationType::Front_Incident: {
+            RdotZ = dot(W6z, RayVect);
+            Cost = -RdotZ;
+            Sint = std::sqrt(1.0 - pow_2(Cost));
+            Theta = std::acos(Cost);
+            RdotY = dot(W6y, RayVect);
+            RdotX = dot(W6x, RayVect);
+            Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
+            if (Psi < 0.0) {
+                Phi = 2.0 * DataGlobalConstants::Pi + Psi;
             } else {
-                assert(false);
+                Phi = Psi;
             }
+            break;
+        }
+        case RayIdentificationType::Front_Transmitted: {
+            Cost = dot(W6z, RayVect);
+            Sint = std::sqrt(1.0 - pow_2(Cost));
+            Theta = std::acos(Cost);
+            RdotY = dot(W6y, RayVect);
+            RdotX = dot(W6x, RayVect);
+            Psi = std::atan2(RdotY / Sint, RdotX / Sint);
+            if (Psi < 0.0) {
+                Phi = 2.0 * DataGlobalConstants::Pi + Psi;
+            } else {
+                Phi = Psi;
+            }
+            break;
+        }
+        case RayIdentificationType::Front_Reflected: {
+            RdotZ = dot(W6z, RayVect);
+            Cost = -RdotZ;
+            Sint = std::sqrt(1.0 - pow_2(Cost));
+            Theta = std::acos(Cost);
+            RdotY = dot(W6y, RayVect);
+            RdotX = dot(W6x, RayVect);
+            Psi = std::atan2(RdotY / Sint, RdotX / Sint);
+            if (Psi < 0.0) {
+                Phi = 2.0 * DataGlobalConstants::Pi + Psi;
+            } else {
+                Phi = Psi;
+            }
+            break;
+        }
+        case RayIdentificationType::Back_Incident: {
+            Cost = dot(W6z, RayVect);
+            Sint = std::sqrt(1.0 - pow_2(Cost));
+            Theta = std::acos(Cost);
+            RdotY = dot(W6y, RayVect);
+            RdotX = dot(W6x, RayVect);
+            Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
+            if (Psi < 0.0) {
+                Phi = 2 * DataGlobalConstants::Pi + Psi;
+            } else {
+                Phi = Psi;
+            }
+            break;
+        }
+        case RayIdentificationType::Back_Transmitted: { // This is same as front reflected
+            RdotZ = dot(W6z, RayVect);
+            Cost = -RdotZ;
+            Sint = std::sqrt(1.0 - pow_2(Cost));
+            Theta = std::acos(Cost);
+            RdotY = dot(W6y, RayVect);
+            RdotX = dot(W6x, RayVect);
+            Psi = std::atan2(RdotY / Sint, RdotX / Sint);
+            if (Psi < 0.0) {
+                Phi = 2.0 * DataGlobalConstants::Pi + Psi;
+            } else {
+                Phi = Psi;
+            }
+            break;
+        }
+        case RayIdentificationType::Back_Reflected: { // This is same as front transmitted
+            Cost = dot(W6z, RayVect);
+            Sint = std::sqrt(1.0 - pow_2(Cost));
+            Theta = std::acos(Cost);
+            RdotY = dot(W6y, RayVect);
+            RdotX = dot(W6x, RayVect);
+            Psi = std::atan2(RdotY / Sint, RdotX / Sint);
+            if (Psi < 0.0) {
+                Phi = 2.0 * DataGlobalConstants::Pi + Psi;
+            } else {
+                Phi = Psi;
+            }
+            break;
+        }
+        default:
+            assert(false);
+            break;
         }
         if (std::abs(Cost) < DataGlobalConstants::rTinyValue) Cost = 0.0;
         if (Cost < 0.0) Theta = DataGlobalConstants::Pi - Theta; // This signals ray out of hemisphere
@@ -2666,7 +2688,7 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        DataComplexFenestration::GasCoeffs GasType; // locally used coefficent to point at correct gas type
+        int GasType; // locally used coefficient to point at correct gas type
         int ICoeff;
 
         std::string tarcogErrorMessage; // store error text from tarcog
@@ -2697,7 +2719,7 @@ namespace WindowComplexManager {
         CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
         CalcSHGC = 0;
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -2727,7 +2749,7 @@ namespace WindowComplexManager {
         isky = 3; // IR radiation is provided from external source
         iwd = 0;  // assume windward for now.  TODO compare surface normal with wind direction
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
             Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
             tind = RefAirTemp + DataGlobalConstants::KelvinConv; // Inside air temperature
@@ -2838,13 +2860,13 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = DataComplexFenestration::GasCoeffs::Air;
-        wght(iprop(1, 1)) = GasWght(static_cast<int>(GasType));
-        gama(iprop(1, 1)) = GasSpecificHeatRatio(static_cast<int>(GasType));
+        GasType = static_cast<int>(DataComplexFenestration::GasCoeffs::Air);
+        wght(iprop(1, 1)) = GasWght[GasType - 1];
+        gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, static_cast<int>(GasType));
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, static_cast<int>(GasType));
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, static_cast<int>(GasType));
+            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp[ICoeff - 1][GasType - 1];
         }
 
         // Fill window layer properties needed for window layer heat balance calculation
@@ -2914,8 +2936,6 @@ namespace WindowComplexManager {
 
                 nmix(IGap + 1) = state.dataMaterial->Material(GasPointer).NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    // iprop(IGap+1, IMix) = dataMaterial.Material(LayPtr)%GasType(IMix)
-                    // iprop(IGap+1, IMix) = GetGasIndex(dataMaterial.Material(LayPtr)%GasWght(IMix))
                     frct(IMix, IGap + 1) = state.dataMaterial->Material(GasPointer).GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
@@ -2945,7 +2965,7 @@ namespace WindowComplexManager {
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
                 if (LayerType(Lay) != TARCOGParams::TARCOGLayerType::SPECULAR) { // Layer is shading
@@ -2974,7 +2994,7 @@ namespace WindowComplexManager {
         // vector of absorbed solar energy fractions for each layer.
         asol = 0.0;
         // direct solar radiation
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
                   state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
@@ -3003,13 +3023,13 @@ namespace WindowComplexManager {
         }
 
         // Standard conditions run (winter and summer)
-        if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             tind = 294.15;
             tout = 255.15;
             hcout = 26.0;
             wso = 5.5;
             dir = 0.0;
-        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Summer) {
             tind = 297.15;
             tout = 305.15;
             hcout = 15.0;
@@ -3019,7 +3039,7 @@ namespace WindowComplexManager {
         }
 
         // Common condition data
-        if (CalcCondition != DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition != DataBSDFWindow::Condition::Invalid) {
             trmin = tind;
             outir = 0.0;
             tsky = tout;
@@ -3165,14 +3185,14 @@ namespace WindowComplexManager {
             ShowSevereError(state, "Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
             ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
-            if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+            if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
                 ShowContinueError(state, "surface name = " + state.dataSurface->Surface(SurfNum).Name);
             }
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
             ShowFatalError(state, "halting because of error in tarcog");
-        } else if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             state.dataHeatBal->NominalU(ConstrNum) = ufactor;
-        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Summer) {
             // tempInt = SurfaceWindow(SurfNum)%ComplexFen%CurrentState
             // tempReal = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffTrans
 
@@ -3195,7 +3215,7 @@ namespace WindowComplexManager {
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;
 
             // Construct(SurfNum)%VisTransNorm = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffVisTrans
-        } else if (CalcCondition == DataBSDFWindow::Condition::Unassigned) { // expect converged results...
+        } else if (CalcCondition == DataBSDFWindow::Condition::Invalid) { // expect converged results...
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;

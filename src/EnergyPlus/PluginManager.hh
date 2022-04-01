@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -209,6 +209,8 @@ namespace PluginManagement {
         static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
+
+        bool eplusRunningViaPythonAPI = false;
     };
 
     struct PluginTrendVariable
@@ -243,10 +245,13 @@ struct PluginManagerData : BaseGlobalStruct
     bool apiErrorFlag = false;
     std::vector<std::string> const objectsToFind = {
         "PythonPlugin:OutputVariable", "PythonPlugin:SearchPaths", "PythonPlugin:Instance", "PythonPlugin:Variables", "PythonPlugin:TrendVariable"};
+
+    bool eplusRunningViaPythonAPI = false;
+
     void clear_state() override
     {
         callbacks.clear();
-#if LINK_WITH_PYTHON == 1
+#if LINK_WITH_PYTHON
         for (auto &plugin : plugins) {
             plugin.shutdown(); // clear unmanaged memory first
         }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantAvailManager.hh>
 
 namespace EnergyPlus {
 
@@ -181,7 +182,7 @@ namespace DataHVACGlobals {
     int constexpr CoilVRF_FluidTCtrl_Cooling(33);
     int constexpr CoilVRF_FluidTCtrl_Heating(34);
     int constexpr CoilDX_Cooling(35);
-    //    int const CoilDX_SubcoolReheat(36);
+    //    int constexpr CoilDX_SubcoolReheat(36);
     int constexpr CoilDX_CurveFit_Speed(37);
 
     int constexpr coilNormalMode = 0;        // Normal operation mode
@@ -325,17 +326,17 @@ namespace DataHVACGlobals {
     struct DefineZoneCompAvailMgrs
     {
         // Members
-        int NumAvailManagers;             // number of availability managers for this system
-        int AvailStatus;                  // system availability status
-        int StartTime;                    // cycle on time (in SimTimeSteps)
-        int StopTime;                     // cycle off time (in SimTimeSteps)
-        std::string AvailManagerListName; // name of each availability manager
-        Array1D_string AvailManagerName;  // name of each availability manager
-        Array1D_int AvailManagerType;     // type of availability manager
-        Array1D_int AvailManagerNum;      // index for availability manager
-        int ZoneNum;                      // cycle off time (in SimTimeSteps)
-        bool Input;                       // starts off as true to initialize zone equipment availability manager data
-        int Count;                        // initialize twice to ensure zone equipment availability manager list name has been read in
+        int NumAvailManagers;                                        // number of availability managers for this system
+        int AvailStatus;                                             // system availability status
+        int StartTime;                                               // cycle on time (in SimTimeSteps)
+        int StopTime;                                                // cycle off time (in SimTimeSteps)
+        std::string AvailManagerListName;                            // name of each availability manager
+        Array1D_string AvailManagerName;                             // name of each availability manager
+        Array1D<DataPlant::SystemAvailabilityType> AvailManagerType; // type of availability manager
+        Array1D_int AvailManagerNum;                                 // index for availability manager
+        int ZoneNum;                                                 // cycle off time (in SimTimeSteps)
+        bool Input;                                                  // starts off as true to initialize zone equipment availability manager data
+        int Count; // initialize twice to ensure zone equipment availability manager list name has been read in
 
         // Default Constructor
         DefineZoneCompAvailMgrs() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0), ZoneNum(0), Input(true), Count(0)
@@ -366,6 +367,14 @@ namespace DataHVACGlobals {
         OptStartDataType() = default;
     };
 
+    // Compressor operation
+    enum class CompressorOperation
+    {
+        Invalid = -1,
+        Off, // signal DXCoil that compressor shouldn't run
+        On,  // normal compressor operation
+        Num
+    };
 } // namespace DataHVACGlobals
 
 struct HVACGlobalsData : BaseGlobalStruct

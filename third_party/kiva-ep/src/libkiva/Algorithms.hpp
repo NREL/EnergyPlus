@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef ConvectionAlgorithms_HPP
@@ -20,7 +20,6 @@
 #define KIVA_HF_DEF [=](double, double, double, double windSpeed) -> double { return windSpeed; }
 #define KIVA_HF_ZERO [=](double, double, double, double) -> double { return 0.0; }
 
-
 namespace Kiva {
 
 MEMOIZE_DECL(cos)
@@ -34,7 +33,8 @@ typedef std::function<double(double, double, double, double)> ForcedConvectionTe
 
 double cbrt_a(double x);
 
-double LIBKIVA_EXPORT getMoWiTTForcedTerm(double cosTilt, double azimuth, double windDir, double windSpeed);
+double LIBKIVA_EXPORT getMoWiTTForcedTerm(double cosTilt, double azimuth, double windDir,
+                                          double windSpeed);
 
 double LIBKIVA_EXPORT getDOE2ConvectionCoeff(double Tsurf, double Tamb, double hfTerm,
                                              double roughness, double cosTilt);

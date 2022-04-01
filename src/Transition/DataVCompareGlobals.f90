@@ -63,6 +63,7 @@ logical LeaveBlank  ! True if blank fields on input should be left blank (no def
 integer auditf  ! auditfile
 real  :: VersionNum=0.0
 CHARACTER(len=3) :: sVersionNum=''
+CHARACTER(len=4) :: sVersionNumFourChars=''
 
 ! Added for compare routines
 

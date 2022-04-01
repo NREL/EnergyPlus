@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include "DeflectionFromCurves.hpp"
+
 namespace Tarcog
 {
     namespace ISO15099
@@ -50,6 +52,10 @@ namespace Tarcog
             [[nodiscard]] std::vector<double> getMaxDeflections() const;
             [[nodiscard]] std::vector<double> getMeanDeflections() const;
 
+            //! Function to return pressure difference on each of the layers when using deflection
+            //! model
+            [[nodiscard]] std::vector<double> getPanesLoad() const;
+
             [[nodiscard]] double getTilt() const;
             [[nodiscard]] double getWidth() const;
             [[nodiscard]] double getHeight() const;
@@ -61,8 +67,19 @@ namespace Tarcog
 
             void setInitialGuess(const std::vector<double> & t_Guess) const;
 
-            void setDeflectionProperties(double t_Tini, double t_Pini);
+            void setDeflectionProperties(double t_Tini,
+                                         double t_Pini,
+                                         double t_InsidePressure = 101325,
+                                         double t_OutsidePressure = 101325);
+
             void setDeflectionProperties(const std::vector<double> & t_MeasuredDeflections);
+
+            void setAppliedLoad(std::vector<double> t_AppliedLoad);
+
+            void clearDeflection();
+
+            //! Function that will update layers deflection states based on new temperature data
+            void updateDeflectionState();
 
         private:
             // Replces layer in existing construction and keeps correct connections in linked list
@@ -81,6 +98,15 @@ namespace Tarcog
             // Routines to calculate deflection coefficients
             [[nodiscard]] double Ldmean() const;
             [[nodiscard]] double Ldmax() const;
+
+            //! This is by default set to nullptr since deflection is not turn on by default.
+            //! Setting deflection properties will enable deflection calculations automatically.
+            std::unique_ptr<Deflection::DeflectionE1300> m_DeflectionFromE1300Curves;
+
+            //! It is possible that user can set applied load before setting initial parameters for
+            //! the deflection in which case applied load will not be set automatically. This is
+            //! intermediate variable that keeps applied load so it can be applied later.
+            std::vector<double> m_DeflectionAppliedLoad;
         };
 
     }   // namespace ISO15099

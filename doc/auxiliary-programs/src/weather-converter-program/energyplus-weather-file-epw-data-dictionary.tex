@@ -668,7 +668,10 @@ The ratio (unitless) of reflected solar irradiance to global horizontal irradian
 
 \subsubsection{Field: Liquid Precipitation Depth}\label{field-liquid-precipitation-depth}
 
-The amount of liquid precipitation (mm) observed at the indicated time for the period indicated in the liquid precipitation quantity field. If this value is not missing, then it is used and overrides the ``precipitation'' flag as rainfall. Conversely, if the precipitation flag shows rain and this field is missing or zero, it is set to 1.5 (mm).
+The amount of liquid precipitation (mm) observed at the indicated time for the period indicated in the liquid
+precipitation quantity field. If this value is not missing, then it is used and overrides the rain indicator (IsRain) as
+true, when the hourly liquid precipitation is no less than 0.8 mm. Conversely, if the rain indicator shows rain and this
+field is missing or zero, it is set to 2.0 mm.
 
 \subsubsection{Field: Liquid Precipitation Quantity}\label{field-liquid-precipitation-quantity}
 

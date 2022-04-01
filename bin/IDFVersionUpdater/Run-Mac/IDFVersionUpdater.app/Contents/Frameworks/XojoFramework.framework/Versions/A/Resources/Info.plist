@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>13D65</string>
+	<string>19H1417</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
@@ -20,23 +20,31 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>5B1008</string>
+	<string>12B45b</string>
+	<key>DTPlatformName</key>
+	<string>macosx</string>
 	<key>DTPlatformVersion</key>
-	<string>GM</string>
+	<string>11.0</string>
 	<key>DTSDKBuild</key>
-	<string>13C64</string>
+	<string>20A2408</string>
 	<key>DTSDKName</key>
-	<string>macosx10.9</string>
+	<string>macosx11.0</string>
 	<key>DTXcode</key>
-	<string>0511</string>
+	<string>1220</string>
 	<key>DTXcodeBuild</key>
-	<string>5B1008</string>
+	<string>12B45b</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.9</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2014 Xojo, Inc. All rights reserved.</string>
+	<string>Copyright © 2015 Xojo, Inc. All rights reserved.</string>
 </dict>
 </plist>

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -184,11 +184,6 @@ namespace TranspiredCollector {
 
 struct TranspiredCollectorData : BaseGlobalStruct
 {
-
-    int const Layout_Square = 1;
-    int const Layout_Triangle = 2;
-    int const Correlation_Kutscher1994 = 1;
-    int const Correlation_VanDeckerHollandsBrunger2001 = 2;
 
     int NumUTSC = 0; // number of transpired collectors in model
     Array1D_bool CheckEquipName;

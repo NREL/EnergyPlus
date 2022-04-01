@@ -101,7 +101,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.1;
 
   Building,
     Building,                !- Name
@@ -3250,17 +3250,23 @@
     ..\datasets\TDV\TDV_2008_kBtu_CTZ06.csv,  !- File Name
     1,                       !- Column Number
     4,                       !- Rows to Skip at Top
-    ,                        !- Number of Hours of Data
-    ,                        !- Column Separator
-    ,                        !- Interpolate to Timestep
-    60;                      !- Minutes per Item
+    8760,                    !- Number of Hours of Data
+    Comma,                   !- Column Separator
+    No,                      !- Interpolate to Timestep
+    60,                      !- Minutes per Item
+    No;                      !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     natgasTDVfromCZ06com,    !- Name
     Any Number,              !- Schedule Type Limits Name
     ..\datasets\TDV\TDV_2008_kBtu_CTZ06.csv,  !- File Name
     3,                       !- Column Number
-    4;                       !- Rows to Skip at Top
+    4,                       !- Rows to Skip at Top
+    8760,                    !- Number of Hours of Data
+    Comma,                   !- Column Separator
+    No,                      !- Interpolate to Timestep
+    60,                      !- Minutes per Item
+    No;                      !- Adjust Schedule for Daylight Savings
 
   EnvironmentalImpactFactors,
     0.3,                     !- District Heating Efficiency
@@ -3390,6 +3396,10 @@
   Output:Variable,*,Pump Mass Flow Rate,hourly;
 
   Output:Variable,*,Pump Outlet Temperature,hourly;
+
+  Output:Variable,*,Environmental Impact NaturalGas Source Energy,hourly;
+
+  Output:Variable,*,Environmental Impact Electricity Source Energy,hourly;
 
   Output:VariableDictionary,Regular;
 

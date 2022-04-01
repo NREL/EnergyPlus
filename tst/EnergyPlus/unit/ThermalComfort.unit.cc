@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -809,6 +809,22 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     state->dataThermalComforts->clear_state();
     RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 14.0, 0.1);
+
+    // set AverageWithSurface to false for Kiva surfaces
+    SurfNum = 1;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 13.1, 0.1);
+
+    SurfNum = 2;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 17.1, 0.1);
+
+    SurfNum = 3;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 18.0, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
@@ -1030,7 +1046,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->ZoneMRT(1) = RadTemp;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) =
         Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
-    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * ThermalComfort::ActLevelConv;
     state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 
     // Test 1 - Air velocity = 0.15 m/s.

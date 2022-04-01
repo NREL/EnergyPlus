@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,7 +100,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     // In general, values set here attempt to avoid as much code as possible so that only the defect code is run.
     // Obviously, not everything can be skipped so some of this information is needed to avoid crashes in other routines.
     auto &thisEFC = state->dataEvapFluidCoolers->SimpleEvapFluidCooler(1);
-    thisEFC.TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
+    thisEFC.Type = DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
     thisEFC.MyOneTimeFlag = false;
     thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
     thisEFC.MyEnvrnFlag = false;
@@ -108,10 +108,10 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.WaterInletNodeNum = 1;
     thisEFC.WaterOutletNodeNum = 2;
     thisEFC.OutdoorAirInletNodeNum = 0;
-    thisEFC.LoopNum = 1;
-    thisEFC.LoopSideNum = 1;
-    thisEFC.BranchNum = 1;
-    thisEFC.CompNum = 1;
+    thisEFC.plantLoc.loopNum = 1;
+    thisEFC.plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    thisEFC.plantLoc.branchNum = 1;
+    thisEFC.plantLoc.compNum = 1;
     PlantLocation pl;
     state->dataEnvrn->OutDryBulbTemp = 20.0;
     state->dataEnvrn->OutHumRat = 0.02;
@@ -126,13 +126,12 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataLoopNodes->Node(1).MassFlowRateMax = 0.05;
     state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.05;
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).MyLoad = 1.0;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).ON = false;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).CurOpSchemeType = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = false;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).CurOpSchemeType = DataPlant::OpScheme::Invalid;
     thisEFC.DesignWaterFlowRateWasAutoSized = false;
     thisEFC.LowSpeedAirFlowRateWasAutoSized = false;
     thisEFC.HighSpeedEvapFluidCoolerUAWasAutoSized = false;
@@ -157,7 +156,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     ExpectedMinLoad = 0.0;
 
     // Call the routine to be tested and see if the fix is correct
-    PlantLocation loc = PlantLocation(1, 1, 1, 1);
+    PlantLocation loc = PlantLocation(1, DataPlant::LoopSideLocation::Demand, 1, 1);
     thisEFC.onInitLoopEquip(*state, loc);
     thisEFC.getDesignCapacities(*state, pl, MaxLoad, MinLoad, OptLoad);
     EXPECT_NEAR(MaxLoad, ExpectedMaxLoad, 0.01);

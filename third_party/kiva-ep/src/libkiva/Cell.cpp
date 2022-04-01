@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Cell_CPP
@@ -40,8 +40,8 @@ void Cell::Assemble(const Foundation &foundation) {
   }
 }
 
-void Cell::setDistances(const double &dxp_in, const double &dxm_in, const double &dyp_in,
-                        const double &dym_in, const double &dzp_in, const double &dzm_in) {
+void Cell::setDistances(const double dxp_in, const double dxm_in, const double dyp_in,
+                        const double dym_in, const double dzp_in, const double dzm_in) {
   dist[0][1] = dxp_in;
   dist[0][0] = dxm_in;
   dist[1][1] = dyp_in;
@@ -203,7 +203,7 @@ double Cell::calcCellExplicit(double timestep, const Foundation &foundation,
   return TNew;
 }
 
-void Cell::calcCellMatrix(Foundation::NumericalScheme scheme, const double &timestep,
+void Cell::calcCellMatrix(Foundation::NumericalScheme scheme, const double timestep,
                           const Foundation &foundation, const BoundaryConditions & /*bcs*/,
                           double &A, double (&Alt)[3][2], double &bVal) {
   if (scheme == Foundation::NS_STEADY_STATE) {
@@ -253,7 +253,7 @@ void Cell::calcCellSteadyState(const Foundation &foundation, double &A, double (
   bVal = -heatGain;
 }
 
-void Cell::calcCellADI(std::size_t dim, const double &timestep, const Foundation &foundation,
+void Cell::calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                        const BoundaryConditions & /*bcs*/, double &A, double (&Alt)[2],
                        double &bVal) {
   double theta = timestep * iHeatCapacityADI;
@@ -295,7 +295,7 @@ void Cell::ADImath(std::size_t dim, const double Q, const double f, const double
   bVal += *told_ptr * (1.0 + f * bit);
 }
 
-void Cell::gatherCCoeffs(const double &theta, bool cylindrical, double (&C)[3][2]) {
+void Cell::gatherCCoeffs(const double theta, bool cylindrical, double (&C)[3][2]) {
   for (auto dim : dims) {
     if (dim < 5) {
       C[dim][0] = pde[dim][0] * theta;
@@ -400,13 +400,13 @@ double ExteriorAirCell::calcCellExplicit(double /*timestep*/, const Foundation &
   return bcs.outdoorTemp;
 }
 
-void ExteriorAirCell::calcCellADI(std::size_t /*dim*/, const double & /*timestep*/,
+void ExteriorAirCell::calcCellADI(std::size_t /*dim*/, const double /*timestep*/,
                                   const Foundation &, const BoundaryConditions &bcs, double &A,
                                   double (&)[2], double &bVal) {
   doOutdoorTemp(bcs, A, bVal);
 }
 
-void ExteriorAirCell::calcCellMatrix(Foundation::NumericalScheme, const double & /*timestep*/,
+void ExteriorAirCell::calcCellMatrix(Foundation::NumericalScheme, const double /*timestep*/,
                                      const Foundation &, const BoundaryConditions &bcs, double &A,
                                      double (&)[3][2], double &bVal) {
   doOutdoorTemp(bcs, A, bVal);
@@ -444,13 +444,13 @@ double InteriorAirCell::calcCellExplicit(double /*timestep*/, const Foundation &
   return bcs.slabConvectiveTemp;
 }
 
-void InteriorAirCell::calcCellMatrix(Foundation::NumericalScheme, const double & /*timestep*/,
+void InteriorAirCell::calcCellMatrix(Foundation::NumericalScheme, const double /*timestep*/,
                                      const Foundation &, const BoundaryConditions &bcs, double &A,
                                      double (&)[3][2], double &bVal) {
   doIndoorTemp(bcs, A, bVal);
 }
 
-void InteriorAirCell::calcCellADI(std::size_t /*dim*/, const double & /*timestep*/,
+void InteriorAirCell::calcCellADI(std::size_t /*dim*/, const double /*timestep*/,
                                   const Foundation &, const BoundaryConditions &bcs, double &A,
                                   double (&)[2], double &bVal) {
   doIndoorTemp(bcs, A, bVal);
@@ -591,7 +591,7 @@ double BoundaryCell::calcCellExplicit(double /*timestep*/, const Foundation & /*
   }
 }
 
-void BoundaryCell::calcCellADI(std::size_t dim, const double & /*timestep*/,
+void BoundaryCell::calcCellADI(std::size_t dim, const double /*timestep*/,
                                const Foundation & /*foundation*/, const BoundaryConditions &bcs,
                                double &A, double (&Alt)[2], double &bVal) {
   std::size_t sdim = surfacePtr->orientation_dim;
@@ -620,7 +620,7 @@ void BoundaryCell::calcCellADI(std::size_t dim, const double & /*timestep*/,
   }
 }
 
-void BoundaryCell::calcCellMatrix(Foundation::NumericalScheme, const double & /*timestep*/,
+void BoundaryCell::calcCellMatrix(Foundation::NumericalScheme, const double /*timestep*/,
                                   const Foundation & /*foundation*/, const BoundaryConditions &bcs,
                                   double &A, double (&Alt)[3][2], double &bVal) {
   std::size_t dim = surfacePtr->orientation_dim;
@@ -759,8 +759,8 @@ BoundaryCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::si
                                               surfacePtr->propPtr->roughness, cosTilt);            \
   double hr = getExteriorIRCoeff(surfacePtr->propPtr->emissivity, *told_ptr, Tair, Fqtr);
 
-void BoundaryCell::zfCellADI(const int &dim, const int &sdim, const int &sign, double &A,
-                             double &Alt, double &bVal) {
+void BoundaryCell::zfCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign,
+                             double &A, double &Alt, double &bVal) {
   A = 1.0;
   if (dim == sdim) {
     Alt = -1.0;
@@ -771,7 +771,8 @@ void BoundaryCell::zfCellADI(const int &dim, const int &sdim, const int &sign, d
   }
 }
 
-void BoundaryCell::ifCellADI(const int &dim, const int &sdim, const int &dir, double &A, double &Alt, double &bVal) {
+void BoundaryCell::ifCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t dir,
+                             double &A, double &Alt, double &bVal) {
   INTFLUX_PREFACE
 
   int sign = (dir == 0) ? -1 : 1;
@@ -779,15 +780,16 @@ void BoundaryCell::ifCellADI(const int &dim, const int &sdim, const int &dir, do
   A = kcoeff[sdim][dir] / dist[sdim][dir] + (hc + hr);
   if (dim == sdim) {
     Alt = -kcoeff[sdim][dir] / dist[sdim][dir];
-    bVal = (hc + hr) * Tair + heatGain;
+    bVal = hc * Tair + hr * Trad + heatGain;
   } else {
     Alt = 0.0;
     bVal = *(told_ptr + sign * stepsize[sdim]) * kcoeff[sdim][dir] / dist[sdim][dir] +
-           (hc + hr) * Tair + heatGain;
+           hc * Tair + hr * Trad + heatGain;
   }
 }
 
-void BoundaryCell::efCellADI(const int &dim, const int &sdim, const int &dir, double &A, double &Alt, double &bVal) {
+void BoundaryCell::efCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t dir,
+                             double &A, double &Alt, double &bVal) {
   EXTFLUX_PREFACE
 
   int sign = (dir == 0) ? -1 : 1;
@@ -809,15 +811,17 @@ void BoundaryCell::zfCellMatrix(double &A, double &Alt, double &bVal) {
   bVal = 0.0;
 }
 
-void BoundaryCell::ifCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal) {
+void BoundaryCell::ifCellMatrix(const std::size_t dim, const std::size_t dir, double &A,
+                                double &Alt, double &bVal) {
   INTFLUX_PREFACE
 
   A = kcoeff[dim][dir] / dist[dim][dir] + (hc + hr);
   Alt = -kcoeff[dim][dir] / dist[dim][dir];
-  bVal = (hc + hr) * Tair + heatGain;
+  bVal = hc * Tair + hr * Trad + heatGain;
 }
 
-void BoundaryCell::efCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal) {
+void BoundaryCell::efCellMatrix(const std::size_t dim, const std::size_t dir, double &A,
+                                double &Alt, double &bVal) {
   EXTFLUX_PREFACE
 
   A = kcoeff[dim][dir] / dist[dim][dir] + (hc + hr);
@@ -825,7 +829,7 @@ void BoundaryCell::efCellMatrix(const int &dim, const int &dir, double &A, doubl
   bVal = (hc + hr * Fqtr) * Tair + heatGain;
 }
 
-void BoundaryCell::zfCellADEUp(const std::size_t &dim, const std::size_t &dir, double &U) {
+void BoundaryCell::zfCellADEUp(const std::size_t dim, const std::size_t &dir, double &U) {
   if (dir == 1) {
     U = *(told_ptr + stepsize[dim]);
   } else /* if (dir == 0) */ {
@@ -833,7 +837,7 @@ void BoundaryCell::zfCellADEUp(const std::size_t &dim, const std::size_t &dir, d
   }
 }
 
-void BoundaryCell::ifCellADEUp(const int &dim, const int &dir, double &U) {
+void BoundaryCell::ifCellADEUp(const std::size_t dim, const std::size_t dir, double &U) {
   INTFLUX_PREFACE
 
   double bit;
@@ -842,11 +846,11 @@ void BoundaryCell::ifCellADEUp(const int &dim, const int &dir, double &U) {
   } else /*if (dir == 0)*/ {
     bit = *(&U - stepsize[dim]);
   }
-  U = (kcoeff[dim][dir] * bit / dist[dim][dir] + (hc + hr) * Tair + heatGain) /
+  U = (kcoeff[dim][dir] * bit / dist[dim][dir] + hc * Tair + hr * Trad + heatGain) /
       (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-void BoundaryCell::efCellADEUp(const int &dim, const int &dir, double &U) {
+void BoundaryCell::efCellADEUp(const std::size_t dim, const std::size_t dir, double &U) {
   EXTFLUX_PREFACE
 
   double bit;
@@ -859,7 +863,7 @@ void BoundaryCell::efCellADEUp(const int &dim, const int &dir, double &U) {
       (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-void BoundaryCell::zfCellADEDown(const std::size_t &dim, const std::size_t &dir, double &V) {
+void BoundaryCell::zfCellADEDown(const std::size_t dim, const std::size_t &dir, double &V) {
   if (dir == 1) {
     V = *(&V + stepsize[dim]);
   } else /* if (dir == 0) */ {
@@ -867,7 +871,7 @@ void BoundaryCell::zfCellADEDown(const std::size_t &dim, const std::size_t &dir,
   }
 }
 
-void BoundaryCell::ifCellADEDown(const int &dim, const int &dir, double &V) {
+void BoundaryCell::ifCellADEDown(const std::size_t dim, const std::size_t dir, double &V) {
   INTFLUX_PREFACE
 
   double bit;
@@ -876,11 +880,11 @@ void BoundaryCell::ifCellADEDown(const int &dim, const int &dir, double &V) {
   } else /*if (dir == 0)*/ {
     bit = *(told_ptr - stepsize[dim]);
   }
-  V = (kcoeff[dim][dir] * bit / dist[dim][dir] + (hc + hr) * Tair + heatGain) /
+  V = (kcoeff[dim][dir] * bit / dist[dim][dir] + hc * Tair + hr * Trad + heatGain) /
       (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-void BoundaryCell::efCellADEDown(const int &dim, const int &dir, double &V) {
+void BoundaryCell::efCellADEDown(const std::size_t dim, const std::size_t dir, double &V) {
   EXTFLUX_PREFACE
 
   double bit;
@@ -893,22 +897,22 @@ void BoundaryCell::efCellADEDown(const int &dim, const int &dir, double &V) {
       (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-double BoundaryCell::zfCellExplicit(const std::size_t &dim, const std::size_t &dir) {
+double BoundaryCell::zfCellExplicit(const std::size_t dim, const std::size_t &dir) {
   int sign = (dir == 0) ? -1 : 1;
   return *(told_ptr + sign * stepsize[dim]);
 }
 
-double BoundaryCell::ifCellExplicit(const std::size_t &dim, const std::size_t &dir) {
+double BoundaryCell::ifCellExplicit(const std::size_t dim, const std::size_t &dir) {
   INTFLUX_PREFACE
 
   int sign = (dir == 0) ? -1 : 1;
 
   return (kcoeff[dim][dir] * *(told_ptr + sign * stepsize[dim]) / dist[dim][dir] +
-          (hc + hr) * Tair + heatGain) /
+          hc * Tair + hr * Trad + heatGain) /
          (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
-double BoundaryCell::efCellExplicit(const std::size_t &dim, const std::size_t &dir) {
+double BoundaryCell::efCellExplicit(const std::size_t dim, const std::size_t &dir) {
   EXTFLUX_PREFACE
 
   return (kcoeff[dim][dir] * *(told_ptr + stepsize[dim]) / dist[dim][dir] +
