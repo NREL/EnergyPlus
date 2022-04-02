@@ -688,6 +688,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             }
             ++Object;
         }
+        NodeObjects(NumObjects) = state.dataBranchNodeConnections->NumOfNodeConnections + 1;
         // NodeObjects now contains each consecutive object...
         for (Object = 1; Object <= NumObjects - 1; ++Object) {
             IsValid = true;
