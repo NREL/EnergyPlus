@@ -684,7 +684,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataBranchNodeConnections->NodeConnections(Object + 1).ObjectName) {
                 EndConnect = Object + 1;
                 NodeObjects(NumObjects) = EndConnect;
-                if (Object + 1 < state.dataBranchNodeConnections->NumOfNodeConnections) ++NumObjects;
+                // if (Object + 1 < state.dataBranchNodeConnections->NumOfNodeConnections) ++NumObjects;
+                ++NumObjects;
             }
             ++Object;
         }
