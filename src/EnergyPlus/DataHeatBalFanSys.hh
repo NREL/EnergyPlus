@@ -427,6 +427,10 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->ZoneLightingLevelHourBins.deallocate();
         this->ZoneLightingLevelOccuHourBins.deallocate();
         this->ZoneComfortControlsFanger.deallocate();
+
+        this->ZoneHeatIndexHourBinsRepPeriod.deallocate();
+        this->ZoneHeatIndexOccuHourBinsRepPeriod.deallocate();
+        this->ZoneHeatIndexOccupiedHourBinsRepPeriod.deallocate();
     }
 };
 
