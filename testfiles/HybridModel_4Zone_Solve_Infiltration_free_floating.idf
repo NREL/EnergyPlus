@@ -1307,6 +1307,8 @@
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Cold Stress Temperature Thresh [C],
+    ,                        !- Heat Stress Temperature Thresh [C],
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1325,6 +1327,8 @@
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Cold Stress Temperature Thresh [C],
+    ,                        !- Heat Stress Temperature Thresh [C],
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1343,6 +1347,8 @@
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Cold Stress Temperature Thresh [C],
+    ,                        !- Heat Stress Temperature Thresh [C],
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1361,6 +1367,8 @@
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Cold Stress Temperature Thresh [C],
+    ,                        !- Heat Stress Temperature Thresh [C],
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
