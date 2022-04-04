@@ -446,10 +446,10 @@
     ZONE ONE People,         !- Name
     ZONE ONE,                !- Zone or ZoneList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
-    Area/Person,             !- Number of People Calculation Method
-    ,                        !- Number of People
+    People,                  !- Number of People Calculation Method
+    10,                      !- Number of People
     ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- Zone Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
