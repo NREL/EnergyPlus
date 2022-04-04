@@ -1074,6 +1074,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "  0.1,                     !- Sensible Heat Fraction",
         "  Core_bottom Activity,    !- Activity Level Schedule Name",
         "  3.82e-08,                !- Carbon Dioxide Generation Rate",
+        "    ,                      !- Cold Stress Temperature Thresh [C]",
+        "    ,                      !- Heat Stress Temperature Thresh [C]",
         "  Yes,                     !- Enable ASHRAE 55 Comfort Warnings",
         "  ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
         "  ,                        !- Surface NameAngle Factor List Name",
@@ -3238,6 +3240,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataHeatBalFanSys->ZoneHumidexHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneHumidexOccuHourBins.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->CrossedColdThresh.dimension(state->dataGlobal->NumOfZones, false);
+    state->dataHeatBalFanSys->CrossedHeatThresh.dimension(state->dataGlobal->NumOfZones, false);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state->dataGlobal->NumOfZones, 28.0);
 
     state->dataHeatBal->TotPeople = 1;
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);

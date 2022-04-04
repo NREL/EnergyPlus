@@ -405,6 +405,8 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    ,                        !- Sensible Heat Fraction",
         "    Activity Sch,            !- Activity Level Schedule Name",
         "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "    ,                        !- Cold Stress Temperature Thresh [C]",
+        "    ,                        !- Heat Stress Temperature Thresh [C]",
         "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
         "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
