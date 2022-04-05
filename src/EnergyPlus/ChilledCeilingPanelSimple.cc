@@ -137,18 +137,18 @@ void SimCoolingPanel(EnergyPlusData &state,
         CoolingPanelNum = UtilityRoutines::FindItemInList(EquipName,
                                                           state.dataChilledCeilingPanelSimple->CoolingPanel,
                                                           &CoolingPanelParams::EquipID,
-                                                          state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+                                                          (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         if (CoolingPanelNum == 0) {
             ShowFatalError(state, "SimCoolingPanelSimple: Unit not found=" + EquipName);
         }
         CompIndex = CoolingPanelNum;
     } else {
         CoolingPanelNum = CompIndex;
-        if (CoolingPanelNum > state.dataChilledCeilingPanelSimple->NumCoolingPanels || CoolingPanelNum < 1) {
+        if (CoolingPanelNum > (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size() || CoolingPanelNum < 1) {
             ShowFatalError(state,
                            format("SimCoolingPanelSimple:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                   CoolingPanelNum,
-                                  state.dataChilledCeilingPanelSimple->NumCoolingPanels,
+                                  (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size(),
                                   EquipName));
         }
         if (state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum)) {
@@ -257,18 +257,18 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     int IOStat;
     bool ErrorsFound(false); // If errors detected in input
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-    state.dataChilledCeilingPanelSimple->NumCoolingPanels =
+    int NumCoolingPanels =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
 
     // Count total number of baseboard units
 
-    state.dataChilledCeilingPanelSimple->CoolingPanel.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
-    state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
-    state.dataChilledCeilingPanelSimple->CheckEquipName.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+    state.dataChilledCeilingPanelSimple->CoolingPanel.allocate(NumCoolingPanels);
+    state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields.allocate(NumCoolingPanels);
+    state.dataChilledCeilingPanelSimple->CheckEquipName.allocate(NumCoolingPanels);
     state.dataChilledCeilingPanelSimple->CheckEquipName = true;
 
     // Get the data from the user input related to cooling panels
-    for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
+    for (CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCMO_CoolingPanel_Simple,
@@ -289,7 +289,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
         if (CoolingPanelNum > 1) {
-            for (CoolPanelNumI = 2; CoolPanelNumI <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolPanelNumI) {
+            for (CoolPanelNumI = 2; CoolPanelNumI <= NumCoolingPanels; ++CoolPanelNumI) {
                 if (state.dataIPShortCut->cAlphaArgs(1) == state.dataChilledCeilingPanelSimple->CoolingPanel(CoolPanelNumI).EquipID) {
                     ErrorsFound = true;
                     ShowSevereError(state, state.dataIPShortCut->cAlphaArgs(1) + " is used as a name for more than one simple COOLING PANEL.");
@@ -644,7 +644,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     }
 
     // Setup Report variables for the Coils
-    for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
+    for (CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum) {
         // CurrentModuleObject='ZoneHVAC:CoolingPanel:RadiantConvective:Water'
         SetupOutputVariable(state,
                             "Cooling Panel Total Cooling Rate",
@@ -776,21 +776,21 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     if (state.dataChilledCeilingPanelSimple->MyOneTimeFlag) {
 
         // Initialize the environment and sizing flags
-        state.dataChilledCeilingPanelSimple->MyEnvrnFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->MyEnvrnFlag.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
         state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf = 0.0;
-        state.dataChilledCeilingPanelSimple->CoolingPanelSource.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->CoolingPanelSource.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         state.dataChilledCeilingPanelSimple->CoolingPanelSource = 0.0;
-        state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg = 0.0;
-        state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc = 0.0;
-        state.dataChilledCeilingPanelSimple->LastSysTimeElapsed.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->LastSysTimeElapsed.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         state.dataChilledCeilingPanelSimple->LastSysTimeElapsed = 0.0;
-        state.dataChilledCeilingPanelSimple->LastTimeStepSys.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->LastTimeStepSys.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         state.dataChilledCeilingPanelSimple->LastTimeStepSys = 0.0;
-        state.dataChilledCeilingPanelSimple->SetLoopIndexFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
-        state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->SetLoopIndexFlag.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
+        state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel.allocate((int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel = true;
         state.dataChilledCeilingPanelSimple->MyEnvrnFlag = true;
         state.dataChilledCeilingPanelSimple->MyOneTimeFlag = false;
@@ -805,7 +805,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
     if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked = true;
-        for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++Loop) {
+        for (Loop = 1; Loop <= (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size(); ++Loop) {
             if (CheckZoneEquipmentList(state, cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
             ShowSevereError(state,
                             "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
@@ -1618,7 +1618,7 @@ void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
     if (!allocated(state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg)) return;
 
     // If it was allocated, then we have to check to see if this was running at all...
-    for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
+    for (CoolingPanelNum = 1; CoolingPanelNum <= (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size(); ++CoolingPanelNum) {
         if (state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) != 0.0) {
             CoolingPanelSysOn = true;
             break; // DO loop
@@ -1668,7 +1668,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     state.dataHeatBalFanSys->SurfQCoolingPanel = 0.0;
     state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
 
-    for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
+    for (CoolingPanelNum = 1; CoolingPanelNum <= (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size(); ++CoolingPanelNum) {
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
