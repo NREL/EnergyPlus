@@ -4391,7 +4391,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // Water / steam boiler
-    for (int iBoiler = 1; iBoiler <= state.dataBoilers->numBoilers; ++iBoiler) {
+    for (int iBoiler = 1; iBoiler <= (int)state.dataBoilers->Boiler.size(); ++iBoiler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed +
                                                          state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption -
                                                          state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
