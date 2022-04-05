@@ -71,58 +71,46 @@ namespace BoilerSteam {
     {
         // Members
         std::string Name;                           // user identifier
-        DataGlobalConstants::ResourceType FuelType; // resource type
-        bool Available;                             // TRUE if machine available in current time step
-        bool ON;                                    // TRUE: simulate the machine at it's operating part load ratio
-        bool MissingSetPointErrDone;                // Missing outlet node setpoint message flag
-        bool UseLoopSetPoint;                       // Flag to use setpoint from loop
-        Real64 DesMassFlowRate;                     // kg/s - Boiler water design mass flow rate
-        Real64 MassFlowRate;                        // kg/s - Boiler water mass flow rate
-        Real64 NomCap;                              // W - design nominal capacity of Boiler
-        bool NomCapWasAutoSized;                    // true if Nominal capacity was autosize on input
-        Real64 NomEffic;                            // boiler efficiency at design conditions
-        Real64 MinPartLoadRat;                      // Minimum allowed operating part load ratio
-        Real64 MaxPartLoadRat;                      // Maximum allowed operating part load ratio
-        Real64 OptPartLoadRat;                      // Optimal operating part load ratio
-        Real64 OperPartLoadRat;                     // Actual operating part load ratio
-        Real64 TempUpLimitBoilerOut;                // C - Boiler outlet maximum temperature limit
-        Real64 BoilerMaxOperPress;                  // Max Boiler Pressure
-        Real64 BoilerPressCheck;                    // Boiler Operating Pressure at Saturation Temperature
-        Real64 SizFac;                              // sizing factor
-        int BoilerInletNodeNum;                     // Node number at the boiler inlet
-        int BoilerOutletNodeNum;                    // Node number at the boiler outlet
-        Array1D<Real64> FullLoadCoef;               // Coefficients of the fuel consumption/part load ratio curve
-        int TypeNum;                                // Plant loop type identifier
+        DataGlobalConstants::ResourceType FuelType = DataGlobalConstants::ResourceType::None; // resource type
+        bool Available = false;                             // TRUE if machine available in current time step
+        bool ON = false;                                    // TRUE: simulate the machine at it's operating part load ratio
+        bool MissingSetPointErrDone = false;                // Missing outlet node setpoint message flag
+        bool UseLoopSetPoint = false;                       // Flag to use setpoint from loop
+        Real64 DesMassFlowRate = 0.0;                     // kg/s - Boiler water design mass flow rate
+        Real64 MassFlowRate = 0.0;                        // kg/s - Boiler water mass flow rate
+        Real64 NomCap = 0.0;                              // W - design nominal capacity of Boiler
+        bool NomCapWasAutoSized = false;                    // true if Nominal capacity was autosize on input
+        Real64 NomEffic = 0.0;                            // boiler efficiency at design conditions
+        Real64 MinPartLoadRat = 0.0;                      // Minimum allowed operating part load ratio
+        Real64 MaxPartLoadRat = 0.0;                      // Maximum allowed operating part load ratio
+        Real64 OptPartLoadRat = 0.0;                      // Optimal operating part load ratio
+        Real64 OperPartLoadRat = 0.0;                     // Actual operating part load ratio
+        Real64 TempUpLimitBoilerOut = 0.0;                // C - Boiler outlet maximum temperature limit
+        Real64 BoilerMaxOperPress = 0.0;                  // Max Boiler Pressure
+        Real64 BoilerPressCheck = 0.0;                    // Boiler Operating Pressure at Saturation Temperature
+        Real64 SizFac = 0.0;                              // sizing factor
+        int BoilerInletNodeNum = 0;                     // Node number at the boiler inlet
+        int BoilerOutletNodeNum = 0;                    // Node number at the boiler outlet
+        std::array<Real64, 3> FullLoadCoef = { 0.0 };  // Coefficients of the fuel consumption/part load ratio curve
+        int TypeNum = 0;                                // Plant loop type identifier
         PlantLocation plantLoc;
-        int PressErrIndex;             // index pointer for recurring errors
-        int FluidIndex;                // Steam index
+        int PressErrIndex = 0;             // index pointer for recurring errors
+        int FluidIndex = 0;                // Steam index
         std::string EndUseSubcategory; // identifier use for the end use subcategory
-        bool myFlag;
-        bool myEnvrnFlag;
+        bool myFlag = true;
+        bool myEnvrnFlag = true;
 
-        Real64 FuelUsed;           // W - Boiler fuel used
-        Real64 BoilerLoad;         // W - Boiler Load
-        Real64 BoilerEff;          // Boiler efficiency
-        Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-        Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
+        Real64 FuelUsed = 0.0;           // W - Boiler fuel used
+        Real64 BoilerLoad = 0.0;         // W - Boiler Load
+        Real64 BoilerEff = 0.0;          // Boiler efficiency
+        Real64 BoilerMassFlowRate = 0.0; // kg/s - Boiler mass flow rate
+        Real64 BoilerOutletTemp = 0.0;   // W - Boiler outlet temperature
 
-        Real64 BoilerEnergy;    // J - Boiler energy integrated over time
-        Real64 FuelConsumed;    // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp; // C - Boiler inlet temperature
+        Real64 BoilerEnergy = 0.0;    // J - Boiler energy integrated over time
+        Real64 FuelConsumed = 0.0;    // J - Boiler Fuel consumed integrated over time
+        Real64 BoilerInletTemp = 0.0; // C - Boiler inlet temperature
 
-        std::string BoilerFuelTypeForOutputVariable;
-
-        // Default Constructor
-        BoilerSpecs()
-            : FuelType(DataGlobalConstants::ResourceType::None), Available(false), ON(false), MissingSetPointErrDone(false), UseLoopSetPoint(false),
-              DesMassFlowRate(0.0), MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), MinPartLoadRat(0.0),
-              MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0),
-              BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), plantLoc{},
-              PressErrIndex(0), FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerEff(0.0),
-              BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0),
-              BoilerFuelTypeForOutputVariable("")
-        {
-        }
+        std::string BoilerFuelTypeForOutputVariable = "";
 
         void initialize(EnergyPlusData &state);
 
@@ -171,15 +159,13 @@ namespace BoilerSteam {
 
 struct BoilerSteamData : BaseGlobalStruct
 {
-    int numBoilers = 0;
+    //int numBoilers = 0;
     bool getSteamBoilerInput = true;
     Array1D<BoilerSteam::BoilerSpecs> Boiler;
 
     void clear_state() override
     {
-        this->numBoilers = 0;
-        this->getSteamBoilerInput = true;
-        this->Boiler.deallocate();
+        *this = BoilerSteamData();
     }
 };
 
