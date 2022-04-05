@@ -245,10 +245,10 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
 
     state.dataIPShortCut->cCurrentModuleObject = moduleObjectType;
 
-    state.dataChillerAbsorber->numAbsorbers =
+    int numAbsorbers =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-    if (state.dataChillerAbsorber->numAbsorbers <= 0) {
+    if (numAbsorbers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
         // See if load distribution manager has already gotten the input
         ErrorsFound = true;
@@ -256,10 +256,10 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
 
     if (allocated(state.dataChillerAbsorber->absorptionChillers)) return;
 
-    state.dataChillerAbsorber->absorptionChillers.allocate(state.dataChillerAbsorber->numAbsorbers);
+    state.dataChillerAbsorber->absorptionChillers.allocate(numAbsorbers);
 
     // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-    for (int AbsorberNum = 1; AbsorberNum <= state.dataChillerAbsorber->numAbsorbers; ++AbsorberNum) {
+    for (int AbsorberNum = 1; AbsorberNum <= numAbsorbers; ++AbsorberNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  AbsorberNum,
@@ -447,12 +447,12 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
         if (thisChiller.CondVolFlowRate == DataSizing::AutoSize) {
             thisChiller.CondVolFlowRateWasAutoSized = true;
         }
-        thisChiller.SteamLoadCoef(1) = state.dataIPShortCut->rNumericArgs(9);
-        thisChiller.SteamLoadCoef(2) = state.dataIPShortCut->rNumericArgs(10);
-        thisChiller.SteamLoadCoef(3) = state.dataIPShortCut->rNumericArgs(11);
-        thisChiller.PumpPowerCoef(1) = state.dataIPShortCut->rNumericArgs(12);
-        thisChiller.PumpPowerCoef(2) = state.dataIPShortCut->rNumericArgs(13);
-        thisChiller.PumpPowerCoef(3) = state.dataIPShortCut->rNumericArgs(14);
+        thisChiller.SteamLoadCoef[0] = state.dataIPShortCut->rNumericArgs(9);
+        thisChiller.SteamLoadCoef[1] = state.dataIPShortCut->rNumericArgs(10);
+        thisChiller.SteamLoadCoef[2] = state.dataIPShortCut->rNumericArgs(11);
+        thisChiller.PumpPowerCoef[0] = state.dataIPShortCut->rNumericArgs(12);
+        thisChiller.PumpPowerCoef[1] = state.dataIPShortCut->rNumericArgs(13);
+        thisChiller.PumpPowerCoef[2] = state.dataIPShortCut->rNumericArgs(14);
         thisChiller.TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(15);
 
         {
@@ -816,7 +816,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
             this->GenMassFlowRateMax = rho * this->GeneratorVolFlowRate;
         } else if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) {
 
-            this->QGenerator = (this->SteamLoadCoef(1) + this->SteamLoadCoef(2) + this->SteamLoadCoef(3)) * this->NomCap;
+            this->QGenerator = (this->SteamLoadCoef[0] + this->SteamLoadCoef[1] + this->SteamLoadCoef[2]) * this->NomCap;
 
             // dry enthalpy of steam (quality = 1)
             Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(state,
@@ -938,7 +938,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     bool LoopErrorsFound = false;
 
     // nominal energy input ratio (steam or hot water)
-    Real64 SteamInputRatNom = this->SteamLoadCoef(1) + this->SteamLoadCoef(2) + this->SteamLoadCoef(3);
+    Real64 SteamInputRatNom = this->SteamLoadCoef[0] + this->SteamLoadCoef[1] + this->SteamLoadCoef[2];
     // init local temporary version in case of partial/mixed autosizing
 
     // local nominal capacity cooling power
@@ -1673,10 +1673,10 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
     }
 
     // Calculate steam input ratio
-    Real64 SteamInputRat = this->SteamLoadCoef(1) / PartLoadRat + this->SteamLoadCoef(2) + this->SteamLoadCoef(3) * PartLoadRat;
+    Real64 SteamInputRat = this->SteamLoadCoef[0] / PartLoadRat + this->SteamLoadCoef[1] + this->SteamLoadCoef[2] * PartLoadRat;
 
     // Calculate electric input ratio
-    Real64 ElectricInputRat = this->PumpPowerCoef(1) + this->PumpPowerCoef(2) * PartLoadRat + this->PumpPowerCoef(3) * pow_2(PartLoadRat);
+    Real64 ElectricInputRat = this->PumpPowerCoef[0] + this->PumpPowerCoef[1] * PartLoadRat + this->PumpPowerCoef[2] * pow_2(PartLoadRat);
 
     // Calculate electric energy input
     this->PumpingPower = ElectricInputRat * this->NomPumpPower * FRAC;
