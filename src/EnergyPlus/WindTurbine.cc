@@ -143,11 +143,12 @@ namespace WindTurbine {
             GeneratorIndex = WindTurbineNum;
         } else {
             WindTurbineNum = GeneratorIndex;
-            if (WindTurbineNum > state.dataWindTurbine->NumWindTurbines || WindTurbineNum < 1) {
+            int NumWindTurbines = (int)state.dataWindTurbine->WindTurbineSys.size();
+            if (WindTurbineNum > NumWindTurbines || WindTurbineNum < 1) {
                 ShowFatalError(state,
                                format("SimWindTurbine: Invalid GeneratorIndex passed={}, Number of Wind Turbine Generators={}, Generator name={}",
                                       WindTurbineNum,
-                                      state.dataWindTurbine->NumWindTurbines,
+                                      NumWindTurbines,
                                       GeneratorName));
             }
             if (GeneratorName != state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name) {
@@ -240,11 +241,11 @@ namespace WindTurbine {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        state.dataWindTurbine->NumWindTurbines = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumWindTurbines = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        state.dataWindTurbine->WindTurbineSys.allocate(state.dataWindTurbine->NumWindTurbines);
+        state.dataWindTurbine->WindTurbineSys.allocate(NumWindTurbines);
 
-        for (WindTurbineNum = 1; WindTurbineNum <= state.dataWindTurbine->NumWindTurbines; ++WindTurbineNum) {
+        for (WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -635,7 +636,7 @@ namespace WindTurbine {
 
         if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
-        for (WindTurbineNum = 1; WindTurbineNum <= state.dataWindTurbine->NumWindTurbines; ++WindTurbineNum) {
+        for (WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum) {
             auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
             SetupOutputVariable(state,
                                 "Generator Produced AC Electricity Rate",
@@ -752,7 +753,7 @@ namespace WindTurbine {
         // Estimate average annual wind speed once
         if (state.dataWindTurbine->MyOneTimeFlag) {
             wsStatFound = false;
-
+            Real64 AnnualTMYWS = 0.0;
             if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
                 auto statFile = state.files.inStatFilePath.open(state, "InitWindTurbine");
                 while (statFile.good()) { // end of file
@@ -809,7 +810,7 @@ namespace WindTurbine {
                     if (wsStatFound) break;
                 }
                 if (wsStatFound) {
-                    state.dataWindTurbine->AnnualTMYWS = sum(MonthWS) / 12.0;
+                    AnnualTMYWS = sum(MonthWS) / 12.0;
                 } else {
                     ShowWarningError(
                         state, "InitWindTurbine: stat file did not include Wind Speed statistics. TMY Wind Speed adjusted at the height is used.");
@@ -818,16 +819,20 @@ namespace WindTurbine {
                 ShowWarningError(state, "InitWindTurbine: stat file missing. TMY Wind Speed adjusted at the height is used.");
             }
 
+            // assign this value to all the wind turbines once here
+            for (auto &wt : state.dataWindTurbine->WindTurbineSys) {
+                wt.AnnualTMYWS = AnnualTMYWS;
+            }
+
             state.dataWindTurbine->MyOneTimeFlag = false;
         }
 
         auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
-        windTurbine.AnnualTMYWS = state.dataWindTurbine->AnnualTMYWS;
 
         // Factor differences between TMY wind data and local wind data once
-        if (state.dataWindTurbine->AnnualTMYWS > 0.0 && windTurbine.WSFactor == 0.0 && windTurbine.LocalAnnualAvgWS > 0) {
+        if (windTurbine.AnnualTMYWS > 0.0 && windTurbine.WSFactor == 0.0 && windTurbine.LocalAnnualAvgWS > 0) {
             // Convert the annual wind speed to the local wind speed at the height of the local station, then factor
-            LocalTMYWS = state.dataWindTurbine->AnnualTMYWS * state.dataEnvrn->WeatherFileWindModCoeff *
+            LocalTMYWS = windTurbine.AnnualTMYWS * state.dataEnvrn->WeatherFileWindModCoeff *
                          std::pow(windTurbine.HeightForLocalWS / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
             windTurbine.WSFactor = LocalTMYWS / windTurbine.LocalAnnualAvgWS;
         }
