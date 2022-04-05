@@ -5539,15 +5539,11 @@ void ReportThermalResilience(EnergyPlusData &state)
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
             state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) = state.dataHeatBal->People(iPeople).NumberOfPeople *
                                                            GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
-            state.dataHeatBalFanSys->ZoneOccPierceSETLastStep(ZoneNum) = state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum);
-            if (state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0) {
-                if (state.dataHeatBal->People(iPeople).Pierce) {
-                    state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum) = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
-                } else {
-                    state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum) = -1;
-                }
+            state.dataHeatBalFanSys->ZonePierceSETLastStep(ZoneNum) = state.dataHeatBalFanSys->ZonePierceSET(ZoneNum);
+            if (state.dataHeatBal->People(iPeople).Pierce) {
+                state.dataHeatBalFanSys->ZonePierceSET(ZoneNum) = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
             } else {
-                state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum) = -1;
+                state.dataHeatBalFanSys->ZonePierceSET(ZoneNum) = -1;
             }
 
             int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
@@ -5652,7 +5648,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                     state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
                     state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
                         NumOcc * state.dataGlobal->TimeStepZone;
-                    // fixme: should it be NumOcc > 0 or state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0
+                    // fixme: should it be NumOcc > 0 or state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0, should it multiply NumOcc or
+                    // state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum)?
                     state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
                         (NumOcc > 0) * state.dataGlobal->TimeStepZone;
                 } else if (HI > 26.7 && HI <= 32.2) {
@@ -5744,48 +5741,48 @@ void ReportThermalResilience(EnergyPlusData &state)
 
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
                 int encodedMonDayHrMin;
-                if (NumOcc > 0) {
-                    Real64 PierceSET = state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum);
-                    Real64 PierceSETLast = state.dataHeatBalFanSys->ZoneOccPierceSETLastStep(ZoneNum);
+                Real64 PierceSET = state.dataHeatBalFanSys->ZonePierceSET(ZoneNum);
+                Real64 PierceSETLast = state.dataHeatBalFanSys->ZonePierceSETLastStep(ZoneNum);
 
-                    if (PierceSET <= 12.2) {
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[0] += (12.2 - PierceSET) * state.dataGlobal->TimeStepZone;
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[1] += (12.2 - PierceSET) * NumOcc * state.dataGlobal->TimeStepZone;
-                        // Reset duration when last step is out of range.
-                        if (PierceSETLast == -1 || PierceSETLast > 12.2) {
-                            General::EncodeMonDayHrMin(encodedMonDayHrMin,
-                                                       state.dataEnvrn->Month,
-                                                       state.dataEnvrn->DayOfMonth,
-                                                       state.dataGlobal->HourOfDay,
-                                                       state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
-                            state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] = 0;
-                            state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
-                        }
-                        // Keep the longest duration record.
-                        state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                        if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2]) {
-                            state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
-                            state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1];
-                        }
-                    } else if (PierceSET > 30) {
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[0] += (PierceSET - 30) * state.dataGlobal->TimeStepZone;
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[1] += (PierceSET - 30) * NumOcc * state.dataGlobal->TimeStepZone;
-                        if (PierceSETLast == -1 || PierceSETLast <= 30) {
-                            General::EncodeMonDayHrMin(encodedMonDayHrMin,
-                                                       state.dataEnvrn->Month,
-                                                       state.dataEnvrn->DayOfMonth,
-                                                       state.dataGlobal->HourOfDay,
-                                                       state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
-                            state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] = 0;
-                            state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
-                        }
-                        state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                        if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2]) {
-                            state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
-                            state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
-                        }
+                if (PierceSET <= 12.2) {
+                    state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[0] += (12.2 - PierceSET) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[1] += (12.2 - PierceSET) * NumOcc * state.dataGlobal->TimeStepZone;
+                    // Reset duration when last step is out of range.
+                    if (PierceSETLast == -1 || PierceSETLast > 12.2) {
+                        General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                   state.dataEnvrn->Month,
+                                                   state.dataEnvrn->DayOfMonth,
+                                                   state.dataGlobal->HourOfDay,
+                                                   state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                        state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] = 0;
+                        state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
                     }
-                } else {
+                    // Keep the longest duration record.
+                    state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
+                    if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2]) {
+                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
+                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1];
+                    }
+                } else if (PierceSET > 30) {
+                    state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[0] += (PierceSET - 30) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[1] += (PierceSET - 30) * NumOcc * state.dataGlobal->TimeStepZone;
+                    if (PierceSETLast == -1 || PierceSETLast <= 30) {
+                        General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                   state.dataEnvrn->Month,
+                                                   state.dataEnvrn->DayOfMonth,
+                                                   state.dataGlobal->HourOfDay,
+                                                   state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                        state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] = 0;
+                        state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
+                    }
+                    state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
+                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2]) {
+                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
+                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
+                    }
+                }
+
+                if (state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) == 0) {
                     // No occupants: record the last time step duration if longer than the record.
                     if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2]) {
                         state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
