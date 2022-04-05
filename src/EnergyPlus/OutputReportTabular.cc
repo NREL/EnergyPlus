@@ -4378,7 +4378,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
         }
     }
     auto &ElectricEIRChiller(state.dataChillerElectricEIR->ElectricEIRChiller);
-    for (int iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
+    for (int iChiller = 1; iChiller <= (int)state.dataChillerElectricEIR->ElectricEIRChiller.size(); ++iChiller) {
         if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
         }
