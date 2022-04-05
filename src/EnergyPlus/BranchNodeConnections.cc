@@ -667,7 +667,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         FluidStreamInletCount.allocate(MaxFluidStream);
         FluidStreamOutletCount.allocate(MaxFluidStream);
         FluidStreamCounts.allocate(MaxFluidStream);
-        NodeObjects.allocate(state.dataBranchNodeConnections->NumOfNodeConnections);
+        NodeObjects.allocate(state.dataBranchNodeConnections->NumOfNodeConnections + 1);
         FluidStreamInletCount = 0;
         FluidStreamOutletCount = 0;
         NodeObjects = 0;
