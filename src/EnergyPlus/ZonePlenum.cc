@@ -139,7 +139,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
                            state.dataZonePlenum->NumZoneReturnPlenums,
                            CompName));
             }
-            if (state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum)) {
+            if (state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).checkEquipName) {
                 if (CompName != state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName) {
                     ShowFatalError(state,
                                    format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:ReturnPlenum name={}, stored "
@@ -148,7 +148,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
                                           CompName,
                                           state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName));
                 }
-                state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum) = false;
+                state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).checkEquipName = false;
             }
         }
 
@@ -177,7 +177,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
                            state.dataZonePlenum->NumZoneReturnPlenums,
                            CompName));
             }
-            if (state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum)) {
+            if (state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).checkEquipName) {
                 if (CompName != state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName) {
                     ShowFatalError(state,
                                    format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:SupplyPlenum name={}, stored "
@@ -186,7 +186,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
                                           CompName,
                                           state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName));
                 }
-                state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum) = false;
+                state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).checkEquipName = false;
             }
         }
 
@@ -275,12 +275,9 @@ void GetZonePlenumInput(EnergyPlusData &state)
 
     state.dataZonePlenum->NumZoneReturnPlenums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPlenum");
     state.dataZonePlenum->NumZoneSupplyPlenums = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPlenum");
-    state.dataZonePlenum->NumZonePlenums = state.dataZonePlenum->NumZoneReturnPlenums + state.dataZonePlenum->NumZoneSupplyPlenums;
 
     if (state.dataZonePlenum->NumZoneReturnPlenums > 0) state.dataZonePlenum->ZoneRetPlenCond.allocate(state.dataZonePlenum->NumZoneReturnPlenums);
     if (state.dataZonePlenum->NumZoneSupplyPlenums > 0) state.dataZonePlenum->ZoneSupPlenCond.allocate(state.dataZonePlenum->NumZoneSupplyPlenums);
-    state.dataZonePlenum->CheckRetEquipName.dimension(state.dataZonePlenum->NumZoneReturnPlenums, true);
-    state.dataZonePlenum->CheckSupEquipName.dimension(state.dataZonePlenum->NumZoneSupplyPlenums, true);
 
     ZonePlenumNum = 0;
 
@@ -743,8 +740,8 @@ void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum)
         // Check that all ADUs with leakage found a return plenum
         for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
             auto &thisADU(state.dataDefineEquipment->AirDistUnit(ADUNum));
-            // TODO: this is comparing the same thing twice
-            if ((thisADU.DownStreamLeak || thisADU.DownStreamLeak) && (thisADU.RetPlenumNum == 0)) {
+            // TODO: the first half of this IF condition was a duplicated OR, if issues around this code, might want to check the history of this line
+            if (thisADU.DownStreamLeak && (thisADU.RetPlenumNum == 0)) {
                 ShowWarningError(state,
                                  "No return plenum found for simple duct leakage for ZoneHVAC:AirDistributionUnit=" + thisADU.Name +
                                      " in Zone=" + state.dataZoneEquip->ZoneEquipConfig(thisADU.ZoneEqNum).ZoneName);
