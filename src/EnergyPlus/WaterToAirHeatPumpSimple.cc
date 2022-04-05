@@ -2743,15 +2743,16 @@ namespace WaterToAirHeatPumpSimple {
 
                 if (simpleWatertoAirHP.WatertoAirHPType == "HEATING") {
 
-                    ReferenceWaterVolFlowRateDes = simpleWatertoAirHP.ReferenceCapHeat / (state.dataSize->PlantSizData(PltSizNum).DeltaT * Cp * rho);
+                    ReferenceWaterVolFlowRateDes =
+                        simpleWatertoAirHP.ReferenceCapHeatAtRefCdts / (state.dataSize->PlantSizData(PltSizNum).DeltaT * Cp * rho);
                 } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING") {
 
                     //       use companion heating coil capacity to calculate volumetric flow rate
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
-                        SystemCapacity =
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).ReferenceCapHeat;
+                        SystemCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
+                                             .ReferenceCapHeatAtRefCdts;
                     } else {
-                        SystemCapacity = simpleWatertoAirHP.ReferenceCapCoolTotal;
+                        SystemCapacity = simpleWatertoAirHP.ReferenceCapCoolAtRefCdts;
                     }
 
                     ReferenceWaterVolFlowRateDes = SystemCapacity / (state.dataSize->PlantSizData(PltSizNum).DeltaT * Cp * rho);
