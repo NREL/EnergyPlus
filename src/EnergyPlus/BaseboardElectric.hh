@@ -66,43 +66,27 @@ namespace BaseboardElectric {
 
     struct BaseboardParams
     {
-        // Members
         std::string EquipName;
         std::string EquipType;
         std::string Schedule;
-        int SchedPtr;
-        Real64 NominalCapacity;
-        Real64 BaseboardEfficiency;
-        Real64 AirInletTemp;
-        Real64 AirInletHumRat;
-        Real64 AirOutletTemp;
-        Real64 Power;
-        Real64 Energy;
-        Real64 ElecUseLoad;
-        Real64 ElecUseRate;
-        int ZonePtr;                  // point to the zone where the basebaord is located
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        bool MySizeFlag;
-        bool CheckEquipName;
-
-        // Default Constructor
-        BaseboardParams()
-            : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
-              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
-              CheckEquipName(true)
-        {
-        }
-    };
-
-    struct BaseboardNumericFieldData
-    {
-        // Members
+        int SchedPtr = 0;
+        Real64 NominalCapacity = 0.0;
+        Real64 BaseboardEfficiency = 0.0;
+        Real64 AirInletTemp = 0.0;
+        Real64 AirInletHumRat = 0.0;
+        Real64 AirOutletTemp = 0.0;
+        Real64 Power = 0.0;
+        Real64 Energy = 0.0;
+        Real64 ElecUseLoad = 0.0;
+        Real64 ElecUseRate = 0.0;
+        int ZonePtr = 0;                    // point to the zone where the basebaord is located
+        int HeatingCapMethod = 0;           // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
+                                            // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        bool MySizeFlag = true;
+        bool CheckEquipName = true;
         Array1D_string FieldNames;
-
-        // Default Constructor
-        BaseboardNumericFieldData() = default;
+        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     };
 
     void SimElectricBaseboard(
@@ -120,23 +104,12 @@ namespace BaseboardElectric {
 
 struct BaseboardElectricData : BaseGlobalStruct
 {
-    int NumBaseboards = 0;
     bool getInputFlag = true;
-    EPVector<BaseboardElectric::BaseboardParams> Baseboard;
-    EPVector<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
-    bool MyOneTimeFlag = true;
-    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
-    Array1D_bool MyEnvrnFlag;
+    EPVector<BaseboardElectric::BaseboardParams> baseboards;
 
     void clear_state() override
     {
-        this->NumBaseboards = 0;
-        this->getInputFlag = true;
-        this->Baseboard.deallocate();
-        this->BaseboardNumericFields.deallocate();
-        this->MyOneTimeFlag = true;
-        this->ZoneEquipmentListChecked = false;
-        this->MyEnvrnFlag.clear();
+        *this = BaseboardElectricData();
     }
 };
 
