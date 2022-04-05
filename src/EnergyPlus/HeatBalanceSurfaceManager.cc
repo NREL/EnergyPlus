@@ -5505,6 +5505,9 @@ void ReportThermalResilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
             }
             state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum).assign(HINoBins, 0.0);
             state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
@@ -5677,6 +5680,34 @@ void ReportThermalResilience(EnergyPlusData &state)
                     state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
                         (NumOcc > 0) * state.dataGlobal->TimeStepZone;
                 }
+
+                if (Humidex <= 29) {
+                    state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                        (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                } else if (Humidex > 29 && Humidex <= 40) {
+                    state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] += state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                        (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                } else if (Humidex > 40 && Humidex <= 45) {
+                    state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                        (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                } else if (Humidex > 45 && Humidex <= 50) {
+                    state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] += state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                        (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                } else {
+                    state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] += state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] += NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                        (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                }
+
             }
 
             if (Humidex <= 29) {

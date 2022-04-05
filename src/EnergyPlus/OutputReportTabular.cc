@@ -12544,6 +12544,14 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         tableName = "Heat Index OccupantHours";
         WriteResilienceBinsTableReportingPeriod(state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod);
 
+        tableName = "Humidex Hours";
+        WriteResilienceBinsTableReportingPeriod(state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod);
+
+        tableName = "Humidex OccupiedHours";
+        WriteResilienceBinsTableReportingPeriod(state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod);
+
+        tableName = "Humidex OccupantHours";
+        WriteResilienceBinsTableReportingPeriod(state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod);
     }
 }
 
