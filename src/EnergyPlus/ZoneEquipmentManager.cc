@@ -6463,7 +6463,7 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
 
     if (!headerAlreadyPrinted) {
         print(state.files.eio, "{}\n", Format_990);
-        headerAlreadyPrinted = false;
+        headerAlreadyPrinted = true;
     }
 
     static constexpr std::string_view Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
