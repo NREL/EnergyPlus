@@ -1407,9 +1407,7 @@ void GetAirPathData(EnergyPlusData &state)
                             PrimaryAirSystems(AirSysNum).Name);
     }
 
-    state.dataAirLoopHVACDOAS->numAirLoopDOAS =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem");
-    if (state.dataAirLoopHVACDOAS->numAirLoopDOAS > 0) {
+    if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") > 0) {
         if (state.dataAirLoopHVACDOAS->GetInputOnceFlag) {
             AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);
             state.dataAirLoopHVACDOAS->GetInputOnceFlag = false;
@@ -2622,7 +2620,7 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
 
     } // End of Air Loop iteration
 
-    if (state.dataAirLoopHVACDOAS->numAirLoopDOAS > 0) {
+    if (state.dataAirLoopHVACDOAS->airloopDOAS.size() > 0) {
         int index;
         Real64 OAMassFLowrate = 0.0;
         for (std::size_t loop = 0; loop < state.dataAirLoopHVACDOAS->airloopDOAS.size(); ++loop) {
