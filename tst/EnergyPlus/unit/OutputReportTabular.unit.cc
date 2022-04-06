@@ -3778,7 +3778,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataMixedAir->OAController.allocate(2);
     state->dataMixedAir->OAController(1).RelTotalLossRate = 1.0;
     state->dataMixedAir->OAController(2).RelTotalLossRate = 1.0;
-    state->dataCondenserLoopTowers->NumSimpleTowers = 1;
     state->dataCondenserLoopTowers->towers.allocate(1);
     state->dataCondenserLoopTowers->towers(1).Qactual = 1.0;
     state->dataCondenserLoopTowers->towers(1).FanEnergy = 50.0;

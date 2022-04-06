@@ -77,169 +77,142 @@ namespace ChillerReformulatedEIR {
     {
         // Members
         std::string Name;                       // User identifier
-        int TypeNum;                            // plant loop type identifier
+        int TypeNum = 0;                        // plant loop type identifier
         std::string CAPFTName;                  // CAPFT curve name
         std::string EIRFTName;                  // EIRFT curve name
         std::string EIRFPLRName;                // EIRPLR curve name
-        DataPlant::CondenserType CondenserType; // Type of Condenser. Water Cooled is the only available option for now
-        PLR PartLoadCurveType;                  // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
-        Real64 RefCap;                          // Reference capacity of the chiller [W]
-        bool RefCapWasAutoSized;                // reference capacity was autosized on input
-        Real64 RefCOP;                          // Reference coefficient of performance [W/W]
-        DataPlant::FlowMode FlowMode;           // one of 3 modes for component flow during operation
-        bool ModulatedFlowSetToLoop;            // True if the setpoint is missing at the outlet node
-        bool ModulatedFlowErrDone;              // true if setpoint warning issued
-        Real64 EvapVolFlowRate;                 // Reference water volumetric flow rate through the evaporator [m3/s]
-        bool EvapVolFlowRateWasAutoSized;       // true if previous was autosize input
-        Real64 EvapMassFlowRateMax;             // Reference water mass flow rate through evaporator [kg/s]
-        Real64 CondVolFlowRate;                 // Reference water volumetric flow rate through the condenser [m3/s]
-        bool CondVolFlowRateWasAutoSized;       // true if previous was set to autosize on input
-        Real64 CondMassFlowRateMax;             // Reference water mass flow rate through condenser [kg/s]
-        Real64 CompPowerToCondenserFrac;        // Fraction of compressor electric power rejected by condenser [0 to 1]
-        int EvapInletNodeNum;                   // Node number on the inlet side of the plant (evaporator side)
-        int EvapOutletNodeNum;                  // Node number on the outlet side of the plant (evaporator side)
-        int CondInletNodeNum;                   // Node number on the inlet side of the condenser
-        int CondOutletNodeNum;                  // Node number on the outlet side of the condenser
-        Real64 MinPartLoadRat;                  // Minimum allowed operating fraction of full load
-        Real64 MaxPartLoadRat;                  // Maximum allowed operating fraction of full load
-        Real64 OptPartLoadRat;                  // Optimal operating fraction of full load
-        Real64 MinUnloadRat;                    // Minimum unloading ratio
-        Real64 TempRefCondIn;                   // The reference secondary loop fluid temperature at the
+        DataPlant::CondenserType CondenserType
+            = DataPlant::CondenserType::Invalid; // Type of Condenser. Water Cooled is the only available option for now
+        PLR PartLoadCurveType = PLR::Invalid;    // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
+        Real64 RefCap = 0.0;                     // Reference capacity of the chiller [W]
+        bool RefCapWasAutoSized = false;         // reference capacity was autosized on input
+        Real64 RefCOP = 0.0;                     // Reference coefficient of performance [W/W]
+        DataPlant::FlowMode FlowMode
+            = DataPlant::FlowMode::Invalid;      // one of 3 modes for component flow during operation
+        bool ModulatedFlowSetToLoop = false;     // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone = false;       // true if setpoint warning issued
+        Real64 EvapVolFlowRate = 0.0;            // Reference water volumetric flow rate through the evaporator [m3/s]
+        bool EvapVolFlowRateWasAutoSized = false;// true if previous was autosize input
+        Real64 EvapMassFlowRateMax = 0.0;        // Reference water mass flow rate through evaporator [kg/s]
+        Real64 CondVolFlowRate = 0.0;            // Reference water volumetric flow rate through the condenser [m3/s]
+        bool CondVolFlowRateWasAutoSized = false;// true if previous was set to autosize on input
+        Real64 CondMassFlowRateMax = 0.0;        // Reference water mass flow rate through condenser [kg/s]
+        Real64 CompPowerToCondenserFrac = 0.0;   // Fraction of compressor electric power rejected by condenser [0 to 1]
+        int EvapInletNodeNum = 0;                // Node number on the inlet side of the plant (evaporator side)
+        int EvapOutletNodeNum = 0;               // Node number on the outlet side of the plant (evaporator side)
+        int CondInletNodeNum = 0;                // Node number on the inlet side of the condenser
+        int CondOutletNodeNum = 0;               // Node number on the outlet side of the condenser
+        Real64 MinPartLoadRat = 0.0;             // Minimum allowed operating fraction of full load
+        Real64 MaxPartLoadRat = 0.0;             // Maximum allowed operating fraction of full load
+        Real64 OptPartLoadRat = 0.0;             // Optimal operating fraction of full load
+        Real64 MinUnloadRat = 0.0;               // Minimum unloading ratio
+        Real64 TempRefCondIn = 0.0;              // The reference secondary loop fluid temperature at the
         // chiller condenser side inlet for the reformulated chiller [C]
-        Real64 TempRefCondOut; // The reference secondary loop fluid temperature at the
+        Real64 TempRefCondOut = 0.0; // The reference secondary loop fluid temperature at the
         // chiller condenser side outlet for the reformulated chiller [C]
-        Real64 TempRefEvapOut; // The reference primary loop fluid
+        Real64 TempRefEvapOut = 0.0; // The reference primary loop fluid
         // temperature at the chiller evaporator side outlet [C]
-        Real64 TempLowLimitEvapOut;                // Low temperature shut off [C]
-        Real64 DesignHeatRecVolFlowRate;           // Design water volumetric flow rate through heat recovery loop [m3/s]
-        bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous input was autosize
-        Real64 DesignHeatRecMassFlowRate;          // Design water mass flow rate through heat recovery loop [kg/s]
-        Real64 SizFac;                             // sizing factor
-        bool HeatRecActive;                        // True when entered Heat Rec Vol Flow Rate > 0
-        int HeatRecInletNodeNum;                   // Node number for the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum;                  // Node number for the heat recovery outlet side of the condenser
-        Real64 HeatRecCapacityFraction;            // user input for heat recovery capacity fraction []
-        Real64 HeatRecMaxCapacityLimit;            // Capacity limit for Heat recovery, one time calc [W]
-        int HeatRecSetPointNodeNum;                // index for system node with the heat recover leaving setpoint
-        int HeatRecInletLimitSchedNum;             // index for schedule for the inlet high limit for heat recovery operation
-        int ChillerCapFTIndex;                     // Index for the total cooling capacity modifier curve
+        Real64 TempLowLimitEvapOut = 0.0;                  // Low temperature shut off [C]
+        Real64 DesignHeatRecVolFlowRate = 0.0;             // Design water volumetric flow rate through heat recovery loop [m3/s]
+        bool DesignHeatRecVolFlowRateWasAutoSized = false; // true if previous input was autosize
+        Real64 DesignHeatRecMassFlowRate = 0.0;            // Design water mass flow rate through heat recovery loop [kg/s]
+        Real64 SizFac = 0.0;                               // sizing factor
+        bool HeatRecActive = false;                        // True when entered Heat Rec Vol Flow Rate > 0
+        int HeatRecInletNodeNum = 0;                       // Node number for the heat recovery inlet side of the condenser
+        int HeatRecOutletNodeNum = 0;                      // Node number for the heat recovery outlet side of the condenser
+        Real64 HeatRecCapacityFraction = 0.0;              // user input for heat recovery capacity fraction []
+        Real64 HeatRecMaxCapacityLimit = 0.0;              // Capacity limit for Heat recovery, one time calc [W]
+        int HeatRecSetPointNodeNum = 0;                    // index for system node with the heat recover leaving setpoint
+        int HeatRecInletLimitSchedNum = 0;                 // index for schedule for the inlet high limit for heat recovery operation
+        int ChillerCapFTIndex = 0;                         // Index for the total cooling capacity modifier curve
         // (function of leaving evaporator and condenser water temperatures)
-        int ChillerEIRFTIndex; // Index for the energy input ratio modifier curve
+        int ChillerEIRFTIndex = 0; // Index for the energy input ratio modifier curve
         // (function of leaving evaporator and condenser water temperatures)
-        int ChillerEIRFPLRIndex; // Index for the energy input ratio vs part-load ratio curve
+        int ChillerEIRFPLRIndex = 0; // Index for the energy input ratio vs part-load ratio curve
         // (function of leaving condenser water temperature and part-load ratio)
-        int ChillerCapFTError;         // Used for negative capacity as a function of temp warnings
-        int ChillerCapFTErrorIndex;    // Used for negative capacity as a function of temp warnings
-        int ChillerEIRFTError;         // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFTErrorIndex;    // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFPLRError;       // Used for negative EIR as a function of PLR warnings
-        int ChillerEIRFPLRErrorIndex;  // Used for negative EIR as a function of PLR warnings
-        Real64 ChillerCAPFTXTempMin;   // Minimum value of CAPFT curve X variable [C]
-        Real64 ChillerCAPFTXTempMax;   // Maximum value of CAPFT curve X variable [C]
-        Real64 ChillerCAPFTYTempMin;   // Minimum value of CAPFT curve Y variable [C]
-        Real64 ChillerCAPFTYTempMax;   // Maximum value of CAPFT curve Y variable [C]
-        Real64 ChillerEIRFTXTempMin;   // Minimum value of EIRFT curve X variable [C]
-        Real64 ChillerEIRFTXTempMax;   // Maximum value of EIRFT curve X variable [C]
-        Real64 ChillerEIRFTYTempMin;   // Minimum value of EIRFT curve Y variable [C]
-        Real64 ChillerEIRFTYTempMax;   // Maximum value of EIRFT curve Y variable [C]
-        Real64 ChillerEIRFPLRTempMin;  // Minimum value of EIRFPLR curve condenser outlet temperature [C]
-        Real64 ChillerEIRFPLRTempMax;  // Maximum value of EIRFPLR curve condenser outlet temperature [C]
-        Real64 ChillerEIRFPLRPLRMin;   // Minimum value of EIRFPLR curve part-load ratio
-        Real64 ChillerEIRFPLRPLRMax;   // Maximum value of EIRFPLR curve part-load ratio
-        Real64 ChillerLiftNomMin;      // Minimum value of EIRFPLR curve Normalized Chiller lift
-        Real64 ChillerLiftNomMax;      // Maximum value of EIRFPLR curve Normalized Chiller lift
-        Real64 ChillerTdevNomMin;      // Minimum value of EIRFPLR curve Normalized Tdev
-        Real64 ChillerTdevNomMax;      // Maximum value of EIRFPLR curve Normalized Tdev
-        int CAPFTXIter;                // Iteration counter for evaporator outlet temperature CAPFT warning messages
-        int CAPFTXIterIndex;           // Index for evaporator outlet temperature CAPFT warning messages
-        int CAPFTYIter;                // Iteration counter for condenser outlet temperature CAPFT warning messages
-        int CAPFTYIterIndex;           // Index for condenser outlet temperature CAPFT warning messages
-        int EIRFTXIter;                // Iteration counter for evaporator outlet temperature EIRFT warning messages
-        int EIRFTXIterIndex;           // Index for evaporator outlet temperature EIRFT warning messages
-        int EIRFTYIter;                // Iteration counter for condenser outlet temperature EIRFT warning messages
-        int EIRFTYIterIndex;           // Index for condenser outlet temperature EIRFT warning messages
-        int EIRFPLRTIter;              // Iteration counter for condenser outlet temperature EIRFPLR warning messages
-        int EIRFPLRTIterIndex;         // Index for condenser outlet temperature EIRFPLR warning messages
-        int EIRFPLRPLRIter;            // Iteration counter for part-load ratio EIRFPLR warning messages
-        int EIRFPLRPLRIterIndex;       // Index for part-load ratio EIRFPLR warning messages
-        bool FaultyChillerSWTFlag;     // True if the chiller has SWT sensor fault
-        int FaultyChillerSWTIndex;     // Index of the fault object corresponding to the chiller
-        Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
-        int IterLimitExceededNum;      // Iteration limit exceeded for RegulaFalsi routine
-        int IterLimitErrIndex;         // Index to iteration limit warning for RegulaFalsi routine
-        int IterFailed;                // Iteration limit failed for RegulaFalsi routine
-        int IterFailedIndex;           // Index to iteration limit failed for RegulaFalsi routine
-        int DeltaTErrCount;            // Evaporator delta T equals 0 for variable flow chiller warning messages
-        int DeltaTErrCountIndex;       // Index to evaporator delta T = 0 for variable flow chiller warning messages
-        PlantLocation CWPlantLoc;      // chilled water plant loop component index
-        PlantLocation CDPlantLoc;      // condenser water plant loop component index
-        PlantLocation HRPlantLoc;      // heat recovery water plant loop component index
-        int CondMassFlowIndex;
-        bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
+        int ChillerCapFTError = 0;           // Used for negative capacity as a function of temp warnings
+        int ChillerCapFTErrorIndex = 0;      // Used for negative capacity as a function of temp warnings
+        int ChillerEIRFTError = 0;           // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFTErrorIndex = 0;      // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFPLRError = 0;         // Used for negative EIR as a function of PLR warnings
+        int ChillerEIRFPLRErrorIndex = 0;    // Used for negative EIR as a function of PLR warnings
+        Real64 ChillerCAPFTXTempMin = 0.0;   // Minimum value of CAPFT curve X variable [C]
+        Real64 ChillerCAPFTXTempMax = 0.0;   // Maximum value of CAPFT curve X variable [C]
+        Real64 ChillerCAPFTYTempMin = 0.0;   // Minimum value of CAPFT curve Y variable [C]
+        Real64 ChillerCAPFTYTempMax = 0.0;   // Maximum value of CAPFT curve Y variable [C]
+        Real64 ChillerEIRFTXTempMin = 0.0;   // Minimum value of EIRFT curve X variable [C]
+        Real64 ChillerEIRFTXTempMax = 0.0;   // Maximum value of EIRFT curve X variable [C]
+        Real64 ChillerEIRFTYTempMin = 0.0;   // Minimum value of EIRFT curve Y variable [C]
+        Real64 ChillerEIRFTYTempMax = 0.0;   // Maximum value of EIRFT curve Y variable [C]
+        Real64 ChillerEIRFPLRTempMin = 0.0;  // Minimum value of EIRFPLR curve condenser outlet temperature [C]
+        Real64 ChillerEIRFPLRTempMax = 0.0;  // Maximum value of EIRFPLR curve condenser outlet temperature [C]
+        Real64 ChillerEIRFPLRPLRMin = 0.0;   // Minimum value of EIRFPLR curve part-load ratio
+        Real64 ChillerEIRFPLRPLRMax = 0.0;   // Maximum value of EIRFPLR curve part-load ratio
+        Real64 ChillerLiftNomMin = 0.0;      // Minimum value of EIRFPLR curve Normalized Chiller lift
+        Real64 ChillerLiftNomMax = 10.0;     // Maximum value of EIRFPLR curve Normalized Chiller lift
+        Real64 ChillerTdevNomMin = 0.0;      // Minimum value of EIRFPLR curve Normalized Tdev
+        Real64 ChillerTdevNomMax = 10.0;     // Maximum value of EIRFPLR curve Normalized Tdev
+        int CAPFTXIter = 0;                // Iteration counter for evaporator outlet temperature CAPFT warning messages
+        int CAPFTXIterIndex = 0;           // Index for evaporator outlet temperature CAPFT warning messages
+        int CAPFTYIter = 0;                // Iteration counter for condenser outlet temperature CAPFT warning messages
+        int CAPFTYIterIndex = 0;           // Index for condenser outlet temperature CAPFT warning messages
+        int EIRFTXIter = 0;                // Iteration counter for evaporator outlet temperature EIRFT warning messages
+        int EIRFTXIterIndex = 0;           // Index for evaporator outlet temperature EIRFT warning messages
+        int EIRFTYIter = 0;                // Iteration counter for condenser outlet temperature EIRFT warning messages
+        int EIRFTYIterIndex = 0;           // Index for condenser outlet temperature EIRFT warning messages
+        int EIRFPLRTIter = 0;              // Iteration counter for condenser outlet temperature EIRFPLR warning messages
+        int EIRFPLRTIterIndex = 0;         // Index for condenser outlet temperature EIRFPLR warning messages
+        int EIRFPLRPLRIter = 0;            // Iteration counter for part-load ratio EIRFPLR warning messages
+        int EIRFPLRPLRIterIndex = 0;       // Index for part-load ratio EIRFPLR warning messages
+        bool FaultyChillerSWTFlag = false; // True if the chiller has SWT sensor fault
+        int FaultyChillerSWTIndex = 0;     // Index of the fault object corresponding to the chiller
+        Real64 FaultyChillerSWTOffset = 0.0; // Chiller SWT sensor offset
+        int IterLimitExceededNum = 0;        // Iteration limit exceeded for RegulaFalsi routine
+        int IterLimitErrIndex = 0;           // Index to iteration limit warning for RegulaFalsi routine
+        int IterFailed = 0;                  // Iteration limit failed for RegulaFalsi routine
+        int IterFailedIndex = 0;             // Index to iteration limit failed for RegulaFalsi routine
+        int DeltaTErrCount = 0;              // Evaporator delta T equals 0 for variable flow chiller warning messages
+        int DeltaTErrCountIndex = 0;         // Index to evaporator delta T = 0 for variable flow chiller warning messages
+        PlantLocation CWPlantLoc;            // chilled water plant loop component index
+        PlantLocation CDPlantLoc;            // condenser water plant loop component index
+        PlantLocation HRPlantLoc;            // heat recovery water plant loop component index
+        int CondMassFlowIndex = 0;
+        bool PossibleSubcooling = false;         // flag to indicate chiller is doing less cooling that requested
         // Operational fault parameters
-        bool FaultyChillerFoulingFlag;     // True if the chiller has fouling fault
-        int FaultyChillerFoulingIndex;     // Index of the fault object corresponding to the chiller
-        Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
-        std::string EndUseSubcategory;     // identifier use for the end use subcategory
-        bool MyEnvrnFlag;
-        bool MyInitFlag;
-        bool MySizeFlag;
-        Real64 ChillerCondAvgTemp;   // average condenser temp for curves with Heat recovery [C]
-        Real64 ChillerFalseLoadRate; // Chiller false load over and above water side load [J]
-        Real64 ChillerCyclingRatio;  // Chiller cycling ratio (time on/time step)
-        Real64 ChillerPartLoadRatio; // Chiller PLR (Load/Capacity)
-        Real64 ChillerEIRFPLR;       // Chiller EIRFPLR curve output value
-        Real64 ChillerEIRFT;         // Chiller EIRFT curve output value
-        Real64 ChillerCapFT;         // Chiller capacity curve output value
-        Real64 HeatRecOutletTemp;
-        Real64 QHeatRecovery; // Heat recovered from water-cooled condenser [W]
-        Real64 QCondenser;
-        Real64 QEvaporator;        // Evaporator heat transfer rate [W]
-        Real64 Power;              // Chiller power [W]
-        Real64 EvapOutletTemp;     // Evaporator outlet temperature [C]
-        Real64 CondOutletTemp;     // Condenser outlet temperature [C]
-        Real64 EvapMassFlowRate;   // Evaporator mass flow rate [kg/s]
-        Real64 CondMassFlowRate;   // Condenser mass flow rate [kg/s]
-        Real64 ChillerFalseLoad;   // Chiller false load over and above water side load [W]
-        Real64 Energy;             // Chiller electric consumption [J]
-        Real64 EvapEnergy;         // Evaporator heat transfer energy [J]
-        Real64 CondEnergy;         // Condenser heat transfer energy [J]
-        Real64 CondInletTemp;      // Condenser inlet temperature [C]
-        Real64 EvapInletTemp;      // Evaporator inlet temperature [C]
-        Real64 ActualCOP;          // Coefficient of performance
-        Real64 EnergyHeatRecovery; // Energy recovered from water-cooled condenser [J]
-        Real64 HeatRecInletTemp;   // Heat reclaim inlet temperature [C]
-        Real64 HeatRecMassFlow;    // Heat reclaim mass flow rate [kg/s]
-        DataBranchAirLoopPlant::ControlType EquipFlowCtrl;
-
-        // Default Constructor
-        ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Invalid), PartLoadCurveType(PLR::Invalid), RefCap(0.0), RefCapWasAutoSized(false),
-              RefCOP(0.0), FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
-              EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
-              CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
-              CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0), TempRefCondIn(0.0),
-              TempRefCondOut(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
-              DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), SizFac(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
-              HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
-              HeatRecInletLimitSchedNum(0), ChillerCapFTIndex(0), ChillerEIRFTIndex(0), ChillerEIRFPLRIndex(0), ChillerCapFTError(0),
-              ChillerCapFTErrorIndex(0), ChillerEIRFTError(0), ChillerEIRFTErrorIndex(0), ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0),
-              ChillerCAPFTXTempMin(0.0), ChillerCAPFTXTempMax(0.0), ChillerCAPFTYTempMin(0.0), ChillerCAPFTYTempMax(0.0), ChillerEIRFTXTempMin(0.0),
-              ChillerEIRFTXTempMax(0.0), ChillerEIRFTYTempMin(0.0), ChillerEIRFTYTempMax(0.0), ChillerEIRFPLRTempMin(0.0), ChillerEIRFPLRTempMax(0.0),
-              ChillerEIRFPLRPLRMin(0.0), ChillerEIRFPLRPLRMax(0.0), ChillerLiftNomMin(0.0), ChillerLiftNomMax(10.0), ChillerTdevNomMin(0.0),
-              ChillerTdevNomMax(10.0), CAPFTXIter(0), CAPFTXIterIndex(0), CAPFTYIter(0), CAPFTYIterIndex(0), EIRFTXIter(0), EIRFTXIterIndex(0),
-              EIRFTYIter(0), EIRFTYIterIndex(0), EIRFPLRTIter(0), EIRFPLRTIterIndex(0), EIRFPLRPLRIter(0), EIRFPLRPLRIterIndex(0),
-              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), IterLimitExceededNum(0), IterLimitErrIndex(0),
-              IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0), CWPlantLoc{}, CDPlantLoc{}, HRPlantLoc{},
-              CondMassFlowIndex(0), PossibleSubcooling(false), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
-              FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true), MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0),
-              ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0), ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0),
-              ChillerCapFT(0.0), HeatRecOutletTemp(0.0), QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0),
-              CondOutletTemp(0.0), EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
-              CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecMassFlow(0.0),
-              EquipFlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid)
-        {
-        }
+        bool FaultyChillerFoulingFlag = false;   // True if the chiller has fouling fault
+        int FaultyChillerFoulingIndex = 0;       // Index of the fault object corresponding to the chiller
+        Real64 FaultyChillerFoulingFactor = 1.0; // Chiller fouling factor
+        std::string EndUseSubcategory;           // identifier use for the end use subcategory
+        bool MyEnvrnFlag = true;
+        bool MyInitFlag = true;
+        bool MySizeFlag = true;
+        Real64 ChillerCondAvgTemp = 0.0;   // average condenser temp for curves with Heat recovery [C]
+        Real64 ChillerFalseLoadRate = 0.0; // Chiller false load over and above water side load [J]
+        Real64 ChillerCyclingRatio = 0.0;  // Chiller cycling ratio (time on/time step)
+        Real64 ChillerPartLoadRatio = 0.0; // Chiller PLR (Load/Capacity)
+        Real64 ChillerEIRFPLR = 0.0;       // Chiller EIRFPLR curve output value
+        Real64 ChillerEIRFT = 0.0;         // Chiller EIRFT curve output value
+        Real64 ChillerCapFT = 0.0;         // Chiller capacity curve output value
+        Real64 HeatRecOutletTemp = 0.0;
+        Real64 QHeatRecovery = 0.0;      // Heat recovered from water-cooled condenser [W]
+        Real64 QCondenser = 0.0;
+        Real64 QEvaporator = 0.0;        // Evaporator heat transfer rate [W]
+        Real64 Power = 0.0;              // Chiller power [W]
+        Real64 EvapOutletTemp = 0.0;     // Evaporator outlet temperature [C]
+        Real64 CondOutletTemp = 0.0;     // Condenser outlet temperature [C]
+        Real64 EvapMassFlowRate = 0.0;   // Evaporator mass flow rate [kg/s]
+        Real64 CondMassFlowRate = 0.0;   // Condenser mass flow rate [kg/s]
+        Real64 ChillerFalseLoad = 0.0;   // Chiller false load over and above water side load [W]
+        Real64 Energy = 0.0;             // Chiller electric consumption [J]
+        Real64 EvapEnergy = 0.0;         // Evaporator heat transfer energy [J]
+        Real64 CondEnergy = 0.0;         // Condenser heat transfer energy [J]
+        Real64 CondInletTemp = 0.0;      // Condenser inlet temperature [C]
+        Real64 EvapInletTemp = 0.0;      // Evaporator inlet temperature [C]
+        Real64 ActualCOP = 0.0;          // Coefficient of performance
+        Real64 EnergyHeatRecovery = 0.0; // Energy recovered from water-cooled condenser [J]
+        Real64 HeatRecInletTemp = 0.0;   // Heat reclaim inlet temperature [C]
+        Real64 HeatRecMassFlow = 0.0;    // Heat reclaim mass flow rate [kg/s]
+        DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
@@ -285,15 +258,12 @@ namespace ChillerReformulatedEIR {
 
 struct ChillerReformulatedEIRData : BaseGlobalStruct
 {
-    int NumElecReformEIRChillers = 0;
     bool GetInputREIR = true;
     Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
 
     void clear_state() override
     {
-        this->NumElecReformEIRChillers = 0;
-        this->GetInputREIR = true;
-        this->ElecReformEIRChiller.deallocate();
+        *this = ChillerReformulatedEIRData();
     }
 };
 

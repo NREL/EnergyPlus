@@ -4339,7 +4339,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // Condenser water loop
-    for (int iCooler = 1; iCooler <= state.dataCondenserLoopTowers->NumSimpleTowers; ++iCooler) {
+    for (int iCooler = 1; iCooler <= (int)state.dataCondenserLoopTowers->towers.size(); ++iCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec +
                                                          state.dataCondenserLoopTowers->towers(iCooler).FanEnergy +
                                                          state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
@@ -4378,13 +4378,13 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
         }
     }
     auto &ElectricEIRChiller(state.dataChillerElectricEIR->ElectricEIRChiller);
-    for (int iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
+    for (int iChiller = 1; iChiller <= (int)state.dataChillerElectricEIR->ElectricEIRChiller.size(); ++iChiller) {
         if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
         }
     }
     auto &ElecReformEIRChiller(state.dataChillerReformulatedEIR->ElecReformEIRChiller);
-    for (int iChiller = 1; iChiller <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++iChiller) {
+    for (int iChiller = 1; iChiller <= (int)state.dataChillerReformulatedEIR->ElecReformEIRChiller.size(); ++iChiller) {
         if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
         }
@@ -11033,7 +11033,7 @@ void WriteCompCostTable(EnergyPlusData &state)
             }
         }
 
-        NumRows = state.dataCostEstimateManager->NumLineItems + 1; // body will have the total and line items
+        NumRows = (int)state.dataCostEstimateManager->CostLineItem.size() + 1; // body will have the total and line items
         NumCols = 6;                                               // Line no., Line name, Qty, Units, ValperQty, Subtotal
         rowHead.allocate(NumRows);
         columnHead.allocate(NumCols);
@@ -11052,7 +11052,7 @@ void WriteCompCostTable(EnergyPlusData &state)
 
         columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
-        for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
+        for (item = 1; item <= (int)state.dataCostEstimateManager->CostLineItem.size(); ++item) {
             tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
             if (unitsStyle_cur == UnitsStyle::InchPound) {

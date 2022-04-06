@@ -158,19 +158,19 @@ namespace CTElectricGenerator {
         bool ErrorsFound(false);      // error flag
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:CombustionTurbine";
-        state.dataCTElectricGenerator->NumCTGenerators =
+        int NumCTGenerators =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-        if (state.dataCTElectricGenerator->NumCTGenerators <= 0) {
+        if (NumCTGenerators <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        state.dataCTElectricGenerator->CTGenerator.allocate(state.dataCTElectricGenerator->NumCTGenerators);
+        state.dataCTElectricGenerator->CTGenerator.allocate(NumCTGenerators);
 
         // LOAD ARRAYS WITH CT CURVE FIT Generator DATA
-        for (int genNum = 1; genNum <= state.dataCTElectricGenerator->NumCTGenerators; ++genNum) {
+        for (int genNum = 1; genNum <= NumCTGenerators; ++genNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      genNum,
@@ -260,8 +260,8 @@ namespace CTElectricGenerator {
                 ErrorsFound = true;
             }
 
-            state.dataCTElectricGenerator->CTGenerator(genNum).UACoef(1) = NumArray(5);
-            state.dataCTElectricGenerator->CTGenerator(genNum).UACoef(2) = NumArray(6);
+            state.dataCTElectricGenerator->CTGenerator(genNum).UACoef[0] = NumArray(5);
+            state.dataCTElectricGenerator->CTGenerator(genNum).UACoef[1] = NumArray(6);
 
             state.dataCTElectricGenerator->CTGenerator(genNum).MaxExhaustperCTPower = NumArray(7);
             state.dataCTElectricGenerator->CTGenerator(genNum).DesignMinExitGasTemp = NumArray(8);
@@ -650,7 +650,7 @@ namespace CTElectricGenerator {
                                  CurveManager::CurveValue(state, this->TempBasedExhaustTempCurve, ambientDeltaT);
 
             // (UACGC) Heat Exchanger UA to Capacity
-            Real64 UA_loc = this->UACoef(1) * std::pow(ratedPowerOutput, this->UACoef(2));
+            Real64 UA_loc = this->UACoef[0] * std::pow(ratedPowerOutput, this->UACoef[1]);
 
             // design engine stack saturated steam temp. (C)
             Real64 designMinExitGasTemp = this->DesignMinExitGasTemp;

@@ -93,69 +93,56 @@ namespace CoolingPanelSimple {
     {
         // Members
         std::string EquipID;
-        DataPlant::PlantEquipmentType EquipType;
+        DataPlant::PlantEquipmentType EquipType = DataPlant::PlantEquipmentType::Invalid;
         std::string Schedule;
         Array1D_string SurfaceName;
         Array1D_int SurfacePtr;
-        int ZonePtr;
-        int SchedPtr;
-        int WaterInletNode;
-        int WaterOutletNode;
-        int TotSurfToDistrib;
-        int ControlCompTypeNum;
-        int CompErrIndex;
-        ClgPanelCtrlType controlType;
+        int ZonePtr = 0;
+        int SchedPtr = 0;
+        int WaterInletNode = 0;
+        int WaterOutletNode = 0;
+        int TotSurfToDistrib = 0;
+        int ControlCompTypeNum = 0;
+        int CompErrIndex = 0;
+        ClgPanelCtrlType controlType = ClgPanelCtrlType::Invalid;
         std::string ColdSetptSched;
-        int ColdSetptSchedPtr;
-        CondCtrl CondCtrlType;
-        Real64 CondDewPtDeltaT;
-        int CondErrIndex;
-        Real64 ColdThrottlRange;
-        Real64 RatedWaterTemp;
-        int CoolingCapMethod;
-        Real64 ScaledCoolingCapacity;
-        Real64 UA;
-        Real64 Offset;
-        Real64 WaterMassFlowRate;
-        Real64 WaterMassFlowRateMax;
-        Real64 RatedWaterFlowRate;
-        Real64 WaterVolFlowRateMax;
-        Real64 WaterInletTempStd;
-        Real64 WaterInletTemp;
-        Real64 WaterInletEnthalpy;
-        Real64 WaterOutletTempStd;
-        Real64 WaterOutletTemp;
-        Real64 WaterOutletEnthalpy;
-        Real64 RatedZoneAirTemp;
-        Real64 FracRadiant;
-        Real64 FracConvect;
-        Real64 FracDistribPerson;
+        int ColdSetptSchedPtr = 0;
+        CondCtrl CondCtrlType = CondCtrl::NONE;
+        Real64 CondDewPtDeltaT = 0.0;
+        int CondErrIndex = 0;
+        Real64 ColdThrottlRange = 0.0;
+        Real64 RatedWaterTemp = 0.0;
+        int CoolingCapMethod = 0;
+        Real64 ScaledCoolingCapacity = 0.0;
+        Real64 UA = 0.0;
+        Real64 Offset = 0.0;
+        Real64 WaterMassFlowRate = 0.0;
+        Real64 WaterMassFlowRateMax = 0.0;
+        Real64 RatedWaterFlowRate = 0.0;
+        Real64 WaterVolFlowRateMax = 0.0;
+        Real64 WaterInletTempStd = 0.0;
+        Real64 WaterInletTemp = 0.0;
+        Real64 WaterInletEnthalpy = 0.0;
+        Real64 WaterOutletTempStd = 0.0;
+        Real64 WaterOutletTemp = 0.0;
+        Real64 WaterOutletEnthalpy = 0.0;
+        Real64 RatedZoneAirTemp = 0.0;
+        Real64 FracRadiant = 0.0;
+        Real64 FracConvect = 0.0;
+        Real64 FracDistribPerson = 0.0;
         Array1D<Real64> FracDistribToSurf;
-        Real64 TotPower;
-        Real64 Power;
-        Real64 ConvPower;
-        Real64 RadPower;
-        Real64 TotEnergy;
-        Real64 Energy;
-        Real64 ConvEnergy;
-        Real64 RadEnergy;
+        Real64 TotPower = 0.0;
+        Real64 Power = 0.0;
+        Real64 ConvPower = 0.0;
+        Real64 RadPower = 0.0;
+        Real64 TotEnergy = 0.0;
+        Real64 Energy = 0.0;
+        Real64 ConvEnergy = 0.0;
+        Real64 RadEnergy = 0.0;
         PlantLocation plantLoc;
-        int CoolingPanelLoadReSimIndex;
-        int CoolingPanelMassFlowReSimIndex;
-        int CoolingPanelInletTempFlowReSimIndex;
-
-        // Default Constructor
-        CoolingPanelParams()
-            : EquipType(DataPlant::PlantEquipmentType::Invalid), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0),
-              ControlCompTypeNum(0), CompErrIndex(0), controlType(ClgPanelCtrlType::Invalid), ColdSetptSchedPtr(0), CondCtrlType(CondCtrl::NONE),
-              CondDewPtDeltaT(0.0), CondErrIndex(0), ColdThrottlRange(0.0), RatedWaterTemp(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0),
-              UA(0.0), Offset(0.0), WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0),
-              WaterInletTempStd(0.0), WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0),
-              WaterOutletEnthalpy(0.0), RatedZoneAirTemp(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0),
-              ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), plantLoc{}, CoolingPanelLoadReSimIndex(0),
-              CoolingPanelMassFlowReSimIndex(0), CoolingPanelInletTempFlowReSimIndex(0)
-        {
-        }
+        int CoolingPanelLoadReSimIndex = 0;
+        int CoolingPanelMassFlowReSimIndex = 0;
+        int CoolingPanelInletTempFlowReSimIndex = 0;
 
         void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
@@ -170,12 +157,6 @@ namespace CoolingPanelSimple {
     {
         // Members
         Array1D_string FieldNames;
-
-        // Default Constructor
-        CoolingPanelSysNumericFieldData() = default;
-
-        // Destructor
-        ~CoolingPanelSysNumericFieldData() = default;
     };
 
     void SimCoolingPanel(EnergyPlusData &state,
@@ -208,7 +189,6 @@ struct ChilledCeilingPanelSimpleData : BaseGlobalStruct
 
     bool GetInputFlag = true;
     bool MyOneTimeFlag = true;
-    int NumCoolingPanels = 0;
     Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
     Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
@@ -230,22 +210,7 @@ struct ChilledCeilingPanelSimpleData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;
     void clear_state() override
     {
-        this->GetInputFlag = true;
-        this->MyOneTimeFlag = true;
-        this->NumCoolingPanels = 0;
-        this->CoolingPanelSource.deallocate();
-        this->CoolingPanelSrcAvg.deallocate();
-        this->ZeroSourceSumHATsurf.deallocate();
-        this->LastCoolingPanelSrc.deallocate();
-        this->LastSysTimeElapsed.deallocate();
-        this->LastTimeStepSys.deallocate();
-        this->CheckEquipName.deallocate();
-        this->SetLoopIndexFlag.deallocate();
-        this->MySizeFlagCoolPanel.deallocate();
-        this->CoolingPanel.deallocate();
-        this->CoolingPanelSysNumericFields.deallocate();
-        this->ZoneEquipmentListChecked = false;
-        this->MyEnvrnFlag.clear();
+        *this = ChilledCeilingPanelSimpleData();
     }
 };
 
