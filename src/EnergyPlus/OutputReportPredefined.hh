@@ -1145,11 +1145,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdstHeatingSETHours = 0;
     int pdchHeatingSETHours = 0;
     int pdchHeatingSETOccuHours = 0;
+    int pdchHeatingSETOccupiedHours = 0;
     int pdchHeatingSETUnmetDuration = 0;
     int pdchHeatingSETUnmetTime = 0;
     int pdstCoolingSETHours = 0;
     int pdchCoolingSETHours = 0;
     int pdchCoolingSETOccuHours = 0;
+    int pdchCoolingSETOccupiedHours = 0;
     int pdchCoolingSETUnmetDuration = 0;
     int pdchCoolingSETUnmetTime = 0;
 
@@ -2092,11 +2094,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdstHeatingSETHours = 0;
         this->pdchHeatingSETHours = 0;
         this->pdchHeatingSETOccuHours = 0;
+        this->pdchHeatingSETOccupiedHours = 0;
         this->pdchHeatingSETUnmetDuration = 0;
         this->pdchHeatingSETUnmetTime = 0;
         this->pdstCoolingSETHours = 0;
         this->pdchCoolingSETHours = 0;
         this->pdchCoolingSETOccuHours = 0;
+        this->pdchCoolingSETOccupiedHours = 0;
         this->pdchCoolingSETUnmetDuration = 0;
         this->pdchCoolingSETUnmetTime = 0;
         this->pdstHourOfSafetyColdEvent = 0;

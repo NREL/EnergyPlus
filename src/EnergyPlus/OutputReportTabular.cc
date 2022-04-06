@@ -12558,6 +12558,26 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         tableName = "Humidex OccupantHours";
         WriteResilienceBinsTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod);
+
+        columnHead(1) = "SET ≤ 12.2°C Hours (°C)";
+        columnHead(2) = "SET ≤ 12.2°C OccupantHours (°C)";
+        columnHead(3) = "SET ≤ 12.2°C OccupiedHours (°C)";
+        columnHead(4) = "Longest SET ≤ 12.2°C Duration [hr]";
+        columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration";
+
+        tableName = "Heating SET Hours";
+        WriteSETHoursTableReportingPeriod(
+            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod);
+
+        columnHead(1) = "SET > 30°C Hours (°C)";
+        columnHead(2) = "SET > 30°C OccupantHours (°C)";
+        columnHead(3) = "SET > 30°C OccupiedHours (°C)";
+        columnHead(4) = "Longest SET > 30°C Duration [hr]";
+        columnHead(5) = "Start Time of the Longest SET > 30°C Duration";
+
+        tableName = "Cooling SET Hours";
+        WriteSETHoursTableReportingPeriod(
+            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod);
     }
 }
 
@@ -12641,6 +12661,63 @@ void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
         tableBody(j + 1, state.dataGlobal->NumOfZones + 3) = RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2);
         tableBody(j + 1, state.dataGlobal->NumOfZones + 4) = RealToStr(columnSum[j], 2);
     }
+
+    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+}
+
+void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
+                                       int const columnNum,
+                                       int const periodIdx,
+                                       const std::string tableName,
+                                       Array1D_string const &columnHead,
+                                       Array1D_int columnWidth,
+                                       Array2D<std::vector<Real64>> const &ZoneBins)
+{
+
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state.dataGlobal->NumOfZones + 3);
+    tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 3);
+
+    WriteSubtitle(state, tableName);
+    tableBody = "";
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
+        for (int j = 1; j < columnNum; j++) {
+            tableBody(j, ZoneNum) = RealToStr(ZoneBins(ZoneNum, periodIdx)[j - 1], 2);
+        }
+        tableBody(columnNum, ZoneNum) = DateToString(ZoneBins(ZoneNum, periodIdx)[columnNum - 1]);
+    }
+
+    std::vector<Real64> columnMax(columnNum - 1, 0);
+    std::vector<Real64> columnMin(columnNum - 1, 0);
+    std::vector<Real64> columnSum(columnNum - 1, 0);
+
+    for (int j = 0; j < columnNum - 1; j++) {
+        columnMin[j] = ZoneBins(1, periodIdx)[j];
+    }
+    for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
+        std::string ZoneName = state.dataHeatBal->Zone(i).Name;
+        for (int j = 0; j < columnNum - 1; j++) {
+            Real64 curValue = ZoneBins(i, periodIdx)[j];
+            if (curValue > columnMax[j]) columnMax[j] = curValue;
+            if (curValue < columnMin[j]) columnMin[j] = curValue;
+            columnSum[j] += curValue;
+        }
+    }
+
+    rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
+    rowHead(state.dataGlobal->NumOfZones + 2) = "Max";
+    rowHead(state.dataGlobal->NumOfZones + 3) = "Average";
+
+    for (int j = 0; j < columnNum - 1; j++) {
+        tableBody(j + 1, state.dataGlobal->NumOfZones + 1) = RealToStr(columnMin[j], 2);
+        tableBody(j + 1, state.dataGlobal->NumOfZones + 2) = RealToStr(columnMax[j], 2);
+        tableBody(j + 1, state.dataGlobal->NumOfZones + 3) = RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2);
+    }
+    tableBody(columnNum, state.dataGlobal->NumOfZones + 1) = "-";
+    tableBody(columnNum, state.dataGlobal->NumOfZones + 2) = "-";
+    tableBody(columnNum, state.dataGlobal->NumOfZones + 3) = "-";
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
 }
@@ -12779,15 +12856,17 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         }
 
         if (hasPierceSET) {
-            columnNum = 4;
+            columnNum = 5;
             columnHead = {state.dataOutRptPredefined->pdchHeatingSETHours,
                           state.dataOutRptPredefined->pdchHeatingSETOccuHours,
+                          state.dataOutRptPredefined->pdchHeatingSETOccupiedHours,
                           state.dataOutRptPredefined->pdchHeatingSETUnmetDuration,
                           state.dataOutRptPredefined->pdchHeatingSETUnmetTime};
             WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLowSETHours);
 
             columnHead = {state.dataOutRptPredefined->pdchCoolingSETHours,
                           state.dataOutRptPredefined->pdchCoolingSETOccuHours,
+                          state.dataOutRptPredefined->pdchCoolingSETOccupiedHours,
                           state.dataOutRptPredefined->pdchCoolingSETUnmetDuration,
                           state.dataOutRptPredefined->pdchCoolingSETUnmetTime};
             WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHighSETHours);

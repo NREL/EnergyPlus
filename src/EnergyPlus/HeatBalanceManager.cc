@@ -6056,6 +6056,12 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZonePierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);
         state.dataHeatBalFanSys->ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->highSETLongestHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->lowSETLongestStartRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
 

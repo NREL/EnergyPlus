@@ -272,6 +272,10 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array2D<std::vector<Real64>> ZoneHumidexHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHumidexOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHumidexOccupiedHourBinsRepPeriod;
+    Array2D<Real64> lowSETLongestHoursRepPeriod;
+    Array2D<Real64> highSETLongestHoursRepPeriod;
+    Array2D<int> lowSETLongestStartRepPeriod;
+    Array2D<int> highSETLongestStartRepPeriod;
     Array1D<std::vector<Real64>> ZoneColdHourOfSafetyBins;
     Array1D<std::vector<Real64>> ZoneHeatHourOfSafetyBins;
     Array1D<std::vector<Real64>> ZoneUnmetDegreeHourBins;
@@ -285,6 +289,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZonePierceSETLastStep;
     Array1D<std::vector<Real64>> ZoneLowSETHours;
     Array1D<std::vector<Real64>> ZoneHighSETHours;
+    Array2D<std::vector<Real64>> ZoneLowSETHoursRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHighSETHoursRepPeriod;
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
@@ -425,6 +431,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->ZonePierceSETLastStep.deallocate();
         this->ZoneLowSETHours.deallocate();
         this->ZoneHighSETHours.deallocate();
+        this->ZoneLowSETHoursRepPeriod.deallocate();
+        this->ZoneHighSETHoursRepPeriod.deallocate();
         this->ZoneCO2LevelHourBins.deallocate();
         this->ZoneCO2LevelOccuHourBins.deallocate();
         this->ZoneLightingLevelHourBins.deallocate();
@@ -437,6 +445,10 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->ZoneHumidexHourBinsRepPeriod.deallocate();
         this->ZoneHumidexOccuHourBinsRepPeriod.deallocate();
         this->ZoneHumidexOccupiedHourBinsRepPeriod.deallocate();
+        this->lowSETLongestHoursRepPeriod.deallocate();
+        this->highSETLongestHoursRepPeriod.deallocate();
+        this->lowSETLongestStartRepPeriod.deallocate();
+        this->highSETLongestStartRepPeriod.deallocate();
     }
 };
 

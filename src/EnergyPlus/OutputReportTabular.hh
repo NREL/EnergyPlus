@@ -674,6 +674,14 @@ namespace OutputReportTabular {
                             std::vector<std::string> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins);
 
+    void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
+                                           int const columnNum,
+                                           int const periodIdx,
+                                           const std::string tableName,
+                                           Array1D_string const &columnHead,
+                                           Array1D_int columnWidth,
+                                           Array2D<std::vector<Real64>> const &ZoneBins);
+
     void WriteHourOfSafetyTable(EnergyPlusData &state,
                                 int const columnNum,
                                 std::vector<int> const &columnHead,
