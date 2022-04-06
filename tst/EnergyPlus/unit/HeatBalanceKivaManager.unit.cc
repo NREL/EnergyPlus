@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -802,6 +802,33 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_GetAccDate)
 
     // Accelerated date should be greater than 0
     EXPECT_GT(accDate, 0);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceKiva_setMessageCallback)
+{
+    // Unit test for Issue #9309
+
+    int SurfNum;
+
+    SurfNum = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(SurfNum).ExtBoundCond = DataSurfaces::KivaFoundation;
+    state->dataSurface->Surface(SurfNum).Name = "Kiva Floor";
+    state->dataSurface->AllHTKivaSurfaceList = {1};
+    HeatBalanceKivaManager::KivaManager km;
+
+    EXPECT_THROW(km.calcKivaSurfaceResults(*state), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** Surface=\"Kiva Floor\": The weights of associated Kiva instances do not add to unity--check exposed perimeter values.",
+        "   **  Fatal  ** Kiva: Errors discovered, program terminates.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Surface=\"Kiva Floor\": The weights of associated Kiva instances do not add to "
+        "unity--check exposed perimeter values.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 } // namespace EnergyPlus

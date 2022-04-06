@@ -15,8 +15,8 @@ namespace Tarcog
           std::shared_ptr<CIGUGapLayer> const & t_Layer) :
             CIGUGapLayer(*t_Layer),
             m_Layer(t_Layer),
-            m_inTemperature(0),
-            m_outTemperature(0),
+            m_inTemperature(Gases::DefaultTemperature),
+            m_outTemperature(Gases::DefaultTemperature),
             m_Zin(0),
             m_Zout(0)
         {
@@ -180,7 +180,7 @@ namespace Tarcog
         {
             const auto aProperties = m_Gas.getGasProperties();
             m_LayerGainFlow = aProperties.m_Density * aProperties.m_SpecificHeat * m_AirSpeed
-                              * getThickness() * m_Width * (m_inTemperature - m_outTemperature);
+                              * getThickness() * (m_inTemperature - m_outTemperature) / m_Height;
         }
 
     }   // namespace ISO15099

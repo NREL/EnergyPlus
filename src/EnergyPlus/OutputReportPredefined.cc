@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,6 +108,14 @@ namespace OutputReportPredefined {
         s->pdchDDwindSp = newPreDefColumn(state, s->pdstDesDay, "Wind Speed [m/s]");
         s->pdchDDwindDr = newPreDefColumn(state, s->pdstDesDay, "Wind Direction");
 
+        s->pdstMonthlyPrec = newPreDefSubTable(state, s->pdrClim, "Monthly Precipitation Summary");
+
+        s->pdchMonthlyTotalPrecInWeather = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation from .epw [mm]");
+        s->pdchMonthlyTotalHrRain = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Hours of Rain from .epw");
+        s->pdchMonthlyTotalPrecInSitePrec = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation in Site:Precipitation [mm]");
+        s->pdchMonthlyTotalIrrDep = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Roof Irrigation Depth [mm]");
+        s->pdchMonthlyTotalRainCol = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Rain Collection Volume [m3]");
+
         s->pdstWthr = newPreDefSubTable(state, s->pdrClim, "Weather Statistics File");
         s->pdchWthrVal = newPreDefColumn(state, s->pdstWthr, "Value");
 
@@ -142,6 +150,7 @@ namespace OutputReportPredefined {
         s->pdstFen = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Fenestration");
 
         s->pdchFenCons = newPreDefColumn(state, s->pdstFen, "Construction");
+        s->pdchFenFrameDivName = newPreDefColumn(state, s->pdstFen, "Frame and Divider");
         s->pdchFenGlassAreaOf1 = newPreDefColumn(state, s->pdstFen, "Glass Area [m2]");
         s->pdchFenFrameAreaOf1 = newPreDefColumn(state, s->pdstFen, "Frame Area [m2]");
         s->pdchFenDividerAreaOf1 = newPreDefColumn(state, s->pdstFen, "Divider Area [m2]");
@@ -152,11 +161,26 @@ namespace OutputReportPredefined {
         s->pdchFenVisTr = newPreDefColumn(state, s->pdstFen, "Glass Visible Transmittance");
         s->pdchFenFrameConductance = newPreDefColumn(state, s->pdstFen, "Frame Conductance [W/m2-K]");
         s->pdchFenDividerConductance = newPreDefColumn(state, s->pdstFen, "Divider Conductance [W/m2-K]");
+        s->pdchFenAssemNfrcType = newPreDefColumn(state, s->pdstFen, "NFRC Product Type");
+        s->pdchFenAssemUfact = newPreDefColumn(state, s->pdstFen, "Assembly U-Factor [W/m2-K]");
+        s->pdchFenAssemSHGC = newPreDefColumn(state, s->pdstFen, "Assembly SHGC");
+        s->pdchFenAssemVisTr = newPreDefColumn(state, s->pdstFen, "Assembly Visible Transmittance");
         s->pdchFenSwitchable = newPreDefColumn(state, s->pdstFen, "Shade Control");
         s->pdchFenParent = newPreDefColumn(state, s->pdstFen, "Parent Surface");
         s->pdchFenAzimuth = newPreDefColumn(state, s->pdstFen, "Azimuth [deg]");
         s->pdchFenTilt = newPreDefColumn(state, s->pdstFen, "Tilt [deg]");
         s->pdchFenDir = newPreDefColumn(state, s->pdstFen, "Cardinal Direction");
+
+        s->pdstFenShd = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Fenestration Shaded State");
+
+        s->pdchFenShdFrameDiv = newPreDefColumn(state, s->pdstFenShd, "Frame and Divider");
+        s->pdchFenShdUfact = newPreDefColumn(state, s->pdstFenShd, "Glass U-Factor [W/m2-K]");
+        s->pdchFenShdSHGC = newPreDefColumn(state, s->pdstFenShd, "Glass SHGC");
+        s->pdchFenShdVisTr = newPreDefColumn(state, s->pdstFenShd, "Glass Visible Transmittance");
+        s->pdchFenShdAssemNfrcType = newPreDefColumn(state, s->pdstFenShd, "NFRC Product Type");
+        s->pdchFenShdAssemUfact = newPreDefColumn(state, s->pdstFenShd, "Assembly U-Factor [W/m2-K]");
+        s->pdchFenShdAssemSHGC = newPreDefColumn(state, s->pdstFenShd, "Assembly SHGC");
+        s->pdchFenShdAssemVisTr = newPreDefColumn(state, s->pdstFenShd, "Assembly Visible Transmittance");
 
         s->pdstIntFen = newPreDefSubTable(state, s->pdrEnvelope, "Interior Fenestration");
 
@@ -171,10 +195,8 @@ namespace OutputReportPredefined {
         // s->pdchIntFenDividerAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Divider Area [m2]')
         // s->pdchIntFenFrameConductance =  newPreDefColumn(state, s->pdstIntFen,'Frame Conductance [W/m2-K]')
         // s->pdchIntFenDividerConductance =  newPreDefColumn(state, s->pdstIntFen,'Divider Conductance [W/m2-K]')
-        s->pdchIntFenParent = newPreDefColumn(state, s->pdstIntFen, "Parent Surface");
 
         s->pdstDoor = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Door");
-
         s->pdchDrCons = newPreDefColumn(state, s->pdstDoor, "Construction");
         s->pdchDrUfactFilm = newPreDefColumn(state, s->pdstDoor, "U-Factor with Film [W/m2-K]");
         s->pdchDrUfactNoFilm = newPreDefColumn(state, s->pdstDoor, "U-Factor no Film [W/m2-K]");

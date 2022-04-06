@@ -38,7 +38,7 @@
 !
 !           The building is oriented 30 degrees east of north.
 !
-! Floor Area:        463.6 m2 (5000 ft2)
+! Floor Area:        463.6 m2 (5000 ft2), Space1-1 floor area reduced by 10% to represent unused areas
 ! Number of Stories: 1
 !
 ! Zone Description Details:
@@ -106,7 +106,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.1;
 
   Building,
     Building,                !- Name
@@ -856,7 +856,8 @@
     1,                       !- Type
     1,                       !- Multiplier
     2.438400269,             !- Ceiling Height {m}
-    239.247360229;           !- Volume {m3}
+    239.247360229,           !- Volume {m3}
+    90.0;                    !- Floor Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
@@ -1120,7 +1121,8 @@
     1,                       !- Type
     1,                       !- Multiplier
     2.438400269,             !- Ceiling Height {m}
-    103.311355591;           !- Volume {m3}
+    103.311355591,           !- Volume {m3}
+    42.369;                  !- Floor Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name

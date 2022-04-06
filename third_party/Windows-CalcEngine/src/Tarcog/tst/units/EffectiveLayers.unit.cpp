@@ -122,7 +122,7 @@ TEST_F(TestEffectiveLayers, TestPerforatedEffectiveOpenness)
     const auto height{1.8};                 // m
     const auto materialThickness{0.0006};   // m
 
-    EffectiveLayers::ShadeOpenness openness{0.087265995, 0.005, 0.004, 0.01, 0.008};
+    const EffectiveLayers::ShadeOpenness openness{0.087265995, 0.005, 0.004, 0.01, 0.008};
 
     EffectiveLayers::EffectiveLayerPerforated perforated{
       width, height, materialThickness, openness};
@@ -132,11 +132,11 @@ TEST_F(TestEffectiveLayers, TestPerforatedEffectiveOpenness)
     EXPECT_NEAR(6e-4, effectiveThickness, 1e-9);
 
     const auto effectiveOpenness{perforated.getEffectiveOpenness()};
-    EXPECT_NEAR(8.400372e-3, effectiveOpenness.Ah, 1e-8);
-    EXPECT_NEAR(6.5e-3, effectiveOpenness.Atop, 1e-8);
-    EXPECT_NEAR(5.2e-3, effectiveOpenness.Abot, 1e-8);
-    EXPECT_NEAR(7.11e-3, effectiveOpenness.Al, 1e-8);
-    EXPECT_NEAR(5.688e-3, effectiveOpenness.Ar, 1e-8);
+    EXPECT_NEAR(9.779677e-3, effectiveOpenness.Ah, 1e-8);
+    EXPECT_NEAR(13.0e-3, effectiveOpenness.Atop, 1e-8);
+    EXPECT_NEAR(10.4e-3, effectiveOpenness.Abot, 1e-8);
+    EXPECT_NEAR(9.0e-3, effectiveOpenness.Al, 1e-8);
+    EXPECT_NEAR(7.2e-3, effectiveOpenness.Ar, 1e-8);
 }
 
 TEST_F(TestEffectiveLayers, TestOtherShadingEffectiveOpenness)

@@ -60,7 +60,7 @@ TEST_F(TestVenetianCellDescriptionFlat45, TestVenetian1)
     {
         for(size_t j = 0; j < size; ++j)
         {
-            EXPECT_NEAR(correctResults(i, j), (*viewFactors)(i, j), 1e-6);
+            EXPECT_NEAR(correctResults(i, j), viewFactors(i, j), 1e-6);
         }
     }
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #include "Foundation.hpp"
@@ -8,12 +8,12 @@ namespace Kiva {
 
 static const double PI = 4.0 * atan(1.0);
 
-Material::Material() {}
+Material::Material() : conductivity{0}, density{0}, specificHeat{0} {}
 
 Material::Material(double k, double rho, double cp)
     : conductivity(k), density(rho), specificHeat(cp) {}
 
-InputBlock::InputBlock() : x(0.0), z(0.0), width(0.0), depth(0.0) {}
+InputBlock::InputBlock() : x(0.0), z(0.0), width(0.0), depth(0.0), box(Point(0, 0), Point(0, 0)) {}
 
 double Wall::totalWidth() {
   double width = 0.0;
@@ -100,13 +100,16 @@ bool Ranges::isType(double position, RangeType::Type type) {
 
 Foundation::Foundation()
     : deepGroundDepth(40.0), farFieldWidth(40.0), foundationDepth(0.0), orientation(0.0),
-      deepGroundBoundary(DGB_ZERO_FLUX), wallTopBoundary(WTB_ZERO_FLUX),
+      deepGroundBoundary(DGB_ZERO_FLUX), wallTopInteriorTemperature{0},
+      wallTopExteriorTemperature{0}, wallTopBoundary(WTB_ZERO_FLUX),
       soil(Material(1.73, 1842, 419)), grade(SurfaceProperties(0.9, 0.9, 0.03)),
       coordinateSystem(CS_CARTESIAN), numberOfDimensions(2), useSymmetry(true),
-      reductionStrategy(RS_BOUNDARY), exposedFraction(1.0), useDetailedExposedPerimeter(false),
-      buildingHeight(0.0), hasWall(true), hasSlab(true), perimeterSurfaceWidth(0.0),
-      hasPerimeterSurface(false), mesh(Mesh()), numericalScheme(NS_ADI), fADI(0.00001),
-      tolerance(1.0e-6), maxIterations(100000) {}
+      reductionStrategy(RS_BOUNDARY), twoParameters{false}, reductionLength1{0},
+      reductionLength2{0}, linearAreaMultiplier{0}, isXSymm{false}, isYSymm{false},
+      exposedFraction(1.0), useDetailedExposedPerimeter(false), buildingHeight(0.0), hasWall(true),
+      hasSlab(true), perimeterSurfaceWidth(0.0), hasPerimeterSurface(false), mesh(Mesh()),
+      numericalScheme(NS_ADI), fADI(0.00001), tolerance(1.0e-6),
+      maxIterations(100000), netArea{0}, netPerimeter{0} {}
 
 void Foundation::createMeshData() {
   std::size_t nV = polygon.outer().size();
@@ -130,6 +133,13 @@ void Foundation::createMeshData() {
     poly.outer().push_back(Point3(nextX, nextY, buildingHeight));
     poly.outer().push_back(Point3(nextX, nextY, 0.0));
     buildingSurfaces.push_back(poly);
+  }
+
+  if (!isCounterClockWise(polygon)) {
+    boost::geometry::correct(polygon);
+    showMessage(
+        MSG_WARN,
+        "Foundation floor polygon was modified to be counterclockwise as required in Kiva.");
   }
 
   Material air;
@@ -223,17 +233,19 @@ void Foundation::createMeshData() {
 
     // Blocks along the top may be part of a wall.
     if (isEqual(bZmax, zMax)) {
-      if (isGreaterOrEqual(bXmax,xyWallTopInterior) && isLessThan(bXmin,xyWallTopInterior)) {
-        // Block is likely part of wall if it's narrow relative to wall or if there is any foundation depth
+      if (isGreaterOrEqual(bXmax, xyWallTopInterior) && isLessThan(bXmin, xyWallTopInterior)) {
+        // Block is likely part of wall if it's narrow relative to wall or if there is any
+        // foundation depth
         if (std::abs(b.width) <= wall.totalWidth() / 2. || foundationDepth > 0.0) {
           xyWallTopInterior = std::min(bXmin, xyWallTopInterior);
           if (foundationDepth == 0.0) {
-              xySlabNear = xyWallTopInterior;
+            xySlabNear = xyWallTopInterior;
           }
         }
       }
-      if (isLessOrEqual(bXmin,xyWallTopExterior) && isGreaterThan(bXmax,xyWallTopExterior)) {
-        // Block is likely part of wall if it's narrow relative to wall or if the wall top is above grade
+      if (isLessOrEqual(bXmin, xyWallTopExterior) && isGreaterThan(bXmax, xyWallTopExterior)) {
+        // Block is likely part of wall if it's narrow relative to wall or if the wall top is above
+        // grade
         if (std::abs(b.width) <= wall.totalWidth() / 2. ||
             (hasWall && wall.heightAboveGrade > 0.0)) {
           xyWallTopExterior = std::max(bXmax, xyWallTopExterior);
@@ -1079,37 +1091,42 @@ void Foundation::createMeshData() {
     if (wallTopBoundary == WTB_LINEAR_DT) {
       // Wall Top
       if (hasWall) {
-        double position = 0.0;
-        double &Tin = wallTopInteriorTemperature;
-        double &Tout = wallTopExteriorTemperature;
-        double Tdiff = (Tin - Tout);
-        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
-        double temperature = Tin - (1.0 / N) / 2 * Tdiff;
-
-        for (std::size_t n = 1; n <= N; n++) {
-          Surface surface;
-          surface.type = Surface::ST_WALL_TOP;
-          surface.xMin = xRef2 + position;
-          surface.xMax = xRef2 + position + (xyWallTopExterior - xyWallTopInterior) / N;
-          surface.yMin = 0.0;
-          surface.yMax = 1.0;
-          surface.setSquarePolygon();
-          surface.zMin = zMax;
-          surface.zMax = zMax;
-          surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
-          surface.orientation = Surface::Z_POS;
-          surface.temperature = temperature;
-          surfaces.push_back(surface);
-
-          position += (xyWallTopExterior - xyWallTopInterior) / N;
-          temperature -= (1.0 / N) * Tdiff;
-        }
-
-        if (twoParameters) {
+        {
+          double position = 0.0;
           double &Tin = wallTopInteriorTemperature;
           double &Tout = wallTopExteriorTemperature;
           double Tdiff = (Tin - Tout);
-          std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
+          std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) /
+                                        mesh.minCellDim);
+          double temperature = Tin - (1.0 / N) / 2 * Tdiff;
+
+          for (std::size_t n = 1; n <= N; n++) {
+            Surface surface;
+            surface.type = Surface::ST_WALL_TOP;
+            surface.xMin = xRef2 + position;
+            surface.xMax = xRef2 + position + (xyWallTopExterior - xyWallTopInterior) / N;
+            surface.yMin = 0.0;
+            surface.yMax = 1.0;
+            surface.setSquarePolygon();
+            surface.zMin = zMax;
+            surface.zMax = zMax;
+            surface.boundaryConditionType = Surface::CONSTANT_TEMPERATURE;
+            surface.orientation = Surface::Z_POS;
+            surface.temperature = temperature;
+            surfaces.push_back(surface);
+
+            position += (xyWallTopExterior - xyWallTopInterior) / N;
+            temperature -= (1.0 / N) * Tdiff;
+          }
+        }
+
+        if (twoParameters) {
+          double position = 0.0;
+          double &Tin = wallTopInteriorTemperature;
+          double &Tout = wallTopExteriorTemperature;
+          double Tdiff = (Tin - Tout);
+          std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) /
+                                        mesh.minCellDim);
           double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
           for (std::size_t n = 1; n <= N; n++) {
@@ -1287,7 +1304,7 @@ void Foundation::createMeshData() {
         double xPosition = xRef2;
 
         // Foundation Wall
-        for (std::size_t n = wall.layers.size() - 1; n < wall.layers.size() /* && n >= 0 */; n--) {
+        for (int n = static_cast<int>(wall.layers.size()) - 1; n >= 0; n--) {
           Block block;
           block.material = wall.layers[n].material;
           block.blockType = Block::SOLID;
@@ -1307,7 +1324,7 @@ void Foundation::createMeshData() {
         double xPosition = xRef1;
 
         // Foundation Wall
-        for (std::size_t n = wall.layers.size() - 1; n < wall.layers.size() /* && n >= 0 */; n--) {
+        for (int n = static_cast<int>(wall.layers.size()) - 1; n >= 0; n--) {
           Block block;
           block.material = wall.layers[n].material;
           block.blockType = Block::SOLID;
@@ -1326,17 +1343,19 @@ void Foundation::createMeshData() {
 
     // General blocks
     for (auto &b : inputBlocks) {
-      Block block;
-      block.material = b.material;
-      block.blockType = Block::SOLID;
-      block.xMin = xRef2 + b.box.min_corner().get<0>();
-      block.xMax = xRef2 + b.box.max_corner().get<0>();
-      block.yMin = 0.0;
-      block.yMax = 1.0;
-      block.setSquarePolygon();
-      block.zMin = b.box.min_corner().get<1>();
-      block.zMax = b.box.max_corner().get<1>();
-      blocks.push_back(block);
+      {
+        Block block;
+        block.material = b.material;
+        block.blockType = Block::SOLID;
+        block.xMin = xRef2 + b.box.min_corner().get<0>();
+        block.xMax = xRef2 + b.box.max_corner().get<0>();
+        block.yMin = 0.0;
+        block.yMax = 1.0;
+        block.setSquarePolygon();
+        block.zMin = b.box.min_corner().get<1>();
+        block.zMax = b.box.max_corner().get<1>();
+        blocks.push_back(block);
+      }
 
       if (twoParameters) {
         Block block;
@@ -1408,14 +1427,6 @@ void Foundation::createMeshData() {
   } else if (numberOfDimensions == 3 && !useSymmetry) {
 #if defined(KIVA_3D)
     // TODO 3D
-    Box boundingBox;
-    boost::geometry::envelope(polygon, boundingBox);
-
-    double xMinBB = boundingBox.min_corner().get<0>();
-    double yMinBB = boundingBox.min_corner().get<1>();
-
-    double xMaxBB = boundingBox.max_corner().get<0>();
-    double yMaxBB = boundingBox.max_corner().get<1>();
 
     xMin = xMinBB - farFieldWidth;
     yMin = yMinBB - farFieldWidth;
@@ -1667,7 +1678,8 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
+        std::size_t N =
+            (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {
@@ -1818,7 +1830,7 @@ void Foundation::createMeshData() {
       double xyPosition = 0.0;
 
       // Foundation Wall
-      for (int n = wall.layers.size() - 1; n >= 0; n--) {
+      for (int n = static_cast<int>(wall.layers.size() - 1); n >= 0; n--) {
         Polygon poly;
         poly = offset(polygon, xyPosition + wall.layers[n].thickness);
 
@@ -2030,15 +2042,6 @@ void Foundation::createMeshData() {
 
     nV = symmetricPoly.outer().size();
 
-    Box boundingBox;
-    boost::geometry::envelope(symmetricPoly, boundingBox);
-
-    double xMinBB = boundingBox.min_corner().get<0>();
-    double yMinBB = boundingBox.min_corner().get<1>();
-
-    double xMaxBB = boundingBox.max_corner().get<0>();
-    double yMaxBB = boundingBox.max_corner().get<1>();
-
     if (isXSymm)
       xMin = xMinBB;
     else
@@ -2218,7 +2221,8 @@ void Foundation::createMeshData() {
         double &Tin = wallTopInteriorTemperature;
         double &Tout = wallTopExteriorTemperature;
         double Tdiff = (Tin - Tout);
-        std::size_t N = (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
+        std::size_t N =
+            (std::size_t)((xyWallTopExterior - xyWallTopInterior + DBL_EPSILON) / mesh.minCellDim);
         double temperature = Tin - (1.0 / N) / 2 * Tdiff;
 
         for (std::size_t n = 1; n <= N; n++) {
@@ -2396,7 +2400,7 @@ void Foundation::createMeshData() {
       double xyPosition = 0.0;
 
       // Foundation Wall
-      for (int n = wall.layers.size() - 1; n >= 0; n--) {
+      for (int n = static_cast<int>(wall.layers.size() - 1); n >= 0; n--) {
         Polygon tempPoly;
         tempPoly = offset(polygon, xyPosition + wall.layers[n].thickness);
 

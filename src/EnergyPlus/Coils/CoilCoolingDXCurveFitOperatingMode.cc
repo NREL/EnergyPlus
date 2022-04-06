@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -210,8 +210,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
-    Real64 const ratedInletAirTemp(26.6667);     // 26.6667C or 80F
-    Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 constexpr ratedInletAirTemp(26.6667);     // 26.6667C or 80F
+    Real64 constexpr ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     this->ratedEvapAirMassFlowRate =
         this->ratedEvapAirFlowRate *
         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
@@ -290,6 +290,17 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
+    if (((speedNum == 1) && (PLR == 0.0)) || (inletNode.MassFlowRate == 0.0)) {
+        outletNode.Temp = inletNode.Temp;
+        outletNode.HumRat = inletNode.HumRat;
+        outletNode.Enthalpy = inletNode.Enthalpy;
+        outletNode.Press = inletNode.Press;
+        OpModeRTF = 0.0;
+        OpModePower = 0.0;
+        OpModeWasteHeat = 0.0;
+        return;
+    }
+
     if (condInletNode.Press <= 0.0) {
         condInletNode.Press = state.dataEnvrn->OutBaroPress;
     }
@@ -350,8 +361,15 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
         outletNode.HumRat = outletNode.HumRat * plr1 + (1.0 - plr1) * inletNode.HumRat;
         outletNode.Enthalpy = outletNode.Enthalpy * plr1 + (1.0 - plr1) * inletNode.Enthalpy;
+        outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+
+        // Check for saturation error and modify temperature at constant enthalpy
+        Real64 tsat = Psychrometrics::PsyTsatFnHPb(state, outletNode.Enthalpy, inletNode.Press, RoutineName);
+        if (outletNode.Temp < tsat) {
+            outletNode.Temp = tsat;
+            outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, tsat, outletNode.Enthalpy);
+        }
     }
-    outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
     OpModeRTF = thisspeed.RTF;
     OpModePower = thisspeed.fullLoadPower * thisspeed.RTF;
