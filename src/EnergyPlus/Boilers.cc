@@ -170,6 +170,7 @@ void GetBoilerInput(EnergyPlusData &state)
     state.dataIPShortCut->cCurrentModuleObject = "Boiler:HotWater";
     int numBoilers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
+
     if (numBoilers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " Equipment specified in input file");
         ErrorsFound = true;
