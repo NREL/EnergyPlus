@@ -11033,7 +11033,7 @@ void WriteCompCostTable(EnergyPlusData &state)
             }
         }
 
-        NumRows = state.dataCostEstimateManager->NumLineItems + 1; // body will have the total and line items
+        NumRows = (int)state.dataCostEstimateManager->CostLineItem.size() + 1; // body will have the total and line items
         NumCols = 6;                                               // Line no., Line name, Qty, Units, ValperQty, Subtotal
         rowHead.allocate(NumRows);
         columnHead.allocate(NumCols);
@@ -11052,7 +11052,7 @@ void WriteCompCostTable(EnergyPlusData &state)
 
         columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
-        for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
+        for (item = 1; item <= (int)state.dataCostEstimateManager->CostLineItem.size(); ++item) {
             tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
             if (unitsStyle_cur == UnitsStyle::InchPound) {
