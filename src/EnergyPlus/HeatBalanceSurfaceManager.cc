@@ -5833,8 +5833,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                                                        state.dataGlobal->HourOfDay,
                                                        state.dataGlobal->TimeStepZone * state.dataGlobal->TimeStep * 60);
                             state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
-                            state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) =
-                            state.dataHeatBalFanSys->lowSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
+                            state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
                         }
                         // Keep the longest duration record.
                         state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) += state.dataGlobal->TimeStepZone;

@@ -368,7 +368,8 @@ namespace General {
 
     void InvOrdinalDay(int Number, int &PMonth, int &PDay, int LeapYr);
 
-    bool BetweenDateHoursLeftInclusive(int const TestDate, int const TestHour, int const StartDate, int const StartHour, int const EndDate, int const EndHour);
+    bool BetweenDateHoursLeftInclusive(
+        int const TestDate, int const TestHour, int const StartDate, int const StartHour, int const EndDate, int const EndHour);
 
     bool BetweenDateHours(int const TestDate, int const TestHour, int const StartDate, int const StartHour, int const EndDate, int const EndHour);
 
