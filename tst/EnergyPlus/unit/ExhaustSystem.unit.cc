@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Heat Recovery Unit Tests
+// EnergyPlus::Exhaust System Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -65,7 +65,6 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-// #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -86,7 +85,6 @@ using namespace EnergyPlus::HeatRecovery;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::SimAirServingZones;
-// using namespace EnergyPlus::ReturnAirPathManager;
 using namespace EnergyPlus::SimulationManager;
 
 TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
