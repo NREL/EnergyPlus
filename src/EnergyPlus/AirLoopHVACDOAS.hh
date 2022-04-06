@@ -73,20 +73,13 @@ namespace AirLoopHVACDOAS {
     {
         std::string name;
         static AirLoopMixer *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
-        int numOfInletNodes;
-        int m_AirLoopMixer_Num;
-        int OutletNodeNum;
+        int numOfInletNodes = 0;
+        int m_AirLoopMixer_Num = 0;
+        int OutletNodeNum = 0;
         std::string OutletNodeName;
         std::vector<std::string> InletNodeName;
         std::vector<int> InletNodeNum;
-        Real64 OutletTemp;
-
-        // default constructor
-        AirLoopMixer() : numOfInletNodes(0), m_AirLoopMixer_Num(0), OutletNodeNum(0), OutletTemp(0.0)
-        {
-        }
-
-        ~AirLoopMixer() = default; // destructor
+        Real64 OutletTemp = 0.0;
 
         static void getAirLoopMixer(EnergyPlusData &state);
         void CalcAirLoopMixer(EnergyPlusData &state);
@@ -96,19 +89,12 @@ namespace AirLoopHVACDOAS {
     {
         std::string name;
         static AirLoopSplitter *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
-        int numOfOutletNodes;
-        int m_AirLoopSplitter_Num;
+        int numOfOutletNodes = 0;
+        int m_AirLoopSplitter_Num = 0;
         std::string InletNodeName;
         std::vector<std::string> OutletNodeName;
         std::vector<int> OutletNodeNum;
-        Real64 InletTemp;
-
-        // default constructor
-        AirLoopSplitter() : numOfOutletNodes(0), m_AirLoopSplitter_Num(0), InletTemp(0.0)
-        {
-        }
-
-        ~AirLoopSplitter() = default; // destructor
+        Real64 InletTemp = 0.0;
 
         static void getAirLoopSplitter(EnergyPlusData &state);
         void CalcAirLoopSplitter(EnergyPlusData &state, Real64 Temp, Real64 Humrat);
@@ -117,42 +103,41 @@ namespace AirLoopHVACDOAS {
     struct AirLoopDOAS
     {
         // friend class AirLoopMixer and AirLoopSplitter;
-        // members
-        Real64 SumMassFlowRate;
-        Real64 PreheatTemp;
-        Real64 PrecoolTemp;
-        Real64 PreheatHumRat;
-        Real64 PrecoolHumRat;
-        Real64 SizingMassFlow;
-        Real64 SizingCoolOATemp;
-        Real64 SizingCoolOAHumRat;
-        Real64 HeatOutTemp;   // outdoor air temperature for heating sizing calculation
-        Real64 HeatOutHumRat; // outdoor air humidity ratio for heating sizing calculation
+        Real64 SumMassFlowRate = 0.0;
+        Real64 PreheatTemp = -999.0;
+        Real64 PrecoolTemp = -999.0;
+        Real64 PreheatHumRat = -999.0;
+        Real64 PrecoolHumRat = -999.0;
+        Real64 SizingMassFlow = 0.0;
+        Real64 SizingCoolOATemp = -999.0;
+        Real64 SizingCoolOAHumRat = -999.0;
+        Real64 HeatOutTemp = 999.0;   // outdoor air temperature for heating sizing calculation
+        Real64 HeatOutHumRat = 999.0; // outdoor air humidity ratio for heating sizing calculation
 
-        int m_AirLoopDOASNum;
-        int m_OASystemNum;
-        int m_AvailManagerSchedPtr;
-        int m_AirLoopMixerIndex;
-        int m_AirLoopSplitterIndex;
-        int NumOfAirLoops;
-        int m_InletNodeNum;
-        int m_OutletNodeNum;
-        int m_FanIndex;
-        int m_FanInletNodeNum;
-        int m_FanOutletNodeNum;
-        SimAirServingZones::CompType m_FanTypeNum;
-        int m_HeatCoilNum;
-        int m_CoolCoilNum;
-        int ConveCount;
-        int ConveIndex;
+        int m_AirLoopDOASNum = 0;
+        int m_OASystemNum = 0;
+        int m_AvailManagerSchedPtr = 0;
+        int m_AirLoopMixerIndex = -1;
+        int m_AirLoopSplitterIndex = -1;
+        int NumOfAirLoops = 0;
+        int m_InletNodeNum = 0;
+        int m_OutletNodeNum = 0;
+        int m_FanIndex = -1;
+        int m_FanInletNodeNum = 0;
+        int m_FanOutletNodeNum = 0;
+        SimAirServingZones::CompType m_FanTypeNum = SimAirServingZones::CompType::Invalid;
+        int m_HeatCoilNum = 0;
+        int m_CoolCoilNum = 0;
+        int ConveCount = 0;
+        int ConveIndex = 0;
 
-        bool m_HeatExchangerFlag;
-        bool SizingOnceFlag;
-        bool DXCoilFlag;
-        bool FanBlowTroughFlag;
+        bool m_HeatExchangerFlag = false;
+        bool SizingOnceFlag = true;
+        bool DXCoilFlag = false;
+        bool FanBlowTroughFlag = false;
 
-        AirLoopMixer *m_CompPointerAirLoopMixer;
-        AirLoopSplitter *m_CompPointerAirLoopSplitter;
+        AirLoopMixer *m_CompPointerAirLoopMixer = nullptr;
+        AirLoopSplitter *m_CompPointerAirLoopSplitter = nullptr;
 
         std::string Name;
         std::string AvailManagerSchedName;
@@ -166,25 +151,10 @@ namespace AirLoopHVACDOAS {
         std::vector<int> m_OACtrlNum; // array of OA controller number
 
         PlantLocation HWPlantLoc;
-        int HWCtrlNodeNum;
+        int HWCtrlNodeNum = 0;
         PlantLocation CWPlantLoc;
-        int CWCtrlNodeNum;
-        bool MyEnvrnFlag;
-
-        // default constructor
-        AirLoopDOAS() // constructor
-            : SumMassFlowRate(0.0), PreheatTemp(-999.0), PrecoolTemp(-999.0), PreheatHumRat(-999.0), PrecoolHumRat(-999.0), SizingMassFlow(0.0),
-              SizingCoolOATemp(-999.0), SizingCoolOAHumRat(-999.0), HeatOutTemp(999.0), HeatOutHumRat(999.0), m_AirLoopDOASNum(0), m_OASystemNum(0),
-              m_AvailManagerSchedPtr(0), m_AirLoopMixerIndex(-1), m_AirLoopSplitterIndex(-1), NumOfAirLoops(0), m_InletNodeNum(0), m_OutletNodeNum(0),
-              m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(SimAirServingZones::CompType::Invalid), m_HeatCoilNum(0),
-              m_CoolCoilNum(0), ConveCount(0), ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false),
-              FanBlowTroughFlag(false), m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWPlantLoc{},
-              HWCtrlNodeNum(0), CWPlantLoc{}, CWCtrlNodeNum(0), MyEnvrnFlag(true)
-
-        {
-        }
-
-        ~AirLoopDOAS() = default; // destructor
+        int CWCtrlNodeNum = 0;
+        bool MyEnvrnFlag = true;
 
         static void getAirLoopDOASInput(EnergyPlusData &state);
 
@@ -210,19 +180,12 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
     bool GetInputOnceFlag = true;
     bool getAirLoopMixerInputOnceFlag = true;
     bool getAirLoopSplitterInputOnceFlag = true;
-    int numAirLoopDOAS = 0;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
     std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
     std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
     void clear_state() override
     {
-        this->GetInputOnceFlag = true;
-        this->getAirLoopMixerInputOnceFlag = true;
-        this->getAirLoopSplitterInputOnceFlag = true;
-        this->numAirLoopDOAS = 0;
-        this->airloopDOAS.clear();
-        this->airloopMixer.clear();
-        this->airloopSplitter.clear();
+        *this = AirLoopHVACDOASData();
     }
 };
 
