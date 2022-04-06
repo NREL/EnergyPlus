@@ -231,19 +231,19 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
     bool ErrorsFound(false); // True when input errors found
 
     state.dataIPShortCut->cCurrentModuleObject = "Chiller:Electric:ReformulatedEIR";
-    state.dataChillerReformulatedEIR->NumElecReformEIRChillers =
+    int NumElecReformEIRChillers =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-    if (state.dataChillerReformulatedEIR->NumElecReformEIRChillers <= 0) {
+    if (NumElecReformEIRChillers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
         ErrorsFound = true;
     }
 
     // ALLOCATE ARRAYS
-    state.dataChillerReformulatedEIR->ElecReformEIRChiller.allocate(state.dataChillerReformulatedEIR->NumElecReformEIRChillers);
+    state.dataChillerReformulatedEIR->ElecReformEIRChiller.allocate(NumElecReformEIRChillers);
 
     // Load arrays with reformulated electric EIR chiller data
-    for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++EIRChillerNum) {
+    for (int EIRChillerNum = 1; EIRChillerNum <= NumElecReformEIRChillers; ++EIRChillerNum) {
         int NumAlphas = 0; // Number of elements in the alpha array
         int NumNums = 0;   // Number of elements in the numeric array
         int IOStat = 0;    // IO Status when calling get input subroutine
