@@ -238,9 +238,9 @@ namespace CondenserLoopTowers {
         NumTwoSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
         NumVariableSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeed);
         NumVSMerkelTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeedMerkel);
-        state.dataCondenserLoopTowers->NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
+        int NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
-        if (state.dataCondenserLoopTowers->NumSimpleTowers <= 0)
+        if (NumSimpleTowers <= 0)
             ShowFatalError(state,
                            "No Cooling Tower objects found in input, however, a branch object has specified a cooling tower. Search the input for "
                            "CoolingTower to determine the cause for this error.");
@@ -250,8 +250,8 @@ namespace CondenserLoopTowers {
         if (allocated(state.dataCondenserLoopTowers->towers)) return;
 
         // Allocate data structures to hold tower input data, report data and tower inlet conditions
-        state.dataCondenserLoopTowers->towers.allocate(state.dataCondenserLoopTowers->NumSimpleTowers);
-        state.dataCondenserLoopTowers->UniqueSimpleTowerNames.reserve(state.dataCondenserLoopTowers->NumSimpleTowers);
+        state.dataCondenserLoopTowers->towers.allocate(NumSimpleTowers);
+        state.dataCondenserLoopTowers->UniqueSimpleTowerNames.reserve(NumSimpleTowers);
         // Allocate variable-speed tower structure with data specific to this type
         if (NumVariableSpeedTowers > 0) {
             // Allow users to input model coefficients other than default

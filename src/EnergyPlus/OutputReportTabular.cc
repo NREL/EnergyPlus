@@ -4339,7 +4339,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     }
 
     // Condenser water loop
-    for (int iCooler = 1; iCooler <= state.dataCondenserLoopTowers->NumSimpleTowers; ++iCooler) {
+    for (int iCooler = 1; iCooler <= (int)state.dataCondenserLoopTowers->towers.size(); ++iCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec +
                                                          state.dataCondenserLoopTowers->towers(iCooler).FanEnergy +
                                                          state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
