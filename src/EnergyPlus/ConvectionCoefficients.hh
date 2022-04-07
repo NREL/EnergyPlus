@@ -214,12 +214,7 @@ namespace ConvectionCoefficients {
         // Members
         int SurfNum = 0;
         int VertNum = 0;
-        Vector Vertex;
-
-        // Default Constructor
-        BoundingBoxVertStruct() : Vertex(0.0, 0.0, 0.0)
-        {
-        }
+        Vector Vertex{0.0, 0.0, 0.0};
     };
 
     struct RoofGeoCharacteristicsStruct
@@ -247,17 +242,37 @@ namespace ConvectionCoefficients {
     struct FacadeGeoCharacteristicsStruct
     {
         // Members
-        Real64 AzimuthRangeLow = AzimuthRangeLow;
-        Real64 AzimuthRangeHi = AzimuthRangeHi;
-        Real64 Zmax = Zmax;
-        Real64 Zmin = Zmin;
-        Real64 Ymax = Ymax;
-        Real64 Ymin = Ymin;
-        Real64 Xmax = Xmax;
-        Real64 Xmin = Xmin;
-        Real64 Area = Area;
-        Real64 Perimeter = Perimeter;
-        Real64 Height = Height;
+        Real64 AzimuthRangeLow;
+        Real64 AzimuthRangeHi;
+        Real64 Zmax;
+        Real64 Zmin;
+        Real64 Ymax;
+        Real64 Ymin;
+        Real64 Xmax;
+        Real64 Xmin;
+        Real64 Area;
+        Real64 Perimeter;
+        Real64 Height;
+
+        // Default Constructor
+        FacadeGeoCharacteristicsStruct() = default;
+
+        // Member Constructor
+        FacadeGeoCharacteristicsStruct(Real64 const AzimuthRangeLow,
+                                       Real64 const AzimuthRangeHi,
+                                       Real64 const Zmax,
+                                       Real64 const Zmin,
+                                       Real64 const Ymax,
+                                       Real64 const Ymin,
+                                       Real64 const Xmax,
+                                       Real64 const Xmin,
+                                       Real64 const Area,
+                                       Real64 const Perimeter,
+                                       Real64 const Height)
+            : AzimuthRangeLow(AzimuthRangeLow), AzimuthRangeHi(AzimuthRangeHi), Zmax(Zmax), Zmin(Zmin), Ymax(Ymax), Ymin(Ymin), Xmax(Xmax),
+              Xmin(Xmin), Area(Area), Perimeter(Perimeter), Height(Height)
+        {
+        }
     };
 
     // Functions
