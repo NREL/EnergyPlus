@@ -231,8 +231,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
     bool ErrorsFound(false); // True when input errors found
 
     state.dataIPShortCut->cCurrentModuleObject = "Chiller:Electric:ReformulatedEIR";
-    int NumElecReformEIRChillers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    int NumElecReformEIRChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (NumElecReformEIRChillers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");

@@ -257,8 +257,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     int IOStat;
     bool ErrorsFound(false); // If errors detected in input
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-    int NumCoolingPanels =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
+    int NumCoolingPanels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
 
     // Count total number of baseboard units
 

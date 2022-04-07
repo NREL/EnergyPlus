@@ -228,8 +228,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
     bool ErrorsFound(false);
 
     state.dataIPShortCut->cCurrentModuleObject = "Chiller:Absorption:Indirect";
-    int NumIndirectAbsorbers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    int NumIndirectAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (NumIndirectAbsorbers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");

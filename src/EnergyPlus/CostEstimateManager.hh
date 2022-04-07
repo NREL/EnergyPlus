@@ -73,9 +73,9 @@ namespace CostEstimateManager {
         Real64 PerCubicMeter = 0.0;      // cost per cubic meter
         Real64 PerCubMeterPerSec = 0.0;  // cost per cubic meter per second
         Real64 PerUAinWattperDelK = 0.0; // cost per (UA) in Watt/deltaK
-        int LineNumber = -1;            // number of line item in detail list
+        int LineNumber = -1;             // number of line item in detail list
         Real64 Qty = 0.0;                // quantity in calculations (can be input)
-        std::string Units;         // Reported units
+        std::string Units;               // Reported units
         Real64 ValuePer = 0.0;           // Cost used in final calculation
         Real64 LineSubTotal = 0.0;       // line item total  Qty * ValuePer
     };

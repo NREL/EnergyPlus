@@ -104,15 +104,14 @@ namespace BranchInputManager {
     struct BranchData
     {
         // Members
-        std::string Name;                                            // Name for this Branch
-        std::string AssignedLoopName;                                // Loop Name for this branch
-        DataBranchAirLoopPlant::PressureCurveType PressureCurveType
-            = DataBranchAirLoopPlant::PressureCurveType::Invalid;    // Integer index of pressure curve type
-        int PressureCurveIndex = 0;                                  // Integer index of pressure curve
-        DataLoopNode::NodeFluidType FluidType 
-            = DataLoopNode::NodeFluidType::Blank;                    // Fluid type (see DataLoopNode)
-        int NumOfComponents = 0;                                     // Number of Components on this Branch
-        Array1D<ComponentData> Component;                            // Component definitions for each component
+        std::string Name;             // Name for this Branch
+        std::string AssignedLoopName; // Loop Name for this branch
+        DataBranchAirLoopPlant::PressureCurveType PressureCurveType =
+            DataBranchAirLoopPlant::PressureCurveType::Invalid;                     // Integer index of pressure curve type
+        int PressureCurveIndex = 0;                                                 // Integer index of pressure curve
+        DataLoopNode::NodeFluidType FluidType = DataLoopNode::NodeFluidType::Blank; // Fluid type (see DataLoopNode)
+        int NumOfComponents = 0;                                                    // Number of Components on this Branch
+        Array1D<ComponentData> Component;                                           // Component definitions for each component
     };
 
     struct SplitterData

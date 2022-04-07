@@ -73,26 +73,25 @@ namespace Construction {
     struct ConstructionProps
     {
         // Members
-        std::string Name; // Name of construction
-        int TotLayers = 0;    // Total number of layers for the construction; for windows
+        std::string Name;  // Name of construction
+        int TotLayers = 0; // Total number of layers for the construction; for windows
         //  this is the total of the glass, gas and shade layers
-        int TotSolidLayers = 0;     // Total number of solid (glass or shade) layers (windows only)
-        int TotGlassLayers = 0;     // Total number of glass layers (windows only)
+        int TotSolidLayers = 0; // Total number of solid (glass or shade) layers (windows only)
+        int TotGlassLayers = 0; // Total number of glass layers (windows only)
         Array1D_int LayerPoint; // Pointer array which refers back to
         // the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
-        bool IsUsed = false;                // Marked true when the construction is used
-        bool IsUsedCTF = false;             // Mark true when the construction is used for a surface with CTF calculations
+        bool IsUsed = false;              // Marked true when the construction is used
+        bool IsUsedCTF = false;           // Mark true when the construction is used for a surface with CTF calculations
         Real64 InsideAbsorpVis = 0.0;     // Inside Layer visible absorptance of an opaque surface; not used for windows.
         Real64 OutsideAbsorpVis = 0.0;    // Outside Layer visible absorptance of an opaque surface; not used for windows.
         Real64 InsideAbsorpSolar = 0.0;   // Inside Layer solar absorptance of an opaque surface; not used for windows.
         Real64 OutsideAbsorpSolar = 0.0;  // Outside Layer solar absorptance of an opaque surface; not used for windows.
         Real64 InsideAbsorpThermal = 0.0; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
-        Real64 OutsideAbsorpThermal = 0.0;                     // Outside Layer Thermal absorptance
-        DataSurfaces::SurfaceRoughness OutsideRoughness
-            = DataSurfaces::SurfaceRoughness::Invalid; // Outside Surface roughness index
-        int DayltPropPtr = 0;                                // Pointer to Daylight Construction Properties
-        int W5FrameDivider = 0;                              // FrameDivider number for window construction from Window5 data file;
+        Real64 OutsideAbsorpThermal = 0.0;                                                         // Outside Layer Thermal absorptance
+        DataSurfaces::SurfaceRoughness OutsideRoughness = DataSurfaces::SurfaceRoughness::Invalid; // Outside Surface roughness index
+        int DayltPropPtr = 0;                                                                      // Pointer to Daylight Construction Properties
+        int W5FrameDivider = 0; // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction
         Array1D<Real64> CTFCross;     // Cross or Y terms of the CTF equation
@@ -123,7 +122,7 @@ namespace Construction {
         int NumHistories = 0; // CTFTimeStep/TimeStepZone or the number of temp/flux history series
         // for the construction
         int NumCTFTerms = 0;        // Number of CTF terms for this construction (not including terms at current time)
-        Real64 UValue = 0.0;          // Overall heat transfer coefficient for the construction
+        Real64 UValue = 0.0;        // Overall heat transfer coefficient for the construction
         int SolutionDimensions = 0; // Number of dimensions in the solution (1 for normal constructions,
         // 1 or 2 for constructions with sources or sinks)-->may allow 3-D later?
         int SourceAfterLayer = 0; // Source/sink is present after this layer in the construction
@@ -153,31 +152,31 @@ namespace Construction {
         Array1D<Real64> AbsDiffBack;   // Diffuse back solar absorptance for each glass layer
         Array2D<Real64> BlAbsDiffBack; // Diffuse back solar absorptance for each glass layer,
         //  vs. slat angle, blind on
-        Real64 AbsDiffShade = 0.0;                  // Diffuse solar absorptance for shade
+        Real64 AbsDiffShade = 0.0;            // Diffuse solar absorptance for shade
         Array1D<Real64> AbsDiffBlind;         // Diffuse solar absorptance for blind, vs. slat angle
         Array1D<Real64> AbsDiffBlindGnd;      // Diffuse ground solar absorptance for blind, vs. slat angle
         Array1D<Real64> AbsDiffBlindSky;      // Diffuse sky solar absorptance for blind, vs. slat angle
-        Real64 AbsDiffBackShade = 0.0;              // Diffuse back solar absorptance for shade
+        Real64 AbsDiffBackShade = 0.0;        // Diffuse back solar absorptance for shade
         Array1D<Real64> AbsDiffBackBlind;     // Diffuse back solar absorptance for blind, vs. slat angle
-        Real64 ShadeAbsorpThermal = 0.0;            // Diffuse back thermal absorptance of shade
+        Real64 ShadeAbsorpThermal = 0.0;      // Diffuse back thermal absorptance of shade
         Array1D<Array1D<Real64>> AbsBeamCoef; // Coefficients of incidence-angle polynomial for solar
         // absorptance for each solid glazing layer
         Array1D<Array1D<Real64>> AbsBeamBackCoef; // As for AbsBeamCoef but for back-incident solar
         Array1D<Real64> AbsBeamShadeCoef;         // Coefficients of incidence-angle polynomial for solar
         // absorptance of shade
-        Real64 TransDiff = 0.0;                      // Diffuse solar transmittance, bare glass or shade on
+        Real64 TransDiff = 0.0;                // Diffuse solar transmittance, bare glass or shade on
         Array1D<Real64> BlTransDiff;           // Diffuse solar transmittance, blind present, vs. slat angle
         Array1D<Real64> BlTransDiffGnd;        // Ground diffuse solar transmittance, blind present, vs. slat angle
         Array1D<Real64> BlTransDiffSky;        // Sky diffuse solar transmittance, blind present, vs. slat angle
         Real64 TransDiffVis;                   // Diffuse visible transmittance, bare glass or shade on
         Array1D<Real64> BlTransDiffVis;        // Diffuse visible transmittance, blind present, vs. slat angle
-        Real64 ReflectSolDiffBack = 0.0;             // Diffuse back solar reflectance, bare glass or shade on
+        Real64 ReflectSolDiffBack = 0.0;       // Diffuse back solar reflectance, bare glass or shade on
         Array1D<Real64> BlReflectSolDiffBack;  // Diffuse back solar reflectance, blind present, vs. slat angle
-        Real64 ReflectSolDiffFront = 0.0;            // Diffuse front solar reflectance, bare glass or shade on
+        Real64 ReflectSolDiffFront = 0.0;      // Diffuse front solar reflectance, bare glass or shade on
         Array1D<Real64> BlReflectSolDiffFront; // Diffuse front solar reflectance, blind present, vs. slat angle
-        Real64 ReflectVisDiffBack = 0.0;             // Diffuse back visible reflectance, bare glass or shade on
+        Real64 ReflectVisDiffBack = 0.0;       // Diffuse back visible reflectance, bare glass or shade on
         Array1D<Real64> BlReflectVisDiffBack;  // Diffuse back visible reflectance, blind present, vs. slat angle
-        Real64 ReflectVisDiffFront = 0.0;            // Diffuse front visible reflectance, bare glass or shade on
+        Real64 ReflectVisDiffFront = 0.0;      // Diffuse front visible reflectance, bare glass or shade on
         Array1D<Real64> BlReflectVisDiffFront; // Diffuse front visible reflectance, blind present, vs. slat angle
         Array1D<Real64> TransSolBeamCoef;      // Coeffs of incidence-angle polynomial for beam sol trans,
         // bare glass or shade on
@@ -185,36 +184,36 @@ namespace Construction {
         // bare glass or shade on
         Array1D<Real64> ReflSolBeamFrontCoef; // Coeffs of incidence-angle polynomial for beam sol front refl,
         // bare glass or shade on
-        Array1D<Real64> ReflSolBeamBackCoef;                             // Like ReflSolBeamFrontCoef, but for back-incident beam solar
-        Array1D<Array1D<Real64>> tBareSolCoef;                           // Isolated glass solar transmittance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> tBareVisCoef;                           // Isolated glass visible transmittance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rfBareSolCoef;                          // Isolated glass front solar reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rfBareVisCoef;                          // Isolated glass front visible reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rbBareSolCoef;                          // Isolated glass back solar reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rbBareVisCoef;                          // Isolated glass back visible reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> afBareSolCoef;                          // Isolated glass front solar absorptance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> abBareSolCoef;                          // Isolated glass back solar absorptance coeffs of inc. angle polynomial
-        Array1D<Real64> tBareSolDiff;                                    // Isolated glass diffuse solar transmittance
-        Array1D<Real64> tBareVisDiff;                                    // Isolated glass diffuse visible transmittance
-        Array1D<Real64> rfBareSolDiff;                                   // Isolated glass diffuse solar front reflectance
-        Array1D<Real64> rfBareVisDiff;                                   // Isolated glass diffuse visible front reflectance
-        Array1D<Real64> rbBareSolDiff;                                   // Isolated glass diffuse solar back reflectance
-        Array1D<Real64> rbBareVisDiff;                                   // Isolated glass diffuse visible back reflectance
-        Array1D<Real64> afBareSolDiff;                                   // Isolated glass diffuse solar front absorptance
-        Array1D<Real64> abBareSolDiff;                                   // Isolated glass diffuse solar back absorptance
-        bool FromWindow5DataFile = false;                                        // True if this is a window construction extracted from the Window5 data file
-        Real64 W5FileMullionWidth = 0.0;                                       // Width of mullion for construction from Window5 data file (m)
-        DataWindowEquivalentLayer::Orientation W5FileMullionOrientation
-            = DataWindowEquivalentLayer::Orientation::Invalid;           // Orientation of mullion, if present, for Window5 data file construction,
-        Real64 W5FileGlazingSysWidth = 0.0;                                    // Glass width for construction from Window5 data file (m)
-        Real64 W5FileGlazingSysHeight = 0.0;                                   // Glass height for construction form Window5 data file (m)
-        Real64 SummerSHGC = 0.0;                                               // Calculated ASHRAE SHGC for summer conditions
-        Real64 VisTransNorm = 0.0;                                             // The normal visible transmittance
-        Real64 SolTransNorm = 0.0;                                             // the normal solar transmittance
-        bool SourceSinkPresent = false;                                          // .TRUE. if there is a source/sink within this construction
-        bool TypeIsWindow = false;                                               // True if a window construction, false otherwise
-        bool WindowTypeBSDF = false;                                             // True for complex window, false otherwise
-        bool TypeIsEcoRoof = false;                                              // -- true for construction with ecoRoof outside, the flag
+        Array1D<Real64> ReflSolBeamBackCoef;    // Like ReflSolBeamFrontCoef, but for back-incident beam solar
+        Array1D<Array1D<Real64>> tBareSolCoef;  // Isolated glass solar transmittance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> tBareVisCoef;  // Isolated glass visible transmittance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rfBareSolCoef; // Isolated glass front solar reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rfBareVisCoef; // Isolated glass front visible reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rbBareSolCoef; // Isolated glass back solar reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rbBareVisCoef; // Isolated glass back visible reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> afBareSolCoef; // Isolated glass front solar absorptance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> abBareSolCoef; // Isolated glass back solar absorptance coeffs of inc. angle polynomial
+        Array1D<Real64> tBareSolDiff;           // Isolated glass diffuse solar transmittance
+        Array1D<Real64> tBareVisDiff;           // Isolated glass diffuse visible transmittance
+        Array1D<Real64> rfBareSolDiff;          // Isolated glass diffuse solar front reflectance
+        Array1D<Real64> rfBareVisDiff;          // Isolated glass diffuse visible front reflectance
+        Array1D<Real64> rbBareSolDiff;          // Isolated glass diffuse solar back reflectance
+        Array1D<Real64> rbBareVisDiff;          // Isolated glass diffuse visible back reflectance
+        Array1D<Real64> afBareSolDiff;          // Isolated glass diffuse solar front absorptance
+        Array1D<Real64> abBareSolDiff;          // Isolated glass diffuse solar back absorptance
+        bool FromWindow5DataFile = false;       // True if this is a window construction extracted from the Window5 data file
+        Real64 W5FileMullionWidth = 0.0;        // Width of mullion for construction from Window5 data file (m)
+        DataWindowEquivalentLayer::Orientation W5FileMullionOrientation =
+            DataWindowEquivalentLayer::Orientation::Invalid; // Orientation of mullion, if present, for Window5 data file construction,
+        Real64 W5FileGlazingSysWidth = 0.0;                  // Glass width for construction from Window5 data file (m)
+        Real64 W5FileGlazingSysHeight = 0.0;                 // Glass height for construction form Window5 data file (m)
+        Real64 SummerSHGC = 0.0;                             // Calculated ASHRAE SHGC for summer conditions
+        Real64 VisTransNorm = 0.0;                           // The normal visible transmittance
+        Real64 SolTransNorm = 0.0;                           // the normal solar transmittance
+        bool SourceSinkPresent = false;                      // .TRUE. if there is a source/sink within this construction
+        bool TypeIsWindow = false;                           // True if a window construction, false otherwise
+        bool WindowTypeBSDF = false;                         // True for complex window, false otherwise
+        bool TypeIsEcoRoof = false;                          // -- true for construction with ecoRoof outside, the flag
         //-- is turned on when the outside layer is of type EcoRoof
         bool TypeIsIRT = false;          // -- true for construction with IRT material
         bool TypeIsCfactorWall = false;  // -- true for construction with Construction:CfactorUndergroundWall
@@ -238,19 +237,19 @@ namespace Construction {
         // Complex Fenestration
         DataBSDFWindow::BSDFWindowInputStruct BSDFInput; // nest structure with user input for complex fenestration
         // EquivalentLayer Window
-        bool WindowTypeEQL = false;              // True for equivalent layer window, false otherwise
-        int EQLConsPtr = 0;                  // Pointer to equivalent Layer window construction
+        bool WindowTypeEQL = false;      // True for equivalent layer window, false otherwise
+        int EQLConsPtr = 0;              // Pointer to equivalent Layer window construction
         Array1D<Real64> AbsDiffFrontEQL; // Diffuse layer system front absorptance for EQL window
         Array1D<Real64> AbsDiffBackEQL;  // Diffuse layer system back absorptance for EQL window
-        Real64 TransDiffFrontEQL = 0.0;        // Diffuse system front transmittance for EQL window
-        Real64 TransDiffBackEQL = 0.0;         // Diffuse system back transmittance for EQL window
+        Real64 TransDiffFrontEQL = 0.0;  // Diffuse system front transmittance for EQL window
+        Real64 TransDiffBackEQL = 0.0;   // Diffuse system back transmittance for EQL window
         // Air boundary
         bool TypeIsAirBoundary = false;       // true for Construction:AirBoundary
         bool TypeIsAirBoundaryMixing = false; // true for Construction:AirBoundary with SimpleMixing for air exchange
-        Real64 AirBoundaryACH = 0.0;        // Air boundary simple mixing air changes per hour [1/hr]
-        int AirBoundaryMixingSched = 0;   // Air boundary simple mixing schedule index
+        Real64 AirBoundaryACH = 0.0;          // Air boundary simple mixing air changes per hour [1/hr]
+        int AirBoundaryMixingSched = 0;       // Air boundary simple mixing schedule index
 
-        int rcmax = 0;                  // Total number of nodes in the construct (<= MaxTotNodes)
+        int rcmax = 0;              // Total number of nodes in the construct (<= MaxTotNodes)
         Array2D<Real64> AExp;       // Exponential of AMat
         Array2D<Real64> AInv;       // Inverse of AMat
         Array2D<Real64> AMat;       // "A" matrix from Seem's dissertation (constant coefficients of linear system)
@@ -272,19 +271,20 @@ namespace Construction {
 
         // Default Constructor
         ConstructionProps()
-            : LayerPoint(MaxLayersInConstruct, 0), CTFCross({0, MaxCTFTerms - 1}, 0.0), CTFFlux(MaxCTFTerms - 1, 0.0), CTFInside({0, MaxCTFTerms - 1}, 0.0),
-              CTFOutside({0, MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0),
-              CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0),
-              CTFTUserOut({0, MaxCTFTerms - 1}, 0.0), CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0),
-              AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsBeamShadeCoef(6, 0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), 
-              BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
+            : LayerPoint(MaxLayersInConstruct, 0), CTFCross({0, MaxCTFTerms - 1}, 0.0), CTFFlux(MaxCTFTerms - 1, 0.0),
+              CTFInside({0, MaxCTFTerms - 1}, 0.0), CTFOutside({0, MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, MaxCTFTerms - 1}, 0.0),
+              CTFSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0),
+              CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0), CTFTUserIn({0, MaxCTFTerms - 1}, 0.0),
+              CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0), AbsBeamShadeCoef(6, 0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0),
+              BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
               BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
-              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0),
-              TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0),
-              tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0),
-              abBareSolDiff(5, 0.0), AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0)
+              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
+              BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
+              ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0),
+              rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0),
+              AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0)
         {
             BMat.allocate(3);
             CMat.allocate(2);

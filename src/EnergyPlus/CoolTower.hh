@@ -82,50 +82,49 @@ namespace CoolTower {
     struct CoolTowerParams
     {
         // Members
-        std::string Name;                           // The component name
-        std::string CompType;                       // Type of component
-        std::string Schedule;                       // Available schedule
-        std::string ZoneName;                       // Name of zone the component is serving
-        int SchedPtr = 0;                           // Index to schedule
-        int ZonePtr = 0;                            // Point to this zone
-        int PumpSchedPtr = 0;                       // Index to schedule for water pump
-        FlowCtrl FlowCtrlType = FlowCtrl::Invalid;  // Type of cooltower operation
-        WaterSupplyMode CoolTWaterSupplyMode 
-            = WaterSupplyMode::FromMains;           // Type of water source
-        std::string CoolTWaterSupplyName;           // Name of water source
-        int CoolTWaterSupTankID;                    // Index to water storage tank
-        int CoolTWaterTankDemandARRID;              // Index to water storage demand
-        Real64 TowerHeight = 0.0;                   // Effective cooltower height in m
-        Real64 OutletArea = 0.0;                    // Outlet area where conditioned air comes in m2
-        Real64 OutletVelocity = 0.0;                // Outlet velocity of the cooltower in m/s
-        Real64 MaxAirVolFlowRate = 0.0;             // Maximum allowable airflow in m3/s
-        Real64 AirMassFlowRate = 0.0;               // Air mass flow rate in kg/s
-        Real64 CoolTAirMass = 0.0;                  // Air mass in kg
-        Real64 MinZoneTemp = 0.0;                   // Lower temperature limit to prevent over cooling in C
-        Real64 FracWaterLoss = 0.0;                 // Fraction of estimated blowdown and drift water
-        Real64 FracFlowSched = 0.0;                 // Fraction of airflow loss
-        Real64 MaxWaterFlowRate = 0.0;              // Maximum limit of water flow rate in m3/s
-        Real64 ActualWaterFlowRate = 0.0;           // Actual water mass flow rate in m3/s
-        Real64 RatedPumpPower = 0.0;                // Rated power consumption for water pump serving the cooltower in watts
-        Real64 SenHeatLoss = 0.0;                   // Sensible heat loss in Joules
-        Real64 SenHeatPower = 0.0;                  // Sensible heat loss rate in watts
-        Real64 LatHeatLoss = 0.0;                   // Latent heat loss in Joules
-        Real64 LatHeatPower = 0.0;                  // Latent heat loss rate in watts
-        Real64 AirVolFlowRate = 0.0;                // Air flow rate in m3/s
-        Real64 AirVolFlowRateStd = 0.0;             // Air flow rate in m3/s at standard conditions
-        Real64 CoolTAirVol = 0.0;                   // Air volume in m3
-        Real64 ActualAirVolFlowRate = 0.0;          // Actual air flow rate in m3/s
-        Real64 InletDBTemp = 0.0;                   // Outdoor dry bulb temperature in C
-        Real64 InletWBTemp = 0.0;                   // Outdoor wet bulb temperature in C
-        Real64 InletHumRat = 0.0;                   // Outdoor humidity ratio
-        Real64 OutletTemp = 0.0;                    // Dry bulb temperature at cooltower exit in C
-        Real64 OutletHumRat = 0.0;                  // Humidity ratio at cooltower exit
-        Real64 CoolTWaterConsumpRate = 0.0;         // Total water consumption during the processes in m3/s
-        Real64 CoolTWaterStarvMakeupRate = 0.0;     // Water provided from the mains (m3/s)
-        Real64 CoolTWaterStarvMakeup = 0.0;         // Water provided from the mains
-        Real64 CoolTWaterConsump = 0.0;             // Total water consumption in m3
-        Real64 PumpElecPower = 0.0;                 // Pump power in watts
-        Real64 PumpElecConsump = 0.0;               // Pump energy consumption in Joules
+        std::string Name;                                                  // The component name
+        std::string CompType;                                              // Type of component
+        std::string Schedule;                                              // Available schedule
+        std::string ZoneName;                                              // Name of zone the component is serving
+        int SchedPtr = 0;                                                  // Index to schedule
+        int ZonePtr = 0;                                                   // Point to this zone
+        int PumpSchedPtr = 0;                                              // Index to schedule for water pump
+        FlowCtrl FlowCtrlType = FlowCtrl::Invalid;                         // Type of cooltower operation
+        WaterSupplyMode CoolTWaterSupplyMode = WaterSupplyMode::FromMains; // Type of water source
+        std::string CoolTWaterSupplyName;                                  // Name of water source
+        int CoolTWaterSupTankID;                                           // Index to water storage tank
+        int CoolTWaterTankDemandARRID;                                     // Index to water storage demand
+        Real64 TowerHeight = 0.0;                                          // Effective cooltower height in m
+        Real64 OutletArea = 0.0;                                           // Outlet area where conditioned air comes in m2
+        Real64 OutletVelocity = 0.0;                                       // Outlet velocity of the cooltower in m/s
+        Real64 MaxAirVolFlowRate = 0.0;                                    // Maximum allowable airflow in m3/s
+        Real64 AirMassFlowRate = 0.0;                                      // Air mass flow rate in kg/s
+        Real64 CoolTAirMass = 0.0;                                         // Air mass in kg
+        Real64 MinZoneTemp = 0.0;                                          // Lower temperature limit to prevent over cooling in C
+        Real64 FracWaterLoss = 0.0;                                        // Fraction of estimated blowdown and drift water
+        Real64 FracFlowSched = 0.0;                                        // Fraction of airflow loss
+        Real64 MaxWaterFlowRate = 0.0;                                     // Maximum limit of water flow rate in m3/s
+        Real64 ActualWaterFlowRate = 0.0;                                  // Actual water mass flow rate in m3/s
+        Real64 RatedPumpPower = 0.0;                                       // Rated power consumption for water pump serving the cooltower in watts
+        Real64 SenHeatLoss = 0.0;                                          // Sensible heat loss in Joules
+        Real64 SenHeatPower = 0.0;                                         // Sensible heat loss rate in watts
+        Real64 LatHeatLoss = 0.0;                                          // Latent heat loss in Joules
+        Real64 LatHeatPower = 0.0;                                         // Latent heat loss rate in watts
+        Real64 AirVolFlowRate = 0.0;                                       // Air flow rate in m3/s
+        Real64 AirVolFlowRateStd = 0.0;                                    // Air flow rate in m3/s at standard conditions
+        Real64 CoolTAirVol = 0.0;                                          // Air volume in m3
+        Real64 ActualAirVolFlowRate = 0.0;                                 // Actual air flow rate in m3/s
+        Real64 InletDBTemp = 0.0;                                          // Outdoor dry bulb temperature in C
+        Real64 InletWBTemp = 0.0;                                          // Outdoor wet bulb temperature in C
+        Real64 InletHumRat = 0.0;                                          // Outdoor humidity ratio
+        Real64 OutletTemp = 0.0;                                           // Dry bulb temperature at cooltower exit in C
+        Real64 OutletHumRat = 0.0;                                         // Humidity ratio at cooltower exit
+        Real64 CoolTWaterConsumpRate = 0.0;                                // Total water consumption during the processes in m3/s
+        Real64 CoolTWaterStarvMakeupRate = 0.0;                            // Water provided from the mains (m3/s)
+        Real64 CoolTWaterStarvMakeup = 0.0;                                // Water provided from the mains
+        Real64 CoolTWaterConsump = 0.0;                                    // Total water consumption in m3
+        Real64 PumpElecPower = 0.0;                                        // Pump power in watts
+        Real64 PumpElecConsump = 0.0;                                      // Pump energy consumption in Joules
     };
 
     void ManageCoolTower(EnergyPlusData &state);
