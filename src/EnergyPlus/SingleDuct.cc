@@ -3428,8 +3428,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
         if (state.dataSize->ZoneSizingRunDone) {
-            // set air flow rate used to size heating coils
-            // ZoneTurndownMinAirFrac defaults to 1 for those TU types that do not use it
+            // set air flow rate used to size heating coils, ZoneTurndownMinAirFrac defaults to 1 for those TU types that do not use it
             if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSingleDuct->UserInputMaxHeatAirVolFlowRateSS,
@@ -3439,19 +3438,10 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                         this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
-            } else { // SingleDuctVAVReheat, and other NoReheat terminal unit types (shouldn't matter for NoReheat TUs)
-                     // if (this->DamperHeatingAction == Action::Reverse) {
-                //    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
-                //        max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
-                //            this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
-                //} else if (this->DamperHeatingAction == Action::ReverseWithLimits) {
-                //    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
-                //        max(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
-                //} else {
+            } else {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                         this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
-                //}
             }
         } else {
             if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
