@@ -5485,7 +5485,7 @@ void ReportThermalResilience(EnergyPlusData &state)
     int SETNoBins = 5;                    // SET report column numbers
     int ColdHourOfSafetyNoBins = 4;       // Cold Stress Hour of Safety number of columns
     int HeatHourOfSafetyNoBins = 4;       // Heat Stress Hour of Safety number of columns
-    int UnmetDegreeHourNoBins = 4;        // Unmet Degree Hour number of columns
+    int UnmetDegreeHourNoBins = 6;        // Unmet Degree Hour number of columns
     int DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
 
     int ReportPeriodIdx = findReportPeriodIdx(state);
@@ -5677,11 +5677,15 @@ void ReportThermalResilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[0] += (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[1] +=
                     NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[2] +=
+                    (NumOcc > 0) * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
             }
             if ((HeatingSetpoint > 0) && (Temperature < HeatingSetpoint)) {
-                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[2] += (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[3] +=
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[3] += (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[4] +=
                     NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins(ZoneNum)[5] +=
+                    (NumOcc > 0) * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
             }
 
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
