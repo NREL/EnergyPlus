@@ -12578,6 +12578,28 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         tableName = "Cooling SET Hours";
         WriteSETHoursTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod);
+
+        int columnNumUnmetDegHr = 6;
+        Array1D_string columnHeadUnmetDegHr(6);
+        // must initialize this otherwise it will only output 5 columns
+        Array1D_int columnWidthUnmetDegHr;
+        columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
+        columnWidthUnmetDegHr = 10;
+        columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree Hours (°C)";
+        columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Degree OccupantHours (°C)";
+        columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Degree OccupiedHours (°C)";
+        columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree Hours (°C)";
+        columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Degree OccupantHours (°C)";
+        columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Degree OccupiedHours (°C)";
+        tableName = "Unmet Degree Hours";
+
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNumUnmetDegHr,
+                                                periodIdx,
+                                                tableName,
+                                                columnHeadUnmetDegHr,
+                                                columnWidthUnmetDegHr,
+                                                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod);
     }
 }
 
@@ -12885,14 +12907,15 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         WriteHourOfSafetyTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins, 1);
 
         columnNum = 6;
-        columnHead = {state.dataOutRptPredefined->pdchCoolingUnmetDegreeHour,
-                      state.dataOutRptPredefined->pdchCoolingUnmetDegreeOccHour,
-                      state.dataOutRptPredefined->pdchCoolingUnmetDegreeOccupiedHour,
-                      state.dataOutRptPredefined->pdchHeatingUnmetDegreeHour,
-                      state.dataOutRptPredefined->pdchHeatingUnmetDegreeOccHour,
-                      state.dataOutRptPredefined->pdchHeatingUnmetDegreeOccupiedHour};
-        WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins);
+        std::vector<int> columnHeadUnmetDegHr = {state.dataOutRptPredefined->pdchCoolingUnmetDegreeHour,
+                                                 state.dataOutRptPredefined->pdchCoolingUnmetDegreeOccHour,
+                                                 state.dataOutRptPredefined->pdchCoolingUnmetDegreeOccupiedHour,
+                                                 state.dataOutRptPredefined->pdchHeatingUnmetDegreeHour,
+                                                 state.dataOutRptPredefined->pdchHeatingUnmetDegreeOccHour,
+                                                 state.dataOutRptPredefined->pdchHeatingUnmetDegreeOccupiedHour};
+        WriteResilienceBinsTable(state, columnNum, columnHeadUnmetDegHr, state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins);
 
+        columnNum = 4;
         columnHead = {state.dataOutRptPredefined->pdchVeryColdExceedHour,
                       state.dataOutRptPredefined->pdchCoolExceedHour,
                       state.dataOutRptPredefined->pdchWarmExceedHour,

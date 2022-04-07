@@ -5512,6 +5512,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                     state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, i).assign(SETNoBins, 0.0);
                     state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, i).assign(SETNoBins, 0.0);
                 }
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, i).assign(UnmetDegreeHourNoBins, 0.0);
             }
             state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod = 0.0;
             state.dataHeatBalFanSys->highSETLongestHoursRepPeriod = 0.0;
@@ -5902,6 +5903,27 @@ void ReportThermalResilience(EnergyPlusData &state)
                         state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
                         state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
                     }
+                }
+
+                Real64 Temperature = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+                Real64 CoolingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
+                Real64 HeatingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
+
+                if ((CoolingSetpoint > 0) && (Temperature > CoolingSetpoint)) {
+                    state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                        (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                        NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                        (NumOcc > 0) * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                }
+                if ((HeatingSetpoint > 0) && (Temperature < HeatingSetpoint)) {
+                    state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                        (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                        NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[5] +=
+                        (NumOcc > 0) * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
                 }
             }
         } // loop over zones

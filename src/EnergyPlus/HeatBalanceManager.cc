@@ -6047,6 +6047,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
