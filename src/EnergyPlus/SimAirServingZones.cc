@@ -836,18 +836,18 @@ void GetAirPathData(EnergyPlusData &state)
         // find and store the primary air system outlet branch reference numbers
         PrimaryAirSystems(AirSysNum).NumOutletBranches = AirToZoneNodeInfo(AirSysNum).NumSupplyNodes;
         for (OutBranchNum = 1; OutBranchNum <= 3; ++OutBranchNum) {
-            PrimaryAirSystems(AirSysNum).OutletBranchNum(OutBranchNum) = 0;
+            PrimaryAirSystems(AirSysNum).OutletBranchNum[OutBranchNum - 1] = 0;
             if (OutBranchNum > PrimaryAirSystems(AirSysNum).NumOutletBranches) break;
             MatchNodeName(OutBranchNum) = state.dataLoopNodes->NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(OutBranchNum));
             for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
                 if (AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(OutBranchNum) == PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumOut) {
-                    PrimaryAirSystems(AirSysNum).OutletBranchNum(OutBranchNum) = BranchNum;
+                    PrimaryAirSystems(AirSysNum).OutletBranchNum[OutBranchNum - 1] = BranchNum;
                 }
             }
         }
         //  Check for errors
         for (OutBranchNum = 1; OutBranchNum <= PrimaryAirSystems(AirSysNum).NumOutletBranches; ++OutBranchNum) {
-            if (PrimaryAirSystems(AirSysNum).OutletBranchNum(OutBranchNum) != 0) continue;
+            if (PrimaryAirSystems(AirSysNum).OutletBranchNum[OutBranchNum - 1] != 0) continue;
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", branch in error.");
             ShowContinueError(state, "Probable missing or misspelled node referenced in the branch(es):");
@@ -861,13 +861,13 @@ void GetAirPathData(EnergyPlusData &state)
         // find and store the primary air system inlet branch numbers
         PrimaryAirSystems(AirSysNum).NumInletBranches = AirToZoneNodeInfo(AirSysNum).NumReturnNodes;
         for (InBranchNum = 1; InBranchNum <= PrimaryAirSystems(AirSysNum).NumInletBranches; ++InBranchNum) {
-            PrimaryAirSystems(AirSysNum).InletBranchNum(InBranchNum) = 0;
+            PrimaryAirSystems(AirSysNum).InletBranchNum[InBranchNum - 1] = 0;
             for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
                 if (AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(InBranchNum) == PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumIn) {
-                    PrimaryAirSystems(AirSysNum).InletBranchNum(InBranchNum) = BranchNum;
+                    PrimaryAirSystems(AirSysNum).InletBranchNum[InBranchNum - 1] = BranchNum;
                 }
             }
-            if (PrimaryAirSystems(AirSysNum).InletBranchNum(InBranchNum) == 0) {
+            if (PrimaryAirSystems(AirSysNum).InletBranchNum[InBranchNum - 1] == 0) {
                 ShowSevereError(
                     state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connection to zone.");
                 ShowContinueError(state, "No Connection found for Return Air from Zone");
@@ -1683,7 +1683,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             for (OutNum = 1; OutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
                 ZoneSideNodeNum = AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum);
                 // find the corresponding branch number
-                OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum(OutNum);
+                OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
                 // find the supply air path corresponding to each air loop outlet node
                 SupAirPathNum = 0;
                 // loop over the air loop's output nodes
@@ -2264,7 +2264,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
         // set the required flow (from zone equipment) at system outlet nodes
         for (OutNum = 1; OutNum <= PrimaryAirSystems(AirLoopNum).NumOutletBranches; ++OutNum) {
-            OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum(OutNum);
+            OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
             NodeNumOut = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).NodeNumOut;
             ZoneSideNodeNum = AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum);
 
@@ -2316,7 +2316,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 e.ConvergedFlag = false;
 
             for (InNum = 1; InNum <= PrimaryAirSystems(AirLoopNum).NumInletBranches; ++InNum) {
-                InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum(InNum);
+                InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum[InNum - 1];
                 if (InBranchNum == 0) {
                     ShowFatalError(state, "Missing Inlet Branch on Primary Air System=" + PrimaryAirSystems(AirLoopNum).Name);
                 }
@@ -2338,7 +2338,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         // if a flow rate is specified for the loop use it here
         if (AirLoopControlInfo(AirLoopNum).LoopFlowRateSet && !FirstHVACIteration) {
             for (InNum = 1; InNum <= PrimaryAirSystems(AirLoopNum).NumInletBranches; ++InNum) {
-                InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum(InNum);
+                InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum[InNum - 1];
                 NodeNumIn = PrimaryAirSystems(AirLoopNum).Branch(InBranchNum).NodeNumIn;
                 state.dataLoopNodes->Node(NodeNumIn).MassFlowRate =
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply * state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac -
@@ -4036,7 +4036,7 @@ void ResolveSysFlow(EnergyPlusData &state,
 
         // Make sure air system inlet nodes have flow consistent with MassFlowRateMaxAvail
         for (InBranchIndex = 1; InBranchIndex <= PrimaryAirSystems(SysNum).NumInletBranches; ++InBranchIndex) {
-            InBranchNum = PrimaryAirSystems(SysNum).InletBranchNum(InBranchIndex);
+            InBranchNum = PrimaryAirSystems(SysNum).InletBranchNum[InBranchIndex - 1];
             InNodeNum = PrimaryAirSystems(SysNum).Branch(InBranchNum).NodeNumIn;
             state.dataLoopNodes->Node(InNodeNum).MassFlowRate =
                 min(state.dataLoopNodes->Node(InNodeNum).MassFlowRate, state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail);
