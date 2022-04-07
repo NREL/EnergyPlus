@@ -11034,7 +11034,7 @@ void WriteCompCostTable(EnergyPlusData &state)
         }
 
         NumRows = (int)state.dataCostEstimateManager->CostLineItem.size() + 1; // body will have the total and line items
-        NumCols = 6;                                               // Line no., Line name, Qty, Units, ValperQty, Subtotal
+        NumCols = 6;                                                           // Line no., Line name, Qty, Units, ValperQty, Subtotal
         rowHead.allocate(NumRows);
         columnHead.allocate(NumCols);
         columnWidth.dimension(NumCols, 14); // array assignment - same for all columns

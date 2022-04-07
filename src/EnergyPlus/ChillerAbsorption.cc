@@ -245,8 +245,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
 
     state.dataIPShortCut->cCurrentModuleObject = moduleObjectType;
 
-    int numAbsorbers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    int numAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (numAbsorbers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
