@@ -16,13 +16,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   endif()
 endif()
 
-if(APPLE)
-  # Force no auto ptr
-  # TODO remove this after kiva/boost is updated to a version that supports
-  # C++17
-  target_compile_definitions(project_options INTERFACE -DBOOST_NO_AUTO_PTR)
-endif()
-
 if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 2013)
 
   # COMPILER FLAGS
@@ -82,11 +75,15 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
   target_compile_options(project_warnings INTERFACE -Wno-delete-non-virtual-dtor)
   target_compile_options(project_warnings INTERFACE -Wno-missing-braces)
   if(CMAKE_COMPILER_IS_GNUCXX) # g++
-    target_compile_options(project_warnings INTERFACE -Wno-unused-but-set-parameter -Wno-unused-but-set-variable)
     # Suppress unused-but-set warnings until more serious ones are addressed
+    target_compile_options(project_warnings INTERFACE -Wno-unused-but-set-parameter -Wno-unused-but-set-variable)
     target_compile_options(project_warnings INTERFACE -Wno-maybe-uninitialized)
     target_compile_options(project_warnings INTERFACE -Wno-aggressive-loop-optimizations)
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
+      # Suppress unused-but-set warnings until more serious ones are addressed
+      target_compile_options(project_warnings INTERFACE -Wno-unused-but-set-parameter -Wno-unused-but-set-variable)
+    endif()
     target_compile_options(project_warnings INTERFACE -Wno-vexing-parse)
     target_compile_options(project_warnings INTERFACE -Wno-invalid-source-encoding)
   endif()

@@ -110,13 +110,12 @@ protected:
         /////////////////////////////////////////////////////////
         // System
         /////////////////////////////////////////////////////////
-        m_TarcogSystem = std::unique_ptr<Tarcog::ISO15099::CSystem>(
-          new Tarcog::ISO15099::CSystem(aIGU, Indoor, Outdoor));
+        m_TarcogSystem = std::make_unique<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
         ASSERT_TRUE(m_TarcogSystem != nullptr);
     }
 
 public:
-    Tarcog::ISO15099::CSystem * GetSystem() const
+    [[nodiscard]] Tarcog::ISO15099::CSystem * GetSystem() const
     {
         return m_TarcogSystem.get();
     };
@@ -126,26 +125,26 @@ TEST_F(TestDoubleOutsidePerforatedShade_SHGC, Test1)
 {
     SCOPED_TRACE("Begin Test: Outside perforated shade.");
 
-    auto aSystem = GetSystem();
+    const auto aSystem = GetSystem();
 
     const auto uval = aSystem->getUValue();
-    EXPECT_NEAR(2.968611, uval, 1e-6);
+    EXPECT_NEAR(3.193057, uval, 1e-6);
 
-    auto effectiveLayerConductivities{
+    const auto effectiveLayerConductivities{
       aSystem->getSolidEffectiveLayerConductivities(Tarcog::ISO15099::System::Uvalue)};
 
-    const std::vector<double> correctEffectConductivites{0.115463, 1};
+    const std::vector<double> correctEffectConductivites{0.115592, 1};
     EXPECT_EQ(correctEffectConductivites.size(), effectiveLayerConductivities.size());
     for(size_t i = 0u; i < correctEffectConductivites.size(); ++i)
     {
         EXPECT_NEAR(correctEffectConductivites[i], effectiveLayerConductivities[i], 1e-6);
     }
 
-    auto totSol{0.315236};
+    const auto totSol{0.315236};
     const auto shgc{aSystem->getSHGC(totSol)};
-    EXPECT_NEAR(0.351377, shgc, 1e-6);
+    EXPECT_NEAR(0.348647, shgc, 1e-6);
 
     const auto heatflow =
       aSystem->getHeatFlow(Tarcog::ISO15099::System::SHGC, Tarcog::ISO15099::Environment::Indoor);
-    EXPECT_NEAR(-51.710066, heatflow, 1e-6);
+    EXPECT_NEAR(-51.705046, heatflow, 1e-6);
 }

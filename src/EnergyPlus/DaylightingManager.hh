@@ -453,7 +453,7 @@ namespace DaylightingManager {
 
     void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state);
 
-    void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum);
+    std::size_t CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum);
 
     void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNum);
 
