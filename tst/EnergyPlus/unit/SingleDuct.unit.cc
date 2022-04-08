@@ -2889,16 +2889,17 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_NoReheat_Sizing)
     state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow = 0.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
-    // MaxAirVolFlowRate hard sized at 1.0
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
-    // TermUnitSizing(1).AirVolFlow should be greater of DesHeatVolFlow (1.0) and NonAirSysDesHeatVolFlow (0.5)
+    // TermUnitSizing(1).AirVolFlow should be greater of user input Maximum Air Flow Rate (1.0) and NonAirSysDesHeatVolFlow (0.5)
     EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow);
+    // MaxAirVolFlowRate hard sized at 1.0
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
 
     // MaxAirVolFlowRate autosized
     state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate = DataSizing::AutoSize;
     state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow = 1.0;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
+    // constant volume TUs do not set or use ZoneMinAirFracDes
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
     // TermUnitSizing(1).AirVolFlow should be greater of DesHeatVolFlow (1.0) and NonAirSysDesHeatVolFlow (0.5)
     EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow); // doesn't matter for NoReheat TUs
@@ -2907,9 +2908,9 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_NoReheat_Sizing)
     state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate = DataSizing::AutoSize;
     state->dataSize->TermUnitFinalZoneSizing(1).DesHeatVolFlow = 0.25;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
-    // TermUnitSizing(1).AirVolFlow should be NonAirSysDesHeatVolFlow (0.5)
+    // TermUnitSizing(1).AirVolFlow should be greater of DesHeatVolFlow (0.25) and NonAirSysDesHeatVolFlow (0.5)
     EXPECT_EQ(0.5, state->dataSize->TermUnitSizing(1).AirVolFlow);
-    // the TU will size to DesHeatVolFlow, DesHeatVolFlow < NonAirSysDesHeatVolFlow should never normally happen
+    // the TU will size to DesHeatVolFlow (0.25) even though NonAirSysDesHeatVolFlow = 0.5
     EXPECT_EQ(0.25, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
 }
 
@@ -2976,10 +2977,9 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
     state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow = 0.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
-    // constant volume TUs should have ZoneMinAirFracDes = 1 (now set correctly in GetSysInput)
+    // constant volume TUs do not set or use ZoneMinAirFracDes
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
-    // if ZoneMinAirFracDes = 0, TermUnitSizing(1).AirVolFlow would = 0.5 (NonAirSysDesHeatVolFlow)
-    // since ZoneMinAirFracDes = 1, TermUnitSizing(1).AirVolFlow = hard sized value (i.e., 1.0)
+    // TermUnitSizing(1).AirVolFlow is greater of NonAirSysDesHeatVolFlow (0.5) and user input Maximum Air Flow Rate (1.0)
     EXPECT_EQ(1.0, state->dataSize->TermUnitSizing(1).AirVolFlow);
 
     // size heating coil
@@ -2994,22 +2994,20 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
     state->dataSize->TermUnitSingDuct = true;
     Real64 coilInTemp = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU;
     Real64 coilOutTemp = state->dataSize->TermUnitFinalZoneSizing(1).HeatDesTemp;
-    Real64 desCoilAirMassFlow = state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow;
-    Real64 actualCoilAirFlow = state->dataSize->TermUnitSizing(1).AirVolFlow;
+    Real64 desHeatingAirMassFlow = state->dataSize->TermUnitFinalZoneSizing(1).NonAirSysDesHeatVolFlow;
+    Real64 desCoilAirFlow = state->dataSize->TermUnitSizing(1).AirVolFlow;
     Real64 CpAir = Psychrometrics::PsyCpAirFnW(state->dataSize->TermUnitFinalZoneSizing(1).HeatDesHumRat);
-    Real64 desCoilSize = CpAir * state->dataEnvrn->StdRhoAir * desCoilAirMassFlow * (coilOutTemp - coilInTemp);
-    Real64 actualCoilSize = CpAir * state->dataEnvrn->StdRhoAir * actualCoilAirFlow * (coilOutTemp - coilInTemp);
+    Real64 desCoilSize = CpAir * state->dataEnvrn->StdRhoAir * desHeatingAirMassFlow * (coilOutTemp - coilInTemp);
+    Real64 actualCoilSize = CpAir * state->dataEnvrn->StdRhoAir * desCoilAirFlow * (coilOutTemp - coilInTemp);
 
     bool FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).SimConstVol(*state,
                                                               FirstHVACIteration,
                                                               state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum,
                                                               state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum);
-    // TUSizing.AirVolFlow gets set like this. If ZoneMinAirFracDes = 0, then autosized air flow is passed to heating coil
-    // this->MaxAirVolFlowRate = 1.0 here which is set by user. This is a factor of 2 higher than design/auosized value
     // TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
     //     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
-    //         this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
+    //         this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
 
     EXPECT_GT(actualCoilSize, desCoilSize);
     EXPECT_NEAR(actualCoilSize, 12192.0, 0.1);
