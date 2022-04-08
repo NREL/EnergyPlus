@@ -222,7 +222,7 @@ namespace DaylightingDevices {
         // Initialize tubular daylighting devices (TDDs)
         GetTDDInput(state);
 
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+        if ((int)state.dataDaylightingDevicesData->TDDPipe.size() > 0) {
             DisplayString(state, "Initializing Tubular Daylighting Devices");
             // Setup COSAngle list for all TDDs
             state.dataDaylightingDevices->COSAngle(1) = 0.0;
@@ -235,9 +235,9 @@ namespace DaylightingDevices {
                 state.dataDaylightingDevices->COSAngle(AngleNum) = std::cos(Theta);
             } // AngleNum
 
-            TDDPipeStored.allocate(state.dataDaylightingDevicesData->NumOfTDDPipes * 2);
+            TDDPipeStored.allocate((int)state.dataDaylightingDevicesData->TDDPipe.size() * 2);
 
-            for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+            for (PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
                 // Initialize optical properties
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio =
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength / state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter;
@@ -380,9 +380,9 @@ namespace DaylightingDevices {
         // Initialize daylighting shelves
         GetShelfInput(state);
 
-        if (state.dataDaylightingDevicesData->NumOfShelf > 0) DisplayString(state, "Initializing Light Shelf Daylighting Devices");
+        if ((int)state.dataDaylightingDevicesData->Shelf.size() > 0) DisplayString(state, "Initializing Light Shelf Daylighting Devices");
 
-        for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+        for (ShelfNum = 1; ShelfNum <= (int)state.dataDaylightingDevicesData->Shelf.size(); ++ShelfNum) {
             WinSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
 
             ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
@@ -430,7 +430,7 @@ namespace DaylightingDevices {
         // calculation
 
         if (state.dataSurface->CalcSolRefl &&
-            (state.dataDaylightingDevicesData->NumOfTDDPipes > 0 || state.dataDaylightingDevicesData->NumOfShelf > 0)) {
+            ((int)state.dataDaylightingDevicesData->TDDPipe.size() > 0 || (int)state.dataDaylightingDevicesData->Shelf.size() > 0)) {
             ShowWarningError(state, "InitDaylightingDevices: Solar Distribution Model includes Solar Reflection calculations;");
             ShowContinueError(state, "the resulting reflected solar values will not be used in the");
             ShowContinueError(state, "DaylightingDevice:Shelf or DaylightingDevice:Tubular calculations.");
@@ -469,12 +469,12 @@ namespace DaylightingDevices {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "DaylightingDevice:Tubular";
-        state.dataDaylightingDevicesData->NumOfTDDPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumOfTDDPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
-            state.dataDaylightingDevicesData->TDDPipe.allocate(state.dataDaylightingDevicesData->NumOfTDDPipes);
+        if (NumOfTDDPipes > 0) {
+            state.dataDaylightingDevicesData->TDDPipe.allocate(NumOfTDDPipes);
 
-            for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+            for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          PipeNum,
@@ -763,10 +763,10 @@ namespace DaylightingDevices {
             } // PipeNum
 
             if (state.dataDaylightingDevices->GetTDDInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Tubular input.");
-            state.dataDaylightingManager->TDDTransVisBeam.allocate(24, state.dataDaylightingDevicesData->NumOfTDDPipes);
-            state.dataDaylightingManager->TDDFluxInc.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
-            state.dataDaylightingManager->TDDFluxTrans.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
-            for (int tddNum = 1; tddNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++tddNum) {
+            state.dataDaylightingManager->TDDTransVisBeam.allocate(24, NumOfTDDPipes);
+            state.dataDaylightingManager->TDDFluxInc.allocate(24, 4, NumOfTDDPipes);
+            state.dataDaylightingManager->TDDFluxTrans.allocate(24, 4, NumOfTDDPipes);
+            for (int tddNum = 1; tddNum <= NumOfTDDPipes; ++tddNum) {
                 for (int hr = 1; hr <= 24; ++hr) {
                     state.dataDaylightingManager->TDDTransVisBeam(hr, tddNum) = 0.0;
                     for (int iSky = 1; iSky <= 4; ++iSky) {
@@ -806,12 +806,12 @@ namespace DaylightingDevices {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = "DaylightingDevice:Shelf";
-        state.dataDaylightingDevicesData->NumOfShelf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumOfShelf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (state.dataDaylightingDevicesData->NumOfShelf > 0) {
-            state.dataDaylightingDevicesData->Shelf.allocate(state.dataDaylightingDevicesData->NumOfShelf);
+        if (NumOfShelf > 0) {
+            state.dataDaylightingDevicesData->Shelf.allocate(NumOfShelf);
 
-            for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+            for (ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          ShelfNum,
@@ -1458,14 +1458,14 @@ namespace DaylightingDevices {
 
         FindTDDPipe = 0;
 
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
+        if ((int)state.dataDaylightingDevicesData->TDDPipe.size() <= 0) {
             ShowFatalError(
                 state,
                 "FindTDDPipe: Surface=" + state.dataSurface->Surface(WinNum).Name +
                     ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface.");
         }
 
-        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+        for (PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
             if ((WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) ||
                 (WinNum == state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser)) {
                 FindTDDPipe = PipeNum;
@@ -1505,7 +1505,7 @@ namespace DaylightingDevices {
         Real64 QRefl;          // Diffuse radiation reflected back up the pipe
         Real64 TotTDDPipeGain; // Total absorbed solar gain in the tubular daylighting device pipe
 
-        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+        for (PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
             DiffSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             transDiff = state.dataConstruction->Construct(state.dataSurface->Surface(DiffSurf).Construction).TransDiff;
 
@@ -1807,10 +1807,10 @@ namespace DaylightingDevices {
         auto &MyEnvrnFlag = state.dataDaylightingDevices->MyEnvrnFlag;
         int Loop;
 
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes == 0) return;
+        if ((int)state.dataDaylightingDevicesData->TDDPipe.size() == 0) return;
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
-            for (Loop = 1; Loop <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++Loop) {
+            for (Loop = 1; Loop <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++Loop) {
                 state.dataDaylightingDevicesData->TDDPipe(Loop).TZoneHeatGain = 0.0;
             }
             MyEnvrnFlag = false;
