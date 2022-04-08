@@ -967,8 +967,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
     state->dataGlobal->NumOfZones = 4;
-    state->dataDaylightingData->totDaylightingControls = state->dataGlobal->NumOfZones;
-    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl.allocate(4);
     state->dataDaylightingData->daylightControl(1).Name = "ZD1";
     state->dataDaylightingData->daylightControl(2).Name = "ZD2";
     state->dataDaylightingData->daylightControl(3).Name = "ZD3";
@@ -3003,8 +3002,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataDaylightingManager->FirstTimeMaps.dimension(state->dataDaylightingData->TotIllumMaps, true);
     state->dataDaylightingManager->EnvrnPrint.dimension(state->dataDaylightingData->TotIllumMaps, false);
     state->dataGlobal->NumOfZones = 1;
-    state->dataDaylightingData->totDaylightingControls = 1;
-    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl.allocate(1);
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 3;
     state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
     state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);

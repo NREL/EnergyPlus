@@ -443,7 +443,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
 
     // Do any daylighting reference points on layer for zone
     if (state.dataDaylightingData->TotRefPoints > 0) {
-        for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
             auto curcolorno = ColorNo::DaylSensor1;
             std::string refPtType;
