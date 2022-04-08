@@ -231,7 +231,7 @@ struct ContaminantBalanceData : BaseGlobalStruct
 
     Array1D<Real64> CONTRAT;           // Zone CO2 at the previous time step used in Exact and Euler method
     Array1D<Real64> MixingMassFlowCO2; // Mixing MASS FLOW * CO2
-    Real64 OutdoorCO2 = 0.0; // Outdoor CO2 level
+    Real64 OutdoorCO2 = 0.0;           // Outdoor CO2 level
 
     Array1D<Real64> ZoneAirDensityCO; // Mixing MASS FLOW * CO2
     Array1D<Real64> AZ;
