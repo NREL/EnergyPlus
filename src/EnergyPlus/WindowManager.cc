@@ -604,7 +604,7 @@ namespace WindowManager {
                         // calc Trans, TransVis, ReflectSolBeamFront, ReflectSolBeamBack, ReflectVisBeamFront, ReflectVisBeamBack
                         //  assuming wlt same as wle
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
-                            auto lam = state.dataWindowManager->wle(ILam);
+                            auto lam = state.dataWindowManager->wle[ILam-1];
                             state.dataWindowManager->wlt(IGlass, ILam) = lam;
                             state.dataWindowManager->t(IGlass, ILam) =
                                 CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
@@ -675,7 +675,7 @@ namespace WindowManager {
                         }
                     } else {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
-                            auto lam = state.dataWindowManager->wle(ILam);
+                            auto lam = state.dataWindowManager->wle[ILam-1];
                             state.dataWindowManager->wlt(IGlass, ILam) = lam;
                             state.dataWindowManager->tPhi(IGlass, ILam) =
                                 CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
@@ -918,7 +918,7 @@ namespace WindowManager {
                         }
                     } else {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
-                            auto lam = state.dataWindowManager->wle(ILam);
+                            auto lam = state.dataWindowManager->wle[ILam-1];
                             state.dataWindowManager->wlt(IGlass, ILam) = lam;
                             state.dataWindowManager->tPhi(IGlass, ILam) =
                                 CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
@@ -1893,7 +1893,7 @@ namespace WindowManager {
 
         for (in = 1; in <= ngllayer; ++in) {
             for (iwl = 1; iwl <= state.dataWindowManager->nume; ++iwl) {
-                wl = state.dataWindowManager->wle(iwl);
+                wl = state.dataWindowManager->wle[iwl-1];
                 if (wl < wlbot || wl > wltop) continue;
                 // In the following numpt is the number of spectral data points for each layer;
                 // numpt = 2 if there is no spectral data for a layer.
@@ -1924,7 +1924,7 @@ namespace WindowManager {
 
         // Calculate system properties at each wavelength
         for (j = 1; j <= state.dataWindowManager->nume; ++j) {
-            wl = state.dataWindowManager->wle(j);
+            wl = state.dataWindowManager->wle[j-1];
             if (wl < wlbot || wl > wltop) continue;
 
             // Set diagonal of matrix for subroutine SystemPropertiesAtLambdaAndPhi
@@ -2077,7 +2077,7 @@ namespace WindowManager {
         down = 0.0;
 
         for (i = 1; i <= state.dataWindowManager->nume - 1; ++i) {
-            esol = (state.dataWindowManager->wle(i + 1) - state.dataWindowManager->wle(i)) * 0.5 *
+            esol = (state.dataWindowManager->wle[i] - state.dataWindowManager->wle[i-1]) * 0.5 *
                    (state.dataWindowManager->e(i) + state.dataWindowManager->e(i + 1));
             up += 0.5 * (p(i) + p(i + 1)) * esol;
             down += esol;
@@ -2128,14 +2128,14 @@ namespace WindowManager {
         for (i = 2; i <= state.dataWindowManager->nume; ++i) { // Autodesk:BoundsViolation e|wle|p(i-1) @ i=1: Changed start index from 1 to 2: wle
             // values prevented this violation from occurring in practice
             // Restrict to visible range
-            if (state.dataWindowManager->wle(i) >= 0.37 && state.dataWindowManager->wle(i) <= 0.78) {
+            if (state.dataWindowManager->wle[i-1] >= 0.37 && state.dataWindowManager->wle[i-1] <= 0.78) {
                 Interpolate(state.dataWindowManager->wlt3,
                             state.dataWindowManager->y30,
                             state.dataWindowManager->numt3,
-                            state.dataWindowManager->wle(i),
+                            state.dataWindowManager->wle[i-1],
                             y30new);
                 evis = state.dataWindowManager->e(i - 1) * 0.5 * (y30new + y30ils1) *
-                       (state.dataWindowManager->wle(i) - state.dataWindowManager->wle(i - 1));
+                       (state.dataWindowManager->wle[i-1] - state.dataWindowManager->wle[i - 2]);
                 up += 0.5 * (p(i) + p(i - 1)) * evis;
                 down += evis;
                 y30ils1 = y30new;
@@ -9199,10 +9199,10 @@ namespace WindowManager {
                         // Step 3 - overwrite default solar spectrum data
                         for (iTmp = 1; iTmp <= state.dataWindowManager->nume; ++iTmp) {
                             if (iTmp <= NumNumbers / 2) {
-                                state.dataWindowManager->wle(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp - 1);
+                                state.dataWindowManager->wle[iTmp-1] = state.dataIPShortCut->rNumericArgs(2 * iTmp - 1);
                                 state.dataWindowManager->e(iTmp) = state.dataIPShortCut->rNumericArgs(2 * iTmp);
                             } else {
-                                state.dataWindowManager->wle(iTmp) = 0.0;
+                                state.dataWindowManager->wle[iTmp-1] = 0.0;
                                 state.dataWindowManager->e(iTmp) = 0.0;
                             }
                         }

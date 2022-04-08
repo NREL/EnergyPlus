@@ -323,6 +323,7 @@ namespace ConvectionCoefficients {
         // Default Constructor
         RoofGeoCharacteristicsStruct() : BoundSurf(4), Area(0.0), Perimeter(0.0), Height(0.0)
         {
+            this->BoundSurf = Array1D<Vector>(4);
         }
     };
 

@@ -123,7 +123,7 @@ namespace WindowManager {
         CSeries solarRadiation;
 
         for (auto i = 1; i <= state.dataWindowManager->nume; ++i) {
-            solarRadiation.addProperty(state.dataWindowManager->wle(i), state.dataWindowManager->e(i));
+            solarRadiation.addProperty(state.dataWindowManager->wle[i-1], state.dataWindowManager->e(i));
         }
 
         return solarRadiation;

@@ -484,10 +484,10 @@ namespace WindowManager {
 struct WindowManagerData : BaseGlobalStruct
 {
 
-    Real64 sigma;   // Stefan-Boltzmann constant
-    Real64 TKelvin; // conversion from Kelvin to Celsius
-    int nume;       // Number of wavelength values in solar spectrum
-    int numt3;      // Number of wavelength values in the photopic response
+    static Real64 constexpr sigma = 5.6697e-8;   // Stefan-Boltzmann constant
+    static Real64 constexpr TKelvin = DataGlobalConstants::KelvinConv; // conversion from Kelvin to Celsius
+    static int constexpr nume = 107;       // Number of wavelength values in solar spectrum
+    static int constexpr numt3 = 81;      // Number of wavelength values in the photopic response
 
     //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
     Array1D<Real64> AirProps;
@@ -495,7 +495,15 @@ struct WindowManagerData : BaseGlobalStruct
     // on a 37 degree tilted surface; corresponds
     // to wavelengths (microns) in following data block (ISO 9845-1 and ASTM E 892;
     // derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99)
-    Array1D<Real64> wle; // Solar spectrum wavelength values (microns)
+
+    // Solar spectrum wavelength values (microns)
+    std::array<Real64, nume> wle = {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800, 0.3900, 0.4000,
+                                    0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200, 0.5300, 0.5400, 0.5500, 0.5700,
+                                    0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400, 0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000,
+                                    0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150, 0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400,
+                                    1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610, 1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770,
+                                    1.4970, 1.5200, 1.5390, 1.5580, 1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850,
+                                    2.0050, 2.0350, 2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370};
 
     Array1D<Real64> e; // Solar spectrum values corresponding to wle
 
@@ -570,8 +578,8 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 A45;
     Real64 A67;
 
-    int MaxNumOfIncidentAngles;
-    int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
+    static int constexpr MaxNumOfIncidentAngles = 20;
+    static int constexpr MaxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
     // TEMP MOVED FROM DataHeatBalance.hh -BLB
 
     Array2D<Real64> wlt;      // Spectral data wavelengths for each glass layer in a glazing system
@@ -673,14 +681,6 @@ struct WindowManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->wle = Array1D<Real64>(
-            nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800, 0.3900, 0.4000,
-                   0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200, 0.5300, 0.5400, 0.5500, 0.5700,
-                   0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400, 0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000,
-                   0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150, 0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400,
-                   1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610, 1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770,
-                   1.4970, 1.5200, 1.5390, 1.5580, 1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850,
-                   2.0050, 2.0350, 2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370});
         this->e = Array1D<Real64>(
             nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,  720.7,  1013.1,
                    1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9, 1572.4, 1550.7, 1561.5, 1501.5,
@@ -816,23 +816,14 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : sigma(5.6697e-8), TKelvin(DataGlobalConstants::KelvinConv), nume(107), numt3(81), gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0),
+        : gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0),
           gwght(5, 5, 0.0), gfract(5, 5, 0.0), gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
           AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0), dtheta(5, 0.0), zir(10, 10, 0.0),
           ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), dhf(5, 10, 0.0), sour(10, 0.0),
-          delta(5, 0.0), hcgap(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0), arhs(6, 0.0), MaxNumOfIncidentAngles(20),
-          MaxSpectralDataElements(800)
+          delta(5, 0.0), hcgap(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0), arhs(6, 0.0)
     {
         AirProps.allocate(8);
         AirProps = {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3};
-        wle.allocate(nume);
-        wle = {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800, 0.3900, 0.4000,
-               0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200, 0.5300, 0.5400, 0.5500, 0.5700,
-               0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400, 0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000,
-               0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150, 0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400,
-               1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610, 1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770,
-               1.4970, 1.5200, 1.5390, 1.5580, 1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850,
-               2.0050, 2.0350, 2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370};
         e.allocate(nume);
         e = {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,  720.7,  1013.1,
              1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9, 1572.4, 1550.7, 1561.5, 1501.5,
