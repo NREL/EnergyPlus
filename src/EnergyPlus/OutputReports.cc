@@ -442,7 +442,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     static constexpr std::string_view Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
 
     // Do any daylighting reference points on layer for zone
-    if (state.dataDaylightingData->TotRefPoints > 0) {
+    if ((int)state.dataDaylightingData->DaylRefPt.size() > 0) {
         for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
             auto curcolorno = ColorNo::DaylSensor1;
@@ -887,7 +887,7 @@ void DXFOut(EnergyPlusData &state,
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const auto curcolorno = ColorNo::DaylSensor1;
 
-        for (int mapnum = 1; mapnum <= state.dataDaylightingData->TotIllumMaps; ++mapnum) {
+        for (int mapnum = 1; mapnum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapnum) {
             if (state.dataDaylightingData->IllumMapCalc(mapnum).zoneIndex != zones) continue;
             for (int refpt = 1; refpt <= state.dataDaylightingData->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
                 print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, refpt));

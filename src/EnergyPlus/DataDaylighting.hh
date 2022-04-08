@@ -302,17 +302,12 @@ namespace DataDaylighting {
 
 struct DaylightingData : BaseGlobalStruct
 {
-
-    // int totDaylightingControls = 0;
-    int TotRefPoints = 0;
     int maxRefPointsPerControl = 0;
-    int TotIllumMaps = 0;
     bool mapResultsToReport = false; // used when only partial hour has "sun up"
     bool mapResultsReported = false; // when no map results are ever reported this will still be false
     char MapColSep;                  // Character for separating map columns (tab, space, comma)
     bool DFSReportSizingDays = false;
     bool DFSReportAllShadowCalculationDays = false;
-    int TotDElightCFS = 0;
 
     Array1D<DataDaylighting::EnclDaylightCalc> enclDaylight;
     Array1D<DataDaylighting::ZoneDaylightCalc> ZoneDaylight;
