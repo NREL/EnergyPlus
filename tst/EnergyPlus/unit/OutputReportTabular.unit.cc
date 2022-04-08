@@ -8466,7 +8466,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 
     state->dataHVACGlobal->TimeStepSys = 10.0;
     state->dataGlobal->TimeStepZone = 20.0;
-    state->dataDefineEquipment->NumAirDistUnits = 1;
 
     state->dataHeatBal->ZonePreDefRep.allocate(1);
     state->dataDefineEquipment->AirDistUnit.allocate(1);

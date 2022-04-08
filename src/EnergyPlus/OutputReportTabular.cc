@@ -4611,7 +4611,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     //--------------------
     // HVAC annual heating by ATU
     // HVAC annual cooling by ATU
-    for (state.dataOutRptTab->iunitGHGR = 1; state.dataOutRptTab->iunitGHGR <= state.dataDefineEquipment->NumAirDistUnits;
+    for (state.dataOutRptTab->iunitGHGR = 1; state.dataOutRptTab->iunitGHGR <= (int)state.dataDefineEquipment->AirDistUnit.size();
          ++state.dataOutRptTab->iunitGHGR) {
         // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
         state.dataOutRptTab->curZoneGHGR = state.dataDefineEquipment->AirDistUnit(state.dataOutRptTab->iunitGHGR).ZoneNum;

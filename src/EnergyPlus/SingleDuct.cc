@@ -602,7 +602,7 @@ void GetSysInput(EnergyPlusData &state)
                     state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode),
                     "Air Nodes");
 
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
                 state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
@@ -947,7 +947,7 @@ void GetSysInput(EnergyPlusData &state)
                     state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode),
                     "Air Nodes");
 
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
                 state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
@@ -1228,7 +1228,7 @@ void GetSysInput(EnergyPlusData &state)
                     state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
                     "Air Nodes");
 
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
                 state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
@@ -1401,7 +1401,7 @@ void GetSysInput(EnergyPlusData &state)
                     state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
                     "Air Nodes");
 
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
                 state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
@@ -1667,7 +1667,7 @@ void GetSysInput(EnergyPlusData &state)
                     state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
                     "Air Nodes");
 
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
                 state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
@@ -1877,7 +1877,7 @@ void GetSysInput(EnergyPlusData &state)
                     state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum),
                     "Air Nodes");
 
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum ==
                 state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
@@ -2277,7 +2277,7 @@ void GetSysInput(EnergyPlusData &state)
                     state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode),
                     "Air Nodes");
 
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode ==
                 state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum =
@@ -6153,7 +6153,7 @@ void GetATMixers(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        for (int ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode;
                 state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum = ADUNum;
