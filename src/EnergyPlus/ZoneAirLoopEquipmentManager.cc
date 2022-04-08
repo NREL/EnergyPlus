@@ -124,11 +124,11 @@ namespace ZoneAirLoopEquipmentManager {
             CompIndex = AirDistUnitNum;
         } else {
             AirDistUnitNum = CompIndex;
-            if (AirDistUnitNum > state.dataDefineEquipment->NumAirDistUnits || AirDistUnitNum < 1) {
+            if (AirDistUnitNum > (int)state.dataDefineEquipment->AirDistUnit.size() || AirDistUnitNum < 1) {
                 ShowFatalError(state,
                                format("ManageZoneAirLoopEquipment:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       AirDistUnitNum,
-                                      state.dataDefineEquipment->NumAirDistUnits,
+                                      (int)state.dataDefineEquipment->AirDistUnit.size(),
                                       ZoneAirLoopEquipName));
             }
             if (ZoneAirLoopEquipName != state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name) {
@@ -196,15 +196,15 @@ namespace ZoneAirLoopEquipmentManager {
         Array1D_bool lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE.
         bool DualDuctRecircIsUsed;        // local temporary for deciding if recirc side used by dual duct terminal
 
-        state.dataDefineEquipment->NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        state.dataDefineEquipment->AirDistUnit.allocate(state.dataDefineEquipment->NumAirDistUnits);
-        state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(state.dataDefineEquipment->NumAirDistUnits);
+        state.dataDefineEquipment->AirDistUnit.allocate(NumAirDistUnits);
+        state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(NumAirDistUnits);
         state.dataZoneAirLoopEquipmentManager->EachOnceFlag = true;
 
-        if (state.dataDefineEquipment->NumAirDistUnits > 0) {
+        if (NumAirDistUnits > 0) {
 
-            for (AirDistUnitNum = 1; AirDistUnitNum <= state.dataDefineEquipment->NumAirDistUnits; ++AirDistUnitNum) {
+            for (AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          AirDistUnitNum,
@@ -504,7 +504,7 @@ namespace ZoneAirLoopEquipmentManager {
                 }
 
             } // End of Air Dist Do Loop
-            for (AirDistUnitNum = 1; AirDistUnitNum <= state.dataDefineEquipment->NumAirDistUnits; ++AirDistUnitNum) {
+            for (AirDistUnitNum = 1; AirDistUnitNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++AirDistUnitNum) {
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
@@ -601,7 +601,7 @@ namespace ZoneAirLoopEquipmentManager {
             }
             state.dataZoneAirLoopEquipmentManager->EachOnceFlag(AirDistUnitNum) = false;
             ++state.dataZoneAirLoopEquipmentManager->numADUInitialized;
-            if (state.dataZoneAirLoopEquipmentManager->numADUInitialized == state.dataDefineEquipment->NumAirDistUnits) {
+            if (state.dataZoneAirLoopEquipmentManager->numADUInitialized == (int)state.dataDefineEquipment->AirDistUnit.size()) {
                 // If all ADUs are initialized, set InitAirDistUnitsFlag to false
                 state.dataZoneAirLoopEquipmentManager->InitAirDistUnitsFlag = false;
             }

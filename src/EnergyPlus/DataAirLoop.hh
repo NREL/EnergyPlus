@@ -243,17 +243,7 @@ struct DataAirLoopData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumOASystems = 0;
-        this->LoopDXCoilRTF = 0.0;
-        this->AirLoopInputsFilled = false;
-        this->AirLoopAFNInfo.deallocate();
-        this->AirToZoneNodeInfo.deallocate();
-        this->AirToOANodeInfo.deallocate();
-        this->PriAirSysAvailMgr.deallocate();
-        this->AirLoopZoneInfo.deallocate();
-        this->AirLoopControlInfo.deallocate();
-        this->AirLoopFlow.deallocate();
-        this->OutsideAirSys.deallocate();
+        *this = DataAirLoopData();
     }
 };
 

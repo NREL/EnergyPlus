@@ -1197,8 +1197,8 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             }
 
             // sum up heating and max flows for any four pipe cooled beam terminal units (the only one using the airTerminalPtr at this point)
-            if (allocated(AirDistUnit) && state.dataDefineEquipment->NumAirDistUnits > 0) {
-                for (int aDUNum = 1; aDUNum <= state.dataDefineEquipment->NumAirDistUnits; ++aDUNum) {
+            if (allocated(AirDistUnit) && (int)state.dataDefineEquipment->AirDistUnit.size() > 0) {
+                for (int aDUNum = 1; aDUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++aDUNum) {
                     if (AirDistUnit(aDUNum).airTerminalPtr.get() != nullptr) {
                         if (AirLoopNum == AirDistUnit(aDUNum).airTerminalPtr->getAirLoopNum()) {
                             airLoopHeatingMaximumFlowRateSum += AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
@@ -1879,7 +1879,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                              state.dataOutRptPredefined->pdchS62zcdAlN,
                                                              TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                              AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                    for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                    for (int iAirDistUnit = 1; iAirDistUnit <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++iAirDistUnit) {
                         if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      state.dataOutRptPredefined->pdchS62zcdBox,
@@ -1961,7 +1961,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                              state.dataOutRptPredefined->pdchS62zhdAlN,
                                                              TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                              AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                    for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                    for (int iAirDistUnit = 1; iAirDistUnit <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++iAirDistUnit) {
                         if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      state.dataOutRptPredefined->pdchS62zhdBox,

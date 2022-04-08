@@ -282,16 +282,11 @@ namespace DataDaylighting {
     struct RefPointData
     {
         std::string Name; // Map name
-        int ZoneNum;      // Pointer to zone being referenced
-        Real64 x;         // x coordinate
-        Real64 y;         // y coordinate
-        Real64 z;         // z coordinate
-        int indexToFracAndIllum;
-
-        // Default Constructor
-        RefPointData() : ZoneNum(0), x(0.0), y(0.0), z(0.0), indexToFracAndIllum(0)
-        {
-        }
+        int ZoneNum = 0;  // Pointer to zone being referenced
+        Real64 x = 0.0;   // x coordinate
+        Real64 y = 0.0;   // y coordinate
+        Real64 z = 0.0;   // z coordinate
+        int indexToFracAndIllum = 0;
     };
 
     struct DElightComplexFeneData // holds Daylighting:DELight:ComplexFenestration
@@ -307,17 +302,12 @@ namespace DataDaylighting {
 
 struct DaylightingData : BaseGlobalStruct
 {
-
-    int totDaylightingControls = 0;
-    int TotRefPoints = 0;
     int maxRefPointsPerControl = 0;
-    int TotIllumMaps = 0;
     bool mapResultsToReport = false; // used when only partial hour has "sun up"
     bool mapResultsReported = false; // when no map results are ever reported this will still be false
     char MapColSep;                  // Character for separating map columns (tab, space, comma)
     bool DFSReportSizingDays = false;
     bool DFSReportAllShadowCalculationDays = false;
-    int TotDElightCFS = 0;
 
     Array1D<DataDaylighting::EnclDaylightCalc> enclDaylight;
     Array1D<DataDaylighting::ZoneDaylightCalc> ZoneDaylight;
@@ -330,24 +320,7 @@ struct DaylightingData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->totDaylightingControls = 0;
-        this->TotRefPoints = 0;
-        this->maxRefPointsPerControl = 0;
-        this->TotIllumMaps = 0;
-        this->mapResultsToReport = false;
-        this->mapResultsReported = false;
-        this->MapColSep = char();
-        this->DFSReportSizingDays = false;
-        this->DFSReportAllShadowCalculationDays = false;
-        this->TotDElightCFS = 0;
-        this->enclDaylight.deallocate();
-        this->ZoneDaylight.deallocate();
-        this->daylightControl.deallocate();
-        this->IllumMap.deallocate();
-        this->IllumMapCalc.deallocate();
-        this->DaylRefPt.deallocate();
-        this->DElightComplexFene.deallocate();
-        this->spacePowerReductionFactor.deallocate();
+        *this = DaylightingData();
     }
 };
 

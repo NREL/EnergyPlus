@@ -240,7 +240,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(1);
     state->dataContaminantBalance->ZoneSysContDemand.allocate(1);
-    state->dataContaminantBalance->NumContControlledZones = 1;
 
     state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
 
@@ -598,7 +597,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(3);
     state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
-    state->dataContaminantBalance->NumContControlledZones = 3;
 
     state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 
@@ -808,7 +806,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataContaminantBalance->GCPredictedRate.allocate(3);
 
     state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
-    state->dataContaminantBalance->NumContControlledZones = 3;
 
     state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 
