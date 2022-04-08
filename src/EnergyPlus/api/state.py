@@ -72,8 +72,8 @@ class StateManager:
 
     def __init__(self, api: cdll):
         self.api = api
-        self.api.stateNew.argtypes = []
-        self.api.stateNew.restype = c_void_p
+        self.api.stateNewPython.argtypes = []
+        self.api.stateNewPython.restype = c_void_p
         self.api.stateReset.argtypes = [c_void_p]
         self.api.stateReset.restype = c_void_p
         self.api.stateDelete.argtypes = [c_void_p]
@@ -85,7 +85,7 @@ class StateManager:
 
         :return: A pointer to a new state object in memory
         """
-        return self.api.stateNew()
+        return self.api.stateNewPython()
 
     def reset_state(self, state: c_void_p) -> None:
         """

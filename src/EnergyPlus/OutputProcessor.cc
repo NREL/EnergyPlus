@@ -4644,7 +4644,7 @@ namespace OutputProcessor {
             NumberOut = "0.0";
         } else {
             NumberOut = format("{:N}", repVal);
-            strip_trailing_zeros(trim(NumberOut));
+            strip_trailing_zeros(strip(NumberOut));
         }
 
         // Append the min and max strings with date information
@@ -6454,10 +6454,8 @@ void UpdateMeterReporting(EnergyPlusData &state)
     int NumAlpha;
     int NumNumbers;
     int IOStat;
-    std::string::size_type varnameLen;
     int NumReqMeters;
     int NumReqMeterFOs;
-    ReportingFrequency ReportFreq;
 
     bool ErrorsFound(false); // If errors detected in input
     auto &op(state.dataOutputProcessor);
@@ -6468,26 +6466,37 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     // Helper lambda to locate a meter index from its name. Returns a negative value if not found
-    auto findMeterIndexFromMeterName = [&state](std::string const &name) -> int {
-        auto &op(state.dataOutputProcessor);
+    auto setupMeterFromMeterName =
+        [&state](std::string &name, std::string const &freqString, bool MeterFileOnlyIndicator, bool CumulativeIndicator) -> bool {
+        bool result = false;
 
-        // Return a value <= 0 if not found
-        int meterIndex = -99;
+        auto varnameLen = index(name, '[');
+        if (varnameLen != std::string::npos) {
+            name.erase(varnameLen);
+        }
+
+        auto &op(state.dataOutputProcessor);
 
         std::string::size_type wildCardPosition = index(name, '*');
 
         if (wildCardPosition == std::string::npos) {
-            meterIndex = UtilityRoutines::FindItem(name, op->EnergyMeters);
+            int meterIndex = UtilityRoutines::FindItem(name, op->EnergyMeters);
+            if (meterIndex > 0) {
+                ReportingFrequency ReportFreq = determineFrequency(state, freqString);
+                SetInitialMeterReportingAndOutputNames(state, meterIndex, MeterFileOnlyIndicator, ReportFreq, CumulativeIndicator);
+                result = true;
+            }
         } else { // Wildcard input
-            for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
-                if (UtilityRoutines::SameString(op->EnergyMeters(Meter).Name.substr(0, wildCardPosition), name.substr(0, wildCardPosition))) {
-                    meterIndex = Meter;
-                    break;
+            ReportingFrequency ReportFreq = determineFrequency(state, freqString);
+            for (int meterIndex = 1; meterIndex <= op->NumEnergyMeters; ++meterIndex) {
+                if (UtilityRoutines::SameString(op->EnergyMeters(meterIndex).Name.substr(0, wildCardPosition), name.substr(0, wildCardPosition))) {
+                    SetInitialMeterReportingAndOutputNames(state, meterIndex, MeterFileOnlyIndicator, ReportFreq, CumulativeIndicator);
+                    result = true;
                 }
             }
         }
 
-        return meterIndex;
+        return result;
     };
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -6509,16 +6518,9 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        varnameLen = index(Alphas(1), '[');
-        if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
-
-        ReportFreq = determineFrequency(state, Alphas(2));
-
-        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
-        if (meterIndex > 0) {
-            // MeterFileOnlyIndicator is false, CumulativeIndicator is false
-            SetInitialMeterReportingAndOutputNames(state, meterIndex, false, ReportFreq, false);
-        } else {
+        bool meterFileOnlyIndicator = false;
+        bool cumulativeIndicator = false;
+        if (!setupMeterFromMeterName(Alphas(1), Alphas(2), meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(state,
                              cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
@@ -6541,16 +6543,9 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        varnameLen = index(Alphas(1), '[');
-        if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
-
-        ReportFreq = determineFrequency(state, Alphas(2));
-
-        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
-        if (meterIndex > 0) {
-            // MeterFileOnlyIndicator is true, CumulativeIndicator is false
-            SetInitialMeterReportingAndOutputNames(state, meterIndex, true, ReportFreq, false);
-        } else {
+        bool meterFileOnlyIndicator = true;
+        bool cumulativeIndicator = false;
+        if (!setupMeterFromMeterName(Alphas(1), Alphas(2), meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(state,
                              cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
@@ -6574,16 +6569,9 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        varnameLen = index(Alphas(1), '[');
-        if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
-
-        ReportFreq = determineFrequency(state, Alphas(2));
-
-        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
-        if (meterIndex > 0) {
-            // MeterFileOnlyIndicator is false, CumulativeIndicator is true
-            SetInitialMeterReportingAndOutputNames(state, meterIndex, false, ReportFreq, true);
-        } else {
+        bool meterFileOnlyIndicator = false;
+        bool cumulativeIndicator = true;
+        if (!setupMeterFromMeterName(Alphas(1), Alphas(2), meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(state,
                              cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
@@ -6606,16 +6594,9 @@ void UpdateMeterReporting(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        varnameLen = index(Alphas(1), '[');
-        if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
-
-        ReportFreq = determineFrequency(state, Alphas(2));
-
-        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
-        if (meterIndex > 0) {
-            // MeterFileOnlyIndicator is true, CumulativeIndicator is true
-            SetInitialMeterReportingAndOutputNames(state, meterIndex, true, ReportFreq, true);
-        } else {
+        bool meterFileOnlyIndicator = true;
+        bool cumulativeIndicator = true;
+        if (!setupMeterFromMeterName(Alphas(1), Alphas(2), meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(state,
                              cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }

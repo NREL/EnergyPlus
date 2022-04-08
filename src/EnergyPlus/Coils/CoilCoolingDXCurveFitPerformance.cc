@@ -203,6 +203,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                                 bool const singleMode,
                                                 Real64 LoadSHR)
 {
+    static constexpr std::string_view RoutineName = "CoilCoolingDXCurveFitPerformance::simulate";
     Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
@@ -325,6 +326,12 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                 this->ModeRatio = 0.0;
                 this->OperatingMode = 1;
                 this->recoveredEnergyRate = 0.0;
+            }
+            // Check for saturation error and modify temperature at constant enthalpy
+            Real64 tsat = Psychrometrics::PsyTsatFnHPb(state, outletNode.Enthalpy, inletNode.Press, RoutineName);
+            if (outletNode.Temp < tsat) {
+                outletNode.Temp = tsat;
+                outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, tsat, outletNode.Enthalpy);
             }
         }
     } else if (useAlternateMode == DataHVACGlobals::coilEnhancedMode) {

@@ -14,6 +14,7 @@ namespace ConstantsData
     static const double PLANKCONSTANT = 6.626196e-34;
     static const double BOLTZMANNCONSTANT = 1.380622e-23;
     static const double floatErrorTolerance = 1e-12;
+    static const double wavelengthErrorTolerance = 1e-6;
     static const double ELECTRON_CHARGE = 1.502e-19;
     static const double EOGHeight = 0.0635;   // meters
 }   // namespace ConstantsData

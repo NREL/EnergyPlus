@@ -115,9 +115,11 @@
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
+#include <EnergyPlus/WindowManagerExteriorThermal.hh>
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
+#include <WCETarcog.hpp>
 
 namespace EnergyPlus::HeatBalanceSurfaceManager {
 
@@ -670,6 +672,43 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 intVistranArea(0.0);
     bool isNorth;
 
+    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
+        "No Shade",  // 0
+        "Shade Off", // 1
+        "Interior Shade",
+        "Switchable Glazing",
+        "Exterior Shade",
+        "Exterior Screen",
+        "Interior Blind",
+        "Exterior Blind",
+        "Between Glass Shade",
+        "Between Glass Blind",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
+        "Uncontrolled",
+        "AlwaysOn",
+        "AlwaysOff",
+        "OnIfScheduleAllows",
+        "OnIfHighSolarOnWindow",
+        "OnIfHighHorizontalSolar",
+        "OnIfHighOutdoorAirTemperature",
+        "OnIfHighZoneAirTemperature",
+        "OnIfHighZoneCooling",
+        "OnIfHighGlare",
+        "MeetDaylightIlluminanceSetpoint",
+        "OnNightIfLowOutdoorTempAndOffDay",
+        "OnNightIfLowInsideTempAndOffDay",
+        "OnNightIfHeatingAndOffDay",
+        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+        "OnNightIfHeatingAndOnDayIfCooling",
+        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+        "OnIfHighZoneAirTempAndHighSolarOnWindow",
+        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
+
     auto &Surface(state.dataSurface->Surface);
 
     numSurfaces = 0;
@@ -677,6 +716,23 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
     computedNetArea.allocate(state.dataSurface->TotSurfaces);
     computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
+
+    // set up for EIO <FenestrationAssembly> output
+    if (state.dataHeatBal->TotFrameDivider > 0 && state.dataGeneral->Constructions) {
+        print(state.files.eio,
+              "{}\n",
+              "! <FenestrationAssembly>,Construction Name,Frame and Divider Name,NFRC Product Type,"
+              "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+    }
+    static constexpr std::string_view FenestrationAssemblyFormat("FenestrationAssembly,{},{},{},{:.3R},{:.3R},{:.3R}\n");
+    std::vector<std::pair<int, int>> uniqConsFrame;
+    std::pair<int, int> consAndFrame;
+
+    // set up for EIO <FenestrationShadedState> output
+    bool fenestrationShadedStateHeaderShown(false);
+    static constexpr std::string_view FenestrationShadedStateFormat("FenestrationShadedState,{},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{:.3R}\n");
+    std::vector<std::pair<int, int>> uniqShdConsFrame;
+    std::pair<int, int> shdConsAndFrame;
 
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         zonePt = Surface(iSurf).Zone;
@@ -723,6 +779,19 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                 curCons = Surface(iSurf).Construction;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
                 zonePt = Surface(iSurf).Zone;
+                // if the construction report is requested the SummerSHGC is already calculated
+                if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
+                    SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
+                    TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
+                } else {
+                    // must calculate Summer SHGC
+                    if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
+                        CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                        state.dataConstruction->Construct(curCons).SummerSHGC = SHGCSummer;
+                        state.dataConstruction->Construct(curCons).VisTransNorm = TransVisNorm;
+                        state.dataConstruction->Construct(curCons).SolTransNorm = TransSolNorm;
+                    }
+                }
                 mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                 // include the frame area if present
                 windowArea = Surface(iSurf).GrossArea;
@@ -740,6 +809,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                          state.dataSurface->FrameDivider(frameDivNum).VertDividers * Surface(iSurf).Height -
                          state.dataSurface->FrameDivider(frameDivNum).HorDividers * state.dataSurface->FrameDivider(frameDivNum).VertDividers *
                              state.dataSurface->FrameDivider(frameDivNum).DividerWidth);
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchFenFrameDivName, surfName, state.dataSurface->FrameDivider(frameDivNum).Name);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchFenFrameConductance,
                                      surfName,
@@ -750,6 +821,46 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                      surfName,
                                      state.dataSurface->FrameDivider(frameDivNum).DividerConductance,
                                      3);
+
+                    // report the selected NRFC product type (specific sizes) and the NFRC rating for the assembly (glass + frame + divider)
+                    std::string_view NFRCname =
+                        DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
+
+                    Real64 uValueAssembly{0.0};
+                    Real64 shgcAssembly{0.0};
+                    Real64 vtAssembly{0.0};
+
+                    GetWindowAssemblyNfrcForReport(
+                        state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueAssembly, shgcAssembly, vtAssembly);
+                    if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+                        state.dataHeatBal->NominalU(Surface(iSurf).Construction) =
+                            GetIGUUValueForNFRCReport(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
+                        SHGCSummer = GetSHGCValueForNFRCReporting(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
+                    }
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueAssembly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcAssembly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtAssembly, 3);
+
+                    // output EIO <FenestrationAssembly> for each unique combination of construction and frame/divider
+                    if (state.dataGeneral->Constructions) {
+                        consAndFrame = std::make_pair(curCons, frameDivNum);
+                        if (std::find(uniqConsFrame.begin(), uniqConsFrame.end(), consAndFrame) == uniqConsFrame.end()) {
+                            uniqConsFrame.push_back(consAndFrame);
+                            print(state.files.eio,
+                                  FenestrationAssemblyFormat,
+                                  state.dataConstruction->Construct(curCons).Name,
+                                  state.dataSurface->FrameDivider(frameDivNum).Name,
+                                  NFRCname,
+                                  uValueAssembly,
+                                  shgcAssembly,
+                                  vtAssembly);
+                        }
+                    }
                 }
                 windowAreaWMult = windowArea * mult;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
@@ -760,16 +871,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                 computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                 nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, surfName, nomUfact, 3);
-                // if the construction report is requested the SummerSHGC is already calculated
-                if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
-                    SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
-                    TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
-                } else {
-                    // must calculate Summer SHGC
-                    if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
-                        CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
-                    }
-                }
+
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, surfName, SHGCSummer, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, surfName, TransVisNorm, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
@@ -792,6 +894,76 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "W");
                     }
                 }
+
+                // Report table for every shading control state
+                const auto totalStates{Surface(iSurf).windowShadingControlList.size()};
+                if (frameDivNum != 0) {
+                    for (unsigned int i = 0; i < totalStates; ++i) {
+                        const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+
+                        const int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
+                        const auto stateUValue{GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
+                        const auto stateSHGC{GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
+                        std::string const &constructionName{state.dataConstruction->Construct(stateConstrNum).Name};
+
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchFenShdFrameDiv,
+                                         constructionName,
+                                         state.dataSurface->FrameDivider(frameDivNum).Name);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdUfact, constructionName, stateUValue, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, constructionName, stateSHGC, 3);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchFenShdVisTr,
+                                         constructionName,
+                                         state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                         3);
+
+                        Real64 stateAssemblyUValue{0.0};
+                        Real64 stateAssemblySHGC{0.0};
+                        Real64 stateAssemblyVT{0.0};
+
+                        GetWindowAssemblyNfrcForReport(
+                            state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
+
+                        std::string_view NFRCname =
+                            DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
+
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, constructionName, stateAssemblyUValue, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, constructionName, stateAssemblySHGC, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, constructionName, stateAssemblyVT, 3);
+
+                        if (state.dataGeneral->Constructions) {
+                            if (!fenestrationShadedStateHeaderShown) {
+                                print(state.files.eio,
+                                      "{}\n",
+                                      "! <FenestrationShadedState>,Construction Name,Glass U-Factor {W/m2-K},"
+                                      "Glass SHGC, Glass Visible Transmittance, Frame and Divider Name,NFRC Product Type,"
+                                      "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+                                fenestrationShadedStateHeaderShown = true;
+                            }
+
+                            shdConsAndFrame = std::make_pair(stateConstrNum, frameDivNum);
+                            if (std::find(uniqShdConsFrame.begin(), uniqShdConsFrame.end(), shdConsAndFrame) == uniqShdConsFrame.end()) {
+                                uniqShdConsFrame.push_back(shdConsAndFrame);
+                                print(state.files.eio,
+                                      FenestrationShadedStateFormat,
+                                      constructionName,
+                                      stateUValue,
+                                      stateSHGC,
+                                      state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                      state.dataSurface->FrameDivider(frameDivNum).Name,
+                                      NFRCname,
+                                      stateAssemblyUValue,
+                                      stateAssemblySHGC,
+                                      stateAssemblyVT);
+                            }
+                        }
+                    }
+                }
+
                 curWSC = Surface(iSurf).activeWindowShadingControl;
                 // compute totals for area weighted averages
                 fenTotArea += windowAreaWMult;
@@ -814,48 +986,14 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, state.dataSurface->WindowShadingControl(curWSC).Name);
                     // shading report
-                    std::vector<std::string> WindowShadingTypeStr = {
-                        "No Shade",  // 0
-                        "Shade Off", // 1
-                        "Interior Shade",
-                        "Switchable Glazing",
-                        "Exterior Shade",
-                        "Exterior Screen",
-                        "Interior Blind",
-                        "Exterior Blind",
-                        "Between Glass Shade",
-                        "Between Glass Blind",
-                    };
-                    std::vector<std::string> WindowShadingControlTypeStr = {"Uncontrolled",
-                                                                            "AlwaysOn",
-                                                                            "AlwaysOff",
-                                                                            "OnIfScheduleAllows",
-                                                                            "OnIfHighSolarOnWindow",
-                                                                            "OnIfHighHorizontalSolar",
-                                                                            "OnIfHighOutdoorAirTemperature",
-                                                                            "OnIfHighZoneAirTemperature",
-                                                                            "OnIfHighZoneCooling",
-                                                                            "OnIfHighGlare",
-                                                                            "MeetDaylightIlluminanceSetpoint",
-                                                                            "OnNightIfLowOutdoorTempAndOffDay",
-                                                                            "OnNightIfLowInsideTempAndOffDay",
-                                                                            "OnNightIfHeatingAndOffDay",
-                                                                            "OnNightIfLowOutdoorTempAndOnDayIfCooling",
-                                                                            "OnNightIfHeatingAndOnDayIfCooling",
-                                                                            "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
-                                                                            "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
-                                                                            "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
-                                                                            "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
-                                                                            "OnIfHighZoneAirTempAndHighSolarOnWindow",
-                                                                            "OnIfHighZoneAirTempAndHighHorizontalSolar"};
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscShading,
                                      surfName,
-                                     WindowShadingTypeStr[int(state.dataSurface->WindowShadingControl(curWSC).ShadingType)]);
+                                     WindowShadingTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingType)]);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscControl,
                                      surfName,
-                                     WindowShadingControlTypeStr[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
+                                     WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
 
                     // output list of all possible shading contructions for shaded windows including those with storms
                     std::string names = "";
@@ -2125,13 +2263,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
         }
-
-        // Initialize Kiva convection algorithms
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
-        }
+    }
+    // Initialize Kiva convection algorithms
+    for (auto SurfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
     }
     if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -3175,7 +3312,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         // DivProjIn will be zero in this case.)
                         if (DivArea > 0.0) {                                                         // Solar absorbed by window divider
                             Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                            if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                            if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                                 // Suspended (between-glass) divider; account for effect glass on outside of divider
                                 // (note that outside and inside projection for this type of divider are both zero)
                                 int MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(1); // Outer glass layer material number
@@ -3690,7 +3827,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {                     // Window has dividers
                     Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum);    // Window divider thermal absorptance
                     Real64 DividerSolAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                    if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {          // Suspended divider; account for inside glass
+                    if (state.dataSurface->SurfWinDividerType(SurfNum) ==
+                        DataSurfaces::FrameDividerType::Suspended) { // Suspended divider; account for inside glass
                         Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                             state.dataConstruction->Construct(ConstrNum).TotLayers);   // Glass layer material number
                         Real64 TransGl = state.dataMaterial->Material(MatNumGl).Trans; // Glass layer solar transmittance, reflectance, absorptance
@@ -3921,7 +4059,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                 Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
                 // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
-                if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended)
+                if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended)
                     DividerThermAbs = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     // Interior shade or blind in place
@@ -4098,7 +4236,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                                 (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum));
                     if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                         Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                        if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                        if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                             // Suspended (between-glass) divider: account for glass on inside of divider
                             Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                                 state.dataConstruction->Construct(ConstrNum).TotLayers); // Glass material number
@@ -4638,6 +4776,13 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
             state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) =
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum);
         }
+    }
+    // Inside face conduction calculation for Kiva surfaces
+    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
+            -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
     }
 }
 
@@ -6830,8 +6975,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
         if (state.dataHeatBal->AnyKiva) {
             for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
-                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) =
-                    kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv; // TODO: Use average radiant temp? Trad?
+                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - DataGlobalConstants::KelvinConv;
             }
         }
 
@@ -7161,8 +7305,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         // Read Kiva results for each surface
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
                             state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
-                        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) =
-                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
 
                         TH11 = 0.0;
                     }
