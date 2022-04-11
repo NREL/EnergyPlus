@@ -316,7 +316,7 @@ namespace DataBSDFWindow {
     {
         // Members
         int NumStates = 0;               // Number of states for this window
-        int CurrentState = 0;            // Current state of this window
+        int CurrentState = 1;            // Current state of this window
         Array2D<Real64> ResultAllStates; // Array to hold calculated
         // quantities for all states.
         // Currently unallocated.  To be defined when control
