@@ -457,8 +457,8 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<std::array<std::array<Real64, 5>, 5>, 3> gcon = {0.0};            // Gas thermal conductivity coefficients for each gap
     std::array<std::array<std::array<Real64, 5>, 5>, 3> gvis = {0.0};            // Gas viscosity coefficients for each gap
     std::array<std::array<std::array<Real64, 5>, 5>, 3> gcp = {0.0};             // Gas specific-heat coefficients for each gap
-    Array2D<Real64> gwght;           // Gas molecular weights for each gap
-    Array2D<Real64> gfract;          // Gas fractions for each gap
+    std::array<std::array<Real64, 5>, 5> gwght = {0.0};           // Gas molecular weights for each gap
+    std::array<std::array<Real64, 5>, 5> gfract = {0.0};          // Gas fractions for each gap
     Array1D_int gnmix;               // Number of gases in gap
     Array1D<Real64> gap;             // Gap width (m)
     Array1D<Real64> thick;           // Glass layer thickness (m)
@@ -607,8 +607,8 @@ struct WindowManagerData : BaseGlobalStruct
         this->gcon = {0.0};
         this->gvis = {0.0};
         this->gcp = {0.0};
-        this->gwght = Array2D<Real64>(5, 5, 0.0);
-        this->gfract = Array2D<Real64>(5, 5, 0.0);
+        this->gwght = {0.0};
+        this->gfract = {0.0};
         this->gnmix = Array1D_int(5, 0);
         this->gap = Array1D<Real64>(5, 0.0);
         this->thick = Array1D<Real64>(5, 0.0);
@@ -683,7 +683,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : gwght(5, 5, 0.0), gfract(5, 5, 0.0), gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
+        : gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
           AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0), dtheta(5, 0.0),
           ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), sour(10, 0.0),
           delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
