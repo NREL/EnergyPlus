@@ -516,9 +516,9 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbadjPhi = {0.0}; // back reflectance at angle of incidence
 
     std::array<int, 5> numpt = {0};              // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
-    Array1D<Real64> stPhi;          // Glazing system transmittance at angle of incidence for each wavelength in wle
-    Array1D<Real64> srfPhi;         // Glazing system front reflectance at angle of incidence for each wavelength in wle
-    Array1D<Real64> srbPhi;         // Glazing system back reflectance at angle of incidence for each wavelenth in wle
+    std::array<Real64, nume> stPhi = {0.0};          // Glazing system transmittance at angle of incidence for each wavelength in wle
+    std::array<Real64, nume> srfPhi = {0.0};         // Glazing system front reflectance at angle of incidence for each wavelength in wle
+    std::array<Real64, nume> srbPhi = {0.0};         // Glazing system back reflectance at angle of incidence for each wavelenth in wle
     Array2D<Real64> saPhi;          // For each layer, glazing system absorptance at angle of incidence
                                     // for each wavelenth in wle
     Array2D<Real64> top;            // Transmittance matrix for subr. op
@@ -643,9 +643,9 @@ struct WindowManagerData : BaseGlobalStruct
         this->A45 = 0.0;
         this->A67 = 0.0;
         this->numpt = {0};
-        this->stPhi = Array1D<Real64>(nume, 0.0);
-        this->srfPhi = Array1D<Real64>(nume, 0.0);
-        this->srbPhi = Array1D<Real64>(nume, 0.0);
+        this->stPhi = {0.0};
+        this->srfPhi = {0.0};
+        this->srbPhi = {0.0};
         this->saPhi = Array2D<Real64>(5, nume, 0.0);
         this->top = Array2D<Real64>(5, 5, 0.0);
         this->rfop = Array2D<Real64>(5, 5, 0.0);
@@ -690,12 +690,6 @@ struct WindowManagerData : BaseGlobalStruct
           delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
     {
 
-        stPhi.allocate(nume);
-        stPhi = 0.0; // Glazing system transmittance at angle of incidence for each wavelength in wle
-        srfPhi.allocate(nume);
-        srfPhi = 0.0; // Glazing system front reflectance at angle of incidence for each wavelength in wle
-        srbPhi.allocate(nume);
-        srbPhi = 0.0;            // Glazing system back reflectance at angle of incidence for each wavelenth in wle
         saPhi.allocate(5, nume); // For each layer, glazing system absorptance at angle of incidence
         saPhi = 0.0;             // for each wavelenth in wle
         top.allocate(5, 5);      // Transmittance matrix for subr. op

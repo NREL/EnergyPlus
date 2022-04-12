@@ -708,9 +708,9 @@ namespace WindowManager {
 
                 // Get solar properties of system by integrating over solar irradiance spectrum.
                 // For now it is assumed that the exterior and interior irradiance spectra are the same.
-                SolarSprectrumAverage(state, state.dataWindowManager->stPhi, state.dataWindowManager->tsolPhi(IPhi));
-                SolarSprectrumAverage(state, state.dataWindowManager->srfPhi, state.dataWindowManager->rfsolPhi(IPhi));
-                SolarSprectrumAverage(state, state.dataWindowManager->srbPhi, state.dataWindowManager->rbsolPhi(IPhi));
+                state.dataWindowManager->tsolPhi(IPhi) = solarSpectrumAverage(state, state.dataWindowManager->stPhi);
+                state.dataWindowManager->rfsolPhi(IPhi) = solarSpectrumAverage(state, state.dataWindowManager->srfPhi);
+                state.dataWindowManager->rbsolPhi(IPhi) = solarSpectrumAverage(state, state.dataWindowManager->srbPhi);
 
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     for (ILam = 1; ILam <= state.dataWindowManager->nume; ++ILam) {
@@ -727,9 +727,9 @@ namespace WindowManager {
                 // without spectral data, as indicated by the argument "2".
 
                 if (lquasi) SystemSpectralPropertiesAtPhi(state, 2, NGlass, 0.37, 0.78);
-                VisibleSprectrumAverage(state, state.dataWindowManager->stPhi, state.dataWindowManager->tvisPhi(IPhi));
-                VisibleSprectrumAverage(state, state.dataWindowManager->srfPhi, state.dataWindowManager->rfvisPhi(IPhi));
-                VisibleSprectrumAverage(state, state.dataWindowManager->srbPhi, state.dataWindowManager->rbvisPhi(IPhi));
+                state.dataWindowManager->tvisPhi(IPhi) = visibleSpectrumAverage(state, state.dataWindowManager->stPhi);
+                state.dataWindowManager->rfvisPhi(IPhi) = visibleSpectrumAverage(state, state.dataWindowManager->srfPhi);
+                state.dataWindowManager->rbvisPhi(IPhi) = visibleSpectrumAverage(state, state.dataWindowManager->srbPhi);
 
             } // End of loop over incidence angles for front calculation
 
@@ -1936,17 +1936,17 @@ namespace WindowManager {
 
             // Calculate glazing system properties
             if (ngllayer == 1) { // Single-layer system
-                state.dataWindowManager->stPhi(j) = state.dataWindowManager->top(1, 1);
-                state.dataWindowManager->srfPhi(j) = state.dataWindowManager->rfop(1, 1);
-                state.dataWindowManager->srbPhi(j) = state.dataWindowManager->rbop(1, 1);
-                sabsPhi(1) = 1.0 - state.dataWindowManager->stPhi(j) - state.dataWindowManager->srfPhi(j);
+                state.dataWindowManager->stPhi[j-1] = state.dataWindowManager->top(1, 1);
+                state.dataWindowManager->srfPhi[j-1] = state.dataWindowManager->rfop(1, 1);
+                state.dataWindowManager->srbPhi[j-1] = state.dataWindowManager->rbop(1, 1);
+                sabsPhi(1) = 1.0 - state.dataWindowManager->stPhi[j-1] - state.dataWindowManager->srfPhi[j-1];
             } else { // Multilayer system
                 // Get glazing system properties stPhi, etc., at this wavelength and incidence angle
                 SystemPropertiesAtLambdaAndPhi(state,
                                                ngllayer,
-                                               state.dataWindowManager->stPhi(j),
-                                               state.dataWindowManager->srfPhi(j),
-                                               state.dataWindowManager->srbPhi(j),
+                                               state.dataWindowManager->stPhi[j-1],
+                                               state.dataWindowManager->srfPhi[j-1],
+                                               state.dataWindowManager->srbPhi[j-1],
                                                sabsPhi);
             }
 
