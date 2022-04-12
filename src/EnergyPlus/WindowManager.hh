@@ -128,6 +128,7 @@ namespace WindowManager {
 
     void Interpolate(gsl::span<Real64> x, // Array of data points for independent variable
                      gsl::span<Real64> y, // Array of data points for dependent variable
+                     int npts,    // Number of data pairs
                      Real64 xin,  // Given value of x
                      Real64 &yout       // Interpolated value of y at xin
     );

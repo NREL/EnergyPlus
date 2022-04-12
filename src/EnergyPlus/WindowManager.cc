@@ -1905,14 +1905,17 @@ namespace WindowManager {
                     // Interpolate to get properties at the solar spectrum wavelengths
                     Interpolate(state.dataWindowManager->wlt[in-1],
                                 state.dataWindowManager->tPhi[in-1],
+                                state.dataWindowManager->numpt(in),
                                 wl,
                                 state.dataWindowManager->tadjPhi[in-1][iwl-1]);
                     Interpolate(state.dataWindowManager->wlt[in-1],
                                 state.dataWindowManager->rfPhi[in-1],
+                                state.dataWindowManager->numpt(in),
                                 wl,
                                 state.dataWindowManager->rfadjPhi[in-1][iwl-1]);
                     Interpolate(state.dataWindowManager->wlt[in-1],
                                 state.dataWindowManager->rbPhi[in-1],
+                                state.dataWindowManager->numpt(in),
                                 wl,
                                 state.dataWindowManager->rbadjPhi[in-1][iwl-1]);
                 }
@@ -2140,6 +2143,7 @@ namespace WindowManager {
             if (state.dataWindowManager->wle[i-1] >= 0.37 && state.dataWindowManager->wle[i-1] <= 0.78) {
                 Interpolate(state.dataWindowManager->wlt3,
                             state.dataWindowManager->y30,
+                            state.dataWindowManager->numt3,
                             state.dataWindowManager->wle[i-1],
                             y30new);
                 evis = state.dataWindowManager->e[i - 2] * 0.5 * (y30new + y30ils1) *
@@ -2164,6 +2168,7 @@ namespace WindowManager {
             if (state.dataWindowManager->wle[i-1] >= 0.37 && state.dataWindowManager->wle[i-1] <= 0.78) {
                 Interpolate(state.dataWindowManager->wlt3,
                             state.dataWindowManager->y30,
+                            state.dataWindowManager->numt3,
                             state.dataWindowManager->wle[i-1],
                             y30new);
                 Real64 evis = state.dataWindowManager->e[i - 2] * 0.5 * (y30new + y30ils1) *
@@ -2180,6 +2185,7 @@ namespace WindowManager {
 
     void Interpolate(gsl::span<Real64> x, // Array of data points for independent variable
                      gsl::span<Real64> y, // Array of data points for dependent variable
+                     int const npts,    // Number of data pairs
                      Real64 const xin,  // Given value of x
                      Real64 &yout       // Interpolated value of y at xin
     )
@@ -2195,8 +2201,7 @@ namespace WindowManager {
         // Linearly interpolates between data points. Outputs yout, interpolated
         // value of y corresponding to xin
 
-        unsigned int npts = x.size();
-        for (unsigned int i = 1; i <= npts; ++i) {
+        for (int i = 1; i <= npts; ++i) {
             if (xin <= x[i-1]) {
                 if (i-1 == 0) {
                     yout = y[0];
