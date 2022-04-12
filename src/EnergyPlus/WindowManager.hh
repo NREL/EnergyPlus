@@ -113,6 +113,8 @@ namespace WindowManager {
                                Real64 &psol       // Quantity p weighted by solar spectrum
     );
 
+    Real64 solarSpectrumAverage(EnergyPlusData &state, gsl::span<Real64> p);
+
     //********************************************************************
 
     void VisibleSprectrumAverage(EnergyPlusData &state,
@@ -120,12 +122,13 @@ namespace WindowManager {
                                  Real64 &pvis       // Quantity p weighted by solar spectrum and photopic
     );
 
+    Real64 visibleSpectrumAverage(EnergyPlusData &state, gsl::span<Real64> p);
+
     //**********************************************************************
 
-    void Interpolate(Array1A<Real64> x, // Array of data points for independent variable
-                     Array1A<Real64> y, // Array of data points for dependent variable
-                     int const npts,    // Number of data pairs
-                     Real64 const xin,  // Given value of x
+    void Interpolate(gsl::span<Real64> x, // Array of data points for independent variable
+                     gsl::span<Real64> y, // Array of data points for dependent variable
+                     Real64 xin,  // Given value of x
                      Real64 &yout       // Interpolated value of y at xin
     );
 
@@ -489,8 +492,9 @@ struct WindowManagerData : BaseGlobalStruct
     static int constexpr nume = 107;       // Number of wavelength values in solar spectrum
     static int constexpr numt3 = 81;      // Number of wavelength values in the photopic response
 
-    //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
-    Array1D<Real64> AirProps;
+    //                                      Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
+    std::array<Real64, 8> const AirProps = {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3};
+
     // Air mass 1.5 terrestrial solar global spectral irradiance (W/m2-micron)
     // on a 37 degree tilted surface; corresponds
     // to wavelengths (microns) in following data block (ISO 9845-1 and ASTM E 892;
@@ -505,17 +509,34 @@ struct WindowManagerData : BaseGlobalStruct
                                     1.4970, 1.5200, 1.5390, 1.5580, 1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850,
                                     2.0050, 2.0350, 2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370};
 
-    Array1D<Real64> e; // Solar spectrum values corresponding to wle
+    // Solar spectrum values corresponding to wle
+    std::array<Real64, nume> e = {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,  720.7,  1013.1,
+                                  1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9, 1572.4, 1550.7, 1561.5, 1501.5,
+                                  1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2, 1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6,
+                                  849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,  690.3,  403.6,  258.3,  313.6,  526.8,  646.4,  746.8,  690.5,
+                                  637.5,  412.6,  108.9,  189.1,  132.2,  339.0,  460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,
+                                  182.1,  262.2,  274.2,  275.0,  244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,
+                                  26.8,   99.5,   60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2};
 
     // Phototopic response function and corresponding wavelengths (microns)
     // (CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers;
     // derived from Optics5 data file "CIE 1931 Color Match from E308.txt", which is
     // the same as WINDOW4 file Cie31t.dat)
-    Array1D<Real64> wlt3; // Wavelength values for photopic response
+    // Wavelength values for photopic response
+    std::array<Real64, numt3> wlt3 = {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445,
+                                      0.450, 0.455, 0.460, 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515,
+                                      0.520, 0.525, 0.530, 0.535, 0.540, 0.545, 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585,
+                                      0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630, 0.635, 0.640, 0.645, 0.650, 0.655,
+                                      0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715, 0.720, 0.725,
+                                      0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780};
 
-    Array1D<Real64> y30; // Photopic response
-                         // corresponding to
-                         // wavelengths in wlt3
+    // Photopic response corresponding to wavelengths in wlt3
+    std::array<Real64, numt3> y30 = {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
+                                     0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
+                                     0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
+                                     0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
+                                     0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
+                                     0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
 
     int ngllayer;                    // Number of glass layers
     int nglface;                     // Number of glass faces
@@ -582,17 +603,18 @@ struct WindowManagerData : BaseGlobalStruct
     static int constexpr MaxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
     // TEMP MOVED FROM DataHeatBalance.hh -BLB
 
-    Array2D<Real64> wlt;      // Spectral data wavelengths for each glass layer in a glazing system
-                              // Following data, Spectral data for each layer for each wavelength in wlt
-    Array2D<Real64> t;        // normal transmittance
-    Array2D<Real64> rff;      // normal front reflectance
-    Array2D<Real64> rbb;      // normal back reflectance
-    Array2D<Real64> tPhi;     // transmittance at angle of incidence
-    Array2D<Real64> rfPhi;    // front reflectance at angle of incidence
-    Array2D<Real64> rbPhi;    // back reflectance at angle of incidence
-    Array2D<Real64> tadjPhi;  // transmittance at angle of incidence
-    Array2D<Real64> rfadjPhi; // front reflectance at angle of incidence
-    Array2D<Real64> rbadjPhi; // back reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> wlt = {0};      // Spectral data wavelengths for each glass layer in a glazing system
+
+    // Following data, Spectral data for each layer for each wavelength in wlt
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> t = {0};        // normal transmittance
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rff = {0};      // normal front reflectance
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbb = {0};      // normal back reflectance
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tPhi = {0};     // transmittance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfPhi = {0};    // front reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbPhi = {0};    // back reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tadjPhi = {0};  // transmittance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfadjPhi = {0}; // front reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbadjPhi = {0}; // back reflectance at angle of incidence
 
     Array1D_int numpt;              // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
     Array1D<Real64> stPhi;          // Glazing system transmittance at angle of incidence for each wavelength in wle
@@ -681,27 +703,6 @@ struct WindowManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->e = Array1D<Real64>(
-            nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,  720.7,  1013.1,
-                   1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9, 1572.4, 1550.7, 1561.5, 1501.5,
-                   1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2, 1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6,
-                   849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,  690.3,  403.6,  258.3,  313.6,  526.8,  646.4,  746.8,  690.5,
-                   637.5,  412.6,  108.9,  189.1,  132.2,  339.0,  460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,
-                   182.1,  262.2,  274.2,  275.0,  244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,
-                   26.8,   99.5,   60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2});
-        this->wlt3 = Array1D<Real64>(numt3, {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445,
-                                             0.450, 0.455, 0.460, 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515,
-                                             0.520, 0.525, 0.530, 0.535, 0.540, 0.545, 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585,
-                                             0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630, 0.635, 0.640, 0.645, 0.650, 0.655,
-                                             0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715, 0.720, 0.725,
-                                             0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780});
-        this->y30 =
-            Array1D<Real64>(numt3, {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
-                                    0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
-                                    0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
-                                    0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
-                                    0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
-                                    0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000});
         this->ngllayer = 0;
         this->nglface = 0;
         this->nglfacep = 0;
@@ -757,16 +758,16 @@ struct WindowManagerData : BaseGlobalStruct
         this->A23 = 0.0;
         this->A45 = 0.0;
         this->A67 = 0.0;
-        this->wlt = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->t = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->rff = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->rbb = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->tPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->rfPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->rbPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->tadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->rfadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        this->rbadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->wlt = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->t = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->rff = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->rbb = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->tPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->rfPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->rbPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->tadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->rfadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+//        this->rbadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
         this->numpt = Array1D_int(5, 0);
         this->stPhi = Array1D<Real64>(nume, 0.0);
         this->srfPhi = Array1D<Real64>(nume, 0.0);
@@ -822,50 +823,28 @@ struct WindowManagerData : BaseGlobalStruct
           ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), dhf(5, 10, 0.0), sour(10, 0.0),
           delta(5, 0.0), hcgap(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0), arhs(6, 0.0)
     {
-        AirProps.allocate(8);
-        AirProps = {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3};
-        e.allocate(nume);
-        e = {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,  720.7,  1013.1,
-             1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9, 1572.4, 1550.7, 1561.5, 1501.5,
-             1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2, 1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6,
-             849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,  690.3,  403.6,  258.3,  313.6,  526.8,  646.4,  746.8,  690.5,
-             637.5,  412.6,  108.9,  189.1,  132.2,  339.0,  460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,
-             182.1,  262.2,  274.2,  275.0,  244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,
-             26.8,   99.5,   60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2};
-        wlt3.allocate(numt3);
-        wlt3 = {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445, 0.450, 0.455, 0.460,
-                0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515, 0.520, 0.525, 0.530, 0.535, 0.540, 0.545,
-                0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585, 0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630,
-                0.635, 0.640, 0.645, 0.650, 0.655, 0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715,
-                0.720, 0.725, 0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780};
-        y30.allocate(numt3);
-        y30 = {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298, 0.0380, 0.0480, 0.0600,
-               0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082, 0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803,
-               0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163, 0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650,
-               0.2170, 0.1750, 0.1382, 0.1070, 0.0816, 0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015,
-               0.0010, 0.0007, 0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
 
-        wlt.allocate(5, MaxSpectralDataElements);
-        wlt = 0.0;
+//        wlt.allocate(5, MaxSpectralDataElements);
+//        wlt = 0.0;
 
-        t.allocate(5, MaxSpectralDataElements);
-        t = (0.0); // normal transmittance
-        rff.allocate(5, MaxSpectralDataElements);
-        rff = (0.0); // normal front reflectance
-        rbb.allocate(5, MaxSpectralDataElements);
-        rbb = (0.0); // normal back reflectance
-        tPhi.allocate(5, MaxSpectralDataElements);
-        tPhi = (0.0); // transmittance at angle of incidence
-        rfPhi.allocate(5, MaxSpectralDataElements);
-        rfPhi = (0.0); // front reflectance at angle of incidence
-        rbPhi.allocate(5, MaxSpectralDataElements);
-        rbPhi = (0.0); // back reflectance at angle of incidence
-        tadjPhi.allocate(5, MaxSpectralDataElements);
-        tadjPhi = (0.0); // transmittance at angle of incidence
-        rfadjPhi.allocate(5, MaxSpectralDataElements);
-        rfadjPhi = (0.0); // front reflectance at angle of incidence
-        rbadjPhi.allocate(5, MaxSpectralDataElements);
-        rbadjPhi = (0.0); // back reflectance at angle of incidence
+//        t.allocate(5, MaxSpectralDataElements);
+//        t = (0.0); // normal transmittance
+//        rff.allocate(5, MaxSpectralDataElements);
+//        rff = (0.0); // normal front reflectance
+//        rbb.allocate(5, MaxSpectralDataElements);
+//        rbb = (0.0); // normal back reflectance
+//        tPhi.allocate(5, MaxSpectralDataElements);
+//        tPhi = (0.0); // transmittance at angle of incidence
+//        rfPhi.allocate(5, MaxSpectralDataElements);
+//        rfPhi = (0.0); // front reflectance at angle of incidence
+//        rbPhi.allocate(5, MaxSpectralDataElements);
+//        rbPhi = (0.0); // back reflectance at angle of incidence
+//        tadjPhi.allocate(5, MaxSpectralDataElements);
+//        tadjPhi = (0.0); // transmittance at angle of incidence
+//        rfadjPhi.allocate(5, MaxSpectralDataElements);
+//        rfadjPhi = (0.0); // front reflectance at angle of incidence
+//        rbadjPhi.allocate(5, MaxSpectralDataElements);
+//        rbadjPhi = (0.0); // back reflectance at angle of incidence
 
         numpt.allocate(5); // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
         numpt = 0;
