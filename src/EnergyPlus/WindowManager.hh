@@ -521,9 +521,10 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<Real64, nume> srbPhi = {0.0};         // Glazing system back reflectance at angle of incidence for each wavelenth in wle
     Array2D<Real64> saPhi;          // For each layer, glazing system absorptance at angle of incidence
                                     // for each wavelenth in wle
-    Array2D<Real64> top;            // Transmittance matrix for subr. op
-    Array2D<Real64> rfop;           // Front reflectance matrix for subr. op
-    Array2D<Real64> rbop;           // Back transmittance matrix for subr. op
+    std::array<std::array<Real64, 5>, 5> top = {0.0};            // Transmittance matrix for subr. op
+    std::array<std::array<Real64, 5>, 5> rfop = {0.0};           // Front reflectance matrix for subr. op
+    std::array<std::array<Real64, 5>, 5> rbop = {0.0};           // Back transmittance matrix for subr. op
+
     Array1D<Real64> DepVarCurveFit; // Values of dependent variable corresponding to IndepVarCurveFit values
     Array1D<Real64> CoeffsCurveFit; // Polynomial coefficients from curve fit
     Array1D<Real64> tsolPhi;        // Glazing system solar transmittance for each angle of incidence
@@ -647,9 +648,9 @@ struct WindowManagerData : BaseGlobalStruct
         this->srfPhi = {0.0};
         this->srbPhi = {0.0};
         this->saPhi = Array2D<Real64>(5, nume, 0.0);
-        this->top = Array2D<Real64>(5, 5, 0.0);
-        this->rfop = Array2D<Real64>(5, 5, 0.0);
-        this->rbop = Array2D<Real64>(5, 5, 0.0);
+        this->top = {0.0};
+        this->rfop = {0.0};
+        this->rbop = {0.0};
         this->DepVarCurveFit = Array1D<Real64>(10, 0.0);
         this->CoeffsCurveFit = Array1D<Real64>(6, 0.0);
         this->tsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
@@ -691,12 +692,6 @@ struct WindowManagerData : BaseGlobalStruct
 
         saPhi.allocate(5, nume); // For each layer, glazing system absorptance at angle of incidence
         saPhi = 0.0;             // for each wavelenth in wle
-        top.allocate(5, 5);      // Transmittance matrix for subr. op
-        top = 0.0;
-        rfop.allocate(5, 5); // Front reflectance matrix for subr. op
-        rfop = 0.0;
-        rbop.allocate(5, 5); // Back transmittance matrix for subr. op
-        rbop = 0.0;
         DepVarCurveFit.allocate(MaxNumOfIncidentAngles); // Values of dependent variable corresponding to IndepVarCurveFit values
         DepVarCurveFit = 0.0;
         CoeffsCurveFit.allocate(6); // Polynomial coefficients from curve fit

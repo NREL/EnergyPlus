@@ -1929,16 +1929,16 @@ namespace WindowManager {
 
             // Set diagonal of matrix for subroutine SystemPropertiesAtLambdaAndPhi
             for (i = 1; i <= ngllayer; ++i) {
-                state.dataWindowManager->top(i, i) = state.dataWindowManager->tadjPhi[i-1][j-1];
-                state.dataWindowManager->rfop(i, i) = state.dataWindowManager->rfadjPhi[i-1][j-1];
-                state.dataWindowManager->rbop(i, i) = state.dataWindowManager->rbadjPhi[i-1][j-1];
+                state.dataWindowManager->top[i-1][i-1] = state.dataWindowManager->tadjPhi[i-1][j-1];
+                state.dataWindowManager->rfop[i-1][i-1] = state.dataWindowManager->rfadjPhi[i-1][j-1];
+                state.dataWindowManager->rbop[i-1][i-1] = state.dataWindowManager->rbadjPhi[i-1][j-1];
             }
 
             // Calculate glazing system properties
             if (ngllayer == 1) { // Single-layer system
-                state.dataWindowManager->stPhi[j-1] = state.dataWindowManager->top(1, 1);
-                state.dataWindowManager->srfPhi[j-1] = state.dataWindowManager->rfop(1, 1);
-                state.dataWindowManager->srbPhi[j-1] = state.dataWindowManager->rbop(1, 1);
+                state.dataWindowManager->stPhi[j-1] = state.dataWindowManager->top[0][0];
+                state.dataWindowManager->srfPhi[j-1] = state.dataWindowManager->rfop[0][0];
+                state.dataWindowManager->srbPhi[j-1] = state.dataWindowManager->rbop[0][0];
                 sabsPhi(1) = 1.0 - state.dataWindowManager->stPhi[j-1] - state.dataWindowManager->srfPhi[j-1];
             } else { // Multilayer system
                 // Get glazing system properties stPhi, etc., at this wavelength and incidence angle
@@ -1997,24 +1997,24 @@ namespace WindowManager {
         // Calculate perimeter elements of rt matrix
         for (i = 1; i <= n - 1; ++i) {
             for (j = i + 1; j <= n; ++j) {
-                denom = 1.0 - state.dataWindowManager->rfop(j, j) * state.dataWindowManager->rbop(i, j - 1);
+                denom = 1.0 - state.dataWindowManager->rfop[j-1][j-1] * state.dataWindowManager->rbop[i-1][j - 2];
                 if (denom == 0.0) {
-                    state.dataWindowManager->top(j, i) = 0.0;
-                    state.dataWindowManager->rfop(j, i) = 1.0;
-                    state.dataWindowManager->rbop(i, j) = 1.0;
+                    state.dataWindowManager->top[j-1][i-1] = 0.0;
+                    state.dataWindowManager->rfop[j-1][i-1] = 1.0;
+                    state.dataWindowManager->rbop[i-1][j-1] = 1.0;
                 } else {
-                    state.dataWindowManager->top(j, i) = state.dataWindowManager->top(j - 1, i) * state.dataWindowManager->top(j, j) / denom;
-                    state.dataWindowManager->rfop(j, i) = state.dataWindowManager->rfop(j - 1, i) +
-                                                          pow_2(state.dataWindowManager->top(j - 1, i)) * state.dataWindowManager->rfop(j, j) / denom;
-                    state.dataWindowManager->rbop(i, j) = state.dataWindowManager->rbop(j, j) +
-                                                          pow_2(state.dataWindowManager->top(j, j)) * state.dataWindowManager->rbop(i, j - 1) / denom;
+                    state.dataWindowManager->top[j-1][i-1] = state.dataWindowManager->top[j - 2][i-1] * state.dataWindowManager->top[j-1][j-1] / denom;
+                    state.dataWindowManager->rfop[j-1][i-1] = state.dataWindowManager->rfop[j - 2][i-1] +
+                                                          pow_2(state.dataWindowManager->top[j - 2][i-1]) * state.dataWindowManager->rfop[j-1][j-1] / denom;
+                    state.dataWindowManager->rbop[i-1][j-1] = state.dataWindowManager->rbop[j-1][j-1] +
+                                                          pow_2(state.dataWindowManager->top[j-1][j-1]) * state.dataWindowManager->rbop[i-1][j - 2] / denom;
                 }
             }
         }
         // System properties: transmittance, front and back reflectance
-        tt = state.dataWindowManager->top(n, 1);
-        rft = state.dataWindowManager->rfop(n, 1);
-        rbt = state.dataWindowManager->rbop(1, n);
+        tt = state.dataWindowManager->top[n-1][0];
+        rft = state.dataWindowManager->rfop[n-1][0];
+        rbt = state.dataWindowManager->rbop[0][n-1];
 
         // Absorptance in each layer
         for (j = 1; j <= n; ++j) {
@@ -2022,25 +2022,25 @@ namespace WindowManager {
                 t0 = 1.0;
                 rb0 = 0.0;
             } else {
-                t0 = state.dataWindowManager->top(j - 1, 1);
-                rb0 = state.dataWindowManager->rbop(1, j - 1);
+                t0 = state.dataWindowManager->top[j - 2][0];
+                rb0 = state.dataWindowManager->rbop[0][j-2];
             }
 
             if (j == n) {
                 rf0 = 0.0;
             } else {
-                rf0 = state.dataWindowManager->rfop(n, j + 1);
+                rf0 = state.dataWindowManager->rfop[n-1][j];
             }
 
-            af = 1.0 - state.dataWindowManager->top(j, j) - state.dataWindowManager->rfop(j, j);
-            ab = 1.0 - state.dataWindowManager->top(j, j) - state.dataWindowManager->rbop(j, j);
-            denom1 = 1.0 - state.dataWindowManager->rfop(n, j) * rb0;
-            denom2 = 1.0 - state.dataWindowManager->rbop(1, j) * rf0;
+            af = 1.0 - state.dataWindowManager->top[j-1][j-1] - state.dataWindowManager->rfop[j-1][j-1];
+            ab = 1.0 - state.dataWindowManager->top[j-1][j-1] - state.dataWindowManager->rbop[j-1][j-1];
+            denom1 = 1.0 - state.dataWindowManager->rfop[n-1][j-1] * rb0;
+            denom2 = 1.0 - state.dataWindowManager->rbop[0][j-1] * rf0;
 
             if (denom1 == 0.0 || denom2 == 0.0) {
                 aft(j) = 0.0;
             } else {
-                aft(j) = (t0 * af) / denom1 + (state.dataWindowManager->top(j, 1) * rf0 * ab) / denom2;
+                aft(j) = (t0 * af) / denom1 + (state.dataWindowManager->top[j-1][0] * rf0 * ab) / denom2;
             }
         }
     }
