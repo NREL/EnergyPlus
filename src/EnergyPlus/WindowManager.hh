@@ -441,22 +441,22 @@ struct WindowManagerData : BaseGlobalStruct
                                      0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
                                      0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
 
-    int ngllayer;                    // Number of glass layers
-    int nglface;                     // Number of glass faces
-    int nglfacep;                    // Number of glass faces, + 2 if shade layer present
-    Real64 tout;                     // Outside air temperature (K)
-    Real64 tin;                      // Inside air temperature (previous timestep) (K)
-    Real64 tilt;                     // Window tilt (deg)
-    Real64 tiltr;                    // Window tilt (radians)
-    Real64 hcin;                     // Convective inside air film conductance (W/m2-K)
-    Real64 hcout;                    // Convective outside air film conductance (W/m2-K)
-    Real64 Ebout;                    // Sigma*(outside air temp)**4 (W/m2)
-    Real64 Outir;                    // IR radiance of window's exterior surround (W/m2)
-    Real64 Rmir;                     // IR radiance of window's interior surround (W/m2)
-    Real64 Rtot;                     // Total thermal resistance of window (m2-K/W)
-    Array3D<Real64> gcon;            // Gas thermal conductivity coefficients for each gap
-    Array3D<Real64> gvis;            // Gas viscosity coefficients for each gap
-    Array3D<Real64> gcp;             // Gas specific-heat coefficients for each gap
+    int ngllayer = 0;                    // Number of glass layers
+    int nglface = 0;                     // Number of glass faces
+    int nglfacep = 0;                    // Number of glass faces, + 2 if shade layer present
+    Real64 tout = 0.0;                     // Outside air temperature (K)
+    Real64 tin = 0.0;                      // Inside air temperature (previous timestep) (K)
+    Real64 tilt = 0.0;                     // Window tilt (deg)
+    Real64 tiltr = 0.0;                    // Window tilt (radians)
+    Real64 hcin = 0.0;                     // Convective inside air film conductance (W/m2-K)
+    Real64 hcout = 0.0;                    // Convective outside air film conductance (W/m2-K)
+    Real64 Ebout = 0.0;                    // Sigma*(outside air temp)**4 (W/m2)
+    Real64 Outir = 0.0;                    // IR radiance of window's exterior surround (W/m2)
+    Real64 Rmir = 0.0;                     // IR radiance of window's interior surround (W/m2)
+    Real64 Rtot = 0.0;                     // Total thermal resistance of window (m2-K/W)
+    std::array<std::array<std::array<Real64, 5>, 5>, 3> gcon = {0.0};            // Gas thermal conductivity coefficients for each gap
+    std::array<std::array<std::array<Real64, 5>, 5>, 3> gvis = {0.0};            // Gas viscosity coefficients for each gap
+    std::array<std::array<std::array<Real64, 5>, 5>, 3> gcp = {0.0};             // Gas specific-heat coefficients for each gap
     Array2D<Real64> gwght;           // Gas molecular weights for each gap
     Array2D<Real64> gfract;          // Gas fractions for each gap
     Array1D_int gnmix;               // Number of gases in gap
@@ -488,15 +488,15 @@ struct WindowManagerData : BaseGlobalStruct
                                      //   (inverse of hcgap + hrgap)
     Array1D<Real64> rs;              // Outside film convective resistance, gap resistances,
                                      //   inside air film convective resistance
-    Real64 A23P; // Intermediate variables in glass face
-    Real64 A32P;
-    Real64 A45P;
-    Real64 A54P;
-    Real64 A67P;
-    Real64 A76P;
-    Real64 A23; // heat balance equations
-    Real64 A45;
-    Real64 A67;
+    Real64 A23P = 0.0; // Intermediate variables in glass face
+    Real64 A32P = 0.0;
+    Real64 A45P = 0.0;
+    Real64 A54P = 0.0;
+    Real64 A67P = 0.0;
+    Real64 A76P = 0.0;
+    Real64 A23 = 0.0; // heat balance equations
+    Real64 A45 = 0.0;
+    Real64 A67 = 0.0;
 
     static int constexpr MaxNumOfIncidentAngles = 20;
     static int constexpr MaxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
@@ -604,9 +604,9 @@ struct WindowManagerData : BaseGlobalStruct
         this->Outir = 0.0;
         this->Rmir = 0.0;
         this->Rtot = 0.0;
-        this->gcon = Array3D<Real64>(3, 5, 5, 0.0);
-        this->gvis = Array3D<Real64>(3, 5, 5, 0.0);
-        this->gcp = Array3D<Real64>(3, 5, 5, 0.0);
+        this->gcon = {0.0};
+        this->gvis = {0.0};
+        this->gcp = {0.0};
         this->gwght = Array2D<Real64>(5, 5, 0.0);
         this->gfract = Array2D<Real64>(5, 5, 0.0);
         this->gnmix = Array1D_int(5, 0);
@@ -683,8 +683,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0),
-          gwght(5, 5, 0.0), gfract(5, 5, 0.0), gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
+        : gwght(5, 5, 0.0), gfract(5, 5, 0.0), gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
           AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0), dtheta(5, 0.0),
           ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), sour(10, 0.0),
           delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)

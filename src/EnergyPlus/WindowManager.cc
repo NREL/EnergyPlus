@@ -2637,9 +2637,9 @@ namespace WindowManager {
                         state.dataWindowManager->gwght(IMix, IGap) = state.dataMaterial->Material(LayPtr).GasWght(IMix);
                         state.dataWindowManager->gfract(IMix, IGap) = state.dataMaterial->Material(LayPtr).GasFract(IMix);
                         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                            state.dataWindowManager->gcon(ICoeff, IMix, IGap) = state.dataMaterial->Material(LayPtr).GasCon(ICoeff, IMix);
-                            state.dataWindowManager->gvis(ICoeff, IMix, IGap) = state.dataMaterial->Material(LayPtr).GasVis(ICoeff, IMix);
-                            state.dataWindowManager->gcp(ICoeff, IMix, IGap) = state.dataMaterial->Material(LayPtr).GasCp(ICoeff, IMix);
+                            state.dataWindowManager->gcon[ICoeff-1][IMix-1][IGap-1] = state.dataMaterial->Material(LayPtr).GasCon(ICoeff, IMix);
+                            state.dataWindowManager->gvis[ICoeff-1][IMix-1][IGap-1] = state.dataMaterial->Material(LayPtr).GasVis(ICoeff, IMix);
+                            state.dataWindowManager->gcp[ICoeff-1][IMix-1][IGap-1] = state.dataMaterial->Material(LayPtr).GasCp(ICoeff, IMix);
                         }
                     }
                 }
@@ -2659,9 +2659,9 @@ namespace WindowManager {
                 state.dataWindowManager->gnmix(IGap) = 1;
                 state.dataWindowManager->gwght(1, IGap) = GasWght[0];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataWindowManager->gcon(ICoeff, 1, IGap) = GasCoeffsCon[ICoeff - 1][0];
-                    state.dataWindowManager->gvis(ICoeff, 1, IGap) = GasCoeffsVis[ICoeff - 1][0];
-                    state.dataWindowManager->gcp(ICoeff, 1, IGap) = GasCoeffsCp[ICoeff - 1][0];
+                    state.dataWindowManager->gcon[ICoeff-1][0][IGap-1] = GasCoeffsCon[ICoeff - 1][0];
+                    state.dataWindowManager->gvis[ICoeff-1][0][IGap-1] = GasCoeffsVis[ICoeff - 1][0];
+                    state.dataWindowManager->gcp[ICoeff-1][0][IGap-1] = GasCoeffsCp[ICoeff - 1][0];
                 }
             }
 
@@ -4971,12 +4971,9 @@ namespace WindowManager {
         Real64 const tmean(0.5 * (tleft + tright)); // Average gap gas temperature (K)
         Real64 const tmean_2(pow_2(tmean));
 
-        fcon(1) = state.dataWindowManager->gcon(1, 1, IGap) + state.dataWindowManager->gcon(2, 1, IGap) * tmean +
-                  state.dataWindowManager->gcon(3, 1, IGap) * tmean_2;
-        fvis(1) = state.dataWindowManager->gvis(1, 1, IGap) + state.dataWindowManager->gvis(2, 1, IGap) * tmean +
-                  state.dataWindowManager->gvis(3, 1, IGap) * tmean_2;
-        fcp(1) = state.dataWindowManager->gcp(1, 1, IGap) + state.dataWindowManager->gcp(2, 1, IGap) * tmean +
-                 state.dataWindowManager->gcp(3, 1, IGap) * tmean_2;
+        fcon(1) = state.dataWindowManager->gcon[0][0][IGap-1] + state.dataWindowManager->gcon[1][0][IGap-1] * tmean + state.dataWindowManager->gcon[2][0][IGap-1] * tmean_2;
+        fvis(1) = state.dataWindowManager->gvis[0][0][IGap-1] + state.dataWindowManager->gvis[1][0][IGap-1] * tmean + state.dataWindowManager->gvis[2][0][IGap-1] * tmean_2;
+        fcp(1) = state.dataWindowManager->gcp[0][0][IGap-1] + state.dataWindowManager->gcp[1][0][IGap-1] * tmean + state.dataWindowManager->gcp[2][0][IGap-1] * tmean_2;
         fdens(1) = pres * state.dataWindowManager->gwght(1, IGap) / (gaslaw * tmean); // Density using ideal gas law:
         //  rho=(presure*molecweight)/(gasconst*tmean)
 
@@ -5001,12 +4998,9 @@ namespace WindowManager {
 
             // Calculate properties of mixture constituents
             for (i = 2; i <= NMix; ++i) {
-                fcon(i) = state.dataWindowManager->gcon(1, i, IGap) + state.dataWindowManager->gcon(2, i, IGap) * tmean +
-                          state.dataWindowManager->gcon(3, i, IGap) * tmean_2;
-                fvis(i) = state.dataWindowManager->gvis(1, i, IGap) + state.dataWindowManager->gvis(2, i, IGap) * tmean +
-                          state.dataWindowManager->gvis(3, i, IGap) * tmean_2;
-                fcp(i) = state.dataWindowManager->gcp(1, i, IGap) + state.dataWindowManager->gcp(2, i, IGap) * tmean +
-                         state.dataWindowManager->gcp(3, i, IGap) * tmean_2;
+                fcon(i) = state.dataWindowManager->gcon[0][i-1][IGap-1] + state.dataWindowManager->gcon[1][i-1][IGap-1] * tmean + state.dataWindowManager->gcon[2][i-1][IGap-1] * tmean_2;
+                fvis(i) = state.dataWindowManager->gvis[0][i-1][IGap-1] + state.dataWindowManager->gvis[1][i-1][IGap-1] * tmean + state.dataWindowManager->gvis[2][i-1][IGap-1] * tmean_2;
+                fcp(i) = state.dataWindowManager->gcp[0][i-1][IGap-1] + state.dataWindowManager->gcp[1][i-1][IGap-1] * tmean + state.dataWindowManager->gcp[2][i-1][IGap-1] * tmean_2;
                 fdens(i) = pres * state.dataWindowManager->gwght(i, IGap) / (gaslaw * tmean);
                 molmix += frct(i) * state.dataWindowManager->gwght(i, IGap);                   // eq. 56
                 cpmixm += frct(i) * fcp(i) * state.dataWindowManager->gwght(i, IGap);          // eq. 58-59
@@ -5115,8 +5109,7 @@ namespace WindowManager {
         }
 
         Real64 const tmean_2(pow_2(tmean));
-        fvis(1) = state.dataWindowManager->gvis(1, 1, IGap) + state.dataWindowManager->gvis(2, 1, IGap) * tmean +
-                  state.dataWindowManager->gvis(3, 1, IGap) * tmean_2;
+        fvis(1) = state.dataWindowManager->gvis[0][0][IGap-1] + state.dataWindowManager->gvis[1][0][IGap-1] * tmean + state.dataWindowManager->gvis[2][0][IGap-1] * tmean_2;
         fdens(1) = pres * state.dataWindowManager->gwght(1, IGap) / (gaslaw * tmean); // Density using ideal gas law:
         //  rho=(presure*molecweight)/(gasconst*tmean)
         if (NMix == 1) { // Single gas
@@ -5131,8 +5124,8 @@ namespace WindowManager {
 
             // Calculate properties of mixture constituents
             for (i = 2; i <= NMix; ++i) {
-                fvis(i) = state.dataWindowManager->gvis(1, i, IGap) + state.dataWindowManager->gvis(2, i, IGap) * tmean +
-                          state.dataWindowManager->gvis(3, i, IGap) * tmean_2;
+                fvis(i) = state.dataWindowManager->gvis[0][i-1][IGap-1] + state.dataWindowManager->gvis[1][i-1][IGap-1] * tmean +
+                          state.dataWindowManager->gvis[2][i-1][IGap-1] * tmean_2;
                 fdens(i) = pres * state.dataWindowManager->gwght(i, IGap) / (gaslaw * tmean);
                 molmix += frct(i) * state.dataWindowManager->gwght(i, IGap); // eq. 56
                 mukpdwn(i) = 1.0;                                            // initialize denomonator of eq. 60
@@ -6937,9 +6930,9 @@ namespace WindowManager {
                     state.dataWindowManager->gwght(IMix, IGap) = state.dataMaterial->Material(LayPtr).GasWght(IMix);
                     state.dataWindowManager->gfract(IMix, IGap) = state.dataMaterial->Material(LayPtr).GasFract(IMix);
                     for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        state.dataWindowManager->gcon(ICoeff, IMix, IGap) = state.dataMaterial->Material(LayPtr).GasCon(ICoeff, IMix);
-                        state.dataWindowManager->gvis(ICoeff, IMix, IGap) = state.dataMaterial->Material(LayPtr).GasVis(ICoeff, IMix);
-                        state.dataWindowManager->gcp(ICoeff, IMix, IGap) = state.dataMaterial->Material(LayPtr).GasCp(ICoeff, IMix);
+                        state.dataWindowManager->gcon[ICoeff-1][IMix-1][IGap-1] = state.dataMaterial->Material(LayPtr).GasCon(ICoeff, IMix);
+                        state.dataWindowManager->gvis[ICoeff-1][IMix-1][IGap-1] = state.dataMaterial->Material(LayPtr).GasVis(ICoeff, IMix);
+                        state.dataWindowManager->gcp[ICoeff-1][IMix-1][IGap-1] = state.dataMaterial->Material(LayPtr).GasCp(ICoeff, IMix);
                     }
                 }
             }
@@ -7018,8 +7011,8 @@ namespace WindowManager {
             int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-                    int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                    state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                    int ConstrNum2 = state.dataSurface->Surface(SurfNum).Construction;
+                    state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum2);
                 }
             }
         }
