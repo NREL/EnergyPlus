@@ -502,20 +502,20 @@ struct WindowManagerData : BaseGlobalStruct
     static int constexpr MaxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
     // TEMP MOVED FROM DataHeatBalance.hh -BLB
 
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> wlt = {0};      // Spectral data wavelengths for each glass layer in a glazing system
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> wlt = {0.0};      // Spectral data wavelengths for each glass layer in a glazing system
 
     // Following data, Spectral data for each layer for each wavelength in wlt
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> t = {0};        // normal transmittance
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rff = {0};      // normal front reflectance
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbb = {0};      // normal back reflectance
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tPhi = {0};     // transmittance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfPhi = {0};    // front reflectance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbPhi = {0};    // back reflectance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tadjPhi = {0};  // transmittance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfadjPhi = {0}; // front reflectance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbadjPhi = {0}; // back reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> t = {0.0};        // normal transmittance
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rff = {0.0};      // normal front reflectance
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbb = {0.0};      // normal back reflectance
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tPhi = {0.0};     // transmittance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfPhi = {0.0};    // front reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbPhi = {0.0};    // back reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tadjPhi = {0.0};  // transmittance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfadjPhi = {0.0}; // front reflectance at angle of incidence
+    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbadjPhi = {0.0}; // back reflectance at angle of incidence
 
-    Array1D_int numpt;              // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
+    std::array<int, 5> numpt = {0};              // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
     Array1D<Real64> stPhi;          // Glazing system transmittance at angle of incidence for each wavelength in wle
     Array1D<Real64> srfPhi;         // Glazing system front reflectance at angle of incidence for each wavelength in wle
     Array1D<Real64> srbPhi;         // Glazing system back reflectance at angle of incidence for each wavelenth in wle
@@ -642,7 +642,7 @@ struct WindowManagerData : BaseGlobalStruct
         this->A23 = 0.0;
         this->A45 = 0.0;
         this->A67 = 0.0;
-        this->numpt = Array1D_int(5, 0);
+        this->numpt = {0};
         this->stPhi = Array1D<Real64>(nume, 0.0);
         this->srfPhi = Array1D<Real64>(nume, 0.0);
         this->srbPhi = Array1D<Real64>(nume, 0.0);
@@ -690,8 +690,6 @@ struct WindowManagerData : BaseGlobalStruct
           delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
     {
 
-        numpt.allocate(5); // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
-        numpt = 0;
         stPhi.allocate(nume);
         stPhi = 0.0; // Glazing system transmittance at angle of incidence for each wavelength in wle
         srfPhi.allocate(nume);

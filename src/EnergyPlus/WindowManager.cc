@@ -519,7 +519,7 @@ namespace WindowManager {
                     // In this case, "front" means incident from the outside and "back"
                     // means incident from the inside.
                     numptDAT = state.dataHeatBal->SpectralData(SpecDataNum).NumOfWavelengths;
-                    state.dataWindowManager->numpt(IGlass) = numptDAT;
+                    state.dataWindowManager->numpt[IGlass-1] = numptDAT;
 
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
                         state.dataWindowManager->wlt[IGlass-1][ILam-1] = state.dataHeatBal->SpectralData(SpecDataNum).WaveLength(ILam);
@@ -571,7 +571,7 @@ namespace WindowManager {
                 if (SpecDataNum == 0 &&
                     !state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) { // No spectral data for this layer; use spectral average values
                     lquasi = true;
-                    state.dataWindowManager->numpt(IGlass) = 2;
+                    state.dataWindowManager->numpt[IGlass-1] = 2;
                     state.dataWindowManager->t[IGlass-1][0] = state.dataMaterial->Material(LayPtr).Trans;
                     if (IGlass == 1 || (IGlass == 2 && StormWinConst))
                         state.dataWindowManager->t[IGlass-1][0] *= state.dataMaterial->Material(LayPtr).GlassTransDirtFactor;
@@ -586,7 +586,7 @@ namespace WindowManager {
                 if (state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) {
                     if (!state.dataWindowManager->BGFlag) AllGlassIsSpectralAverage = false;
                     numptDAT = state.dataWindowManager->wle.size();
-                    state.dataWindowManager->numpt(IGlass) = numptDAT;
+                    state.dataWindowManager->numpt[IGlass-1] = numptDAT;
                     if (state.dataWindowManager->BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
                         ShowWarningError(state,
@@ -661,7 +661,7 @@ namespace WindowManager {
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum(IGlass));
                     if (!state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) {
-                        for (ILam = 1; ILam <= state.dataWindowManager->numpt(IGlass); ++ILam) {
+                        for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass-1]; ++ILam) {
                             TransAndReflAtPhi(CosPhi,
                                               state.dataWindowManager->t[IGlass-1][ILam-1],
                                               state.dataWindowManager->rff[IGlass-1][ILam-1],
@@ -855,7 +855,7 @@ namespace WindowManager {
                     // means incident from the outside.
 
                     numptDAT = state.dataHeatBal->SpectralData(SpecDataNum).NumOfWavelengths;
-                    state.dataWindowManager->numpt(IGlass) = numptDAT;
+                    state.dataWindowManager->numpt[IGlass-1] = numptDAT;
 
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
                         state.dataWindowManager->wlt[IGlass-1][ILam-1] = state.dataHeatBal->SpectralData(SpecDataNum).WaveLength(ILam);
@@ -869,7 +869,7 @@ namespace WindowManager {
                 } else { // No spectral data for this layer; use spectral average values
                     if (!state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) {
                         lquasi = true;
-                        state.dataWindowManager->numpt(IGlass) = 2;
+                        state.dataWindowManager->numpt[IGlass-1] = 2;
                         state.dataWindowManager->t[IGlass-1][0] = state.dataMaterial->Material(LayPtr).Trans;
                         if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst))
                             state.dataWindowManager->t[IGlass-1][0] *= state.dataMaterial->Material(LayPtr).GlassTransDirtFactor;
@@ -884,7 +884,7 @@ namespace WindowManager {
                 }
                 if (state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) {
                     numptDAT = state.dataWindowManager->wle.size();
-                    state.dataWindowManager->numpt(IGlass) = numptDAT;
+                    state.dataWindowManager->numpt[IGlass-1] = numptDAT;
                 }
             } // End of loop over glass layers in the construction for back calculation
 
@@ -903,7 +903,7 @@ namespace WindowManager {
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum(IGlass));
                     if (!state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) {
-                        for (ILam = 1; ILam <= state.dataWindowManager->numpt(IGlass); ++ILam) {
+                        for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass-1]; ++ILam) {
 
                             TransAndReflAtPhi(CosPhi,
                                               state.dataWindowManager->t[IGlass-1][ILam-1],
@@ -1897,7 +1897,7 @@ namespace WindowManager {
                 if (wl < wlbot || wl > wltop) continue;
                 // In the following numpt is the number of spectral data points for each layer;
                 // numpt = 2 if there is no spectral data for a layer.
-                if (state.dataWindowManager->numpt(in) <= 2) {
+                if (state.dataWindowManager->numpt[in-1] <= 2) {
                     state.dataWindowManager->tadjPhi[in-1][iwl-1] = state.dataWindowManager->tPhi[in-1][iquasi-1];
                     state.dataWindowManager->rfadjPhi[in-1][iwl-1] = state.dataWindowManager->rfPhi[in-1][iquasi-1];
                     state.dataWindowManager->rbadjPhi[in-1][iwl-1] = state.dataWindowManager->rbPhi[in-1][iquasi-1];
@@ -1905,17 +1905,17 @@ namespace WindowManager {
                     // Interpolate to get properties at the solar spectrum wavelengths
                     Interpolate(state.dataWindowManager->wlt[in-1],
                                 state.dataWindowManager->tPhi[in-1],
-                                state.dataWindowManager->numpt(in),
+                                state.dataWindowManager->numpt[in-1],
                                 wl,
                                 state.dataWindowManager->tadjPhi[in-1][iwl-1]);
                     Interpolate(state.dataWindowManager->wlt[in-1],
                                 state.dataWindowManager->rfPhi[in-1],
-                                state.dataWindowManager->numpt(in),
+                                state.dataWindowManager->numpt[in-1],
                                 wl,
                                 state.dataWindowManager->rfadjPhi[in-1][iwl-1]);
                     Interpolate(state.dataWindowManager->wlt[in-1],
                                 state.dataWindowManager->rbPhi[in-1],
-                                state.dataWindowManager->numpt(in),
+                                state.dataWindowManager->numpt[in-1],
                                 wl,
                                 state.dataWindowManager->rbadjPhi[in-1][iwl-1]);
                 }
