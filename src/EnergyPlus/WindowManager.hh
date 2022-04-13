@@ -453,9 +453,9 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<Real64, 5> thick = {0.0};                              // Glass layer thickness (m)
     std::array<Real64, 5> scon = {0.0};                               // Glass layer conductance--conductivity/thickness (W/m2-K)
 
-    Array1D<Real64> tir;             // Front and back IR transmittance for each glass layer
-    Array1D<Real64> emis;            // Front and back IR emissivity for each glass layer
-    Array1D<Real64> rir;             // Front and back IR reflectance for each glass layer
+    std::array<Real64, 10> tir = {0.0};             // Front and back IR transmittance for each glass layer
+    std::array<Real64, 10> emis = {0.0};            // Front and back IR emissivity for each glass layer
+    std::array<Real64, 10> rir = {0.0};             // Front and back IR reflectance for each glass layer
                                      //  (program calculates from tir and emis)
     Array1D<Real64> AbsRadGlassFace; // Solar radiation and IR radiation from internal
                                      //  gains absorbed by glass face
@@ -604,9 +604,9 @@ struct WindowManagerData : BaseGlobalStruct
         this->gap = {0.0};
         this->thick = {0.0};
         this->scon = {0.0};
-        this->tir = Array1D<Real64>(10, 0.0);
-        this->emis = Array1D<Real64>(10, 0.0);
-        this->rir = Array1D<Real64>(10, 0.0);
+        this->tir = {0.0};
+        this->emis = {0.0};
+        this->rir = {0.0};
         this->AbsRadGlassFace = Array1D<Real64>(10, 0.0);
         this->thetas = Array1D<Real64>(10, 0.0);
         this->thetasPrev = Array1D<Real64>(10, 0.0);
@@ -674,7 +674,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : tir(10, 0.0), emis(10, 0.0), rir(10, 0.0), AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0),
+        : AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0),
           dtheta(5, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), sour(10, 0.0),
           delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
     {
