@@ -70,6 +70,15 @@ struct EnergyPlusData;
 
 namespace WindowManager {
 
+    enum class GlassPane
+    {
+        Invaild = -1,
+        Single,
+        Double,
+        Triple,
+        Quad
+    };
+
     class CWindowModel;
     class CWindowOpticalModel;
     class CWindowConstructionsSimplified;
