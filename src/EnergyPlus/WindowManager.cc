@@ -2708,7 +2708,6 @@ namespace WindowManager {
             state.dataWindowManager->thetas = {0.0};
             state.dataWindowManager->thetasPrev = {0.0};
             state.dataWindowManager->fvec = {0.0};
-            state.dataWindowManager->fjac = {0.0};
 
             // Calculate window face temperatures
 

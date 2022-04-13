@@ -462,17 +462,6 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<Real64, 10> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
     std::array<Real64, 10> fvec = {0.0};            // Glass face heat balance function
 
-    Array2D<Real64> fjac;   // Glass face heat balance Jacobian
-    Array1D<Real64> dtheta; // Glass layer temperature difference factor [K]
-    Array2D<Real64> ziri;   // Inverse of IR transfer matrix
-    Array2D<Real64> ddeldt; // Matrix of derivatives of residuals wrt temperature
-    Array2D<Real64> dtddel; // Inverse of matrix of derivatives of
-                            //   residuals wrt temperature
-    Array1D<Real64> qf;     // IR heat flux at each face [W/m2]
-    Array1D<Real64> hf;     // Component of convective flux at each face
-    Array2D<Real64> der;    // Derivative of IR sources wrt surface temperature
-    Array1D<Real64> sour;   // IR source term at each face [W/m2]
-    Array1D<Real64> delta;  // Residual at each glass layer [W/m2]
     Array1D<Real64> hrgap;  // Radiative gap conductance
     Array1D<Real64> rgap;   // Convective plus radiative gap resistance
                             //   (inverse of hcgap + hrgap)
@@ -611,16 +600,6 @@ struct WindowManagerData : BaseGlobalStruct
         this->thetas = {0.0};
         this->thetasPrev = {0.0};
         this->fvec = {0.0};
-        this->fjac = Array2D<Real64>(10, 10, 0.0);
-        this->dtheta = Array1D<Real64>(5, 0.0);
-        this->ziri = Array2D<Real64>(10, 10, 0.0);
-        this->ddeldt = Array2D<Real64>(10, 10, 0.0);
-        this->dtddel = Array2D<Real64>(10, 10, 0.0);
-        this->qf = Array1D<Real64>(10, 0.0);
-        this->hf = Array1D<Real64>(10, 0.0);
-        this->der = Array2D<Real64>(5, 10, 0.0);
-        this->sour = Array1D<Real64>(10, 0.0);
-        this->delta = Array1D<Real64>(5, 0.0);
         this->hrgap = Array1D<Real64>(5, 0.0);
         this->rgap = Array1D<Real64>(6, 0.0);
         this->rs = Array1D<Real64>(6, 0.0);
@@ -674,8 +653,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : fjac(10, 10, 0.0), dtheta(5, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0),
-          sour(10, 0.0), delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
+        : hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
     {
 
         saPhi.allocate(5, nume);                         // For each layer, glazing system absorptance at angle of incidence
