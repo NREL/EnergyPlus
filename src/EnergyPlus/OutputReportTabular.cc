@@ -12559,23 +12559,23 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         WriteResilienceBinsTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod);
 
-        columnHead(1) = "SET ≤ 12.2°C Hours (°C)";
-        columnHead(2) = "SET ≤ 12.2°C OccupantHours (°C)";
-        columnHead(3) = "SET ≤ 12.2°C OccupiedHours (°C)";
+        columnHead(1) = "SET ≤ 12.2°C Degree-Hours (°C·h)";
+        columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours (°C·h)";
+        columnHead(3) = "SET ≤ 12.2°C Occupied Degree-Hours (°C·h)";
         columnHead(4) = "Longest SET ≤ 12.2°C Duration [hr]";
         columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration";
 
-        tableName = "Heating SET Hours";
+        tableName = "Heating SET Degree-Hours";
         WriteSETHoursTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod);
 
-        columnHead(1) = "SET > 30°C Hours (°C)";
-        columnHead(2) = "SET > 30°C OccupantHours (°C)";
-        columnHead(3) = "SET > 30°C OccupiedHours (°C)";
+        columnHead(1) = "SET > 30°C Degree-Hours (°C·h)";
+        columnHead(2) = "SET > 30°C Occupant-Weighted Degree-Hours (°C·h)";
+        columnHead(3) = "SET > 30°C Occupied Degree-Hours (°C·h)";
         columnHead(4) = "Longest SET > 30°C Duration [hr]";
         columnHead(5) = "Start Time of the Longest SET > 30°C Duration";
 
-        tableName = "Cooling SET Hours";
+        tableName = "Cooling SET Degree-Hours";
         WriteSETHoursTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod);
 
@@ -12585,13 +12585,13 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         Array1D_int columnWidthUnmetDegHr;
         columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
         columnWidthUnmetDegHr = 10;
-        columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree Hours (°C)";
-        columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Degree OccupantHours (°C)";
-        columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Degree OccupiedHours (°C)";
-        columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree Hours (°C)";
-        columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Degree OccupantHours (°C)";
-        columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Degree OccupiedHours (°C)";
-        tableName = "Unmet Degree Hours";
+        columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours (°C·h)";
+        columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h)";
+        columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours (°C·h)";
+        columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours (°C·h)";
+        columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h)";
+        columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours (°C·h)";
+        tableName = "Unmet Degree-Hours";
 
         WriteResilienceBinsTableReportingPeriod(state,
                                                 columnNumUnmetDegHr,
@@ -12859,7 +12859,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
             hasPierceSET = false;
             if (ort->displayThermalResilienceSummaryExplicitly) {
                 ShowWarningError(state,
-                                 "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                 "Writing Annual Thermal Resilience Summary - SET Degree-Hours reports: "
                                  "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
                                  "but no People object is defined.");
             }
@@ -12869,7 +12869,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                 hasPierceSET = false;
                 if (ort->displayThermalResilienceSummaryExplicitly) {
                     ShowWarningError(state,
-                                     "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                     "Writing Annual Thermal Resilience Summary - SET Degree-Hours reports: "
                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
                                      "but no Pierce model is defined in " +
                                          state.dataHeatBal->People(iPeople).Name + " object.");
@@ -17829,7 +17829,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     //    na
     auto &ort(state.dataOutRptTab);
 
-    ort->UnitConvSize = 117;
+    ort->UnitConvSize = 118;
     ort->UnitConv.allocate(ort->UnitConvSize);
     ort->UnitConv(1).siName = "%";
     ort->UnitConv(2).siName = "°C";
@@ -17948,6 +17948,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(115).siName = "PERSON/M2";
     ort->UnitConv(116).siName = "MM";
     ort->UnitConv(117).siName = "MM";
+    ort->UnitConv(118).siName = "°C·h";
 
     ort->UnitConv(1).ipName = "%";
     ort->UnitConv(2).ipName = "F";
@@ -18066,6 +18067,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(115).ipName = "person/ft2";
     ort->UnitConv(116).ipName = "in";
     ort->UnitConv(117).ipName = "ft";
+    ort->UnitConv(118).ipName = "°F·h";
 
     ort->UnitConv(1).mult = 1.0;
     ort->UnitConv(2).mult = 1.8;
@@ -18184,11 +18186,13 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(115).mult = 0.09290304;
     ort->UnitConv(116).mult = 0.03937;
     ort->UnitConv(117).mult = 0.003281;
+    ort->UnitConv(118).mult = 1.8;
 
     ort->UnitConv(2).offset = 32.0;
     ort->UnitConv(11).offset = 32.0;
     ort->UnitConv(25).offset = 7.6736;
     ort->UnitConv(81).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
+    ort->UnitConv(118).offset = 32.0;
 
     ort->UnitConv(20).hint = "ELEC";
     ort->UnitConv(21).hint = "GAS";

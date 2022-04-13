@@ -3314,7 +3314,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBins(1)[0]); // # of People = 0
 
     // Test SET-hours calculation - No occupant
-    EXPECT_EQ(4, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Hours
+    EXPECT_EQ(4, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Degree-Hours
     EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1]); // SET OccupantHours
     EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2]); // SET OccupiedHours
 
@@ -3326,7 +3326,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
         ReportThermalResilience(*state);
     }
     // Test SET-hours calculation - Heating unmet
-    EXPECT_EQ(3, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * 3 Hours
+    EXPECT_EQ(3, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]); // SET Degree-Hours = (12.2 - 11.2) * 3 Hours
     EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1]); // SET OccupantHours = (12.2 - 11.2) * 3 Hours * 2 OCC
     EXPECT_EQ(3, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2]); // SET OccupantHours = (12.2 - 11.2) * 3 Hours * (OCC > 0)
 
@@ -3336,7 +3336,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
         ReportThermalResilience(*state);
     }
     // Test SET-hours calculation - Cooling unmet
-    EXPECT_EQ(10, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Hours = 4 + (32 - 30) * 3 Hours
+    EXPECT_EQ(10, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Degree-Hours = 4 + (32 - 30) * 3 Hours
     EXPECT_EQ(12, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1]); // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 2 OCC
     EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2]);  // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 1 (OCC > 0)
 
@@ -3359,8 +3359,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     // Test SET longest duration calculation
     // Cooling Unmet Duration: Hour 1 - 4 (no occupants), Hour 8 - 10;
     // Heating Unmet Duration: Hour 5 - 7, Hour 13 - 18, Hour 18 - 20 (no occupants);
-    EXPECT_EQ(11, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]);  // SET Hours = (12.2 - 11.2) * (3 + 6) Hours
-    EXPECT_EQ(10, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Hours = SET Hours = 4 + (32 - 30) * 3 Hours
+    EXPECT_EQ(11, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]);  // SET Degree-Hours = (12.2 - 11.2) * (3 + 6) Hours
+    EXPECT_EQ(10, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Degree-Hours = SET Degree-Hours = 4 + (32 - 30) * 3 Hours
     EXPECT_EQ(7, state->dataHeatBalFanSys->ZoneLowSETHours(1)[3]);   // Longest Heating SET Unmet Duration
     EXPECT_EQ(3, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3]);  //  Longest Cooling SET Unmet Duration
 
