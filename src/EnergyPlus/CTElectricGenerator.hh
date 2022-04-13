@@ -125,6 +125,11 @@ namespace CTElectricGenerator {
         bool CheckEquipName = true;
         bool MyFlag = true;
 
+        // Default Constructor
+        CTGeneratorData() : HRPlantLoc{}
+        {
+        }
+
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 

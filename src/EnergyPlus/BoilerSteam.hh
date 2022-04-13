@@ -112,6 +112,11 @@ namespace BoilerSteam {
 
         std::string BoilerFuelTypeForOutputVariable = "";
 
+        // Default Constructor
+        BoilerSpecs() : plantLoc{}
+        {
+        }
+
         void initialize(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
