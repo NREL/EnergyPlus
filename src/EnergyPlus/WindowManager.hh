@@ -105,11 +105,6 @@ namespace WindowManager {
 
     Real64 solarSpectrumAverage(EnergyPlusData &state, gsl::span<Real64> p);
 
-    void VisibleSprectrumAverage(EnergyPlusData &state,
-                                 Array1A<Real64> p, // Quantity to be weighted by solar spectrum
-                                 Real64 &pvis       // Quantity p weighted by solar spectrum and photopic
-    );
-
     Real64 visibleSpectrumAverage(EnergyPlusData &state, gsl::span<Real64> p);
 
     void Interpolate(gsl::span<Real64> x, // Array of data points for independent variable
@@ -459,10 +454,11 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<std::array<std::array<Real64, 5>, 5>, 3> gcp = {0.0};             // Gas specific-heat coefficients for each gap
     std::array<std::array<Real64, 5>, 5> gwght = {0.0};           // Gas molecular weights for each gap
     std::array<std::array<Real64, 5>, 5> gfract = {0.0};          // Gas fractions for each gap
-    Array1D_int gnmix;               // Number of gases in gap
-    Array1D<Real64> gap;             // Gap width (m)
-    Array1D<Real64> thick;           // Glass layer thickness (m)
-    Array1D<Real64> scon;            // Glass layer conductance--conductivity/thickness (W/m2-K)
+    std::array<int, 5> gnmix = {0};               // Number of gases in gap
+    std::array<Real64, 5> gap = {0.0};             // Gap width (m)
+    std::array<Real64, 5> thick = {0.0};           // Glass layer thickness (m)
+    std::array<Real64, 5> scon = {0.0};            // Glass layer conductance--conductivity/thickness (W/m2-K)
+
     Array1D<Real64> tir;             // Front and back IR transmittance for each glass layer
     Array1D<Real64> emis;            // Front and back IR emissivity for each glass layer
     Array1D<Real64> rir;             // Front and back IR reflectance for each glass layer
@@ -610,10 +606,10 @@ struct WindowManagerData : BaseGlobalStruct
         this->gcp = {0.0};
         this->gwght = {0.0};
         this->gfract = {0.0};
-        this->gnmix = Array1D_int(5, 0);
-        this->gap = Array1D<Real64>(5, 0.0);
-        this->thick = Array1D<Real64>(5, 0.0);
-        this->scon = Array1D<Real64>(5, 0.0);
+        this->gnmix = {0};
+        this->gap = {0.0};
+        this->thick = {0.0};
+        this->scon = {0.0};
         this->tir = Array1D<Real64>(10, 0.0);
         this->emis = Array1D<Real64>(10, 0.0);
         this->rir = Array1D<Real64>(10, 0.0);
@@ -684,7 +680,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
+        : tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
           AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0), dtheta(5, 0.0),
           ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), sour(10, 0.0),
           delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
