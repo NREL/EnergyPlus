@@ -501,6 +501,7 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<std::array<Real64, 5>, 5> rfop = {0.0}; // Front reflectance matrix for subr. op
     std::array<std::array<Real64, 5>, 5> rbop = {0.0}; // Back transmittance matrix for subr. op
 
+    // These need to stay as Array1D for a little longer because changing them spreads into many source files
     Array1D<Real64> DepVarCurveFit; // Values of dependent variable corresponding to IndepVarCurveFit values
     Array1D<Real64> CoeffsCurveFit; // Polynomial coefficients from curve fit
     Array1D<Real64> tsolPhi;        // Glazing system solar transmittance for each angle of incidence
@@ -513,8 +514,6 @@ struct WindowManagerData : BaseGlobalStruct
     Array1D<Real64> rfvisPhi;       // Glazing system visible front reflectance for each angle of incidence
     Array1D<Real64> rbvisPhi;       // Glazing system visible back reflectance for each angle of incidence
     Array1D<Real64> CosPhiIndepVar; // Cos of incidence angles at 10-deg increments for curve fits
-
-    Array1D<int> LayerNum; // Glass layer number
 
     std::unique_ptr<WindowManager::CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
     std::unique_ptr<WindowManager::CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
@@ -552,19 +551,19 @@ struct WindowManagerData : BaseGlobalStruct
     Array1D<Real64> AbsRadShadeFace = Array1D<Real64>(2); // Solar radiation, short-wave radiation from lights, and long-wave
     Array1D<Real64> RhoIR = Array1D<Real64>(10);          // Face IR reflectance
 
-    Array1D<Real64> vv = Array1D<Real64>(10); // Stores the implicit scaling of each row
+    std::array<Real64, 10> vv = {0.0}; // Stores the implicit scaling of each row
+    std::array<Real64, 10> kprime = {0.0};  // Monotonic thermal conductivity
+    std::array<Real64, 10> kdblprm = {0.0}; // Conductivity term accounting for additional energy moved by the diffusional transport of internal energy in polyatomic gases.
+    std::array<Real64, 10> mukpdwn = {0.0}; // Denominator term
+    std::array<Real64, 10> kpdown = {0.0};  // Denominator terms
+    std::array<Real64, 10> kdpdown = {0.0};
+    std::array<Real64, 10> frct = {0.0};  // Fraction of each gas in a mixture
+    std::array<Real64, 10> fvis = {0.0};  // Viscosity of each gas in a mixture (g/m-s)
+    std::array<Real64, 10> fcon = {0.0};  // Conductance of each gas in a mixture (W/m2-K)
+    std::array<Real64, 10> fdens = {0.0}; // Density of each gas in a mixture (kg/m3)
+    std::array<Real64, 10> fcp = {0.0};   // Specific heat of each gas in a mixture (J/m3-K)
 
-    Array1D<Real64> kprime = Array1D<Real64>(10);  // Monotonic thermal conductivity
-    Array1D<Real64> kdblprm = Array1D<Real64>(10); // Conductivity term accounting for additional energy moved by
-    //  the diffusional transport of internal energy in polyatomic gases.
-    Array1D<Real64> mukpdwn = Array1D<Real64>(10); // Denominator term
-    Array1D<Real64> kpdown = Array1D<Real64>(10);  // Denominator terms
-    Array1D<Real64> kdpdown = Array1D<Real64>(10);
-    Array1D<Real64> frct = Array1D<Real64>(10);  // Fraction of each gas in a mixture
-    Array1D<Real64> fvis = Array1D<Real64>(10);  // Viscosity of each gas in a mixture (g/m-s)
-    Array1D<Real64> fcon = Array1D<Real64>(10);  // Conductance of each gas in a mixture (W/m2-K)
-    Array1D<Real64> fdens = Array1D<Real64>(10); // Density of each gas in a mixture (kg/m3)
-    Array1D<Real64> fcp = Array1D<Real64>(10);   // Specific heat of each gas in a mixture (J/m3-K)
+    std::array<int, 5> LayerNum = {0}; // Glass layer number
 
     void clear_state() override
     {
@@ -675,8 +674,6 @@ struct WindowManagerData : BaseGlobalStruct
         rbvisPhi = 0.0;
         CosPhiIndepVar.allocate(MaxNumOfIncidentAngles); // Cos of incidence angles at 10-deg increments for curve fits
         CosPhiIndepVar = 0.0;
-        LayerNum.allocate(5); // Glass layer number
-        LayerNum = 0;
         SimpleGlazingSHGC = 0.0;
         SimpleGlazingU = 0.0;
         tmpReflectSolBeamFront = 0.0;
