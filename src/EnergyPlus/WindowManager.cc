@@ -714,7 +714,7 @@ namespace WindowManager {
 
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     for (ILam = 1; ILam <= state.dataWindowManager->nume; ++ILam) {
-                        sabsPhi(ILam) = state.dataWindowManager->saPhi[IGlass-1][ILam-1];
+                        sabsPhi(ILam) = state.dataWindowManager->saPhi(IGlass, ILam);
                     }
                     SolarSprectrumAverage(state, sabsPhi, state.dataWindowManager->solabsPhi(IGlass, IPhi));
                 }
@@ -939,7 +939,7 @@ namespace WindowManager {
 
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     for (j = 1; j <= state.dataWindowManager->nume; ++j) {
-                        sabsPhi(j) = state.dataWindowManager->saPhi[IGlass-1][j-1];
+                        sabsPhi(j) = state.dataWindowManager->saPhi(IGlass, j);
                     }
                     SolarSprectrumAverage(state, sabsPhi, state.dataWindowManager->solabsBackPhi(IGlass, IPhi));
                 }
@@ -1951,7 +1951,7 @@ namespace WindowManager {
             }
 
             for (i = 1; i <= ngllayer; ++i) {
-                state.dataWindowManager->saPhi[i-1][j-1] = sabsPhi(i);
+                state.dataWindowManager->saPhi(i, j) = sabsPhi(i);
             }
 
         } // End of wavelength loop
