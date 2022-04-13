@@ -321,16 +321,16 @@ namespace DataHVACGlobals {
     struct DefineZoneCompAvailMgrs
     {
         // Members
-        int NumAvailManagers = 0;                                        // number of availability managers for this system
-        int AvailStatus = 0;                                             // system availability status
-        int StartTime = 0;                                               // cycle on time (in SimTimeSteps)
-        int StopTime = 0;                                                // cycle off time (in SimTimeSteps)
+        int NumAvailManagers = 0;                                    // number of availability managers for this system
+        int AvailStatus = 0;                                         // system availability status
+        int StartTime = 0;                                           // cycle on time (in SimTimeSteps)
+        int StopTime = 0;                                            // cycle off time (in SimTimeSteps)
         std::string AvailManagerListName;                            // name of each availability manager
         Array1D_string AvailManagerName;                             // name of each availability manager
         Array1D<DataPlant::SystemAvailabilityType> AvailManagerType; // type of availability manager
         Array1D_int AvailManagerNum;                                 // index for availability manager
-        int ZoneNum = 0;                                                 // cycle off time (in SimTimeSteps)
-        bool Input = true;                                                  // starts off as true to initialize zone equipment availability manager data
+        int ZoneNum = 0;                                             // cycle off time (in SimTimeSteps)
+        bool Input = true;                                           // starts off as true to initialize zone equipment availability manager data
         int Count = 0; // initialize twice to ensure zone equipment availability manager list name has been read in
     };
 
