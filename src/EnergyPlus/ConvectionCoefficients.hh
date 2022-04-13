@@ -214,7 +214,12 @@ namespace ConvectionCoefficients {
         // Members
         int SurfNum = 0;
         int VertNum = 0;
-        Vector Vertex{0.0, 0.0, 0.0};
+        Vector Vertex;
+
+        // Default Constructor
+        BoundingBoxVertStruct() : Vertex(0.0, 0.0, 0.0)
+        {
+        }
     };
 
     struct RoofGeoCharacteristicsStruct
