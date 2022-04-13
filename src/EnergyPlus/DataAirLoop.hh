@@ -170,7 +170,7 @@ namespace DataAirLoop {
         Real64 Previous = 0.0;              // Previous mass air flow rate for this loop [kg/s]
         Real64 SupFlow = 0.0;               // supply air flow rate (includes LeakFlow) [kg/s]
         Real64 ZoneRetFlow = 0.0;           // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
-        Real64 ZoneRetFlowRatio = 0.0;      // ratio for adjusting zone return flows for excess zone exhaust
+        Real64 ZoneRetFlowRatio = 1.0;      // ratio for adjusting zone return flows for excess zone exhaust
         Real64 SysRetFlow = 0.0;            // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
         Real64 RecircFlow = 0.0;            // sum of zone plenum recirculated flows [kg/s]
         Real64 LeakFlow = 0.0;              // sum of air distribution leak flows to return plenum [kg/s]
