@@ -214,6 +214,16 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
         GetInputTabularTimeBins(state);
         GetInputTabularStyle(state);
         GetInputOutputTableSummaryReports(state);
+        if (state.dataOutRptTab->displayThermalResilienceSummary) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; zoneNum++) {
+                if (state.dataHeatBal->Zone(zoneNum).numPeopleObject > 1) {
+                    ShowWarningMessage(state,
+                                       fmt::format("Thermal resilience tabular report assumes at most one people object per zone, but multiple "
+                                                   "people objects are defined for Zone {}",
+                                                   zoneNum));
+                }
+            }
+        }
         // noel -- noticed this was called once and very slow -- sped up a little by caching keys
         InitializeTabularMonthly(state);
         if (isInvalidAggregationOrder(state)) {

@@ -463,6 +463,7 @@ namespace InternalHeatGains {
                         // Note that min/max occupants are non-coincident
                         state.dataHeatBal->Zone(zoneNum).minOccupants += thisPeople.NomMinNumberPeople;
                         state.dataHeatBal->Zone(zoneNum).maxOccupants += thisPeople.NomMaxNumberPeople;
+                        state.dataHeatBal->Zone(zoneNum).numPeopleObject += 1;
                     }
 
                     if (spaceNum > 0) {
