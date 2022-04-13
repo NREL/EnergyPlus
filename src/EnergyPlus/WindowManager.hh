@@ -462,12 +462,9 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<Real64, 10> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
     std::array<Real64, 10> fvec = {0.0};            // Glass face heat balance function
 
-    Array1D<Real64> hrgap;  // Radiative gap conductance
-    Array1D<Real64> rgap;   // Convective plus radiative gap resistance
-                            //   (inverse of hcgap + hrgap)
-    Array1D<Real64> rs;     // Outside film convective resistance, gap resistances,
-                            //   inside air film convective resistance
-    Real64 A23P = 0.0;      // Intermediate variables in glass face
+    std::array<Real64, 5> hrgap = {0.0}; // Radiative gap conductance
+
+    Real64 A23P = 0.0; // Intermediate variables in glass face
     Real64 A32P = 0.0;
     Real64 A45P = 0.0;
     Real64 A54P = 0.0;
@@ -600,9 +597,7 @@ struct WindowManagerData : BaseGlobalStruct
         this->thetas = {0.0};
         this->thetasPrev = {0.0};
         this->fvec = {0.0};
-        this->hrgap = Array1D<Real64>(5, 0.0);
-        this->rgap = Array1D<Real64>(6, 0.0);
-        this->rs = Array1D<Real64>(6, 0.0);
+        this->hrgap = {0.0};
         this->A23P = 0.0;
         this->A32P = 0.0;
         this->A45P = 0.0;
@@ -653,9 +648,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
     {
-
         saPhi.allocate(5, nume);                         // For each layer, glazing system absorptance at angle of incidence
         saPhi = 0.0;                                     // for each wavelenth in wle
         DepVarCurveFit.allocate(MaxNumOfIncidentAngles); // Values of dependent variable corresponding to IndepVarCurveFit values
