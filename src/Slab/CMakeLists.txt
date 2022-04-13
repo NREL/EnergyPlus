@@ -41,7 +41,7 @@ message(DEBUG "Slab: F_INTERFACE_COMPILE_FLAGS=${F_INTERFACE_COMPILE_FLAGS}")
 target_link_libraries(Slab PRIVATE SlabOptions fortran_project_options)
 
 install(TARGETS Slab DESTINATION PreProcess/GrndTempCalc)
-if(NOT ${STATIC_EXE})
+if(NOT ${FORTRAN_STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
   install_target_prereqs(Slab PreProcess/GrndTempCalc)
 endif()
