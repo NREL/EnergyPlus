@@ -457,11 +457,11 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<Real64, 10> emis = {0.0};            // Front and back IR emissivity for each glass layer
     std::array<Real64, 10> rir = {0.0};             // Front and back IR reflectance for each glass layer
                                      //  (program calculates from tir and emis)
-    Array1D<Real64> AbsRadGlassFace; // Solar radiation and IR radiation from internal
-                                     //  gains absorbed by glass face
-    Array1D<Real64> thetas;          // Glass surface temperatures (K)
-    Array1D<Real64> thetasPrev;      // Previous-iteration glass surface temperatures (K)
-    Array1D<Real64> fvec;            // Glass face heat balance function
+    std::array<Real64, 10> AbsRadGlassFace = {0.0}; // Solar radiation and IR radiation from internal gains absorbed by glass face
+    std::array<Real64, 10> thetas = {0.0};          // Glass surface temperatures (K)
+    std::array<Real64, 10> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
+    std::array<Real64, 10> fvec = {0.0};            // Glass face heat balance function
+
     Array2D<Real64> fjac;            // Glass face heat balance Jacobian
     Array1D<Real64> dtheta;          // Glass layer temperature difference factor [K]
     Array2D<Real64> ziri;            // Inverse of IR transfer matrix
@@ -607,10 +607,10 @@ struct WindowManagerData : BaseGlobalStruct
         this->tir = {0.0};
         this->emis = {0.0};
         this->rir = {0.0};
-        this->AbsRadGlassFace = Array1D<Real64>(10, 0.0);
-        this->thetas = Array1D<Real64>(10, 0.0);
-        this->thetasPrev = Array1D<Real64>(10, 0.0);
-        this->fvec = Array1D<Real64>(10, 0.0);
+        this->AbsRadGlassFace = {0.0};
+        this->thetas = {0.0};
+        this->thetasPrev = {0.0};
+        this->fvec = {0.0};
         this->fjac = Array2D<Real64>(10, 10, 0.0);
         this->dtheta = Array1D<Real64>(5, 0.0);
         this->ziri = Array2D<Real64>(10, 10, 0.0);
@@ -674,7 +674,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowManagerData()
-        : AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0),
+        : fjac(10, 10, 0.0),
           dtheta(5, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), sour(10, 0.0),
           delta(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0)
     {

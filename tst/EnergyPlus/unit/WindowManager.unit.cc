@@ -2844,7 +2844,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 *
-                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))),
+                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas[0])),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->SurfQHeatEmiReport(surfNum2), 3);
 }
