@@ -144,6 +144,11 @@ namespace CoolingPanelSimple {
         int CoolingPanelMassFlowReSimIndex = 0;
         int CoolingPanelInletTempFlowReSimIndex = 0;
 
+        // Default Constructor
+        CoolingPanelParams() : plantLoc{}
+        {
+        }
+
         void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
         void SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int ZoneNum);

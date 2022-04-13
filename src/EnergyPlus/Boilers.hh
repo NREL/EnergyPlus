@@ -136,6 +136,11 @@ namespace Boilers {
 
         std::string BoilerFuelTypeForOutputVariable = "";
 
+        // Default Constructor
+        BoilerSpecs() : plantLoc{}
+        {
+        }
+
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
                       bool FirstHVACIteration,
