@@ -954,11 +954,11 @@ namespace DataHeatBalance {
         Real64 UPSGainRateToZone = 0.0; // ITE UPS Heat Gain to Zone Rate [W] - convective gain
         Real64 ConGainRateToZone = 0.0; // ITE Total Heat Gain to Zone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if
                                         // room air model not used
-        Real64 CPUConsumption = 0.0;      // ITE CPU Electric Energy [J]
-        Real64 FanConsumption = 0.0;      // ITE Fan Electric Energy [J]
-        Real64 UPSConsumption = 0.0;      // ITE UPS Electric Energy [J]
-        Real64 CPUEnergyAtDesign = 0.0;   // ITE CPU Electric Energy at Design Inlet Conditions [J]
-        Real64 FanEnergyAtDesign = 0.0;   // ITE Fan Electric Energy at Design Inlet Conditions [J]
+        Real64 CPUConsumption = 0.0;    // ITE CPU Electric Energy [J]
+        Real64 FanConsumption = 0.0;    // ITE Fan Electric Energy [J]
+        Real64 UPSConsumption = 0.0;    // ITE UPS Electric Energy [J]
+        Real64 CPUEnergyAtDesign = 0.0; // ITE CPU Electric Energy at Design Inlet Conditions [J]
+        Real64 FanEnergyAtDesign = 0.0; // ITE Fan Electric Energy at Design Inlet Conditions [J]
         Real64 UPSGainEnergyToZone = 0.0; // ITE UPS Heat Gain to Zone Energy [J] - convective gain
         Real64 ConGainEnergyToZone = 0.0; // ITE Total Heat Gain to Zone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans
                                           // if room air model not used
@@ -1828,14 +1828,14 @@ namespace DataHeatBalance {
         Real64 ITEqUPSGainRateToZone = 0.0; // Zone ITE UPS Heat Gain to Zone Rate [W] - convective gain
         Real64 ITEqConGainRateToZone = 0.0; // Zone ITE Total Heat Gain toZone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and
                                             // Fans if room air model not used
-        Real64 ITEqCPUConsumption = 0.0;      // Zone ITE CPU Electric Energy [J]
-        Real64 ITEqFanConsumption = 0.0;      // Zone ITE Fan Electric Energy [J]
-        Real64 ITEqUPSConsumption = 0.0;      // Zone ITE UPS Electric Energy [J]
-        Real64 ITEqCPUEnergyAtDesign = 0.0;   // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
-        Real64 ITEqFanEnergyAtDesign = 0.0;   // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
-        Real64 ITEqUPSGainEnergyToZone = 0.0; // Zone ITE UPS Heat Gain to Zone Energy [J] - convective gain
-        Real64 ITEqConGainEnergyToZone = 0.0; // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU
-                                              // and Fans if room air model not used
+        Real64 ITEqCPUConsumption = 0.0;    // Zone ITE CPU Electric Energy [J]
+        Real64 ITEqFanConsumption = 0.0;    // Zone ITE Fan Electric Energy [J]
+        Real64 ITEqUPSConsumption = 0.0;    // Zone ITE UPS Electric Energy [J]
+        Real64 ITEqCPUEnergyAtDesign = 0.0; // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
+        Real64 ITEqFanEnergyAtDesign = 0.0; // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
+        Real64 ITEqUPSGainEnergyToZone = 0.0;  // Zone ITE UPS Heat Gain to Zone Energy [J] - convective gain
+        Real64 ITEqConGainEnergyToZone = 0.0;  // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU
+                                               // and Fans if room air model not used
         Real64 ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
         Real64 ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
         Real64 ITEqSHI = 0.0;                  // Zone Supply Heat Index []
