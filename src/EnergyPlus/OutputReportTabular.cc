@@ -12904,16 +12904,18 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
             WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHighSETHours);
         }
 
-        columnNum = 4;
+        columnNum = 5;
         columnHead = {state.dataOutRptPredefined->pdchColdHourOfSafety,
                       state.dataOutRptPredefined->pdchColdSafetyEndTime,
                       state.dataOutRptPredefined->pdchColdSafeTempExceedHour,
-                      state.dataOutRptPredefined->pdchColdSafeTempExceedOccHour};
+                      state.dataOutRptPredefined->pdchColdSafeTempExceedOccHour,
+                      state.dataOutRptPredefined->pdchColdSafeTempExceedOccupiedHour};
         WriteHourOfSafetyTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins, 1);
         columnHead = {state.dataOutRptPredefined->pdchHeatHourOfSafety,
                       state.dataOutRptPredefined->pdchHeatSafetyEndTime,
                       state.dataOutRptPredefined->pdchHeatSafeTempExceedHour,
-                      state.dataOutRptPredefined->pdchHeatSafeTempExceedOccHour};
+                      state.dataOutRptPredefined->pdchHeatSafeTempExceedOccHour,
+                      state.dataOutRptPredefined->pdchHeatSafeTempExceedOccupiedHour};
         WriteHourOfSafetyTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins, 1);
 
         columnNum = 6;

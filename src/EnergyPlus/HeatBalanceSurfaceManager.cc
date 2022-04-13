@@ -5483,8 +5483,8 @@ void ReportThermalResilience(EnergyPlusData &state)
     int HINoBins = 5;                     // Heat Index range - number of bins
     int HumidexNoBins = 5;                // Humidex range - number of bins
     int SETNoBins = 5;                    // SET report column numbers
-    int ColdHourOfSafetyNoBins = 4;       // Cold Stress Hour of Safety number of columns
-    int HeatHourOfSafetyNoBins = 4;       // Heat Stress Hour of Safety number of columns
+    int ColdHourOfSafetyNoBins = 5;       // Cold Stress Hour of Safety number of columns
+    int HeatHourOfSafetyNoBins = 5;       // Heat Stress Hour of Safety number of columns
     int UnmetDegreeHourNoBins = 6;        // Unmet Degree Hour number of columns
     int DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
 
@@ -5563,11 +5563,12 @@ void ReportThermalResilience(EnergyPlusData &state)
             if (Temperature > ColdTempThresh) {
                 if (!CrossedColdThresh) {
                     // compute the number of hours before threshold is reached
-                    state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone / max(1, NumOcc);
+                    state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 }
                 // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
-                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone / max(1, NumOcc);
-                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone / max(1, NumOcc);
+                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else {
                 // first time crossing threshold
                 if (!CrossedColdThresh) {
@@ -5588,11 +5589,12 @@ void ReportThermalResilience(EnergyPlusData &state)
             if (Temperature < HeatTempThresh) {
                 if (!CrossedHeatThresh) {
                     // compute the number of hours before threshold is reached
-                    state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone / max(1, NumOcc);
+                    state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 }
                 // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
-                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone / max(1, NumOcc);
-                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone / max(1, NumOcc);
+                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else {
                 // first time crossing threshold
                 if (!CrossedHeatThresh) {
