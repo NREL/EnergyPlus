@@ -2317,7 +2317,7 @@ namespace WindowManager {
                 state.dataConstruction->Construct(ConstrNum).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
             // Simon: need to transfer surface temperatures because of frames calculation
             for (i = 1; i <= 2 * state.dataConstruction->Construct(ConstrNum).TotSolidLayers; ++i) {
-                state.dataWindowManager->thetas[i-1] = window.ThetaFace(i);
+                state.dataWindowManager->thetas[i - 1] = window.ThetaFace(i);
             }
             state.dataWindowManager->hcout = HextConvCoeff;
             state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
@@ -2525,10 +2525,8 @@ namespace WindowManager {
                             state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] =
                                 state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(ShadeLayPtr).ScreenDataPtr).DifDifTrans;
                         } else {
-                            state.dataWindowManager->emis[state.dataWindowManager->nglface] =
-                                state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
-                            state.dataWindowManager->tir[state.dataWindowManager->nglface] =
-                                state.dataMaterial->Material(ShadeLayPtr).TransThermal;
+                            state.dataWindowManager->emis[state.dataWindowManager->nglface] = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
+                            state.dataWindowManager->tir[state.dataWindowManager->nglface] = state.dataMaterial->Material(ShadeLayPtr).TransThermal;
                             state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] =
                                 state.dataMaterial->Material(ShadeLayPtr).TransThermal;
                         }
@@ -2758,7 +2756,7 @@ namespace WindowManager {
             // Save temperatures for use next time step
 
             for (k = 1; k <= state.dataWindowManager->nglfacep; ++k) {
-                window.ThetaFace(k) = state.dataWindowManager->thetas[k-1];
+                window.ThetaFace(k) = state.dataWindowManager->thetas[k - 1];
             }
 
             // Added TH 12/23/2008 for thermochromic windows to save the current TC layer temperature
@@ -3336,7 +3334,7 @@ namespace WindowManager {
 
             if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                 for (i = 1; i <= 6; ++i) {
-                    RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir[i-1] - state.dataWindowManager->emis[i-1]);
+                    RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir[i - 1] - state.dataWindowManager->emis[i - 1]);
                 }
                 FacRhoIR25 = 1.0 - RhoIR(2) * RhoIR(5);
                 FacRhoIR63 = 1.0 - RhoIR(6) * RhoIR(3);
@@ -3464,7 +3462,7 @@ namespace WindowManager {
                 Aface(8, 8) = hr(8) * (1 - RhoGlIR1 * (EpsShIR2 + RhoShIR2)) / ShGlReflFacIR + sconsh + hcv;
             } else if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                 for (i = 1; i <= 8; ++i) {
-                    RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir[i-1] - state.dataWindowManager->emis[i-1]);
+                    RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir[i - 1] - state.dataWindowManager->emis[i - 1]);
                 }
                 FacRhoIR47 = 1 - RhoIR(4) * RhoIR(7);
                 FacRhoIR85 = 1 - RhoIR(8) * RhoIR(5);
@@ -3757,7 +3755,7 @@ namespace WindowManager {
             RhoShIR1 = max(0.0, 1.0 - TauShIR - EpsShIR1);
             RhoShIR2 = max(0.0, 1.0 - TauShIR - EpsShIR2);
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
-                RhoGlIR2 = 1.0 - state.dataWindowManager->emis[2 * state.dataWindowManager->ngllayer-1];
+                RhoGlIR2 = 1.0 - state.dataWindowManager->emis[2 * state.dataWindowManager->ngllayer - 1];
                 ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
             } else if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                 RhoGlIR1 = 1.0 - state.dataWindowManager->emis[0];
@@ -3779,7 +3777,7 @@ namespace WindowManager {
         while (iter < MaxIterations && errtemp > errtemptol) {
 
             for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
-                hr(i) = state.dataWindowManager->emis[i-1] * state.dataWindowManager->sigma * pow_3(state.dataWindowManager->thetas[i-1]);
+                hr(i) = state.dataWindowManager->emis[i - 1] * state.dataWindowManager->sigma * pow_3(state.dataWindowManager->thetas[i - 1]);
                 // Following line is redundant since thetas is being relaxed;
                 // removed by FCW, 3/4/03
                 //! fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
@@ -3798,7 +3796,7 @@ namespace WindowManager {
                 }
                 CalcISO15099WindowIntConvCoeff(state,
                                                SurfNum,
-                                               state.dataWindowManager->thetas[InsideFaceIndex-1] - DataGlobalConstants::KelvinConv,
+                                               state.dataWindowManager->thetas[InsideFaceIndex - 1] - DataGlobalConstants::KelvinConv,
                                                state.dataWindowManager->tin - DataGlobalConstants::KelvinConv);
                 state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             }
@@ -3878,17 +3876,17 @@ namespace WindowManager {
                        Bface); // face temperatures are returned in Bface
 
             for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
-                state.dataWindowManager->thetasPrev[i-1] = state.dataWindowManager->thetas[i-1];
+                state.dataWindowManager->thetasPrev[i - 1] = state.dataWindowManager->thetas[i - 1];
                 if (iter < MaxIterations / 4) {
-                    state.dataWindowManager->thetas[i-1] = 0.5 * state.dataWindowManager->thetas[i-1] + 0.5 * Bface(i);
+                    state.dataWindowManager->thetas[i - 1] = 0.5 * state.dataWindowManager->thetas[i - 1] + 0.5 * Bface(i);
                 } else {
-                    state.dataWindowManager->thetas[i-1] = 0.75 * state.dataWindowManager->thetas[i-1] + 0.25 * Bface(i);
+                    state.dataWindowManager->thetas[i - 1] = 0.75 * state.dataWindowManager->thetas[i - 1] + 0.25 * Bface(i);
                 }
             }
 
             errtemp = 0.0;
             for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
-                errtemp += std::abs(state.dataWindowManager->thetas[i-1] - state.dataWindowManager->thetasPrev[i-1]);
+                errtemp += std::abs(state.dataWindowManager->thetas[i - 1] - state.dataWindowManager->thetasPrev[i - 1]);
             }
             errtemp /= state.dataWindowManager->nglfacep;
         }
@@ -3920,7 +3918,7 @@ namespace WindowManager {
                 //                     state.dataWindowManager->thetas[state.dataWindowManager->nglfacep-1]);
                 state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) =
                     ShadeArea * EpsShIR2 *
-                        (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep-1]) -
+                        (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1]) -
                          state.dataWindowManager->Rmir) +
                     EpsShIR1 *
                         (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 2]) -
@@ -3932,7 +3930,7 @@ namespace WindowManager {
                      state.dataWindowManager->Rmir);
                 state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) =
                     ShadeArea * state.dataWindowManager->hcin *
-                    (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep-1] - state.dataWindowManager->tin);
+                    (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1] - state.dataWindowManager->tin);
                 state.dataSurface->SurfWinHeatGain(SurfNum) =
                     state.dataSurface->SurfWinTransSolar(SurfNum) + state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) +
                     state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) + state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) +
@@ -4061,8 +4059,8 @@ namespace WindowManager {
                     ShowContinueError(state,
                                       format("Glazing face index = {} ; new temperature ={:.4R}C  ; previous temperature = {:.4R}C",
                                              i,
-                                             state.dataWindowManager->thetas[i-1] - DataGlobalConstants::KelvinConv,
-                                             state.dataWindowManager->thetasPrev[i-1] - DataGlobalConstants::KelvinConv));
+                                             state.dataWindowManager->thetas[i - 1] - DataGlobalConstants::KelvinConv,
+                                             state.dataWindowManager->thetasPrev[i - 1] - DataGlobalConstants::KelvinConv));
                 }
             }
 
@@ -4160,7 +4158,7 @@ namespace WindowManager {
         if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) { // Interior shade or blind
             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(nglassfaces);
             TGapInlet = state.dataWindowManager->tin;
-            TGlassFace = state.dataWindowManager->thetas[nglassfaces-1];
+            TGlassFace = state.dataWindowManager->thetas[nglassfaces - 1];
             TShadeFace = state.dataWindowManager->thetas[nglassfaces];
         } else { // Exterior shade, screen or blind
             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1);
@@ -5188,13 +5186,13 @@ namespace WindowManager {
             ressum = 0.0;
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
                 ressum += rguess(i);
-                state.dataWindowManager->thetas[i-1] = (ressum / restot) * temdiff + state.dataWindowManager->tout;
+                state.dataWindowManager->thetas[i - 1] = (ressum / restot) * temdiff + state.dataWindowManager->tout;
             }
 
         } else {
             // Use previous time step values
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
-                state.dataWindowManager->thetas[i-1] = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(i);
+                state.dataWindowManager->thetas[i - 1] = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(i);
             }
         }
 
@@ -7160,7 +7158,7 @@ namespace WindowManager {
 
         while (iter < MaxIterations && errtemp > errtemptol) {
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
-                hr(i) = state.dataWindowManager->emis[i-1] * state.dataWindowManager->sigma * pow_3(state.dataWindowManager->thetas[i-1]);
+                hr(i) = state.dataWindowManager->emis[i - 1] * state.dataWindowManager->sigma * pow_3(state.dataWindowManager->thetas[i - 1]);
                 //! fw 3/4/03 if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
             }
 
@@ -7213,11 +7211,11 @@ namespace WindowManager {
 
             errtemp = 0.0;
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
-                errtemp += std::abs(state.dataWindowManager->thetas[i-1] - Bface(i)) / state.dataWindowManager->nglface;
+                errtemp += std::abs(state.dataWindowManager->thetas[i - 1] - Bface(i)) / state.dataWindowManager->nglface;
             }
 
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
-                state.dataWindowManager->thetas[i-1] = 0.5 * (state.dataWindowManager->thetas[i-1] + Bface(i));
+                state.dataWindowManager->thetas[i - 1] = 0.5 * (state.dataWindowManager->thetas[i - 1] + Bface(i));
             }
         }
 
@@ -7279,7 +7277,7 @@ namespace WindowManager {
 
         for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
             ressum += rguess(i);
-            state.dataWindowManager->thetas[i-1] = (ressum / restot) * temdiff + state.dataWindowManager->tout;
+            state.dataWindowManager->thetas[i - 1] = (ressum / restot) * temdiff + state.dataWindowManager->tout;
         }
     }
 

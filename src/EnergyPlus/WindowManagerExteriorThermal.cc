@@ -134,7 +134,7 @@ namespace WindowManager {
             Real64 aTemp = 0;
             for (auto aSide : FenestrationCommon::EnumSide()) {
                 aTemp = aLayer->getTemperature(aSide);
-                state.dataWindowManager->thetas[i-1] = aTemp;
+                state.dataWindowManager->thetas[i - 1] = aTemp;
                 if (i == 1) {
                     SurfOutsideTemp = aTemp - DataGlobalConstants::KelvinConv;
                 }
@@ -189,7 +189,7 @@ namespace WindowManager {
             auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
-                    (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep-1], 4) - rmir) +
+                    (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1], 4) - rmir) +
                 EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 2], 4) - rmir) *
                     RhoGlIR2 * TauShIR / ShGlReflFacIR;
             auto NetIRHeatGainGlass =
@@ -197,7 +197,7 @@ namespace WindowManager {
                 (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglface - 1], 4) - rmir);
             auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
             auto ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
-                                                 (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep-1] - tind);
+                                                 (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1] - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
 
