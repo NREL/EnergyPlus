@@ -10,8 +10,7 @@ Update output reporting of mechanical equipment using 90.1-2019 metrics
 
 ## Justification for New Feature ##
 
-Many new metrics appear in the ASHRAE 90.1-2019 [1] standard. EnergyPlus needs to be updated to support the most commonly used metrics so that users can use these interchanchable between simulation and product information available for specific components. 
-
+Many new metrics appear in the ASHRAE 90.1-2019 [1] standard. EnergyPlus needs to be updated to support the most commonly used metrics so they are in sync with component characteristics. 
 
 ## Overview ##
 
