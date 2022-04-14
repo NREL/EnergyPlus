@@ -1349,24 +1349,29 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (ErrInList) {
             ErrorsFound = true;
         }
-        NumZones = NumNodes;
-        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).NumZones = NumZones;
-        // only allow one control zone for now
-        if (NumNodes > 1) {
-            ShowSevereError(state, format("{}: {}=\"{}\", entered nodelist.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-            ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-            ShowContinueError(state, "..only one control zone is allowed.");
+
+        int ctrlZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, cAlphaArgs(2));
+        if (ctrlZoneNum > 0) {
+            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ControlZoneNum = ctrlZoneNum;
+            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).ZoneNode;
+        } else {
+            ShowSevereError(
+                state, format("{}: {}=\"{}\", invalid Control Zone Name=\"{}\"", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2)));
             ErrorsFound = true;
         }
-        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes.allocate(NumZones);
-        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum.allocate(NumZones);
-        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum.allocate(NumZones);
+        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneInletNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHumidityMaximum,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
 
-        for (ZoneNum = 1; ZoneNum <= NumZones; ++ZoneNum) {
-            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(ZoneNum) = NodeNums(ZoneNum);
-            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(ZoneNum) = 0;
-            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(ZoneNum) = 0;
-        }
+        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).MinSetHum = rNumericArgs(1);
+        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum = rNumericArgs(2);
 
         AllSetPtMgrNum = SetPtMgrNum + state.dataSetPointManager->NumSchSetPtMgrs + state.dataSetPointManager->NumDualSchSetPtMgrs +
                          state.dataSetPointManager->NumOutAirSetPtMgrs + state.dataSetPointManager->NumSZRhSetPtMgrs +
@@ -1411,7 +1416,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         NodeListError = false;
         GetNodeNums(state,
-                    cAlphaArgs(2),
+                    cAlphaArgs(4),
                     NumNodes,
                     NodeNums,
                     NodeListError,
@@ -1422,7 +1427,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
-                    cAlphaFieldNames(2)); // nodes whose max humidity ratio will be set
+                    cAlphaFieldNames(4)); // nodes whose max humidity ratio will be set
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
             state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1453,25 +1458,29 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (ErrInList) {
             ErrorsFound = true;
         }
-        NumZones = NumNodes;
-        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).NumZones = NumZones;
-        // only allow one control zone for now
-        if (NumNodes > 1) {
-            ShowSevereError(state, format("{}: {}=\"{}\", entered nodelist.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-            ShowContinueError(state, "..invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
-            ShowContinueError(state, "..only one control zone is allowed.");
+
+        int ctrlZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, cAlphaArgs(2));
+        if (ctrlZoneNum > 0) {
+            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ControlZoneNum = ctrlZoneNum;
+            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).ZoneNode;
+        } else {
+            ShowSevereError(
+                state, format("{}: {}=\"{}\", invalid Control Zone Name=\"{}\"", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2)));
             ErrorsFound = true;
         }
-        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes.allocate(NumZones);
-        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum.allocate(NumZones);
-        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum.allocate(NumZones);
+        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneInletNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::SetpointManagerSingleZoneHumidityMaximum,
+                              cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
 
-        for (ZoneNum = 1; ZoneNum <= NumZones; ++ZoneNum) {
-            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(ZoneNum) = NodeNums(ZoneNum);
-            //   Actual zone node and controlled zone numbers set in Init subroutine
-            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(ZoneNum) = 0;
-            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(ZoneNum) = 0;
-        }
+        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum = rNumericArgs(1);
+        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum = rNumericArgs(2);
 
         AllSetPtMgrNum = SetPtMgrNum + state.dataSetPointManager->NumSchSetPtMgrs + state.dataSetPointManager->NumDualSchSetPtMgrs +
                          state.dataSetPointManager->NumOutAirSetPtMgrs + state.dataSetPointManager->NumSZRhSetPtMgrs +
@@ -4399,94 +4408,42 @@ void InitSetPointManagers(EnergyPlusData &state)
             // Minimum humidity setpoint managers
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::SZMinHum)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
-                for (SetZoneNum = 1; SetZoneNum <= state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
-                    // set the actual and controlled zone numbers
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode ==
-                            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
-                            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) =
-                                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
-                            break;
-                        }
-                    }
-                    // still need to validate...
-                    if (state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) == 0) { // didn't find
-                        ShowSevereError(
-                            state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).Name + "\", invalid zone");
-                        ShowContinueError(
-                            state,
-                            "could not find Controlled Zone=" +
-                                state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
-                        ErrorsFound = true;
-                    } else {
-                        // make sure humidity controlled zone
-                        HstatZoneFound = false;
-                        for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
-                            if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum))
-                                continue;
-                            HstatZoneFound = true;
-                            break;
-                        }
-                        if (!HstatZoneFound) {
-                            ShowSevereError(state,
-                                            cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).Name +
-                                                "\", invalid humidistat specification");
-                            ShowContinueError(
-                                state,
-                                "could not locate Humidistat in Zone=" +
-                                    state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
-                            ErrorsFound = true;
-                        }
-                    }
+                // make sure humidity controlled zone
+                int actualZoneNum =
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ControlZoneNum).ActualZoneNum;
+                HstatZoneFound = false;
+                for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                    if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != actualZoneNum) continue;
+                    HstatZoneFound = true;
+                    break;
+                }
+                if (!HstatZoneFound) {
+                    ShowSevereError(state,
+                                    cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).Name +
+                                        "\", invalid humidistat specification");
+                    ShowContinueError(state, "could not locate Humidistat in Zone=" + state.dataHeatBal->Zone(actualZoneNum).Name);
+                    ErrorsFound = true;
                 }
             }
 
             // Maximum humidity setpoint managers
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::SZMaxHum)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
-                for (SetZoneNum = 1; SetZoneNum <= state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
-                    // set the actual and controlled zone numbers
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode ==
-                            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
-                            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) =
-                                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
-                            break;
-                        }
-                    }
-                    // still need to validate...
-                    if (state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) == 0) { // didn't find
-                        ShowSevereError(
-                            state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).Name + "\", invalid zone");
-                        ShowContinueError(
-                            state,
-                            "could not find Controlled Zone=" +
-                                state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
-                        ErrorsFound = true;
-                    } else {
-                        // make sure humidity controlled zone
-                        HstatZoneFound = false;
-                        for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
-                            if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum))
-                                continue;
-                            HstatZoneFound = true;
-                            break;
-                        }
-                        if (!HstatZoneFound) {
-                            ShowSevereError(state,
-                                            cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).Name +
-                                                "\", invalid humidistat specification");
-                            ShowContinueError(
-                                state,
-                                "could not locate Humidistat in Zone=" +
-                                    state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
-                            ErrorsFound = true;
-                        }
-                    }
+                // make sure humidity controlled zone
+                int actualZoneNum =
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ControlZoneNum).ActualZoneNum;
+                HstatZoneFound = false;
+                for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                    if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != actualZoneNum) continue;
+                    HstatZoneFound = true;
+                    break;
+                }
+                if (!HstatZoneFound) {
+                    ShowSevereError(state,
+                                    cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).Name +
+                                        "\", invalid humidistat specification");
+                    ShowContinueError(state, "could not locate Humidistat in Zone=" + state.dataHeatBal->Zone(actualZoneNum).Name);
+                    ErrorsFound = true;
                 }
             }
 
@@ -5375,10 +5332,6 @@ void InitSetPointManagers(EnergyPlusData &state)
         }
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMinHumSetPtMgrs; ++SetPtMgrNum) { // Minimum humidity setpoint managers
-            for (ZoneIndex = 1; ZoneIndex <= state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).NumZones; ++ZoneIndex) {
-                ZoneNode = state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(ZoneIndex);
-                state.dataLoopNodes->Node(ZoneNode).MassFlowRate = 0.0;
-            }
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                 state.dataLoopNodes->Node(NodeNum).HumRatMin = 0.007;                                        // Set the setpoint
@@ -5386,10 +5339,6 @@ void InitSetPointManagers(EnergyPlusData &state)
         }
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) { // Maximum humidity setpoint managers
-            for (ZoneIndex = 1; ZoneIndex <= state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).NumZones; ++ZoneIndex) {
-                ZoneNode = state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(ZoneIndex);
-                state.dataLoopNodes->Node(ZoneNode).MassFlowRate = 0.0;
-            }
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                 state.dataLoopNodes->Node(NodeNum).HumRatMax = 0.011;                                        // Set the setpoint
@@ -6433,13 +6382,6 @@ void DefineSZOneStageHeatingSetPointManager::calculate(EnergyPlusData &state)
 void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   October 2000
-    //       MODIFIED       Shirey/Raustad Jan 2002
-    //                      Gu, Dec 2007
-    //       RE-ENGINEERED  na
-
     // PURPOSE OF THIS SUBROUTINE:
     // From humidity load of the control zone, calculate the supply air humidity
     // needed to meet the minimum humidity setpoint
@@ -6449,43 +6391,26 @@ void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
     // is used to calculate the minimum supply air humidity ratio
     // needed to meet minimum zone relative humidity requirement
 
-    // Using/Aliasing
-    using DataHVACGlobals::SmallMassFlow;
-    using Psychrometrics::PsyWFnTdbRhPb;
-
-    int ZoneNode;
-    Real64 ZoneMassFlow;
-    int ZoneNum;
-    Real64 MoistureLoad; // Zone moisture load (kg moisture/second) required to meet the relative humidity setpoint
-    // Value obtained from ZoneTempPredictorCorrector (via ZoneSysMoistureDemand in DataZoneEnergyDemands)
-    Real64 SupplyAirHumRat; // Desired air humidity ratio
-
     this->SetPt = 0.0;
-    // Only use one zone for now
-    ZoneNode = this->ZoneNodes(1);
-    ZoneMassFlow = state.dataLoopNodes->Node(ZoneNode).MassFlowRate;
-    ZoneNum = this->ZoneNum(1);
+    Real64 supplyMassFlow = state.dataLoopNodes->Node(this->ZoneInletNodeNum).MassFlowRate;
 
-    if (ZoneMassFlow > SmallMassFlow) {
+    if (supplyMassFlow > DataHVACGlobals::SmallMassFlow) {
 
-        MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToHumidifyingSP;
+        // Positive MoistureLoad means a humidification load
+        Real64 moistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ControlZoneNum).OutputRequiredToHumidifyingSP;
 
-        SupplyAirHumRat = max(0.0, state.dataLoopNodes->Node(ZoneNode).HumRat + MoistureLoad / ZoneMassFlow);
+        // MoistureLoad (negative for dehumidification) may be so large that a negative humrat results, cap at 0.00001
+        Real64 supplyAirHumRat = max(0.00001, state.dataLoopNodes->Node(this->ZoneNodeNum).HumRat + moistureLoad / supplyMassFlow);
+        // Apply limits
+        supplyAirHumRat = max(supplyAirHumRat, this->MinSetHum);
+        supplyAirHumRat = min(supplyAirHumRat, this->MaxSetHum);
 
-        // Positive Humidity Ratio MoistureLoad means a humidification load and only humidifying can raise up to a minimum
-        //  IF(MoistureLoad .GT. 0.0) SZMinHumSetPtMgr(SetPtMgrNum)%SetPt = SupplyAirHumRat
-        this->SetPt = SupplyAirHumRat;
+        this->SetPt = supplyAirHumRat;
     }
 }
 
 void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
 {
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Raustad/Shirey, FSEC
-    //       DATE WRITTEN   January 2004
-    //       MODIFIED       Gu, Dec. 2007
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // From humidity load of the control zone, calculate the supply air humidity
@@ -6496,34 +6421,21 @@ void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     // is used to calculate the maximum supply air humidity ratio
     // needed to meet maximum zone relative humidity requirement
 
-    // Using/Aliasing
-    using DataHVACGlobals::SmallMassFlow;
-    using Psychrometrics::PsyWFnTdbRhPb;
-
-    int ZoneNode;        // Control zone air node number
-    Real64 ZoneMassFlow; // Zone air mass flow rate (kg/s)
-    Real64 MoistureLoad; // Zone moisture load (kg moisture/sec) required to meet the relative humidity setpoint
-    // Value obtained from ZoneTempPredictorCorrector (via ZoneSysMoistureDemand in DataZoneEnergyDemands)
-    Real64 SupplyAirHumRat; // Desired air humidity ratio
-    Real64 SystemMassFlow;
-
     this->SetPt = 0.0;
-    // Only use one zone for now
-    ZoneNode = this->ZoneNodes(1);
-    ZoneMassFlow = state.dataLoopNodes->Node(ZoneNode).MassFlowRate;
+    Real64 supplyMassFlow = state.dataLoopNodes->Node(this->ZoneInletNodeNum).MassFlowRate;
 
-    if (ZoneMassFlow > SmallMassFlow) {
+    if (supplyMassFlow > DataHVACGlobals::SmallMassFlow) {
 
-        MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToDehumidifyingSP;
-
-        SystemMassFlow = state.dataLoopNodes->Node(this->CtrlNodes(1)).MassFlowRate;
+        // Negative MoistureLoad means a dehumidification load
+        Real64 moistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
         // MoistureLoad (negative for dehumidification) may be so large that a negative humrat results, cap at 0.00001
-        SupplyAirHumRat = max(0.00001, state.dataLoopNodes->Node(ZoneNode).HumRat + MoistureLoad / ZoneMassFlow);
+        Real64 supplyAirHumRat = max(0.00001, state.dataLoopNodes->Node(this->ZoneNodeNum).HumRat + moistureLoad / supplyMassFlow);
+        // Apply limits
+        supplyAirHumRat = max(supplyAirHumRat, this->MinSetHum);
+        supplyAirHumRat = min(supplyAirHumRat, this->MaxSetHum);
 
-        // This hum rat is currently used in Controller:Simple, control variable "TEMPandHUMRAT" (Jan 2004)
-        // Negative MoistureLoad means a dehumidification load
-        this->SetPt = SupplyAirHumRat;
+        this->SetPt = supplyAirHumRat;
     }
 }
 

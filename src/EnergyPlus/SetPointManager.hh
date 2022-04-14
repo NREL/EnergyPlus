@@ -333,18 +333,14 @@ namespace SetPointManager {
     struct DefineSZMinHumSetPointManager : SPBase // Derived Type for Single Zone Minimum Humidity Setpoint Manager data
     {
         // Members
-        int NumZones;            // number of zones whose humidity is being controlled
-        int NumCtrlNodes;        // number of nodes whose humidity ratio is being set
-        Array1D_int ZoneNodes;   // zone node numbers of zones being controlled
-        Array1D_int ZoneNum;     // actual zone number ( index into Zone array)
-        Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
-        Array1D_int CtrlNodes;   // nodes where humidity ratio is being set
-        Real64 SetPt;            // the setpoint
-
-        // Default Constructor
-        DefineSZMinHumSetPointManager() : NumZones(0), NumCtrlNodes(0), SetPt(0.0)
-        {
-        }
+        int ControlZoneNum;         // number (index into Zone array) of control zone
+        int ZoneNodeNum;            // zone node number
+        int ZoneInletNodeNum;       // inlet node number for the supply air
+        Real64 MinSetHum = 0.00001; // minimum supply air humidity ratio [kg/kg]
+        Real64 MaxSetHum = 0.015;   // maximum supply air humidity ratio [kg/kg]
+        int NumCtrlNodes = 0;       // number of setpoint nodes
+        Array1D_int CtrlNodes;      // node numbers of nodes where setpoint is to be set
+        Real64 SetPt = 0.0;         // the setpoint
 
         void calculate(EnergyPlusData &state);
     };
@@ -352,18 +348,14 @@ namespace SetPointManager {
     struct DefineSZMaxHumSetPointManager : SPBase // Derived Type for Single Zone Maximum Humidity Setpoint Manager data
     {
         // Members
-        int NumZones;            // number of zones whose humidity is being controlled
-        int NumCtrlNodes;        // number of nodes whose humidity ratio is being set
-        Array1D_int ZoneNodes;   // zone node numbers of zones being controlled
-        Array1D_int ZoneNum;     // actual zone number (index into Zone array)
-        Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
-        Array1D_int CtrlNodes;   // nodes where humidity ratio is being set
-        Real64 SetPt;            // the setpoint
-
-        // Default Constructor
-        DefineSZMaxHumSetPointManager() : NumZones(0), NumCtrlNodes(0), SetPt(0.0)
-        {
-        }
+        int ControlZoneNum;         // number (index into Zone array) of control zone
+        int ZoneNodeNum;            // zone node number
+        int ZoneInletNodeNum;       // inlet node number for the supply air
+        Real64 MinSetHum = 0.00001; // minimum supply air humidity ratio [kg/kg]
+        Real64 MaxSetHum = 0.015;   // maximum supply air humidity ratio [kg/kg]
+        int NumCtrlNodes = 0;       // number of setpoint nodes
+        Array1D_int CtrlNodes;      // node numbers of nodes where setpoint is to be set
+        Real64 SetPt = 0.0;         // the setpoint
 
         void calculate(EnergyPlusData &state);
     };
