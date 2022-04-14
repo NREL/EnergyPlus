@@ -1301,11 +1301,17 @@ namespace OutputReportPredefined {
         s->pdchHeatingUnmetDegreeOccHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h)");
         s->pdchHeatingUnmetDegreeOccupiedHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupied Degree-Hours (°C·h)");
 
-        s->pdstDiscomfortWtExceedHour = newPreDefSubTable(state, s->pdrThermalResilience, "Discomfort-weighted Exceedance Hours");
-        s->pdchVeryColdExceedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedHour, "Very-cold Exceedance OccupantHours [hr]");
-        s->pdchCoolExceedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedHour, "Cool Exceedance OccupantHours [hr]");
-        s->pdchWarmExceedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedHour, "Warm Exceedance OccupantHours [hr]");
-        s->pdchVeryHotExceedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedHour, "Very-hot Exceedance OccupantHours [hr]");
+        s->pdstDiscomfortWtExceedOccuHour = newPreDefSubTable(state, s->pdrThermalResilience, "Discomfort-weighted Exceedance OccupantHours");
+        s->pdchVeryColdExceedOccuHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccuHour, "Very-cold Exceedance OccupantHours [hr]");
+        s->pdchCoolExceedOccuHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccuHour, "Cool Exceedance OccupantHours [hr]");
+        s->pdchWarmExceedOccuHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccuHour, "Warm Exceedance OccupantHours [hr]");
+        s->pdchVeryHotExceedOccuHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccuHour, "Very-hot Exceedance OccupantHours [hr]");
+
+        s->pdstDiscomfortWtExceedOccupiedHour = newPreDefSubTable(state, s->pdrThermalResilience, "Discomfort-weighted Exceedance OccupiedHours");
+        s->pdchVeryColdExceedOccupiedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccupiedHour, "Very-cold Exceedance OccupiedHours [hr]");
+        s->pdchCoolExceedOccupiedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccupiedHour, "Cool Exceedance OccupiedHours [hr]");
+        s->pdchWarmExceedOccupiedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccupiedHour, "Warm Exceedance OccupiedHours [hr]");
+        s->pdchVeryHotExceedOccupiedHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccupiedHour, "Very-hot Exceedance OccupiedHours [hr]");
 
         s->pdrCO2Resilience = newPreDefReport(state, "CO2ResilienceSummary", "CO2R", "Annual CO2 Resilience Summary");
 

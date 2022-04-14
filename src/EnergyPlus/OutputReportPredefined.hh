@@ -1176,11 +1176,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHeatingUnmetDegreeOccHour = 0;
     int pdchHeatingUnmetDegreeOccupiedHour = 0;
 
-    int pdstDiscomfortWtExceedHour = 0;
-    int pdchVeryColdExceedHour = 0;
-    int pdchCoolExceedHour = 0;
-    int pdchWarmExceedHour = 0;
-    int pdchVeryHotExceedHour = 0;
+    int pdstDiscomfortWtExceedOccuHour = 0;
+    int pdstDiscomfortWtExceedOccupiedHour = 0;
+    int pdchVeryColdExceedOccuHour = 0;
+    int pdchCoolExceedOccuHour = 0;
+    int pdchWarmExceedOccuHour = 0;
+    int pdchVeryHotExceedOccuHour = 0;
+    int pdchVeryColdExceedOccupiedHour = 0;
+    int pdchCoolExceedOccupiedHour = 0;
+    int pdchWarmExceedOccupiedHour = 0;
+    int pdchVeryHotExceedOccupiedHour = 0;
 
     int pdrCO2Resilience = 0;
     int pdstCO2Hours = 0;
@@ -2126,11 +2131,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchHeatingUnmetDegreeHour = 0;
         this->pdchHeatingUnmetDegreeOccHour = 0;
         this->pdchHeatingUnmetDegreeOccupiedHour = 0;
-        this->pdstDiscomfortWtExceedHour = 0;
-        this->pdchVeryColdExceedHour = 0;
-        this->pdchCoolExceedHour = 0;
-        this->pdchWarmExceedHour = 0;
-        this->pdchVeryHotExceedHour = 0;
+        this->pdstDiscomfortWtExceedOccuHour = 0;
+        this->pdstDiscomfortWtExceedOccupiedHour = 0;
+        this->pdchVeryColdExceedOccuHour = 0;
+        this->pdchCoolExceedOccuHour = 0;
+        this->pdchWarmExceedOccuHour = 0;
+        this->pdchVeryHotExceedOccuHour = 0;
+        this->pdchVeryColdExceedOccupiedHour = 0;
+        this->pdchCoolExceedOccupiedHour = 0;
+        this->pdchWarmExceedOccupiedHour = 0;
+        this->pdchVeryHotExceedOccupiedHour = 0;
         this->pdrCO2Resilience = 0;
         this->pdstCO2Hours = 0;
         this->pdchCO2HourSafe = 0;
