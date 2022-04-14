@@ -31,7 +31,10 @@ class EnergyPlusPath(object):
         install_folders = glob.glob('/Applications/EnergyPlus*')
 
         # then process them into a nice list
-        ep_versions = sorted([EnergyPlusPath.get_version_number_from_path(x) for x in install_folders])
+        ep_versions = [EnergyPlusPath.get_version_number_from_path(x)
+                       for x in install_folders]
+        ep_versions = sorted(
+            ep_versions, key=lambda x: [int(x) for x in x.split('-')])
 
         # set current_entry to something meaningful if needed
         new_version = ep_versions[-1]
