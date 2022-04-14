@@ -260,6 +260,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneHumidex;
     Array1D<bool> CrossedColdThresh;
     Array1D<bool> CrossedHeatThresh;
+    Array2D<bool> CrossedColdThreshRepPeriod;
+    Array2D<bool> CrossedHeatThreshRepPeriod;
     Array1D_int ZoneNumOcc;
 
     Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
@@ -278,6 +280,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array2D<int> highSETLongestStartRepPeriod;
     Array1D<std::vector<Real64>> ZoneColdHourOfSafetyBins;
     Array1D<std::vector<Real64>> ZoneHeatHourOfSafetyBins;
+    Array2D<std::vector<Real64>> ZoneColdHourOfSafetyBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHeatHourOfSafetyBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneUnmetDegreeHourBins;
     Array2D<std::vector<Real64>> ZoneUnmetDegreeHourBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneDiscomfortWtExceedHourBins;
@@ -419,6 +423,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->ZoneNumOcc.deallocate();
         this->CrossedColdThresh.deallocate();
         this->CrossedHeatThresh.deallocate();
+        this->CrossedColdThreshRepPeriod.deallocate();
+        this->CrossedHeatThreshRepPeriod.deallocate();
         ;
         this->ZoneHeatIndexHourBins.deallocate();
         this->ZoneHeatIndexOccuHourBins.deallocate();
@@ -426,6 +432,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->ZoneHumidexOccuHourBins.deallocate();
         this->ZoneColdHourOfSafetyBins.deallocate();
         this->ZoneHeatHourOfSafetyBins.deallocate();
+        this->ZoneColdHourOfSafetyBinsRepPeriod.deallocate();
+        this->ZoneHeatHourOfSafetyBinsRepPeriod.deallocate();
         this->ZoneUnmetDegreeHourBins.deallocate();
         this->ZoneUnmetDegreeHourBinsRepPeriod.deallocate();
         this->ZoneDiscomfortWtExceedHourBins.deallocate();

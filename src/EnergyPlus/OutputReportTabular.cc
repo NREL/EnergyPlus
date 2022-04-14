@@ -12589,6 +12589,20 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         WriteSETHoursTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod);
 
+        columnHead(1) = "Hours of Safety [hr]";
+        columnHead(2) = "End Time of the Safety Duration";
+        columnHead(3) = "Safe Temperature Exceedance Hours [hr]";
+        columnHead(4) = "Safe Temperature Exceedance OccupantHours [hr]";
+        columnHead(5) = "Safe Temperature Exceedance OccupiedHours [hr]";
+
+        tableName = "Hours of Safety for Cold Events";
+        WriteHourOfSafetyTableReportingPeriod(
+            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod, 2);
+
+        tableName = "Hours of Safety for Heat Events";
+        WriteHourOfSafetyTableReportingPeriod(
+            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod, 2);
+
         int columnNumUnmetDegHr = 6;
         Array1D_string columnHeadUnmetDegHr(6);
         // must initialize this otherwise it will only output 5 columns
@@ -12750,6 +12764,66 @@ void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
     tableBody(columnNum, state.dataGlobal->NumOfZones + 1) = "-";
     tableBody(columnNum, state.dataGlobal->NumOfZones + 2) = "-";
     tableBody(columnNum, state.dataGlobal->NumOfZones + 3) = "-";
+
+    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+}
+
+void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
+                                           int const columnNum,
+                                           int const periodIdx,
+                                           const std::string tableName,
+                                           Array1D_string const &columnHead,
+                                           Array1D_int columnWidth,
+                                           Array2D<std::vector<Real64>> const &ZoneBins,
+                                           int const dateColIdx)
+{
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+    tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
+
+    WriteSubtitle(state, tableName);
+    tableBody = "";
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
+        for (int j = 1; j <= columnNum; j++) {
+            tableBody(j, ZoneNum) = RealToStr(ZoneBins(ZoneNum, periodIdx)[j - 1], 2);
+        }
+        tableBody(dateColIdx, ZoneNum) = DateToString(ZoneBins(ZoneNum, periodIdx)[dateColIdx - 1]);
+    }
+
+    std::vector<Real64> columnMax(columnNum, 0);
+    std::vector<Real64> columnMin(columnNum, 0);
+    std::vector<Real64> columnSum(columnNum, 0);
+
+    for (int j = 0; j < columnNum; j++) {
+        columnMin[j] = ZoneBins(1, periodIdx)[j];
+    }
+    for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
+        std::string ZoneName = state.dataHeatBal->Zone(i).Name;
+        for (int j = 0; j < columnNum; j++) {
+            Real64 curValue = ZoneBins(i, periodIdx)[j];
+            if (curValue > columnMax[j]) columnMax[j] = curValue;
+            if (curValue < columnMin[j]) columnMin[j] = curValue;
+            columnSum[j] += curValue;
+        }
+    }
+
+    rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
+    rowHead(state.dataGlobal->NumOfZones + 2) = "Max";
+    rowHead(state.dataGlobal->NumOfZones + 3) = "Average";
+    rowHead(state.dataGlobal->NumOfZones + 4) = "Sum";
+
+    for (int j = 0; j < columnNum; j++) {
+        tableBody(j + 1, state.dataGlobal->NumOfZones + 1) = RealToStr(columnMin[j], 2);
+        tableBody(j + 1, state.dataGlobal->NumOfZones + 2) = RealToStr(columnMax[j], 2);
+        tableBody(j + 1, state.dataGlobal->NumOfZones + 3) = RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2);
+        tableBody(j + 1, state.dataGlobal->NumOfZones + 4) = RealToStr(columnSum[j], 2);
+    }
+
+    for (int i = 1; i < 5; i++) {
+        tableBody(dateColIdx, state.dataGlobal->NumOfZones + i) = "-";
+    }
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
 }

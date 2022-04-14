@@ -6033,6 +6033,10 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneNumOcc.dimension(state.dataGlobal->NumOfZones, 0);
         state.dataHeatBalFanSys->CrossedColdThresh.dimension(state.dataGlobal->NumOfZones, false);
         state.dataHeatBalFanSys->CrossedHeatThresh.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->CrossedColdThreshRepPeriod = false;
+        state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod = false;
         state.dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
@@ -6046,6 +6050,8 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins.allocate(state.dataGlobal->NumOfZones);

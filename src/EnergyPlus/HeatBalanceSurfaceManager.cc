@@ -5512,6 +5512,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                     state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, i).assign(SETNoBins, 0.0);
                     state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, i).assign(SETNoBins, 0.0);
                 }
+                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, i).assign(ColdHourOfSafetyNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, i).assign(HeatHourOfSafetyNoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, i).assign(UnmetDegreeHourNoBins, 0.0);
             }
             state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod = 0.0;
@@ -5632,7 +5634,66 @@ void ReportThermalResilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZoneDiscomfortWtExceedHourBins(ZoneNum)[3] +=
                     (PMV - VeryHotPMVThresh) * state.dataGlobal->TimeStepZone / max(1, NumOcc);
             }
+
+            if (ReportPeriodIdx > 0) {
+                ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
+                bool &CrossedColdThreshRepPeriod = state.dataHeatBalFanSys->CrossedColdThreshRepPeriod(ZoneNum, ReportPeriodIdx);
+                if (Temperature > ColdTempThresh) {
+                    if (!CrossedColdThreshRepPeriod) {
+                        // compute the number of hours before threshold is reached
+                        state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                    }
+                    // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                    state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                        NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                        (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                } else {
+                    // first time crossing threshold
+                    if (!CrossedColdThreshRepPeriod) {
+                        // compute the time when the zone crosses the threshold temperature
+                        int encodedMonDayHrMin;
+                        General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                   state.dataEnvrn->Month,
+                                                   state.dataEnvrn->DayOfMonth,
+                                                   state.dataGlobal->HourOfDay,
+                                                   state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                        // fixme: not sure how to aggregate by zone
+                        state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] = encodedMonDayHrMin;
+                        CrossedColdThreshRepPeriod = true;
+                    }
+                }
+                HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
+                bool &CrossedHeatThreshRepPeriod = state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod(ZoneNum, ReportPeriodIdx);
+                if (Temperature < HeatTempThresh) {
+                    if (!CrossedHeatThreshRepPeriod) {
+                        // compute the number of hours before threshold is reached
+                        state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                    }
+                    // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                    state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                        NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                        (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                } else {
+                    // first time crossing threshold
+                    if (!CrossedHeatThreshRepPeriod) {
+                        // compute the time when the zone crosses the threshold temperature
+                        int encodedMonDayHrMin;
+                        General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                   state.dataEnvrn->Month,
+                                                   state.dataEnvrn->DayOfMonth,
+                                                   state.dataGlobal->HourOfDay,
+                                                   state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                        state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] = encodedMonDayHrMin;
+                        CrossedHeatThreshRepPeriod = true;
+                    }
+                }
+            }
         }
+
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 HI = state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum);
             Real64 Humidex = state.dataHeatBalFanSys->ZoneHumidex(ZoneNum);
@@ -5752,6 +5813,7 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
 
             if (ReportPeriodIdx > 0) {
+
                 if (HI <= 26.7) {
                     state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
                     state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
@@ -5885,7 +5947,6 @@ void ReportThermalResilience(EnergyPlusData &state)
                                 state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx);
                         }
                     }
-
                     if (state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) == 0) {
                         // No occupants: record the last time step duration if longer than the record.
                         if (state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) >
