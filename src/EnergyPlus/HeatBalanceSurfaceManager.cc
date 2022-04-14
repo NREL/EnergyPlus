@@ -5515,6 +5515,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, i).assign(ColdHourOfSafetyNoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, i).assign(HeatHourOfSafetyNoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, i).assign(UnmetDegreeHourNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, i).assign(DiscomfortWtExceedHourNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, i).assign(DiscomfortWtExceedHourNoBins, 0.0);
             }
             state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod = 0.0;
             state.dataHeatBalFanSys->highSETLongestHoursRepPeriod = 0.0;
@@ -5698,6 +5700,36 @@ void ReportThermalResilience(EnergyPlusData &state)
                         state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] = encodedMonDayHrMin;
                         CrossedHeatThreshRepPeriod = true;
                     }
+                }
+
+                Real64 VeryHotPMVThresh = 3.0;
+                Real64 WarmPMVThresh = 0.7;
+                Real64 CoolPMVThresh = -0.7;
+                Real64 VeryColdPMVThresh = -3.0;
+                Real64 PMV = state.dataThermalComforts->ThermalComfortData(iPeople).FangerPMV;
+                if (PMV < VeryColdPMVThresh) {
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                        (VeryColdPMVThresh - PMV) * NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                        (VeryColdPMVThresh - PMV) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                }
+                if (PMV < CoolPMVThresh) {
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                        (CoolPMVThresh - PMV) * NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                        (CoolPMVThresh - PMV) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                }
+                if (PMV > WarmPMVThresh) {
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                        (PMV - WarmPMVThresh) * NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                        (PMV - WarmPMVThresh) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                }
+                if (PMV > VeryHotPMVThresh) {
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                        (PMV - VeryHotPMVThresh) * NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                        (PMV - VeryHotPMVThresh) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
                 }
             }
         }

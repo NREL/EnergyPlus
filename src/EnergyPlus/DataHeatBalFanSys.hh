@@ -286,6 +286,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array2D<std::vector<Real64>> ZoneUnmetDegreeHourBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneDiscomfortWtExceedOccuHourBins;
     Array1D<std::vector<Real64>> ZoneDiscomfortWtExceedOccupiedHourBins;
+    Array2D<std::vector<Real64>> ZoneDiscomfortWtExceedOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
     Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
     Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
@@ -439,6 +441,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->ZoneUnmetDegreeHourBinsRepPeriod.deallocate();
         this->ZoneDiscomfortWtExceedOccuHourBins.deallocate();
         this->ZoneDiscomfortWtExceedOccupiedHourBins.deallocate();
+        this->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.deallocate();
+        this->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.deallocate();
         this->ZonePierceSET.deallocate();
         this->ZonePierceSETLastStep.deallocate();
         this->ZoneLowSETHours.deallocate();

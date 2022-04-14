@@ -3403,9 +3403,9 @@ void WriteTableOfContents(EnergyPlusData &state)
             }
             if (ort->displayThermalResilienceSummary) {
                 int nReportPeriods = state.dataWeatherManager->TotReportPers;
+                std::string ReportPeriod_Thermal_Resilience_Summary = "";
                 for (int i = 1; i <= nReportPeriods; i++) {
-                    static std::string const ReportPeriod_Thermal_Resilience_Summary(
-                        fmt::format("Thermal Resilience Summary for Reporting Period {}", i));
+                    ReportPeriod_Thermal_Resilience_Summary = fmt::format("Thermal Resilience Summary for Reporting Period {}", i);
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility)
                                << "\">Thermal Resilience Summary for Reporting Period " << i << "</a>\n";
                 }
@@ -12624,6 +12624,17 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 columnHeadUnmetDegHr,
                                                 columnWidthUnmetDegHr,
                                                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod);
+
+        columnHead(1) = "Very-cold Exceedance OccupiedHours [hr]";
+        columnHead(2) = "Cool Exceedance OccupiedHours [hr]";
+        columnHead(3) = "Warm Exceedance OccupiedHours [hr]";
+        columnHead(4) = "Very-hot Exceedance OccupiedHours [hr]";
+        tableName = "Discomfort-weighted Exceedance OccupantHours";
+        WriteResilienceBinsTableReportingPeriod(
+            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod);
+        tableName = "Discomfort-weighted Exceedance OccupiedHours";
+        WriteResilienceBinsTableReportingPeriod(
+            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod);
     }
 }
 
