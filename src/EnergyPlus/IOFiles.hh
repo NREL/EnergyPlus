@@ -738,6 +738,7 @@ public:
     InputOutputFilePath dxf{"eplusout.dxf"};
     InputOutputFilePath sci{"eplusout.sci"};
     InputOutputFilePath wrl{"eplusout.wrl"};
+    InputOutputFilePath rmd{"eplusout.rmd"};
 
     InputOutputFilePath delightIn{"eplusout.delightin"};
 

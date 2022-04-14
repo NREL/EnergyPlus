@@ -475,6 +475,7 @@ namespace CommandLineInterface {
         state.files.sln.filePath = composePath(normalSuffix + ".sln");
         state.files.sci.filePath = composePath(normalSuffix + ".sci");
         state.files.wrl.filePath = composePath(normalSuffix + ".wrl");
+        state.files.rmd.filePath = composePath(normalSuffix + ".rmd");
         state.dataStrGlobals->outputSqlFilePath = composePath(normalSuffix + ".sql");
         state.files.debug.filePath = composePath(normalSuffix + ".dbg");
         state.dataStrGlobals->outputPerfLogFilePath = composePath(normalSuffix + "_perflog.csv");
