@@ -121,10 +121,9 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             }
             break;
         }
-        case DataAirSystems::Invalid: {
+        default:
             // do nothing
             break;
-        }
         } // end switch
     }
 

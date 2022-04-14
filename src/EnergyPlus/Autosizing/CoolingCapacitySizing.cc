@@ -381,10 +381,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 FanCoolLoad = this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::Invalid: {
+                            default:
                                 // do nothing
                                 break;
-                            }
                             } // end switch
 
                             switch (this->primaryAirSystem(this->curSysNum).retFanModelType) {
@@ -396,10 +395,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 FanCoolLoad += (1.0 - OutAirFrac) * this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::Invalid: {
+                            default:
                                 // do nothing
                                 break;
-                            }
                             } // end switch
 
                             this->primaryAirSystem(this->curSysNum).FanDesCoolLoad = FanCoolLoad;
