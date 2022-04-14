@@ -254,7 +254,8 @@ TEST_F(EnergyPlusFixture, OutputControlFiles)
         "  Yes,                     !- Output WRL",
         "  Yes,                     !- Output Screen",
         "  Yes,                     !- Output ExtShd",
-        "  Yes;                     !- Output Tarcog",
+        "  Yes,                     !- Output Tarcog",
+        "  Yes;                     !- Output RMD",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -316,7 +317,8 @@ OutputControl:Files,
   {wrl},              !- Output WRL
   {screen},           !- Output Screen
   {extshd},           !- Output ExtShd
-  {tarcog};           !- Output Tarcog
+  {tarcog},           !- Output Tarcog
+  {rmd};              !- Output RMD
   )";
 
     auto boolToString = [](bool b) { return b ? "Yes" : "No"; };
@@ -353,6 +355,7 @@ OutputControl:Files,
         bool screen = (i == 28);
         bool extshd = (i == 29);
         bool tarcog = (i == 30);
+        bool rmd = (i == 31);
 
         std::string const idf_objects = fmt::format(idf_objects_fmt,
                                                     fmt::arg("csv", boolToString(csv)),
@@ -385,7 +388,8 @@ OutputControl:Files,
                                                     fmt::arg("wrl", boolToString(wrl)),
                                                     fmt::arg("screen", boolToString(screen)),
                                                     fmt::arg("extshd", boolToString(extshd)),
-                                                    fmt::arg("tarcog", boolToString(tarcog)));
+                                                    fmt::arg("tarcog", boolToString(tarcog)),
+                                                    fmt::arg("rmd", boolToString(rmd)));
 
         EXPECT_TRUE(process_idf(idf_objects));
 
@@ -422,6 +426,7 @@ OutputControl:Files,
         EXPECT_EQ(screen, state->files.outputControl.screen);
         EXPECT_EQ(extshd, state->files.outputControl.extshd);
         EXPECT_EQ(tarcog, state->files.outputControl.tarcog);
+        EXPECT_EQ(rmd, state->files.outputControl.rmd);
 
         // state->clear_state();
         // Make explicit that we're resetting everything
@@ -456,6 +461,7 @@ OutputControl:Files,
         state->files.outputControl.screen = false;
         state->files.outputControl.extshd = false;
         state->files.outputControl.tarcog = false;
+        state->files.outputControl.rmd = false;
     }
 }
 

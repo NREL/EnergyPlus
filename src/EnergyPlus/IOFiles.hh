@@ -701,6 +701,7 @@ public:
         bool json = true;
         bool tabular = true;
         bool sqlite = true;
+        bool rmd = true;
     };
 
     OutputControl outputControl;
