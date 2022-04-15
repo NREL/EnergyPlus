@@ -58,13 +58,18 @@ We propose to add an *Output:Table:ReportPeriod* that takes an input of a Summar
 
 The following tables will be appended to the existing Thermal Resilience Summary reports as part of the tabular summary reports.
 
-Report: **Thermal Resilience Summary**
+Report: **Thermal Resilience Summary for Reporting Period 1**
+
 For: **Entire Facility**
+
+Timestamp: **2022-04-13 10:00:00**
+
+**Reporting period: 1/1 8:00 -- 1/3 18:00**
 
 **Hours of Safety for Cold Events**
 
-|	Hours of Safety [h]	| End Time of the Safety Duration | Safe Temperature Exceedance Hours [h] | Safe Temperature Exceedance OccupantHours [h]
-|-----------------------|---------------------------------|---------------------------------------|------------------|
+|     |	Hours of Safety [hr]	| End Time of the Safety Duration | Safe Temperature Exceedance Hours [hr] | Safe Temperature Exceedance OccupantHours [hr] | Safe Temperature Exceedance OccupiedHours [hr]
+|-----|------------------|---------------------------------|---------------------------------------|------------------|--------------|
 |Space<sub>1</sub>||||
 |...||||
 |Space<sub>N</sub>||||
@@ -73,13 +78,12 @@ For: **Entire Facility**
 |Average||||
 |Sum||||
 
-Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 1. Sample report table of hours of safety for cold events.</p>
 
 **Hours of Safety for Hot Events**
 
-|	Hours of Safety [h]	| End Time of the Safety Duration | Safe Temperature Exceedance Hours [h] | Safe Temperature Exceedance OccupantHours [h]
-|-----------------------|---------------------------------|---------------------------------------|------------------|
+|     |	Hours of Safety [hr]	| End Time of the Safety Duration | Safe Temperature Exceedance Hours [hr] | Safe Temperature Exceedance OccupantHours [hr] | Safe Temperature Exceedance OccupiedHours [hr]
+|-----|------------------|---------------------------------|---------------------------------------|------------------|--------------|
 |Space<sub>1</sub>||||
 |...||||
 |Space<sub>N</sub>||||
@@ -88,28 +92,26 @@ Reporting period: Jun-01 to Jun-03
 |Average||||
 |Sum||||
 
-Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 2. Sample report table of hours of safety for hot events.</p>
 
 **Unmet Degree Hours**
 
-|	Cooling Setpoint Unmet Degree Hours [°C•h] | Cooling Setpoint Unmet Degree OccupantHours [°C•h] | Heating Setpoint Unmet Degree Hours [°C•h] | Heating Setpoint Unmet Degree OccupantHours [°C•h]
-|-----------------------|---------------------------------|---------------------------------------|------------------|
-|Space<sub>1</sub>||||
-|...||||
-|Space<sub>N</sub>||||
-|Min||||
-|Max||||
-|Average||||
-|Sum||||
+|     |Cooling Setpoint Unmet Degree-Hours (°C·h) | Cooling Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h) | Cooling Setpoint Unmet Occupied Degree-Hours (°C·h) | Heating Setpoint Unmet Degree-Hours (°C·h) | Heating Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h) | Heating Setpoint Unmet Occupied Degree-Hours (°C·h) 
+|----|------------------|---------------------------------|---------------------------------------|---------------------------------------|---------------------------------------|------------------|
+|Space<sub>1</sub>|||||||
+|...|||||||
+|Space<sub>N</sub>|||||||
+|Min|||||||
+|Max|||||||
+|Average|||||||
+|Sum|||||||
 
-Reporting period: Jun-01 to Jun-03
 <p style="text-align: center;"> Table 3. Sample report table of unmet degree hours (UDH).</p>
 
 **Discomfort-weighted Exceedance Hours**
 
-|	Very-cold Exceedance OccupantHours [h] | Cool Exceedance OccupantHours [h] | Warm Exceedance OccupantHours [h] | Very-hot Exceedance OccupantHours [h]
-|-----------------------|---------------------------------|---------------------------------------|------------------|
+|     |	Very-cold Exceedance OccupantHours [hr] | Cool Exceedance OccupantHours [hr] | Warm Exceedance OccupantHours [hr] | Very-hot Exceedance OccupantHours [hr]
+|-----|------------------|---------------------------------|---------------------------------------|------------------|
 |Space<sub>1</sub>||||
 |...||||
 |Space<sub>N</sub>||||
@@ -118,16 +120,38 @@ Reporting period: Jun-01 to Jun-03
 |Average||||
 |Sum||||
 
-Reporting period: Jun-01 to Jun-03
-<p style="text-align: center;"> Table 4. Sample report table of discomfort-weighted exceedance hours.</p>
+<p style="text-align: center;"> Table 4. Sample report table of discomfort-weighted exceedance occupanthours.</p>
 
-When *ThermalResilienceSummary* is declared in *Output:Table:SummaryReports*, the above three tables will be generated and presented in the tabular reports. In particular, the *Hours of Safety* table will only be presented if an *Output:Table:ReportPeriod* object is defined for ThermalResilienceSummary report. 
+**Discomfort-weighted Exceedance OccupiedHours**
 
-### 2. Warnings for power outage ###
+|     |	Very-cold Exceedance OccupiedHours [hr] | Cool Exceedance OccupiedHours [hr] | Warm Exceedance OccupiedHours [hr] | Very-hot Exceedance OccupiedHours [hr]
+|-----|------------------|---------------------------------|---------------------------------------|------------------|
+|Space<sub>1</sub>||||
+|...||||
+|Space<sub>N</sub>||||
+|Min||||
+|Max||||
+|Average||||
+|Sum||||
+
+<p style="text-align: center;"> Table 5. Sample report table of discomfort-weighted exceedance occupiedhours.</p>
+
+When *ThermalResilienceSummary* is declared in *Output:Table:SummaryReports*, the tables above will be generated and presented in the tabular reports.
+
+### 2. Additional Warnings ###
 
 During the power outage period, a warning will be thrown when the electricity usage is non-zero.
 
-### 3. Documentation updates ###
+In the calculation of zone level Heating/Cooling SET Degree-Hours, if multiple *People* objects are defined for one zone, EnergyPlus will use the SET of one *People* object to compute the zone level SET Degree-Hours. In this feature update, a warning message will be produced to caution user that such zone-level values will only be meaningful if each zone have at most one *People* object defined.
+
+### 3. Bug fixes ###
+In the develop branch, for Heating and Cooling SET degree-hours tabular report, the hours are only accumulated for occupied hours for both the "SET > 30°C Hours (°C)" column and the column "SET > 30°C OccupantHours (°C)", due to the `NumOcc > 0` check and the `state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0` check when passing values from `state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET` to `state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum)`.
+
+Another issue more general to all thermal resilience metrics is that when computing the OccupantHour values, the floating point version of the number of occupants for a specific zone and timestep is cast into an integer first, than multiplied when computing the OccupantHour values. This means when the number of occupants is between 0 and 1, the tabular thermal resilience report treats it as not occupied.
+
+This feature branch removes the restriction in SET degree-hour calculation and computes the aggregated SET degree-hours for the whole run/reporting period in the first column of the SET degree-hour tabular report. It will also remove the integer casting when computing the OccupantHour columns.   
+
+### 4. Documentation updates ###
 
 The documentation of the *Output:Table:ReportPeriod* will be updated, suggesting users to include adaptation strategies people usually adopt during power outages, such as increased airflow rate from window usage during hot events and the use of alternative space heating strategies, such as fireplaces, natural gas or propane portable heaters during code events.
 
