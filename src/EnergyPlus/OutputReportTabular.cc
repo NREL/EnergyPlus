@@ -12633,8 +12633,13 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         WriteResilienceBinsTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod);
         tableName = "Discomfort-weighted Exceedance OccupiedHours";
-        WriteResilienceBinsTableReportingPeriod(
-            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod);
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod);
     }
 }
 
