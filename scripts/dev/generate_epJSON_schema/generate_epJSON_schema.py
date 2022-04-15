@@ -56,24 +56,49 @@
 import idd_parser
 import modify_schema
 import json
-import sys
 from os import path
+from pathlib import Path
+from argparse import ArgumentParser
+import multiprocessing as mp
 
 
-source_dir_path = sys.argv[1]
-data = idd_parser.Data()
-with open(path.join(source_dir_path, 'idd', 'Energy+.idd.in'), 'r') as f:
-    data.file = f.read()
+def generate_schema(energyplus_idd: Path, energyplus_epJSON: Path):
+    data = idd_parser.Data()
+    with open(energyplus_idd, 'r') as f:
+        data.file = f.read()
 
-idd_parser.parse_idd(data)
-modify_schema.change_version(data.schema)
-modify_schema.change_schedule_compact(data.schema)
-modify_schema.change_utility_cost(data.schema)
-modify_schema.change_special_cased_enums(data.schema)
-modify_schema.change_special_cased_name_fields(data.schema)
-modify_schema.change_extensions_name(data.schema)
-modify_schema.change_89_release_issues(data.schema)
-modify_schema.add_explicit_extensible_bounds(data.schema)
+    idd_parser.parse_idd(data)
+    modify_schema.change_version(data.schema)
+    modify_schema.change_schedule_compact(data.schema)
+    modify_schema.change_utility_cost(data.schema)
+    modify_schema.change_special_cased_enums(data.schema)
+    modify_schema.change_special_cased_name_fields(data.schema)
+    modify_schema.change_extensions_name(data.schema)
+    modify_schema.change_89_release_issues(data.schema)
+    modify_schema.add_explicit_extensible_bounds(data.schema)
 
-with open(path.join(source_dir_path, 'idd', 'Energy+.schema.epJSON.in'), 'w') as f2:
-    f2.write(json.dumps(data.schema, indent=4))
+    energyplus_epJSON.mkdir(parents=True, exist_ok=True)
+    with open(energyplus_epJSON.joinpath('Energy+.schema.epJSON'), 'w') as f2:
+        f2.write(json.dumps(data.schema, indent=4))
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Run epJSON Schema generation')
+    parser.add_argument(dest='energyplus_idd', metavar='energyplus_idd',
+                        help='Path to input Energy+.idd',
+                        type=lambda x: Path(x) if path.isfile(x) else parser.error(f'Energy+.idd not found: {x}'))
+    parser.add_argument(dest='energyplus_epJSON', metavar='energyplus_epJSON',
+                        help='Path to output directory',
+                        type=lambda x: Path(x))
+    parsed_args = parser.parse_args()
+
+    p = mp.Process(target=generate_schema, args=[parsed_args.energyplus_idd, parsed_args.energyplus_epJSON])
+    p.start()
+    # Wait for 30 second timeout or until finished
+    p.join(30)
+
+    if p.is_alive():
+        # too late, kill it with fire
+        p.kill()
+        p.join()
+        raise RuntimeError('Generating epJSON Schema from IDD failed!')
