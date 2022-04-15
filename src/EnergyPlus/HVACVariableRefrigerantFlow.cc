@@ -722,60 +722,61 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     } else if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && HeatingCoilAvailableFlag) {
         InletAirDryBulbC = SumHeatInletDB;
         InletAirWetBulbC = SumHeatInletWB;
-        {
-            auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-            if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                TotHeatCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, CondInletTemp);
-                TotHeatEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, CondInletTemp);
-            } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                TotHeatCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, OutdoorWetBulb);
-                TotHeatEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, OutdoorWetBulb);
-            } else {
-                TotHeatCapTempModFac = 1.0;
-                TotHeatEIRTempModFac = 1.0;
-            }
+        switch (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType) {
+        case DataHVACGlobals::DryBulbIndicator: {
+            TotHeatCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, CondInletTemp);
+            TotHeatEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, CondInletTemp);
+        } break;
+        case DataHVACGlobals::WetBulbIndicator: {
+            TotHeatCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, OutdoorWetBulb);
+            TotHeatEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, OutdoorWetBulb);
+        } break;
+        default: {
+            TotHeatCapTempModFac = 1.0;
+            TotHeatEIRTempModFac = 1.0;
+        } break;
         }
         // recalculate heating Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
         if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatBoundaryCurvePtr > 0) {
             HeatOABoundary = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
-            {
-                auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                    if (OutdoorDryBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi > 0)
-                            TotHeatCapTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, CondInletTemp);
-                    }
-                } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                    if (OutdoorWetBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi > 0)
-                            TotHeatCapTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, OutdoorWetBulb);
-                    }
-                } else {
-                    TotHeatCapTempModFac = 1.0;
+            switch (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType) {
+            case DataHVACGlobals::DryBulbIndicator: {
+                if (OutdoorDryBulb > HeatOABoundary) {
+                    if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi > 0)
+                        TotHeatCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, CondInletTemp);
                 }
+            } break;
+            case DataHVACGlobals::WetBulbIndicator: {
+                if (OutdoorWetBulb > HeatOABoundary) {
+                    if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi > 0)
+                        TotHeatCapTempModFac =
+                            CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, OutdoorWetBulb);
+                }
+            } break;
+            default: {
+                TotHeatCapTempModFac = 1.0;
+            } break;
             }
         }
         if (state.dataHVACVarRefFlow->VRF(VRFCond).EIRHeatBoundaryCurvePtr > 0) {
             HeatOABoundary = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
-            {
-                auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                    if (OutdoorDryBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi > 0)
-                            TotHeatEIRTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, CondInletTemp);
-                    }
-                } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                    if (OutdoorWetBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi > 0)
-                            TotHeatEIRTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, OutdoorWetBulb);
-                    }
-                } else {
-                    TotHeatEIRTempModFac = 1.0;
+            switch (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType) {
+            case DataHVACGlobals::DryBulbIndicator: {
+                if (OutdoorDryBulb > HeatOABoundary) {
+                    if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi > 0)
+                        TotHeatEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, CondInletTemp);
                 }
+            } break;
+            case DataHVACGlobals::WetBulbIndicator: {
+                if (OutdoorWetBulb > HeatOABoundary) {
+                    if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi > 0)
+                        TotHeatEIRTempModFac =
+                            CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, OutdoorWetBulb);
+                }
+            } break;
+            default: {
+                TotHeatEIRTempModFac = 1.0;
+            } break;
             }
         }
 
@@ -788,22 +789,26 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                         state,
                         format(" Heating Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotHeatCapTempModFac));
 
-                    auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                    if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
+                    switch (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType) {
+                    case DataHVACGlobals::DryBulbIndicator: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air temperature of {:.1T} C and an average indoor air "
                                                  "dry-bulb temperature of {:.1T} C.",
                                                  CondInletTemp,
                                                  InletAirDryBulbC));
-                    } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
+                    } break;
+                    case DataHVACGlobals::WetBulbIndicator: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an average "
                                                  "indoor air wet-bulb temperature of {:.1T} C.",
                                                  OutdoorWetBulb,
                                                  InletAirWetBulbC));
-                    } else {
+                    } break;
+                    default:
                         // should never get here
+                        break;
                     }
+
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
@@ -825,23 +830,23 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     ShowContinueError(state,
                                       format(" Heating Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                              TotHeatEIRTempModFac));
-                    {
-                        auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                        if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                            ShowContinueError(state,
-                                              format(" Negative value occurs using an outdoor air dry-bulb temperature of {:.1T} C and an "
-                                                     "average indoor air dry-bulb temperature of {:.1T} C.",
-                                                     CondInletTemp,
-                                                     InletAirDryBulbC));
-                        } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-
-                            ShowContinueError(state,
-                                              format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an "
-                                                     "average indoor air wet-bulb temperature of {:.1T} C.",
-                                                     OutdoorWetBulb,
-                                                     InletAirWetBulbC));
-                        } else {
-                        }
+                    switch (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType) {
+                    case DataHVACGlobals::DryBulbIndicator: {
+                        ShowContinueError(state,
+                                          format(" Negative value occurs using an outdoor air dry-bulb temperature of {:.1T} C and an "
+                                                 "average indoor air dry-bulb temperature of {:.1T} C.",
+                                                 CondInletTemp,
+                                                 InletAirDryBulbC));
+                    } break;
+                    case DataHVACGlobals::WetBulbIndicator: {
+                        ShowContinueError(state,
+                                          format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an "
+                                                 "average indoor air wet-bulb temperature of {:.1T} C.",
+                                                 OutdoorWetBulb,
+                                                 InletAirWetBulbC));
+                    } break;
+                    default:
+                        break;
                     }
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
@@ -1011,16 +1016,16 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     //         VRF(VRFCond)%HRCAPFTHeatConst = 1.1d0 ! initialized to 1.1
                     if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeat).NumDims ==
                         2) { // Curve type for HRCAPFTCool
-                        {
-                            auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                            if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, CondInletTemp);
-                            } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst =
-                                    CurveValue(state, HRCAPFT, InletAirDryBulbC, OutdoorWetBulb);
-                            } else {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = 1.0;
-                            }
+                        switch (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType) {
+                        case DataHVACGlobals::DryBulbIndicator: {
+                            state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, CondInletTemp);
+                        } break;
+                        case DataHVACGlobals::WetBulbIndicator: {
+                            state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, OutdoorWetBulb);
+                        } break;
+                        default: {
+                            state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = 1.0;
+                        } break;
                         }
                     } else {
                         state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = CurveValue(state, HRCAPFT, tmpVRFCondPLR);
@@ -1038,16 +1043,16 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
                     if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeat).NumDims ==
                         2) { // Curve type for HREIRFTHeat
-                        {
-                            auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                            if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, CondInletTemp);
-                            } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst =
-                                    CurveValue(state, HREIRFT, InletAirDryBulbC, OutdoorWetBulb);
-                            } else {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = 1.0;
-                            }
+                        switch (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType) {
+                        case DataHVACGlobals::DryBulbIndicator: {
+                            state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, CondInletTemp);
+                        } break;
+                        case DataHVACGlobals::WetBulbIndicator: {
+                            state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, OutdoorWetBulb);
+                        } break;
+                        default: {
+                            state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = 1.0;
+                        } break;
                         }
                     } else {
                         state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = CurveValue(state, HREIRFT, tmpVRFCondPLR);
@@ -10427,35 +10432,36 @@ void InitializeOperatingMode(EnergyPlusData &state,
                 if (ThisZoneNum > 0) {
                     SPTempHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ThisZoneNum);
                     SPTempLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ThisZoneNum);
-                    {
-                        auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ThisZoneNum));
-                        if (SELECT_CASE_var == 0) { // Uncontrolled
-                            // MaxDeltaT denotes cooling, MinDeltaT denotes heating
-                        } else if (SELECT_CASE_var == DataHVACGlobals::SingleHeatingSetPoint) {
-                            // if heating load, ZoneDeltaT will be negative
-                            ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+                    switch (state.dataHeatBalFanSys->TempControlType(ThisZoneNum)) {
+                    case DataHVACGlobals::SingleHeatingSetPoint: {
+                        // if heating load, ZoneDeltaT will be negative
+                        ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+                        state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
+                    } break;
+                    case DataHVACGlobals::SingleCoolingSetPoint: {
+                        // if cooling load, ZoneDeltaT will be positive
+                        ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
+                        state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
+                    } break;
+                    case DataHVACGlobals::SingleHeatCoolSetPoint: {
+                        ZoneDeltaT = state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi; //- SPTempHi and SPTempLo are same value
+                        if (ZoneDeltaT > 0.0) {
+                            state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
+                        } else {
                             state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
-                        } else if (SELECT_CASE_var == DataHVACGlobals::SingleCoolingSetPoint) {
-                            // if cooling load, ZoneDeltaT will be positive
+                        }
+                    } break;
+                    case DataHVACGlobals::DualSetPointWithDeadBand: {
+                        if (state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi > 0.0) {
                             ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
                             state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                        } else if (SELECT_CASE_var == DataHVACGlobals::SingleHeatCoolSetPoint) {
-                            ZoneDeltaT = state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi; //- SPTempHi and SPTempLo are same value
-                            if (ZoneDeltaT > 0.0) {
-                                state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                            } else {
-                                state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
-                            }
-                        } else if (SELECT_CASE_var == DataHVACGlobals::DualSetPointWithDeadBand) {
-                            if (state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi > 0.0) {
-                                ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
-                                state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                            } else if (SPTempLo - state.dataHeatBalFanSys->ZT(ThisZoneNum) > 0.0) {
-                                ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
-                                state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
-                            }
-                        } else {
+                        } else if (SPTempLo - state.dataHeatBalFanSys->ZT(ThisZoneNum) > 0.0) {
+                            ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+                            state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
                         }
+                    } break;
+                    default:
+                        break;
                     }
                 }
             } else if (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority == ThermostatCtrlType::LoadPriority ||
@@ -15570,67 +15576,57 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
         SuppHeatCoilLoad = 0.0;
     }
 
-    {
-        auto const SELECT_CASE_var(this->SuppHeatCoilType_Num);
-
-        if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-            HeatingCoils::SimulateHeatingCoilComponents(state,
-                                                        this->SuppHeatCoilName,
-                                                        FirstHVACIteration,
-                                                        SuppHeatCoilLoad,
-                                                        this->SuppHeatCoilIndex,
-                                                        QActual,
-                                                        true,
-                                                        this->OpMode,
-                                                        PartLoadRatio);
-            SuppHeatCoilLoad = QActual;
-        } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
-            if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
-                //     see if HW coil has enough capacity to meet the load
-                Real64 mdot = this->SuppHeatCoilFluidMaxFlow;
-                state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-                //     simulate hot water coil to find the full flow operating capacity
-                WaterCoils::SimulateWaterCoilComponents(
-                    state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
-                if (QActual > SuppHeatCoilLoad) {
-                    Par[1] = double(VRFTUNum);
-                    if (FirstHVACIteration) {
-                        Par[2] = 1.0;
-                    } else {
-                        Par[2] = 0.0;
-                    }
-                    Par[3] = SuppHeatCoilLoad;
-
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
-                    this->SuppHeatPartLoadRatio = PartLoadFrac;
-                } else {
-                    this->SuppHeatPartLoadRatio = 1.0;
-                    SuppHeatCoilLoad = QActual;
-                }
-            } else {
-                this->SuppHeatPartLoadRatio = 0.0;
-                Real64 mdot = 0.0;
-                SuppHeatCoilLoad = 0.0;
-                PlantUtilities::SetComponentFlowRate(
-                    state, mdot, this->SuppHeatCoilFluidInletNode, this->SuppHeatCoilFluidOutletNode, this->SuppHeatCoilPlantLoc);
-            }
-            //     simulate water heating coil
-            WaterCoils::SimulateWaterCoilComponents(state,
-                                                    this->SuppHeatCoilName,
-                                                    FirstHVACIteration,
-                                                    this->SuppHeatCoilIndex,
-                                                    SuppHeatCoilLoad,
-                                                    this->OpMode,
-                                                    this->SuppHeatPartLoadRatio);
-
-        } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
-            //     simulate steam heating coil
-            Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
+    switch (this->SuppHeatCoilType_Num) {
+    case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
+    case DataHVACGlobals::Coil_HeatingElectric: {
+        HeatingCoils::SimulateHeatingCoilComponents(
+            state, this->SuppHeatCoilName, FirstHVACIteration, SuppHeatCoilLoad, this->SuppHeatCoilIndex, QActual, true, this->OpMode, PartLoadRatio);
+        SuppHeatCoilLoad = QActual;
+    } break;
+    case DataHVACGlobals::Coil_HeatingWater: {
+        if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
+            //     see if HW coil has enough capacity to meet the load
+            Real64 mdot = this->SuppHeatCoilFluidMaxFlow;
             state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(
-                state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
-            SuppHeatCoilLoad = QActual;
+            //     simulate hot water coil to find the full flow operating capacity
+            WaterCoils::SimulateWaterCoilComponents(
+                state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
+            if (QActual > SuppHeatCoilLoad) {
+                Par[1] = double(VRFTUNum);
+                if (FirstHVACIteration) {
+                    Par[2] = 1.0;
+                } else {
+                    Par[2] = 0.0;
+                }
+                Par[3] = SuppHeatCoilLoad;
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
+                this->SuppHeatPartLoadRatio = PartLoadFrac;
+            } else {
+                this->SuppHeatPartLoadRatio = 1.0;
+                SuppHeatCoilLoad = QActual;
+            }
+        } else {
+            this->SuppHeatPartLoadRatio = 0.0;
+            Real64 mdot = 0.0;
+            SuppHeatCoilLoad = 0.0;
+            PlantUtilities::SetComponentFlowRate(
+                state, mdot, this->SuppHeatCoilFluidInletNode, this->SuppHeatCoilFluidOutletNode, this->SuppHeatCoilPlantLoc);
         }
+        //     simulate water heating coil
+        WaterCoils::SimulateWaterCoilComponents(
+            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, this->OpMode, this->SuppHeatPartLoadRatio);
+    } break;
+    case DataHVACGlobals::Coil_HeatingSteam: {
+        //     simulate steam heating coil
+        Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
+        state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+        SteamCoils::SimulateSteamCoilComponents(
+            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
+        SuppHeatCoilLoad = QActual;
+    } break;
+    default:
+        break;
         SuppCoilLoad = SuppHeatCoilLoad;
     }
 }
