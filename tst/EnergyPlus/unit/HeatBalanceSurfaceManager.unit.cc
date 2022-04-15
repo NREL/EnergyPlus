@@ -3245,8 +3245,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->CrossedColdThresh.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBalFanSys->CrossedHeatThresh.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
