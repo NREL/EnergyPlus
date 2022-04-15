@@ -291,13 +291,13 @@ namespace CurveManager {
     void ResetPerformanceCurveOutput(EnergyPlusData &state);
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,                  // index of curve in curve array
-                      Real64 Var1,                     // 1st independent variable
-                      Optional<Real64 const> Var2 = _, // 2nd independent variable
-                      Optional<Real64 const> Var3 = _, // 3rd independent variable
-                      Optional<Real64 const> Var4 = _, // 4th independent variable
-                      Optional<Real64 const> Var5 = _, // 5th independent variable
-                      Optional<Real64 const> Var6 = _  // 6th independent variable
+                      int CurveIndex,    // index of curve in curve array
+                      Real64 Var1,       // 1st independent variable
+                      Real64 Var2 = 0.0, // 2nd independent variable
+                      Real64 Var3 = 0.0, // 3rd independent variable
+                      Real64 Var4 = 0.0, // 4th independent variable
+                      Real64 Var5 = 0.0, // 5th independent variable
+                      Real64 Var6 = 0.0  // 6th independent variable
     );
 
     void GetCurveInput(EnergyPlusData &state);
@@ -307,22 +307,22 @@ namespace CurveManager {
     void InitCurveReporting(EnergyPlusData &state);
 
     Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int CurveIndex,                  // index of curve in curve array
-                                  Real64 Var1,                     // 1st independent variable
-                                  Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                  Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                  Optional<Real64 const> Var4 = _, // 4th independent variable
-                                  Optional<Real64 const> Var5 = _  // 5th independent variable
+                                  int CurveIndex,    // index of curve in curve array
+                                  Real64 Var1,       // 1st independent variable
+                                  Real64 Var2 = 0.0, // 2nd independent variable
+                                  Real64 Var3 = 0.0, // 3rd independent variable
+                                  Real64 Var4 = 0.0, // 4th independent variable
+                                  Real64 Var5 = 0.0  // 5th independent variable
     );
 
     Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                   int CurveIndex,                  // index of curve in curve array
-                                   Real64 Var1,                     // 1st independent variable
-                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                   Optional<Real64 const> Var4 = _, // 4th independent variable
-                                   Optional<Real64 const> Var5 = _, // 5th independent variable
-                                   Optional<Real64 const> Var6 = _);
+                                   int CurveIndex,    // index of curve in curve array
+                                   Real64 Var1,       // 1st independent variable
+                                   Real64 Var2 = 0.0, // 2nd independent variable
+                                   Real64 Var3 = 0.0, // 3rd independent variable
+                                   Real64 Var4 = 0.0, // 4th independent variable
+                                   Real64 Var5 = 0.0, // 5th independent variable
+                                   Real64 Var6 = 0.0);
 
     bool IsCurveInputTypeValid(std::string const &InInputType); // index of curve in curve array
 

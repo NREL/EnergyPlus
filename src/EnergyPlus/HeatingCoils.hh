@@ -212,7 +212,7 @@ namespace HeatingCoils {
     );
 
     void CalcMultiStageElectricHeatingCoil(EnergyPlusData &state,
-                                           int &CoilNum,            // the number of the electric heating coil to be simulated
+                                           int const CoilNum,       // the number of the electric heating coil to be simulated
                                            Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
@@ -228,7 +228,7 @@ namespace HeatingCoils {
     );
 
     void CalcMultiStageGasHeatingCoil(EnergyPlusData &state,
-                                      int &CoilNum,            // the number of the Gas heating coil to be simulated
+                                      int const CoilNum,       // the number of the Gas heating coil to be simulated
                                       Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                       Real64 const CycRatio,   // cycling part load ratio
                                       int const StageNum,      // Speed number
