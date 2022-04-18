@@ -629,7 +629,7 @@ namespace SimulationManager {
 
         CloseOutputTabularFile(state);
 
-        writeRulesetModelDescription(state);
+        if (state.files.outputControl.rmd) writeRulesetModelDescription(state);
 
         DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
