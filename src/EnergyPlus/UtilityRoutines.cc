@@ -490,6 +490,28 @@ namespace UtilityRoutines {
         }
     }
 
+    void writeRulesetModelDescription(EnergyPlusData &state)
+    // Write the ruleset model description output file which is JSON formatted and based on
+    // https://github.com/open229/ruleset-model-report-schema
+    // J.Glazer April 2022
+    {
+        using json = nlohmann::json;
+
+        json j2 = {{"pi", 3.141},
+                   {"happy", true},
+                   {"name", "Niels"},
+                   {"nothing", nullptr},
+                   {"answer", {{"everything", 42}}},
+                   {"list", {1, 0, 2}},
+                   {"object", {{"currency", "USD"}, {"value", 42.99}}}};
+
+        std::fstream fsRmd;
+        fsRmd.open(state.dataStrGlobals->outputRulesetModelDescFilePath, std::fstream::out); // open file normally
+        fsRmd << j2.dump(4);
+        fsRmd.close();
+    }
+
+
     bool ValidateFuelType([[maybe_unused]] EnergyPlusData &state,
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,

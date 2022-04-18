@@ -110,6 +110,7 @@ struct DataStringGlobalsData : BaseGlobalStruct
     fs::path outputCsvFilePath = "eplusout.csv";
     fs::path outputMtrCsvFilePath = "eplusmtr.csv";
     fs::path outputRvauditFilePath = "eplusout.rvaudit";
+    fs::path outputRulesetModelDescFilePath = "eplusout.rmd";
 
     fs::path outputErrFilePath;
     fs::path eplusADSFilePath;

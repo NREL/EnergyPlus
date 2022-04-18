@@ -195,6 +195,7 @@ namespace SimulationManager {
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
         using EconomicTariff::ComputeTariff; // added for computing annual utility costs
         using EconomicTariff::WriteTabularTariffReports;
+        using UtilityRoutines::writeRulesetModelDescription;
         using EMSManager::CheckIfAnyEMS;
         using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
@@ -627,6 +628,8 @@ namespace SimulationManager {
         ComputeLifeCycleCostAndReport(state); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile(state);
+
+        writeRulesetModelDescription(state);
 
         DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
