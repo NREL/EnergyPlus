@@ -48,6 +48,8 @@
 #ifndef Boilers_hh_INCLUDED
 #define Boilers_hh_INCLUDED
 
+#include <array>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -67,6 +69,8 @@ struct EnergyPlusData;
 
 namespace Boilers {
 
+    extern const std::array<int, 3> a;
+        
     // water temperature evaluation method
     enum class TempMode
     {
