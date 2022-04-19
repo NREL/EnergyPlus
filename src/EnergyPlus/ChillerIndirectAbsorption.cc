@@ -446,14 +446,9 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
         }
 
         {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(6));
-            if (SELECT_CASE_var == "CONSTANTFLOW") {
-                thisChiller.FlowMode = DataPlant::FlowMode::Constant;
-            } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
-                thisChiller.FlowMode = DataPlant::FlowMode::LeavingSetpointModulated;
-            } else if (SELECT_CASE_var == "NOTMODULATED") {
-                thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
-            } else {
+            thisChiller.FlowMode =
+                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
+            if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\",");
@@ -461,7 +456,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
-            }
+            };
         }
 
         thisChiller.CapFCondenserTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));

@@ -754,35 +754,42 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                         if (this->finalSysSizing(this->curSysNum).DesOutAirVolFlow > 0.0) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                         } else {
-                            {
-                                auto const SELECT_CASE_var(this->curDuctType);
-                                if (SELECT_CASE_var == DataHVACGlobals::Main) {
-                                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                                } else if (SELECT_CASE_var == DataHVACGlobals::Cooling) {
-                                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                                } else if (SELECT_CASE_var == DataHVACGlobals::Heating) {
-                                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                                } else if (SELECT_CASE_var == DataHVACGlobals::Other) {
-                                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                                } else {
-                                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                                }
+                            switch (this->curDuctType) {
+                            case DataHVACGlobals::Main: {
+                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                            } break;
+                            case DataHVACGlobals::Cooling: {
+                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
+                            } break;
+                            case DataHVACGlobals::Heating: {
+                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
+                            } break;
+                            case DataHVACGlobals::Other: {
+                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                            } break;
+                            default: {
+                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                            } break;
                             }
                         }
                     } else {
-                        {
-                            auto const SELECT_CASE_var(this->curDuctType);
-                            if (SELECT_CASE_var == DataHVACGlobals::Main) {
-                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                            } else if (SELECT_CASE_var == DataHVACGlobals::Cooling) {
-                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                            } else if (SELECT_CASE_var == DataHVACGlobals::Heating) {
-                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                            } else if (SELECT_CASE_var == DataHVACGlobals::Other) {
-                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                            } else {
-                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                            }
+                        switch (this->curDuctType) {
+                        case DataHVACGlobals::Main: {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                        } break;
+                        case DataHVACGlobals::Cooling: {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
+                        } break;
+                        case DataHVACGlobals::Heating: {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
+                        } break;
+
+                        case DataHVACGlobals::Other: {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                        } break;
+                        default: {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                        } break;
                         }
                     }
 
