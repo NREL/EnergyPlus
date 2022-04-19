@@ -1004,7 +1004,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     bool HXUnitOn = false;
     int InletNode = 1;
     int ControlNode = 2; // same as outlet node number
-    int condensserNode = 3;
+    int condenserNode = 3;
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
@@ -1024,21 +1024,22 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataEnvrn->OutHumRat = 0.0196;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutWetBulbTemp = 27.0932;
-    state->dataLoopNodes->Node(condensserNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(condensserNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(condenserNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(condenserNode).HumRat = state->dataEnvrn->OutHumRat;
 
     // set up inputs to test coil control
     thisSys->m_DesiredOutletTemp = 20.0;
     thisSys->m_DesiredOutletHumRat = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataLoopNodes->Node(InletNode).MassFlowRate = 0.8 * state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(InletNode).Temp = 24.0;
+    state->dataLoopNodes->Node(InletNode).Press = state->dataEnvrn->OutBaroPress;
     state->dataLoopNodes->Node(InletNode).HumRat = 0.012143698;
     state->dataLoopNodes->Node(InletNode).Enthalpy = 55029.3778; // conditions at 65 % RH
+    state->dataLoopNodes->Node(InletNode).Temp =
+        Psychrometrics::PsyTdbFnHW(state->dataLoopNodes->Node(InletNode).Enthalpy, state->dataLoopNodes->Node(InletNode).HumRat);
     state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
-    Real64 RHControlHumRat = 0.01; // humrat at 24C, 60% RH
+    Real64 RHControlHumRat = 0.01; // humrat at 24C, ~60% RH
     state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
-    state->dataLoopNodes->Node(ControlNode).HumRat = 0.008;
 
     // test sensible control
     state->dataGlobal->BeginEnvrnFlag = true;
