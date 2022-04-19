@@ -1343,7 +1343,8 @@
 
   NodeList,
     OutsideAirInletNodes,    !- Name
-    Outside Air Inlet Node;  !- Node 1 Name
+    Outside Air Inlet Node,  !- Node 1 Name
+    Heat Pump ACDXCoil 1 Condenser Inlet Node; !- Node 2 Name
 
   NodeList,
     Zone1Inlets,             !- Name
@@ -1441,8 +1442,7 @@
     OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
-    OutsideAirInletNodes,                      !- Node or NodeList Name 1
-    Heat Pump ACDXCoil 1 Condenser Inlet Node; !- Node or NodeList Name 2
+    OutsideAirInletNodes;    !- Node or NodeList Name 1
 
   OutdoorAir:Mixer,
     OA Mixing Box 1,         !- Name
