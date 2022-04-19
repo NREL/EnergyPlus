@@ -178,6 +178,17 @@ namespace DataSurfaces {
         Num
     };
 
+    enum RefAirTemp // Parameters to indicate reference air temperatures for inside surface temperature calculations
+    {
+        Invalid = -1,
+        ZoneMeanAirTemp,   // mean air temperature of the zone => MAT
+        AdjacentAirTemp,   // air temperature adjacent to surface => TempEffBulkAir
+        ZoneSupplyAirTemp, // supply air temperature of the zone
+        Num
+    };
+
+    constexpr std::array<int, static_cast<int>(DataSurfaces::RefAirTemp::Num)> SurfTAirRefReportVals = {1, 2, 3};
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -198,11 +209,6 @@ namespace DataSurfaces {
     constexpr int LowerLeftCorner(2);
     constexpr int LowerRightCorner(3);
     constexpr int UpperRightCorner(4);
-
-    // Parameters to indicate reference air temperatures for inside surface temperature calculations
-    constexpr int ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
-    constexpr int AdjacentAirTemp(2);   // air temperature adjacent ot surface => TempEffBulkAir
-    constexpr int ZoneSupplyAirTemp(3); // supply air temperature of the zone
 
     constexpr int AltAngStepsForSolReflCalc(10); // Number of steps in altitude angle for solar reflection calc
     constexpr int AzimAngStepsForSolReflCalc(9); // Number of steps in azimuth angle of solar reflection calc
@@ -1506,6 +1512,7 @@ struct SurfacesData : BaseGlobalStruct
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
+    Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
     Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<ConvectionConstants::InConvClass>
@@ -1884,6 +1891,7 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfICSPtr.deallocate();
         this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
         this->SurfTAirRef.deallocate();
+        this->SurfTAirRefRpt.deallocate();
         this->SurfIntConvCoeffIndex.deallocate();
         this->SurfExtConvCoeffIndex.deallocate();
         this->SurfIntConvClassification.deallocate();
