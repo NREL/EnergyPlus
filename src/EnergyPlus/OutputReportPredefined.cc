@@ -1266,16 +1266,16 @@ namespace OutputReportPredefined {
         s->pdchHumidexOccuHourStroke = newPreDefColumn(state, s->pdstHumidexOccuHours, "Heat Stroke Quite Possible (> 50) [hr]");
 
         s->pdstHeatingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heating SET Degree-Hours");
-        s->pdchHeatingSETHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Degree-Hours (°C·h)");
-        s->pdchHeatingSETOccuHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupant-Weighted Degree-Hours (°C·h)");
-        s->pdchHeatingSETOccupiedHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupied Degree-Hours (°C·h)");
+        s->pdchHeatingSETHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Degree-Hours [°C·hr]");
+        s->pdchHeatingSETOccuHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]");
+        s->pdchHeatingSETOccupiedHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]");
         s->pdchHeatingSETUnmetDuration = newPreDefColumn(state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration [hr]");
         s->pdchHeatingSETUnmetTime = newPreDefColumn(state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration");
 
         s->pdstCoolingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Cooling SET Degree-Hours");
-        s->pdchCoolingSETHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Degree-Hours (°C·h)");
-        s->pdchCoolingSETOccuHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Occupant-Weighted Degree-Hours (°C·h)");
-        s->pdchCoolingSETOccupiedHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Occupied Degree-Hours (°C·h)");
+        s->pdchCoolingSETHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Degree-Hours [°C·hr]");
+        s->pdchCoolingSETOccuHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]");
+        s->pdchCoolingSETOccupiedHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Occupied Degree-Hours [°C·hr]");
         s->pdchCoolingSETUnmetDuration = newPreDefColumn(state, s->pdstCoolingSETHours, "Longest SET > 30°C Duration [hr]");
         s->pdchCoolingSETUnmetTime = newPreDefColumn(state, s->pdstCoolingSETHours, "Start Time of the Longest SET > 30°C Duration");
 
@@ -1294,12 +1294,12 @@ namespace OutputReportPredefined {
         s->pdchHeatSafeTempExceedOccupiedHour = newPreDefColumn(state, s->pdstHourOfSafetyHeatEvent, "Safe Temperature Exceedance OccupiedHours [hr]");
 
         s->pdstUnmetDegreeHour = newPreDefSubTable(state, s->pdrThermalResilience, "Unmet Degree-Hours");
-        s->pdchCoolingUnmetDegreeHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Degree-Hours (°C·h)");
-        s->pdchCoolingUnmetDegreeOccHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h)");
-        s->pdchCoolingUnmetDegreeOccupiedHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupied Degree-Hours (°C·h)");
-        s->pdchHeatingUnmetDegreeHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Degree-Hours (°C·h)");
-        s->pdchHeatingUnmetDegreeOccHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h)");
-        s->pdchHeatingUnmetDegreeOccupiedHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupied Degree-Hours (°C·h)");
+        s->pdchCoolingUnmetDegreeHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Degree-Hours [°C·hr]");
+        s->pdchCoolingUnmetDegreeOccHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
+        s->pdchCoolingUnmetDegreeOccupiedHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]");
+        s->pdchHeatingUnmetDegreeHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Degree-Hours [°C·hr]");
+        s->pdchHeatingUnmetDegreeOccHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
+        s->pdchHeatingUnmetDegreeOccupiedHour = newPreDefColumn(state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]");
 
         s->pdstDiscomfortWtExceedOccuHour = newPreDefSubTable(state, s->pdrThermalResilience, "Discomfort-weighted Exceedance OccupantHours");
         s->pdchVeryColdExceedOccuHour = newPreDefColumn(state, s->pdstDiscomfortWtExceedOccuHour, "Very-cold Exceedance OccupantHours [hr]");

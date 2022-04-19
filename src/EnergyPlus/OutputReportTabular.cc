@@ -12507,6 +12507,15 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
     if (ort->WriteTabularFiles) {
 
+        Real64 degreeHourConversion;
+        UnitsStyle unitsStyle_cur = ort->unitsStyle;
+
+        if (unitsStyle_cur == UnitsStyle::InchPound) {
+            degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
+        } else {
+            degreeHourConversion = 1.0;
+        }
+
         WriteReportHeaders(state,
                            fmt::format("Thermal Resilience Summary for Reporting Period {}", periodIdx),
                            "Entire Facility",
@@ -12569,25 +12578,31 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         WriteResilienceBinsTableReportingPeriod(
             state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod);
 
-        columnHead(1) = "SET ≤ 12.2°C Degree-Hours (°C·h)";
-        columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours (°C·h)";
-        columnHead(3) = "SET ≤ 12.2°C Occupied Degree-Hours (°C·h)";
+        columnHead(1) = "SET ≤ 12.2°C Degree-Hours [°C·hr]";
+        columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]";
+        columnHead(3) = "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]";
         columnHead(4) = "Longest SET ≤ 12.2°C Duration [hr]";
         columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration";
 
         tableName = "Heating SET Degree-Hours";
         WriteSETHoursTableReportingPeriod(
-            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod);
+            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod, degreeHourConversion);
 
-        columnHead(1) = "SET > 30°C Degree-Hours (°C·h)";
-        columnHead(2) = "SET > 30°C Occupant-Weighted Degree-Hours (°C·h)";
-        columnHead(3) = "SET > 30°C Occupied Degree-Hours (°C·h)";
+        columnHead(1) = "SET > 30°C Degree-Hours [°C·hr]";
+        columnHead(2) = "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]";
+        columnHead(3) = "SET > 30°C Occupied Degree-Hours [°C·hr]";
         columnHead(4) = "Longest SET > 30°C Duration [hr]";
         columnHead(5) = "Start Time of the Longest SET > 30°C Duration";
 
         tableName = "Cooling SET Degree-Hours";
-        WriteSETHoursTableReportingPeriod(
-            state, columnNum, periodIdx, tableName, columnHead, columnWidth, state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod);
+        WriteSETHoursTableReportingPeriod(state,
+                                          columnNum,
+                                          periodIdx,
+                                          tableName,
+                                          columnHead,
+                                          columnWidth,
+                                          state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod,
+                                          degreeHourConversion);
 
         columnHead(1) = "Hours of Safety [hr]";
         columnHead(2) = "End Time of the Safety Duration";
@@ -12609,12 +12624,12 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         Array1D_int columnWidthUnmetDegHr;
         columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
         columnWidthUnmetDegHr = 10;
-        columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours (°C·h)";
-        columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h)";
-        columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours (°C·h)";
-        columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours (°C·h)";
-        columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours (°C·h)";
-        columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours (°C·h)";
+        columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
         tableName = "Unmet Degree-Hours";
 
         WriteResilienceBinsTableReportingPeriod(state,
@@ -12733,7 +12748,8 @@ void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                        const std::string tableName,
                                        Array1D_string const &columnHead,
                                        Array1D_int columnWidth,
-                                       Array2D<std::vector<Real64>> const &ZoneBins)
+                                       Array2D<std::vector<Real64>> const &ZoneBins,
+                                       Real64 unitConvMultiplier)
 {
 
     Array1D_string rowHead;
@@ -12743,29 +12759,25 @@ void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
 
     WriteSubtitle(state, tableName);
     tableBody = "";
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
-        for (int j = 1; j < columnNum; j++) {
-            tableBody(j, ZoneNum) = RealToStr(ZoneBins(ZoneNum, periodIdx)[j - 1], 2);
-        }
-        tableBody(columnNum, ZoneNum) = DateToString(ZoneBins(ZoneNum, periodIdx)[columnNum - 1]);
-    }
 
     std::vector<Real64> columnMax(columnNum - 1, 0);
     std::vector<Real64> columnMin(columnNum - 1, 0);
     std::vector<Real64> columnSum(columnNum - 1, 0);
 
     for (int j = 0; j < columnNum - 1; j++) {
-        columnMin[j] = ZoneBins(1, periodIdx)[j];
+        columnMin[j] = ZoneBins(1, periodIdx)[j] * unitConvMultiplier;
     }
-    for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
-        std::string ZoneName = state.dataHeatBal->Zone(i).Name;
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ZoneNum++) {
+        std::string ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
+        rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
         for (int j = 0; j < columnNum - 1; j++) {
-            Real64 curValue = ZoneBins(i, periodIdx)[j];
+            Real64 curValue = ZoneBins(ZoneNum, periodIdx)[j] * unitConvMultiplier;
             if (curValue > columnMax[j]) columnMax[j] = curValue;
             if (curValue < columnMin[j]) columnMin[j] = curValue;
             columnSum[j] += curValue;
+            tableBody(j + 1, ZoneNum) = RealToStr(curValue, 2);
         }
+        tableBody(columnNum, ZoneNum) = DateToString(ZoneBins(ZoneNum, periodIdx)[columnNum - 1]);
     }
 
     rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
@@ -12887,7 +12899,11 @@ void WriteHourOfSafetyTable(EnergyPlusData &state,
     }
 }
 
-void WriteSETHoursTable(EnergyPlusData &state, int const columnNum, std::vector<int> const &columnHead, Array1D<std::vector<Real64>> const &ZoneBins)
+void WriteSETHoursTable(EnergyPlusData &state,
+                        int const columnNum,
+                        std::vector<int> const &columnHead,
+                        Array1D<std::vector<Real64>> const &ZoneBins,
+                        Real64 unitConvMultiplier)
 {
     auto &Zone(state.dataHeatBal->Zone);
 
@@ -12895,11 +12911,11 @@ void WriteSETHoursTable(EnergyPlusData &state, int const columnNum, std::vector<
     std::vector<Real64> columnMin(columnNum - 1, 0);
     std::vector<Real64> columnSum(columnNum - 1, 0);
     for (int j = 0; j < columnNum - 1; j++) {
-        columnMin[j] = ZoneBins(1)[j];
+        columnMin[j] = ZoneBins(1)[j] * unitConvMultiplier;
     }
     for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
         for (int j = 0; j < columnNum - 1; j++) {
-            Real64 curValue = ZoneBins(i)[j];
+            Real64 curValue = ZoneBins(i)[j] * unitConvMultiplier;
             if (curValue > columnMax[j]) columnMax[j] = curValue;
             if (curValue < columnMin[j]) columnMin[j] = curValue;
             columnSum[j] += curValue;
@@ -12923,7 +12939,15 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
 
     // Using/Aliasing
     auto &ort(state.dataOutRptTab);
+    Real64 degreeHourConversion;
+    UnitsStyle unitsStyle_cur = ort->unitsStyle;
 
+    if (unitsStyle_cur == UnitsStyle::InchPound) {
+        degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
+    } else {
+        degreeHourConversion = 1.0;
+    }
+    // fixme: add unit conversion to Heating / Cooling SET Degree-Hours and Unmet Degree-Hours
     if (state.dataGlobal->NumOfZones > 0) {
         int columnNum = 5;
         std::vector<int> columnHead = {state.dataOutRptPredefined->pdchHIHourSafe,
@@ -12984,14 +13008,14 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                           state.dataOutRptPredefined->pdchHeatingSETOccupiedHours,
                           state.dataOutRptPredefined->pdchHeatingSETUnmetDuration,
                           state.dataOutRptPredefined->pdchHeatingSETUnmetTime};
-            WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLowSETHours);
+            WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLowSETHours, degreeHourConversion);
 
             columnHead = {state.dataOutRptPredefined->pdchCoolingSETHours,
                           state.dataOutRptPredefined->pdchCoolingSETOccuHours,
                           state.dataOutRptPredefined->pdchCoolingSETOccupiedHours,
                           state.dataOutRptPredefined->pdchCoolingSETUnmetDuration,
                           state.dataOutRptPredefined->pdchCoolingSETUnmetTime};
-            WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHighSETHours);
+            WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHighSETHours, degreeHourConversion);
         }
 
         columnNum = 5;
@@ -18055,7 +18079,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(115).siName = "PERSON/M2";
     ort->UnitConv(116).siName = "MM";
     ort->UnitConv(117).siName = "MM";
-    ort->UnitConv(118).siName = "°C·h";
+    ort->UnitConv(118).siName = "°C·hr";
 
     ort->UnitConv(1).ipName = "%";
     ort->UnitConv(2).ipName = "F";
@@ -18174,7 +18198,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(115).ipName = "person/ft2";
     ort->UnitConv(116).ipName = "in";
     ort->UnitConv(117).ipName = "ft";
-    ort->UnitConv(118).ipName = "°F·h";
+    ort->UnitConv(118).ipName = "°F·hr";
 
     ort->UnitConv(1).mult = 1.0;
     ort->UnitConv(2).mult = 1.8;
@@ -18299,7 +18323,6 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(11).offset = 32.0;
     ort->UnitConv(25).offset = 7.6736;
     ort->UnitConv(81).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
-    ort->UnitConv(118).offset = 32.0;
 
     ort->UnitConv(20).hint = "ELEC";
     ort->UnitConv(21).hint = "GAS";
