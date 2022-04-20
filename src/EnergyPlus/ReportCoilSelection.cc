@@ -588,10 +588,9 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
                 state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex);
             break;
         }
-        case DataAirSystems::Invalid: {
+        default:
             // do nothing
             break;
-        }
         } // end switch
     }
 
@@ -850,10 +849,9 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->fanSizeMaxAirMassFlow = state.dataHVACFan->fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
             break;
         }
-        case DataAirSystems::Invalid: {
+        default:
             // do nothing
             break;
-        }
         } // end switch
 
         c->coilAndFanNetTotalCapacityIdealPeak = c->coilTotCapAtPeak - c->fanHeatGainIdealPeak;
