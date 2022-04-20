@@ -35,7 +35,7 @@ Here are assumptions used to implement Phase 1. Figure 1 shows schematic air dis
 
 ####Supply duct####
 
-The supply ducts will be divided into two sections based on current duct configurqation: Truck and Branch. The truck section includes ducts between Return Air Path Outlet Node in Demand Side Inlet Node in AirLoopHVAC, and Inlet Node in AirLoopHVAC:ZoneSplitter. The branch section includes ducts between Outlet Nodes in AirLoopHVAC:ZoneSplitter, and Inlet Node in ZoneTernminal Units defined in ZoneHVAC:AirDistributionUnit. 
+The supply ducts will be divided into two sections based on current duct configuration: Truck and Branch. The truck section includes ducts between Return Air Path Outlet Node in Demand Side Inlet Node in AirLoopHVAC, and Inlet Node in AirLoopHVAC:ZoneSplitter. The branch section includes ducts between Outlet Nodes in AirLoopHVAC:ZoneSplitter, and Inlet Node in ZoneTernminal Units defined in ZoneHVAC:AirDistributionUnit. 
   
 ####Return duct####
 
