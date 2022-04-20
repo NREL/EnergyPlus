@@ -954,13 +954,6 @@
     For: Alldays,            !- Field 10
     Until: 24:00,1;          !- Field 11
 
-  Schedule:Compact,
-    CyclingFanSchedule,      !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,0.0;        !- Field 3
-
   People,
     WestPeople,              !- Name
     West Zone,               !- Zone or ZoneList Name
