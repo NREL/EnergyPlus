@@ -839,18 +839,24 @@ namespace Humidifiers {
                             OutletHumRatDes = std::max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat,
                                                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
                         } else { // ELSE size to supply air duct flow rate
-                            auto const SELECT_CASE_var(state.dataSize->CurDuctType);
-                            if (SELECT_CASE_var == Main) {
+                            switch (state.dataSize->CurDuctType) {
+                            case Main: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                            } else if (SELECT_CASE_var == Cooling) {
+                            } break;
+                            case Cooling: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
-                            } else if (SELECT_CASE_var == Heating) {
+                            } break;
+                            case Heating: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
-                            } else if (SELECT_CASE_var == Other) {
+                            } break;
+                            case Other: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                            } else {
+                            } break;
+                            default: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            } break;
                             }
+
                             AirDensity = PsyRhoAirFnPbTdbW(state,
                                                            state.dataEnvrn->OutBaroPress,
                                                            state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak,
@@ -863,18 +869,24 @@ namespace Humidifiers {
                                                   state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
                         }
                     } else {
-                        auto const SELECT_CASE_var(state.dataSize->CurDuctType);
-                        if (SELECT_CASE_var == Main) {
+                        switch (state.dataSize->CurDuctType) {
+                        case Main: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        } else if (SELECT_CASE_var == Cooling) {
+                        } break;
+                        case Cooling: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
-                        } else if (SELECT_CASE_var == Heating) {
+                        } break;
+                        case Heating: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
-                        } else if (SELECT_CASE_var == Other) {
+                        } break;
+                        case Other: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        } else {
+                        } break;
+                        default: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        } break;
                         }
+
                         AirDensity = PsyRhoAirFnPbTdbW(state,
                                                        state.dataEnvrn->OutBaroPress,
                                                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak,
