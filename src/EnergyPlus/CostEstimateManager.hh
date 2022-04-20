@@ -59,11 +59,28 @@ struct EnergyPlusData;
 
 namespace CostEstimateManager {
 
+    enum class ParentObject
+    {
+        Invalid = -1,
+        General,
+        Construction,
+        CoilDX,
+        CoilCoolingDX,
+        CoilCoolingDXSingleSpeed,
+        CoilHeatingFuel,
+        ChillerElectric,
+        DaylightingControls,
+        ShadingZoneDetailed,
+        Lights,
+        GeneratorPhotovoltaic,
+        Num
+    };
+
     struct CostLineItemStruct
     {
         // Members
         std::string LineName;      // object name (needed ?)
-        std::string ParentObjType; // parent reference to IDD object type
+        ParentObject ParentObjType; // parent reference to IDD object type
         std::string ParentObjName; // parent instance in IDF
         int ParentObjIDinList = 1;
         Real64 PerSquareMeter = 0.0;     // cost per square meter

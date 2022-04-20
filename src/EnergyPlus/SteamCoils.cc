@@ -875,9 +875,7 @@ namespace SteamCoils {
                             DataAirSystems::StructArrayLegacyFanModels,
                             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum);
                     }
-
-                    break;
-                }
+                } break;
                 case DataAirSystems::ObjectVectorOOFanSystemModel: {
                     if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex >= 0) {
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
@@ -888,12 +886,10 @@ namespace SteamCoils {
                             DataAirSystems::ObjectVectorOOFanSystemModel,
                             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex);
                     }
-                    break;
-                }
-                case DataAirSystems::Invalid: {
+                } break;
+                default:
                     // do nothing
                     break;
-                }
                 }
 
                 // if this is a zone coil
