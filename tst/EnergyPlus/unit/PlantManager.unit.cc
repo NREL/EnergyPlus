@@ -286,53 +286,43 @@ namespace UserDefinedComponents {
         EXPECT_EQ(5, state->dataBranchNodeConnections->NumOfNodeConnections);
 
         // OA Node
-        EXPECT_EQ(static_cast<int>(NodeInputManager::CompFluidStream::Primary),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(1).FluidStream));
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionObjectType::OutdoorAirNode),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(1).ObjectType));
+        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(1).FluidStream));
+        EXPECT_TRUE(
+            compare_enums(DataLoopNode::ConnectionObjectType::OutdoorAirNode, state->dataBranchNodeConnections->NodeConnections(1).ObjectType));
         EXPECT_EQ("OutdoorAir:Node", state->dataBranchNodeConnections->NodeConnections(1).ObjectName);
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionType::OutsideAir),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(1).ConnectionType));
+        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::OutsideAir, state->dataBranchNodeConnections->NodeConnections(1).ConnectionType));
         EXPECT_EQ("TEST_OA_NODE", state->dataBranchNodeConnections->NodeConnections(1).NodeName);
 
         // Coil Air Primiary Inlet
-        EXPECT_EQ(static_cast<int>(NodeInputManager::CompFluidStream::Primary),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(2).FluidStream));
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionObjectType::CoilUserDefined),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(2).ObjectType));
+        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(2).FluidStream));
+        EXPECT_TRUE(
+            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(2).ObjectType));
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(2).ObjectName);
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionType::Inlet),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(2).ConnectionType));
+        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Inlet, state->dataBranchNodeConnections->NodeConnections(2).ConnectionType));
         EXPECT_EQ("PRIMARY_INLET_NODE", state->dataBranchNodeConnections->NodeConnections(2).NodeName);
 
         // Coil Air Primiary Outlet
-        EXPECT_EQ(static_cast<int>(NodeInputManager::CompFluidStream::Primary),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(3).FluidStream));
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionObjectType::CoilUserDefined),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(3).ObjectType));
+        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Primary, state->dataBranchNodeConnections->NodeConnections(3).FluidStream));
+        EXPECT_TRUE(
+            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(3).ObjectType));
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(3).ObjectName);
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionType::Outlet),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(3).ConnectionType));
+        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Outlet, state->dataBranchNodeConnections->NodeConnections(3).ConnectionType));
         EXPECT_EQ("PRIMARY_OUTLET_NODE", state->dataBranchNodeConnections->NodeConnections(3).NodeName);
 
         // Coil Air Secondary Inlet
-        EXPECT_EQ(static_cast<int>(NodeInputManager::CompFluidStream::Secondary),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(4).FluidStream));
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionObjectType::CoilUserDefined),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(4).ObjectType));
+        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Secondary, state->dataBranchNodeConnections->NodeConnections(4).FluidStream));
+        EXPECT_TRUE(
+            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(4).ObjectType));
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(4).ObjectName);
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionType::Inlet),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(4).ConnectionType));
+        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Inlet, state->dataBranchNodeConnections->NodeConnections(4).ConnectionType));
         EXPECT_EQ("SECONDARY_INLET_NODE", state->dataBranchNodeConnections->NodeConnections(4).NodeName);
 
         // Coil Air Secondary Outlet
-        EXPECT_EQ(static_cast<int>(NodeInputManager::CompFluidStream::Secondary),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(5).FluidStream));
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionObjectType::CoilUserDefined),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(5).ObjectType));
+        EXPECT_TRUE(compare_enums(NodeInputManager::CompFluidStream::Secondary, state->dataBranchNodeConnections->NodeConnections(5).FluidStream));
+        EXPECT_TRUE(
+            compare_enums(DataLoopNode::ConnectionObjectType::CoilUserDefined, state->dataBranchNodeConnections->NodeConnections(5).ObjectType));
         EXPECT_EQ("COILUSERDEF_1", state->dataBranchNodeConnections->NodeConnections(5).ObjectName);
-        EXPECT_EQ(static_cast<int>(DataLoopNode::ConnectionType::Outlet),
-                  static_cast<int>(state->dataBranchNodeConnections->NodeConnections(5).ConnectionType));
+        EXPECT_TRUE(compare_enums(DataLoopNode::ConnectionType::Outlet, state->dataBranchNodeConnections->NodeConnections(5).ConnectionType));
         EXPECT_EQ("SECONDARY_OUTLET_NODE", state->dataBranchNodeConnections->NodeConnections(5).NodeName);
     }
 } // namespace UserDefinedComponents
