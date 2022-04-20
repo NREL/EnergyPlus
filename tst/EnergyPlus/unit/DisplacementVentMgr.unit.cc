@@ -161,6 +161,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     state->dataSurface->SurfIntConvCoeffIndex.allocate(TotSurfaces);
     state->dataSurface->SurfTAirRef.allocate(TotSurfaces);
+    state->dataSurface->SurfTAirRefRpt.allocate(TotSurfaces);
     state->dataSurface->SurfIntConvCoeffIndex = 0.0;
     state->dataSurface->SurfTAirRef = 0;
 

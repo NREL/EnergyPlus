@@ -64,41 +64,41 @@ enum class AutoSizingType
     // align with DataHVACGlobals so scalable sizing strings can be applied
     // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
     Invalid = -1,
-    ASHRAEMinSATCoolingSizing = 30,
-    ASHRAEMaxSATHeatingSizing = 31,
-    AutoCalculateSizing = 25,
     CoolingAirFlowSizing = 1,
-    CoolingCapacitySizing = 17,
-    CoolingSHRSizing = 22,
-    CoolingWaterDesAirInletHumRatSizing = 5,
-    CoolingWaterDesAirInletTempSizing = 4,
-    CoolingWaterDesAirOutletHumRatSizing = 8,
-    CoolingWaterDesAirOutletTempSizing = 7,
-    CoolingWaterDesWaterInletTempSizing = 6,
     CoolingWaterflowSizing = 2,
+    HeatingWaterflowSizing = 3,
+    CoolingWaterDesAirInletTempSizing = 4,
+    CoolingWaterDesAirInletHumRatSizing = 5,
+    CoolingWaterDesWaterInletTempSizing = 6,
+    CoolingWaterDesAirOutletTempSizing = 7,
+    CoolingWaterDesAirOutletHumRatSizing = 8,
     CoolingWaterNumofTubesPerRowSizing = 9,
-    DesiccantDehumidifierBFPerfDataFaceVelocitySizing = 35,
-    HeatingAirFlowSizing = 14,
-    HeatingAirflowUASizing = 15,
-    HeatingCapacitySizing = 18,
-    HeatingCoilDesAirInletHumRatSizing = 34,
-    HeatingCoilDesAirInletTempSizing = 32,
-    HeatingCoilDesAirOutletTempSizing = 33,
-    HeatingDefrostSizing = 23, // not used
-    HeatingWaterDesAirInletHumRatSizing = 11,
     HeatingWaterDesAirInletTempSizing = 10,
+    HeatingWaterDesAirInletHumRatSizing = 11,
     HeatingWaterDesCoilLoadUsedForUASizing = 12,
     HeatingWaterDesCoilWaterVolFlowUsedForUASizing = 13,
-    HeatingWaterflowSizing = 3,
-    MinSATempCoolingSizing = 28, // not used
-    MaxHeaterOutletTempSizing = 24,
-    MaxSATempHeatingSizing = 29, // not used
+    HeatingAirFlowSizing = 14,
+    HeatingAirflowUASizing = 15,
     SystemAirFlowSizing = 16,
-    SystemCapacitySizing = 21, // not used
+    CoolingCapacitySizing = 17,
+    HeatingCapacitySizing = 18,
     WaterHeatingCapacitySizing = 19,
     WaterHeatingCoilUASizing = 20,
+    SystemCapacitySizing = 21, // not used
+    CoolingSHRSizing = 22,
+    HeatingDefrostSizing = 23, // not used
+    MaxHeaterOutletTempSizing = 24,
+    AutoCalculateSizing = 25,
     ZoneCoolingLoadSizing = 26,
     ZoneHeatingLoadSizing = 27,
+    MinSATempCoolingSizing = 28, // not used
+    MaxSATempHeatingSizing = 29, // not used
+    ASHRAEMinSATCoolingSizing = 30,
+    ASHRAEMaxSATHeatingSizing = 31,
+    HeatingCoilDesAirInletTempSizing = 32,
+    HeatingCoilDesAirOutletTempSizing = 33,
+    HeatingCoilDesAirInletHumRatSizing = 34,
+    DesiccantDehumidifierBFPerfDataFaceVelocitySizing = 35,
     Num
 };
 
