@@ -19,7 +19,7 @@ NA
 
 ## Overview ##
 
-Due to complexity of this new feature, it will implement in differernt phases. Phase 1 will be a preliminary phase of airflow network duct autosizing. In this phase, the task will cover autosize duct diameter for a given duct length in simulations with a single air loop and a single conditioned zone. This will answer questions and reveal issues that will inform subsequent phases.
+Due to complexity of this new feature, it will implement in different phases. Phase 1 will be a preliminary phase of airflow network duct autosizing. In this phase, the task will cover autosize duct diameter for a given duct length in simulations with a single air loop and a single conditioned zone. This will answer questions and reveal issues that will inform subsequent phases.
 
 ## Approach ##
 
