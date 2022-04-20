@@ -659,7 +659,8 @@ namespace OutputReportTabular {
     void WriteResilienceBinsTable(EnergyPlusData &state,
                                   int const columnNum,
                                   std::vector<int> const &columnHead,
-                                  Array1D<std::vector<Real64>> const &ZoneBins);
+                                  Array1D<std::vector<Real64>> const &ZoneBins,
+                                  Real64 const unitConvMultiplier = 1.0);
 
     void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
                                                  int const columnNum,
@@ -667,13 +668,14 @@ namespace OutputReportTabular {
                                                  const std::string tableName,
                                                  Array1D_string const &columnHead,
                                                  Array1D_int columnWidth,
-                                                 Array2D<std::vector<Real64>> const &ZoneBins);
+                                                 Array2D<std::vector<Real64>> const &ZoneBins,
+                                                 Real64 const unitConvMultiplier = 1.0);
 
     void WriteSETHoursTable(EnergyPlusData &state,
                             int const columnNum,
                             std::vector<int> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins,
-                            Real64 const unitConvMultiplier);
+                            Real64 const unitConvMultiplier = 1.0);
 
     void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                            int const columnNum,
@@ -682,7 +684,7 @@ namespace OutputReportTabular {
                                            Array1D_string const &columnHead,
                                            Array1D_int columnWidth,
                                            Array2D<std::vector<Real64>> const &ZoneBins,
-                                           Real64 unitConvMultiplier);
+                                           Real64 const unitConvMultiplier = 1.0);
 
     void WriteHourOfSafetyTable(EnergyPlusData &state,
                                 int const columnNum,

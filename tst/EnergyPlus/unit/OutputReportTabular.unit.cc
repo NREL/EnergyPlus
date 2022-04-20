@@ -296,6 +296,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(1.8, curConversionFactor);
     EXPECT_EQ(32., curConversionOffset);
 
+    varNameWithUnits = "SET > 30°C DEGREE-HOURS [°C·hr]";
+    LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    EXPECT_EQ(118, indexUnitConv);
+    EXPECT_EQ("°F·hr", curUnits);
+    EXPECT_EQ(1.8, curConversionFactor);
+
     varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY[J]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
