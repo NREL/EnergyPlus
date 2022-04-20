@@ -5564,7 +5564,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZonePierceSET(ZoneNum) = -1;
             }
 
-            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+            Real64 NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
             Real64 Temperature = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
             bool &CrossedColdThresh = state.dataHeatBalFanSys->CrossedColdThresh(ZoneNum);
@@ -5741,7 +5741,7 @@ void ReportThermalResilience(EnergyPlusData &state)
             Real64 HI = state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum);
             Real64 Humidex = state.dataHeatBalFanSys->ZoneHumidex(ZoneNum);
 
-            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+            Real64 NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
             if (HI <= 26.7) {
                 state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
@@ -6066,7 +6066,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 ZoneAirCO2 = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum);
 
-            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+            Real64 NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
             if (ZoneAirCO2 <= 1000) {
                 state.dataHeatBalFanSys->ZoneCO2LevelHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
@@ -6132,7 +6132,7 @@ void ReportVisualResilience(EnergyPlusData &state)
             Real64 avgZoneIllum =
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum / state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts;
 
-            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+            Real64 NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
             if (avgZoneIllum <= 100) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
