@@ -69,8 +69,6 @@ struct EnergyPlusData;
 
 namespace Boilers {
 
-    extern const std::array<int, 3> a;
-        
     // water temperature evaluation method
     enum class TempMode
     {
