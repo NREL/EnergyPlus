@@ -48,6 +48,8 @@
 #ifndef Boilers_hh_INCLUDED
 #define Boilers_hh_INCLUDED
 
+#include <array>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
