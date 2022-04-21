@@ -1806,44 +1806,46 @@ namespace HeatingCoils {
             state.dataHeatingCoils->HeatingCoilNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
         // create predefined report entries
-        {
-            auto const SELECT_CASE_var(HeatingCoil(CoilNum).HCoilType_Num);
-            if (SELECT_CASE_var == Coil_HeatingElectric) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric");
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
-            } else if (SELECT_CASE_var == Coil_HeatingElectric_MultiStage) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric:MultiStage");
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchHeatCoilNomCap,
-                                 HeatingCoil(CoilNum).Name,
-                                 HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchHeatCoilNomEff,
-                                 HeatingCoil(CoilNum).Name,
-                                 HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
-            } else if (SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Fuel");
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
-            } else if (SELECT_CASE_var == Coil_HeatingGas_MultiStage) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Gas:MultiStage");
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchHeatCoilNomCap,
-                                 HeatingCoil(CoilNum).Name,
-                                 HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchHeatCoilNomEff,
-                                 HeatingCoil(CoilNum).Name,
-                                 HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
-            } else if (SELECT_CASE_var == Coil_HeatingDesuperheater) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Desuperheater");
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
-            }
+        switch (HeatingCoil(CoilNum).HCoilType_Num) {
+        case Coil_HeatingElectric: {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
+        } break;
+        case Coil_HeatingElectric_MultiStage: {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Electric:MultiStage");
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchHeatCoilNomCap,
+                             HeatingCoil(CoilNum).Name,
+                             HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchHeatCoilNomEff,
+                             HeatingCoil(CoilNum).Name,
+                             HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
+        } break;
+        case Coil_HeatingGasOrOtherFuel: {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Fuel");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
+        } break;
+        case Coil_HeatingGas_MultiStage: {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Gas:MultiStage");
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchHeatCoilNomCap,
+                             HeatingCoil(CoilNum).Name,
+                             HeatingCoil(CoilNum).MSNominalCapacity(HeatingCoil(CoilNum).NumOfStages));
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchHeatCoilNomEff,
+                             HeatingCoil(CoilNum).Name,
+                             HeatingCoil(CoilNum).MSEfficiency(HeatingCoil(CoilNum).NumOfStages));
+        } break;
+        case Coil_HeatingDesuperheater: {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, HeatingCoil(CoilNum).Name, "Coil:Heating:Desuperheater");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).NominalCapacity);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, HeatingCoil(CoilNum).Name, HeatingCoil(CoilNum).Efficiency);
+        } break;
+        default:
+            break;
         }
     }
 
@@ -3061,19 +3063,24 @@ namespace HeatingCoils {
             state.dataHeatingCoils->HeatingCoil(CoilNum).ParasiticFuelRate * ReportingConstant;
 
         std::string coilObjClassName;
-        {
-            auto const SELECT_CASE_var(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num);
-            if (SELECT_CASE_var == Coil_HeatingElectric) {
-                coilObjClassName = "Coil:Heating:Electric";
-            } else if (SELECT_CASE_var == Coil_HeatingElectric_MultiStage) {
-                coilObjClassName = "Coil:Heating:Electric:MultiStage";
-            } else if (SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) {
-                coilObjClassName = "Coil:Heating:Fuel";
-            } else if (SELECT_CASE_var == Coil_HeatingGas_MultiStage) {
-                coilObjClassName = "Coil:Heating:Gas:MultiStage";
-            } else if (SELECT_CASE_var == Coil_HeatingDesuperheater) {
-                coilObjClassName = "Coil:Heating:Desuperheater";
-            }
+        switch (state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) {
+        case Coil_HeatingElectric: {
+            coilObjClassName = "Coil:Heating:Electric";
+        } break;
+        case Coil_HeatingElectric_MultiStage: {
+            coilObjClassName = "Coil:Heating:Electric:MultiStage";
+        } break;
+        case Coil_HeatingGasOrOtherFuel: {
+            coilObjClassName = "Coil:Heating:Fuel";
+        } break;
+        case Coil_HeatingGas_MultiStage: {
+            coilObjClassName = "Coil:Heating:Gas:MultiStage";
+        } break;
+        case Coil_HeatingDesuperheater: {
+            coilObjClassName = "Coil:Heating:Desuperheater";
+        } break;
+        default:
+            break;
         }
         if (state.dataHeatingCoils->HeatingCoil(CoilNum).reportCoilFinalSizes) {
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
