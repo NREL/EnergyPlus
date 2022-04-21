@@ -43,7 +43,7 @@ The return ducts will be divided into two sections based on current duct configu
 
 ####Mass or volumetric flow rates####
 
-The mass flow rates are avialble from either system sizing or user inputs. Each truck has the same mass flow rate as max fan flow rate. Each branch has the same flow rate as max flow rate from the corresponding ZoneTernminal Unit.
+The mass flow rates are available from either system sizing or user inputs. Each truck has the same mass flow rate as max fan flow rate. Each branch has the same flow rate as max flow rate from the corresponding ZoneTernminal Unit.
 
 All ducts in the same truck or branch have the same size as diameter, due to the same mass flow rate and velocity. 
 
