@@ -6807,14 +6807,14 @@ void CalcZoneSums(EnergyPlusData &state,
         // determine reference air temperature for this surface
         {
             auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-            if (SELECT_CASE_var == ZoneMeanAirTemp) {
+            if (SELECT_CASE_var == DataSurfaces::RefAirTemp::ZoneMeanAirTemp) {
                 // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
                 RefAirTemp = MAT(ZoneNum);
                 SumHA += HA;
-            } else if (SELECT_CASE_var == AdjacentAirTemp) {
+            } else if (SELECT_CASE_var == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
                 RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
-            } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
+            } else if (SELECT_CASE_var == DataSurfaces::RefAirTemp::ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
                     ShowFatalError(state,
