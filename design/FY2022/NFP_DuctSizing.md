@@ -5,6 +5,7 @@ AirflowNetwork Duct Autosizing
 
 **Florida Solar Energy Center**
 
+ - Second revision, 04/21/22
  - First draft, 04/13/22
  - 
  
@@ -15,7 +16,89 @@ Duct sizing is one of the remaining barriers to greater usage of the AFN distrib
 
 ## E-mail and  Conference Call Conclusions ##
 
-NA
+### First conference ###
+
+The first conference call was held on 04/20/22 as a part of EnergyPlus Technicalities. Most team members attended the conference call. Comments and my answers are provided below:
+
+1. Shall we make duct objects in general, instead of inside of AFN?
+
+A: It is preferred that all duct inputs should be available in general. Unfortunately, all air duct objects are inside AFN currently. The present new feature provides duct sizing, not for general purpose. The team may condier this request in the future, include duct objects as a part of AirLoops.
+
+2. Duct leakage
+
+Duct leakage will not be considered for duct sizing. In order to compensate possible leakage flow losses, a new field of Sizing Factor will be added, similar to two fields listed in the Sizing:Parameters: Heating Sizing Factor, and Cooling Sizing Factor.
+
+3. New fields
+
+All proposed new fields will be added in the existing AirflowNetwork:SimulationControl object. No new object will be created, since no comments were mentioned for the IDD change during the conference call. 
+
+4. Duct shape
+
+The proposed duct shape for this phase will be a round duct. Since hydrolic diameter input is a field for autosize, the Corss Section Area will be calculated after autosizing in AirflowNetwork:Distribution:Component:Duct object.   
+
+### E-mail communication with Tianzhen ###
+
+Thanks for clarification.
+
+
+On Apr 20, 2022, at 7:52 PM, gu@fsec.ucf.edu wrote:
+
+Tianzhen:
+ 
+No. I don’t allow this happens for now, because all ducts in each branch or trunk should have same diameter. I will think of later after Phase 1.
+ 
+Thanks.
+ 
+Gu
+ 
+From: Tianzhen Hong <thong@lbl.gov> 
+Sent: Wednesday, April 20, 2022 7:46 PM
+To: Lixing Gu <gu@fsec.ucf.edu>
+Subject: Re: NFP on duct sizing
+ 
+Gu,
+ 
+On item 3, do you allow a mix of auto-size and manual/entered sizes?
+ 
+Tianzhen
+ 
+On Wed, Apr 20, 2022 at 1:18 PM Lixing Gu <gu@fsec.ucf.edu> wrote:
+Tianzhen:
+ 
+Thanks for your comments. Here are my answers:
+ 
+1.       Will make a change as "Duct Sizing Method"
+2.       Yes. Your understanding is correct. It is intended to have a choice for “None”.
+3.       Yes. Since each truck or branch have the same airflow, they should have the same size for each truck or branch.
+ 
+I will incorporate your comments and my reply in the updated NFP.
+ 
+Thanks.
+ 
+Gu 
+ 
+From: Tianzhen Hong <thong@lbl.gov> 
+Sent: Wednesday, April 20, 2022 3:13 PM
+To: Lixing Gu <gu@fsec.ucf.edu>
+Cc: Lee, Edwin <Edwin.Lee@nrel.gov>; Mike Witte <MJWitte@gard.com>
+Subject: NFP on duct sizing
+ 
+Gu,
+ 
+A nice feature to add.
+ 
+To finish up the comments:
+1. The field name Duct Sizing Type may be named "Duct Sizing Method" to be consistent with naming convention
+2. You have a default None for the sizing method. Is the intent to keep the IDD object even if the duct sizing feature is not used at all. This is fine, allowing users to switch back easily. In EnergyPlus, when None is selected, I would assume the object is basically ignored and not needed.
+3. Do you require all air ducts to be auto-sized? or some can be auto-sized while others are manually sized?
+ 
+Tianzhen
+
+### Actions from the first conference call and E-mail communication ###
+
+1. Duct leakage will not be considered during sizing
+2. Add new fields in AirflowNetwork:SimulationControl object
+3. Add a new field as Sizing Factor to compensate possible leakage losses
 
 ## Overview ##
 
@@ -115,6 +198,8 @@ When sizing is requested, no hard input values of hydrolic diameter will be allo
 ####New fields ####
 
 The proposed new fields can be added at the end of the AirflowNetwork:SimulationControl object as optional. Or a new sizing object may be created: Sizing:AFN:Ducts with the same fields.
+
+Based on conference call, no comments are provided for this discussion. I propose to add new fields in the existing AirflowNetwork:SimulationControl object. No new object will be created. 
 
 ## Testing/Validation/Data Sources ##
 
@@ -267,14 +352,18 @@ The pressure loss method will be applied to all branches, so that all ducts have
       \default No
 <span style="color:red">
 
- 	A10, \field Duct Sizing Type
+ 	A10, \field Duct Sizing Method
       \type choice
       \key None
       \key MaximumVelocity
       \key PressureLoss
       \key PressureLossWithMaximumVelocity
       \default None
- 	N11 , \field Maximum Airflow Velocity
+    N11, \field Duct Sizing Factor
+      \type real
+      \minimum> 0.0
+      \default 1.0
+	N12 , \field Maximum Airflow Velocity
       \type real
       \units m/s
       \minimum >0.0
@@ -287,7 +376,7 @@ The pressure loss method will be applied to all branches, so that all ducts have
       \note PressureLoss. The value is used to check to ensure the final velocity is less than
       \note the maximum value. If greater, final value will be obtained from MaximumVelocity.
       \note This field is apply for truck size, while branch size is based on total pressure drop.
- 	N12 , \field Total Pressure Loss Across Supply Truck
+ 	N13 , \field Total Pressure Loss Across Supply Truck
       \type real
       \units Pa
       \minimum >0.0
@@ -297,17 +386,17 @@ The pressure loss method will be applied to all branches, so that all ducts have
       \note PressureLoss. The value is used to check to ensure the final velocity is less than
       \note the maximum value. If greater, final value will be obtained from MaximumVelocity.
       \note This field is apply for truck size, while branch size is based on total pressure drop.
- 	N13 , \field Total Pressure Loss Across Supply Branch
+ 	N14 , \field Total Pressure Loss Across Supply Branch
       \type real
       \units Pa
       \minimum >0.0
       \note Duct diameter is calculated using Colebrrook's equation  
- 	N14 , \field Total Pressure Loss Across Return Trunk
+ 	N15 , \field Total Pressure Loss Across Return Trunk
       \type real
       \units Pa
       \minimum >0.0
       \note Duct diameter is calculated using Colebrrook's equation  
- 	N15 , \field Total Pressure Loss Across Return Branch
+ 	N16 ; \field Total Pressure Loss Across Return Branch
       \type real
       \units Pa
       \minimum >0.0
