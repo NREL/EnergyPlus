@@ -4108,11 +4108,6 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
     //       DATE WRITTEN   Unknown
     //       MODIFIED       B. Griffith Sept 2011, add storage of requirements by sequence
 
-    using DataHVACGlobals::DualSetPointWithDeadBand;
-    using DataHVACGlobals::SingleCoolingSetPoint;
-    using DataHVACGlobals::SingleHeatCoolSetPoint;
-    using DataHVACGlobals::SingleHeatingSetPoint;
-
     int ctrlZoneNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
     auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
@@ -4137,27 +4132,27 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
         // re-evaluate if loads are now such that in dead band or set back
         {
             auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
-            if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
+            if (SELECT_CASE_var == DataHVACGlobals::SetPointType::Uncontrolled) { // uncontrolled zone; shouldn't ever get here, but who knows
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-            } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeating) {
                 if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 }
-            } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleCooling) {
                 if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 }
-            } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeatCool) {
                 if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 }
-            } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
                 if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {
@@ -4240,27 +4235,27 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
         // re-evaluate if loads are now such that in dead band or set back
         {
             auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
-            if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
+            if (SELECT_CASE_var == DataHVACGlobals::SetPointType::Uncontrolled) { // uncontrolled zone; shouldn't ever get here, but who knows
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-            } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeating) {
                 if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 }
-            } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleCooling) {
                 if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 }
-            } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeatCool) {
                 if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 }
-            } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+            } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
                 if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                     state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                 } else {

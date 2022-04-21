@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // SingleHeatingSetPoint thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = SingleHeatingSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleHeating;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // SingleCoolingSetPoint thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = SingleCoolingSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleCooling;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // SingleHeatCoolSetPoint thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = SingleHeatCoolSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleHeatCool;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // DualSetPointWithDeadBand thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -929,7 +929,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
-    state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F

@@ -135,10 +135,6 @@ namespace FanCoilUnits {
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
-    using DataHVACGlobals::DualSetPointWithDeadBand;
-    using DataHVACGlobals::SingleCoolingSetPoint;
-    using DataHVACGlobals::SingleHeatCoolSetPoint;
-    using DataHVACGlobals::SingleHeatingSetPoint;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
@@ -2411,7 +2407,8 @@ namespace FanCoilUnits {
             QCoilCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP - QUnitOutNoHC;
 
             // if cooling
-            if (UnitOn && QCoilCoolSP < (-1.0 * SmallLoad) && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+            if (UnitOn && QCoilCoolSP < (-1.0 * SmallLoad) &&
+                state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleHeating) {
                 ControlNode = FanCoil(FanCoilNum).CoolCoilFluidInletNode;
                 ControlOffset = FanCoil(FanCoilNum).ColdControlOffset;
                 MaxWaterFlow = FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
@@ -2551,7 +2548,8 @@ namespace FanCoilUnits {
                 CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QUnitOut);
 
                 // if heating
-            } else if (UnitOn && QCoilHeatSP > SmallLoad && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint) {
+            } else if (UnitOn && QCoilHeatSP > SmallLoad &&
+                       state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling) {
                 // get full load result
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) { // if HW Coil
                     ControlNode = FanCoil(FanCoilNum).HeatCoilFluidInletNode;
@@ -2804,7 +2802,8 @@ namespace FanCoilUnits {
             }
 
             // meet the coil load adjusted for fan operation
-            if (UnitOn && QCoilCoolSP < (-1.0 * SmallLoad) && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+            if (UnitOn && QCoilCoolSP < (-1.0 * SmallLoad) &&
+                state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleHeating) {
                 // cooling coil action, maximum cold water flow
                 mdot = FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
                 SetComponentFlowRate(state,
@@ -2906,7 +2905,8 @@ namespace FanCoilUnits {
                 // at the end calculate output
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
 
-            } else if (UnitOn && QCoilHeatSP > SmallLoad && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint) {
+            } else if (UnitOn && QCoilHeatSP > SmallLoad &&
+                       state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling) {
                 // heating coil action, maximun hot water flow
 
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
@@ -3111,15 +3111,19 @@ namespace FanCoilUnits {
                 QCoilCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                 QCoilHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
 
-                if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint) {
+                if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 &&
+                    state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling) {
                     QZnReq = QCoilHeatSP;
                     state.dataFanCoilUnits->HeatingLoad = true;
-                } else if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) {
+                } else if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 &&
+                           state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::SetPointType::SingleCooling) {
                     QZnReq = 0.0;
-                } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+                } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 &&
+                           state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleHeating) {
                     QZnReq = QCoilCoolSP;
                     state.dataFanCoilUnits->CoolingLoad = true;
-                } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleHeatingSetPoint) {
+                } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 &&
+                           state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::SetPointType::SingleHeating) {
                     QZnReq = 0.0;
                 } else if (QCoilHeatSP <= 0.0 && QCoilCoolSP >= 0.0) {
                     QZnReq = 0.0;
@@ -3242,7 +3246,7 @@ namespace FanCoilUnits {
                              0.0); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
             if (UnitOn && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP < (-1.0 * SmallLoad) &&
-                state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+                state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleHeating) {
                 // cooling coil action, maximum cold water flow
                 mdot = FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
                 SetComponentFlowRate(state,
@@ -3291,7 +3295,7 @@ namespace FanCoilUnits {
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
 
             } else if (UnitOn && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP > SmallLoad &&
-                       state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint) {
+                       state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling) {
                 // heating coil action, maximun hot water flow
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                     mdot = FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
@@ -3985,15 +3989,19 @@ namespace FanCoilUnits {
         state.dataFanCoilUnits->HeatingLoad = false;
         state.dataFanCoilUnits->CoolingLoad = false;
 
-        if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint) {
+        if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 &&
+            state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling) {
             QZnReq = QCoilHeatSP;
             HeatingLoad = true;
-        } else if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) {
+        } else if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 &&
+                   state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::SetPointType::SingleCooling) {
             QZnReq = 0.0;
-        } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+        } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 &&
+                   state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleHeating) {
             QZnReq = QCoilCoolSP;
             CoolingLoad = true;
-        } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleHeatingSetPoint) {
+        } else if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0 &&
+                   state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::SetPointType::SingleHeating) {
             QZnReq = 0.0;
         } else if (QCoilHeatSP <= 0.0 && QCoilCoolSP >= 0.0) {
             QZnReq = 0.0;
@@ -4002,7 +4010,7 @@ namespace FanCoilUnits {
         // Zone load calculation for constant fan systems, adopted from unitary system
         if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
             switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-            case SingleHeatingSetPoint: {
+            case DataHVACGlobals::SetPointType::SingleHeating: {
                 CoolingLoad = false;
                 // No heating load and constant fan pushes zone below heating set point
                 if (QUnitOutNoHC < 0.0 && QCoilHeatSP < 0.0 && QUnitOutNoHC - QCoilHeatSP < -SmallLoad) {
@@ -4011,7 +4019,7 @@ namespace FanCoilUnits {
                     QZnReq = QCoilHeatSP;
                 }
             } break;
-            case SingleCoolingSetPoint: {
+            case DataHVACGlobals::SetPointType::SingleCooling: {
                 HeatingLoad = false;
                 // No heating load and constant fan pushes zone above cooling set point
                 if (QUnitOutNoHC > 0.0 && QCoilCoolSP > 0.0 && QUnitOutNoHC - QCoilCoolSP > SmallLoad) {
@@ -4020,7 +4028,7 @@ namespace FanCoilUnits {
                     QZnReq = QCoilCoolSP;
                 }
             } break;
-            case SingleHeatCoolSetPoint: {
+            case DataHVACGlobals::SetPointType::SingleHeatCool: {
                 // zone temp above cooling and heating set point temps
                 if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0) {
                     // zone pushed below heating set point
@@ -4039,7 +4047,7 @@ namespace FanCoilUnits {
                     }
                 }
             } break;
-            case DualSetPointWithDeadBand: {
+            case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand: {
                 // zone temp above cooling and heating set point temps
                 if (QCoilHeatSP < 0.0 && QCoilCoolSP < 0.0) {
                     // zone pushed into deadband

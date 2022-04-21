@@ -512,11 +512,11 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     //	extern int const SingleHeatCoolSetPoint; = 3
     //	extern int const DualSetPointWithDeadBand; = 4
     state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(HeatZoneNum).CTSchedIndex).CurrentValue =
-        DataHVACGlobals::SingleHeatingSetPoint;
+        static_cast<int>(DataHVACGlobals::SetPointType::SingleHeating);
     state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(CoolZoneNum).CTSchedIndex).CurrentValue =
-        DataHVACGlobals::SingleCoolingSetPoint;
+        static_cast<int>(DataHVACGlobals::SetPointType::SingleCooling);
     state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(CoolHeatZoneNum).CTSchedIndex).CurrentValue =
-        DataHVACGlobals::SingleHeatCoolSetPoint;
+        static_cast<int>(DataHVACGlobals::SetPointType::SingleHeatCool);
 
     state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue =
         0; // simulate no thermostat or non-controlled zone
@@ -531,7 +531,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
                   DualZoneNum)); // Set point initialized to 0 and never set since thermostat control type = 0
 
     state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue =
-        DataHVACGlobals::DualSetPointWithDeadBand; // reset Tstat control schedule to dual thermostat control
+        static_cast<int>(DataHVACGlobals::SetPointType::DualSetPointWithDeadBand); // reset Tstat control schedule to dual thermostat control
 
     // set up a back calculated load
     // for the first few, TempIndZnLd() = 0.0
@@ -1151,7 +1151,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
 
     OverrideAirSetPointsforEMSCntrl(*state);
     EXPECT_EQ(23.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));
@@ -1164,7 +1164,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
     state->dataZoneCtrls->ComfortControlledZone(1).ActualZoneNum = 1;
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideHeatingSetPointOn = true;
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideCoolingSetPointOn = true;
-    state->dataHeatBalFanSys->ComfortControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->ComfortControlType(1) = static_cast<int>(DataHVACGlobals::SetPointType::DualSetPointWithDeadBand);
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideHeatingSetPointValue = 22;
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideCoolingSetPointValue = 25;
 

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -253,7 +254,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
     Array1D<Real64> ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
     Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
-    Array1D_int TempControlType;
+    Array1D<DataHVACGlobals::SetPointType> TempControlType;
+    EPVector<int> TempControlTypeRpt;
     Array1D_int ComfortControlType;
 
     Array1D<Real64> ZoneHeatIndex;

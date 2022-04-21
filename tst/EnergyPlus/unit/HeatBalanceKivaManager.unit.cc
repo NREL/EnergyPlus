@@ -194,7 +194,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
     state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue =
-        DataHVACGlobals::DualSetPointWithDeadBand;
+        static_cast<int>(DataHVACGlobals::SetPointType::DualSetPointWithDeadBand);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 24C/20C
 

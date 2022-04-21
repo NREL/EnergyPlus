@@ -2520,10 +2520,6 @@ namespace ThermalComfort {
         using namespace OutputReportPredefined;
         auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
-        using DataHVACGlobals::DualSetPointWithDeadBand;
-        using DataHVACGlobals::SingleCoolingSetPoint;
-        using DataHVACGlobals::SingleHeatCoolSetPoint;
-        using DataHVACGlobals::SingleHeatingSetPoint;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SensibleLoadPredictedNoAdj;
@@ -2547,16 +2543,16 @@ namespace ThermalComfort {
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeatingOccupied = 0.0;
             {
                 auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(iZone));
-                if (SELECT_CASE_var == SingleHeatingSetPoint) {
+                if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeating) {
                     testHeating = true;
                     testCooling = false;
-                } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
+                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleCooling) {
                     testHeating = false;
                     testCooling = true;
-                } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeatCool) {
                     testHeating = true;
                     testCooling = true;
-                } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
+                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
                     testHeating = true;
                     testCooling = true;
                 } else {

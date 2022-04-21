@@ -100,10 +100,17 @@ namespace DataHVACGlobals {
     int constexpr CycleOn(2);
     int constexpr CycleOnZoneFansOnly(3);
     // The following parameters describe the setpoint types in TempControlType(ActualZoneNum)
-    int constexpr SingleHeatingSetPoint(1);
-    int constexpr SingleCoolingSetPoint(2);
-    int constexpr SingleHeatCoolSetPoint(3);
-    int constexpr DualSetPointWithDeadBand(4);
+    enum class SetPointType
+    {
+        Invalid = -1,
+        Uncontrolled,
+        SingleHeating,
+        SingleCooling,
+        SingleHeatCool,
+        DualSetPointWithDeadBand,
+        Num
+    };
+
     // parameters describing air duct type
     int constexpr Main(1);
     int constexpr Cooling(2);

@@ -252,13 +252,14 @@ void KivaInstanceMap::setInitialBoundaryConditions(
         case KIVAZONE_TEMPCONTROL: {
 
             int controlTypeSchId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).CTSchedIndex;
-            int controlType = ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep);
+            auto controlType =
+                static_cast<DataHVACGlobals::SetPointType>(ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep));
 
-            if (controlType == 0) { // Uncontrolled
+            if (controlType == DataHVACGlobals::SetPointType::Uncontrolled) { // Uncontrolled
 
                 Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv;
 
-            } else if (controlType == DataHVACGlobals::SingleHeatingSetPoint) {
+            } else if (controlType == DataHVACGlobals::SetPointType::SingleHeating) {
 
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleHeatSetPoint;
                 int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
@@ -266,7 +267,7 @@ void KivaInstanceMap::setInitialBoundaryConditions(
                 Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
                 Tin = setpoint + DataGlobalConstants::KelvinConv;
 
-            } else if (controlType == DataHVACGlobals::SingleCoolingSetPoint) {
+            } else if (controlType == DataHVACGlobals::SetPointType::SingleCooling) {
 
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleCoolSetPoint;
                 int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
@@ -274,7 +275,7 @@ void KivaInstanceMap::setInitialBoundaryConditions(
                 Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
                 Tin = setpoint + DataGlobalConstants::KelvinConv;
 
-            } else if (controlType == DataHVACGlobals::SingleHeatCoolSetPoint) {
+            } else if (controlType == DataHVACGlobals::SetPointType::SingleHeatCool) {
 
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleHeatCoolSetPoint;
                 int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
@@ -282,7 +283,7 @@ void KivaInstanceMap::setInitialBoundaryConditions(
                 Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
                 Tin = setpoint + DataGlobalConstants::KelvinConv;
 
-            } else if (controlType == DataHVACGlobals::DualSetPointWithDeadBand) {
+            } else if (controlType == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
 
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBand;
                 int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
