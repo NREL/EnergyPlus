@@ -1,21 +1,21 @@
 Equation-Fit Based Gas Fired Absorption Heat Pump Module
 =============================================================
 
-**J. Yuan & M.J. Witte, J. Glazer, GARD Analytics**
+**J. Yuan & M.J. Witte, GARD Analytics**
 
  - Original Date: April 18, 2021
  - Revised: 
 
 
 ## Justification for New Feature ##
+The goal of the proposed new feature development is to add a new EnergyPlus model for an ammonia-water absorption heat pump. Previous modeling of this equipment using EnergyPlus EMS is described in [1]. Here, the heat pump was modeled using the "PlantComponent:UserDefined" object to connect the EMS programs into the plant simulation. This method is not standarized and lack scalability for different connections and equipment configurations. The proposed new feature will address the model needs for convinient and scacale modeling of such gas-fired absorption heatpump systems. 
 
 Current EnergyPlus has capabilities to model an absorption chillerheater and a heat pump separately. For example, an existing EnergyPlus object that can provide the basis for the absorption chiller is ChillerHeater:Absorption:DirectFired; and an existing EnergyPlus object that can provide the heat pump modeling capability is HeatPump:PlantLoop:EIR:Cooling/Heating. 
 
 ChillerHeater:Absorption:DirectFired: Direct fired gas absorption chiller-heater using performance curves. This component models fuel-fired heating and cooling with an air-cooled condenser option. However, the heating mode is simply a boiler, not a heat pump.
 
-HeatPump:PlantLoop:EIR:Cooling/Heating: An EIR formulated water-to-water (or air-to-water) heat pump model. This component can model and air-to-water heat pump, but does not have a fuel type option, and the heating mode does not have any defrost options.
+HeatPump:PlantLoop:EIR:Cooling/Heating: An EIR formulated water-to-water (or air-to-water) heat pump model. This component can model a general -purpose heat pump, either air-to-water or water-to-water. However, it does not have a fuel type option; and the heating mode currently does not allow defrost operations. Further, parameter input options are more general for a heatpump configuration; but not specifically to a gas-fired absorption heat pump to be modeled in the current NFP. In order to model a gas-fired absorption heatpump, many input fields need to be expanded or allow alternatives in order to fit it in a the current general-purpose heat pump model.  
 
-The goal of the proposed new feature development is to add a new EnergyPlus model for an ammonia-water absorption heat pump. Previous modeling of this equipment using EnergyPlus EMS is described in [1]. Here, the heat pump was modeled using the "PlantComponent:UserDefined" object to connect the EMS programs into the plant simulation. This method is not standarized and lack scalability for different connections and equipment configurations. The proposed new feature will address the model needs for convinient and scacale modeling of such gas-fired absorption heatpump systems. 
 
 ## E-mail and Conference Call Conclusions ##
 ### E-mail Communications ###
@@ -24,7 +24,7 @@ The goal of the proposed new feature development is to add a new EnergyPlus mode
 
 ## Overview ##
 
-The proposed new feature will implement a chillerheat absorption heat pump model that would use equation-based model with manufacture provided parameters. Currently the requester (GTI) uses a customized plant system component and EMS programs to implement the gas-fired absorption heat pump. The implemented model [1] are as follows: 
+The proposed new feature will implement a chillerheat absorption heat pump model that would use equation-fit model with manufacture provided parameters. Currently the requester (GTI) uses a customized plant system component and EMS programs to implement the gas-fired absorption heat pump. The implemented model [1] is as follows: 
 
 $$ GAHP Heating Capacity =Rated Heating Capacity \times CAPFT $$
 
@@ -32,7 +32,7 @@ $$ CAPFT = a1 \times Tamb + b1 \times Tamb^{2} +c1 \times Tret + d1 \times Tret^
 
 $$ PLR = \frac{Load}{Capacity} (0.2 <= PLR <= 1) $$
 
-$$ Gas Usage = \frac{Load \times EIRFT \times EIRFPLR \times EIRDEFROST}{CRF} $$
+$$ Fuel Usage = \frac{Load \times EIRFT \times EIRFPLR \times EIRDEFROST}{CRF} $$
 
 $$ EIRFT = a2 \times Tamb + b2 \times Tamb^{2} +c2 \times Tret + d2 \times Tret^{2} + e2 \times Tret \times Tamb + f2 $$
 
@@ -44,61 +44,69 @@ $$ CRF = 0.4167 \times CR + 0.5833 $$
 
 $$ CR = \frac{PLR}{PLR_{min}}, for 0.2 <= PLR <= 0.25 $$
 
+
 ## Approach ##
 
-The following new IDF object will be added to EnergyPlus to implement the absorption heat pump model, based on a new input data dictionary (IDD) definition has been proposed by GTI (e-mail from Alex Fridlyand on Nov 29, 2021), with a few addition of essential entries. The name of the object is HeatPump:AirToWater:FuelFiredEquationFit:Heating. 
+The following new IDF object will be added to EnergyPlus to implement the absorption heat pump model, based on a new input data dictionary (IDD) definition has been proposed by GTI (e-mail from Alex Fridlyand on Nov 29, 2021), with a few addition of essential entries. The name of the object is HeatPump:AirToWater:FuelFired:Heating. 
 
-### IDF Object for HeatPump:AirToWater:FuelFiredEquationFit:Heating
+### IDF Object for HeatPump:AirToWater:FuelFired:Heating
 
 ```
-HeatPump:AirToWater:FuelFiredEquationFit:Heating,
+HeatPump:AirToWater:FuelFired:Heating,
     AbsorptionHeatPumpName1, !- Name
-    Inlet_Node_Name, !-Heat Pump Inlet Node Name
-    Outlet_Node_Name, !-Heat Pump Outlet Node Name
-    NaturalGas, !-Fuel Type (NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2)
+    Inlet_Node_Name, !-Water Inlet Node Name
+    Outlet_Node_Name, !-Water Outlet Node Name
+    Air_Source_Node_Name, ! Air Source Node Name
+    NaturalGas, !-Fuel Type
+    General, \field End-Use Subcategory
     0.99, !-Fuel Burner Efficiency
-    10000, !-Nominal Heating Capacity [W] (autosizeable)
-    2, !-Design Flow Rate [kg/s] (autosizeable)
-    60, !-Design Supply Temperature [degree C] (default 60°C)
-    11.1, !-Design Temperature Lift [degree C] (default 11.1°C)
+    10000, !-Nominal Heating Capacity
+    2, !-Design Flow Rate
+    60, !-Design Supply Temperature
+    11.1, !-Design Temperature Lift
     1.1, ! Sizing Factor
-    NotModulated; !-Flow Mode (NotModulated, ConstantFlow, or LeavingSetpointModulated)
-    OutdoorAirDryBulb, !-Temp1 Variable Type - Outdoor Air Dry Bulb or Wet Bulb (for following curves)
-    HeatPumpEnteringWaterTemperature, !-Temp2 Variable Type - Heat Pump Entering or Leaving Water Temperature (for following curves)
+    NotModulated, !-Flow Mode
+    OutdoorAirDryBulb, !-Outdoor Air Temperature Variable Type
+    HeatPumpEnteringWaterTemperature, !-Water Temperature Type
     CAPFT_CurveName, !-CAPFT Name - Normalized Capacity Function of Temperature Curve name (biquadratic curve or lookup table)
     Fuel_EIRFT_CurveName, !-Fuel EIRFT - Fuel Energy Input Ratio Function of Temperature Curve name (biquadratic curve or lookup table)
     Fuel_EIRFPLR_CurveName, !-Fuel EIRFPLR - Fuel Energy Input Ratio Function of PLR Curve name (cubic curve or lookup table)
-    0.1, !-Minimum Part Load Ratio (0-1)
-    1, !-Maximum Part Load Ratio (0-1)
+    0.1, !-Minimum Part Load Ratio
+    1, !-Maximum Part Load Ratio
     Fuel_EIRDefrost_CurveName, !-Fuel EIRDEFROST - Energy Input Ratio Defrost Adjustment Curve name (cubic curve or lookup table function of Temp1 above)
-    5, !-Defrost operation Tmin [minute]
-    30, !-Defrost operation Tmax [minute]
+    5, !-Defrost operation Time min
+    30, !-Defrost operation Time max 
     CRF_CurveName, !-Cycling Ratio Factor Curve Name (cubic curve or lookup table function of Cycling Ratio = PLR/PLRmin)
-    900, !-Nominal Aux. Electricity Use (W)
-    Aux_Elec_EIRFT_CurveName, !-Aux. Electric EIRFT (biquadratic curve or lookup table) - accounts for system internal fans, pumps, and electronics
-    Aux_EIRPLR_CurveName, !-All: Aux. Electric EIRFPLR (cubic curve or lookup table)
-    300; !-Standby Electricity Use (W)
+    900, !-Nominal Auxiliary. Electricity Power
+    Aux_Elec_EIRFT_CurveName, !-Auxiliary Electric EIRFT (biquadratic curve or lookup table) - accounts for system internal fans, pumps, and electronics
+    Aux_EIRPLR_CurveName, !-All: Auxiliary Electric EIRFPLR (cubic curve or lookup table)
+    300; !-Standby Electricity Power
 ```
 
-### IDD entry for HeatPump:AirToWater:FuelFiredEquationFit:Heating ###
+### IDD entry for HHeatPump:AirToWater:FuelFired:Heating ###
 
-A HeatPump:AirToWater:FuelFiredEquationFit:Heating defines the basic inputs for an equation based gas-fired absorption heat pump. 
-
+A HeatPump:AirToWater:FuelFired:Heating defines the basic inputs for an equation-fit gas-fired absorption heat pump. 
 ```
-HeatPump:AirToWater:FuelFiredEquationFit:Heating,
+HeatPump:AirToWater:FuelFired:Heating,
   \memo The object defines a gas-fired absorption heat pump which is based on equation-fit models.
+  \min-fields 10
   A1 , \field Name
        \required-field
        \note Name of the gas fired absorption heat pump system system
-  A2 , \field Heat Pump Inlet Node Name
+  A2 , \field Water Inlet Node Name
        \required-field
        \type node
-       \note Inlet node name of the heat pump connection
-  A3 , \field Heat Pump Outlet Node Name
+       \note Inlet node name of the water side connection
+  A3 , \field Water Outlet Node Name
        \required-field
        \type node
-       \note Outlet node name of the heat pump connection
-  A4 , \field Fuel Type
+       \note Outlet node name of the water side connection
+  A4 , \field Air Source Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note This is the air source node name, which is the evaporator side for heating mode heat pump.
+       \note Enter the name of an OutdoorAir:Node object.
+  A5 , \field Fuel Type
        \required-field
        \type choice
        \key NaturalGas
@@ -112,6 +120,11 @@ HeatPump:AirToWater:FuelFiredEquationFit:Heating,
        \key OtherFuel2
        \default NaturalGas
        \note Fuel Type (NaturalGas, Propane, Gasoline, Diesel etc.)
+  A6 , \field End-Use Subcategory
+        \type alpha
+        \retaincase
+        \default General
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
   N1 , \field Fuel Burner Efficiency
        \minimum> 0
        \maximum 1
@@ -119,11 +132,11 @@ HeatPump:AirToWater:FuelFiredEquationFit:Heating,
        \note Fuel Burner Efficiency (0-1)
   N2 , \field Nominal Heating Capacity
        \autosizable
-       \minimum >0
+       \minimum> 0
        \note Nominal Heating Capacity in [W] (autosizeable)
   N3 , \field Design Flow Rate (autosizeable)
        \autosizable
-       \minimum >0
+       \minimum> 0
        \note Design Flow Rate in m3/s (autosizeable)
   N4 , \field Design Supply Temperature
        \default 60
@@ -135,7 +148,7 @@ HeatPump:AirToWater:FuelFiredEquationFit:Heating,
        \minimum 1.0
        \default 1.0
        \note Sizing Factor for equipment sizing
-  A14, \field Flow Mode
+  A7 , \field Flow Mode
        \required-field
        \type choice
        \key NotModulated
@@ -143,31 +156,31 @@ HeatPump:AirToWater:FuelFiredEquationFit:Heating,
        \key LeavingSetpointModulated
        \default NotModulated
        \note Flow Mode similar to a boiler flow mode classification
-  A5 , \field Temp1 Variable Type
+  A8 , \field Temp1 Variable Type
        \required-field
        \type choice
        \key OutdoorAirDryBulb
        \key OUtdoorAirWetBulb
        \default OutdoorAirDryBulb
        \note Temp1 Variable Type - Outdoor Air Dry Bulb or Wet Bulb (for following curves)
-  A6 , \field Temp2 Variable Type
+  A9 , \field Temp2 Variable Type
        \required-field
        \type choice
        \key HeatPumpEnteringWaterTemperature
        \key HeatPumpLeavingWaterTemperature
        \default HeatPumpEnteringWaterTemperature
        \note Temp2 Variable Type - Heat Pump Entering or Leaving Water Temperature (for following curves)
-  A7 , \field CAPFT Curve Name
+  A10, \field CAPFT Curve Name
        \required-field
        \type object-list
        \object-list BivariateFunctions
        \note: CAPFT Name - Normalized Capacity Function of Temperature Curve name (biquadratic curve or lookup table)
-  A8 , \field Fuel EIRFT Curve Name
+  A11, \field Fuel EIRFT Curve Name
        \required-field
        \type object-list
        \object-list BivariateFunctions
        \note Fuel EIRFT - Fuel Energy Input Ratio Function of Temperature Curve name (biquadratic curve or lookup table)
-  A9 , \field Fuel EIRFPLR Curve Name
+  A12, \field Fuel EIRFPLR Curve Name
        \required-field
        \type object-list
        \object-list UnivariateFunctions
@@ -182,7 +195,7 @@ HeatPump:AirToWater:FuelFiredEquationFit:Heating,
        \maximum 1.0
        \default 1.0
        \note Maximum Part Load Ratio (PLR) in between 0 and 1
-  A10, \field Fuel EIRDEFROST Curve Name
+  A13, \field Fuel EIRDEFROST Curve Name
        \type object-list
        \object-list UnivariateFunctions
        \note Fuel EIRDEFROST - Energy Input Ratio Defrost Adjustment Curve name (cubic curve or lookup table function of Temp1 above)
@@ -194,29 +207,29 @@ HeatPump:AirToWater:FuelFiredEquationFit:Heating,
        \minimum> 0
        \default 30
        \note Defrost operation Maximum Time Tmax in [minute] 
-  A11, \field Cycling Ratio Factor Curve Name
+  A14, \field Cycling Ratio Factor Curve Name
        \type object-list
        \object-list UnivariateFunctions
        \note Cycling Ratio Factor (CRF) Curve Name (cubic curve or lookup table function of Cycling Ratio = PLR/PLRmin)
-  N11, \field Nominal Auxiliary Electricity Use
+  N11, \field Nominal Auxiliary Electricity Power
        \minimum 0
-       \note Nominal Auxiliary Electricity Use in [W]
-  A12, \field Auxiliary Electric EIRFT Curve Name
+       \note Nominal Auxiliary Electricity Power in [W]
+  A15, \field Auxiliary Electric EIRFT Curve Name
        \type object-list
        \object-list BivariateFunctions
        \note Auxiliary Electric EIRFT Curve Name (biquadratic curve or lookup table) - accounts for system internal fans, pumps, and electronics
-  A13, \field  Auxiliary Electric EIRFPLR Curve Name
+  A16, \field  Auxiliary Electric EIRFPLR Curve Name
        \type object-list
        \note Auxiliary. Electric EIRFPLR Curve Name (cubic curve or lookup table)
-  N12;  \field Standby Electricity Use
+  N12;  \field Standby Electricity Power
        \minimum 0
-       \note Standby Electricity Use in [W]
+       \note Standby Electricity Power in [W]
 
 ```
 
 ### Output Variables ###
 
-Output variables will reported for operation conditions, such as heating energy (rate), fuel energy (rate), electricity energy (rate)load, plr, flow rate values. 
+Output variables will reported for operation conditions, such as heating energy (rate), fuel energy (rate), electricity energy (rate)load, PLR, flow rate values. 
 
 The newly added output variables are listed as follows:
 
@@ -255,14 +268,16 @@ Since the feature is based on completely newly added blocks, an older version wo
 
 The proposed new feature development will add the following contents to the Input Output Reference document:
 
-### HeatPump:AirToWater:FuelFiredEquationFit:Heating Input Fields ###
+### HeatPump:AirToWater:FuelFired:Heating Input Fields ###
 
-The eatPump:AirToWater:FuelFiredEquationFit:Heating will take the following input fields:
+The HeatPump:AirToWater:FuelFired:Heating will take the following input fields:
 
 #### Field: Name ####
 The name of the gas-fired absorption heatpump system.
 
-#### Field Name ####
+#### Field: Water Inlet Node Name ####
+
+Note that here the "water" is literally mean "water". Rather it is the working fluid in the connected water side plant loop, which is usually some kind of glycol-water solution. 
 
 #### Field: Sizing Factor ####
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. For this component the inputs that would be altered by the sizing factor are: Nominal Capacity and Design Flow Rate. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature.
@@ -276,36 +291,37 @@ This choice field determines how the gas-fired absorption heatpump operates with
 
 #### Field: ####
 
-An example of the HeatPump:AirToWater:FuelFiredEquationFit:Heating input object is like this:
+An example of the HeatPump:AirToWater:FuelFired:Heating input object is like this:
 
 ```
-HeatPump:AirToWater:FuelFiredEquationFit:Heating,
+HeatPump:AirToWater:FuelFired:Heating,
     AbsorptionHeatPumpName1, !- Name
-    Inlet_Node_Name, !-Heat Pump Inlet Node Name
-    Outlet_Node_Name, !-Heat Pump Outlet Node Name
-    NaturalGas, !-Fuel Type (NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2)
+    Inlet_Node_Name, !-Water Inlet Node Name
+    Outlet_Node_Name, !-Water Outlet Node Name
+    Air_Source_Node_Name, ! Air Source Node Name
+    NaturalGas, !-Fuel Type
     0.99, !-Fuel Burner Efficiency
-    10000, !-Nominal Heating Capacity [W] (autosizeable)
-    2, !-Design Flow Rate [kg/s] (autosizeable)
-    60, !-Design Supply Temperature [degree C] (default 60°C)
-    11.1, !-Design Temperature Lift [degree C] (default 11.1°C)
+    10000, !-Nominal Heating Capacity
+    2, !-Design Flow Rate
+    60, !-Design Supply Temperature
+    11.1, !-Design Temperature Lift
     1.1, ! Sizing Factor
-    NotModulated; !-Flow Mode (NotModulated, ConstantFlow, or LeavingSetpointModulated)
-    OutdoorAirDryBulb, !-Temp1 Variable Type - Outdoor Air Dry Bulb or Wet Bulb (for following curves)
-    HeatPumpEnteringWaterTemperature, !-Temp2 Variable Type - Heat Pump Entering or Leaving Water Temperature (for following curves)
+    NotModulated, !-Flow Mode
+    OutdoorAirDryBulb, !-Outdoor Air Temperature Variable Type
+    HeatPumpEnteringWaterTemperature, !-Water Temperature Type
     CAPFT_CurveName, !-CAPFT Name - Normalized Capacity Function of Temperature Curve name (biquadratic curve or lookup table)
     Fuel_EIRFT_CurveName, !-Fuel EIRFT - Fuel Energy Input Ratio Function of Temperature Curve name (biquadratic curve or lookup table)
     Fuel_EIRFPLR_CurveName, !-Fuel EIRFPLR - Fuel Energy Input Ratio Function of PLR Curve name (cubic curve or lookup table)
-    0.1, !-Minimum Part Load Ratio (0-1)
-    1, !-Maximum Part Load Ratio (0-1)
+    0.1, !-Minimum Part Load Ratio
+    1, !-Maximum Part Load Ratio
     Fuel_EIRDefrost_CurveName, !-Fuel EIRDEFROST - Energy Input Ratio Defrost Adjustment Curve name (cubic curve or lookup table function of Temp1 above)
-    5, !-Defrost operation Tmin [minute]
-    30, !-Defrost operation Tmax [minute]
+    5, !-Defrost operation Time min
+    30, !-Defrost operation Time max 
     CRF_CurveName, !-Cycling Ratio Factor Curve Name (cubic curve or lookup table function of Cycling Ratio = PLR/PLRmin)
-    900, !-Nominal Aux. Electricity Use (W)
-    Aux_Elec_EIRFT_CurveName, !-Aux. Electric EIRFT (biquadratic curve or lookup table) - accounts for system internal fans, pumps, and electronics
-    Aux_EIRPLR_CurveName, !-All: Aux. Electric EIRFPLR (cubic curve or lookup table)
-    300; !-Standby Electricity Use (W)
+    900, !-Nominal Auxiliary. Electricity Power
+    Aux_Elec_EIRFT_CurveName, !-Auxiliary Electric EIRFT (biquadratic curve or lookup table) - accounts for system internal fans, pumps, and electronics
+    Aux_EIRPLR_CurveName, !-All: Auxiliary Electric EIRFPLR (cubic curve or lookup table)
+    300; !-Standby Electricity Power
 ```
 
 ## Input Description ##
@@ -331,7 +347,6 @@ HVAC,average,Gas-fired Absorption HeatPump Inlet Temperature [C]
 HVAC,average,Gas-fired Absorption HeatPump Outlet Temperature [C]
 ```
 
-
 ## Engineering Reference ##
 
 The fundamental methods and equations used for the model, as well as the original references will be added to the the Engineering Reference.
@@ -340,7 +355,7 @@ The fundamental methods and equations used for the model, as well as the origina
 
 ### getGasFireAbsorptionHeatPumpInput() ###
 
-A function to process the input fields for the eatPump:AirToWater:FuelFiredEquationFit:Heating object. It will read input information for the system's connection, equipment sizing, and operation mode.
+A function to process the input fields for the HeatPump:AirToWater:FuelFired:Heating object. It will read input information for the system's connection, equipment sizing, and operation mode.
 
 ### SizeGasFiredAbsorptionHeatPump() ###
 
