@@ -60,16 +60,15 @@ HeatPump:AirToWater:FuelFired:Heating,
     Outlet_Node_Name, !-Water Outlet Node Name
     Air_Source_Node_Name, ! Air Source Node Name
     NaturalGas, !-Fuel Type
-    General, \field End-Use Subcategory
-    0.99, !-Fuel Burner Efficiency
+    General, !-End-Use Subcategory
     10000, !-Nominal Heating Capacity
     2, !-Design Flow Rate
     60, !-Design Supply Temperature
     11.1, !-Design Temperature Lift
     1.1, ! Sizing Factor
     NotModulated, !-Flow Mode
-    OutdoorAirDryBulb, !-Temperature Curve Input Variable 1
-    EnteringCondenser, !-Temperature Curve Input Variable 2
+    DryBulb, !-Outdoor Air Temperature Curve Input Variable
+    EnteringCondenser, !-Water Temperature Curve Input Variable
     CAPFT_CurveName, !-Normalized Capacity Function of Temperature Curve Name
     Fuel_EIRFT_CurveName, !-Fuel Energy Input Ratio Function of Temperature Curve name
     Fuel_EIRFPLR_CurveName, !-Fuel Energy Input Ratio Function of PLR Curve Name
@@ -90,7 +89,7 @@ HeatPump:AirToWater:FuelFired:Heating,
 A HeatPump:AirToWater:FuelFired:Heating object defines the basic inputs for an equation-fit gas-fired absorption heat pump. 
 ```
 HeatPump:AirToWater:FuelFired:Heating,
-  \memo The object defines a gas-fired absorption heat pump which is based on equation-fit models.
+  \memo The object defines a gas-fired absorption heat pump based on equation-fit models.
   \min-fields 10
   A1 , \field Name
        \required-field
@@ -106,7 +105,7 @@ HeatPump:AirToWater:FuelFired:Heating,
   A4 , \field Air Source Node Name
        \type object-list
        \object-list OutdoorAirNodeNames
-       \note This is the air source node name, which is the evaporator side for heating mode heat pump.
+       \note This is the air source node name, which is the evaporator side of the heat pump in heating mode.
        \note Enter the name of an OutdoorAir:Node object.
   A5 , \field Fuel Type
        \required-field
@@ -123,31 +122,26 @@ HeatPump:AirToWater:FuelFired:Heating,
        \default NaturalGas
        \note Fuel Type (NaturalGas, Propane, Gasoline, Diesel etc.)
   A6 , \field End-Use Subcategory
-        \type alpha
-        \retaincase
-        \default General
-        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-  N1 , \field Fuel Burner Efficiency
-       \minimum> 0
-       \maximum 1
-       \default 1
-       \note Fuel Burner Efficiency (0-1)
-  N2 , \field Nominal Heating Capacity
+       \type alpha
+       \retaincase
+       \default General
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+  N1 , \field Nominal Heating Capacity
        \autosizable
        \minimum> 0
        \note Nominal Heating Capacity in [W] (autosizeable)
-  N3 , \field Design Flow Rate (autosizeable)
+  N2 , \field Design Flow Rate (autosizeable)
        \autosizable
        \minimum> 0
        \note Design Flow Rate in m3/s (autosizeable)
-  N4 , \field Design Supply Temperature
+  N3 , \field Design Supply Temperature
        \default 60
        \note Design Supply Temperature in [degree C]
-  N5 , \field Design Temperature Lift
+  N4 , \field Design Temperature Lift
        \autosizable
        \default 11.1
        \note Design Temperature Lift in [degree C]
-  N6 , \field Sizing Factor
+  N5 , \field Sizing Factor
        \minimum 1.0
        \default 1.0
        \note Sizing Factor for equipment sizing
@@ -158,73 +152,81 @@ HeatPump:AirToWater:FuelFired:Heating,
        \key ConstantFlow
        \key LeavingSetpointModulated
        \default NotModulated
-       \note Flow Mode similar to a boiler flow mode classification
-  A8 , \field Temperature Curve Input Variable 1
+       \note Flow Mode for the water side of the gas-fired absorption heat pump
+  A8 , \field Outdoor Air Temperature Curve Input Variable
        \required-field
        \type choice
-       \key OutdoorAirDryBulb
-       \key OUtdoorAirWetBulb
-       \default OutdoorAirDryBulb
-       \note Temperature curve input variable 1 - Outdoor Air Dry Bulb or Wet Bulb temperature (for following curves)
-  A9 , \field Temperature Curve Input Variable 2
+       \key DryBulb
+       \key WetBulb
+       \default DryBulb
+       \note Outdoor air temperature curve input variable;
+       \note The options are Outdoor Air Dry Bulb or Wet Bulb temperature for curves
+  A9 , \field Water Temperature Curve Input Variable
        \required-field
        \type choice
        \key EnteringCondenser
        \key LeavingCondenser
        \default EnteringCondenser
-       \note Temperature curve input Variable 2 - Condenser Entering or Leaving Water Temperature (for following curves)
+       \note Water Temperature curve input variable - Condenser Entering or Leaving Water Temperature for curves
   A10, \field Normalized Capacity Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BivariateFunctions
-       \note: CAPFT - Normalized Capacity Function of Temperature Curve name (biquadratic curve or lookup table)
+       \note: CAPFT - Normalized Capacity Function of Temperature Curve name,
+       \note which is a biquadratic curve or a lookup table.
   A11, \field Fuel Energy Input Ratio Function of Temperature Curve name
        \required-field
        \type object-list
        \object-list BivariateFunctions
-       \note EIRFT - Fuel Energy Input Ratio Function of Temperature Curve name (biquadratic curve or lookup table)
+       \note EIRFT - Fuel Energy Input Ratio Function of Temperature Curve name,
+       \note which is a biquadratic curve or a lookup table.
   A12, \field Fuel Energy Input Ratio Function of PLR Curve Name
        \required-field
        \type object-list
        \object-list UnivariateFunctions
-       \note EIRFPLR - Fuel Energy Input Ratio Function of Part Load Ratio(PLR) Curve name (cubic curve or lookup table)
-  N7 , \field Minimum Part Load Ratio
+       \note EIRFPLR - Fuel Energy Input Ratio Function of Part Load Ratio(PLR) Curve name,
+       \note which is a cubic curve or a lookup table.
+  N6 , \field Minimum Part Load Ratio
        \minimum> 0.0
        \maximum 1.0
        \default 0.1
        \note Minimum Part Load Ratio (PLR) in between 0 and 1
-  N8 , \field Maximum Part Load Ratio
+  N7 , \field Maximum Part Load Ratio
        \minimum> 0.0
        \default 1.0
        \note Maximum Part Load Ratio (PLR) in between 0 and 1
   A13, \field Fuel Energy Input Ratio Defrost Adjustment Curve name
        \type object-list
        \object-list UnivariateFunctions
-       \note EIRDEFROST - Energy Input Ratio Defrost Adjustment Curve name (cubic curve or lookup table function of Temperature 1 above)
-  N9 , \field Defrost Operation Minimum Time
+       \note EIRDEFROST - Energy Input Ratio Defrost Adjustment Curve name,
+       \note which is a cubic curve or a lookup table function of Outdoor Air Temperature.
+  N8 , \field Defrost Operation Minimum Time
        \minimum 0
        \default 5
        \note Defrost operation minimum time Tmin in [minute]
-  N10, \field Defrost Operation Maximum Time
+  N9, \field Defrost Operation Maximum Time
        \minimum> 0
        \default 30
        \note Defrost operation maximum time Tmax in [minute] 
   A14, \field Cycling Ratio Factor Curve Name
        \type object-list
        \object-list UnivariateFunctions
-       \note Cycling Ratio Factor (CRF) Curve Name (cubic curve or lookup table function of Cycling Ratio = PLR/PLRmin)
-  N11, \field Nominal Auxiliary Electric Power
+       \note Cycling Ratio Factor (CRF) Curve Name,
+       \note which is a cubic curve or a lookup table function of Cycling Ratio (defined as = PLR/PLRmin).
+  N10, \field Nominal Auxiliary Electric Power
        \minimum 0
        \note Nominal Auxiliary Electric Power in [W]
   A15, \field Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
        \type object-list
        \object-list BivariateFunctions
-       \note Auxiliary Electric EIRFT - Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name (biquadratic curve or lookup table)
+       \note Auxiliary Electric EIRFT - Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name,
+       \note which is a biquadratic curve or a lookup table.
        \note which accounts for system internal fans, pumps, and electronics
   A16, \field Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
        \type object-list
-       \note Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Raitio) Curve Name (cubic curve or lookup table)
-  N12;  \field Standby Electric Power
+       \note Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name,
+       \note which is a cubic curve or a lookup table.
+  N11;  \field Standby Electric Power
        \minimum 0
        \note Standby Electric Power in [W]
 ```
@@ -312,16 +314,15 @@ HeatPump:AirToWater:FuelFired:Heating,
     Outlet_Node_Name, !-Water Outlet Node Name
     Air_Source_Node_Name, ! Air Source Node Name
     NaturalGas, !-Fuel Type
-    General, \field End-Use Subcategory
-    0.99, !-Fuel Burner Efficiency
+    General, !-End-Use Subcategory
     10000, !-Nominal Heating Capacity
     2, !-Design Flow Rate
     60, !-Design Supply Temperature
     11.1, !-Design Temperature Lift
     1.1, ! Sizing Factor
     NotModulated, !-Flow Mode
-    OutdoorAirDryBulb, !-Temperature Curve Input Variable 1
-    EnteringCondenser, !-Temperature Curve Input Variable 2
+    DryBulb, !-Outdoor Air Temperature Curve Input Variable
+    EnteringCondenser, !-Water Temperature Curve Input Variable
     CAPFT_CurveName, !-Normalized Capacity Function of Temperature Curve Name
     Fuel_EIRFT_CurveName, !-Fuel Energy Input Ratio Function of Temperature Curve name
     Fuel_EIRFPLR_CurveName, !-Fuel Energy Input Ratio Function of PLR Curve Name
