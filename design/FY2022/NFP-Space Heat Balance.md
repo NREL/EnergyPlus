@@ -31,9 +31,9 @@ Subdivide Heat Balance by Space
 
 ## Justification for New Feature ##
 
-Each EnergyPlus Zone contains one or more Spaces. Space was added in v9.6 and currently is used for assigning and allocating internal gains. To facilitate room-by-room sizing and HVAC simulations, it is necessary to subdivide the zone heat balance by space.
+Space was added in v9.6 and currently is used for assigning and allocating internal gains. Each EnergyPlus Zone contains one or more Spaces. To facilitate room-by-room sizing and HVAC simulations, it is necessary to subdivide the zone heat balance by space.
 
-## E-mail and  Conference Call Conclusions ##
+## E-mail and Conference Call Conclusions ##
 
 
 
@@ -54,7 +54,7 @@ The current implementation of Space includes the following key features:
     * Internal gain output variables (by object, space, and zone)
     * Submeters by SpaceType (not by Space)
 
-The heat balance is currently at the zone level only. While some components are already calculated and summed across spaces, the zone heat balance, HVAC equipment simulation, and zone air temperature calculations are lumped for all spaces within the zone. This task will focus on refactoring the zone predictor/corrector functions to calculate air temperatures (with limits) and heat balance components by Space as well as by Zone.
+The heat balance is currently at the zone level only. While some components are already calculated and summed across spaces, the zone heat balance, HVAC equipment simulation, and zone air temperature calculations are lumped for all spaces within the zone. This task will focus on refactoring the zone predictor/corrector functions to calculate air temperatures (with some limitations) and heat balance components by Space as well as by Zone.
 
 ## Approach ##
 
@@ -64,32 +64,34 @@ The next step will be to calculate the Space heat balance. This should be fairly
 
 The final step will be the most challenging, combining the Space results for the Zone. Some Zone results are simply a sum of the Space results. But the air temperatures raise some questions. During sizing, all Spaces in the Zone will be controlled to the same thermostat temperature, so combining Spaces into Zones will be straightforward, and all surfaces will see the same air temperature.
 
-But during the HVAC simulation there are some stages which build on each other:
+But during the HVAC simulation there are some development stages which build on each other:
 
 1. Lumping the Space air masses together for the Zone heat balance will force all Spaces in the Zone to the same air temperature. This will (should) produce the same Zone-level result, but it won't allow any difference in Space air temperatures.
 
 2. The next level would be to somehow allocate the HVAC output by Space. This could be by floor area, by volume, by load, or by user-specified airflow fractions. The additional inputs required for this are beyond the scope of this task. But the goal will be to refactor the air heat balance to allow for Space air temperatures to be calculated independently in the future.
 
+Key aspects of the surface and air heat balances are listed below with italics indicating required changes.
+
 ### Surface Heat Balance ###
 * Surfaces are already assigned to a space and an enclosure.
 * Solar and radiant internal gains to surfaces are simulated by enclosure.
 * Radiant exchange between surfaces is simulated by enclosure.
-* Surface convection to the air is currently to the zone air temperature. 
-  * *This needs to be changed to the space air temperature.*
-  * *Surfaces which are assigned to an auto-generated space named ZoneName-Remainder may need special handling. If a Remainder space exists within a given zone, it may be necessary to lump the spaces in that zone together for the zone heat balance.*
+* Surface convection to the air is currently to the zone air temperature (or suppply air temperature depending on the convection model). 
+  * *Change to space air temperature.*
+  * *Surfaces which are assigned to an auto-generated space named "ZoneName-Remainder" may need special handling. If a Remainder space exists within a given zone, it may be necessary to lump the spaces in that zone together for the zone heat balance.*
 
 ### Zone/Space Air Heat Balance ##
 
 * Surface convection to the air is currently to the zone air temperature. 
-  * *This needs to be changed to the space air temperature.*
+  * *Change to the space air temperature.*
 * Internal convective gains are already computed by space.
 * Zone airflows for infiltration and mixing are currently by zone (ZoneInfiltration, ZoneMixing, ZoneCrossMixing).
-  * *New inputs need to be added to specify and calculate these at the space level (similar to internal gains, but allocated by volume or floor area depending on the input method).* 
+  * *Modify inputs to specify by zone or space (similar to internal gains, but allocated by volume or floor area depending on the input method).* 
 * Air volume is currently by zone. 
-  * *Space volume inputs and calculations need to be added. See [Issue #9362](https://github.com/NREL/EnergyPlus/issues/9362).*
+  * *Add input and calculations for Space volume. See [Issue #9362](https://github.com/NREL/EnergyPlus/issues/9362).*
 * AirflowNetwork inputs and simulation will remain at the zone level.
-  * *The impact on the air heat balance will need to be allocated by space. For this phase AFN zones may need to use a lumped air heat balance.*
-* ZoneAirBalance:OutdoorAir will remain a zone-level input, and the same method will be applied to all space in the zone.
+  * *Allocate the impact on the air heat balance by space. For this phase AFN zones may need to use a lumped air heat balance.*
+* ZoneAirBalance:OutdoorAir will remain a zone-level input, and the same method will be applied to all spaces in the zone.
 * ZoneRefrigerationDoorMixing is currently between two zones.
   * *Modify inputs to specify by zone or space.*
 * ZoneEarthtube will remain at the zone level, because it it thermostatically controlled.
@@ -108,9 +110,9 @@ Zone-level results should stay the same.
 No new objects are proposed. Several existing objects will have changes.
 
 ### Space
-* *Add new field for Volume*
-* *Add new field for Ceiling Height*
-* *Transition required.
+* *Add new field for Volume.*
+* *Add new field for Ceiling Height.*
+* *Transition required.*
 
 
 ### ZoneInfiltration:DesignFlowRate
@@ -138,7 +140,7 @@ No new objects are proposed. Several existing objects will have changes.
 
 ## Outputs Description ##
 
-Space equivalents will be added for the following zone output variables (not sure about some of these, seems excessive):
+Space equivalents will be added for the following zone output variables and meters (not sure about some of these, seems excessive):
 
 ```
 Zone,Average,Zone Outdoor Air Drybulb Temperature [C]
@@ -236,11 +238,19 @@ Zone,Sum,Zone Heating Setpoint Not Met While Occupied Time [hr]
 Zone,Sum,Zone Cooling Setpoint Not Met Time [hr]
 Zone,Sum,Zone Cooling Setpoint Not Met While Occupied Time [hr]
 
+Output:Meter,Electricity:Zone:ZONE 1,hourly; !- [J]
+Output:Meter:Cumulative,Electricity:Zone:ZONE 1,hourly; !- [J]
+Output:Meter,InteriorLights:Electricity:Zone:ZONE 1,hourly; !- [J]
+Output:Meter:Cumulative,InteriorLights:Electricity:Zone:ZONE 1,hourly; !- [J]
+Output:Meter,GeneralLights:InteriorLights:Electricity:Zone:ZONE 1,hourly; !- [J]
+Output:Meter:Cumulative,GeneralLights:InteriorLights:Electricity:Zone:ZONE 1,hourly; !- [J]
+*and all types of end-uses and sub-end-uses*
+
 ```
 
 ## Engineering Reference ##
 
-Summary paragraphs or sentences will be added to indicate that references to zone throughout the heat balance documentation are applicable to Space or Zone.
+Summary paragraphs or sentences will be added to indicate that references to "Zone" throughout the heat balance documentation are applicable to "Space or Zone".
 
 ## Example File and Transition Changes ##
 
