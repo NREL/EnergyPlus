@@ -396,6 +396,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->ZoneWM2.deallocate();
         this->ZoneW1.deallocate();
         this->TempControlType.deallocate();
+        this->TempControlTypeRpt.clear();
         this->ComfortControlType.deallocate();
         this->ZoneHeatIndex.deallocate();
         this->ZoneHumidex.deallocate();

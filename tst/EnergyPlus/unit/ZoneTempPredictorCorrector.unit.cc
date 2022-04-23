@@ -485,6 +485,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->TempControlType.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(state->dataZoneCtrls->NumTempControlledZones);
@@ -1148,6 +1149,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
     state->dataZoneCtrls->TempControlledZone(1).EMSOverrideCoolingSetPointValue = 26;
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
@@ -1313,6 +1315,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneCtrls->TempControlledZone(1).CTSchedIndex = 1;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
     state->dataZoneCtrls->TempControlledZone(1).SchIndx_SingleHeatSetPoint = 2;
     state->dataZoneCtrls->TempControlledZone(1).ControlTypeSchIndx.allocate(4);
     state->dataZoneCtrls->TempControlledZone(1).ControlTypeSchIndx(2) = 1;
@@ -1448,6 +1451,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneCtrls->TempControlledZone(1).CTSchedIndex = 1;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
     state->dataZoneCtrls->TempControlledZone(1).SchIndx_SingleHeatSetPoint = 2;
     state->dataZoneCtrls->TempControlledZone(1).ControlTypeSchIndx.allocate(4);
     state->dataZoneCtrls->TempControlledZone(1).ControlTypeSchIndx(2) = 1;

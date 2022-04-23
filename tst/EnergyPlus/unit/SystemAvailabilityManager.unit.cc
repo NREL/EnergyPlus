@@ -378,6 +378,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     // Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
     state->dataHeatBalFanSys->TempControlType.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->CurrentTime = 19.0; // set the current time to 7 PM which is post-occupancy
@@ -394,6 +395,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance)
 {
     int NumZones(4);
     state->dataHeatBalFanSys->TempControlType.allocate(NumZones);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(NumZones);
@@ -460,6 +462,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataScheduleMgr->Schedule.allocate(1);
     state->dataHVACGlobal->ZoneComp.allocate(DataZoneEquipment::NumValidSysAvailZoneComponents);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(1);
 
     state->dataSystemAvailabilityManager->HybridVentData(1).Name = "HybridControl";
@@ -669,6 +672,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).AvailStatus = 0;
 
     state->dataHeatBalFanSys->TempControlType.allocate(NumZones);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleCooling;
@@ -791,6 +795,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataAirLoop->PriAirSysAvailMgr.allocate(PriAirSysNum);
     state->dataSystemAvailabilityManager->NightCycleData.allocate(NumZones);
     state->dataHeatBalFanSys->TempControlType.allocate(NumZones);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleCooling;
