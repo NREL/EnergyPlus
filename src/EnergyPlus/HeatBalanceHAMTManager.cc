@@ -47,13 +47,14 @@
 
 // C++ Headers
 #include <cmath>
+#include <iostream>
 #include <string>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh> // for internal moisture source type 3
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -163,6 +164,7 @@ namespace HeatBalanceHAMTManager {
         static std::string const cHAMTObject5("MaterialProperty:HeatAndMoistureTransfer:Diffusion");
         static std::string const cHAMTObject6("MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity");
         static std::string const cHAMTObject7("SurfaceProperties:VaporCoefficients");
+        static std::string const cHAMTObject8("ConstructionProperty:InternalMoistureSource");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -258,6 +260,9 @@ namespace HeatBalanceHAMTManager {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cHAMTObject7, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
+        // inputProcessor->getObjectDefMaxArgs(state, cHAMTObject8, NumParams, NumAlphas, NumNums);
+        // MaxAlphas = max(MaxAlphas, NumAlphas);
+        // MaxNums = max(MaxNums, NumNums);
 
         ErrorsFound = false;
 
@@ -616,6 +621,118 @@ namespace HeatBalanceHAMTManager {
             }
         }
 
+        // Internal Moisture Source
+        auto instances = state.dataInputProcessing->inputProcessor->epJSON.find(cHAMTObject8);
+
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            int item = 0;
+            auto &instancesValue = instances.value();
+
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string construction_name{UtilityRoutines::MakeUPPERCase(std::string(fields.at("construction_name")))};
+
+                int construction_index = UtilityRoutines::FindItemInList(construction_name, state.dataConstruction->Construct);
+
+                if (construction_index == 0) {
+                    ShowSevereError(state,
+                                    "Did not find matching construction for " + cHAMTObject8 + ' ' + thisObjectName +
+                                        ", missing construction = " + construction_name);
+                    ErrorsFound = true;
+                    continue;
+                }
+                auto &thisConstruct(state.dataConstruction->Construct(construction_index));
+
+                int layer_id{fields.at("moisture_source_present_in_layer_number")};
+                if ((layer_id >= thisConstruct.TotLayers) || (layer_id <= 0)) {
+                    ShowSevereError(state, "Construction " + thisConstruct.Name + " cannot support a source in layer = " + std::to_string(layer_id));
+                    ErrorsFound = true;
+                    continue;
+                }
+
+                Real64 moist_airflow_input{0.0};
+                Real64 stack_height{0.0};
+                Real64 component_air_permeance{0.0};
+                Real64 mechanical_ventilation_overpressure{0.0};
+
+                std::string source_type{fields.at("source_type")};
+                InternalMoistureSource::Type type{InternalMoistureSource::Type::UserDefined};
+                if (source_type == "UserDefined") {
+                    auto found = fields.find("air_flow_rate");
+                    if (found == fields.end()) {
+                        ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Air Flow Rate\" is blank");
+                        ShowContinueError(state,
+                                          "No user defined input for air flow through component found. Internal Moisture Source Type \"UserDefined\" "
+                                          "requires this input.");
+                        ErrorsFound = true;
+                        continue;
+                    } else {
+                        moist_airflow_input = found->get<double>();
+                    }
+                } else if (source_type == "StackAndOverPressure") {
+                    type = InternalMoistureSource::Type::StackAndOverPressure;
+                    // Stack height
+                    auto found = fields.find("stack_height");
+                    if (found == fields.end()) {
+                        ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Stack Height\" is blank");
+                        ShowContinueError(state,
+                                          "No user defined input for stack height found. Internal Moisture Source Type \"StackAndOverPressure\" "
+                                          "requires this input.");
+                        ErrorsFound = true;
+                        continue;
+                    } else {
+                        stack_height = found->get<double>();
+                    }
+                    // Component air permeance
+                    found = fields.find("component_air_permeance");
+                    if (found == fields.end()) {
+                        ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Component Air Permeance\" is blank");
+                        ShowContinueError(state,
+                                          "No user defined input for component air permeance found. Internal Moisture Source Type "
+                                          "\"StackAndOverPressure\" requires this input.");
+                        ErrorsFound = true;
+                        continue;
+                    } else {
+                        component_air_permeance = found->get<double>();
+                    }
+                    // Mechanical ventilation overpressure
+                    found = fields.find("mechanical_ventilation_overpressure");
+                    if (found == fields.end()) {
+                        ShowSevereError(state, cHAMTObject8 + ' ' + thisObjectName + " \"Mechanical Ventilation Overpressure\" is blank");
+                        ShowContinueError(state,
+                                          "No user defined input for mechanical ventilation overpressure found. Internal Moisture Source Type "
+                                          "\"StackAndOverPressure\" requires this input.");
+                        ErrorsFound = true;
+                        continue;
+                    } else {
+                        mechanical_ventilation_overpressure = found->get<double>();
+                    }
+                } else if (source_type == "AirflowNetwork") {
+                    type = InternalMoistureSource::Type::AirflowNetwork;
+                } else {
+                    ShowSevereError(state, cHAMTObject8 + " Source Type = \"" + source_type + "\" is invalid (undefined).");
+                    ErrorsFound = true;
+                    continue;
+                }
+
+                // Find all of the surfaces that use a construction
+                for (int surface_id = 1; surface_id < state.dataSurface->Surface.size(); ++surface_id) {
+                    if (state.dataSurface->Surface[surface_id].Construction == construction_index) {
+                        ++item;
+                        state.dataHeatBalHAMTMgr->sources.emplace_back(item,
+                                                                       surface_id,
+                                                                       layer_id,
+                                                                       type,
+                                                                       moist_airflow_input,
+                                                                       stack_height,
+                                                                       component_air_permeance,
+                                                                       mechanical_ventilation_overpressure);
+                    }
+                }
+            }
+        }
+
         AlphaArray.deallocate();
         cAlphaFieldNames.deallocate();
         cNumericFieldNames.deallocate();
@@ -667,6 +784,7 @@ namespace HeatBalanceHAMTManager {
         bool DoReport;
 
         auto &cells(state.dataHeatBalHAMTMgr->cells);
+        auto &sources(state.dataHeatBalHAMTMgr->sources);
 
         state.dataHeatBalHAMTMgr->deltat = state.dataGlobal->TimeStepZone * 3600.0;
 
@@ -848,6 +966,7 @@ namespace HeatBalanceHAMTManager {
 
                     cells(cid).matid = matid;
                     cells(cid).sid = sid;
+                    cells(cid).layer_id = lid; // layer Id to cell info for internal moisture source
 
                     cells(cid).temp = state.dataMaterial->Material(matid).itemp;
                     cells(cid).tempp1 = state.dataMaterial->Material(matid).itemp;
@@ -874,6 +993,13 @@ namespace HeatBalanceHAMTManager {
                     runor += cells(cid).length(1);
 
                     cells(cid).volume = cells(cid).length(1) * state.dataSurface->Surface(sid).Area;
+
+                    // connect internal moisture source with cell
+                    for (int imsid = 1; imsid <= sources.size(); ++imsid) {
+                        if ((cells(cid).sid == sources(imsid).surface_id) && (cells(cid).layer_id == sources(imsid).layer_id)) {
+                            cells(cid).source_id = imsid;
+                        }
+                    }
                 }
             }
 
@@ -1098,6 +1224,8 @@ namespace HeatBalanceHAMTManager {
         Real64 tempmax;
         Real64 tempmin;
 
+        Real64 internal_moisture_source;
+
         int ii;
         int matid;
         int itter;
@@ -1110,8 +1238,10 @@ namespace HeatBalanceHAMTManager {
         Real64 denominator;
 
         auto &cells(state.dataHeatBalHAMTMgr->cells);
+        auto &sources(state.dataHeatBalHAMTMgr->sources);
         auto &Extcell(state.dataHeatBalHAMTMgr->Extcell);
         auto &Intcell(state.dataHeatBalHAMTMgr->Intcell);
+        auto &IntConcell(state.dataHeatBalHAMTMgr->IntConcell);
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHeatBalHAMTMgr->MyEnvrnFlag(sid)) {
             cells(Extcell(sid)).rh = 0.0;
@@ -1140,6 +1270,23 @@ namespace HeatBalanceHAMTManager {
                 cells(cid).rh = state.dataMaterial->Material(matid).irh;
                 cells(cid).rhp1 = state.dataMaterial->Material(matid).irh;
                 cells(cid).rhp2 = state.dataMaterial->Material(matid).irh;
+
+                if (cells(cid).source_id != -1) {
+                    if (sources(cells(cid).source_id).type == InternalMoistureSource::Type::AirflowNetwork) {
+                        if (!sources(cells(cid).source_id).afn_id) {
+                            if (state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces) {
+                                for (ii = 1; ii <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++ii) {
+                                    if (state.dataSurface->Surface(sources(cells(cid).source_id).surface_id)
+                                            .Name.compare(state.dataAirflowNetwork->AirflowNetworkLinkageData(ii).Name) == 0) {
+                                        // assign network link to cell with internal moisture source type 3
+                                        sources(cells(cid).source_id).afn_id = state.dataAirflowNetwork->AirflowNetworkLinkageData(ii).LinkNum;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             state.dataHeatBalHAMTMgr->MyEnvrnFlag(sid) = false;
         }
@@ -1281,6 +1428,53 @@ namespace HeatBalanceHAMTManager {
                            state.dataMaterial->Material(matid).tcdata,
                            cells(cid).water,
                            cells(cid).wthermalc);
+                }
+
+                // calc Wadds
+                if (cells(cid).source_id > 0) {
+                    matid = cells(cid).matid;
+                    int imsid = cells(cid).source_id;
+
+                    if (sources(imsid).type == InternalMoistureSource::Type::UserDefined) { // user defined input of the air flow
+                        sources(imsid).moist_airflow = sources(imsid).moist_airflow_input;
+                    } else if (sources(imsid).type ==
+                               InternalMoistureSource::Type::StackAndOverPressure) { // infiltration model according to Kuenzel, extended with
+                                                                                     // ventilation pressure
+                        sources(imsid).delta_pressure = cells(Extcell(sid)).density *
+                                                            ((cells(Extcell(sid)).temp - cells(Intcell(sid)).temp) / cells(Intcell(sid)).temp) *
+                                                            DataGlobalConstants::GravityConstant * (sources(imsid).stack_height / 2) -
+                                                        sources(imsid).mechanical_ventilation_overpressure;
+                        sources(imsid).moist_airflow = std::abs(sources(imsid).delta_pressure) * (sources(imsid).component_air_permeance) / 3600;
+                    } else if (sources(imsid).type ==
+                               InternalMoistureSource::Type::AirflowNetwork) { // air flow through component from multizone airflow network
+                        if (sources(imsid).afn_id) {
+                            sources(imsid).moist_airflow = state.dataAirflowNetwork->AirflowNetworkLinkSimu(sources(imsid).afn_id).VolFLOW /
+                                                           state.dataSurface->Surface(sources(imsid).surface_id).Area;
+                        } else {
+                            sources(imsid).moist_airflow = 0;
+                        }
+                    } else {
+                        sources(imsid).moist_airflow = 0.0;
+                    }
+
+                    if (sources(imsid).moist_airflow >= 0) {
+                        internal_moisture_source =
+                            sources(imsid).moist_airflow *
+                            (cells(IntConcell(sid)).rh * SatAbsHum(state, cells(IntConcell(sid)).temp) - SatAbsHum(state, cells(cid).temp));
+                    } else {
+                        internal_moisture_source =
+                            -sources(imsid).moist_airflow *
+                            (cells(IntConcell(sid)).rh * SatAbsHum(state, cells(IntConcell(sid)).temp) - SatAbsHum(state, cells(cid).temp));
+                    }
+
+                    if (internal_moisture_source > 0) {
+                        cells(cid).Wadds = state.dataSurface->Surface(sid).Area *
+                                           (cells(cid).length(1) / state.dataMaterial->Material(matid).Thickness) * internal_moisture_source;
+                    } else {
+                        cells(cid).Wadds = 0;
+                    }
+                } else {
+                    cells(cid).Wadds = 0;
                 }
             }
 
@@ -1486,7 +1680,8 @@ namespace HeatBalanceHAMTManager {
                 // Calculate the RH for the next time step
                 denominator = (phioosum + vpoosum * cells(cid).vpsat + wcap / state.dataHeatBalHAMTMgr->deltat);
                 if (denominator != 0.0) {
-                    cells(cid).rhp1 = (phiorsum + vporsum + (wcap * cells(cid).rh) / state.dataHeatBalHAMTMgr->deltat) / denominator;
+                    cells(cid).rhp1 =
+                        (phiorsum + vporsum + cells(cid).Wadds + (wcap * cells(cid).rh) / state.dataHeatBalHAMTMgr->deltat) / denominator;
                 } else {
                     ShowSevereError(state, "CalcHeatBalHAMT: demoninator in calculating RH is zero.  Check material properties for accuracy.");
                     ShowContinueError(state, "...Problem occurs in Material=\"" + state.dataMaterial->Material(cells(cid).matid).Name + "\".");
@@ -1678,6 +1873,56 @@ namespace HeatBalanceHAMTManager {
         WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv, 0.81)) / ambp;
 
         return WVDC;
+    }
+
+    Real64 SatAbsHum(EnergyPlusData &state, Real64 const Temperature)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Florian Antretter
+        //       DATE WRITTEN   March 2018
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Compute Absolute Humidity in kg/m3 from Temperature
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // Vaisala: Humidity conversion formulas (2013), eq (17)
+
+        // USE STATEMENTS:
+        // na
+
+        // Return value
+        Real64 SatAbsHum;
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+        Real64 VPSat;
+
+        VPSat = PsyPsatFnTemp(state, Temperature);
+
+        Real64 IdealGasConst;
+
+        IdealGasConst = 2.16679;
+
+        SatAbsHum = (IdealGasConst * VPSat) / (Temperature + 273.15) / 1000;
+
+        return SatAbsHum;
     }
 
     //                                 COPYRIGHT NOTICE

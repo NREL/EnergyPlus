@@ -60,7 +60,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace AirflowNetworkBalanceManager;
+using namespace AirflowNetwork;
 using namespace AirflowNetwork;
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
