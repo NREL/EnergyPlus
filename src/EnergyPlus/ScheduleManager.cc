@@ -628,7 +628,7 @@ namespace ScheduleManager {
                 if (state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum > state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum) {
                     if (state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal) {
                         ShowSevereError(state,
-                                        format("{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
+                                        format("{}{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
                                                RoutineName,
                                                CurrentModuleObject,
                                                Alphas(1),
@@ -639,7 +639,7 @@ namespace ScheduleManager {
                         ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
                     } else {
                         ShowSevereError(state,
-                                        format("{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
+                                        format("{}{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
                                                RoutineName,
                                                CurrentModuleObject,
                                                Alphas(1),

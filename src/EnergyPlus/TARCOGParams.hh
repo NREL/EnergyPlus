@@ -159,10 +159,10 @@ Real64 constexpr C2_VENET_VERTICAL(0.000);
 Real64 constexpr C3_VENET_VERTICAL(0.270);
 Real64 constexpr C4_VENET_VERTICAL(0.012);
 
-Real64 constexpr C1_SHADE(0.05);
-Real64 constexpr C2_SHADE(1.08);
-Real64 constexpr C3_SHADE(0.79);
-Real64 constexpr C4_SHADE(0.50);
+Real64 constexpr C1_SHADE(0.078);
+Real64 constexpr C2_SHADE(1.2);
+Real64 constexpr C3_SHADE(1.0);
+Real64 constexpr C4_SHADE(1.0);
 
 } // namespace EnergyPlus::TARCOGParams
 

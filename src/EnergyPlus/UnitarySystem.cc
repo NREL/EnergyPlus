@@ -513,9 +513,7 @@ namespace UnitarySystems {
                                         DataAirSystems::StructArrayLegacyFanModels,
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                                 }
-
-                                break;
-                            }
+                            } break;
                             case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex >= 0) {
                                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
@@ -526,12 +524,10 @@ namespace UnitarySystems {
                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex);
                                 }
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
+                            } break;
+                            default:
                                 // do nothing
                                 break;
-                            }
                             }
                         }
                     }

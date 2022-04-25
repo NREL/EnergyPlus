@@ -227,6 +227,8 @@ EnergyPlusData::EnergyPlusData()
     this->dataReportFlag = std::make_unique<ReportFlagData>();
     this->dataResultsFramework = std::make_unique<ResultsFrameworkData>();
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
+    this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
+    this->dataExhCtrlSystemMrg = std::make_unique<ExhaustControlSystemMgr>();
     this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
@@ -306,6 +308,8 @@ EnergyPlusData::EnergyPlusData()
     this->dataZonePlenum = std::make_unique<ZonePlenumData>();
     this->dataZoneTempPredictorCorrector = std::make_unique<ZoneTempPredictorCorrectorData>();
 }
+
+EnergyPlusData::~EnergyPlusData() = default;
 
 void EnergyPlusData::clear_state()
 {
@@ -483,6 +487,8 @@ void EnergyPlusData::clear_state()
     this->dataReportFlag->clear_state();
     this->dataResultsFramework->clear_state();
     this->dataRetAirPathMrg->clear_state();
+    this->dataExhAirSystemMrg->clear_state();
+    this->dataExhCtrlSystemMrg->clear_state();
     this->dataRoomAirMod->clear_state();
     this->dataRoomAirModelMgr->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();

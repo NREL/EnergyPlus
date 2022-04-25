@@ -1769,8 +1769,9 @@ namespace WindowManager {
                 state.dataSurface->SurfWinFrameVisAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameVisAbsorp;
                 state.dataSurface->SurfWinFrameEmis(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameEmis;
                 state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrEdgeToCenterGlCondRatio;
-                state.dataSurface->SurfWinDividerType(SurfNum) = DividedLite;
-                if (state.dataSurface->FrameDivider(FrDivNum).DividerType == Suspended) state.dataSurface->SurfWinDividerType(SurfNum) = Suspended;
+                state.dataSurface->SurfWinDividerType(SurfNum) = DataSurfaces::FrameDividerType::DividedLite;
+                if (state.dataSurface->FrameDivider(FrDivNum).DividerType == DataSurfaces::FrameDividerType::Suspended)
+                    state.dataSurface->SurfWinDividerType(SurfNum) = DataSurfaces::FrameDividerType::Suspended;
                 DivWidth = state.dataSurface->FrameDivider(FrDivNum).DividerWidth;
                 state.dataSurface->SurfWinDividerConductance(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerConductance;
                 state.dataSurface->SurfWinDividerSolAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerSolAbsorp;
@@ -6292,10 +6293,10 @@ namespace WindowManager {
         Real64 Bfac;
         Real64 Dfac;
         Real64 Efac;
-        int DivType;       // Divider type
-        Real64 DivCon;     // Divider conductance (W/m2-K)
-        Real64 DivEmisIn;  // Inside divider emissivity
-        Real64 DivEmisOut; // Outside divider emissivity
+        DataSurfaces::FrameDividerType DivType; // Divider type
+        Real64 DivCon;                          // Divider conductance (W/m2-K)
+        Real64 DivEmisIn;                       // Inside divider emissivity
+        Real64 DivEmisOut;                      // Outside divider emissivity
 
         Real64 ProjCorrFrOut; // Outside correction factor for absorbed radiation
         //   for frame with outside projection
@@ -6397,7 +6398,7 @@ namespace WindowManager {
             DivType = state.dataSurface->SurfWinDividerType(SurfNum);
             DivCon = state.dataSurface->SurfWinDividerConductance(SurfNum);
 
-            if (DivType == DividedLite) { // Divided lite
+            if (DivType == DataSurfaces::FrameDividerType::DividedLite) { // Divided lite
                 DivEmisIn = state.dataSurface->SurfWinDividerEmis(SurfNum);
                 DivEmisOut = DivEmisIn;
             } else { // Suspended (between-glass) divider
@@ -6992,6 +6993,12 @@ namespace WindowManager {
                 }
             }
         }
+
+        // Need to add variables writing here since this routine will override previously calcualted values from WinCalc-Engine
+        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+            TSolNorm = GetSolarTransDirectHemispherical(state, ConstrNum);
+            TVisNorm = GetVisibleTransDirectHemispherical(state, ConstrNum);
+        }
     }
 
     void EvalNominalWindowCond(EnergyPlusData &state,
@@ -7334,8 +7341,8 @@ namespace WindowManager {
         // Outside air temperature = 35.0C (95F)
         // Windspeed = 3.35 m/s (7.5 mph)
         // 783 W/m2 (248 Btu/h-ft2) incident beam solar radiation normal to glazing
-        Real64 SHGCWinter; // Center-of-glass solar heat gain coefficient for ASHRAE
-        Real64 SHGCSummer;
+        Real64 SHGCWinter(0.0); // Center-of-glass solar heat gain coefficient for ASHRAE
+        Real64 SHGCSummer(0.0);
         // winter and summer conditions
         Real64 TransSolNorm;        // Window construction solar transmittance at normal incidence
         Real64 TransVisNorm;        // Window construction visible transmittance at normal incidence
@@ -7397,7 +7404,10 @@ namespace WindowManager {
                       "Glass Distance {m}");
 
             if (state.dataWindowManager->HasComplexWindows)
-                print(state.files.eio, "{}\n", "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC");
+                print(state.files.eio,
+                      "{}\n",
+                      "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC"
+                      "NFRC Product Type,Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
 
             if (state.dataWindowManager->HasEQLWindows)
                 print(state.files.eio,
@@ -7525,6 +7535,7 @@ namespace WindowManager {
                         // Save the SHGC for later use in tabular report IVRS
                         state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
+                        state.dataConstruction->Construct(ThisNum).SolTransNorm = TransSolNorm;
 
                         static constexpr std::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
@@ -7782,6 +7793,9 @@ namespace WindowManager {
                 CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
                 if (errFlag == 1 || errFlag == 2) continue;
                 state.dataHeatBal->NominalU(ThisNum) = NominalConductanceWinter;
+                // Need to have this because of window assembly reports (Simon)
+                state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
+                state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
             }
         }
     }

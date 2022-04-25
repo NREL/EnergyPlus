@@ -39,7 +39,7 @@ function Component()
       // LastAnchor, REG_SZ, #9.1.0-mqjdfsiojf
 
       // REG ADD KeyName /v ValueName, /d Data, /f = force overwrite
-      var reg = installer.environmentVariable("SystemRoot") + "\\System32\\reg.exe";
+      var reg = installer.environmentVariable("SystemRoot").replace(/\//g, '\\') + "\\System32\\reg.exe";
 
       var keyName = "HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck";
 

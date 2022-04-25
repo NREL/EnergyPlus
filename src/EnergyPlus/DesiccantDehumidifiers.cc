@@ -3335,22 +3335,79 @@ namespace DesiccantDehumidifiers {
 
         RegenCoilActual = 0.0;
         if (RegenCoilLoad > SmallLoad) {
-            {
-                auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).RegenCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  DesicDehum(DesicDehumNum).RegenCoilName,
-                                                  FirstHVACIteration,
-                                                  RegenCoilLoad,
-                                                  DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                                  RegenCoilActual);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    MaxHotWaterFlow = DesicDehum(DesicDehumNum).MaxCoilFluidFlow;
-                    SetComponentFlowRate(state,
-                                         MaxHotWaterFlow,
-                                         DesicDehum(DesicDehumNum).CoilControlNode,
-                                         DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc);
+            switch (DesicDehum(DesicDehumNum).RegenCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              DesicDehum(DesicDehumNum).RegenCoilName,
+                                              FirstHVACIteration,
+                                              RegenCoilLoad,
+                                              DesicDehum(DesicDehumNum).RegenCoilIndex,
+                                              RegenCoilActual);
+            } break;
+            case Coil_HeatingWater: {
+                MaxHotWaterFlow = DesicDehum(DesicDehumNum).MaxCoilFluidFlow;
+                SetComponentFlowRate(state,
+                                     MaxHotWaterFlow,
+                                     DesicDehum(DesicDehumNum).CoilControlNode,
+                                     DesicDehum(DesicDehumNum).CoilOutletNode,
+                                     DesicDehum(DesicDehumNum).plantLoc);
+                RegenCoilActual = RegenCoilLoad;
+                // simulate the regenerator hot water heating coil
+                SimulateWaterCoilComponents(
+                    state, DesicDehum(DesicDehumNum).RegenCoilName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenCoilIndex, RegenCoilActual);
+
+                if (RegenCoilActual > (RegenCoilLoad + SmallLoad)) {
+                    // control water flow to obtain output matching RegenCoilLoad
+                    SolFlag = 0;
+                    MinWaterFlow = 0.0;
+                    std::array<Real64, 3> Par;
+                    Par[0] = double(DesicDehumNum);
+                    if (FirstHVACIteration) {
+                        Par[1] = 1.0;
+                    } else {
+                        Par[1] = 0.0;
+                    }
+                    Par[2] = RegenCoilLoad;
+                    General::SolveRoot(
+                        state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                    if (SolFlag == -1) {
+                        if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex == 0) {
+                            ShowWarningMessage(state,
+                                               "CalcNonDXHeatingCoils: Hot water coil control failed for " + DesicDehum(DesicDehumNum).DehumType +
+                                                   "=\"" + DesicDehum(DesicDehumNum).Name + "\"");
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state,
+                                              format("...Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
+                        }
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}\"",
+                                   SolveMaxIter,
+                                   DesicDehum(DesicDehumNum).DehumType,
+                                   DesicDehum(DesicDehumNum).Name),
+                            DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex);
+                    } else if (SolFlag == -2) {
+                        if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex2 == 0) {
+                            ShowWarningMessage(state,
+                                               "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
+                                                   DesicDehum(DesicDehumNum).DehumType + "=\"" + DesicDehum(DesicDehumNum).Name + "\"");
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state, "...Bad hot water maximum flow rate limits");
+                            ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
+                            ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
+                        }
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
+                                                           DesicDehum(DesicDehumNum).DehumType + "=\"" + DesicDehum(DesicDehumNum).Name + "\"",
+                                                       DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex2,
+                                                       MaxHotWaterFlow,
+                                                       MinWaterFlow,
+                                                       _,
+                                                       "[kg/s]",
+                                                       "[kg/s]");
+                    }
+
                     RegenCoilActual = RegenCoilLoad;
                     // simulate the regenerator hot water heating coil
                     SimulateWaterCoilComponents(state,
@@ -3358,121 +3415,66 @@ namespace DesiccantDehumidifiers {
                                                 FirstHVACIteration,
                                                 DesicDehum(DesicDehumNum).RegenCoilIndex,
                                                 RegenCoilActual);
-
-                    if (RegenCoilActual > (RegenCoilLoad + SmallLoad)) {
-                        // control water flow to obtain output matching RegenCoilLoad
-                        SolFlag = 0;
-                        MinWaterFlow = 0.0;
-                        std::array<Real64, 3> Par;
-                        Par[0] = double(DesicDehumNum);
-                        if (FirstHVACIteration) {
-                            Par[1] = 1.0;
-                        } else {
-                            Par[1] = 0.0;
-                        }
-                        Par[2] = RegenCoilLoad;
-                        General::SolveRoot(
-                            state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
-                        if (SolFlag == -1) {
-                            if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex == 0) {
-                                ShowWarningMessage(state,
-                                                   "CalcNonDXHeatingCoils: Hot water coil control failed for " + DesicDehum(DesicDehumNum).DehumType +
-                                                       "=\"" + DesicDehum(DesicDehumNum).Name + "\"");
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state,
-                                                  format("...Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
-                            }
-                            ShowRecurringWarningErrorAtEnd(
-                                state,
-                                format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}\"",
-                                       SolveMaxIter,
-                                       DesicDehum(DesicDehumNum).DehumType,
-                                       DesicDehum(DesicDehumNum).Name),
-                                DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex);
-                        } else if (SolFlag == -2) {
-                            if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex2 == 0) {
-                                ShowWarningMessage(state,
-                                                   "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
-                                                       DesicDehum(DesicDehumNum).DehumType + "=\"" + DesicDehum(DesicDehumNum).Name + "\"");
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
-                                ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
-                            }
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
-                                                               DesicDehum(DesicDehumNum).DehumType + "=\"" + DesicDehum(DesicDehumNum).Name + "\"",
-                                                           DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex2,
-                                                           MaxHotWaterFlow,
-                                                           MinWaterFlow,
-                                                           _,
-                                                           "[kg/s]",
-                                                           "[kg/s]");
-                        }
-
-                        RegenCoilActual = RegenCoilLoad;
-                        // simulate the regenerator hot water heating coil
-                        SimulateWaterCoilComponents(state,
-                                                    DesicDehum(DesicDehumNum).RegenCoilName,
-                                                    FirstHVACIteration,
-                                                    DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                                    RegenCoilActual);
-                    }
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = DesicDehum(DesicDehumNum).MaxCoilFluidFlow;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         DesicDehum(DesicDehumNum).CoilControlNode,
-                                         DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc);
-                    // simulate the regenerator steam heating coil
-                    SimulateSteamCoilComponents(state,
-                                                DesicDehum(DesicDehumNum).RegenCoilName,
-                                                FirstHVACIteration,
-                                                DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                                RegenCoilLoad,
-                                                RegenCoilActual);
                 }
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = DesicDehum(DesicDehumNum).MaxCoilFluidFlow;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     DesicDehum(DesicDehumNum).CoilControlNode,
+                                     DesicDehum(DesicDehumNum).CoilOutletNode,
+                                     DesicDehum(DesicDehumNum).plantLoc);
+                // simulate the regenerator steam heating coil
+                SimulateSteamCoilComponents(state,
+                                            DesicDehum(DesicDehumNum).RegenCoilName,
+                                            FirstHVACIteration,
+                                            DesicDehum(DesicDehumNum).RegenCoilIndex,
+                                            RegenCoilLoad,
+                                            RegenCoilActual);
+            } break;
+            default:
+                break;
             }
         } else {
-            {
-                auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).RegenCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  DesicDehum(DesicDehumNum).RegenCoilName,
-                                                  FirstHVACIteration,
-                                                  RegenCoilLoad,
-                                                  DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                                  RegenCoilActual);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         DesicDehum(DesicDehumNum).CoilControlNode,
-                                         DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc);
-                    RegenCoilActual = RegenCoilLoad;
-                    // simulate the regenerator hot water heating coil
-                    SimulateWaterCoilComponents(state,
-                                                DesicDehum(DesicDehumNum).RegenCoilName,
-                                                FirstHVACIteration,
-                                                DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                                RegenCoilActual);
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         DesicDehum(DesicDehumNum).CoilControlNode,
-                                         DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc);
-                    // simulate the regenerator steam heating coil
-                    SimulateSteamCoilComponents(state,
-                                                DesicDehum(DesicDehumNum).RegenCoilName,
-                                                FirstHVACIteration,
-                                                DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                                RegenCoilLoad,
-                                                RegenCoilActual);
-                }
+            switch (DesicDehum(DesicDehumNum).RegenCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              DesicDehum(DesicDehumNum).RegenCoilName,
+                                              FirstHVACIteration,
+                                              RegenCoilLoad,
+                                              DesicDehum(DesicDehumNum).RegenCoilIndex,
+                                              RegenCoilActual);
+            } break;
+            case Coil_HeatingWater: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     DesicDehum(DesicDehumNum).CoilControlNode,
+                                     DesicDehum(DesicDehumNum).CoilOutletNode,
+                                     DesicDehum(DesicDehumNum).plantLoc);
+                RegenCoilActual = RegenCoilLoad;
+                // simulate the regenerator hot water heating coil
+                SimulateWaterCoilComponents(
+                    state, DesicDehum(DesicDehumNum).RegenCoilName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenCoilIndex, RegenCoilActual);
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     DesicDehum(DesicDehumNum).CoilControlNode,
+                                     DesicDehum(DesicDehumNum).CoilOutletNode,
+                                     DesicDehum(DesicDehumNum).plantLoc);
+                // simulate the regenerator steam heating coil
+                SimulateSteamCoilComponents(state,
+                                            DesicDehum(DesicDehumNum).RegenCoilName,
+                                            FirstHVACIteration,
+                                            DesicDehum(DesicDehumNum).RegenCoilIndex,
+                                            RegenCoilLoad,
+                                            RegenCoilActual);
+            } break;
+            default:
+                break;
             }
         }
         if (present(RegenCoilLoadmet)) RegenCoilLoadmet = RegenCoilActual;

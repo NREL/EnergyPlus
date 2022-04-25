@@ -1624,8 +1624,7 @@ namespace BranchInputManager {
                         continue;
                     if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) != 0) continue;
                     {
-                        auto const SELECT_CASE_var(CurSplitter);
-                        if (SELECT_CASE_var) {
+                        if (CurSplitter) {
                             // Current "item" is a splitter, candidate is a mixer.
                             MixerNum = UtilityRoutines::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop1),
                                                                        state.dataBranchInputManager->Mixers);

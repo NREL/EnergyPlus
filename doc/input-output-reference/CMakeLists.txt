@@ -123,6 +123,7 @@ set(INCLUDED_IMAGES
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithACStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithDCStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ElectPowerServiceOverview.png
+    ${PROJECT_SOURCE_DIR}/input-output-reference/media/NFRC100-Table4-3.PNG
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/OASysComponentMatrix.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ZoneComponentMatrix.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/calculation-of-dtop-for-a-shading-device-collage.png

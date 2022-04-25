@@ -52,7 +52,7 @@ TEST_F(TestDoubleRangeMaterialRatio, TestMaterialProperties)
     EXPECT_NEAR(0.7, R, 1e-6);
 
     // Properties at four wavelengths should have been created
-    size_t size = 4;
+    size_t size = 5;
 
     std::vector<double> Transmittances = aMaterial->getBandProperties(Property::T, Side::Front);
 
@@ -62,6 +62,7 @@ TEST_F(TestDoubleRangeMaterialRatio, TestMaterialProperties)
     correctResults.push_back(0);
     correctResults.push_back(0.0039215686274509838);
     correctResults.push_back(0.2);
+    correctResults.push_back(0.0039215686274509838);
     correctResults.push_back(0.0039215686274509838);
 
     for(size_t i = 0; i < size; ++i)
@@ -77,6 +78,7 @@ TEST_F(TestDoubleRangeMaterialRatio, TestMaterialProperties)
     correctResults.push_back(0);
     correctResults.push_back(0.79607843137254897);
     correctResults.push_back(0.6);
+    correctResults.push_back(0.79607843137254897);
     correctResults.push_back(0.79607843137254897);
 
     for(size_t i = 0; i < size; ++i)
