@@ -457,7 +457,6 @@ struct CondenserLoopTowersData : BaseGlobalStruct
 {
     bool GetInput = true;
     Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
-    std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
     void clear_state() override
     {

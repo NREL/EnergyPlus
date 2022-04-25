@@ -233,6 +233,8 @@ namespace CondenserLoopTowers {
         Array1D_string AlphArray(16);      // Character string input data array
         Array1D_string AlphArray2(1);      // Character string input data array for VS tower coefficients
 
+        std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
+
         constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> EvapLossNamesUC{"LOSSFACTOR", "SATURATEDEXIT"};
         constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"NOMINALCAPACITY", "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"};
 
@@ -254,7 +256,7 @@ namespace CondenserLoopTowers {
 
         // Allocate data structures to hold tower input data, report data and tower inlet conditions
         state.dataCondenserLoopTowers->towers.allocate(NumSimpleTowers);
-        state.dataCondenserLoopTowers->UniqueSimpleTowerNames.reserve(NumSimpleTowers);
+        UniqueSimpleTowerNames.reserve(NumSimpleTowers);
         // Allocate variable-speed tower structure with data specific to this type
         if (NumVariableSpeedTowers > 0) {
             // Allow users to input model coefficients other than default
@@ -281,7 +283,7 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
+                                                     UniqueSimpleTowerNames,
                                                      AlphArray(1),
                                                      cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
@@ -652,7 +654,7 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
+                                                     UniqueSimpleTowerNames,
                                                      AlphArray(1),
                                                      cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
@@ -1060,7 +1062,7 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
+                                                     UniqueSimpleTowerNames,
                                                      AlphArray(1),
                                                      cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
@@ -1595,7 +1597,7 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
+                                                     UniqueSimpleTowerNames,
                                                      AlphArray(1),
                                                      cCurrentModuleObject,
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
