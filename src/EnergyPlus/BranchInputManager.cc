@@ -1054,8 +1054,6 @@ namespace BranchInputManager {
             int NumOfBranches = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
             if (NumOfBranches > 0) {
                 state.dataBranchInputManager->Branch.allocate(NumOfBranches);
-                for (auto &e : state.dataBranchInputManager->Branch)
-                    e.AssignedLoopName.clear();
                 ErrFound = false;
                 state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
                 NodeNums.dimension(NumParams, 0);
@@ -1323,10 +1321,6 @@ namespace BranchInputManager {
         std::string CurrentModuleObject = "BranchList";
         int NumOfBranchLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataBranchInputManager->BranchList.allocate(NumOfBranchLists);
-        for (auto &e : state.dataBranchInputManager->BranchList) {
-            e.LoopName.clear();
-            e.LoopType.clear();
-        }
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
@@ -2744,7 +2738,6 @@ namespace BranchInputManager {
         // Build node names in branches
         for (Count = 1; Count <= (int)state.dataBranchInputManager->Branch.size(); ++Count) {
             BranchNodes(Count).UniqueNodeNames.allocate(state.dataBranchInputManager->Branch(Count).NumOfComponents * 2);
-            BranchNodes(Count).UniqueNodeNames = std::string();
             NodeNum = 0;
             for (Loop = 1; Loop <= state.dataBranchInputManager->Branch(Count).NumOfComponents; ++Loop) {
                 Found = UtilityRoutines::FindItemInList(

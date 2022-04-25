@@ -143,20 +143,26 @@ namespace CoolingPanelSimple {
         int CoolingPanelLoadReSimIndex = 0;
         int CoolingPanelMassFlowReSimIndex = 0;
         int CoolingPanelInletTempFlowReSimIndex = 0;
+        bool MyEnvrnFlag = true;
+        Real64 ZeroSourceSumHATsurf = 0.0;
+        Real64 CoolingPanelSource = 0.0;
+        Real64 CoolingPanelSrcAvg = 0.0;
+        Real64 LastCoolingPanelSrc = 0.0;
+        Real64 LastSysTimeElapsed = 0.0;
+        Real64 LastTimeStepSys = 0.0;
+        bool SetLoopIndexFlag = true;
+        bool MySizeFlagCoolPanel = true;
+        bool CheckEquipName = true;
+        Array1D_string FieldNames;
+        bool ZoneEquipmentListChecked = false;
 
-        void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
+        void CalcCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-        void SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int ZoneNum);
+        void SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int ZoneNum) const;
 
         bool SizeCoolingPanelUA(EnergyPlusData &state);
 
         void ReportCoolingPanel(EnergyPlusData &state);
-    };
-
-    struct CoolingPanelSysNumericFieldData
-    {
-        // Members
-        Array1D_string FieldNames;
     };
 
     void SimCoolingPanel(EnergyPlusData &state,
@@ -186,28 +192,8 @@ namespace CoolingPanelSimple {
 
 struct ChilledCeilingPanelSimpleData : BaseGlobalStruct
 {
-
     bool GetInputFlag = true;
-    bool MyOneTimeFlag = true;
-    Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
-    Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-
-    // Record keeping variables used to calculate CoolingPanelSrcAvg locally
-    Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
-    Array1D_bool CheckEquipName;
-    Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // Autosizing variables
-    Array1D_bool MySizeFlagCoolPanel;
-
     Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
-    Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
-
-    bool ZoneEquipmentListChecked = false;
-    Array1D_bool MyEnvrnFlag;
     void clear_state() override
     {
         *this = ChilledCeilingPanelSimpleData();

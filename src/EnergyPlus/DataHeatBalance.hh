@@ -694,6 +694,8 @@ namespace DataHeatBalance {
         Real64 delta_T = 0.0;                               // Indoor and outdoor temperature
         Real64 delta_HumRat = 0.0;                          // Indoor and outdoor humidity ratio delta
 
+        Real64 ZeroSourceSumHATsurf = 0.0;  // From Chilled Ceiling Panel, equal to the SumHATsurf for all the walls in a zone with no source
+
         // Spaces
         bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
         bool anySurfacesWithSpace = false;    // True if any surfaces in a zone have a space assigned in input
