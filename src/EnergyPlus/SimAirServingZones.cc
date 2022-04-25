@@ -2620,7 +2620,7 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
 
     } // End of Air Loop iteration
 
-    if (state.dataAirLoopHVACDOAS->airloopDOAS.size() > 0) {
+    if ((int)state.dataAirLoopHVACDOAS->airloopDOAS.size() > 0) {
         int index;
         Real64 OAMassFLowrate = 0.0;
         for (std::size_t loop = 0; loop < state.dataAirLoopHVACDOAS->airloopDOAS.size(); ++loop) {
