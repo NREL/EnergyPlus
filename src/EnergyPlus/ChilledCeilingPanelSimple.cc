@@ -775,11 +775,11 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
     if (!ThisCP.ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         ThisCP.ZoneEquipmentListChecked = true;
-            if (!CheckZoneEquipmentList(state, cCMO_CoolingPanel_Simple, ThisCP.EquipID)) {
-                ShowSevereError(state,
-                                "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
-                                    "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
-            }
+        if (!CheckZoneEquipmentList(state, cCMO_CoolingPanel_Simple, ThisCP.EquipID)) {
+            ShowSevereError(state,
+                            "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
+                                "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+        }
     }
 
     if (ThisCP.SetLoopIndexFlag) {
@@ -794,8 +794,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     if (!state.dataGlobal->SysSizingCalc) {
-        if (ThisCP.MySizeFlagCoolPanel &&
-            !ThisCP.SetLoopIndexFlag) {
+        if (ThisCP.MySizeFlagCoolPanel && !ThisCP.SetLoopIndexFlag) {
             // for each cooling panel do the sizing once.
             SizeCoolingPanel(state, CoolingPanelNum);
             ThisCP.MySizeFlagCoolPanel = false;
@@ -1438,8 +1437,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // that all energy radiated to people is converted to convective energy is
             // not very precise, but at least it conserves energy. The system impact to heat balance
             // should include this.
-            LoadMet = (SumHATsurf(state, ZoneNum) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) +
-                      (CoolingPanelCool * this->FracConvect) + (RadHeat * this->FracDistribPerson);
+            LoadMet = (SumHATsurf(state, ZoneNum) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) + (CoolingPanelCool * this->FracConvect) +
+                      (RadHeat * this->FracDistribPerson);
         }
         this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
 
@@ -1528,7 +1527,6 @@ void UpdateCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     ThisCP.LastSysTimeElapsed = SysTimeElapsed;
     ThisCP.LastTimeStepSys = TimeStepSys;
 
-
     int WaterInletNode = ThisCP.WaterInletNode;
     int WaterOutletNode = ThisCP.WaterOutletNode;
 
@@ -1585,7 +1583,7 @@ void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
         }
     }
 
-    for (auto & cp : state.dataChilledCeilingPanelSimple->CoolingPanel) {
+    for (auto &cp : state.dataChilledCeilingPanelSimple->CoolingPanel) {
         cp.CoolingPanelSource = cp.CoolingPanelSrcAvg;
     }
 
