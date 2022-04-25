@@ -112,6 +112,8 @@ namespace CondenserLoopTowers {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(CapacityCtrl::Num)> CapacityCtrlNamesUC{"FANCYCLING", "FLUIDBYPASS"};
+
     enum class CellCtrl
     {
         Invalid = -1,

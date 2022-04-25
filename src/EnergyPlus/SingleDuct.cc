@@ -3428,11 +3428,16 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
         if (state.dataSize->ZoneSizingRunDone) {
+            // set air flow rate used to size heating coils, ZoneTurndownMinAirFrac defaults to 1 for those TU types that do not use it
             if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSingleDuct->UserInputMaxHeatAirVolFlowRateSS,
                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                         this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
+            } else if (this->SysType_Num == SysType::SingleDuctConstVolReheat || this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
+                TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
+                        this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
             } else {
                 TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
@@ -4830,7 +4835,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     }
 
     // Active cooling with fix for issue #5592
-    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
+    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < (QCoolFanOnMin - SmallLoad) && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
         !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
         // check that it can meet the load
         FanOp = 1;

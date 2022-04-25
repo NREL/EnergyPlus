@@ -175,7 +175,8 @@ namespace DataAirSystems {
     {
         Invalid = -1,
         StructArrayLegacyFanModels,
-        ObjectVectorOOFanSystemModel
+        ObjectVectorOOFanSystemModel,
+        Num
     };
 
     enum class FanPlacement

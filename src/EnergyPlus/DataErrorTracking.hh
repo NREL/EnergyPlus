@@ -160,7 +160,7 @@ namespace DataErrorTracking {
                                   "errors in a zone leading to program termination.<CRE>"); // Occupant density is extremely high
     auto constexpr MoreDetails_16(
         "A temperature out of bounds problem can be caused by several things. The user should check:<CR>1) the weather environment "
-        "(including the horizontal IR from sky)<CR>2) the level of interal gains with respect to the zone<CR>3) the thermal "
+        "(including the horizontal IR from sky)<CR>2) the level of internal gains with respect to the zone<CR>3) the thermal "
         "properties of their materials.  And other things.<CR>A common cause is a building with no or little thermal mass - all "
         "materials with Material:NoMass definitions.<CRE>"); // Temperature (low) out of bounds AND Temperature (high) out of bounds
     auto constexpr MoreDetails_18(
