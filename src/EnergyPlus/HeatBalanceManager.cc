@@ -6039,12 +6039,14 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod = false;
         state.dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                  state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);

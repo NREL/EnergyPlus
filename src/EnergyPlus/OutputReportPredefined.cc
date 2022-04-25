@@ -1251,6 +1251,13 @@ namespace OutputReportPredefined {
         s->pdchHIOccuHourDanger = newPreDefColumn(state, s->pdstHIOccuHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
         s->pdchHIOccuHourExtremeDanger = newPreDefColumn(state, s->pdstHIOccuHours, "Extreme Danger (> 51.7°C) [hr]");
 
+        s->pdstHIOccupiedHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heat Index OccupiedpantHours");
+        s->pdchHIOccupiedHourSafe = newPreDefColumn(state, s->pdstHIOccupiedHours, "Safe (≤ 26.7°C) [hr]");
+        s->pdchHIOccupiedHourCaution = newPreDefColumn(state, s->pdstHIOccupiedHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
+        s->pdchHIOccupiedHourExtremeCaution = newPreDefColumn(state, s->pdstHIOccupiedHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
+        s->pdchHIOccupiedHourDanger = newPreDefColumn(state, s->pdstHIOccupiedHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
+        s->pdchHIOccupiedHourExtremeDanger = newPreDefColumn(state, s->pdstHIOccupiedHours, "Extreme Danger (> 51.7°C) [hr]");
+
         s->pdstHumidexHours = newPreDefSubTable(state, s->pdrThermalResilience, "Humidex Hours");
         s->pdchHumidexHourLittle = newPreDefColumn(state, s->pdstHumidexHours, "Little to no Discomfort (≤ 29) [hr]");
         s->pdchHumidexHourSome = newPreDefColumn(state, s->pdstHumidexHours, "Some Discomfort (> 29, ≤ 40) [hr]");
@@ -1264,6 +1271,13 @@ namespace OutputReportPredefined {
         s->pdchHumidexOccuHourGreat = newPreDefColumn(state, s->pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
         s->pdchHumidexOccuHourDanger = newPreDefColumn(state, s->pdstHumidexOccuHours, "Dangerous (> 45, ≤ 50) [hr]");
         s->pdchHumidexOccuHourStroke = newPreDefColumn(state, s->pdstHumidexOccuHours, "Heat Stroke Quite Possible (> 50) [hr]");
+
+        s->pdstHumidexOccupiedHours = newPreDefSubTable(state, s->pdrThermalResilience, "Humidex OccupiedpantHours");
+        s->pdchHumidexOccupiedHourLittle = newPreDefColumn(state, s->pdstHumidexOccupiedHours, "Little to no Discomfort (≤ 29) [hr]");
+        s->pdchHumidexOccupiedHourSome = newPreDefColumn(state, s->pdstHumidexOccupiedHours, "Some Discomfort (> 29, ≤ 40) [hr]");
+        s->pdchHumidexOccupiedHourGreat = newPreDefColumn(state, s->pdstHumidexOccupiedHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
+        s->pdchHumidexOccupiedHourDanger = newPreDefColumn(state, s->pdstHumidexOccupiedHours, "Dangerous (> 45, ≤ 50) [hr]");
+        s->pdchHumidexOccupiedHourStroke = newPreDefColumn(state, s->pdstHumidexOccupiedHours, "Heat Stroke Quite Possible (> 50) [hr]");
 
         s->pdstHeatingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heating SET Degree-Hours");
         s->pdchHeatingSETHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Degree-Hours [°C·hr]");

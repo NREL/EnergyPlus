@@ -1129,6 +1129,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHIOccuHourExtremeCaution = 0;
     int pdchHIOccuHourDanger = 0;
     int pdchHIOccuHourExtremeDanger = 0;
+    int pdstHIOccupiedHours = 0;
+    int pdchHIOccupiedHourSafe = 0;
+    int pdchHIOccupiedHourCaution = 0;
+    int pdchHIOccupiedHourExtremeCaution = 0;
+    int pdchHIOccupiedHourDanger = 0;
+    int pdchHIOccupiedHourExtremeDanger = 0;
     int pdstHumidexHours = 0;
     int pdchHumidexHourLittle = 0;
     int pdchHumidexHourSome = 0;
@@ -1141,6 +1147,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHumidexOccuHourGreat = 0;
     int pdchHumidexOccuHourDanger = 0;
     int pdchHumidexOccuHourStroke = 0;
+    int pdstHumidexOccupiedHours = 0;
+    int pdchHumidexOccupiedHourLittle = 0;
+    int pdchHumidexOccupiedHourSome = 0;
+    int pdchHumidexOccupiedHourGreat = 0;
+    int pdchHumidexOccupiedHourDanger = 0;
+    int pdchHumidexOccupiedHourStroke = 0;
 
     int pdstHeatingSETHours = 0;
     int pdchHeatingSETHours = 0;
@@ -2100,6 +2112,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchHumidexOccuHourGreat = 0;
         this->pdchHumidexOccuHourDanger = 0;
         this->pdchHumidexOccuHourStroke = 0;
+        this->pdstHumidexOccupiedHours = 0;
+        this->pdchHumidexOccupiedHourLittle = 0;
+        this->pdchHumidexOccupiedHourSome = 0;
+        this->pdchHumidexOccupiedHourGreat = 0;
+        this->pdchHumidexOccupiedHourDanger = 0;
+        this->pdchHumidexOccupiedHourStroke = 0;
         this->pdstHeatingSETHours = 0;
         this->pdchHeatingSETHours = 0;
         this->pdchHeatingSETOccuHours = 0;

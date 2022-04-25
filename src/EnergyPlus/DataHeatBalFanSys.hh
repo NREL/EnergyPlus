@@ -266,11 +266,13 @@ struct HeatBalFanSysData : BaseGlobalStruct
 
     Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
     Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneHeatIndexOccupiedHourBins;
     Array2D<std::vector<Real64>> ZoneHeatIndexHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHeatIndexOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHeatIndexOccupiedHourBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneHumidexHourBins;
     Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneHumidexOccupiedHourBins;
     Array2D<std::vector<Real64>> ZoneHumidexHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHumidexOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHumidexOccupiedHourBinsRepPeriod;
@@ -431,8 +433,10 @@ struct HeatBalFanSysData : BaseGlobalStruct
         ;
         this->ZoneHeatIndexHourBins.deallocate();
         this->ZoneHeatIndexOccuHourBins.deallocate();
+        this->ZoneHeatIndexOccupiedHourBins.deallocate();
         this->ZoneHumidexHourBins.deallocate();
         this->ZoneHumidexOccuHourBins.deallocate();
+        this->ZoneHumidexOccupiedHourBins.deallocate();
         this->ZoneColdHourOfSafetyBins.deallocate();
         this->ZoneHeatHourOfSafetyBins.deallocate();
         this->ZoneColdHourOfSafetyBinsRepPeriod.deallocate();

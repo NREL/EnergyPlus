@@ -13023,6 +13023,13 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                       state.dataOutRptPredefined->pdchHIOccuHourExtremeDanger};
         WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins);
 
+        columnHead = {state.dataOutRptPredefined->pdchHIOccupiedHourSafe,
+                      state.dataOutRptPredefined->pdchHIOccupiedHourCaution,
+                      state.dataOutRptPredefined->pdchHIOccupiedHourExtremeCaution,
+                      state.dataOutRptPredefined->pdchHIOccupiedHourDanger,
+                      state.dataOutRptPredefined->pdchHIOccupiedHourExtremeDanger};
+        WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBins);
+
         columnHead = {state.dataOutRptPredefined->pdchHumidexHourLittle,
                       state.dataOutRptPredefined->pdchHumidexHourSome,
                       state.dataOutRptPredefined->pdchHumidexHourGreat,
@@ -13036,6 +13043,13 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                       state.dataOutRptPredefined->pdchHumidexOccuHourDanger,
                       state.dataOutRptPredefined->pdchHumidexOccuHourStroke};
         WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHumidexOccuHourBins);
+
+        columnHead = {state.dataOutRptPredefined->pdchHumidexOccupiedHourLittle,
+                      state.dataOutRptPredefined->pdchHumidexOccupiedHourSome,
+                      state.dataOutRptPredefined->pdchHumidexOccupiedHourGreat,
+                      state.dataOutRptPredefined->pdchHumidexOccupiedHourDanger,
+                      state.dataOutRptPredefined->pdchHumidexOccupiedHourStroke};
+        WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBins);
 
         bool hasPierceSET = true;
         if (state.dataHeatBal->TotPeople == 0) {
