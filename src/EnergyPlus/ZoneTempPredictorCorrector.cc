@@ -753,6 +753,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         for (ControlTypeNum = SchedMin; ControlTypeNum <= SchedMax; ++ControlTypeNum) {
 
             switch (static_cast<DataHVACGlobals::SetPointType>(ControlTypeNum)) {
+            case DataHVACGlobals::SetPointType::Uncontrolled:
+                break;
             case DataHVACGlobals::SetPointType::SingleHeating:
                 TempIndex = TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatSetPoint;
                 TStatControlTypes(TempControlledZoneNum).DidHave(static_cast<int>(DataHVACGlobals::SetPointType::SingleHeating)) = true;
