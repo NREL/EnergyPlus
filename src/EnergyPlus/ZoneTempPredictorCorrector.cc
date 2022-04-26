@@ -1596,134 +1596,126 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
         for (ControlTypeNum = SchedMin; ControlTypeNum <= SchedMax; ++ControlTypeNum) {
 
-            {
-                auto const SELECT_CASE_var(ControlTypeNum);
-
-                if (SELECT_CASE_var == 0) { // Thermal comfort uncontrolled
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-
-                    ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglHeatSetPointFanger;
-                    TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) = true;
-                    if (ComfortIndex != 0) {
-                        SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
-                        if (SchedTypeIndex == 0) {
-                            ShowSevereError(state,
-                                            "GetZoneAirSetpoints: Could not find " +
-                                                ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) +
-                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
-                            ErrorsFound = true;
-                        }
-                    } else { // ComfortIndex = 0
-                        if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::SglHeatSetPointFanger))) {
-                            ShowSevereError(state, "Control Type Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                            ShowContinueError(state,
-                                              "..specifies thermal control type 1 (" +
-                                                  ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) +
-                                                  ") as the control type. Not valid for this zone.");
-                            ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
-                            ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-                            ErrorsFound = true;
-                        }
+            switch (static_cast<ComfortControl>(ControlTypeNum)) {
+            case ComfortControl::Uncontrolled:
+                break;
+            case ComfortControl::SglHeatSetPointFanger:
+                ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglHeatSetPointFanger;
+                TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) = true;
+                if (ComfortIndex != 0) {
+                    SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
+                    if (SchedTypeIndex == 0) {
+                        ShowSevereError(state,
+                                        "GetZoneAirSetpoints: Could not find " +
+                                            ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) +
+                                            " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
+                        ErrorsFound = true;
                     }
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-
-                    ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglCoolSetPointFanger;
-                    TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) = true;
-                    if (ComfortIndex != 0) {
-                        SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
-                        if (SchedTypeIndex == 0) {
-                            ShowSevereError(state,
-                                            "GetZoneAirSetpoints: Could not find " +
-                                                ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) +
-                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
-                            ErrorsFound = true;
-                        }
-                    } else { // ComfortIndex = 0
-                        if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::SglCoolSetPointFanger))) {
-                            ShowSevereError(state, "Control Type Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                            ShowContinueError(state,
-                                              "..specifies thermal control type 2 (" +
-                                                  ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) +
-                                                  ") as the control type. Not valid for this zone.");
-                            ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
-                            ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-                            ErrorsFound = true;
-                        }
+                } else { // ComfortIndex = 0
+                    if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::SglHeatSetPointFanger))) {
+                        ShowSevereError(state, "Control Type Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                        ShowContinueError(state,
+                                          "..specifies thermal control type 1 (" +
+                                              ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) +
+                                              ") as the control type. Not valid for this zone.");
+                        ShowContinueError(state,
+                                          "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                              ComfortControlledZone(ComfortControlledZoneNum).Name);
+                        ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                        ErrorsFound = true;
                     }
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-
-                    ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglHCSetPointFanger;
-                    TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::SglHCSetPointFanger)) = true;
-                    if (ComfortIndex != 0) {
-                        SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
-                        if (SchedTypeIndex == 0) {
-                            ShowSevereError(state,
-                                            "GetZoneAirSetpoints: Could not find " +
-                                                ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) +
-                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
-                            ErrorsFound = true;
-                        }
-                    } else { // ComfortIndex = 0
-                        if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::SglHCSetPointFanger))) {
-                            ShowSevereError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                            ShowContinueError(state,
-                                              "..specifies thermal control type 3 (" +
-                                                  ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) +
-                                                  ") as the control type. Not valid for this zone.");
-                            ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
-                            ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-                            ErrorsFound = true;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-
-                    ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_DualSetPointFanger;
-                    TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::DualSetPointFanger)) = true;
-                    if (ComfortIndex != 0) {
-                        SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
-                        if (SchedTypeIndex == 0) {
-                            ShowSevereError(state,
-                                            "GetZoneAirSetpoints: Could not find " +
-                                                ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) +
-                                                " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
-                            ErrorsFound = true;
-                        }
-                    } else { // ComfortIndex = 0
-                        if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::DualSetPointFanger))) {
-                            ShowSevereError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                            ShowContinueError(state,
-                                              "..specifies thermal control type 4 (" +
-                                                  ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) +
-                                                  ") as the control type. Not valid for this zone.");
-                            ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                                  ComfortControlledZone(ComfortControlledZoneNum).Name);
-                            ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-                            ErrorsFound = true;
-                        }
-                    }
-                    // CASE PIERCE
-                    // CASE KSU
-
-                } else {
-                    ShowSevereError(state,
-                                    format("GetZoneAirSetpoints: Illegal control type for Zone={}, Found value={}, in Schedule={}",
-                                           Zone(ActualZoneNum).Name,
-                                           ControlTypeNum,
-                                           ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName));
-                    ShowContinueError(state, "..valid range values are [0,4].");
-                    ErrorsFound = true;
                 }
+                break;
+            case ComfortControl::SglCoolSetPointFanger:
+                ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglCoolSetPointFanger;
+                TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) = true;
+                if (ComfortIndex != 0) {
+                    SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
+                    if (SchedTypeIndex == 0) {
+                        ShowSevereError(state,
+                                        "GetZoneAirSetpoints: Could not find " +
+                                            ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) +
+                                            " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
+                        ErrorsFound = true;
+                    }
+                } else { // ComfortIndex = 0
+                    if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::SglCoolSetPointFanger))) {
+                        ShowSevereError(state, "Control Type Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                        ShowContinueError(state,
+                                          "..specifies thermal control type 2 (" +
+                                              ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) +
+                                              ") as the control type. Not valid for this zone.");
+                        ShowContinueError(state,
+                                          "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                              ComfortControlledZone(ComfortControlledZoneNum).Name);
+                        ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                        ErrorsFound = true;
+                    }
+                }
+                break;
+            case ComfortControl::SglHCSetPointFanger:
+                ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglHCSetPointFanger;
+                TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::SglHCSetPointFanger)) = true;
+                if (ComfortIndex != 0) {
+                    SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
+                    if (SchedTypeIndex == 0) {
+                        ShowSevereError(state,
+                                        "GetZoneAirSetpoints: Could not find " +
+                                            ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) +
+                                            " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
+                        ErrorsFound = true;
+                    }
+                } else { // ComfortIndex = 0
+                    if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::SglHCSetPointFanger))) {
+                        ShowSevereError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                        ShowContinueError(state,
+                                          "..specifies thermal control type 3 (" +
+                                              ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) +
+                                              ") as the control type. Not valid for this zone.");
+                        ShowContinueError(state,
+                                          "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                              ComfortControlledZone(ComfortControlledZoneNum).Name);
+                        ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                        ErrorsFound = true;
+                    }
+                }
+                break;
+            case ComfortControl::DualSetPointFanger:
+                ComfortIndex = ComfortControlledZone(ComfortControlledZoneNum).SchIndx_DualSetPointFanger;
+                TComfortControlTypes(ComfortControlledZoneNum).DidHave(static_cast<int>(ComfortControl::DualSetPointFanger)) = true;
+                if (ComfortIndex != 0) {
+                    SchedTypeIndex = ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex);
+                    if (SchedTypeIndex == 0) {
+                        ShowSevereError(state,
+                                        "GetZoneAirSetpoints: Could not find " +
+                                            ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) +
+                                            " Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex));
+                        ErrorsFound = true;
+                    }
+                } else { // ComfortIndex = 0
+                    if (CheckScheduleValue(state, CTIndex, static_cast<int>(ComfortControl::DualSetPointFanger))) {
+                        ShowSevereError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                        ShowContinueError(state,
+                                          "..specifies thermal control type 4 (" +
+                                              ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) +
+                                              ") as the control type. Not valid for this zone.");
+                        ShowContinueError(state,
+                                          "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                              ComfortControlledZone(ComfortControlledZoneNum).Name);
+                        ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                        ErrorsFound = true;
+                    }
+                }
+                break;
+            default:
+                ShowSevereError(state,
+                                format("GetZoneAirSetpoints: Illegal control type for Zone={}, Found value={}, in Schedule={}",
+                                       Zone(ActualZoneNum).Name,
+                                       ControlTypeNum,
+                                       ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName));
+                ShowContinueError(state, "..valid range values are [0,4].");
+                ErrorsFound = true;
+                break;
             }
         }
     }
@@ -1739,58 +1731,53 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 TComfortControlTypes(ComfortControlledZoneNum).DidHave(ControlTypeNum))
                 continue;
 
-            {
-                auto const SELECT_CASE_var(ControlTypeNum);
-
-                if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-                    if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
-                    ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                    ShowContinueError(state,
-                                      "...should include control type 1 (" +
-                                          ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) + ") but does not.");
-                    ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                          ComfortControlledZone(ComfortControlledZoneNum).Name);
-                    ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                    if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
-                    ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                    ShowContinueError(state,
-                                      "...should include control type 2 (" +
-                                          ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) + ") but does not.");
-                    ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                          ComfortControlledZone(ComfortControlledZoneNum).Name);
-                    ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-                    if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
-                    ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                    ShowContinueError(state,
-                                      "...should include control type 3 (" +
-                                          ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) + ") but does not.");
-                    ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                          ComfortControlledZone(ComfortControlledZoneNum).Name);
-                    ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                    if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
-                    ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
-                    ShowContinueError(state,
-                                      "...should include control type 4 (" +
-                                          ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) + ") but does not.");
-                    ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
-                                          ComfortControlledZone(ComfortControlledZoneNum).Name);
-                    ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
-
-                    // CASE PIERCE
-                    // CASE KSU
-
-                } else {
-                }
+            switch (static_cast<ComfortControl>(ControlTypeNum)) {
+            case ComfortControl::SglHeatSetPointFanger:
+                if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
+                ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                ShowContinueError(state,
+                                  "...should include control type 1 (" +
+                                      ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) + ") but does not.");
+                ShowContinueError(state,
+                                  "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                      ComfortControlledZone(ComfortControlledZoneNum).Name);
+                ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                break;
+            case ComfortControl::SglCoolSetPointFanger:
+                if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
+                ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                ShowContinueError(state,
+                                  "...should include control type 2 (" +
+                                      ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) + ") but does not.");
+                ShowContinueError(state,
+                                  "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                      ComfortControlledZone(ComfortControlledZoneNum).Name);
+                ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                break;
+            case ComfortControl::SglHCSetPointFanger:
+                if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
+                ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                ShowContinueError(state,
+                                  "...should include control type 3 (" +
+                                      ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) + ") but does not.");
+                ShowContinueError(state,
+                                  "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                      ComfortControlledZone(ComfortControlledZoneNum).Name);
+                ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                break;
+            case ComfortControl::DualSetPointFanger:
+                if (!TComfortControlTypes(ComfortControlledZoneNum).MustHave(ControlTypeNum)) continue;
+                ShowWarningError(state, "Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
+                ShowContinueError(state,
+                                  "...should include control type 4 (" +
+                                      ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) + ") but does not.");
+                ShowContinueError(state,
+                                  "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
+                                      ComfortControlledZone(ComfortControlledZoneNum).Name);
+                ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
+                break;
+            default:
+                break;
             }
         }
     }
@@ -3409,53 +3396,48 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         if (ComfortControlledZone(Loop).ManageDemand) {
             ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
 
-            {
-                auto const SELECT_CASE_var(state.dataHeatBalFanSys->ComfortControlType(ZoneNum));
+            switch (static_cast<ComfortControl>(state.dataHeatBalFanSys->ComfortControlType(ZoneNum))) {
+            case ComfortControl::SglHeatSetPointFanger:
+                if (TempZoneThermostatSetPoint(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit) {
+                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
+                    ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                    TempControlType(ZoneNum) = DataHVACGlobals::SetPointType::SingleHeating;
+                    TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
+                }
+                break;
+            case ComfortControl::SglCoolSetPointFanger:
+                if (TempZoneThermostatSetPoint(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit) {
+                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
+                    ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                    TempControlType(ZoneNum) = DataHVACGlobals::SetPointType::SingleCooling;
+                    TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
+                }
+                break;
+            case ComfortControl::SglHCSetPointFanger:
+                if ((TempZoneThermostatSetPoint(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit) ||
+                    (TempZoneThermostatSetPoint(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)) {
 
-                if (SELECT_CASE_var == 0) { // Uncontrolled
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-                    if (TempZoneThermostatSetPoint(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit) {
-                        TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
-                        ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                        TempControlType(ZoneNum) = DataHVACGlobals::SetPointType::SingleHeating;
-                        TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
-                    }
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                    if (TempZoneThermostatSetPoint(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit) {
-                        TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
-                        ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                        TempControlType(ZoneNum) = DataHVACGlobals::SetPointType::SingleCooling;
-                        TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
-                    }
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-                    if ((TempZoneThermostatSetPoint(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit) ||
-                        (TempZoneThermostatSetPoint(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)) {
-
-                        TempControlType(ZoneNum) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
-                        TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
-                        ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                        ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-
-                        if (ZoneThermostatSetPointLo(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit)
-                            ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
-                        if (ZoneThermostatSetPointHi(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)
-                            ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
-                    }
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
                     TempControlType(ZoneNum) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
                     TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
+                    ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                    ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+
                     if (ZoneThermostatSetPointLo(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit)
                         ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
                     if (ZoneThermostatSetPointHi(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)
                         ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
-
-                } else {
-                    // Do nothing
                 }
+                break;
+            case ComfortControl::DualSetPointFanger:
+                TempControlType(ZoneNum) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
+                TempControlTypeRpt(ZoneNum) = static_cast<int>(TempControlType(ZoneNum));
+                if (ZoneThermostatSetPointLo(ZoneNum) >= ComfortControlledZone(Loop).HeatingResetLimit)
+                    ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).HeatingResetLimit;
+                if (ZoneThermostatSetPointHi(ZoneNum) <= ComfortControlledZone(Loop).CoolingResetLimit)
+                    ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).CoolingResetLimit;
+                break;
+            default:
+                break;
             }
         } // Demand manager
     }
@@ -7516,76 +7498,69 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
         ComfortControlType(ActualZoneNum) = GetCurrentScheduleValue(state, ComfortControlSchedIndex);
 
         // Get PMV values
-
-        {
-            auto const SELECT_CASE_var(ComfortControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
-            // during the simulation?
-            if (SELECT_CASE_var == 0) { // Uncontrolled for thermal comfort
-                ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
-                ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
-
-            } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-
-                SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_SglHeatSetPointFanger;
-                SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
-                SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SchedTypeIndex).PMVSchedIndex;
-                ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHeatSetPointFanger);
-                ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
-                ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
-
-            } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-
-                SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_SglCoolSetPointFanger;
-                SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
-                SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SchedTypeIndex).PMVSchedIndex;
-                ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglCoolSetPointFanger);
-                ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
-                ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
-
-            } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-
-                SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_SglHCSetPointFanger;
-                SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
-                SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SchedTypeIndex).PMVSchedIndex;
-                ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHCSetPointFanger);
-                ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
-                ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
-
-            } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-
-                SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_DualSetPointFanger;
-                SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
-                SetPointComfortSchedIndexHot = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).HeatPMVSchedIndex;
-                SetPointComfortSchedIndexCold = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).CoolPMVSchedIndex;
-                ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::DualSetPointFanger);
-                ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexHot);
-                ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexCold);
-                if (ZoneComfortControlsFanger(ActualZoneNum).LowPMV > ZoneComfortControlsFanger(ActualZoneNum).HighPMV) {
-                    ++ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount;
-                    if (ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount < 2) {
-                        ShowWarningError(state,
-                                         "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the cooling "
-                                         "PMV setpoint in " +
-                                             state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).Name);
-                        ShowContinueError(state, "The zone dual heating PMV setpoint is set to the dual cooling PMV setpoint.");
-                        ShowContinueErrorTimeStamp(state, "Occurrence info:");
-                    } else {
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       "The heating PMV setpoint is still above the cooling PMV setpoint",
-                                                       ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrIndex,
-                                                       ZoneComfortControlsFanger(ActualZoneNum).LowPMV,
-                                                       ZoneComfortControlsFanger(ActualZoneNum).LowPMV);
-                    }
-                    ZoneComfortControlsFanger(ActualZoneNum).LowPMV = ZoneComfortControlsFanger(ActualZoneNum).HighPMV;
+        switch (static_cast<ComfortControl>(ComfortControlType(ActualZoneNum))) {
+        case ComfortControl::Uncontrolled:
+            ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
+            ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
+            break;
+        case ComfortControl::SglHeatSetPointFanger:
+            SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_SglHeatSetPointFanger;
+            SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
+            SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SchedTypeIndex).PMVSchedIndex;
+            ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHeatSetPointFanger);
+            ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+            ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
+            break;
+        case ComfortControl::SglCoolSetPointFanger:
+            SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_SglCoolSetPointFanger;
+            SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
+            SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SchedTypeIndex).PMVSchedIndex;
+            ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglCoolSetPointFanger);
+            ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
+            ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+            break;
+        case ComfortControl::SglHCSetPointFanger:
+            SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_SglHCSetPointFanger;
+            SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
+            SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SchedTypeIndex).PMVSchedIndex;
+            ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHCSetPointFanger);
+            ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+            ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+            break;
+        case ComfortControl::DualSetPointFanger:
+            SchedNameIndex = ComfortControlledZone(RelativeZoneNum).SchIndx_DualSetPointFanger;
+            SchedTypeIndex = ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
+            SetPointComfortSchedIndexHot = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).HeatPMVSchedIndex;
+            SetPointComfortSchedIndexCold = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).CoolPMVSchedIndex;
+            ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::DualSetPointFanger);
+            ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexHot);
+            ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexCold);
+            if (ZoneComfortControlsFanger(ActualZoneNum).LowPMV > ZoneComfortControlsFanger(ActualZoneNum).HighPMV) {
+                ++ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount;
+                if (ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount < 2) {
+                    ShowWarningError(state,
+                                     "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the cooling "
+                                     "PMV setpoint in " +
+                                         state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).Name);
+                    ShowContinueError(state, "The zone dual heating PMV setpoint is set to the dual cooling PMV setpoint.");
+                    ShowContinueErrorTimeStamp(state, "Occurrence info:");
+                } else {
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   "The heating PMV setpoint is still above the cooling PMV setpoint",
+                                                   ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrIndex,
+                                                   ZoneComfortControlsFanger(ActualZoneNum).LowPMV,
+                                                   ZoneComfortControlsFanger(ActualZoneNum).LowPMV);
                 }
-
-            } else {
-                ShowSevereError(state,
-                                format("CalcZoneAirTempSetpoints: Illegal thermal control control type for Zone={}, Found value={}, in Schedule={}",
-                                       Zone(ActualZoneNum).Name,
-                                       ComfortControlType(ActualZoneNum),
-                                       ComfortControlledZone(RelativeZoneNum).ControlTypeSchedName));
+                ZoneComfortControlsFanger(ActualZoneNum).LowPMV = ZoneComfortControlsFanger(ActualZoneNum).HighPMV;
             }
+            break;
+        default:
+            ShowSevereError(state,
+                            format("CalcZoneAirTempSetpoints: Illegal thermal control control type for Zone={}, Found value={}, in Schedule={}",
+                                   Zone(ActualZoneNum).Name,
+                                   ComfortControlType(ActualZoneNum),
+                                   ComfortControlledZone(RelativeZoneNum).ControlTypeSchedName));
+            break;
         }
 
         // Check Average method
@@ -8078,46 +8053,39 @@ void OverrideAirSetPointsforEMSCntrl(EnergyPlusData &state)
     for (int Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
         if (ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn) {
             int ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
-            {
-                auto const SELECT_CASE_var(state.dataHeatBalFanSys->ComfortControlType(ZoneNum));
-
-                if (SELECT_CASE_var == 0) { // Uncontrolled
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                    ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                    // do nothing
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                    ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                    ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                } else {
-                    // Do nothing
-                }
+            switch (static_cast<ComfortControl>(state.dataHeatBalFanSys->ComfortControlType(ZoneNum))) {
+            case ComfortControl::SglHeatSetPointFanger:
+                TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                break;
+            case ComfortControl::SglHCSetPointFanger:
+                TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                break;
+            case ComfortControl::DualSetPointFanger:
+                ZoneThermostatSetPointLo(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                break;
+            default:
+                break;
             }
         }
+
         if (ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn) {
             int ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
-            {
-                auto const SELECT_CASE_var(state.dataHeatBalFanSys->ComfortControlType(ZoneNum));
-
-                if (SELECT_CASE_var == 0) { // Uncontrolled
-
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-                    // do nothing
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                    ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-                    TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                    ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                    ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                } else {
-                    // Do nothing
-                }
+            switch (static_cast<ComfortControl>(state.dataHeatBalFanSys->ComfortControlType(ZoneNum))) {
+            case ComfortControl::SglCoolSetPointFanger:
+                TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                break;
+            case ComfortControl::SglHCSetPointFanger:
+                TempZoneThermostatSetPoint(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                break;
+            case ComfortControl::DualSetPointFanger:
+                ZoneThermostatSetPointHi(ZoneNum) = ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                break;
+            default:
+                break;
             }
         }
     }
