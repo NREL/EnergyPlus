@@ -102,6 +102,7 @@ namespace ZoneTempPredictorCorrector {
     enum class ComfortControl
     {
         Invalid = -1,
+        Uncontrolled = 0,
         SglHeatSetPoint = 1,
         SglCoolSetPoint = 2,
         SglHCSetPoint = 3,

@@ -2541,25 +2541,30 @@ namespace ThermalComfort {
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeating = 0.0;
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCoolingOccupied = 0.0;
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeatingOccupied = 0.0;
-            {
-                auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(iZone));
-                if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeating) {
-                    testHeating = true;
-                    testCooling = false;
-                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleCooling) {
-                    testHeating = false;
-                    testCooling = true;
-                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeatCool) {
-                    testHeating = true;
-                    testCooling = true;
-                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
-                    testHeating = true;
-                    testCooling = true;
-                } else {
-                    testHeating = true;
-                    testCooling = true;
-                }
+
+            switch (state.dataHeatBalFanSys->TempControlType(iZone)) {
+            case DataHVACGlobals::SetPointType::SingleHeating:
+                testHeating = true;
+                testCooling = false;
+                break;
+            case DataHVACGlobals::SetPointType::SingleCooling:
+                testHeating = false;
+                testCooling = true;
+                break;
+            case DataHVACGlobals::SetPointType::SingleHeatCool:
+                testHeating = true;
+                testCooling = true;
+                break;
+            case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+                testHeating = true;
+                testCooling = true;
+                break;
+            default:
+                testHeating = true;
+                testCooling = true;
+                break;
             }
+
             if (testHeating && (SensibleLoadPredictedNoAdj > 0)) { // heating
                 if (state.dataRoomAirMod->AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
                     deltaT = state.dataHeatBalFanSys->TempTstatAir(iZone) - state.dataHeatBalFanSys->ZoneThermostatSetPointLo(iZone);

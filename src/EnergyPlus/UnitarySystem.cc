@@ -9990,89 +9990,93 @@ namespace UnitarySystems {
                                           HeatCoilLoad,
                                           SupHeaterLoad,
                                           CompressorOn);
-            {
-                auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum));
-                if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeating) {
+
+            switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
+            case DataHVACGlobals::SetPointType::SingleHeating:
+                state.dataUnitarySystems->CoolingLoad = false;
+                // No heating load and constant fan pushes zone below heating set point
+                if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt < 0.0 &&
+                    SensOutputOff - state.dataUnitarySystems->QToHeatSetPt < -DataHVACGlobals::SmallLoad) {
+                    state.dataUnitarySystems->HeatingLoad = true;
                     state.dataUnitarySystems->CoolingLoad = false;
-                    // No heating load and constant fan pushes zone below heating set point
-                    if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt < 0.0 &&
-                        SensOutputOff - state.dataUnitarySystems->QToHeatSetPt < -DataHVACGlobals::SmallLoad) {
+                    ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
+                }
+                break;
+            case DataHVACGlobals::SetPointType::SingleCooling:
+                state.dataUnitarySystems->HeatingLoad = false;
+                // No heating load and constant fan pushes zone above cooling set point
+                if (SensOutputOff > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0 &&
+                    SensOutputOff - state.dataUnitarySystems->QToCoolSetPt > DataHVACGlobals::SmallLoad) {
+                    state.dataUnitarySystems->HeatingLoad = false;
+                    state.dataUnitarySystems->CoolingLoad = true;
+                    ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
+                }
+                break;
+            case DataHVACGlobals::SetPointType::SingleHeatCool:
+                // zone temp above cooling and heating set point temps
+                if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0) {
+                    // zone pushed below heating set point
+                    if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
                         state.dataUnitarySystems->HeatingLoad = true;
                         state.dataUnitarySystems->CoolingLoad = false;
                         ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
                     }
-                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleCooling) {
-                    state.dataUnitarySystems->HeatingLoad = false;
-                    // No heating load and constant fan pushes zone above cooling set point
-                    if (SensOutputOff > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0 &&
-                        SensOutputOff - state.dataUnitarySystems->QToCoolSetPt > DataHVACGlobals::SmallLoad) {
+                    // zone temp below heating set point temp
+                } else if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0) {
+                    // zone pushed above cooling set point
+                    if (SensOutputOff > 0.0 && state.dataUnitarySystems->QToCoolSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
                         state.dataUnitarySystems->HeatingLoad = false;
                         state.dataUnitarySystems->CoolingLoad = true;
                         ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
                     }
-                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeatCool) {
-                    // zone temp above cooling and heating set point temps
-                    if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0) {
-                        // zone pushed below heating set point
-                        if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = true;
-                            state.dataUnitarySystems->CoolingLoad = false;
-                            ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
-                        }
-                        // zone temp below heating set point temp
-                    } else if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0) {
-                        // zone pushed above cooling set point
-                        if (SensOutputOff > 0.0 && state.dataUnitarySystems->QToCoolSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = false;
-                            state.dataUnitarySystems->CoolingLoad = true;
-                            ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
-                        }
-                    }
-                } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
-                    // zone temp above cooling and heating set point temps
-                    if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0) {
-                        // zone pushed into deadband
-                        if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToCoolSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = false;
-                            state.dataUnitarySystems->CoolingLoad = false;
-                            ZoneLoad = 0.0;
-                        }
-                        // zone pushed below heating set point
-                        if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = true;
-                            state.dataUnitarySystems->CoolingLoad = false;
-                            ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
-                        }
-                        // zone temp below heating set point temp
-                    } else if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0) {
-                        // zone pushed into deadband
-                        if (SensOutputOff > 0.0 && SensOutputOff - state.dataUnitarySystems->QToHeatSetPt > DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = false;
-                            state.dataUnitarySystems->CoolingLoad = false;
-                            ZoneLoad = 0.0;
-                        }
-                        // zone pushed above cooling set point
-                        if (SensOutputOff > 0.0 && SensOutputOff - state.dataUnitarySystems->QToCoolSetPt > DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = false;
-                            state.dataUnitarySystems->CoolingLoad = true;
-                            ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
-                        }
-                        // zone temp between set point temps
-                    } else if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0) {
-                        // zone pushed below heating set point
-                        if (SensOutputOff < 0.0 && SensOutputOff - state.dataUnitarySystems->QToHeatSetPt < -DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = true;
-                            state.dataUnitarySystems->CoolingLoad = false;
-                            ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
-                            // zone pushed above cooling set point
-                        } else if (SensOutputOff > 0.0 && SensOutputOff - state.dataUnitarySystems->QToCoolSetPt > DataHVACGlobals::SmallLoad) {
-                            state.dataUnitarySystems->HeatingLoad = false;
-                            state.dataUnitarySystems->CoolingLoad = true;
-                            ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
-                        }
-                    }
-                } else {
                 }
+                break;
+            case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+                // zone temp above cooling and heating set point temps
+                if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0) {
+                    // zone pushed into deadband
+                    if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToCoolSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
+                        state.dataUnitarySystems->HeatingLoad = false;
+                        state.dataUnitarySystems->CoolingLoad = false;
+                        ZoneLoad = 0.0;
+                    }
+                    // zone pushed below heating set point
+                    if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt - SensOutputOff > DataHVACGlobals::SmallLoad) {
+                        state.dataUnitarySystems->HeatingLoad = true;
+                        state.dataUnitarySystems->CoolingLoad = false;
+                        ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
+                    }
+                    // zone temp below heating set point temp
+                } else if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0) {
+                    // zone pushed into deadband
+                    if (SensOutputOff > 0.0 && SensOutputOff - state.dataUnitarySystems->QToHeatSetPt > DataHVACGlobals::SmallLoad) {
+                        state.dataUnitarySystems->HeatingLoad = false;
+                        state.dataUnitarySystems->CoolingLoad = false;
+                        ZoneLoad = 0.0;
+                    }
+                    // zone pushed above cooling set point
+                    if (SensOutputOff > 0.0 && SensOutputOff - state.dataUnitarySystems->QToCoolSetPt > DataHVACGlobals::SmallLoad) {
+                        state.dataUnitarySystems->HeatingLoad = false;
+                        state.dataUnitarySystems->CoolingLoad = true;
+                        ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
+                    }
+                    // zone temp between set point temps
+                } else if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0) {
+                    // zone pushed below heating set point
+                    if (SensOutputOff < 0.0 && SensOutputOff - state.dataUnitarySystems->QToHeatSetPt < -DataHVACGlobals::SmallLoad) {
+                        state.dataUnitarySystems->HeatingLoad = true;
+                        state.dataUnitarySystems->CoolingLoad = false;
+                        ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
+                        // zone pushed above cooling set point
+                    } else if (SensOutputOff > 0.0 && SensOutputOff - state.dataUnitarySystems->QToCoolSetPt > DataHVACGlobals::SmallLoad) {
+                        state.dataUnitarySystems->HeatingLoad = false;
+                        state.dataUnitarySystems->CoolingLoad = true;
+                        ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
+                    }
+                }
+                break;
+            default:
+                break;
             }
 
             // push iteration mode stack and set current mode

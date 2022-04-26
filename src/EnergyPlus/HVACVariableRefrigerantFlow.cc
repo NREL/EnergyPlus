@@ -10432,35 +10432,40 @@ void InitializeOperatingMode(EnergyPlusData &state,
                 if (ThisZoneNum > 0) {
                     SPTempHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ThisZoneNum);
                     SPTempLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ThisZoneNum);
-                    {
-                        auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ThisZoneNum));
-                        if (SELECT_CASE_var == DataHVACGlobals::SetPointType::Uncontrolled) { // Uncontrolled
-                            // MaxDeltaT denotes cooling, MinDeltaT denotes heating
-                        } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeating) {
-                            // if heating load, ZoneDeltaT will be negative
-                            ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+
+                    switch (state.dataHeatBalFanSys->TempControlType(ThisZoneNum)) {
+                    case DataHVACGlobals::SetPointType::Uncontrolled:
+                        // MaxDeltaT denotes cooling, MinDeltaT denotes heating
+                        break;
+                    case DataHVACGlobals::SetPointType::SingleHeating:
+                        // if heating load, ZoneDeltaT will be negative
+                        ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+                        state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
+                        break;
+                    case DataHVACGlobals::SetPointType::SingleCooling:
+                        // if cooling load, ZoneDeltaT will be positive
+                        ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
+                        state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
+                        break;
+                    case DataHVACGlobals::SetPointType::SingleHeatCool:
+                        ZoneDeltaT = state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi; //- SPTempHi and SPTempLo are same value
+                        if (ZoneDeltaT > 0.0) {
+                            state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
+                        } else {
                             state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
-                        } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleCooling) {
-                            // if cooling load, ZoneDeltaT will be positive
+                        }
+                        break;
+                    case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+                        if (state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi > 0.0) {
                             ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
                             state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                        } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::SingleHeatCool) {
-                            ZoneDeltaT = state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi; //- SPTempHi and SPTempLo are same value
-                            if (ZoneDeltaT > 0.0) {
-                                state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                            } else {
-                                state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
-                            }
-                        } else if (SELECT_CASE_var == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
-                            if (state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi > 0.0) {
-                                ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
-                                state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                            } else if (SPTempLo - state.dataHeatBalFanSys->ZT(ThisZoneNum) > 0.0) {
-                                ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
-                                state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
-                            }
-                        } else {
+                        } else if (SPTempLo - state.dataHeatBalFanSys->ZT(ThisZoneNum) > 0.0) {
+                            ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
+                            state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
                         }
+                        break;
+                    default:
+                        break;
                     }
                 }
             } else if (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority == ThermostatCtrlType::LoadPriority ||

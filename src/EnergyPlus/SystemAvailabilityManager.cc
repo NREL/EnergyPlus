@@ -2302,19 +2302,21 @@ namespace SystemAvailabilityManager {
         // Check if any zone temperature is above the cooling setpoint plus tolerance
         for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
             int ZoneNum = ZonePtrList(Index);
-            {
-                auto const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
-                if ((tstatType == DataHVACGlobals::SetPointType::SingleCooling) || (tstatType == DataHVACGlobals::SetPointType::SingleHeatCool)) {
-                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTolerance) {
-                        return true; // return on the first zone found
-                    }
-                } else if (tstatType == DataHVACGlobals::SetPointType::DualSetPointWithDeadBand) {
-                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTolerance) {
-                        return true; // return on the first zone found
-                    }
+            switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
+            case DataHVACGlobals::SetPointType::SingleCooling:
+            case DataHVACGlobals::SetPointType::SingleHeatCool:
+                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTolerance) {
+                    return true; // return on the first zone found
                 }
+                break;
+            case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTolerance) {
+                    return true; // return on the first zone found
+                }
+                break;
+            default:
+                break;
             }
         }
         return false;
