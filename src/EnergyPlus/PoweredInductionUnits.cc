@@ -472,7 +472,7 @@ void GetPIUs(EnergyPlusData &state)
                     "Air Nodes");
 
         AirNodeFound = false;
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 state.dataPowerInductionUnits->PIU(PIUNum).ADUNum = ADUNum;
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode;
@@ -709,7 +709,7 @@ void GetPIUs(EnergyPlusData &state)
                     "Air Nodes");
 
         AirNodeFound = false;
-        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+        for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
             if (state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                 //      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
                 state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataPowerInductionUnits->PIU(PIUNum).PriAirInNode;

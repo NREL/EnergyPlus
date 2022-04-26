@@ -6245,7 +6245,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum)
                             continue;
                         inletNodeADUNum = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeADUNum(inletNode);
-                        if (inletNodeADUNum > 0 && inletNodeADUNum <= state.dataDefineEquipment->NumAirDistUnits) {
+                        if (inletNodeADUNum > 0 && inletNodeADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size()) {
                             sysType_Num = DataZoneEquipment::ZoneEquip::AirDistUnit;
                             sysName = state.dataDefineEquipment->AirDistUnit(inletNodeADUNum).Name;
                             break;
