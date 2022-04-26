@@ -1494,7 +1494,7 @@ Real64 CoolingPanelParams::getCoolingPanelControlTemp(EnergyPlusData &state, int
     default: { // Should never get here
         ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
         ShowFatalError(state, "Preceding condition causes termination.");
-        return -99990;  // Compiler doesn't understand that a fatal error means the program will exit, so give an invalid value
+        return -99990; // Compiler doesn't understand that a fatal error means the program will exit, so give an invalid value
     } break;
     }
 }
