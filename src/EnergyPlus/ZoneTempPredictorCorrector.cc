@@ -1114,25 +1114,25 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         "\" - cannot use Comfort Control.");
                     ErrorsFound = true;
                 }
-                ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::NO);
+                ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::NO;
                 if (IZoneCount > 1) {
                     ComfortControlledZone(ComfortControlledZoneNum).AverageMethodName = cAlphaArgs(3);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "SpecificObject")) {
-                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::SPE);
+                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::SPE;
                     }
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "ObjectAverage")) {
-                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::OBJ);
+                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::OBJ;
                     }
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "PeopleAverage")) {
-                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum = static_cast<int>(AverageMethod::PEO);
+                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::PEO;
                     }
-                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum == 0) {
+                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethod == AverageMethod::NO) {
                         ShowSevereError(
                             state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                         ShowContinueError(state, "Allowed keys are SpecificObject, ObjectAverage, or PeopleAverage");
                         ErrorsFound = true;
                     }
-                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethodNum == static_cast<int>(AverageMethod::SPE)) {
+                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethod == AverageMethod::SPE) {
                         ComfortControlledZone(ComfortControlledZoneNum).AverageObjectName = cAlphaArgs(4);
                         if (UtilityRoutines::FindItem(cAlphaArgs(4), state.dataHeatBal->People) == 0) {
                             ShowSevereError(state,
@@ -7564,27 +7564,79 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
         }
 
         // Check Average method
-        {
-            auto const SELECT_CASE_var(ComfortControlledZone(RelativeZoneNum).AverageMethodNum);
-            if (SELECT_CASE_var == static_cast<int>(AverageMethod::NO)) {
-                PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
-                if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
-                } else {
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+        switch (ComfortControlledZone(RelativeZoneNum).AverageMethod) {
+        case AverageMethod::NO:
+            PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
+            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
+                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+            } else {
+                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+            }
+            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
+                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+            break;
+        case AverageMethod::SPE:
+            PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
+            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
+                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+            } else {
+                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+            }
+            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
+                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+            break;
+        case AverageMethod::OBJ:
+            ObjectCount = 0;
+            SetPointLo = 0.0;
+            SetPointHi = 0.0;
+            for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
+                    ++ObjectCount;
+                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                    SetPointLo += Tset;
+                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                        SetPointHi += Tset;
+                    }
                 }
-                if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
-            } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::SPE)) {
-                PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
-                if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
-                } else {
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+            }
+            SetPointLo /= ObjectCount;
+            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= ObjectCount;
+            break;
+        case AverageMethod::PEO:
+            PeopleCount = 0.0;
+            SetPointLo = 0.0;
+            SetPointHi = 0.0;
+            for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
+                    NumberOccupants = state.dataHeatBal->People(PeopleNum).NumberOfPeople *
+                                      GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr);
+                    PeopleCount += NumberOccupants;
+                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                    SetPointLo += Tset * NumberOccupants;
+                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                        SetPointHi += Tset * NumberOccupants;
+                    }
                 }
-                if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
-            } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::OBJ)) {
+            }
+            if (PeopleCount > 0) {
+                SetPointLo /= PeopleCount;
+                if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= PeopleCount;
+            } else {
+                if (ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex == 0) {
+                    ShowWarningMessage(state,
+                                       "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + Zone(ActualZoneNum).Name +
+                                           " is zero. The People Average option is not used.");
+                    ShowContinueError(state, "The Object Average option is used instead. Simulation continues .....");
+                    ShowContinueErrorTimeStamp(state, "Occurrence info:");
+                }
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " +
+                                                   Zone(ActualZoneNum).Name + " is still zero. The People Average option is not used",
+                                               ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex,
+                                               PeopleCount,
+                                               PeopleCount);
                 ObjectCount = 0;
                 SetPointLo = 0.0;
                 SetPointHi = 0.0;
@@ -7601,61 +7653,10 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
                 }
                 SetPointLo /= ObjectCount;
                 if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= ObjectCount;
-            } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::PEO)) {
-                PeopleCount = 0.0;
-                SetPointLo = 0.0;
-                SetPointHi = 0.0;
-                for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                    if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
-                        NumberOccupants = state.dataHeatBal->People(PeopleNum).NumberOfPeople *
-                                          GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr);
-                        PeopleCount += NumberOccupants;
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
-                        SetPointLo += Tset * NumberOccupants;
-                        if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
-                            SetPointHi += Tset * NumberOccupants;
-                        }
-                    }
-                }
-                if (PeopleCount > 0) {
-                    SetPointLo /= PeopleCount;
-                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= PeopleCount;
-                } else {
-                    // recurring warnings
-                    //          ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount = &
-                    //                                           ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount + 1
-                    if (ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex == 0) {
-                        ShowWarningMessage(state,
-                                           "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " + Zone(ActualZoneNum).Name +
-                                               " is zero. The People Average option is not used.");
-                        ShowContinueError(state, "The Object Average option is used instead. Simulation continues .....");
-                        ShowContinueErrorTimeStamp(state, "Occurrence info:");
-                    }
-                    ShowRecurringWarningErrorAtEnd(state,
-                                                   "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " +
-                                                       Zone(ActualZoneNum).Name + " is still zero. The People Average option is not used",
-                                                   ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex,
-                                                   PeopleCount,
-                                                   PeopleCount);
-                    ObjectCount = 0;
-                    SetPointLo = 0.0;
-                    SetPointHi = 0.0;
-                    for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                        if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
-                            ++ObjectCount;
-                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
-                            SetPointLo += Tset;
-                            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
-                                SetPointHi += Tset;
-                            }
-                        }
-                    }
-                    SetPointLo /= ObjectCount;
-                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= ObjectCount;
-                }
             }
+            break;
+        default:
+            break;
         }
 
         // Assign setpoint
