@@ -68,12 +68,7 @@ struct IPShortCutsData : BaseGlobalStruct
     std::string cCurrentModuleObject;
     void clear_state() override
     {
-        this->cAlphaFieldNames.deallocate();
-        this->cAlphaArgs.deallocate();
-        this->lAlphaFieldBlanks.deallocate();
-        this->cNumericFieldNames.deallocate();
-        this->rNumericArgs.deallocate();
-        this->lNumericFieldBlanks.deallocate();
+        *this = IPShortCutsData();
     }
 };
 

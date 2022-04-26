@@ -233,6 +233,8 @@ namespace CondenserLoopTowers {
         Array1D_string AlphArray(16);      // Character string input data array
         Array1D_string AlphArray2(1);      // Character string input data array for VS tower coefficients
 
+        std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
+
         constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> EvapLossNamesUC{"LOSSFACTOR", "SATURATEDEXIT"};
         constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"NOMINALCAPACITY", "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"};
 
@@ -241,9 +243,9 @@ namespace CondenserLoopTowers {
         NumTwoSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
         NumVariableSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeed);
         NumVSMerkelTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeedMerkel);
-        state.dataCondenserLoopTowers->NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
+        int NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
-        if (state.dataCondenserLoopTowers->NumSimpleTowers <= 0)
+        if (NumSimpleTowers <= 0)
             ShowFatalError(state,
                            "No Cooling Tower objects found in input, however, a branch object has specified a cooling tower. Search the input for "
                            "CoolingTower to determine the cause for this error.");
@@ -253,8 +255,8 @@ namespace CondenserLoopTowers {
         if (allocated(state.dataCondenserLoopTowers->towers)) return;
 
         // Allocate data structures to hold tower input data, report data and tower inlet conditions
-        state.dataCondenserLoopTowers->towers.allocate(state.dataCondenserLoopTowers->NumSimpleTowers);
-        state.dataCondenserLoopTowers->UniqueSimpleTowerNames.reserve(state.dataCondenserLoopTowers->NumSimpleTowers);
+        state.dataCondenserLoopTowers->towers.allocate(NumSimpleTowers);
+        UniqueSimpleTowerNames.reserve(NumSimpleTowers);
         // Allocate variable-speed tower structure with data specific to this type
         if (NumVariableSpeedTowers > 0) {
             // Allow users to input model coefficients other than default
@@ -280,12 +282,8 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
-                                                     AlphArray(1),
-                                                     cCurrentModuleObject,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
             tower.thisTowerNum = TowerNum;
@@ -651,12 +649,8 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
-                                                     AlphArray(1),
-                                                     cCurrentModuleObject,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
@@ -1059,12 +1053,8 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
-                                                     AlphArray(1),
-                                                     cCurrentModuleObject,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
 
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.VSTower = VariableSpeedTowerNumber;
@@ -1594,12 +1584,8 @@ namespace CondenserLoopTowers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataCondenserLoopTowers->UniqueSimpleTowerNames,
-                                                     AlphArray(1),
-                                                     cCurrentModuleObject,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
             tower.thisTowerNum = TowerNum;

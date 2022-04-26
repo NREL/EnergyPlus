@@ -433,7 +433,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     // exterior windows in Daylighting:Detailed enclosures. Note that it is possible for a
     // Daylighting:Detailed enclosure to have zero exterior windows of its own, but it may have an interior
     // through which daylight passes from adjacent enclosures with exterior windows.
-    if (state.dataDaylightingData->TotRefPoints == 0) return;
+    if ((int)state.dataDaylightingData->DaylRefPt.size() == 0) return;
     if (state.dataGlobal->BeginSimFlag) {
         state.dataDaylightingManager->TotWindowsWithDayl = 0;
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
@@ -484,16 +484,18 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     }
 
     // Zero daylighting factor arrays
-    if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+    if ((int)state.dataDaylightingDevicesData->TDDPipe.size() > 0) {
         if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             state.dataDaylightingManager->TDDTransVisBeam = 0.0;
             state.dataDaylightingManager->TDDFluxInc = 0.0;
             state.dataDaylightingManager->TDDFluxTrans = 0.0;
         } else {
-            state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->HourOfDay, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
-            state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
-            state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) =
+            state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->HourOfDay, {1, (int)state.dataDaylightingDevicesData->TDDPipe.size()}) =
                 0.0;
+            state.dataDaylightingManager->TDDFluxInc(
+                state.dataGlobal->HourOfDay, {1, 4}, {1, (int)state.dataDaylightingDevicesData->TDDPipe.size()}) = 0.0;
+            state.dataDaylightingManager->TDDFluxTrans(
+                state.dataGlobal->HourOfDay, {1, 4}, {1, (int)state.dataDaylightingDevicesData->TDDPipe.size()}) = 0.0;
         }
     }
 
@@ -570,7 +572,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                     "! <Sky Daylight Factors>, Sky Type, MonthAndDay, Daylighting Control Name, Enclosure Name, "
                     "Window Name, Reference Point, Daylight Factor\n");
                 print(state.files.eio, Format_700);
-                for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+                for (int controlNum = 1; controlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++controlNum) {
                     auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
                     int enclNum = thisDaylightControl.enclIndex;
                     auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
@@ -655,7 +657,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->CreateDFSReportFile = false;
     }
 
-    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+    for (int controlNum = 1; controlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++controlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
         int enclNum = thisDaylightControl.enclIndex;
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
@@ -779,7 +781,7 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
     }
 
     // Calc for daylighting reference points for daylighting controls that use SplitFlux method
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
         if (state.dataDaylightingData->daylightControl(daylightCtrlNum).DaylightMethod != DataDaylighting::DaylightingMethod::SplitFlux) continue;
         // Skip enclosures with no exterior windows or in adjacent enclosure(s) with which an interior window is shared
         if (state.dataDaylightingData->enclDaylight(state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex).NumOfDayltgExtWins == 0)
@@ -788,8 +790,8 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
     }
     if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
         // Calc for illuminance maps
-        if (state.dataDaylightingData->TotIllumMaps > 0) {
-            for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+        if ((int)state.dataDaylightingData->IllumMap.size() > 0) {
+            for (int MapNum = 1; MapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++MapNum) {
                 int mapZoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex;
                 if (state.dataGlobal->WarmupFlag) {
                     DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(mapZoneNum).Name);
@@ -1270,9 +1272,9 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     auto &U23 = state.dataDaylightingManager->U23;
     auto &VIEWVC2 = state.dataDaylightingManager->VIEWVC2;
 
-    if (state.dataDaylightingManager->mapFirstTime && state.dataDaylightingData->TotIllumMaps > 0) {
+    if (state.dataDaylightingManager->mapFirstTime && (int)state.dataDaylightingData->IllumMap.size() > 0) {
         IL = -999;
-        for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+        for (int MapNum = 1; MapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++MapNum) {
             IL = max(IL, state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints);
         }
         state.dataDaylightingManager->MapErrIndex.dimension(IL, state.dataSurface->TotSurfaces, 0);
@@ -2348,7 +2350,7 @@ void InitializeCFSDaylighting(EnergyPlusData &state,
     if (CalledFrom == DataDaylighting::CalledFor::MapPoint) {
 
         if (!allocated(state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap)) {
-            state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap.allocate(NRefPts, state.dataDaylightingData->TotIllumMaps);
+            state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap.allocate(NRefPts, (int)state.dataDaylightingData->IllumMap.size());
         }
 
         AllocateForCFSRefPointsGeometry(state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl);
@@ -2374,12 +2376,12 @@ void InitializeCFSDaylighting(EnergyPlusData &state,
         NTrnBasis = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurFenState).Trn.NBasis;
 
         if (CalledFrom == DataDaylighting::CalledFor::MapPoint) {
-            if (state.dataDaylightingData->TotIllumMaps > 0) {
+            if ((int)state.dataDaylightingData->IllumMap.size() > 0) {
                 // illuminance map for each state
                 if (!allocated(state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap)) {
                     state.dataBSDFWindow->ComplexWind(IWin)
                         .DaylghtGeom(CurFenState)
-                        .IlluminanceMap.allocate(NRefPts, state.dataDaylightingData->TotIllumMaps);
+                        .IlluminanceMap.allocate(NRefPts, (int)state.dataDaylightingData->IllumMap.size());
                 }
 
                 AllocateForCFSRefPointsState(state,
@@ -4051,7 +4053,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     state.dataDaylightingManager->maxNumRefPtInAnyDaylCtrl = 0;
     state.dataDaylightingManager->maxNumRefPtInAnyEncl = 0;
     // Loop through all daylighting controls to find total reference points in each enclosure
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
         int numRefPoints = state.dataDaylightingData->daylightControl(daylightCtrlNum).TotalDaylRefPoints;
         state.dataDaylightingManager->maxNumRefPtInAnyDaylCtrl = max(numRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyDaylCtrl);
     }
@@ -4379,13 +4381,13 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Output:IlluminanceMap";
-    state.dataDaylightingData->TotIllumMaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int TotIllumMaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-    state.dataDaylightingData->IllumMap.allocate(state.dataDaylightingData->TotIllumMaps);
-    state.dataDaylightingData->IllumMapCalc.allocate(state.dataDaylightingData->TotIllumMaps);
+    state.dataDaylightingData->IllumMap.allocate(TotIllumMaps);
+    state.dataDaylightingData->IllumMapCalc.allocate(TotIllumMaps);
 
-    if (state.dataDaylightingData->TotIllumMaps > 0) {
-        for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+    if (TotIllumMaps > 0) {
+        for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      MapNum,
@@ -4520,11 +4522,11 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         ConvertCaseToLower(state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cAlphaArgs(2));
         state.dataIPShortCut->cAlphaArgs(1).erase(1);
         state.dataIPShortCut->cAlphaArgs(1) += state.dataIPShortCut->cAlphaArgs(2).substr(1);
-        print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", state.dataDaylightingData->TotIllumMaps, state.dataIPShortCut->cAlphaArgs(1));
+        print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, state.dataIPShortCut->cAlphaArgs(1));
     }
 
     // Check for illuminance maps associated with this zone
-    for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+    for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
         if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex > 0) {
             auto &zone(Zone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex));
             // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
@@ -4739,7 +4741,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         }
     } // MapNum
     ZoneMsgDone.dimension(state.dataGlobal->NumOfZones, false);
-    for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+    for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
         if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex == 0) continue;
         int enclNum = state.dataDaylightingData->IllumMap(MapNum).enclIndex;
         if (!state.dataDaylightingData->enclDaylight(enclNum).hasSplitFluxDaylighting &&
@@ -4752,12 +4754,12 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     }
     ZoneMsgDone.deallocate();
 
-    if (state.dataDaylightingData->TotIllumMaps > 0) {
+    if (TotIllumMaps > 0) {
         print(state.files.eio,
               "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
               "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}\n");
     }
-    for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+    for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
         print(state.files.eio,
               "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
               state.dataDaylightingData->IllumMap(MapNum).Name,
@@ -4794,15 +4796,15 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
     constexpr Real64 FractionTolerance(0.001);
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Daylighting:Controls";
-    state.dataDaylightingData->totDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataDaylightingData->daylightControl.allocate(state.dataDaylightingData->totDaylightingControls);
+    int totDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataDaylightingData->daylightControl.allocate(totDaylightingControls);
     Array1D<bool> spaceHasDaylightingControl;
     spaceHasDaylightingControl.dimension(state.dataGlobal->numSpaces, false);
     // Reset to zero in case this is called more than once in unit tests
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints = 0;
     }
-    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+    for (int controlNum = 1; controlNum <= totDaylightingControls; ++controlNum) {
         state.dataIPShortCut->cAlphaArgs = "";
         state.dataIPShortCut->rNumericArgs = 0.0;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -5131,7 +5133,7 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
     NewAspectRatio = 1.0;
 
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
-    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+    for (int controlNum = 1; controlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++controlNum) {
         auto &daylCntrl = state.dataDaylightingData->daylightControl(controlNum);
         auto &zone(state.dataHeatBal->Zone(daylCntrl.zoneIndex));
 
@@ -5261,8 +5263,8 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
     int NumNumber;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Daylighting:ReferencePoint";
-    state.dataDaylightingData->TotRefPoints = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataDaylightingData->DaylRefPt.allocate(state.dataDaylightingData->TotRefPoints);
+    int TotRefPoints = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    state.dataDaylightingData->DaylRefPt.allocate(TotRefPoints);
     for (auto &pt : state.dataDaylightingData->DaylRefPt) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
@@ -5331,7 +5333,7 @@ void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state)
 
     ErrorsFound = false;
 
-    for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+    for (PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
         SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
         if (SurfNum > 0) {
             int const pipeEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
@@ -5350,7 +5352,7 @@ void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state)
         }
     } // PipeNum
 
-    for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+    for (ShelfNum = 1; ShelfNum <= (int)state.dataDaylightingDevicesData->Shelf.size(); ++ShelfNum) {
         SurfNum = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
         if (SurfNum == 0) {
             // should not come here (would have already been caught in shelf get input), but is an error
@@ -5367,7 +5369,7 @@ void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
     for (int iShadeCtrl = 1; iShadeCtrl <= state.dataSurface->TotWinShadingControl; ++iShadeCtrl) {
         if (state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName.empty()) continue;
         int found = -1;
-        for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
             if (UtilityRoutines::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName,
                                             state.dataDaylightingData->daylightControl(daylightCtrlNum).Name)) {
                 found = daylightCtrlNum;
@@ -5999,7 +6001,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
     for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
         state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
     }
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
         thisDaylightControl.PowerReductionFactor = 1.0;
         if (state.dataEnvrn->PreviousSolRadPositive) {
@@ -6051,12 +6053,12 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
         }
     }
 
-    if (state.dataEnvrn->SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+    if (state.dataEnvrn->SunIsUp && (int)state.dataDaylightingDevicesData->TDDPipe.size() > 0) {
         if (initSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
         DayltgInteriorTDDIllum(state);
     }
 
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
         // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
@@ -6209,7 +6211,7 @@ void manageDaylighting(EnergyPlusData &state)
         }
         DayltgElecLightingControl(state);
     } else if (state.dataDaylightingData->mapResultsToReport && state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
-        for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+        for (int MapNum = 1; MapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++MapNum) {
             ReportIllumMap(state, MapNum);
         }
         state.dataDaylightingData->mapResultsToReport = false;
@@ -7261,7 +7263,7 @@ void DayltgInteriorTDDIllum(EnergyPlusData &state)
     }
 
     // Calculate and report TDD visible transmittances
-    for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+    for (PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
 
         state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam =
             state.dataGlobal->WeightNow * state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->HourOfDay, PipeNum) +
@@ -7325,13 +7327,13 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     Real64 XRAN;  // Random number between 0 and 1
     bool ScheduledAvailable;
 
-    if (state.dataDaylightingData->totDaylightingControls == 0) return;
+    if ((int)state.dataDaylightingData->daylightControl.size() == 0) return;
     // Reset space power reduction factors
     for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
         state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
     }
 
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
         if (thisDaylightControl.DaylightMethod != DataDaylighting::DaylightingMethod::SplitFlux) {
@@ -7446,8 +7448,8 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     } // end daylighting control loop
 
     //  IF(DataDaylighting::TotIllumMaps > 0 .and. .not. DoingSizing .and. .not. WarmupFlag .and. .not. KickoffSimulation) THEN
-    if (state.dataDaylightingData->TotIllumMaps > 0 && !state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
-        for (int mapNum = 1; mapNum <= state.dataDaylightingData->TotIllumMaps; ++mapNum) {
+    if ((int)state.dataDaylightingData->IllumMap.size() > 0 && !state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
+        for (int mapNum = 1; mapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapNum) {
             if (state.dataGlobal->TimeStep == 1) state.dataDaylightingData->mapResultsToReport = false;
             for (IL = 1; IL <= state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints; ++IL) {
                 state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPtHr(IL) +=
@@ -9454,7 +9456,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
 
     //              Initialize reference point illuminance and window background luminance
 
-    for (int mapNum = 1; mapNum <= state.dataDaylightingData->TotIllumMaps; ++mapNum) {
+    for (int mapNum = 1; mapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapNum) {
         auto &thisMap = state.dataDaylightingData->IllumMapCalc(mapNum);
         int enclNum = thisMap.enclIndex;
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
@@ -9714,9 +9716,9 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
     if (state.dataDaylightingManager->ReportIllumMap_firstTime) {
         state.dataDaylightingManager->ReportIllumMap_firstTime = false;
-        FirstTimeMaps.dimension(state.dataDaylightingData->TotIllumMaps, true);
-        EnvrnPrint.dimension(state.dataDaylightingData->TotIllumMaps, true);
-        SavedMnDy.allocate(state.dataDaylightingData->TotIllumMaps);
+        FirstTimeMaps.dimension((int)state.dataDaylightingData->IllumMap.size(), true);
+        EnvrnPrint.dimension((int)state.dataDaylightingData->IllumMap.size(), true);
+        SavedMnDy.allocate((int)state.dataDaylightingData->IllumMap.size());
     }
 
     if (FirstTimeMaps(MapNum)) {
@@ -9752,7 +9754,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
     state.dataDaylightingData->IllumMap(MapNum).pointsHeader = "";
     int rCount = 0;
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
         if (state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex == state.dataDaylightingData->IllumMap(MapNum).zoneIndex) {
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
@@ -9901,7 +9903,7 @@ void CloseReportIllumMaps(EnergyPlusData &state)
     using DataStringGlobals::CharTab;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    if (state.dataDaylightingData->TotIllumMaps > 0) {
+    if ((int)state.dataDaylightingData->IllumMap.size() > 0) {
         // Write map header
         if (state.dataDaylightingData->MapColSep == CharTab) {
             state.files.map.filePath = state.files.outputMapTabFilePath;
@@ -9913,7 +9915,7 @@ void CloseReportIllumMaps(EnergyPlusData &state)
 
         state.files.map.ensure_open(state, "CloseReportIllumMaps");
 
-        for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+        for (int MapNum = 1; MapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++MapNum) {
             if (!state.dataDaylightingData->IllumMap(MapNum).mapFile->good()) continue; // fatal error processing
 
             const auto mapLines = state.dataDaylightingData->IllumMap(MapNum).mapFile->getLines();
@@ -10273,7 +10275,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         }
     }
 
-    for (int mapNum = 1; mapNum <= state.dataDaylightingData->TotIllumMaps; ++mapNum) {
+    for (int mapNum = 1; mapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapNum) {
         int numExtWin = enclExtWin(state.dataDaylightingData->IllumMapCalc(mapNum).enclIndex);
         int numMapRefPts = state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints;
 

@@ -327,7 +327,7 @@ namespace DualDuct {
                 TestCompSet(
                     state, CurrentModuleObject + ":COOL", state.dataDualDuct->dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
-                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                     if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                         state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum;
                         state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum;
@@ -491,7 +491,7 @@ namespace DualDuct {
                 TestCompSet(
                     state, CurrentModuleObject + ":COOL", state.dataDualDuct->dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
-                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                     if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                         state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum;
                         state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 = state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum;
@@ -705,7 +705,7 @@ namespace DualDuct {
                 }
                 // checks on this are done later
 
-                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                     if (state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                         state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum;
                         state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum2 =
