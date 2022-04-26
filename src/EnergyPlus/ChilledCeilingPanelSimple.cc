@@ -1375,7 +1375,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
 
         if (CoolingPanelOn) {
 
-            this->SetCoolingPanelControlTemp(state, ControlTemp, ZoneNum);
+            ControlTemp = this->getCoolingPanelControlTemp(state, ZoneNum);
 
             SetPointTemp = GetCurrentScheduleValue(state, this->ColdSetptSchedPtr);
             OffTempCool = SetPointTemp - 0.5 * this->ColdThrottlRange;
@@ -1463,7 +1463,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     this->RadPower = RadHeat;
 }
 
-void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int const ZoneNum) const
+Real64 CoolingPanelParams::getCoolingPanelControlTemp(EnergyPlusData &state, int const ZoneNum) const
 {
 
     // SUBROUTINE INFORMATION:
@@ -1477,24 +1477,24 @@ void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real6
 
     switch (this->controlType) {
     case ClgPanelCtrlType::MAT: {
-        ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+        return state.dataHeatBalFanSys->MAT(ZoneNum);
     } break;
     case ClgPanelCtrlType::MRT: {
-        ControlTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+        return state.dataHeatBal->ZoneMRT(ZoneNum);
     } break;
     case ClgPanelCtrlType::Operative: {
-        ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+        return 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
     } break;
     case ClgPanelCtrlType::ODB: {
-        ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+        return state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
     } break;
     case ClgPanelCtrlType::OWB: {
-        ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
+        return state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
     } break;
     default: { // Should never get here
-        ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
         ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
         ShowFatalError(state, "Preceding condition causes termination.");
+        return -99990;  // Compiler doesn't understand that a fatal error means the program will exit, so give an invalid value
     } break;
     }
 }
