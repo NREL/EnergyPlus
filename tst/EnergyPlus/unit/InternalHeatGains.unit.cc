@@ -2602,3 +2602,52 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
     EXPECT_NEAR(calculatedResult3, expectedResult3, tol);
     EXPECT_NEAR(calculatedResult4, expectedResult4, tol);
 }
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_GetHeatColdStressTemp){
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
+
+        "Schedule:Constant,Schedule1,,1.0;",
+
+        "People,",
+        "  Main Zone People,        !- Name",
+        "  Main Zone,               !- Zone or ZoneList Name",
+        "  Schedule1,               !- Number of People Schedule Name",
+        "  people,                  !- Number of People Calculation Method",
+        "  3.000000,                !- Number of People",
+        "  ,                        !- People per Zone Floor Area{ person / m2 }",
+        "  ,                        !- Zone Floor Area per Person{ m2 / person }",
+        "  0.3000000,               !- Fraction Radiant",
+        "  0.5,                     !- Sensible Heat Fraction",
+        "  Schedule1,               !- Activity Level Schedule Name",
+        "  3.82E-8,                 !- Carbon Dioxide Generation Rate{ m3 / s - W }",
+        "  11.5,                    !- Cold Stress Temperature Thresh [C]",
+        "  30.5;                    !- Heat Stress Temperature Thresh [C]",
+
+        "Zone,",
+        "  Main Zone,               !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // cold and heat threshold is properly read
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    EXPECT_EQ(state->dataHeatBal->People(1).ColdStressTempThresh, 11.5);
+    EXPECT_EQ(state->dataHeatBal->People(1).HeatStressTempThresh, 30.5);
+}

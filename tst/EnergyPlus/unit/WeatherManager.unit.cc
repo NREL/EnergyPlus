@@ -1794,3 +1794,34 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     WeatherManager::SetCurrentWeather(*state);
     ASSERT_FALSE(state->dataEnvrn->IsRain);
 }
+
+TEST_F(EnergyPlusFixture, WeatherManager_GetReportPeriodData) {
+
+    std::string const idf_objects = delimited_string({
+    "Output:Table:ReportPeriod,",
+    "ThermalResilienceReportTimeWinter,  !- field Name,",
+    "ThermalResilienceSummary,     !- field Report Name,",
+    ",                             !- Begin Year",
+    "1,                            !- Begin Month",
+    "1,                            !- Begin Day of Month",
+    "8,                            !- Begin Hour of Day",
+    "    ,                             !- End Year",
+    "1,                            !- End Month",
+    "3,                            !- End Day of Month",
+    "18;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 1;
+
+    GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startMonth, 1);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startHour, 8);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endMonth, 1);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endDay, 3);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endHour, 18);
+
+}
