@@ -34,7 +34,7 @@ jobs:
         TAG_NAME=$(echo $release_info | jq -r -e '.tag_name')
         echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
-        echo $release_info | jq -r '.assets[].browser_download_url' > download_lists.txt
+        echo $release_info | jq -r '.assets[].browser_download_url | select(. | contains("EnergyPlus-"))' > download_lists.txt
         echo "Found the following assets"
         cat download_lists.txt
         echo "Downloading all via aria"
