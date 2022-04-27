@@ -24,7 +24,7 @@ jobs:
         if [ -z "$TAG_NAME" ]; then
           url=https://api.github.com/repos/NREL/EnergyPlus/releases/latest
         else
-          url=https://api.github.com/repos/NREL/EnergyPlus/releases/tags/
+          url=https://api.github.com/repos/NREL/EnergyPlus/releases/tags/$TAG_NAME
         fi;
 
         echo "Querying url=$url"
