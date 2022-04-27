@@ -440,9 +440,6 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             { // "sqlite"
                 sqlite = boolean_choice(find_input(fields, "output_sqlite"));
             }
-            { // "rmd"
-                rmd = boolean_choice(find_input(fields, "output_rmd"));
-            }
         }
     }
 }
