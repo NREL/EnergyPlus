@@ -54,7 +54,7 @@ namespace EnergyPlus {
 enum class HVACSystemRootSolverAlgorithm : int
 {
     Invalid = -1,
-    RegulaFalsi = 0,
+    RegulaFalsi,
     Bisection,
     RegulaFalsiThenBisection,
     BisectionThenRegulaFalsi,
