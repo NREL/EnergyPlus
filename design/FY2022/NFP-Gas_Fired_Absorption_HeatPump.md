@@ -89,15 +89,15 @@ HeatPump:AirToWater:FuelFired:Heating,
 
 ### IDD entry for HeatPump:AirToWater:FuelFired:Heating ###
 
-A HeatPump:AirToWater:FuelFired:Heating object defines the basic inputs for an equation-fit gas-fired absorption heat pump. 
+A HeatPump:AirToWater:FuelFired:Heating object defines the basic inputs for an equation-fit gas-fired (or generally fuel-fired) absorption heat pump. 
 ```
 HeatPump:AirToWater:FuelFired:Heating,
-  \memo The object defines a gas-fired absorption heat pump based on equation-fit models.
+  \memo The object defines a fuel-fired absorption heat pump based on equation-fit models.
   \min-fields 10
   A1 , \field Name
        \required-field
        \reference HeatPumpAirToWaterFuelFiredHeatingNames
-       \note Name of the gas fired absorption heat pump system system
+       \note Name of the fuel fired absorption heat pump system system
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -165,7 +165,7 @@ HeatPump:AirToWater:FuelFired:Heating,
        \key ConstantFlow
        \key LeavingSetpointModulated
        \default NotModulated
-       \note Flow Mode for the water side of the gas-fired absorption heat pump
+       \note Flow Mode for the water side of the fuel-fired absorption heat pump
   A9 , \field Outdoor Air Temperature Curve Input Variable
        \required-field
        \type choice
@@ -248,7 +248,153 @@ HeatPump:AirToWater:FuelFired:Heating,
        \note Standby Electric Power in [W]
 ```
 
-A companion gas fired heat pump entry named HeatPump:AirToWater:FuelFired:Cooling with similar sets of input fields will also be added to the IDD file. The companion coil will be dealing with the input for the cooling mode operations and equipment sizing. 
+### IDD entry for HeatPump:AirToWater:FuelFired:Cooling ###
+
+A companion gas fired heat pump entry named HeatPump:AirToWater:FuelFired:Cooling with similar sets of input fields will also be added to the IDD file. The companion coil will be dealing with the input for the cooling mode operations and equipment sizing. For the input fields for the companion HeatPump:AirToWater:FuelFired:Cooling are similar to those for HeatPump:AirToWater:FuelFired:Heating, with the biggest difference being that the defrost options are no longer needed. 
+
+```
+HeatPump:AirToWater:FuelFired:Cooling,
+  \memo The object defines a fuel-fired absorption heat pump based on equation-fit models.
+  \min-fields 10
+  A1 , \field Name
+       \required-field
+       \reference HeatPumpAirToWaterFuelFiredCoolingNames
+       \note Name of the fuel-fired absorption heat pump system system
+  A2 , \field Water Inlet Node Name
+       \required-field
+       \type node
+       \note Inlet node name of the water side connection
+  A3 , \field Water Outlet Node Name
+       \required-field
+       \type node
+       \note Outlet node name of the water side connection
+  A4 , \field Air Source Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note This is the air source node name, which is the condenser side of the heat pump in cooling mode.
+       \note Enter the name of an OutdoorAir:Node object.
+  A5,  \field Companion Heating Heat Pump Name
+       \note The name of the companion HeatPump:AirToWater:FuelFired:Heating object
+       \note This field is used for a heat pump with switchable heating and cooling mode.
+       \type object-list
+       \object-list HeatPumpAirToWaterFuelFiredHeatingNames
+  A6 , \field Fuel Type
+       \required-field
+       \type choice
+       \key NaturalGas
+       \key Propane
+       \key FuelOilNo1
+       \key FuelOilNo2
+       \key Diesel
+       \key Gasoline
+       \key Coal
+       \key OtherFuel1
+       \key OtherFuel2
+       \default NaturalGas
+       \note Fuel Type (NaturalGas, Propane, Gasoline, Diesel etc.)
+  A7 , \field End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default General
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+  N1 , \field Nominal Cooling Capacity
+       \autosizable
+       \minimum> 0
+       \units W
+       \note Nominal Cooling Capacity in [W] (autosizeable)
+  N2 , \field Design Flow Rate (autosizeable)
+       \autosizable
+       \minimum> 0
+       \units m3/s
+       \note Design Flow Rate in m3/s (autosizeable)
+  N3 , \field Design Supply Temperature
+       \default 7
+       \units C
+       \note Design Supply Temperature in [degree C]
+  N4 , \field Design Temperature Lift
+       \autosizable
+       \default 4
+       \units deltaC
+       \note Design Temperature Lift in [degree C]
+       \note For cooling this is the designed water temperature drop of the waterside outlet
+  N5 , \field Sizing Factor
+       \minimum 1.0
+       \default 1.0
+       \note Sizing Factor for equipment sizing
+  A8 , \field Flow Mode
+       \required-field
+       \type choice
+       \key NotModulated
+       \key ConstantFlow
+       \key LeavingSetpointModulated
+       \default NotModulated
+       \note Flow Mode for the water side of the fuel-fired absorption heat pump
+  A9 , \field Outdoor Air Temperature Curve Input Variable
+       \required-field
+       \type choice
+       \key DryBulb
+       \key WetBulb
+       \default DryBulb
+       \note Outdoor air temperature curve input variable;
+       \note The options are Outdoor Air Dry Bulb or Wet Bulb temperature for curves
+  A10 , \field Water Temperature Curve Input Variable
+       \required-field
+       \type choice
+       \key EnteringCondenser
+       \key LeavingCondenser
+       \default EnteringCondenser
+       \note Water Temperature curve input variable - Condenser Entering or Leaving Water Temperature for curves
+  A11, \field Normalized Capacity Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BivariateFunctions
+       \note: CAPFT - Normalized Capacity Function of Temperature Curve name,
+       \note which is a biquadratic curve or a lookup table.
+  A12, \field Fuel Energy Input Ratio Function of Temperature Curve name
+       \required-field
+       \type object-list
+       \object-list BivariateFunctions
+       \note EIRFT - Fuel Energy Input Ratio Function of Temperature Curve name,
+       \note which is a biquadratic curve or a lookup table.
+  A13, \field Fuel Energy Input Ratio Function of PLR Curve Name
+       \required-field
+       \type object-list
+       \object-list UnivariateFunctions
+       \note EIRFPLR - Fuel Energy Input Ratio Function of Part Load Ratio(PLR) Curve name,
+       \note which is a cubic curve or a lookup table.
+  N6 , \field Minimum Part Load Ratio
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.1
+       \note Minimum Part Load Ratio (PLR) in between 0 and 1
+  N7 , \field Maximum Part Load Ratio
+       \minimum> 0.0
+       \default 1.0
+       \note Maximum Part Load Ratio (PLR) in between 0 and 1
+  A14, \field Cycling Ratio Factor Curve Name
+       \type object-list
+       \object-list UnivariateFunctions
+       \note Cycling Ratio Factor (CRF) Curve Name,
+       \note which is a cubic curve or a lookup table function of Cycling Ratio (defined as = PLR/PLRmin).
+  N8 , \field Nominal Auxiliary Electric Power
+       \units W
+       \minimum 0
+       \note Nominal Auxiliary Electric Power in [W]
+  A15, \field Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
+       \type object-list
+       \object-list BivariateFunctions
+       \note Auxiliary Electric EIRFT - Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name,
+       \note which is a biquadratic curve or a lookup table.
+       \note which accounts for system internal fans, pumps, and electronics
+  A16, \field Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
+       \type object-list
+       \note Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name,
+       \note which is a cubic curve or a lookup table.
+  N9 ; \field Standby Electric Power
+       \units W
+       \minimum 0
+       \note Standby Electric Power in [W]
+```
 
 ### Output Variables ###
 
