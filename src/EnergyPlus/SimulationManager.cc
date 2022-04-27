@@ -598,7 +598,7 @@ namespace SimulationManager {
 
         if (state.dataGlobal->DoPureLoadCalc) { // pure load calcs option
             ReportHeatBalance(state);           // need to kick reporting at least once with flags set
-        }                                       
+        }
 
         if (!SimsDone && state.dataGlobal->DoDesDaySim) {
             if ((state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
