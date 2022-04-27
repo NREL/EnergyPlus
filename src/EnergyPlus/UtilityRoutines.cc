@@ -490,49 +490,6 @@ namespace UtilityRoutines {
         }
     }
 
-    void writeRulesetModelDescription(EnergyPlusData &state)
-    // Write the ruleset model description output file which is JSON formatted and based on
-    // https://github.com/open229/ruleset-model-report-schema
-    // J.Glazer April 2022
-    {
-        using json = nlohmann::json;
-
-        //json j2 = {{"pi", 3.141},
-        //           {"happy", true},
-        //           {"name", "Niels"},
-        //           {"nothing", nullptr},
-        //           {"answer", {{"everything", 42}}},
-        //           {"list", {1, 0, 2}},
-        //           {"object", {{"currency", "USD"}, {"value", 42.99}}}};
-
-
-        json ruleset_model_instance;
-        ruleset_model_instance["id"] = "instance 1";
-        ruleset_model_instance["ruleset_mdoel_type"] = "";
-        ruleset_model_instance["transformers"] = "";
-        ruleset_model_instance["buildings"] = "";
-        json ruleset_model_instances = json::array();
-        ruleset_model_instances.push_back(ruleset_model_instance);
-
-        json rmdRoot;
-        rmdRoot["id"] = "ASHRAE229_01";
-        rmdRoot["reporting_name"] = "";
-        rmdRoot["notes"] = "";
-        rmdRoot["ruleset_model_instances"] = ruleset_model_instances;
-        rmdRoot["calendar"] = "";
-        rmdRoot["weather"] = "";
-        rmdRoot["compliance_path"] = "";
-        rmdRoot["output_format_type"] = "";
-
-
-        std::fstream fsRmd;
-        fsRmd.open(state.dataStrGlobals->outputRulesetModelDescFilePath, std::fstream::out); // open file normally
-        //fsRmd << j2.dump(4);
-        fsRmd << rmdRoot.dump(4);
-        fsRmd.close();
-    }
-
-
     bool ValidateFuelType([[maybe_unused]] EnergyPlusData &state,
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,

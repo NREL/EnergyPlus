@@ -385,7 +385,7 @@ OutputControl:Files,
                                                     fmt::arg("wrl", boolToString(wrl)),
                                                     fmt::arg("screen", boolToString(screen)),
                                                     fmt::arg("extshd", boolToString(extshd)),
-                                                    fmt::arg("tarcog", boolToString(tarcog));
+                                                    fmt::arg("tarcog", boolToString(tarcog)));
 
         EXPECT_TRUE(process_idf(idf_objects));
 

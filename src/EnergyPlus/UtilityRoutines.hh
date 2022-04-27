@@ -584,8 +584,6 @@ namespace UtilityRoutines {
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
 
-    void writeRulesetModelDescription(EnergyPlusData &state);
-
     bool ValidateFuelType(EnergyPlusData &state,
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,

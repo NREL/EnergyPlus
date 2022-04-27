@@ -195,7 +195,6 @@ namespace SimulationManager {
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
         using EconomicTariff::ComputeTariff; // added for computing annual utility costs
         using EconomicTariff::WriteTabularTariffReports;
-        using UtilityRoutines::writeRulesetModelDescription;
         using EMSManager::CheckIfAnyEMS;
         using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
