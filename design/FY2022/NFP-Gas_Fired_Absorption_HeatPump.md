@@ -8,11 +8,11 @@ Equation-Fit Based Gas Fired Absorption Heat Pump (GAHP) Module
 
 
 ## Justification for New Feature ##
-The goal of the proposed new feature development is to add a new EnergyPlus model for a fuel-fired absorption heat pump which represents a potential new product line for space heating and domestic hot water (DHW) heating applications [1]. The equipment is intended to used in cold climates as a heat pump to provided space-heating to the space and hot water heating for domestic hot water. Currently, the heat pump is modeled by the feature requester using the "PlantComponent:UserDefined" object to connect the EMS programs into the plant simulation. This method is not standardized and lack scalability for different connections and equipment configurations. The proposed new feature will address the model needs for convenient and scalable modeling of such gas-fired absorption heat pump (GAHP) systems. 
+The goal of the proposed new feature development is to add a new EnergyPlus model for a gas-fired (or fuel-fired) absorption heat pump which represents a potential new product line for space heating and domestic hot water (DHW) heating applications [1]. The equipment is intended to used in cold climates as a heat pump to provided space-heating to the space and hot water heating for domestic hot water. Currently, the heat pump is modeled by the feature requester using the "PlantComponent:UserDefined" object to connect the EMS programs into the plant simulation. This method is not standardized and lack scalability for different connections and equipment configurations. The proposed new feature will address the model needs for convenient and scalable modeling of such gas-fired absorption heat pump (GAHP) systems. 
 
 Current EnergyPlus has capabilities to model an absorption chillerheater and a heat pump separately. For example, an existing EnergyPlus object that can provide the basis for the absorption chiller is ChillerHeater:Absorption:DirectFired; and an existing EnergyPlus object that can provide the heat pump modeling capability is HeatPump:PlantLoop:EIR:Cooling/Heating. 
 
-ChillerHeater:Absorption:DirectFired: This is an DOE-2 type direct-fired absorption chiller models that allows heating and cooling connections (and operations) at the same time. Direct fired gas absorption chiller-heater using performance curves. This component models fuel-fired heating and cooling with a possible air-cooled condenser option. However, the heating mode is intended to represent simply a boiler, but not a heat pump. The fundamental difference is that the general ChillerHeater:Absorption:DirectFired has an independent condenser units to reject heat; however, the gas-fired heat pump to be modeled in this study actually will have heat extracted from the condenser and feed to the hot-water or domestic hot water demand loop. 
+ChillerHeater:Absorption:DirectFired: This is an DOE-2 type direct-fired absorption chiller models that allows heating and cooling connections (and operations) at the same time. Direct gas-fired absorption chiller-heater using performance curves. This component models fuel-fired heating and cooling with a possible air-cooled condenser option. However, the heating mode is intended to represent simply a boiler, but not a heat pump. The fundamental difference is that the general ChillerHeater:Absorption:DirectFired has an independent condenser units to reject heat; however, the gas-fired heat pump to be modeled in this study actually will have heat extracted from the condenser and feed to the hot-water or domestic hot water demand loop. 
 
 HeatPump:PlantLoop:EIR:Cooling/Heating: An EIR formulated air-to-water (or water-to-water) heat pump model. This component can model a general -purpose heat pump, either air-to-water or water-to-water. However, it does not have a fuel type option; and the heating mode currently does not allow defrost operations. Further, parameter input options are more general for a traditional electric heat pump configuration; but not specifically to a gas-fired absorption heat pump to be modeled in the current NFP. In order to model a gas-fired absorption heat pump, many input fields, including a set of different curves, need to be expanded or allow alternatives in order to fit GAHP in a the current general-purpose heat pump model. Further, the HeatPUmp:PlantLoop:EIR:Cooling/Heating modules can only deal with constant flows for the load modulation; while for the current development, more load modulation options are needed. 
 
@@ -21,7 +21,7 @@ In addition, for both of the two existing models ChillerHeater:Absorption:Direct
 
 ## E-mail and Conference Call Conclusions ##
 ### E-mail Communications ###
-On 2022-04-22, a few email exchanges with the feature requester (Alex Fridlyand) regarding the first draft NFP and a few related questions. Some comments and additional feedbacks were offered by Alex on the equipment's operation modes, typical application scenarios, and typical parameter values. 
+From 2022-04-22 to 2022-04-26, a few email exchanges with the feature requester (Alex Fridlyand) regarding the first draft NFP and a few related questions. Some comments and additional feedbacks were offered by Alex on the equipment's operation modes, typical application scenarios, and typical parameter values. 
 
 ### Conference Call Communications ###
 
@@ -78,8 +78,9 @@ HeatPump:AirToWater:FuelFired:Heating,
     0.1, !-Minimum Part Load Ratio
     1, !-Maximum Part Load Ratio
     Fuel_EIRDefrost_CurveName, !-Fuel Energy Input Ratio Defrost Adjustment Curve name
-    5, !-Defrost Operation Minimum Time
-    30, !-Defrost Operation Maximum Time
+    OnDemand, !-Defrost Control Type
+    0.05, !-Defrost operation time fraction
+    5, !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
     CRF_CurveName, !-Cycling Ratio Factor Curve Name
     900, !-Nominal Auxiliary Electric Power
     Aux_Elec_EIRFT_CurveName, !-Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
@@ -213,17 +214,23 @@ HeatPump:AirToWater:FuelFired:Heating,
        \object-list UnivariateFunctions
        \note EIRDEFROST - Energy Input Ratio Defrost Adjustment Curve name,
        \note which is a cubic curve or a lookup table function of Outdoor Air Temperature.
-  N8 , \field Defrost Operation Minimum Time
-       \units minutes
+  A15, \field Defrost Control Type
+       \type choice
+       \key timed
+       \key OnDemand
+       \default timed
+       \note Defrost operation control type: timed or OnDemand
+  N8 , \field Defrost Operation Time Fraction
        \minimum 0
+       \default 0
+       \note Defrost operation time fraction
+  N9 , \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+       \units C
+       \minimum 0
+       \maximum 10
        \default 5
-       \note Defrost operation minimum time Tmin in [minute]
-  N9 , \field Defrost Operation Maximum Time
-       \units minutes
-       \minimum> 0
-       \default 30
-       \note Defrost operation maximum time Tmax in [minute] 
-  A15, \field Cycling Ratio Factor Curve Name
+       \note There will be no defrost operation when outdoor air is above this temperature.
+  A16, \field Cycling Ratio Factor Curve Name
        \type object-list
        \object-list UnivariateFunctions
        \note Cycling Ratio Factor (CRF) Curve Name,
@@ -232,13 +239,13 @@ HeatPump:AirToWater:FuelFired:Heating,
        \units W
        \minimum 0
        \note Nominal Auxiliary Electric Power in [W]
-  A16, \field Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
+  A17, \field Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
        \type object-list
        \object-list BivariateFunctions
        \note Auxiliary Electric EIRFT - Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name,
        \note which is a biquadratic curve or a lookup table.
        \note which accounts for system internal fans, pumps, and electronics
-  A17, \field Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
+  A18, \field Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
        \type object-list
        \note Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name,
        \note which is a cubic curve or a lookup table.
@@ -432,17 +439,18 @@ One new example file will be added to the test suite to demonstrate how to use t
 
 Since the feature is based on completely newly added blocks, an older version would not carry the feature. Therefore a transition program is not needed for converting from earlier versions.
 
-
 ## Input Output Reference Documentation ##
 
 The proposed new feature development will add the following contents to the Input Output Reference document:
 
 ### HeatPump:AirToWater:FuelFired:Heating Input Fields ###
 
+HeatPump:AirToWater:FuelFired:Heating is a gas-fired (or fuel fired) absorption heat pump that can be used for space heating and domestic hot water. It is can be considered a more efficient heat source (like a boiler) for hot water loop or DHW loop. It can be used as the heat source for a low temperature radiant heating system. 
+
 The HeatPump:AirToWater:FuelFired:Heating will take the following input fields:
 
 #### Field: Name ####
-The name of the gas-fired absorption heatpump system.
+The name of the gas-fired (fuel-fired) absorption heat pump system.
 
 #### Fiedl: ####
 
@@ -496,14 +504,18 @@ HeatPump:AirToWater:FuelFired:Heating,
     0.1, !-Minimum Part Load Ratio
     1, !-Maximum Part Load Ratio
     Fuel_EIRDefrost_CurveName, !-Fuel Energy Input Ratio Defrost Adjustment Curve name
-    5, !-Defrost Operation Minimum Time
-    30, !-Defrost Operation Maximum Time
+    OnDemand, !-Defrost Control Type
+    0.05, !-Defrost operation time fraction
+    5, !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
     CRF_CurveName, !-Cycling Ratio Factor Curve Name
     900, !-Nominal Auxiliary Electric Power
     Aux_Elec_EIRFT_CurveName, !-Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
     Aux_EIRPLR_CurveName, !-Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
     20; !-Standby Electric Power
 ```
+
+### HeatPump:AirToWater:FuelFired:Cooling Input Fields ###
+
 
 ## Input Description ##
 
@@ -512,7 +524,7 @@ See the Input Output Reference documentation contents update above.
 
 ## Outputs Description ##
 
-The following output will be added the to the new gas-fired absorption heatpump system: 
+The following output will be added the to the new gas-fired (fuel-fired) absorption heat pump system: 
 
 ```
 HVAC,sum,Fuel-fired Absorption HeatPump Heating Energy [J]
