@@ -4131,32 +4131,32 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
 
         // re-evaluate if loads are now such that in dead band or set back
         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-        case DataHVACGlobals::SetPointType::Uncontrolled:
+        case DataHVACGlobals::ThermostatType::Uncontrolled:
             // uncontrolled zone; shouldn't ever get here, but who knows
             state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             break;
-        case DataHVACGlobals::SetPointType::SingleHeating:
+        case DataHVACGlobals::ThermostatType::SingleHeating:
             if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             }
             break;
-        case DataHVACGlobals::SetPointType::SingleCooling:
+        case DataHVACGlobals::ThermostatType::SingleCooling:
             if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             }
             break;
-        case DataHVACGlobals::SetPointType::SingleHeatCool:
+        case DataHVACGlobals::ThermostatType::SingleHeatCool:
             if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             }
             break;
-        case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
             if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {
@@ -4240,32 +4240,32 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
 
         // re-evaluate if loads are now such that in dead band or set back
         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-        case DataHVACGlobals::SetPointType::Uncontrolled:
+        case DataHVACGlobals::ThermostatType::Uncontrolled:
             // uncontrolled zone; shouldn't ever get here, but who knows
             state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             break;
-        case DataHVACGlobals::SetPointType::SingleHeating:
+        case DataHVACGlobals::ThermostatType::SingleHeating:
             if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             }
             break;
-        case DataHVACGlobals::SetPointType::SingleCooling:
+        case DataHVACGlobals::ThermostatType::SingleCooling:
             if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             }
             break;
-        case DataHVACGlobals::SetPointType::SingleHeatCool:
+        case DataHVACGlobals::ThermostatType::SingleHeatCool:
             if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
             }
             break;
-        case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
             if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
             } else {

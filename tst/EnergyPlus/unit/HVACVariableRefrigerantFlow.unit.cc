@@ -153,7 +153,7 @@ protected:
         state->dataLoopNodes->NodeID.allocate(50);
 
         state->dataHeatBalFanSys->TempControlType.allocate(numZones);
-        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
+        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
@@ -4057,7 +4057,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo = 21.0;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZT = 25.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
@@ -5948,7 +5948,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
               0.0); // flow should be = 0 for cycling fan mode
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0; // set constant fan operating mode

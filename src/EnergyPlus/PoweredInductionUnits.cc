@@ -1919,7 +1919,8 @@ void CalcSeriesPIU(EnergyPlusData &state,
     QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                         (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
     if ((!UnitOn) || (QActualHeating < SmallLoad) ||
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::SetPointType::SingleCooling) || (PriAirMassFlow > PriAirMassFlowMin)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
+        (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }
     // fire the heating coil
@@ -2239,7 +2240,8 @@ void CalcParallelPIU(EnergyPlusData &state,
     QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                         (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
     if ((!UnitOn) || (QActualHeating < SmallLoad) ||
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::SetPointType::SingleCooling) || (PriAirMassFlow > PriAirMassFlowMin)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
+        (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }
     // fire the heating coil

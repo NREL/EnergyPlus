@@ -401,19 +401,19 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance)
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(NumZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(NumZones);
 
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
     state->dataHeatBalFanSys->TempTstatAir(1) = 30.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
 
-    state->dataHeatBalFanSys->TempControlType(2) = DataHVACGlobals::SetPointType::SingleHeatCool;
+    state->dataHeatBalFanSys->TempControlType(2) = DataHVACGlobals::ThermostatType::SingleHeatCool;
     state->dataHeatBalFanSys->TempTstatAir(2) = 25.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(2) = 25.0;
 
-    state->dataHeatBalFanSys->TempControlType(3) = DataHVACGlobals::SetPointType::SingleHeating;
+    state->dataHeatBalFanSys->TempControlType(3) = DataHVACGlobals::ThermostatType::SingleHeating;
     state->dataHeatBalFanSys->TempTstatAir(3) = 10.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(3) = 20.0;
 
-    state->dataHeatBalFanSys->TempControlType(4) = DataHVACGlobals::SetPointType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(4) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->TempTstatAir(4) = 30.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(4) = 25.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(4) = 20.0;
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // No change
     state->dataSystemAvailabilityManager->HybridVentData(1).TimeVentDuration = 11.0;
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleHeating;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Can change
@@ -675,7 +675,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
 
@@ -798,7 +798,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SetPointType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     state->dataHeatBal->Zone.allocate(NumZones);

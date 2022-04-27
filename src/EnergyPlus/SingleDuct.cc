@@ -3856,7 +3856,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // if the massflow is below the minimum or greater than the Max it is set to either the Min
     // or the Max as specified for the VAV model.
     if ((QTotLoad < 0.0) && (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleHeating) &&
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) &&
         (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
         // Calculate the flow required for cooling
 
@@ -3897,7 +3897,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         }
 
     } else if ((this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) &&
-               (QTotLoad >= 0.0 || state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::SetPointType::SingleHeating) &&
+               (QTotLoad >= 0.0 || state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleHeating) &&
                (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
         //     IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. this->sd_airterminalInlet%AirMassFlowRateMinAvail <=
         //     SmallMassFlow) THEN
@@ -3987,7 +3987,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // there's a heating requirement, and there's a thermostat with a heating setpoint
     // Reverse damper option is working only for water coils for now.
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
         // At this point we know that there is a heating requirement: i.e., the heating coil needs to
         // be activated (there's a zone heating load or there's a reheat requirement). There are 3 possible
         // situations: 1) the coil load can be met by variable temperature air (below the max heat temp) at
@@ -4450,7 +4450,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
 
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
         //   VAVHeatandCool boxes operate at varying mass flow rates when reheating, VAV boxes operate at min flow
         //      (MassFlow <= this->sd_airterminalInlet%AirMassFlowRateMinAvail) .AND. &
         //   Per Fred Buhl, don't use DeadBandOrSetback to determine if heaters operate
@@ -5236,7 +5236,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
     // system scheduled OFF then not operational and shut the system down.
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SetPointType::SingleCooling)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
 
         switch (this->ReheatComp_Num) {
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING

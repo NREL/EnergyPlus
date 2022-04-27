@@ -99,8 +99,9 @@ namespace DataHVACGlobals {
     int constexpr ForceOff(1);
     int constexpr CycleOn(2);
     int constexpr CycleOnZoneFansOnly(3);
+
     // The following parameters describe the setpoint types in TempControlType(ActualZoneNum)
-    enum class SetPointType
+    enum class ThermostatType
     {
         Invalid = -1,
         Uncontrolled,

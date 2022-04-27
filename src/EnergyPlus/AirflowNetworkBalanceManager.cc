@@ -13369,19 +13369,19 @@ namespace AirflowNetworkBalanceManager {
         }
 
         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-        case DataHVACGlobals::SetPointType::SingleHeating:
+        case DataHVACGlobals::ThermostatType::SingleHeating:
             if (state.dataHeatBalFanSys->MAT(ZoneNum) <= state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) {
                 return false;
             }
             break;
-        case DataHVACGlobals::SetPointType::SingleCooling:
+        case DataHVACGlobals::ThermostatType::SingleCooling:
             if (state.dataHeatBalFanSys->MAT(ZoneNum) >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;
             }
             break;
-        case DataHVACGlobals::SetPointType::SingleHeatCool:
+        case DataHVACGlobals::ThermostatType::SingleHeatCool:
             return false;
-        case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
             if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) ||
                 state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;

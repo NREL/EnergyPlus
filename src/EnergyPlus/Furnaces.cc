@@ -312,19 +312,19 @@ namespace Furnaces {
                                             .SequencedOutputRequiredToHeatingSP(state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceHeatingNum);
             if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0 &&
                 state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) !=
-                    DataHVACGlobals::SetPointType::SingleCooling) {
+                    DataHVACGlobals::ThermostatType::SingleCooling) {
                 ZoneLoad = ZoneLoadToHeatSPSequenced;
             } else if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0 &&
                        state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                           DataHVACGlobals::SetPointType::SingleCooling) {
+                           DataHVACGlobals::ThermostatType::SingleCooling) {
                 ZoneLoad = 0.0;
             } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0 &&
                        state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) !=
-                           DataHVACGlobals::SetPointType::SingleHeating) {
+                           DataHVACGlobals::ThermostatType::SingleHeating) {
                 ZoneLoad = ZoneLoadToCoolSPSequenced;
             } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0 &&
                        state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                           DataHVACGlobals::SetPointType::SingleHeating) {
+                           DataHVACGlobals::ThermostatType::SingleHeating) {
                 ZoneLoad = 0.0;
             } else if (ZoneLoadToHeatSPSequenced <= 0.0 && ZoneLoadToCoolSPSequenced >= 0.0) {
                 ZoneLoad = 0.0;
@@ -6156,9 +6156,9 @@ namespace Furnaces {
                         state.dataFurnaces->CoolingLoad = false;
                         //         Don't set mode TRUE unless mode is allowed. Also check for floating zone.
                         if (state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                                DataHVACGlobals::SetPointType::SingleCooling ||
+                                DataHVACGlobals::ThermostatType::SingleCooling ||
                             state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                                DataHVACGlobals::SetPointType::Uncontrolled) {
+                                DataHVACGlobals::ThermostatType::Uncontrolled) {
                             state.dataFurnaces->HeatingLoad = false;
                         } else {
                             state.dataFurnaces->HeatingLoad = true;
@@ -6243,9 +6243,9 @@ namespace Furnaces {
                         QZnReq = QToCoolSetPt;
                         //         Don't set mode TRUE unless mode is allowed. Also check for floating zone.
                         if (state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                                DataHVACGlobals::SetPointType::SingleHeating ||
+                                DataHVACGlobals::ThermostatType::SingleHeating ||
                             state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                                DataHVACGlobals::SetPointType::Uncontrolled) {
+                                DataHVACGlobals::ThermostatType::Uncontrolled) {
                             state.dataFurnaces->CoolingLoad = false;
                         } else {
                             state.dataFurnaces->CoolingLoad = true;

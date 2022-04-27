@@ -2543,19 +2543,19 @@ namespace ThermalComfort {
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeatingOccupied = 0.0;
 
             switch (state.dataHeatBalFanSys->TempControlType(iZone)) {
-            case DataHVACGlobals::SetPointType::SingleHeating:
+            case DataHVACGlobals::ThermostatType::SingleHeating:
                 testHeating = true;
                 testCooling = false;
                 break;
-            case DataHVACGlobals::SetPointType::SingleCooling:
+            case DataHVACGlobals::ThermostatType::SingleCooling:
                 testHeating = false;
                 testCooling = true;
                 break;
-            case DataHVACGlobals::SetPointType::SingleHeatCool:
+            case DataHVACGlobals::ThermostatType::SingleHeatCool:
                 testHeating = true;
                 testCooling = true;
                 break;
-            case DataHVACGlobals::SetPointType::DualSetPointWithDeadBand:
+            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
                 testHeating = true;
                 testCooling = true;
                 break;

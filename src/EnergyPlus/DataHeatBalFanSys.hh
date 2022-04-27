@@ -249,7 +249,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
     Array1D<Real64> ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
     Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
-    Array1D<DataHVACGlobals::SetPointType> TempControlType;
+    EPVector<DataHVACGlobals::ThermostatType> TempControlType;
     EPVector<int> TempControlTypeRpt;
     Array1D_int ComfortControlType;
 

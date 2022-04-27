@@ -99,7 +99,7 @@ namespace ZoneTempPredictorCorrector {
     };
 
     // The numbers are used to access zone comfort control type, see ValidComfortControlTypes
-    enum class ComfortControl
+    enum class ThermalComfortCtrlType
     {
         Invalid = -1,
         Uncontrolled = 0,
@@ -133,7 +133,7 @@ namespace ZoneTempPredictorCorrector {
         Num
     };
 
-    struct ZoneTempControlType
+    struct ZoneTempControl
     {
         // Members
         std::string Name;          // Name of the zone
@@ -145,12 +145,12 @@ namespace ZoneTempPredictorCorrector {
         int CoolTempSchedIndex;
 
         // Default Constructor
-        ZoneTempControlType() : TempSchedIndex(0), HeatTempSchedIndex(0), CoolTempSchedIndex(0)
+        ZoneTempControl() : TempSchedIndex(0), HeatTempSchedIndex(0), CoolTempSchedIndex(0)
         {
         }
     };
 
-    struct ZoneComfortFangerControlType
+    struct ZoneComfortFangerControl
     {
         // Members
         std::string Name;                  // Name of the zone
@@ -162,7 +162,7 @@ namespace ZoneTempPredictorCorrector {
         int CoolPMVSchedIndex;             // INdex to PMV cooling set point schedule
 
         // Default Constructor
-        ZoneComfortFangerControlType() : PMVSchedIndex(0), HeatPMVSchedIndex(0), CoolPMVSchedIndex(0)
+        ZoneComfortFangerControl() : PMVSchedIndex(0), HeatPMVSchedIndex(0), CoolPMVSchedIndex(0)
         {
         }
     };
@@ -404,14 +404,14 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
 
     // Object Data
     std::unordered_set<std::string> HumidityControlZoneUniqueNames;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeating;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleCooling;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeatCool;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointDualHeatCool;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointSingleHeating;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointSingleCooling;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointSingleHeatCool;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointDualHeatCool;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointSingleHeatingFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointSingleCoolingFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointSingleHeatCoolFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointDualHeatCoolFanger;
     ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
 
     Array1D<Real64> AdapComfortSetPointSummerDesDay;
