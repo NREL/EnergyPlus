@@ -5570,16 +5570,16 @@ void ReportThermalResilience(EnergyPlusData &state)
             Real64 Temperature = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
             bool &CrossedColdThresh = state.dataHeatBalFanSys->CrossedColdThresh(ZoneNum);
-            if (Temperature > ColdTempThresh) {
+            if (Temperature > ColdTempThresh) { // safe
                 if (!CrossedColdThresh) {
                     // compute the number of hours before threshold is reached
                     state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 }
+            } else { // danger
                 // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
                 state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneColdHourOfSafetyBins(ZoneNum)[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
-            } else {
                 // first time crossing threshold
                 if (!CrossedColdThresh) {
                     // compute the time when the zone crosses the threshold temperature
@@ -5596,16 +5596,16 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
             HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
             bool &CrossedHeatThresh = state.dataHeatBalFanSys->CrossedHeatThresh(ZoneNum);
-            if (Temperature < HeatTempThresh) {
+            if (Temperature < HeatTempThresh) { // safe
                 if (!CrossedHeatThresh) {
                     // compute the number of hours before threshold is reached
                     state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 }
+            } else { // danger
                 // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
                 state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(ZoneNum)[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
-            } else {
                 // first time crossing threshold
                 if (!CrossedHeatThresh) {
                     // compute the time when the zone crosses the threshold temperature
@@ -5828,7 +5828,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                     }
                     // Keep the longest duration record.
                     state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                    if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3]) {
+                    if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3] &&
+                        state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0) {
                         state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
                         state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[4] = state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1];
                     }
@@ -5846,22 +5847,14 @@ void ReportThermalResilience(EnergyPlusData &state)
                         state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
                     }
                     state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3]) {
+                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3]
+                        && state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0) {
                         state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
                         state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[4] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
                     }
                 }
 
                 if (state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) == 0) {
-                    // No occupants: record the last time step duration if longer than the record.
-                    if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3]) {
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[4] = state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1];
-                    }
-                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3]) {
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[4] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
-                    }
                     state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] = 0;
                     state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] = 0;
                 }
