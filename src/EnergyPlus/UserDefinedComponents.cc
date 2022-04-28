@@ -1988,7 +1988,7 @@ namespace UserDefinedComponents {
                 BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
 
                 int ADUNum = 0;
-                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                     if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum ==
                         state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                         //        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum

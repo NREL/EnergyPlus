@@ -110,16 +110,7 @@ struct OutputsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        MaxConsideredOutputVariables = 0;
-        NumConsideredOutputVariables = 0;
-        iNumberOfRecords = int();
-        iNumberOfDefaultedFields = int();
-        iTotalFieldsWithDefaults = int();
-        iNumberOfAutoSizedFields = int();
-        iTotalAutoSizableFields = int();
-        iNumberOfAutoCalcedFields = int();
-        iTotalAutoCalculatableFields = int();
-        OutputVariablesForSimulation.clear();
+        *this = OutputsData();
     }
 };
 

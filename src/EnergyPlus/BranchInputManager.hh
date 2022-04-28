@@ -70,39 +70,23 @@ namespace BranchInputManager {
     {
         // Members
         std::string Name;             // Name for this Connector
-        int NumOfConnectors;          // Number of Connectors in this group
-        int NumOfSplitters;           // Number of Splitters in this connector group
-        int NumOfMixers;              // Number of Mixers in this connector group
+        int NumOfConnectors = 0;      // Number of Connectors in this group
+        int NumOfSplitters = 0;       // Number of Splitters in this connector group
+        int NumOfMixers = 0;          // Number of Mixers in this connector group
         Array1D_string ConnectorType; // Connector:Splitter or Connector:Mixer
         Array1D_string ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
         Array1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
         // Splitter => Mixer or Mixer => Splitter.  0 indicates no match
-
-        // Default Constructor
-        ConnectorData() : NumOfConnectors(0), NumOfSplitters(0), NumOfMixers(0)
-        {
-        }
-
-        // Destructor
-        ~ConnectorData() = default;
     };
 
     struct BranchListData
     {
         // Members
         std::string Name;           // Name of this Branch List
-        int NumOfBranchNames;       // Number of Branches on the Branch List
+        int NumOfBranchNames = 0;   // Number of Branches on the Branch List
         Array1D_string BranchNames; // Names of the branches on this branch list
         std::string LoopName;       // Name of Loop this Branch list belongs to
         std::string LoopType;       // Loop type this branch is on
-
-        // Default Constructor
-        BranchListData() : NumOfBranchNames(0)
-        {
-        }
-
-        // Destructor
-        ~BranchListData() = default;
     };
 
     struct ComponentData
@@ -110,41 +94,24 @@ namespace BranchInputManager {
         // Members
         std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
         std::string Name;           // Component Name
-        int CtrlType;               // Active, Passive, Bypass (1,2,3)
+        int CtrlType = 0;           // Active, Passive, Bypass (1,2,3)
         std::string InletNodeName;  // Inlet Node ID
-        int InletNode;              // Inlet Node Number
+        int InletNode = 0;          // Inlet Node Number
         std::string OutletNodeName; // Outlet Node ID
-        int OutletNode;             // Outlet Node Number
-
-        // Default Constructor
-        ComponentData() : CtrlType(0), InletNode(0), OutletNode(0)
-        {
-        }
-
-        // Destructor
-        ~ComponentData() = default;
+        int OutletNode = 0;         // Outlet Node Number
     };
 
     struct BranchData
     {
         // Members
-        std::string Name;                                            // Name for this Branch
-        std::string AssignedLoopName;                                // Loop Name for this branch
-        DataBranchAirLoopPlant::PressureCurveType PressureCurveType; // Integer index of pressure curve type
-        int PressureCurveIndex;                                      // Integer index of pressure curve
-        DataLoopNode::NodeFluidType FluidType;                       // Fluid type (see DataLoopNode)
-        int NumOfComponents;                                         // Number of Components on this Branch
-        Array1D<ComponentData> Component;                            // Component definitions for each component
-
-        // Default Constructor
-        BranchData()
-            : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Invalid), PressureCurveIndex(0),
-              FluidType(DataLoopNode::NodeFluidType::Blank), NumOfComponents(0)
-        {
-        }
-
-        // Destructor
-        ~BranchData() = default;
+        std::string Name;             // Name for this Branch
+        std::string AssignedLoopName; // Loop Name for this branch
+        DataBranchAirLoopPlant::PressureCurveType PressureCurveType =
+            DataBranchAirLoopPlant::PressureCurveType::Invalid;                     // Integer index of pressure curve type
+        int PressureCurveIndex = 0;                                                 // Integer index of pressure curve
+        DataLoopNode::NodeFluidType FluidType = DataLoopNode::NodeFluidType::Blank; // Fluid type (see DataLoopNode)
+        int NumOfComponents = 0;                                                    // Number of Components on this Branch
+        Array1D<ComponentData> Component;                                           // Component definitions for each component
     };
 
     struct SplitterData
@@ -152,13 +119,8 @@ namespace BranchInputManager {
         // Members
         std::string Name;                 // Splitter Name
         std::string InletBranchName;      // Splitter Inlet Branch Name
-        int NumOutletBranches;            // Number of outlets on this Splitter
+        int NumOutletBranches = 0;        // Number of outlets on this Splitter
         Array1D_string OutletBranchNames; // Names of the Outlet Branches
-
-        // Default Constructor
-        SplitterData() : NumOutletBranches(0)
-        {
-        }
     };
 
     struct MixerData
@@ -166,16 +128,8 @@ namespace BranchInputManager {
         // Members
         std::string Name;                // Mixer Name
         std::string OutletBranchName;    // Mixer Outlet Branch Name
-        int NumInletBranches;            // Number of inlets for this Mixer
+        int NumInletBranches = 0;        // Number of inlets for this Mixer
         Array1D_string InletBranchNames; // Names of Inlet Branches
-
-        // Default Constructor
-        MixerData() : NumInletBranches(0)
-        {
-        }
-
-        // Destructor
-        ~MixerData() = default;
     };
 
     // Functions
@@ -348,12 +302,6 @@ namespace BranchInputManager {
 
 struct BranchInputManagerData : BaseGlobalStruct
 {
-    int NumOfBranchLists = 0;    // Number of Branch Lists found in IDF
-    int NumOfBranches = 0;       // Number of Branches found in IDF
-    int NumOfConnectorLists = 0; // Number of Connector Lists found in IDF
-    int NumSplitters = 0;        // Number of Splitters found in IDF
-    int NumMixers = 0;           // Number of Mixers found in IDF
-
     bool GetBranchInputFlag = true;        // Flag used to retrieve Input
     bool GetBranchListInputFlag = true;    // Flag used to retrieve Input
     bool GetSplitterInputFlag = true;      // Flag used to retrieve Input
@@ -371,24 +319,7 @@ struct BranchInputManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumOfBranchLists = 0;
-        this->NumOfBranches = 0;
-        this->NumOfConnectorLists = 0;
-        this->NumSplitters = 0;
-        this->NumMixers = 0;
-        this->GetBranchInputFlag = true;
-        this->GetBranchListInputFlag = true;
-        this->GetSplitterInputFlag = true;
-        this->GetMixerInputFlag = true;
-        this->GetConnectorListInputFlag = true;
-        this->InvalidBranchDefinitions = false;
-        this->GetBranchInputOneTimeFlag = true;
-        this->BranchList.deallocate();
-        this->Branch.deallocate();
-        this->ConnectorLists.deallocate();
-        this->Splitters.deallocate();
-        this->Mixers.deallocate();
-        this->BComponents.deallocate();
+        *this = BranchInputManagerData();
     }
 };
 
