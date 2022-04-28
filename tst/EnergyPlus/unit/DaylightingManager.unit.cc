@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(1, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(1, (int)state->dataDaylightingData->DaylRefPt.size());
 
     GetDaylightingControls(*state, foundErrors);
     compare_err_stream("");
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
     GetDaylightingControls(*state, foundErrors);
     compare_err_stream("");
@@ -337,7 +337,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
     EXPECT_EQ("WEST ZONE_DAYLREFPT1", state->dataDaylightingData->DaylRefPt(1).Name);
     EXPECT_EQ(1, state->dataDaylightingData->DaylRefPt(1).ZoneNum);
@@ -404,7 +404,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     GetInputIlluminanceMap(*state, foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
 
-    EXPECT_EQ(1, state->dataDaylightingData->TotIllumMaps);
+    EXPECT_EQ(1, (int)state->dataDaylightingData->IllumMap.size());
 
     EXPECT_EQ("MAP1", state->dataDaylightingData->IllumMap(1).Name);
     EXPECT_EQ(1, state->dataDaylightingData->IllumMap(1).zoneIndex);
@@ -892,7 +892,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     GetDaylightingParametersInput(*state);
     state->dataDaylightingManager->CalcDayltghCoefficients_firstTime = false;
     compare_err_stream("");
-    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
     EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
     EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
@@ -967,8 +967,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
     state->dataGlobal->NumOfZones = 4;
-    state->dataDaylightingData->totDaylightingControls = state->dataGlobal->NumOfZones;
-    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl.allocate(4);
     state->dataDaylightingData->daylightControl(1).Name = "ZD1";
     state->dataDaylightingData->daylightControl(2).Name = "ZD2";
     state->dataDaylightingData->daylightControl(3).Name = "ZD3";
@@ -1621,7 +1620,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(10, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(10, (int)state->dataDaylightingData->DaylRefPt.size());
 
     DaylightingManager::GetDaylightingControls(*state, foundErrors);
     // Used to throw
@@ -1737,7 +1736,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(2, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(2, (int)state->dataDaylightingData->DaylRefPt.size());
 
     DaylightingManager::GetDaylightingControls(*state, foundErrors);
 
@@ -2242,7 +2241,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         delim);
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true)); // reset eio stream after compare
-    EXPECT_EQ(4, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(4, (int)state->dataDaylightingData->DaylRefPt.size());
 
     EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
     EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
@@ -2998,16 +2997,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
 {
     int MapNum = 1;
     state->dataDaylightingManager->ReportIllumMap_firstTime = false;
-    state->dataDaylightingData->TotIllumMaps = 1;
 
-    state->dataDaylightingManager->FirstTimeMaps.dimension(state->dataDaylightingData->TotIllumMaps, true);
-    state->dataDaylightingManager->EnvrnPrint.dimension(state->dataDaylightingData->TotIllumMaps, false);
+    state->dataDaylightingManager->FirstTimeMaps.dimension(1, true);
+    state->dataDaylightingManager->EnvrnPrint.dimension(1, false);
     state->dataGlobal->NumOfZones = 1;
-    state->dataDaylightingData->totDaylightingControls = 1;
-    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl.allocate(1);
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 3;
     state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
-    state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
+    state->dataDaylightingManager->SavedMnDy.allocate(1);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->IllumMap(MapNum).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
