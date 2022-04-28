@@ -112,6 +112,30 @@ namespace DataHVACGlobals {
         Num
     };
 
+    // The numbers are used to access zone comfort control type, see ValidComfortControlTypes
+    enum class ThermalComfortCtrlType
+    {
+        Invalid = -1,
+        Uncontrolled = 0,
+        SglHeatSetPoint = 1,
+        SglCoolSetPoint = 2,
+        SglHCSetPoint = 3,
+        DualSetPoint = 4,
+        SglHeatSetPointFanger = 1,
+        SglCoolSetPointFanger = 2,
+        SglHCSetPointFanger = 3,
+        DualSetPointFanger = 4,
+        SglHeatSetPointPierce = 5,
+        SglCoolSetPointPierce = 6,
+        SglHCSetPointPierce = 7,
+        DualSetPointPierce = 8,
+        SglHeatSetPointKSU = 9,
+        SglCoolSetPointKSU = 10,
+        SglHCSetPointKSU = 11,
+        DualSetPointKSU = 12,
+        Num
+    };
+
     // parameters describing air duct type
     int constexpr Main(1);
     int constexpr Cooling(2);
