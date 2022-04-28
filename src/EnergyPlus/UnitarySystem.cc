@@ -488,6 +488,7 @@ namespace UnitarySystems {
                     DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
                 // open this up to include UnitarySystem on a future commit
+                // associates an air loop fan on main branch with a coil on main branch
                 if (!this->m_FanExists && this->m_sysType == SysType::CoilCoolingDX) {
                     if (this->m_CoolCoilExists) { // copy this block for heating coil also on future commit
                         bool coilDataSet = false;
@@ -6017,21 +6018,14 @@ namespace UnitarySystems {
 
         // set fan info for supplemental heating coils
         if (this->m_SuppCoilExists && this->m_FanExists) {
-            if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                         this->m_SuppHeatCoilName,
-                                                                                         this->m_SuppHeatCoilTypeName,
-                                                                                         this->m_FanName,
-                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
-                                                                                         this->m_FanIndex);
-            } else {
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                         this->m_SuppHeatCoilName,
-                                                                                         this->m_SuppHeatCoilTypeName,
-                                                                                         this->m_FanName,
-                                                                                         DataAirSystems::StructArrayLegacyFanModels,
-                                                                                         this->m_FanIndex);
-            }
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                                     this->m_SuppHeatCoilName,
+                                                                                     this->m_SuppHeatCoilTypeName,
+                                                                                     this->m_FanName,
+                                                                                     this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject
+                                                                                         ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                                                                         : DataAirSystems::StructArrayLegacyFanModels,
+                                                                                     this->m_FanIndex);
         }
 
         // Users may not provide SA flow input fields (below) and leave them blank. Check if other coil is AutoSized first to
@@ -6636,22 +6630,14 @@ namespace UnitarySystems {
                     }
                 }
                 // set fan info for cooling coils
-                if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->m_CoolingCoilName,
-                                                                                             loc_coolingCoilType,
-                                                                                             this->m_FanName,
-                                                                                             DataAirSystems::ObjectVectorOOFanSystemModel,
-                                                                                             this->m_FanIndex);
-
-                } else {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->m_CoolingCoilName,
-                                                                                             loc_coolingCoilType,
-                                                                                             this->m_FanName,
-                                                                                             DataAirSystems::StructArrayLegacyFanModels,
-                                                                                             this->m_FanIndex);
-                }
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                    state,
+                    this->m_CoolingCoilName,
+                    loc_coolingCoilType,
+                    this->m_FanName,
+                    this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                                                                      : DataAirSystems::StructArrayLegacyFanModels,
+                    this->m_FanIndex);
             }
             if (this->m_HeatCoilExists) {
                 if (loc_m_HeatingSAFMethod.empty()) {
@@ -6672,22 +6658,14 @@ namespace UnitarySystems {
                     }
                 }
                 // set fan info for heating coils
-                if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->m_HeatingCoilName,
-                                                                                             this->m_HeatingCoilTypeName,
-                                                                                             this->m_FanName,
-                                                                                             DataAirSystems::ObjectVectorOOFanSystemModel,
-                                                                                             this->m_FanIndex);
-
-                } else {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->m_HeatingCoilName,
-                                                                                             this->m_HeatingCoilTypeName,
-                                                                                             this->m_FanName,
-                                                                                             DataAirSystems::StructArrayLegacyFanModels,
-                                                                                             this->m_FanIndex);
-                }
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                    state,
+                    this->m_HeatingCoilName,
+                    this->m_HeatingCoilTypeName,
+                    this->m_FanName,
+                    this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                                                                      : DataAirSystems::StructArrayLegacyFanModels,
+                    this->m_FanIndex);
             }
         }
 
