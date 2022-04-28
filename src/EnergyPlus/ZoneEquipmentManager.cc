@@ -4350,7 +4350,7 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
     auto &Node(state.dataLoopNodes->Node);
 
     // Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
-    for (int airDistUnit = 1; airDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++airDistUnit) {
+    for (int airDistUnit = 1; airDistUnit <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++airDistUnit) {
         int airLoop = state.dataDefineEquipment->AirDistUnit(airDistUnit).AirLoopNum;
         if (airLoop > 0) {
             state.dataAirLoop->AirLoopFlow(airLoop).SupFlow += state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRateSup;
