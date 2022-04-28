@@ -262,7 +262,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<bool> CrossedHeatThresh;
     Array2D<bool> CrossedColdThreshRepPeriod;
     Array2D<bool> CrossedHeatThreshRepPeriod;
-    Array1D_int ZoneNumOcc;
+    Array1D<Real64> ZoneNumOcc;
 
     Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
     Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
