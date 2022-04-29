@@ -12,8 +12,10 @@ Allow Multiple Ground Surface Temperature and Reflectance Objects
 
 Currently EnergyPlus only allows one single ground surface with user defined ground solar reflectance and ground temperature. Each exterior surface has a single view factor to ground. A real building usually sees multiple types of ground surfaces, e.g., bare soil, grass, sidewalks, driveways, water surface, which may have different solar reflectance and ground temperature.
 
+**- The new feature was requeted by LBNL **
+
 **- this feature is intended for use with exterior surfaces only **
-`
+
 ## E-mail and  Conference Call Conclusions ##
 
 NA
@@ -23,28 +25,36 @@ NA
 ### Current Code ###
 
 (1) Exterior surface LWR exchange with the ground is calculated using outside air dryblub temperature (default)
+
 (2) Currently ground surface temperature can be specified using `SurfaceProperty:SurroundingSurfaces` object 
-(3) Exiting model uses global Site:GroundReflectance object
+
+(3) Existing model uses global Site:GroundReflectance object
 
 **- This enhancement allows each exterior surfaces to see different ground surface temperature and reflectance objects.
 
 ## Implementation Approach ##
 
 *(1) This new feature can be implemented using the following two existing Objects:
-`SurfaceProperty:LocalEnvironment` and `SurfaceProperty:SurroundingSurfaces`
-*(2) Requires modifying SurfaceProperty:SurroundingSurfaces` object
+
+     `SurfaceProperty:LocalEnvironment` and `SurfaceProperty:SurroundingSurfaces`
+
+*(2) Requires modifying SurfaceProperty:SurroundingSurfaces object
+
 *(3) Adds new input fields for Ground Reflectance Schedule Name
+
 *(4) Adds new input fields for Surrounding Surface X Reflectance Schedule Name
+
 *(4) View factor weighed ground reflectance will be calculated for each exterior surface
 
 ### Exsting SurfaceProperty:SurroundingSurfaces ###
 
 
 
-![Figure 1](GroundSurfaceProperties_I.PNG)
+![Figure 1](GroundSurfaceProperties.PNG)
 
 ** Figure 1. Surface Property Object **
  
+``` 
 SurfaceProperty:SurroundingSurfaces,
        \min-fields 10
        \memo This object defines a list of surrounding surfaces for an exterior surface.
@@ -140,6 +150,7 @@ SurfaceProperty:LocalEnvironment,
        \type object-list
        \object-list OutdoorAirNodeNames
        \note Enter the name of an OutdoorAir:Node object
+```
 	   
 ## Testing/Validation/Data Source(s): ##
 
