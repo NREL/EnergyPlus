@@ -32,7 +32,29 @@ In the current workorder, we would focus on two metrics only and propose to focu
 
 1. SEER2
 
+SEER2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+capacities less than 65,000 Btu/h
+
+![image](https://user-images.githubusercontent.com/49325382/165989369-12ff95cd-3e8d-4b4d-8bc5-d29a7c260687.png)
+
+based on the following temperature bin values
+
+![image](https://user-images.githubusercontent.com/49325382/165989393-bfe2b1f7-940c-4b6b-85dd-3ab1ea947fb0.png)
+
+
 2. HSPF2
+
+HSPF2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+capacities less than 65,000 Btu/h
+
+Calculation is done as follows (more details in ANSI/AHRI 210/240:
+
+![image](https://user-images.githubusercontent.com/49325382/165988448-6c29f39c-cb7b-447d-8942-0b8eeaf61b28.png)
+
+based on the following temperature bin values
+
+![image](https://user-images.githubusercontent.com/49325382/165988518-3237a3b7-8a1b-4a41-ae6f-38fc5ec5dc6a.png)
+
 
 ## Approach ##
 
@@ -74,7 +96,7 @@ There will be an update to the reports to include the metrics as desribed above.
 
 ## Engineering Reference ##
 
-The EngeineeringReference will be updated to include the formulas used to calculate the two metrics and be referenced from the corresponding EnergyPlus components. 
+The EngineeringReference will be updated to include the formulas used to calculate the two metrics and be referenced from the corresponding EnergyPlus components. 
 
 ## Example Files and Transition Changes ##
 
