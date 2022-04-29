@@ -60,20 +60,20 @@ based on the following temperature bin values
 
 For each of the two metrics, we define EnergyPlus components that the metric applies to. Replicate the code patter of existing metrics for the new metric and write unit tests to ensure the calculation is correct. Once the metrics are calculated we can integrate them into the correpsonding report code of the equipment summary table. 
 - Extent the implementation in StandardRatings.hh & StandardRatings.cc
- - for SEER2 by adding code to the following functions
-  - CalcDXCoilStandardRating
-  - SingleSpeedDXCoolingCoilStandardRatings
-  - DXCoolingCoilDataCenterStandardRatings
-  - MultiSpeedDXCoolingCoilStandardRatings
-  - ReportDXCoilRating
-  - CheckCurveLimitsForStandardRatings
- - for HSPF2
-  - CalcDXCoilStandardRating
-  - SingleSpeedDXHeatingCoilStandardRatings
-  - MultiSpeedDXHeatingCoilStandardRatings
-  - ReportDXCoilRating
-  - CheckCurveLimitsForStandardRatings
-- Add unit tests for both metrics into StandardRatings.unit.cc
+   - for SEER2 by adding code to the following functions
+     - CalcDXCoilStandardRating
+     - SingleSpeedDXCoolingCoilStandardRatings
+     - DXCoolingCoilDataCenterStandardRatings
+     - MultiSpeedDXCoolingCoilStandardRatings
+     - ReportDXCoilRating
+     - CheckCurveLimitsForStandardRatings
+   - for HSPF2
+     - CalcDXCoilStandardRating
+     - SingleSpeedDXHeatingCoilStandardRatings
+     - MultiSpeedDXHeatingCoilStandardRatings
+     - ReportDXCoilRating
+     - CheckCurveLimitsForStandardRatings
+   - Add unit tests for both metrics into StandardRatings.unit.cc
 
 
 
