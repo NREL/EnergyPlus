@@ -12,8 +12,9 @@ Allow Multiple Ground Surface Temperature and Reflectance Objects
 
 Currently EnergyPlus only allows one single ground surface with user defined ground solar reflectance and ground temperature. Each exterior surface has a single view factor to ground. A real building usually sees multiple types of ground surfaces, e.g., bare soil, grass, sidewalks, driveways, water surface, which may have different solar reflectance and ground temperature.
 
+**- The new feature was requeted by LBNL **
 **- this feature is intended for use with exterior surfaces only **
-`
+
 ## E-mail and  Conference Call Conclusions ##
 
 NA
@@ -31,7 +32,7 @@ NA
 ## Implementation Approach ##
 
 *(1) This new feature can be implemented using the following two existing Objects:
-`SurfaceProperty:LocalEnvironment` and `SurfaceProperty:SurroundingSurfaces`
+     `SurfaceProperty:LocalEnvironment` and `SurfaceProperty:SurroundingSurfaces`
 *(2) Requires modifying SurfaceProperty:SurroundingSurfaces` object
 *(3) Adds new input fields for Ground Reflectance Schedule Name
 *(4) Adds new input fields for Surrounding Surface X Reflectance Schedule Name
@@ -45,6 +46,7 @@ NA
 
 ** Figure 1. Surface Property Object **
  
+``` 
 SurfaceProperty:SurroundingSurfaces,
        \min-fields 10
        \memo This object defines a list of surrounding surfaces for an exterior surface.
@@ -140,6 +142,7 @@ SurfaceProperty:LocalEnvironment,
        \type object-list
        \object-list OutdoorAirNodeNames
        \note Enter the name of an OutdoorAir:Node object
+```
 	   
 ## Testing/Validation/Data Source(s): ##
 
