@@ -3,8 +3,8 @@ Equation-Fit Based Gas Fired Absorption Heat Pump (GAHP) Module
 
 **J. Yuan & M.J. Witte, GARD Analytics**
 
- - Original Date: April 22, 2021
- - Revised: April 25, 2021
+ - Original Date: April 22, 2022
+ - Revised: April 29, 2022
 
 
 ## Justification for New Feature ##
@@ -21,7 +21,7 @@ In addition, for both of the two existing models ChillerHeater:Absorption:Direct
 
 ## E-mail and Conference Call Conclusions ##
 ### E-mail Communications ###
-From 2022-04-22 to 2022-04-26, a few email exchanges with the feature requester (Alex Fridlyand) regarding the first draft NFP and a few related questions. Some comments and additional feedbacks were offered by Alex on the equipment's operation modes, typical application scenarios, and typical parameter values. 
+From 2022-04-22 to 2022-04-29, a few email exchanges with the feature requester (Alex Fridlyand) regarding the first draft NFP and a few related questions. Some comments and additional feedbacks were offered by Alex on the equipment's operation modes, typical application scenarios, typical input parameter values, and output variables. 
 
 ### Conference Call Communications ###
 
@@ -79,7 +79,7 @@ HeatPump:AirToWater:FuelFired:Heating,
     1, !-Maximum Part Load Ratio
     Fuel_EIRDefrost_CurveName, !-Fuel Energy Input Ratio Defrost Adjustment Curve name
     OnDemand, !-Defrost Control Type
-    0.05, !-Defrost operation time fraction
+    , !-Defrost operation time fraction
     5, !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
     CRF_CurveName, !-Cycling Ratio Factor Curve Name
     900, !-Nominal Auxiliary Electric Power
@@ -222,8 +222,9 @@ HeatPump:AirToWater:FuelFired:Heating,
        \note Defrost operation control type: timed or OnDemand
   N8 , \field Defrost Operation Time Fraction
        \minimum 0
+       \maximum 1   
        \default 0
-       \note Defrost operation time fraction
+       \note Defrost operation time fraction, which will be used for timed defrost control type.
   N9 , \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
        \units C
        \minimum 0
@@ -411,11 +412,11 @@ The newly added output variables are listed as follows:
 
 ```
 HVAC,sum,Fuel-fired Absorption HeatPump Heating Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Power Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Fuel Energy Usage [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Fuel Power Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Electricity Energy Usage [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Electricity Power Rate [W]
+HVAC,average,Fuel-fired Absorption HeatPump Heating Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Heating Fuel Energy [J]
+HVAC,average,Fuel-fired Absorption HeatPump Heating Fuel Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Heating Electricity Energy [J]
+HVAC,average,Fuel-fired Absorption HeatPump Heating Electricity Rate [W]
 HVAC,average,Fuel-fired Absorption HeatPump Runtime Fraction [];
 HVAC,average,Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s];
 HVAC,average,Fuel-fired Absorption HeatPump Mass Flow Rate [m3/s];
@@ -505,7 +506,7 @@ HeatPump:AirToWater:FuelFired:Heating,
     1, !-Maximum Part Load Ratio
     Fuel_EIRDefrost_CurveName, !-Fuel Energy Input Ratio Defrost Adjustment Curve name
     OnDemand, !-Defrost Control Type
-    0.05, !-Defrost operation time fraction
+    , !-Defrost operation time fraction
     5, !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
     CRF_CurveName, !-Cycling Ratio Factor Curve Name
     900, !-Nominal Auxiliary Electric Power
@@ -528,11 +529,11 @@ The following output will be added the to the new gas-fired (fuel-fired) absorpt
 
 ```
 HVAC,sum,Fuel-fired Absorption HeatPump Heating Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Power Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Fuel Energy Usage [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Fuel Power Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Electricity Energy Usage [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Electricity Power Rate [W]
+HVAC,average,Fuel-fired Absorption HeatPump Heating Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Heating Fuel Energy [J]
+HVAC,average,Fuel-fired Absorption HeatPump Heating Fuel Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Heating Electricity Energy [J]
+HVAC,average,Fuel-fired Absorption HeatPump Heating Electricity Rate [W]
 HVAC,average,Fuel-fired Absorption HeatPump Runtime Fraction [];
 HVAC,average,Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s];
 HVAC,average,Fuel-fired Absorption HeatPump Mass Flow Rate [m3/s];
