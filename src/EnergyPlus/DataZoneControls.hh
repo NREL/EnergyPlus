@@ -75,7 +75,7 @@ namespace DataZoneControls {
 
         // these are all allocated to NumControlTypes, should be a struct allocated once
         Array1D_string ControlType; // from IDF, the "types" (string-should be an enum) of control modes for this particular thermostat - delete this
-        Array1D_string ControlTypeName; // from IDF, the names of the control modes for this particular thermostat
+        Array1D_string ControlTypeName;                           // from IDF, the names of the control modes for this particular thermostat
         Array1D<DataHVACGlobals::ThermostatType> ControlTypeEnum; // from IDF, the enum types of each control mode for this particular thermostat
 
         // these now reflect that actual underlying setpoint temperature schedule indexes for each possible control type,
@@ -125,14 +125,14 @@ namespace DataZoneControls {
         // Default Constructor
         ZoneTempControls()
             : ActualZoneNum(0), CTSchedIndex(0), NumControlTypes(0), SchIndx_SingleHeatSetPoint(0), SchIndx_SingleCoolSetPoint(0),
-              SchIndx_SingleHeatCoolSetPoint(0), SchIndx_DualSetPointWDeadBandHeat(0), SchIndx_DualSetPointWDeadBandCool(0), ManageDemand(false), HeatingResetLimit(0.0),
-              CoolingResetLimit(0.0), EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0), EMSOverrideCoolingSetPointOn(false),
-              EMSOverrideCoolingSetPointValue(0.0), OperativeTempControl(false), OpTempCntrlModeScheduled(false), FixedRadiativeFraction(0.0),
-              OpTempRadiativeFractionSched(0), AdaptiveComfortTempControl(false), AdaptiveComfortModelTypeIndex(0), ZoneOvercoolRange(0.0),
-              ZoneOvercoolControl(false), OvercoolCntrlModeScheduled(false), ZoneOvercoolConstRange(0.0), ZoneOvercoolRangeSchedIndex(0),
-              ZoneOvercoolControlRatio(0.0), DehumidifyingSchedIndex(0), DeltaTCutSet(0), ZoneThermostatSetPointHi(0.0),
-              ZoneThermostatSetPointLo(0.0), CoolModeLast(false), HeatModeLast(false), CoolModeLastSave(false), HeatModeLastSave(false),
-              CoolOffFlag(false), HeatOffFlag(false)
+              SchIndx_SingleHeatCoolSetPoint(0), SchIndx_DualSetPointWDeadBandHeat(0), SchIndx_DualSetPointWDeadBandCool(0), ManageDemand(false),
+              HeatingResetLimit(0.0), CoolingResetLimit(0.0), EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0),
+              EMSOverrideCoolingSetPointOn(false), EMSOverrideCoolingSetPointValue(0.0), OperativeTempControl(false), OpTempCntrlModeScheduled(false),
+              FixedRadiativeFraction(0.0), OpTempRadiativeFractionSched(0), AdaptiveComfortTempControl(false), AdaptiveComfortModelTypeIndex(0),
+              ZoneOvercoolRange(0.0), ZoneOvercoolControl(false), OvercoolCntrlModeScheduled(false), ZoneOvercoolConstRange(0.0),
+              ZoneOvercoolRangeSchedIndex(0), ZoneOvercoolControlRatio(0.0), DehumidifyingSchedIndex(0), DeltaTCutSet(0),
+              ZoneThermostatSetPointHi(0.0), ZoneThermostatSetPointLo(0.0), CoolModeLast(false), HeatModeLast(false), CoolModeLastSave(false),
+              HeatModeLastSave(false), CoolOffFlag(false), HeatOffFlag(false)
 
         {
         }

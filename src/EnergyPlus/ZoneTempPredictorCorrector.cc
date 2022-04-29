@@ -515,14 +515,14 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                 cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 3)) + "\"");
                             ErrorsFound = true;
                         }
-                        TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ControlTypeNum) = static_cast<DataHVACGlobals::ThermostatType>(CTIndex);
+                        TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ControlTypeNum) =
+                            static_cast<DataHVACGlobals::ThermostatType>(CTIndex);
                     } else {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
                                             cAlphaFieldNames(nint(2.0 * ControlTypeNum - 1 + 3)) + "=\"<blank>\"");
                         ErrorsFound = true;
                     }
-
                 }
                 if (NumNums > 0) {
                     if (rNumericArgs(1) >= 0.0) {
@@ -695,21 +695,30 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         for (int ct = 1; ct <= state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).NumControlTypes; ct++) {
             switch (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ct)) {
             case DataHVACGlobals::ThermostatType::SingleHeating:
-                setPointObjectArrayIndex = UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleHeating);
-                TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatSetPoint = state.dataZoneTempPredictorCorrector->SetPointSingleHeating(setPointObjectArrayIndex).TempSchedIndex;
+                setPointObjectArrayIndex =
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleHeating);
+                TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatSetPoint =
+                    state.dataZoneTempPredictorCorrector->SetPointSingleHeating(setPointObjectArrayIndex).TempSchedIndex;
                 break;
             case DataHVACGlobals::ThermostatType::SingleCooling:
-                setPointObjectArrayIndex = UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleCooling);
-                TempControlledZone(TempControlledZoneNum).SchIndx_SingleCoolSetPoint = state.dataZoneTempPredictorCorrector->SetPointSingleCooling(setPointObjectArrayIndex).TempSchedIndex;
+                setPointObjectArrayIndex =
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleCooling);
+                TempControlledZone(TempControlledZoneNum).SchIndx_SingleCoolSetPoint =
+                    state.dataZoneTempPredictorCorrector->SetPointSingleCooling(setPointObjectArrayIndex).TempSchedIndex;
                 break;
             case DataHVACGlobals::ThermostatType::SingleHeatCool:
-                setPointObjectArrayIndex = UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool);
-                TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatCoolSetPoint = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(setPointObjectArrayIndex).TempSchedIndex;
+                setPointObjectArrayIndex = UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct),
+                                                                     state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool);
+                TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatCoolSetPoint =
+                    state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(setPointObjectArrayIndex).TempSchedIndex;
                 break;
             case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
-                setPointObjectArrayIndex = UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), state.dataZoneTempPredictorCorrector->SetPointDualHeatCool);
-                TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBandHeat = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(setPointObjectArrayIndex).HeatTempSchedIndex;
-                TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBandCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(setPointObjectArrayIndex).CoolTempSchedIndex;
+                setPointObjectArrayIndex = UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct),
+                                                                     state.dataZoneTempPredictorCorrector->SetPointDualHeatCool);
+                TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBandHeat =
+                    state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(setPointObjectArrayIndex).HeatTempSchedIndex;
+                TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBandCool =
+                    state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(setPointObjectArrayIndex).CoolTempSchedIndex;
                 break;
             default:
                 assert(false);
@@ -793,7 +802,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 }
                 break;
             case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
-                TempIndex = TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBandHeat;  // using "Heat" as a sentinel that dualsetpoint is on this zone control object
+                TempIndex = TempControlledZone(TempControlledZoneNum)
+                                .SchIndx_DualSetPointWDeadBandHeat; // using "Heat" as a sentinel that dualsetpoint is on this zone control object
                 if (TempIndex == 0) {
                     if (CheckScheduleValue(state, CTIndex, static_cast<int>(DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand))) {
                         ShowSevereError(state, "Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
@@ -4008,11 +4018,9 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     int RelativeZoneNum;
     int ActualZoneNum;
     int TempControlSchedIndex;
-    int SetPointTempSchedIndex;
     int SetPointTempSchedIndexHot;
     int SetPointTempSchedIndexCold;
     int SchedNameIndex;
-    int SchedTypeIndex;
     Array2D<Real64> DaySPValues; // Day room temp setpoint values - for optimum start
     int OccStartTime;            // Occupancy start time - for optimum start
     Real64 DeltaT;               // Temperature difference between cutout and setpoint
@@ -4025,7 +4033,6 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     auto &ZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo;
     auto &ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi;
     auto &NumOfZones = state.dataGlobal->NumOfZones;
-    auto &SetPointDualHeatCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool;
 
     TempControlType = DataHVACGlobals::ThermostatType::Uncontrolled; // Default
 
