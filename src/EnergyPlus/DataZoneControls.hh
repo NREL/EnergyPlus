@@ -69,14 +69,23 @@ namespace DataZoneControls {
         int ActualZoneNum;
         std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
         int CTSchedIndex;                 // Index for this schedule
+
+        // this is the number of control types defined on this zone control object
         int NumControlTypes;
-        Array1D_string ControlType;
-        Array1D_string ControlTypeName;
-        Array1D_int ControlTypeSchIndx;
+
+        // these are all allocated to NumControlTypes, should be a struct allocated once
+        Array1D_string ControlType; // from IDF, the "types" (string-should be an enum) of control modes for this particular thermostat - delete this
+        Array1D_string ControlTypeName; // from IDF, the names of the control modes for this particular thermostat
+        Array1D<DataHVACGlobals::ThermostatType> ControlTypeEnum; // from IDF, the enum types of each control mode for this particular thermostat
+
+        // these now reflect that actual underlying setpoint temperature schedule indexes for each possible control type,
+        // so they can be used to call directly to ScheduleValue(...)
         int SchIndx_SingleHeatSetPoint;
         int SchIndx_SingleCoolSetPoint;
         int SchIndx_SingleHeatCoolSetPoint;
-        int SchIndx_DualSetPointWDeadBand;
+        int SchIndx_DualSetPointWDeadBandHeat;
+        int SchIndx_DualSetPointWDeadBandCool;
+
         bool ManageDemand;                      // Flag to indicate whether to use demand limiting
         Real64 HeatingResetLimit;               // Lowest heating setpoint that can be set by demand manager [C]
         Real64 CoolingResetLimit;               // Highest cooling setpoint that can be set by demand manager [C]
@@ -116,7 +125,7 @@ namespace DataZoneControls {
         // Default Constructor
         ZoneTempControls()
             : ActualZoneNum(0), CTSchedIndex(0), NumControlTypes(0), SchIndx_SingleHeatSetPoint(0), SchIndx_SingleCoolSetPoint(0),
-              SchIndx_SingleHeatCoolSetPoint(0), SchIndx_DualSetPointWDeadBand(0), ManageDemand(false), HeatingResetLimit(0.0),
+              SchIndx_SingleHeatCoolSetPoint(0), SchIndx_DualSetPointWDeadBandHeat(0), SchIndx_DualSetPointWDeadBandCool(0), ManageDemand(false), HeatingResetLimit(0.0),
               CoolingResetLimit(0.0), EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0), EMSOverrideCoolingSetPointOn(false),
               EMSOverrideCoolingSetPointValue(0.0), OperativeTempControl(false), OpTempCntrlModeScheduled(false), FixedRadiativeFraction(0.0),
               OpTempRadiativeFractionSched(0), AdaptiveComfortTempControl(false), AdaptiveComfortModelTypeIndex(0), ZoneOvercoolRange(0.0),
