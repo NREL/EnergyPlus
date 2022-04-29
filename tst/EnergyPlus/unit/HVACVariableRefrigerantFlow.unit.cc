@@ -305,11 +305,9 @@ protected:
         // set up air loop
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumBranches = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumInletBranches = 1;
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum.allocate(1);
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum[0] = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumOutletBranches = 1;
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum.allocate(1);
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum[0] = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).TotalComponents = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp.allocate(1);

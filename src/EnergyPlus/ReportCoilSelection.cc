@@ -873,7 +873,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             } else {
                 // find boiler on this plant loop and get capacity from it
                 if (allocated(state.dataBoilerSteam->Boiler)) {
-                    for (int boilerIndex = 1; boilerIndex <= state.dataBoilerSteam->numBoilers; ++boilerIndex) {
+                    for (int boilerIndex = 1; boilerIndex <= (int)state.dataBoilerSteam->Boiler.size(); ++boilerIndex) {
                         if (state.dataBoilerSteam->Boiler(boilerIndex).plantLoc.loopNum == c->waterLoopNum) { // steam boiler on this loop
                             c->plantDesSupTemp = state.dataBoilerSteam->Boiler(boilerIndex).TempUpLimitBoilerOut;
                             c->plantDesRetTemp = state.dataBoilerSteam->Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
