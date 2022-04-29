@@ -28,15 +28,32 @@ We have identified the following commonly used metrics:
 |UEF (10 CFP 430 Appendix E)|ASHRAE 90.1-2019|Uniform Energy Factor|Water Heaters|[link](https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE)|
 |FEI (AMCA 208)|ASHRAE 90.1-2019|Fan Energy Index|Fan Energy|[link](www.amca.org/news/press-releases/ansi/amca-standard-208%2C-calculation-of-the-fan-energy-index%2C-available-for-free-download.html&usg=AOvVaw2eZxHxgdq183Y9WsZlgjTB)|
 
-In the current workorder, we would focus on two metrics only and propose to focus on heat pump related metrics: HSPF2 and IEER.
+In the current workorder, we would focus on two metrics only and propose to focus on SEER2 and HSPF2.
 
-1. HSPF2
+1. SEER2
 
-2. IEER
+2. HSPF2
 
 ## Approach ##
 
 For each of the two metrics, we define EnergyPlus components that the metric applies to. Replicate the code patter of existing metrics for the new metric and write unit tests to ensure the calculation is correct. Once the metrics are calculated we can integrate them into the correpsonding report code of the equipment summary table. 
+- Extent the implementation in StandardRatings.hh & StandardRatings.cc
+ - for SEER2 by adding code to the following functions
+  - CalcDXCoilStandardRating
+  - SingleSpeedDXCoolingCoilStandardRatings
+  - DXCoolingCoilDataCenterStandardRatings
+  - MultiSpeedDXCoolingCoilStandardRatings
+  - ReportDXCoilRating
+  - CheckCurveLimitsForStandardRatings
+ - for HSPF2
+  - CalcDXCoilStandardRating
+  - SingleSpeedDXHeatingCoilStandardRatings
+  - MultiSpeedDXHeatingCoilStandardRatings
+  - ReportDXCoilRating
+  - CheckCurveLimitsForStandardRatings
+- Add unit tests for both metrics into StandardRatings.unit.cc
+
+
 
 ## Testing/Validation/Data Source(s) ##
 
