@@ -178,14 +178,6 @@ namespace DataZoneControls {
         int SchIndx_SglCoolSetPointFanger;                       // Index to fanger single cooling setpoint schedule
         int SchIndx_SglHCSetPointFanger;                         // Index to fanger single heating/cooling setpoint schedule
         int SchIndx_DualSetPointFanger;                          // Index to fanger dual setpoint schedule
-        int SchIndx_SglHeatSetPointPierce;                       // Index to pierce single heating setpoint schedule
-        int SchIndx_SglCoolSetPointPierce;                       // Index to pierce single cooling setpoint schedule
-        int SchIndx_SglHCSetPointPierce;                         // Index to pierce single heating/cooling setpoint schedule
-        int SchIndx_DualSetPointPierce;                          // Index to pierce dual setpoint schedule
-        int SchIndx_SglHeatSetPointKSU;                          // Index to KSU single heating setpoint schedule
-        int SchIndx_SglCoolSetPointKSU;                          // Index to KSU single cooling setpoint schedule
-        int SchIndx_SglHCSetPointKSU;                            // Index to KSU single heating/cooling setpoint schedule
-        int SchIndx_DualSetPointKSU;                             // Index to KSU dual setpoint schedule
         bool ManageDemand;                                       // Flag to indicate whether to use demand limiting
         Real64 HeatingResetLimit;                                // Lowest heating setpoint that can be set by demand manager [C]
         Real64 CoolingResetLimit;                                // Highest cooling setpoint that can be set by demand manager [C]
@@ -209,9 +201,7 @@ namespace DataZoneControls {
         // Default Constructor
         ZoneComfortControls()
             : ActualZoneNum(0), ComfortSchedIndex(0), NumControlTypes(0), SchIndx_SglHeatSetPointFanger(0), SchIndx_SglCoolSetPointFanger(0),
-              SchIndx_SglHCSetPointFanger(0), SchIndx_DualSetPointFanger(0), SchIndx_SglHeatSetPointPierce(0), SchIndx_SglCoolSetPointPierce(0),
-              SchIndx_SglHCSetPointPierce(0), SchIndx_DualSetPointPierce(0), SchIndx_SglHeatSetPointKSU(0), SchIndx_SglCoolSetPointKSU(0),
-              SchIndx_SglHCSetPointKSU(0), SchIndx_DualSetPointKSU(0), ManageDemand(false), HeatingResetLimit(0.0), CoolingResetLimit(0.0),
+              SchIndx_SglHCSetPointFanger(0), SchIndx_DualSetPointFanger(0), ManageDemand(false), HeatingResetLimit(0.0), CoolingResetLimit(0.0),
               EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0), EMSOverrideCoolingSetPointOn(false),
               EMSOverrideCoolingSetPointValue(0.0), TdbMaxSetPoint(50.0), TdbMinSetPoint(0.0), AverageMethodName("PEOPLE AVERGAE"),
               AverageMethod(ZoneTempPredictorCorrector::AverageMethod::NO), SpecificObjectNum(0), PeopleAverageErrIndex(0), TdbMaxErrIndex(0),

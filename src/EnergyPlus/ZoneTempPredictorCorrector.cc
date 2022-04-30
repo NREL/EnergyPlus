@@ -508,6 +508,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     if (!TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum).empty()) {
                         auto ctrlType = static_cast<DataHVACGlobals::ThermostatType>(
                             getEnumerationValue(ValidControlTypesUC, TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum)));
+                        TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ControlTypeNum) = ctrlType;
                         if (ctrlType == DataHVACGlobals::ThermostatType::Invalid) {
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
