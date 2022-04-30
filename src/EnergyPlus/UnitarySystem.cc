@@ -18017,7 +18017,7 @@ namespace UnitarySystems {
         return this->m_OAMixerNodes[2];
     }
 
-    int UnitarySys::getParentIndex()
+    int UnitarySys::getEquipIndex()
     {
         return this->m_EquipCompNum;
     }

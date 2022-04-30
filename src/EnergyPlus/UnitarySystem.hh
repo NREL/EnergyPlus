@@ -958,7 +958,7 @@ namespace UnitarySystems {
         int getMixerOANode() override;
         int getMixerMixNode() override;
         int getMixerRetNode() override;
-        int getParentIndex() override;
+        int getEquipIndex() override;
 
         UnitarySys() = default;
         ~UnitarySys() = default;
