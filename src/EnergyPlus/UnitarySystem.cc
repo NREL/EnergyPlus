@@ -484,12 +484,8 @@ namespace UnitarySystems {
                 if (this->m_FanExists && (this->m_CoolCoilExists && (this->m_HeatCoilExists || this->m_SuppCoilExists)))
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = true;
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
-                if (this->m_sysType == SysType::CoilCoolingDX) { // set CoilSystem name for cooling coil
-                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                        // not sure if new cooling coil model needs to set something? but certainly can't call DXCoils
-                    } else {
-                        DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
-                    }
+                if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                    DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
                 // associates an air loop fan on main branch with a coil on main branch where parent does not have a fan
                 if (!this->m_FanExists) {
