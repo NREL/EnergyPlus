@@ -499,12 +499,13 @@ namespace UnitarySystems {
                                 state,
                                 this->m_CoolingCoilName,
                                 DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilIndex),
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
                                     ? state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name
                                     : state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject ? DataAirSystems::ObjectVectorOOFanSystemModel
-                                                                                                  : DataAirSystems::StructArrayLegacyFanModels,
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
+                                    ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                    : DataAirSystems::StructArrayLegacyFanModels,
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
                                     ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex
                                     : state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                         }
@@ -513,12 +514,13 @@ namespace UnitarySystems {
                                 state,
                                 this->m_HeatingCoilName,
                                 DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilIndex),
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
                                     ? state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name
                                     : state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject ? DataAirSystems::ObjectVectorOOFanSystemModel
-                                                                                                  : DataAirSystems::StructArrayLegacyFanModels,
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
+                                    ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                    : DataAirSystems::StructArrayLegacyFanModels,
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
                                     ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex
                                     : state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                         }
@@ -527,12 +529,13 @@ namespace UnitarySystems {
                                 state,
                                 this->m_SuppHeatCoilName,
                                 DataHVACGlobals::cAllCoilTypes(this->m_SuppHeatCoilIndex),
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
                                     ? state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name
                                     : state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject ? DataAirSystems::ObjectVectorOOFanSystemModel
-                                                                                                  : DataAirSystems::StructArrayLegacyFanModels,
-                                this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
+                                    ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                    : DataAirSystems::StructArrayLegacyFanModels,
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
                                     ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex
                                     : state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                         }
@@ -7878,7 +7881,7 @@ namespace UnitarySystems {
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
         int zoneUnitaryNum = 0;
-        int airloopUnitarySum = 0;
+        int airloopUnitaryNum = 0;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
@@ -8131,8 +8134,9 @@ namespace UnitarySystems {
                     } else {
                         // zone equipment require a 1-n index for access to zone availability managers
                         // although not zone equipment, use same methodology
-                        ++airloopUnitarySum;
-                        thisSys.m_EquipCompNum = airloopUnitarySum;
+                        // keep OA system unitary equipment indexes separate?
+                        ++airloopUnitaryNum;
+                        thisSys.m_EquipCompNum = airloopUnitaryNum;
                     }
                     int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                     state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
