@@ -494,7 +494,7 @@ namespace UnitarySystems {
                             state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                                 state,
                                 this->m_CoolingCoilName,
-                                DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilIndex),
+                                DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num),
                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
                                     ? state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name
                                     : state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
