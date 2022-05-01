@@ -160,7 +160,7 @@ namespace UnitarySystems {
             // Get the unitary system input
             getUnitarySystemInput(state, Name, ZoneEquipment, ZoneOAUnitNum);
         }
-        CompIndex = this->m_UnitarySysNum;
+        CompIndex = this->m_EquipCompNum;
 
         state.dataUnitarySystems->FanSpeedRatio = 1.0;
         if (ZoneEquipment) {
@@ -7436,6 +7436,7 @@ namespace UnitarySystems {
         EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
         std::string cCurrentModuleObject = "CoilSystem:Cooling:DX";
+        int numCoilSystemDX = 0;
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
@@ -7530,6 +7531,10 @@ namespace UnitarySystems {
                 if (sysNum == -1) {
                     int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                     state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
+                    // zone equipment require a 1-n index for access to zone availability managers
+                    // although not zone equipment, use same methodology
+                    ++numCoilSystemDX;
+                    thisSys.m_EquipCompNum = numCoilSystemDX;
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
                 }
@@ -7674,6 +7679,7 @@ namespace UnitarySystems {
                     thisSys.processInputSpec(state, original_input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                     if (sysNum == -1) {
+                        // zone equipment require a 1-n index for access to zone availability managers
                         switch (getPTUnitType) {
                         case 1:
                             ++numPTAC;
@@ -7721,6 +7727,7 @@ namespace UnitarySystems {
     {
 
         std::string cCurrentModuleObject("CoilSystem:Cooling:Water");
+        int numCoilSystemWater = 0;
         static const std::string routineName("getCoilWaterSystemInputData: ");
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -7843,6 +7850,10 @@ namespace UnitarySystems {
                 if (sysNum == -1) {
                     int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                     state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
+                    // zone equipment require a 1-n index for access to zone availability managers
+                    // although not zone equipment, use same methodology
+                    ++numCoilSystemWater;
+                    thisSys.m_EquipCompNum = numCoilSystemWater;
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
                 }
@@ -7862,6 +7873,7 @@ namespace UnitarySystems {
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
         int zoneUnitaryNum = 0;
+        int airloopUnitarySum = 0;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
@@ -8108,8 +8120,14 @@ namespace UnitarySystems {
                 if (sysNum == -1) {
                     ++thisSys.m_UnitarySysNum;
                     if (ZoneEquipment) {
+                        // zone equipment require a 1-n index for access to zone availability managers
                         ++zoneUnitaryNum;
                         thisSys.m_EquipCompNum = zoneUnitaryNum;
+                    } else {
+                        // zone equipment require a 1-n index for access to zone availability managers
+                        // although not zone equipment, use same methodology
+                        ++airloopUnitarySum;
+                        thisSys.m_EquipCompNum = airloopUnitarySum;
                     }
                     int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                     state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
