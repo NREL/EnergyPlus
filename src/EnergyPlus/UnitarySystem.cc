@@ -490,50 +490,48 @@ namespace UnitarySystems {
                 // associates an air loop fan on main branch with a coil on main branch where parent does not have a fan
                 if (!this->m_FanExists) {
                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType != DataAirSystems::Invalid) {
+                        auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
                         if (this->m_CoolCoilExists) {
                             state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                                 state,
                                 this->m_CoolingCoilName,
                                 DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num),
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
-                                    ? state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name
-                                    : state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
+                                    ? state.dataHVACFan->fanObjs[primaryAirSystems.supFanVecIndex]->name
+                                    : state.dataFans->Fan(primaryAirSystems.SupFanNum).FanName,
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
                                     ? DataAirSystems::ObjectVectorOOFanSystemModel
                                     : DataAirSystems::StructArrayLegacyFanModels,
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
-                                    ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex
-                                    : state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel ? primaryAirSystems.supFanVecIndex
+                                                                                                                  : primaryAirSystems.SupFanNum);
                         }
                         if (this->m_HeatCoilExists) {
                             state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                                 state,
                                 this->m_HeatingCoilName,
-                                DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilIndex),
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
-                                    ? state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name
-                                    : state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
+                                DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num),
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
+                                    ? state.dataHVACFan->fanObjs[primaryAirSystems.supFanVecIndex]->name
+                                    : state.dataFans->Fan(primaryAirSystems.SupFanNum).FanName,
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
                                     ? DataAirSystems::ObjectVectorOOFanSystemModel
                                     : DataAirSystems::StructArrayLegacyFanModels,
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
-                                    ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex
-                                    : state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel ? primaryAirSystems.supFanVecIndex
+                                                                                                                  : primaryAirSystems.SupFanNum);
                         }
                         if (this->m_SuppCoilExists) {
                             state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                                 state,
                                 this->m_SuppHeatCoilName,
-                                DataHVACGlobals::cAllCoilTypes(this->m_SuppHeatCoilIndex),
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
-                                    ? state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name
-                                    : state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
+                                DataHVACGlobals::cAllCoilTypes(this->m_SuppHeatCoilType_Num),
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
+                                    ? state.dataHVACFan->fanObjs[primaryAirSystems.supFanVecIndex]->name
+                                    : state.dataFans->Fan(primaryAirSystems.SupFanNum).FanName,
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
                                     ? DataAirSystems::ObjectVectorOOFanSystemModel
                                     : DataAirSystems::StructArrayLegacyFanModels,
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType == DataHVACGlobals::FanType_SystemModelObject
-                                    ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex
-                                    : state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
+                                primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel ? primaryAirSystems.supFanVecIndex
+                                                                                                                  : primaryAirSystems.SupFanNum);
                         }
                     }
                 }
