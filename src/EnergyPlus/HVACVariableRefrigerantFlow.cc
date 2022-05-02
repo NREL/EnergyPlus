@@ -15559,8 +15559,10 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
     } break;
     default:
         break;
-        SuppCoilLoad = SuppHeatCoilLoad;
     }
+
+    SuppCoilLoad = SuppHeatCoilLoad;
+
 }
 
 Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(EnergyPlusData &state,
