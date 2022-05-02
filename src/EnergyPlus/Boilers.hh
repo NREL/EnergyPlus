@@ -48,6 +48,8 @@
 #ifndef Boilers_hh_INCLUDED
 #define Boilers_hh_INCLUDED
 
+#include <array>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -80,74 +82,64 @@ namespace Boilers {
     struct BoilerSpecs : PlantComponent
     {
         // Members
-        std::string Name;                           // user identifier
-        DataGlobalConstants::ResourceType FuelType; // resource type assignment
-        DataPlant::PlantEquipmentType Type;         // plant loop type identifier
+        std::string Name;                                                                     // user identifier
+        DataGlobalConstants::ResourceType FuelType = DataGlobalConstants::ResourceType::None; // resource type assignment
+        DataPlant::PlantEquipmentType Type = DataPlant::PlantEquipmentType::Invalid;          // plant loop type identifier
         PlantLocation plantLoc;
-        bool Available;               // TRUE if machine available in current time step
-        bool ON;                      // TRUE: simulate the machine at it's operating part load ratio
-        Real64 NomCap;                // W - design nominal capacity of Boiler
-        bool NomCapWasAutoSized;      // true if previous was set to autosize input
-        Real64 NomEffic;              // boiler efficiency at design conditions
-        Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        DataPlant::FlowMode FlowMode; // one of 3 modes for component flow during operation
-        bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
-        bool ModulatedFlowErrDone;    // true if setpoint warning issued
-        Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
-        bool VolFlowRateWasAutoSized; // true if previous was set to autosize input
-        Real64 DesMassFlowRate;       // kg/s - Boiler water design mass flow rate
-        Real64 MassFlowRate;          // kg/s - Boiler water mass flow rate
-        Real64 SizFac;                // sizing factor
-        int BoilerInletNodeNum;       // Node number at the boiler inlet
-        int BoilerOutletNodeNum;      // Node number at the boiler outlet
-        Real64 MinPartLoadRat;        // Minimum allowed operating part load ratio
-        Real64 MaxPartLoadRat;        // Maximum allowed operating part load ratio
-        Real64 OptPartLoadRat;        // Optimal operating part load ratio
-        Real64 OperPartLoadRat;       // Actual operating part load ratio
-        TempMode CurveTempMode;       // water temp to use in curve, switch between entering and leaving
-        int EfficiencyCurvePtr;       // Index to efficiency curve
-        Real64 TempUpLimitBoilerOut;  // C - Boiler outlet maximum temperature limit
-        Real64 ParasiticElecLoad;     // W - Parasitic electric power (e.g. forced draft fan)
-        int EffCurveOutputError;      // efficiency curve output <=0 recurring warning error counter
-        int EffCurveOutputIndex;      // efficiency curve output <=0 recurring warning error message index
-        int CalculatedEffError;       // calculated efficiency >1.1 recurring warning error counter
-        int CalculatedEffIndex;       // calculated efficiency >1.1 recurring warning error message index
-        bool IsThisSized;             // TRUE if sizing is done
+        bool Available = false;                                      // TRUE if machine available in current time step
+        bool ON = false;                                             // TRUE: simulate the machine at it's operating part load ratio
+        Real64 NomCap = 0.0;                                         // W - design nominal capacity of Boiler
+        bool NomCapWasAutoSized = false;                             // true if previous was set to autosize input
+        Real64 NomEffic = 0.0;                                       // boiler efficiency at design conditions
+        Real64 TempDesBoilerOut = 0.0;                               // C - Boiler design outlet temperature
+        DataPlant::FlowMode FlowMode = DataPlant::FlowMode::Invalid; // one of 3 modes for component flow during operation
+        bool ModulatedFlowSetToLoop = false;                         // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone = false;                           // true if setpoint warning issued
+        Real64 VolFlowRate = 0.0;                                    // m3/s - Boiler water design volumetric flow rate
+        bool VolFlowRateWasAutoSized = false;                        // true if previous was set to autosize input
+        Real64 DesMassFlowRate = 0.0;                                // kg/s - Boiler water design mass flow rate
+        Real64 MassFlowRate = 0.0;                                   // kg/s - Boiler water mass flow rate
+        Real64 SizFac = 0.0;                                         // sizing factor
+        int BoilerInletNodeNum = 0;                                  // Node number at the boiler inlet
+        int BoilerOutletNodeNum = 0;                                 // Node number at the boiler outlet
+        Real64 MinPartLoadRat = 0.0;                                 // Minimum allowed operating part load ratio
+        Real64 MaxPartLoadRat = 0.0;                                 // Maximum allowed operating part load ratio
+        Real64 OptPartLoadRat = 0.0;                                 // Optimal operating part load ratio
+        Real64 OperPartLoadRat = 0.0;                                // Actual operating part load ratio
+        TempMode CurveTempMode = TempMode::NOTSET;                   // water temp to use in curve, switch between entering and leaving
+        int EfficiencyCurvePtr = 0;                                  // Index to efficiency curve
+        Real64 TempUpLimitBoilerOut = 0.0;                           // C - Boiler outlet maximum temperature limit
+        Real64 ParasiticElecLoad = 0.0;                              // W - Parasitic electric power (e.g. forced draft fan)
+        int EffCurveOutputError = 0;                                 // efficiency curve output <=0 recurring warning error counter
+        int EffCurveOutputIndex = 0;                                 // efficiency curve output <=0 recurring warning error message index
+        int CalculatedEffError = 0;                                  // calculated efficiency >1.1 recurring warning error counter
+        int CalculatedEffIndex = 0;                                  // calculated efficiency >1.1 recurring warning error message index
+        bool IsThisSized = false;                                    // TRUE if sizing is done
         // Operational fault parameters
-        bool FaultyBoilerFoulingFlag;     // True if the boiler has fouling fault
-        int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
-        Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
-        std::string EndUseSubcategory;    // identifier use for the end use subcategory
-        bool MyEnvrnFlag;
-        bool MyFlag;
+        bool FaultyBoilerFoulingFlag = false;   // True if the boiler has fouling fault
+        int FaultyBoilerFoulingIndex = 0;       // Index of the fault object corresponding to the boiler
+        Real64 FaultyBoilerFoulingFactor = 1.0; // Boiler fouling factor
+        std::string EndUseSubcategory;          // identifier use for the end use subcategory
+        bool MyEnvrnFlag = true;
+        bool MyFlag = true;
 
-        Real64 FuelUsed;           // W - Boiler fuel used
-        Real64 ParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
-        Real64 BoilerLoad;         // W - Boiler Load
-        Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-        Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
-        Real64 BoilerPLR;          // Boiler operating part-load ratio
-        Real64 BoilerEff;          // Boiler operating efficiency
+        Real64 FuelUsed = 0.0;           // W - Boiler fuel used
+        Real64 ParasiticElecPower = 0.0; // W - Parasitic electrical power (e.g. forced draft fan)
+        Real64 BoilerLoad = 0.0;         // W - Boiler Load
+        Real64 BoilerMassFlowRate = 0.0; // kg/s - Boiler mass flow rate
+        Real64 BoilerOutletTemp = 0.0;   // W - Boiler outlet temperature
+        Real64 BoilerPLR = 0.0;          // Boiler operating part-load ratio
+        Real64 BoilerEff = 0.0;          // Boiler operating efficiency
 
-        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
-        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
-        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+        Real64 BoilerEnergy = 0.0;             // J - Boiler energy integrated over time
+        Real64 FuelConsumed = 0.0;             // J - Boiler Fuel consumed integrated over time
+        Real64 BoilerInletTemp = 0.0;          // C - Boiler inlet temperature
+        Real64 ParasiticElecConsumption = 0.0; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
 
-        std::string BoilerFuelTypeForOutputVariable;
+        std::string BoilerFuelTypeForOutputVariable = "";
 
         // Default Constructor
-        BoilerSpecs()
-            : FuelType(DataGlobalConstants::ResourceType::None), Type(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, Available(false),
-              ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::Invalid),
-              ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0),
-              MassFlowRate(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
-              OptPartLoadRat(0.0), OperPartLoadRat(0.0), CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0),
-              ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0),
-              IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true),
-              MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
-              BoilerEff(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0),
-              BoilerFuelTypeForOutputVariable("")
+        BoilerSpecs() : plantLoc{}
         {
         }
 
@@ -197,15 +189,12 @@ namespace Boilers {
 
 struct BoilersData : BaseGlobalStruct
 {
-    int numBoilers = 0;
     bool getBoilerInputFlag = true;
     Array1D<Boilers::BoilerSpecs> Boiler;
 
     void clear_state() override
     {
-        this->numBoilers = 0;
-        this->getBoilerInputFlag = true;
-        this->Boiler.deallocate();
+        *this = BoilersData();
     }
 };
 

@@ -134,14 +134,15 @@ void RegisterNodeConnection(EnergyPlusData &state,
         MakeNew = false;
     }
     if (MakeNew) {
+        int constexpr NodeConnectionAlloc = 1000;
         ++state.dataBranchNodeConnections->NumOfNodeConnections;
         if (state.dataBranchNodeConnections->NumOfNodeConnections > 1 &&
             state.dataBranchNodeConnections->NumOfNodeConnections > state.dataBranchNodeConnections->MaxNumOfNodeConnections) {
             state.dataBranchNodeConnections->NodeConnections.redimension(state.dataBranchNodeConnections->MaxNumOfNodeConnections +=
-                                                                         state.dataBranchNodeConnections->NodeConnectionAlloc);
+                                                                         NodeConnectionAlloc);
         } else if (state.dataBranchNodeConnections->NumOfNodeConnections == 1) {
-            state.dataBranchNodeConnections->NodeConnections.allocate(state.dataBranchNodeConnections->NodeConnectionAlloc);
-            state.dataBranchNodeConnections->MaxNumOfNodeConnections = state.dataBranchNodeConnections->NodeConnectionAlloc;
+            state.dataBranchNodeConnections->NodeConnections.allocate(NodeConnectionAlloc);
+            state.dataBranchNodeConnections->MaxNumOfNodeConnections = NodeConnectionAlloc;
         }
 
         state.dataBranchNodeConnections->NodeConnections(state.dataBranchNodeConnections->NumOfNodeConnections).NodeNumber = NodeNumber;
@@ -156,13 +157,14 @@ void RegisterNodeConnection(EnergyPlusData &state,
     if (has_prefixi(objTypeStr, "AirTerminal:")) {
         if (!InputFieldName.empty()) {
             ++state.dataBranchNodeConnections->NumOfAirTerminalNodes;
+            int constexpr EqNodeConnectionAlloc = 100;
             if (state.dataBranchNodeConnections->NumOfAirTerminalNodes > 1 &&
                 state.dataBranchNodeConnections->NumOfAirTerminalNodes > state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes) {
                 state.dataBranchNodeConnections->AirTerminalNodeConnections.redimension(state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes +=
-                                                                                        state.dataBranchNodeConnections->EqNodeConnectionAlloc);
+                                                                                        EqNodeConnectionAlloc);
             } else if (state.dataBranchNodeConnections->NumOfAirTerminalNodes == 1) {
-                state.dataBranchNodeConnections->AirTerminalNodeConnections.allocate(state.dataBranchNodeConnections->EqNodeConnectionAlloc);
-                state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes = state.dataBranchNodeConnections->EqNodeConnectionAlloc;
+                state.dataBranchNodeConnections->AirTerminalNodeConnections.allocate(EqNodeConnectionAlloc);
+                state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes = EqNodeConnectionAlloc;
             }
 
             // Check out AirTerminal inlet/outlet nodes
@@ -667,7 +669,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         FluidStreamInletCount.allocate(MaxFluidStream);
         FluidStreamOutletCount.allocate(MaxFluidStream);
         FluidStreamCounts.allocate(MaxFluidStream);
-        NodeObjects.allocate(state.dataBranchNodeConnections->NumOfNodeConnections);
+        NodeObjects.allocate(state.dataBranchNodeConnections->NumOfNodeConnections + 1);
         FluidStreamInletCount = 0;
         FluidStreamOutletCount = 0;
         NodeObjects = 0;
@@ -684,10 +686,12 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataBranchNodeConnections->NodeConnections(Object + 1).ObjectName) {
                 EndConnect = Object + 1;
                 NodeObjects(NumObjects) = EndConnect;
-                if (Object + 1 < state.dataBranchNodeConnections->NumOfNodeConnections) ++NumObjects;
+                // if (Object + 1 < state.dataBranchNodeConnections->NumOfNodeConnections) ++NumObjects;
+                ++NumObjects;
             }
             ++Object;
         }
+        NodeObjects(NumObjects) = state.dataBranchNodeConnections->NumOfNodeConnections + 1;
         // NodeObjects now contains each consecutive object...
         for (Object = 1; Object <= NumObjects - 1; ++Object) {
             IsValid = true;

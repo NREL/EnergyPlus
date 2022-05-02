@@ -1137,16 +1137,11 @@ namespace UserDefinedComponents {
                     }
 
                     if (!lAlphaFieldBlanks(8)) {
-                        {
-                            auto const SELECT_CASE_var(cAlphaArgs(8));
-
-                            if (SELECT_CASE_var == "YES") {
-                                state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = true;
-                            } else if (SELECT_CASE_var == "NO") {
-                                state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = false;
-                            }
+                        if (cAlphaArgs(8) == "YES") {
+                            state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = true;
+                        } else if (cAlphaArgs(8) == "NO") {
+                            state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = false;
                         }
-
                     } else {
                         state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = false;
                     }
@@ -1993,7 +1988,7 @@ namespace UserDefinedComponents {
                 BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
 
                 int ADUNum = 0;
-                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                     if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum ==
                         state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                         //        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum

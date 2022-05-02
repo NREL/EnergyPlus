@@ -366,7 +366,7 @@ namespace FuelCellElectricGenerator {
 
         GeneratorFuelSupply::GetGeneratorFuelSupplyInput(state);
 
-        for (int FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
+        for (int FuelSupNum = 1; FuelSupNum <= (int)state.dataGenerator->FuelSupply.size(); ++FuelSupNum) {
             GeneratorFuelSupply::SetupFuelConstituentData(state, FuelSupNum, ErrorsFound);
         }
 
