@@ -213,7 +213,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum)
                                                         .AirDistUnitCool(ZoneInletNodeNum)
                                                         .SupplyBranchIndex =
-                                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OutletBranchNum(OutNum);
+                                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                         for (MainBranchNum = 1;
                                                              MainBranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;

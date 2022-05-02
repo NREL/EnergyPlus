@@ -6348,7 +6348,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             state.dataSurface->SurfOpaqAO(SurfNum) = 0.0;
         }
     }
-    if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+    if ((int)state.dataDaylightingDevicesData->TDDPipe.size() > 0) {
         for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
             int SurfDome = e.Dome;
             for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {

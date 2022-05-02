@@ -228,10 +228,9 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
     bool ErrorsFound(false);
 
     state.dataIPShortCut->cCurrentModuleObject = "Chiller:Absorption:Indirect";
-    state.dataChillerIndirectAbsorption->NumIndirectAbsorbers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    int NumIndirectAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-    if (state.dataChillerIndirectAbsorption->NumIndirectAbsorbers <= 0) {
+    if (NumIndirectAbsorbers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
         // See if load distribution manager has already gotten the input
         ErrorsFound = true;
@@ -239,10 +238,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
 
     if (allocated(state.dataChillerIndirectAbsorption->IndirectAbsorber)) return;
 
-    state.dataChillerIndirectAbsorption->IndirectAbsorber.allocate(state.dataChillerIndirectAbsorption->NumIndirectAbsorbers);
+    state.dataChillerIndirectAbsorption->IndirectAbsorber.allocate(NumIndirectAbsorbers);
 
     // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-    for (AbsorberNum = 1; AbsorberNum <= state.dataChillerIndirectAbsorption->NumIndirectAbsorbers; ++AbsorberNum) {
+    for (AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  AbsorberNum,

@@ -458,7 +458,7 @@ namespace FourPipeBeam {
                             thisBeam->name);
 
         airNodeFound = false;
-        for (aDUIndex = 1; aDUIndex <= state.dataDefineEquipment->NumAirDistUnits; ++aDUIndex) {
+        for (aDUIndex = 1; aDUIndex <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++aDUIndex) {
             if (thisBeam->airOutNodeNum == state.dataDefineEquipment->AirDistUnit(aDUIndex).OutletNodeNum) {
                 thisBeam->aDUNum = aDUIndex;
                 state.dataDefineEquipment->AirDistUnit(aDUIndex).InletNodeNum = thisBeam->airInNodeNum;
