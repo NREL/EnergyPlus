@@ -207,7 +207,184 @@ insert text
 
 ## Input Output Reference Documentation ##
 
-insert text
+This section provides description for the AirflowNetwork:SimulationControl objec with proposed new optional fields.
+
+\subsection{AirflowNetwork:SimulationControl}\label{airflownetworksimulationcontrol}
+
+The basic run parameters for this model are defined in this unique object which has the following input specifications:
+
+\subsubsection{Inputs}\label{inputs-004}
+
+\paragraph{Field: Name}\label{field-name-004}
+
+This is a unique character string associated with this instance of the AirflowNetwork:\hyperref[simulationcontrol]{SimulationControl} object. At this time, only one AirflowNetwork:\hyperref[simulationcontrol]{SimulationControl} object can be specified in an input data file (idf).
+
+\paragraph{Field: AirflowNetwork Control}\label{field-airflownetwork-control}
+
+The following selections are available to control the Airflow Network simulation:
+
+\textbf{MultiZoneWithDistribution:} MultiZone air flow calculations are performed during all simulation timesteps, including the impacts of the air distribution system when a HVAC system fan is operating. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{\hyperref[zonemixing]{ZoneMixing}} and \textbf{\hyperref[zonecrossmixing]{ZoneCrossMixing}} objects specified in the input data file are not simulated.
+
+\textbf{MultiZoneWithoutDistribution}: MultiZone air flow calculations are performed during all simulation timesteps, but the air distribution system portion of the network is not modeled even if it is specified in the input data file. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{\hyperref[zonemixing]{ZoneMixing}} and \textbf{\hyperref[zonecrossmixing]{ZoneCrossMixing}} objects specified in the input data file are not simulated.
+
+\textbf{MultiZoneWithDistributionOnlyDuringFanOperation:} MultiZone air flow calculations, including the impacts of the air distribution system, are only performed when the HVAC system fan is operating. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{\hyperref[zonemixing]{ZoneMixing}} and \textbf{\hyperref[zonecrossmixing]{ZoneCrossMixing}} objects specified in the input data file are used when the HVAC system fan is OFF (if none are specified, then no air flow calculations are performed when the fan is OFF).
+
+\textbf{NoMultiZoneOrDistribution:} No multizone air flow calculations (with or without the air distribution system portion of the network) are performed during the simulation. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{\hyperref[zonemixing]{ZoneMixing}} and \textbf{\hyperref[zonecrossmixing]{ZoneCrossMixing}} objects specified in the input data file are simulated (if none are specified, then no air flow calculations are performed). Note: Having an input data file with no AirflowNetwork:\hyperref[simulationcontrol]{SimulationControl} objects gives the same impact -- no multizone air flow calculations. However, this choice is provided as a convenience to the user to easily disable the multizone air flow calculations for an input data file that already contains AirflowNetwork objects.
+
+\textbf{Note:} A \textbf{ZoneInfiltration:*} object indicates any one of \textbf{\hyperref[zoneinfiltrationdesignflowrate]{ZoneInfiltration:DesignFlowRate}}, \textbf{\hyperref[zoneinfiltrationeffectiveleakagearea]{ZoneInfiltration:EffectiveLeakageArea}},and \textbf{\hyperref[zoneinfiltrationflowcoefficient]{ZoneInfiltration:FlowCoefficient}} objects.A object of\textbf{ZoneVentilation:*} indicates any one of \textbf{\hyperref[zoneventilationdesignflowrate]{ZoneVentilation:DesignFlowRate}} and \textbf{\hyperref[zoneventilationwindandstackopenarea]{ZoneVentilation:WindandStackOpenArea}} objects\textbf{.}
+
+\paragraph{Field: Wind Pressure Coefficient Type}\label{field-wind-pressure-coefficient-type}
+
+Determines whether the wind pressure coefficients are input by the user or calculated. The choices are \textbf{Input} or \textbf{SurfaceAverageCalculation}, with the default being SurfaceAverageCalculation.
+
+If INPUT, you must enter an \hyperref[airflownetworkmultizonewindpressurecoefficientarray]{AirflowNetwork:MultiZone:WindPressureCoefficientArray} object, one or more \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} objects, and one or more \hyperref[airflownetworkmultizonewindpressurecoefficientvalues]{AirflowNetwork:MultiZone:WindPressureCoefficientValues} objects.
+
+The second choice, SurfaceAverageCalculation, should only be used for \textbf{rectangular} buildings. In this case surface-average wind pressure coefficients vs. wind direction are calculated by the program for the four vertical fa\c{c}ades and the roof based on user entries for ``Building Type,'' ``Azimuth Angle of Long Axis of Building,'' and ``Ratio of Building Width Along Short Axis to Width Along Long Axis'' (see description of these fields below). With this choice you do \textbf{not} have to enter any of the following objects: AirflowNetwork:MultiZone: Wind Pressure Coefficient Array, \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} and \hyperref[airflownetworkmultizonewindpressurecoefficientvalues]{AirflowNetwork:MultiZone:WindPressureCoefficientValues}.
+
+\paragraph{Field: Height Selection for Local Wind Pressure Calculation}\label{field-height-selection-for-local-wind-pressure-calculation}
+
+Determines whether the local wind pressure is calculated based on either given external node heights or surface opening heights. The choices are \textbf{ExternalNode} or \textbf{OpeningHeight}, with the default being OpeningHeight. The local outdoor wind speed calculation procedure is given in the section of ``Local Wind Speed Calculation'' in the Engineering Reference. The calculation procedure requires the height input.
+
+If \textbf{ExternalNode}, the heights given in the \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} objects are used to calculate local wind pressures based on the given height local wind speed.~ Used only if Wind Pressure Coefficient Type = INPUT (see description of previous field).
+
+If \textbf{OpeningHeight}, the number of the \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} objects has to be equal to the number of external surfaces defined in the \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} objects. The centroids in the z direction of the \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} objects are the heights used in the local wind pressure calculation with the given height wind speed. The input is required if Wind Pressure Coefficient Type = INPUT (see description of previous field).
+
+If Wind Pressure Coefficient Type = \textbf{SurfaceAverageCalculation}, a value in this field is not required and a blank may be entered. The default choice is used internally to generate the \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} objects
+
+\paragraph{Field: Building Type}\label{field-building-type}
+
+Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation. The choices for Building Type are LowRise and HighRise, with the default being LowRise.
+
+LowRise corresponds to a rectangular building whose height is less than three times the width of the footprint (\emph{w\(_{short}\)} in Figure~\ref{fig:footprint-of-a-rectangular-building-showing}) and is less than three times the length of the footprint (\emph{w\(_{long}\)} in the same figure).
+
+HighRise corresponds to a rectangular building whose height is more than three times the width of the footprint (\emph{w\(_{short}\)} in Figure~\ref{fig:footprint-of-a-rectangular-building-showing}) or is more than three times the length of the footprint (\emph{w\(_{long}\)} in the same figure).
+
+\paragraph{Field: Maximum Number of Iterations}\label{field-maximum-number-of-iterations}
+
+The maximum number of iterations allowed in finding an AirflowNetwork solution. If the number of iterations at each simulation timestep is above the maximum number of iterations defined by this field, the program could not find the solution and a Severe error is issued and the program is aborted. The default value is 500.
+
+\paragraph{Field: Initialization Type}\label{field-initialization-type}
+
+Designates which method is used for AirflowNetwork initialization. The choices for Initialization Type are LinearInitializationMethod and ZeroNodePressures, with the default being ZeroNodePressures.
+
+\paragraph{Field: Relative Airflow Convergence Tolerance}\label{field-relative-airflow-convergence-tolerance}
+
+The solution is assumed to have converged when \({{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet }_{_i}}} } \right|} \mathord{\left/ {\vphantom {{\left| {\,\sum\limits_{} {{{\mathop m\limits^ \bullet }_{_i}}} } \right|} {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|} }}} \right. } {\sum\limits_{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|} }}\) is less than the value specified for this input field. This convergence criteria is equivalent to the ratio of the absolute value of the sum of all network airflows (\(\left| {\sum {{{\mathop m\limits^ \bullet }_{_i}}} } \right|\) ) to the sum of network airflow magnitudes (\(\sum\limits_{}^{} {\left| {{{\mathop m\limits^ \bullet }_{_i}}} \right|}\) ). The default value is 1.0x10\(^{-4}\).
+
+\paragraph{Field: Absolute Airflow Convergence Tolerance}\label{field-absolute-airflow-convergence-tolerance}
+
+The solution is assumed to have converged when the summation of the absolute value of all network airflows (\(\left| {\sum {{{\mathop m\limits^ \bullet }_{_i}}} } \right|\) ) is less than the value specified for this input field. The default value is 1.0x10\(^{-6}\).
+
+\paragraph{Field: Convergence Acceleration Limit}\label{field-convergence-acceleration-limit}
+
+If the ratio of successive pressure corrections is less than this limit, use Steffensen acceleration algorithm (Ref. AirflowNetwork Model in the EnergyPlus Engineering Reference). The range for this field is -1 to 1, with the default value being -0.5.
+
+\paragraph{Field: Azimuth Angle of Long Axis of Building}\label{field-azimuth-angle-of-long-axis-of-building}
+
+Gives the orientation of a rectangular building for calculating wind pressure coefficients. This is the smaller of the angles, measured clockwise, between North and the long axis of the building (see Figure~\ref{fig:footprint-of-a-rectangular-building-showing}). Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation. The range for this input is 0 to 180, with the default value being 0.
+
+\paragraph{Field: Ratio of Building Width Along Short Axis to Width Along Long Axis}\label{field-ratio-of-building-width-along-short-axis-to-width-along-long-axis}
+
+This is the aspect ratio of a rectangular footprint. It is given by the width of the footprint along its short axis divided by the width along the long axis (see Figure~\ref{fig:footprint-of-a-rectangular-building-showing}). If the footprint is square, the value of this field is 1.0. Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation. The range for this input is \textgreater{} 0 to 1, with the default value being 1.
+
+\begin{figure}[hbtp] % fig 95
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image221.png}
+\caption{Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the ``Azimuth Angle of Long Axis of Building.''  $w_{short}/w_{long}$ is the ``Ratio of Building Width Along Short Axis to Width Along Long Axis.'' \protect \label{fig:footprint-of-a-rectangular-building-showing}}
+\end{figure}
+
+\paragraph{Field: Height Dependence of External Node Temperature}\label{field-height-dependence-of-external-node-temperature}
+
+This is an optional field. Input is Yes or No. The default is No. Yes is that external node temperature is dependent on node height. No means that external node temperature is calculated with zero height.
+
+\paragraph{Field: Allow Unsupported Zone Equipment}\label{allow-unsupported-zone-equipment}
+
+This is an optional field. Input is Yes or No. The default is No. Set this input to Yes to have zone equipment that are currently unsupported in the AirflowNetwork model allowed in the simulation. Setting this field to Yes, allows the following equipment to be modeled along an AirflowNetwork model: ZoneHVAC:Dehumidifier, ZoneHVAC:EnergyRecoveryVentilator, WaterHeater:HeatPump:*. The AirflowNetwork model will exclude mass balance in these equipment objects and assume the mass flows are self-balanced in the equipment objects.
+
+<span style="color:red">
+
+\paragraph{Field: Duct Sizing Method}\label{duct-sizing-method}
+
+This is an optional field. The allowed choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity, with the default being None.
+
+None: No duct sizing is performed.
+
+MaximumVelocity: The duct diameter is calculated based on entered velocity as D_h = sqrt(4Q/(V*pi))
+
+where Q = volumetric flow rate {m3}
+
+      V = maximum velocity {m/s}
+
+PressureLoss: Colebrook's equation is used to calculate duct diameter. Please see detailed description of calculation procedure in Engineering Reference.
+
+PressureLossWithMaximumVelocity: When PressureLossWithMaximumVelocity is entered, duct diameter is calculated based on PressureLoss first. The value will be used to calculate flow velocity to ensure the final velocity is less than the maximum value. If greater, final value will be obtained from MaximumVelocity.
+
+\paragraph{Field: Duct Sizing Factor}\label{duct-sizing-factor}
+
+The global duct sizing ratio applied to all of the duct component diameter.
+
+\paragraph{Field: Maximum Airflow Velocity}\label{maximum-airflow-velocity}
+
+This is an optional field to represent the maximum velopcity in trunk ducts with units m/s. The default value is 5 m/s. The value is used when the choice of Duct Sizing Method is either MaximumVelocity or PressureLossWithMaximumVelocity. The duct diameter is calculated at D = flow rate / Cross section area.
+
+\paragraph{Field: Total Pressure Loss Across Supply Truck}\label{total-pressure-loss-across-supply-truck}
+
+This optional field is used if Duct Sizing Method is PressureLoss or PressureLossWithMaximumVelocity. When PressureLoss is entered, duct diameter is calculated using Colebrook's equation.  When PressureLossWithMaximumVelocity is entered, duct diameter is calculated based on PressureLoss first. The value is used to calculate flow velocity to ensure the final velocity is less than the maximum value. If greater, final value will be obtained from the MaximumVelocity method.
+
+\paragraph{Field: Total Pressure Loss Across Supply Branch}\label{total-pressure-loss-across-supply-branch}
+
+This optional field with units Pa is used to calculate supply branch duct diameter based on Colesbrook's equation. 
+
+\paragraph{Field: Total Pressure Loss Across Return Truck}\label{total-pressure-loss-across-return-truck}
+
+This optional field with units Pa is used to calculate return trunk duct diameter based on Colesbrook's equation. 
+
+\paragraph{Field: Total Pressure Loss Across Return Branch}\label{total-pressure-loss-across-return-branch}
+ 
+This optional field with units Pa is used to calculate return branch duct diameter based on Colesbrook's equation. 
+</span>
+
+An IDF example is shown below:
+
+\begin{lstlisting}
+AirflowNetwork:SimulationControl,
+      AirflowNetwork_All,      !- Name
+      MultiZoneWithDistribution,  !- AirflowNetwork Control
+      Input,                   !- Wind Pressure Coefficient Type
+      Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
+      OpeningHeight,           !- Height Selection for Local Wind Speed Calculation
+      LowRise,                 !- Building Type
+      500,                     !- Maximum Number of Iterations {dimensionless}
+      ZeroNodePressures,       !- Initialization Type
+      1.0E-05,                 !- Relative Airflow Convergence Tolerance {dimensionless}
+      1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
+      -0.5,                    !- Convergence Acceleration Limit {dimensionless}
+      0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
+      1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+\end{lstlisting}
+
+If the AirflowNetwork:SimulationControl object is not provided in an input file, the default input object will be created by the program internally, as long as following conditions are satisfied:
+\begin{itemize}
+\item The number of AirflowNetwork:MultiZone:Zone objects >= 1
+\item The number of AirflowNetwork:MultiZone:Surface objects >= 2
+\end{itemize}
+The default input object is shown below:
+
+\begin{lstlisting}
+AirflowNetwork:SimulationControl,
+    AFNDefaultControl,          !- Name
+    MultizoneWithoutDistribution,  !- AirflowNetwork Control
+    SurfaceAverageCalculation,  !- Wind Pressure Coefficient Type
+    OpeningHeight,           !- Height Selection for Local Wind Pressure Calculation
+    LOWRISE,                 !- Building Type
+    500,                     !- Maximum Number of Iterations {dimensionless}
+    ZeroNodePressures,       !- Initialization Type
+    1.0E-04,                 !- Relative Airflow Convergence Tolerance {dimensionless}
+    1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
+    -0.5,                    !- Convergence Acceleration Limit {dimensionless}
+    0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
+    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+\end{lstlisting}
 
 ## Input Description ##
 
@@ -409,7 +586,94 @@ Duct sizes will be added in the output of eio.
 
 ## Engineering Reference ##
 
-insert text
+A new section of Duct Sizing is provided below.
+
+\subsection{Duct Sizing}\label{duct-sizingl}
+
+There are two methods used to size duct diameter and cross section area by assuming round ducts. Each method is presented below.
+
+1. Maxiumum velocity
+
+The cross section area (A) is calculated below
+
+A =  \frac{Q}{V} 
+
+where 
+
+A = Cross section area {m2}
+
+Q = Volumetric air flow rate {m3/s}
+
+V = Maximum velocity {m/s}
+
+The duct diameter is calculated as
+
+D = \sqrt{\frac{4Q}{V \pi } } 
+
+where
+
+D = Duct diameter {m}
+
+Q = Volumetric air flow rate {m3/s}
+
+V = Maximum velocity {m/s}
+
+
+2. Pressure loss
+
+The total pressure loss across a duct may be expressed as
+
+\Delta P =  \big( P_{1} +  \rho  \frac{V_{1}^2}{2}  )  - \big( P_{2} +  \rho  \frac{V_{2}^2}{2}  ) +  \rho g(z_{1} - z_{2} ) 
+
+where
+
+\Delta P = Total pressure loss in a truck or branch {Pa}
+
+P_1, P_2 = Entry and exit static pressure {Pa}
+
+V_1, V_2 = Entry and exit velocities {m/s}
+
+\rho = Air density {kg/m3}
+
+g = Acceleration of gravity {m/s2}
+
+z_1, z_2 = Entry and exit elevations {m}
+
+When entry and exit velocities and elevations are the same, the total pressure difference is equal to the static pressure difference. The assumption will be used for duct sizing. 
+
+The total pressure loss in either a truck or a branch can be calculated using Darcy-Weisbach Equation (Eq. 34 in Chpater 21, 2017 ASHRAE HOF)
+
+\Delta P =  \big( \frac{1000 f L}{D} +  \Sigma C ) *  \frac{ \rho  V^{2} }{2}  
+
+f = Friction factor {dimensionless}
+
+L = Total length in a truck or branch {m}
+
+D = Hydraulic diameter {m}
+
+V = Velocity {m/s}
+
+\rho = Air density {kg/m3}
+
+C = Local loss coefficient for all ducts {dimensionless}
+
+where the friction factor can be represented by Colebrrook's equation:
+
+\frac{1}{\sqrt{f}} = -2 log\big( \frac{ \varepsilon }{3.7 D} +  \frac{2.51}{Re\sqrt{f}}) 
+
+Re = 66.4 *D *V
+
+For a round duct:
+
+V = Q/A = Q / (D^2 * \pi / 4)
+
+The cross section area
+
+A = \frac{D^2 * \pi}{4}
+
+
+When ΔP given, and the relationship between D and V is also given, there is only a single unknow D. The value can be obtained through iteration. 
+
 
 ## Example File and Transition Changes ##
 
@@ -418,6 +682,52 @@ An existing eample file will be modified by adding duct sizing capability. If no
 ## References ##
 
 insert text
+
+##Design Documentation##
+
+The new feature will revise a single module: AirflowNetworkBalanceManager. Some functions will be revised and a new function of DuctSizing will be created to calculate duct diameters.
+
+
+### AirflowNetworkBalanceManager ###
+
+The module revision includes the GetAirflowNetworkInput fuction and a new variable as bool AFNDuctAutoSize.
+
+####GetAirflowNetworkInput####
+
+The function will be revised to read proposed 7 new fields for the AirflowNetwork:SimulationControl object. Corresponding code validation and warnings will be added after reading statements.
+
+Add a new bool variable as AFNDuctAutoSize, with default being false. When any choice of Duct Size Methos is entered, the variable will be set to true.
+
+####A new function as DuctSizing ####
+
+The new function will perform several actions as shown below.
+
+1. The function will be called inside AirflowNetworkBalanceManagerData::initialize.
+
+The calling point is similar to other system modules, such as SizeDXCoils in the DXCOils module.
+
+2. Get volumetric airflow rates for each trunk and branch.
+
+Fan flow rate will be assigned to trunk flow rate, and terminal flow rates will be assinged to branch flow rates
+
+3. Assign duct components as Trunk and Branch
+
+As mentioned before, the supply truck section includes ducts between Return Air Path Outlet Node in Demand Side Inlet Node in AirLoopHVAC, and Inlet Node in AirLoopHVAC:ZoneSplitter. The supply branch section includes ducts between Outlet Nodes in AirLoopHVAC:ZoneSplitter, and Inlet Node in ZoneTernminal Units defined in ZoneHVAC:AirDistributionUnit. The return truck section includes ducts between Demand Side Outlet Node in AirLoopHVAC, and Outlet Node in AirLoopHVAC:ZoneMixer. The return branch section includes ducts between Inlet Nodes in AirLoopHVAC:ZoneMixer, and Zone Return Air Node defined in ZoneHVAC:EquipmentConnections.
+
+Based on trunk and branch definitions, a loop for every linkage, with duct component and exposed to zones, will be performed to find supply trunks and branches, and return trunks and branches, using node information.
+
+4. Solve Colesbrook equation to get duct diameter for each duct component
+
+5. Select D = max(D1, D2, D3....)
+
+6. Check duct diameter to ensure diamters from other ducts located in HVAS system and zone connection are greater or equal to the calculated duct diameter.
+
+7. Write duct diameter values for each duct component in trunks and branches in the eio.
+
+Note:
+
+If we assume all Surface Roughness values are the same in the same trunk or branch, a simple iteration will be performed to find a solution for all ducts in the same trunk or branch.    
+
 
 
 
