@@ -4749,12 +4749,8 @@ void InitPTUnit(EnergyPlusData &state,
                 QZnReq = QToHeatSetPt;
                 state.dataPTHP->CoolingLoad = false;
                 //       Don't set mode TRUE unless mode is allowed. Also check for floating zone.
-                if (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling ||
-                    state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::Uncontrolled) {
-                    state.dataPTHP->HeatingLoad = false;
-                } else {
-                    state.dataPTHP->HeatingLoad = true;
-                }
+                state.dataPTHP->HeatingLoad = (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling &&
+                                               state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::Uncontrolled);
                 PartLoadFrac = 1.0;
                 if (state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel) {
                     SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);

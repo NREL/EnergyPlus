@@ -116,11 +116,11 @@ namespace DataHVACGlobals {
     enum class ThermalComfortCtrlType
     {
         Invalid = -1,
-        Uncontrolled = 0,
-        SglHeatSetPointFanger = 1,
-        SglCoolSetPointFanger = 2,
-        SglHCSetPointFanger = 3,
-        DualSetPointFanger = 4,
+        Uncontrolled,
+        SglHeatSetPointFanger,
+        SglCoolSetPointFanger,
+        SglHCSetPointFanger,
+        DualSetPointFanger,
         Num
     };
 
