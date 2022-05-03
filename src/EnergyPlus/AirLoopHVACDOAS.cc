@@ -110,7 +110,7 @@ namespace AirLoopHVACDOAS {
 
         if (this->SumMassFlowRate == 0.0 && !state.dataGlobal->BeginEnvrnFlag) {
             state.dataLoopNodes->Node(this->m_CompPointerAirLoopMixer->OutletNodeNum).MassFlowRate = 0.0;
-            return;
+            if (state.dataGlobal->KickOffSimulation) return;
         }
 
         this->CalcAirLoopDOAS(state, FirstHVACIteration);
