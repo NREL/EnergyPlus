@@ -4,8 +4,7 @@ Subdivide Heat Balance by Space
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original April 22, 2022
- - Revision Date
- 
+ - Rev1 May 3, 2022 - Expand justification, make space heat balance calcs optional
 
 ## Table of Contents ##
 
@@ -31,10 +30,29 @@ Subdivide Heat Balance by Space
 
 ## Justification for New Feature ##
 
-Space was added in v9.6 and currently is used for assigning and allocating internal gains. Each EnergyPlus Zone contains one or more Spaces. To facilitate room-by-room sizing and HVAC simulations, it is necessary to subdivide the zone heat balance by space.
+Space was added as a new concept in v9.6. At the time, it was decided that the definition of Zone would not change: a thermal zone (HVAC zone) is composed of one or more rooms (spaces) controlled by a single thermostat or HVAC system control point such as a VAV terminal unit. This aligns with the most common understanding of a "zone" in HVAC design and energy modeling practice, including the OpenStudio data model.
+
+Currently, each EnergyPlus Zone contains one or more Spaces which are used for:
+
+  * assigning and allocating internal gains
+  * specifying enclosure boundaries,
+  * reporting inputs grouped by space types, and 
+  * reporting select output grouped by space types.
+  
+The Zone air heat balance is currently lumped across all Spaces in the Zone. During the initial Space NFP discussions, additional capabilities were requested which would require an air heat balance for each Space:
+
+  * Room-by-room sizing is commonly done to size individual room diffusers or equipment such as PTACs. Zone-level equipment may be sized to either the coincident or non-coincident peak across the rooms (Spaces). 
+
+  * Room-by-room HVAC simulation allows modeling the impact of thermostat placement in a specific room which often results in less-than-ideal temperature control for other rooms in the same Zone. For some applications, such as a unitary system with a single thermostat, this can be achieved by modeling each room as a separate Zone and using the "control zone" options. But this is not adequate for VAV systems or unitary systems with zoning controls.
 
 ## E-mail and Conference Call Conclusions ##
+Q1: What, if any, effect on runtime performance do we expect?
 
+A1: For this phase, the goal is to have a minimal impact on speed. Most of the calculations in the predictor-corrector are already looping over every surface, every internal gain, every HVAC supply node, etc. Looping over these groupings the space level and then aggregating results to the zone level shouldn't be costly. And radiant exchange is already at the enclosure-level, so that will not change. But if this proves to be slow, an option to do only zone heat balance can be added.
+
+Q2: I still don't understand the need for this feature. If you want a finer resolution of heat balances, you can already make smaller zones, no? If you want room-by-room sizing, just make each room a separate zone. The current balance of zone and space allows you to aggregate things nicely to the higher level zone heat balance without incurring additional runtime associated with the additional heat balances for spaces that aren't expected to be thermally dissimilar.
+
+A2: The difference comes in the HVAC system sizing and controls. For unitary systems, one can make each room a separate zone, size each zone's airflow separately, and then use the current unitary system inputs for control zone and control flow fraction to model the system. But for other types of HVAC systems, such as VAV, there is no equivalent way to control the VAV damper (and reheat coil) based on a thermostat in one Space and split the airflow to diffusers in other Spaces. In the early discussions for the original Space implementation, one of the proposed approaches was to use Zones for the room-level model and add a new HVAC-Zone concept to group rooms for HVAC control. Ultimately, it was decided to keep Zone aligned with the concept of a group of Spaces (rooms) that are an HVAC control Zone. This is the next step along that path. Regarding performance, see Q1.
 
 
 ## Overview ##
@@ -54,21 +72,23 @@ The current implementation of Space includes the following key features:
     * Internal gain output variables (by object, space, and zone)
     * Submeters by SpaceType (not by Space)
 
-The heat balance is currently at the zone level only. While some components are already calculated and summed across spaces, the zone heat balance, HVAC equipment simulation, and zone air temperature calculations are lumped for all spaces within the zone. This task will focus on refactoring the zone predictor/corrector functions to calculate air temperatures (with some limitations) and heat balance components by Space as well as by Zone.
+The air heat balance is currently at the zone level only. While some components are already calculated and summed across spaces, the zone air heat balance, HVAC equipment simulation, and zone air temperature calculations are lumped for all spaces within the zone. This task will focus on refactoring the zone predictor/corrector functions to calculate air temperatures and heat balance components by Space as well as by Zone.
 
 ## Approach ##
 
-The first step will be to ensure that all components of the heat balance are allocated by space. This will require changing some objects to allow specification by space or zone, similar to what is already done for people, lights, etc.
+1. The first step will be to ensure that all components of the heat balance are allocated by space. This will require changing some objects to allow specification by space or zone, similar to what is already done for people, lights, etc.
 
-The next step will be to calculate the Space heat balance. This should be fairly straightforward, modifying existing calculation loops to sum components by Space instead of by Zone.
+2. The next step will be to calculate the Space air heat balance. This should be fairly straightforward, modifying existing calculation loops to sum components by Space instead of by Zone.
 
-The final step will be the most challenging, combining the Space results for the Zone. Some Zone results are simply a sum of the Space results. But the air temperatures raise some questions. During sizing, all Spaces in the Zone will be controlled to the same thermostat temperature, so combining Spaces into Zones will be straightforward, and all surfaces will see the same air temperature.
+3. Combining the Space results for the Zone will be more challenging.
 
-But during the HVAC simulation there are some development stages which build on each other:
+  * Some Zone results are simply a sum of the Space results.
 
-1. Lumping the Space air masses together for the Zone heat balance will force all Spaces in the Zone to the same air temperature. This will (should) produce the same Zone-level result, but it won't allow any difference in Space air temperatures.
+  * During sizing, all Spaces in the Zone will be controlled to the same thermostat temperature, so combining Spaces into Zones will be straightforward, and all surfaces will see the same air temperature.
 
-2. The next level would be to somehow allocate the HVAC output by Space. This could be by floor area, by volume, by load, or by user-specified airflow fractions. The additional inputs required for this are beyond the scope of this task. But the goal will be to refactor the air heat balance to allow for Space air temperatures to be calculated independently in the future.
+  * During the HVAC simulation, for this task, the Space air masses will be lumped together for the Zone heat balance. This will force all Spaces in the Zone to the same air temperature.
+  
+  * Future work may add Space-level HVAC distribution and thermostat control options to allow calculation of independent Space air temperatures.
 
 Key aspects of the surface and air heat balances are listed below with italics indicating required changes.
 
@@ -83,7 +103,7 @@ Key aspects of the surface and air heat balances are listed below with italics i
 ### Zone/Space Air Heat Balance ##
 
 * Surface convection to the air is currently to the zone air temperature. 
-  * *Change to the space air temperature.*
+  * *Change to space air temperature.*
 * Internal convective gains are already computed by space.
 * Zone airflows for infiltration and mixing are currently by zone (ZoneInfiltration, ZoneMixing, ZoneCrossMixing).
   * *Modify inputs to specify by zone or space (similar to internal gains, but allocated by volume or floor area depending on the input method).* 
@@ -109,11 +129,13 @@ Zone-level results should stay the same.
 ## Input Description ##
 No new objects are proposed. Several existing objects will have changes.
 
+### HeatBalanceAlgorithm
+* *Add a new field for Air Heat Balance Detail - Zone (default), ZoneAndSpace*
+
 ### Space
 * *Add new field for Volume.*
 * *Add new field for Ceiling Height.*
 * *Transition required.*
-
 
 ### ZoneInfiltration:DesignFlowRate
 * *Change field "Zone or ZoneList Name" to "Zone or ZoneList or Space or SpaceList Name."*
@@ -137,6 +159,8 @@ No new objects are proposed. Several existing objects will have changes.
 ### ZoneThermalChimney
 * *Change field "Zone N Name" to "Inlet Zone or Space Name N."*
 
+### ZoneControl:Thermostat:\*
+* No change. Apply the same thermostat across all Spaces in the Zone.
 
 ## Outputs Description ##
 
@@ -308,7 +332,6 @@ void CalcZoneSums(EnergyPlusData &state,
 `CalcZoneSensibleOutput`
 * No change necessary inside the function,because all values are passed in as arguments.
 * Calls to this function may need to be changed to pass in space values rather than zone values.
-
 
 `PredictSystemLoads`
 * Break apart into multiple functions for 
