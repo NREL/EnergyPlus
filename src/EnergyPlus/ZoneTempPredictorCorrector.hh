@@ -125,10 +125,10 @@ namespace ZoneTempPredictorCorrector {
     enum class AverageMethod
     {
         Invalid = -1,
-        NO = 0,  // No multiple people objects
-        SPE = 1, // Specific people object
-        OBJ = 2, // People object average
-        PEO = 3, // People number average
+        NO,  // No multiple people objects
+        SPE, // Specific people object
+        OBJ, // People object average
+        PEO, // People number average
         Num
     };
 

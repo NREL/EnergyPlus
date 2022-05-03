@@ -327,7 +327,8 @@ void Ground::calculateSurfaceAverages() {
     }
 
     double totalQ = 0.0;
-    double totalQc = 0.0, totalQr = 0.0;
+    double totalQc = 0.0;
+    // double totalQr = 0.0;
     double TA = 0;
     double hA = 0.0, hcA = 0.0, hrA = 0.0;
     double totalArea = 0.0;
@@ -368,7 +369,7 @@ void Ground::calculateSurfaceAverages() {
             hA += Ahc + Ahr;
 
             totalQc += Qc;
-            totalQr += Qr;
+            // totalQr += Qr;
             totalQ += Qc + Qr + q * A;
 
             TA += TNew[index] * A;

@@ -22,6 +22,12 @@
 #pragma warning(push)
 #pragma warning(disable : 4127) // Conditional expression is constant
 #pragma warning(disable : 4459) // Declaration hides global declaration
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#if __clang_major__ >= 13
+#pragma clang diagnostic ignored "-Wdeprecated-copy"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic push
 #if __GNUC__ >= 9
@@ -32,6 +38,8 @@
 #include <Eigen/SparseCore>
 #if defined(_MSC_VER)
 #pragma warning(pop)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
 #elif defined(__GNUC__) && defined(__linux__)
 #pragma GCC diagnostic pop
 #endif

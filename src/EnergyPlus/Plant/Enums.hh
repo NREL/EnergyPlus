@@ -243,6 +243,8 @@ enum class FlowMode
     Num
 };
 
+constexpr std::array<std::string_view, static_cast<int>(FlowMode::Num)> FlowModeNamesUC{"CONSTANTFLOW", "NOTMODULATED", "LEAVINGSETPOINTMODULATED"};
+
 enum class CondenserType
 {
     Invalid = -1,

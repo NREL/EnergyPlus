@@ -944,76 +944,64 @@ namespace DataLoopNode {
     struct NodeData
     {
         // Members
-        NodeFluidType FluidType;     // must be one of the valid parameters
-        int FluidIndex;              // For Fluid Properties
-        Real64 Temp;                 // {C}
-        Real64 TempMin;              // {C}
-        Real64 TempMax;              // {C}
-        Real64 TempSetPoint;         // {C}
-        Real64 TempLastTimestep;     // [C}
-        Real64 MassFlowRateRequest;  // {kg/s}
-        Real64 MassFlowRate;         // {kg/s}
-        Real64 MassFlowRateMin;      // {kg/s}
-        Real64 MassFlowRateMax;      // {kg/s}
-        Real64 MassFlowRateMinAvail; // {kg/s}
-        Real64 MassFlowRateMaxAvail; // {kg/s}
-        Real64 MassFlowRateSetPoint; // {kg/s}
-        Real64 Quality;              // {0.0-1.0 vapor fraction/percent}
-        Real64 Press;                // {Pa}
-        Real64 Enthalpy;             // {J/kg}
-        Real64 EnthalpyLastTimestep; // {J/kg}
-        Real64 HumRat;               // {}
-        Real64 HumRatMin;            // {}
-        Real64 HumRatMax;            // {}
-        Real64 HumRatSetPoint;       // {}
-        Real64 TempSetPointHi;       // {C}
-        Real64 TempSetPointLo;       // {C}
-        Real64 Height;               // {m}
+        NodeFluidType FluidType = NodeFluidType::Blank; // must be one of the valid parameters
+        int FluidIndex = 0;                             // For Fluid Properties
+        Real64 Temp = 0.0;                              // {C}
+        Real64 TempMin = 0.0;                           // {C}
+        Real64 TempMax = 0.0;                           // {C}
+        Real64 TempSetPoint = SensedNodeFlagValue;      // {C}
+        Real64 TempLastTimestep = 0.0;                  // [C}
+        Real64 MassFlowRateRequest = 0.0;               // {kg/s}
+        Real64 MassFlowRate = 0.0;                      // {kg/s}
+        Real64 MassFlowRateMin = 0.0;                   // {kg/s}
+        Real64 MassFlowRateMax = SensedNodeFlagValue;   // {kg/s}
+        Real64 MassFlowRateMinAvail = 0.0;              // {kg/s}
+        Real64 MassFlowRateMaxAvail = 0.0;              // {kg/s}
+        Real64 MassFlowRateSetPoint = 0.0;              // {kg/s}
+        Real64 Quality = 0.0;                           // {0.0-1.0 vapor fraction/percent}
+        Real64 Press = 0.0;                             // {Pa}
+        Real64 Enthalpy = 0.0;                          // {J/kg}
+        Real64 EnthalpyLastTimestep = 0.0;              // {J/kg}
+        Real64 HumRat = 0.0;                            // {}
+        Real64 HumRatMin = SensedNodeFlagValue;         // {}
+        Real64 HumRatMax = SensedNodeFlagValue;         // {}
+        Real64 HumRatSetPoint = SensedNodeFlagValue;    // {}
+        Real64 TempSetPointHi = SensedNodeFlagValue;    // {C}
+        Real64 TempSetPointLo = SensedNodeFlagValue;    // {C}
+        Real64 Height = -1.0;                           // {m}
 
         //  Following are for Outdoor Air Nodes Scheduled Properties
-        bool IsLocalNode;
-        int OutAirDryBulbSchedNum;
-        int OutAirWetBulbSchedNum;
-        int OutAirWindSpeedSchedNum;
-        int OutAirWindDirSchedNum;
+        bool IsLocalNode = false;
+        int OutAirDryBulbSchedNum = 0;
+        int OutAirWetBulbSchedNum = 0;
+        int OutAirWindSpeedSchedNum = 0;
+        int OutAirWindDirSchedNum = 0;
 
         //  Following are for Outdoor Air Nodes "read only"
-        Real64 OutAirDryBulb;              // {C}
-        bool EMSOverrideOutAirDryBulb;     // if true, the EMS is calling to override outdoor air node drybulb setting
-        Real64 EMSValueForOutAirDryBulb;   // value EMS is directing to use for outdoor air node's drybulb {C}
-        Real64 OutAirWetBulb;              // {C}
-        bool EMSOverrideOutAirWetBulb;     // if true, the EMS is calling to override outdoor air node wetbulb setting
-        Real64 EMSValueForOutAirWetBulb;   // value EMS is directing to use for outdoor air node's wetbulb {C}
-        Real64 OutAirWindSpeed;            // {m/s}
-        bool EMSOverrideOutAirWindSpeed;   // if true, the EMS is calling to override outdoor air node wind speed setting
-        Real64 EMSValueForOutAirWindSpeed; // value EMS is directing to use for outdoor air node's drybulb {m/s}
-        Real64 OutAirWindDir;              // {degree}
-        bool EMSOverrideOutAirWindDir;     // if true, the EMS is calling to override outdoor air node wind direction setting
-        Real64 EMSValueForOutAirWindDir;   // value EMS is directing to use for outdoor air node's wind directio {degree}
+        Real64 OutAirDryBulb = 0.0;              // {C}
+        bool EMSOverrideOutAirDryBulb = false;   // if true, the EMS is calling to override outdoor air node drybulb setting
+        Real64 EMSValueForOutAirDryBulb = 0.0;   // value EMS is directing to use for outdoor air node's drybulb {C}
+        Real64 OutAirWetBulb = 0.0;              // {C}
+        bool EMSOverrideOutAirWetBulb = false;   // if true, the EMS is calling to override outdoor air node wetbulb setting
+        Real64 EMSValueForOutAirWetBulb = 0.0;   // value EMS is directing to use for outdoor air node's wetbulb {C}
+        Real64 OutAirWindSpeed = 0.0;            // {m/s}
+        bool EMSOverrideOutAirWindSpeed = false; // if true, the EMS is calling to override outdoor air node wind speed setting
+        Real64 EMSValueForOutAirWindSpeed = 0.0; // value EMS is directing to use for outdoor air node's drybulb {m/s}
+        Real64 OutAirWindDir = 0.0;              // {degree}
+        bool EMSOverrideOutAirWindDir = false;   // if true, the EMS is calling to override outdoor air node wind direction setting
+        Real64 EMSValueForOutAirWindDir = 0.0;   // value EMS is directing to use for outdoor air node's wind directio {degree}
         // Contaminant
-        Real64 CO2;                // {ppm}
-        Real64 CO2SetPoint;        // {ppm}
-        Real64 GenContam;          // {ppm}
-        Real64 GenContamSetPoint;  // {ppm}
-        bool SPMNodeWetBulbRepReq; // Set to true when node has SPM which follows wetbulb
+        Real64 CO2 = 0.0;                  // {ppm}
+        Real64 CO2SetPoint = 0.0;          // {ppm}
+        Real64 GenContam = 0.0;            // {ppm}
+        Real64 GenContamSetPoint = 0.0;    // {ppm}
+        bool SPMNodeWetBulbRepReq = false; // Set to true when node has SPM which follows wetbulb
 
         // error message flag
-        bool plantNodeErrorMsgIssued;
+        bool plantNodeErrorMsgIssued = false;
 
         // Default Constructor
-        NodeData()
-            : FluidType(NodeFluidType::Blank), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue),
-              TempLastTimestep(0.0), MassFlowRateRequest(0.0), MassFlowRate(0.0), MassFlowRateMin(0.0), MassFlowRateMax(SensedNodeFlagValue),
-              MassFlowRateMinAvail(0.0), MassFlowRateMaxAvail(0.0), MassFlowRateSetPoint(0.0), Quality(0.0), Press(0.0), Enthalpy(0.0),
-              EnthalpyLastTimestep(0.0), HumRat(0.0), HumRatMin(SensedNodeFlagValue), HumRatMax(SensedNodeFlagValue),
-              HumRatSetPoint(SensedNodeFlagValue), TempSetPointHi(SensedNodeFlagValue), TempSetPointLo(SensedNodeFlagValue), Height(-1.0),
-              IsLocalNode(false), OutAirDryBulbSchedNum(0), OutAirWetBulbSchedNum(0), OutAirWindSpeedSchedNum(0), OutAirWindDirSchedNum(0),
-              OutAirDryBulb(0.0), EMSOverrideOutAirDryBulb(false), EMSValueForOutAirDryBulb(0.0), OutAirWetBulb(0.0), EMSOverrideOutAirWetBulb(false),
-              EMSValueForOutAirWetBulb(0.0), OutAirWindSpeed(0.0), EMSOverrideOutAirWindSpeed(false), EMSValueForOutAirWindSpeed(0.0),
-              OutAirWindDir(0.0), EMSOverrideOutAirWindDir(false), EMSValueForOutAirWindDir(0.0), CO2(0.0), CO2SetPoint(0.0), GenContam(0.0),
-              GenContamSetPoint(0.0), SPMNodeWetBulbRepReq(false), plantNodeErrorMsgIssued(false)
-        {
-        }
+        NodeData() = default;
 
         // Member Constructor
         NodeData(NodeFluidType const FluidType,     // must be one of the valid parameters
@@ -1086,57 +1074,38 @@ namespace DataLoopNode {
     struct MoreNodeData
     {
         // Members
-        Real64 RelHumidity;        // {%}
-        Real64 ReportEnthalpy;     // specific enthalpy calculated at the HVAC timestep [J/kg]
-        Real64 VolFlowRateStdRho;  // volume flow rate at standard density [m3/s]
-        Real64 VolFlowRateCrntRho; // volume flow rate at current density, only used for air nodes [m3/s]
-        Real64 WetBulbTemp;        // wetbulb temperature [C]
-        Real64 Density;            // reported density at current temperature [kg/m3]
-        Real64 AirDewPointTemp;    // reported system node dewpoint temperature [C]
-        Real64 SpecificHeat;       // reported node specific heat [J/kg-C]
-
-        // Default Constructor
-        MoreNodeData()
-            : RelHumidity(0.0), ReportEnthalpy(0.0), VolFlowRateStdRho(0.0), VolFlowRateCrntRho(0.0), WetBulbTemp(0.0), Density(0.0),
-              AirDewPointTemp(0.0), SpecificHeat(0.0)
-        {
-        }
+        Real64 RelHumidity = 0.0;        // {%}
+        Real64 ReportEnthalpy = 0.0;     // specific enthalpy calculated at the HVAC timestep [J/kg]
+        Real64 VolFlowRateStdRho = 0.0;  // volume flow rate at standard density [m3/s]
+        Real64 VolFlowRateCrntRho = 0.0; // volume flow rate at current density, only used for air nodes [m3/s]
+        Real64 WetBulbTemp = 0.0;        // wetbulb temperature [C]
+        Real64 Density = 0.0;            // reported density at current temperature [kg/m3]
+        Real64 AirDewPointTemp = 0.0;    // reported system node dewpoint temperature [C]
+        Real64 SpecificHeat = 0.0;       // reported node specific heat [J/kg-C]
     };
 
     struct MarkedNodeData
     {
         // Members
-        bool IsMarked;                   // true if this is a marked node
-        ConnectionObjectType ObjectType; // Object Type that needs it "marked"
-        std::string ObjectName;          // Object Name that needs it "marked"
-        std::string FieldName;           // FieldName that needs it "marked"
-
-        // Default Constructor
-        MarkedNodeData() : IsMarked(false), ObjectType(ConnectionObjectType::Invalid)
-        {
-        }
+        bool IsMarked = false;                                           // true if this is a marked node
+        ConnectionObjectType ObjectType = ConnectionObjectType::Invalid; // Object Type that needs it "marked"
+        std::string ObjectName;                                          // Object Name that needs it "marked"
+        std::string FieldName;                                           // FieldName that needs it "marked"
     };
 
     // A struct to defer checking whether a node did correctly get a setpoint via the API / PythonPlugin
     struct NodeSetpointCheckData
     {
-        bool needsSetpointChecking;
-        bool checkTemperatureSetPoint;
-        bool checkTemperatureMinSetPoint;
-        bool checkTemperatureMaxSetPoint;
-        bool checkHumidityRatioSetPoint;
-        bool checkHumidityRatioMinSetPoint;
-        bool checkHumidityRatioMaxSetPoint;
-        bool checkMassFlowRateSetPoint;
-        bool checkMassFlowRateMinSetPoint;
-        bool checkMassFlowRateMaxSetPoint;
-
-        NodeSetpointCheckData()
-            : needsSetpointChecking(false), checkTemperatureSetPoint(false), checkTemperatureMinSetPoint(false), checkTemperatureMaxSetPoint(false),
-              checkHumidityRatioSetPoint(false), checkHumidityRatioMinSetPoint(false), checkHumidityRatioMaxSetPoint(false),
-              checkMassFlowRateSetPoint(false), checkMassFlowRateMinSetPoint(false), checkMassFlowRateMaxSetPoint(false)
-        {
-        }
+        bool needsSetpointChecking = false;
+        bool checkTemperatureSetPoint = false;
+        bool checkTemperatureMinSetPoint = false;
+        bool checkTemperatureMaxSetPoint = false;
+        bool checkHumidityRatioSetPoint = false;
+        bool checkHumidityRatioMinSetPoint = false;
+        bool checkHumidityRatioMaxSetPoint = false;
+        bool checkMassFlowRateSetPoint = false;
+        bool checkMassFlowRateMinSetPoint = false;
+        bool checkMassFlowRateMaxSetPoint = false;
     };
 } // namespace DataLoopNode
 
@@ -1212,62 +1181,7 @@ struct LoopNodeData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumOfNodes = 0;
-        this->NumofSplitters = 0;
-        this->NumofMixers = 0;
-        this->NodeID.deallocate();
-        this->Node.deallocate();
-        this->DefaultNodeValues = DataLoopNode::NodeData(DataLoopNode::NodeFluidType::Blank,
-                                                         0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         -1.0,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         0,
-                                                         0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         false);
-        this->MoreNodeInfo.deallocate();
-        this->MarkedNode.deallocate();
-        this->NodeSetpointCheck.deallocate();
+        *this = LoopNodeData();
     }
 };
 
