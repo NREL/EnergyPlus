@@ -48,7 +48,7 @@ The Zone air heat balance is currently lumped across all Spaces in the Zone. Dur
 ## E-mail and Conference Call Conclusions ##
 Q1: What, if any, effect on runtime performance do we expect?
 
-A1: For this phase, the goal is to have a minimal impact on speed. Most of the calculations in the predictor-corrector are already looping over every surface, every internal gain, every HVAC supply node, etc. Looping over these groupings the space level and then aggregating results to the zone level shouldn't be costly. And radiant exchange is already at the enclosure-level, so that will not change. But if this proves to be slow, an option to do only zone heat balance can be added.
+A1: For this phase, the goal is to have a minimal impact on speed. Most of the calculations in the predictor-corrector are already looping over every surface, every internal gain, every HVAC supply node, etc. Looping over these groupings the space level and then aggregating results to the zone level shouldn't be costly. And radiant exchange is already at the enclosure-level, so that will not change. But just to be sure, the Space heat balance will be optional (and default to Zone-only).
 
 Q2: I still don't understand the need for this feature. If you want a finer resolution of heat balances, you can already make smaller zones, no? If you want room-by-room sizing, just make each room a separate zone. The current balance of zone and space allows you to aggregate things nicely to the higher level zone heat balance without incurring additional runtime associated with the additional heat balances for spaces that aren't expected to be thermally dissimilar.
 
