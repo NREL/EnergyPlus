@@ -12741,25 +12741,31 @@ namespace UnitarySystems {
                     }
                     if (this->m_CoolingSpeedNum == 0) this->m_CoolingSpeedNum = 1;
                     bool const singleMode = (this->m_SingleMode == 1);
+                    PartLoadFrac = 1.0;
                     for (int speedNum = this->m_CoolingSpeedNum; speedNum <= this->m_NumOfSpeedCooling; speedNum++) {
                         this->m_CoolingSpeedNum = speedNum;
                         state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
                             state, OperationMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
+                        // Cooling: break if outlet temp is lower than DesOutTemp or approaches DesOutTemp to within Acc from above
                         if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
                     }
 
-                    std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
-                                                  DesOutTemp,
-                                                  // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                                  // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                                                  // or fatal out in GetInput
-                                                  1.0, // DehumidMode
-                                                  double(FanOpMode),
-                                                  double(this->m_CoolingSpeedNum),
-                                                  1.0, //  this->m_CoolingSpeedRatio;
-                                                  0.0,
-                                                  0.0};
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                    // make sure outlet temp is below set point before calling SolveRoot
+                    // Cooling: iterate only when outlet temp is below DesOutTemp by at least Acc
+                    if ((DesOutTemp - state.dataLoopNodes->Node(OutletNode).Temp) > Acc) {
+                        std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
+                                                      DesOutTemp,
+                                                      // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                                                      // need to test what happens when Alt mode doesn't exist, or somehow test for it,
+                                                      // or fatal out in GetInput
+                                                      1.0, // DehumidMode
+                                                      double(FanOpMode),
+                                                      double(this->m_CoolingSpeedNum),
+                                                      1.0, //  this->m_CoolingSpeedRatio;
+                                                      0.0,
+                                                      0.0};
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                    }
                     if (this->m_CoolingSpeedNum == 1) {
                         this->m_CompPartLoadRatio = PartLoadFrac;
                         SpeedRatio = 0.0;
@@ -13119,24 +13125,28 @@ namespace UnitarySystems {
                                                                                                       this->m_CoolingSpeedRatio,
                                                                                                       this->m_FanOpMode,
                                                                                                       singleMode);
-                            if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < Acc) break;
+                            // Cooling: break if outlet humrat is lower than DesOutHumRat or approaches DesOutHumRat to within HumRatAcc from above
+                            if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < HumRatAcc) break;
                         }
+                        // make sure outlet HumRat is below set point before calling SolveRoot
+                        // Cooling: iterate only when outlet humrat is below DesOutHumRat by at least HumRatAcc
+                        if ((DesOutHumRat - state.dataLoopNodes->Node(OutletNode).HumRat) > HumRatAcc) {
+                            std::array<Real64, 8> Par2 = {
+                                double(this->m_CoolingCoilIndex),
+                                DesOutHumRat,
+                                // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                                // need to test what happens when Alt mode doesn't exist, or somehow test for it,
+                                // or fatal out in GetInput
+                                0.0, // DehumidMode
+                                double(FanOpMode),
+                                double(this->m_CoolingSpeedNum),
+                                1.0, //  this->m_CoolingSpeedRatio;
+                                1.0, // run on latent, check coil outlet node HumRat
+                                0.0  // dummy because genericDXCoilResidual takes 8 parameters
+                            };
 
-                        std::array<Real64, 8> Par2 = {
-                            double(this->m_CoolingCoilIndex),
-                            DesOutHumRat,
-                            // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                            // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                            // or fatal out in GetInput
-                            0.0, // DehumidMode
-                            double(FanOpMode),
-                            double(this->m_CoolingSpeedNum),
-                            1.0, //  this->m_CoolingSpeedRatio;
-                            1.0, // run on latent, check coil outlet node HumRat
-                            0.0  // dummy because genericDXCoilResidual takes 8 parameters
-                        };
-
-                        General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                        }
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CompPartLoadRatio = PartLoadFrac;
                             SpeedRatio = 0.0;
