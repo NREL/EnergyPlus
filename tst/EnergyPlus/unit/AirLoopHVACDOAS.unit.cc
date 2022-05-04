@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -76,7 +77,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
@@ -8436,7 +8436,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
     // expect zero coil heating rate and flow rates
     EXPECT_EQ(0.0, mainHtgCoil.HeatingCoilRate);
-    EXPECT_EQ(0.0, thisAirLoopDOASObjec.SumMassFlowRate);    
+    EXPECT_EQ(0.0, thisAirLoopDOASObjec.SumMassFlowRate);
 }
 
 } // namespace EnergyPlus
