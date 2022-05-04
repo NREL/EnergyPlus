@@ -4544,7 +4544,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                         continue;
                     }
                     MixedAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum;
-                    InletBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).InletBranchNum(1);
+                    InletBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).InletBranchNum[0];
                     LoopInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(InletBranchNum).NodeNumIn;
                     // get the supply fan inlet and outlet nodes
                     if (MixedAirNode > 0) {
