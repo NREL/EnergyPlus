@@ -17353,7 +17353,8 @@ namespace UnitarySystems {
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
 
                     switch (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num) {
-                    case DataHVACGlobals::CoilDX_MultiSpeedCooling: {
+                    case DataHVACGlobals::CoilDX_MultiSpeedCooling:
+                    case DataHVACGlobals::CoilDX_Cooling: {
                         if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecActive) {
                             SetupOutputVariable(state,
                                                 "Unitary System Heat Recovery Rate",
@@ -17410,59 +17411,6 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    } break;
-                    case DataHVACGlobals::CoilDX_Cooling: {
-                        SetupOutputVariable(state,
-                                            "Unitary System Requested Sensible Cooling Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilSensDemand,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        SetupOutputVariable(state,
-                                            "Unitary System Requested Latent Cooling Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilLatentDemand,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecActive) {
-                            SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Rate",
-                                                OutputProcessor::Unit::W,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryRate,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                            SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Inlet Temperature",
-                                                OutputProcessor::Unit::C,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryInletTemp,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                            SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Outlet Temperature",
-                                                OutputProcessor::Unit::C,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryOutletTemp,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                            SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Fluid Mass Flow Rate",
-                                                OutputProcessor::Unit::kg_s,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryMassFlowRate,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                            SetupOutputVariable(state,
-                                                "Unitary System Heat Recovery Energy",
-                                                OutputProcessor::Unit::J,
-                                                state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryEnergy,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Summed,
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        }
                     } break;
                     default:
                         break;
