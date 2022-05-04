@@ -44,7 +44,7 @@ NA
 
 *(4) Adds new input fields for Surrounding Surface X Reflectance Schedule Name
 
-*(4) View factor weighed ground reflectance will be calculated for each exterior surface
+*(5) View factor weighed ground reflectance will be calculated for each exterior surface
 
 ### Exsting SurfaceProperty:SurroundingSurfaces ###
 
@@ -52,7 +52,9 @@ NA
 
 ![Figure 1](GroundSurfaceProperties.PNG)
 
+
 ** Figure 1. Surface Property Object **
+
  
 ``` 
 SurfaceProperty:SurroundingSurfaces,
