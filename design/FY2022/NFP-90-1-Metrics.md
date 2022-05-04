@@ -24,9 +24,9 @@ We have identified the following commonly used metrics:
 |CEER (ANSI/AHAM RAC-1)|ASHRAE 90.1-2019|Combined Energy Efficiency Ratio|Household Room Air Conditioners|[5]|
 |MRE (AHRI 910)|ASHRAE 90.1-2019|Moisture Removal Efficiency|Indoor Pool Dehumidifiers |[6]|
 |ISMRE|ASHRAE 90.1-2019|Integrated Seasonal Moisture Removal Efficiency|DOAS Specification|[7]|
-|ISCOP (AHRI 920)|ASHRAE 90.1-2019|Integrated Seasonal Coefficient of Performance|Direct Expansion-Dedicated Outdoor Air System Units|[link](www.ahrinet.org/App_Content/ahri/files/STANDARDS/AHRI/AHRI_Standard_920_I-P_2020.pdf&usg=AOvVaw2BiFZqovmIGDJ0tSxvJACo)|
-|UEF (10 CFP 430 Appendix E)|ASHRAE 90.1-2019|Uniform Energy Factor|Water Heaters|[link](https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE)|
-|FEI (AMCA 208)|ASHRAE 90.1-2019|Fan Energy Index|Fan Energy|[link](www.amca.org/news/press-releases/ansi/amca-standard-208%2C-calculation-of-the-fan-energy-index%2C-available-for-free-download.html&usg=AOvVaw2eZxHxgdq183Y9WsZlgjTB)|
+|ISCOP (AHRI 920)|ASHRAE 90.1-2019|Integrated Seasonal Coefficient of Performance|Direct Expansion-Dedicated Outdoor Air System Units|[8]|
+|UEF (10 CFP 430 Appendix E)|ASHRAE 90.1-2019|Uniform Energy Factor|Water Heaters|[9]|
+|FEI (AMCA 208)|ASHRAE 90.1-2019|Fan Energy Index|Fan Energy|[10]|
 
 In the current workorder, we would focus on two metrics only and propose to focus on SEER2 and HSPF2.
 
@@ -58,7 +58,7 @@ based on the following temperature bin values
 
 ## Approach ##
 
-For each of the two metrics, we define EnergyPlus components that the metric applies to. Replicate the code patter of existing metrics for the new metric and write unit tests to ensure the calculation is correct. Once the metrics are calculated we can integrate them into the correpsonding report code of the equipment summary table. 
+For each of the two metrics, will identify a set of EnergyPlus components for which the metric applies. Replicate the code pattern of existing metrics for the new metric and write unit tests to ensure the calculation is correct. Once the metrics are calculated we can integrate them into the corresponding report code of the equipment summary table. 
 - Extent the implementation in StandardRatings.hh & StandardRatings.cc
    - for SEER2 by adding code to the following functions
      - CalcDXCoilStandardRating
@@ -67,7 +67,7 @@ For each of the two metrics, we define EnergyPlus components that the metric app
      - MultiSpeedDXCoolingCoilStandardRatings
      - ReportDXCoilRating
      - CheckCurveLimitsForStandardRatings
-   - for HSPF2
+   - for HSPF2 by adding code to the following functions
      - CalcDXCoilStandardRating
      - SingleSpeedDXHeatingCoilStandardRatings
      - MultiSpeedDXHeatingCoilStandardRatings
@@ -92,7 +92,7 @@ There is no additional input needed.
 
 ## Outputs Description ##
 
-There will be an update to the reports to include the metrics as desribed above. 
+There will be an update to the reports to include the metrics as described above. 
 
 ## Engineering Reference ##
 
@@ -102,7 +102,7 @@ The EngineeringReference will be updated to include the formulas used to calcula
 
 No transition change is required.
 
-## E-mail and  Conference Call Conclusions ##
+## E-mail and Conference Call Conclusions ##
 
 TBD
 
@@ -126,3 +126,9 @@ Equipment. 2020. URL: https://www.ahrinet.org/Portals/_Appleseed/documents/Stand
 [6] ANSI/AHAM: ANSI/AHRI 910-I-P-2014: Performance Rating of Indoor Pool Dehumidifiers. 2014. http://www.ahrinet.org/App_Content/ahri/files/STANDARDS/AHRI/AHRI_Standard_910_I-P_2014.pdf
 
 [7] HPAC Engineering. Understanding AHRI 920 and ISMRE Ratings for Most Efficient DOAS Specification. 2018. https://www.hpac.com/columns/managing-facilities/article/20929562/understanding-ahri-920-and-ismre-ratings-for-most-efficient-doas-specification
+
+[8] ANSI/AHAM: ANSI/AHRI 920-I-P-2015: 2015 Standard for Performance Rating of DX-Dedicated Outdoor Air System Units. 2015. https://www.ahrinet.org/App_Content/ahri/files/STANDARDS/ANSI/ANSI_AHRI_Standard_920_I-P_2015.pdf
+
+[9] 10 CFR Appendix E to Subpart B of Part 430 - Uniform Test Method for Measuring the Energy Consumption of Water Heaters. 2016. https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE
+
+[10] ANSI/AMCA Standard 208, Calculation of the Fan Energy Index. 2019. https://www.amca.org/news/press-releases/ansi/amca-standard-208,-calculation-of-the-fan-energy-index,-available-for-free-download.html&usg=AOvVaw2eZxHxgdq183Y9WsZlgjTB
