@@ -216,7 +216,8 @@ namespace HeatingCoils {
                                            Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
-                                           int const FanOpMode      // Fan operation mode
+                                           int const FanOpMode,     // Fan operation mode
+                                           Real64 &QCoilActual      // coil load actually delivered (W)
     );
 
     void CalcFuelHeatingCoil(EnergyPlusData &state,

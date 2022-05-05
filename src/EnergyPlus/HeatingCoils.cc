@@ -229,7 +229,8 @@ namespace HeatingCoils {
                                               SpeedRatio,
                                               PartLoadRatio,
                                               StageNum,
-                                              OpMode); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
+                                              OpMode,
+                                              QCoilActual2); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
         } else if (state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingGasOrOtherFuel) {
             CalcFuelHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
         } else if (state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingGas_MultiStage) {
@@ -2029,7 +2030,8 @@ namespace HeatingCoils {
                                            Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
-                                           int const FanOpMode      // Fan operation mode
+                                           int const FanOpMode,     // Fan operation mode
+                                           Real64 &QCoilActual      // coil load actually delivered (W)
     )
     {
 
@@ -2051,9 +2053,6 @@ namespace HeatingCoils {
         // Using/Aliasing
         using CurveManager::CurveValue;
         auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
-        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
-        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
-
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -2100,7 +2099,6 @@ namespace HeatingCoils {
         Real64 PartLoadRat;          // part load ratio
 
         auto &HeatingCoil(state.dataHeatingCoils->HeatingCoil);
-
         if (StageNum > 1) {
             StageNumLS = StageNum - 1;
             StageNumHS = StageNum;
@@ -2132,8 +2130,6 @@ namespace HeatingCoils {
                 EffHS = HeatingCoil(CoilNum).MSEfficiency(StageNumHS);
 
                 // Get full load output and power
-                LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLS / MSHPMassFlowRateLow;
-                HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHS / MSHPMassFlowRateHigh;
                 LSElecHeatingPower = TotCapLS / EffLS;
                 HSElecHeatingPower = TotCapHS / EffHS;
                 OutletAirHumRat = InletAirHumRat;
@@ -2145,8 +2141,7 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).ElecUseLoad = SpeedRatio * HSElecHeatingPower + (1.0 - SpeedRatio) * LSElecHeatingPower;
 
                 ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
-                HeatingCoil(CoilNum).HeatingCoilLoad = MSHPMassFlowRateHigh * (HSFullLoadOutAirEnth - InletAirEnthalpy) * SpeedRatio +
-                                                       MSHPMassFlowRateLow * (LSFullLoadOutAirEnth - InletAirEnthalpy) * (1.0 - SpeedRatio);
+                HeatingCoil(CoilNum).HeatingCoilLoad = TotCapHS * SpeedRatio + TotCapLS * (1.0 - SpeedRatio);
 
                 OutletAirEnthalpy = InletAirEnthalpy + HeatingCoil(CoilNum).HeatingCoilLoad / HeatingCoil(CoilNum).InletAirMassFlowRate;
                 OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
@@ -2169,7 +2164,6 @@ namespace HeatingCoils {
 
                 // for cycling fan, reset mass flow to full on rate
                 if (FanOpMode == CycFanCycCoil) AirMassFlow /= PartLoadRat;
-                if (FanOpMode == ContFanCycCoil) AirMassFlow = MSHPMassFlowRateLow;
 
                 TotCap = HeatingCoil(CoilNum).MSNominalCapacity(StageNumLS);
 
@@ -2240,6 +2234,8 @@ namespace HeatingCoils {
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         state.dataLoopNodes->Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
+
+        QCoilActual = HeatingCoil(CoilNum).HeatingCoilLoad;
     }
 
     void CalcFuelHeatingCoil(EnergyPlusData &state,

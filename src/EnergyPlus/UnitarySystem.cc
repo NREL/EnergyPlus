@@ -140,7 +140,8 @@ namespace UnitarySystems {
           m_DesignFanVolFlowRate(0.0), m_DesignMassFlowRate(0.0), m_FanAvailSchedPtr(0), m_FanOpMode(0), m_ATMixerIndex(0), m_ATMixerPriNode(0),
           m_ATMixerSecNode(0), m_AirLoopEquipment(true), m_ZoneInletNode(0), m_ZoneSequenceCoolingNum(0), m_ZoneSequenceHeatingNum(0),
           m_HeatCoilExists(false), m_HeatingSizingRatio(1.0), m_HeatingCoilType_Num(0), m_DXHeatingCoil(false), m_HeatingCoilIndex(0),
-          m_HeatingCoilAvailSchPtr(0), m_DesignHeatingCapacity(0.0), m_MaxHeatAirVolFlow(0.0), m_NumOfSpeedHeating(0), m_MultiSpeedHeatingCoil(false),
+          m_HeatingCoilAvailSchPtr(0), m_DesignHeatingCapacity(0.0), m_MaxHeatAirVolFlow(0.0), m_NumOfSpeedHeating(0), m_NumOfSpeedSuppHeating(0),
+          m_MultiSpeedHeatingCoil(false),
 
           m_VarSpeedHeatingCoil(false), m_SystemHeatControlNodeNum(0), m_CoolCoilExists(false), m_CoolingCoilType_Num(0), m_NumOfSpeedCooling(0),
           m_CoolingCoilAvailSchPtr(0), m_DesignCoolingCapacity(0.0), m_MaxCoolAirVolFlow(0.0), m_CondenserNodeNum(0),
@@ -164,28 +165,29 @@ namespace UnitarySystems {
           m_CoolingCoilLatentDemand(0.0), m_HeatingCoilSensDemand(0.0), m_SenLoadLoss(0.0), m_LatLoadLoss(0.0), m_DesignHeatRecMassFlowRate(0.0),
           m_HeatRecoveryMassFlowRate(0.0), m_HeatRecoveryRate(0.0), m_HeatRecoveryEnergy(0.0), m_HeatRecoveryInletTemp(0.0),
           m_HeatRecoveryOutletTemp(0.0), m_IterationCounter(0), m_DesiredOutletTemp(0.0), m_DesiredOutletHumRat(0.0), m_FrostControlStatus(0),
-          m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0), m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_HeatingSpeedRatio(0.0),
-          m_HeatingSpeedNum(0), m_SpeedNum(0), m_EMSOverrideCoilSpeedNumOn(false), m_EMSOverrideCoilSpeedNumValue(0.0), m_CoilSpeedErrIdx(0),
-          m_DehumidInducedHeatingDemandRate(0.0), m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0), m_CoolingAuxElecConsumption(0.0),
-          m_ElecPower(0.0), m_ElecPowerConsumption(0.0), m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0), m_SensCoolEnergyRate(0.0),
-          m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0), m_SensHeatEnergyRate(0.0), m_LatHeatEnergyRate(0.0),
-          m_DesignFanVolFlowRateEMSOverrideOn(false), m_MaxHeatAirVolFlowEMSOverrideOn(false), m_MaxCoolAirVolFlowEMSOverrideOn(false),
-          m_MaxNoCoolHeatAirVolFlowEMSOverrideOn(false), m_DesignFanVolFlowRateEMSOverrideValue(0.0), m_MaxHeatAirVolFlowEMSOverrideValue(0.0),
-          m_MaxCoolAirVolFlowEMSOverrideValue(0.0), m_MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), m_EMSOverrideSensZoneLoadRequest(false),
-          m_EMSOverrideMoistZoneLoadRequest(false), m_EMSSensibleZoneLoadValue(0.0), m_EMSMoistureZoneLoadValue(0.0), m_StageNum(0), m_Staged(false),
-          m_HeatingFanSpeedRatio(0.0), m_CoolingFanSpeedRatio(0.0), m_NoHeatCoolSpeedRatio(0.0), m_MyFanFlag(true), m_MyCheckFlag(true),
-          m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false), m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0),
-          m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
-          m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
-          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), m_TemperatureOffsetControlActive(false),
-          m_minAirToWaterTempOffset(0.0), m_HRcoolCoilFluidInletNode(0), m_HRcoolCoilAirInNode(0), m_minWaterLoopTempForHR(0.0),
-          m_waterSideEconomizerFlag(false), m_WaterHRPlantLoopModel(false), UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0),
-          NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0),
-          AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0),
-          DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0),
-          CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilFluidInletNode(0), HeatCoilFluidInletNode(0),
-          HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0),
-          ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0)
+          m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0), m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_SuppHeatingCycRatio(0.0),
+          m_HeatingSpeedRatio(0.0), m_SuppHeatingSpeedRatio(0.0), m_HeatingSpeedNum(0), m_SuppHeatingSpeedNum(0), m_SpeedNum(0),
+          m_EMSOverrideCoilSpeedNumOn(false), m_EMSOverrideCoilSpeedNumValue(0.0), m_CoilSpeedErrIdx(0), m_DehumidInducedHeatingDemandRate(0.0),
+          m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0), m_CoolingAuxElecConsumption(0.0), m_ElecPower(0.0), m_ElecPowerConsumption(0.0),
+          m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0), m_SensCoolEnergyRate(0.0), m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0),
+          m_SensHeatEnergyRate(0.0), m_LatHeatEnergyRate(0.0), m_DesignFanVolFlowRateEMSOverrideOn(false), m_MaxHeatAirVolFlowEMSOverrideOn(false),
+          m_MaxCoolAirVolFlowEMSOverrideOn(false), m_MaxNoCoolHeatAirVolFlowEMSOverrideOn(false), m_DesignFanVolFlowRateEMSOverrideValue(0.0),
+          m_MaxHeatAirVolFlowEMSOverrideValue(0.0), m_MaxCoolAirVolFlowEMSOverrideValue(0.0), m_MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0),
+          m_EMSOverrideSensZoneLoadRequest(false), m_EMSOverrideMoistZoneLoadRequest(false), m_EMSSensibleZoneLoadValue(0.0),
+          m_EMSMoistureZoneLoadValue(0.0), m_StageNum(0), m_Staged(false), m_HeatingFanSpeedRatio(0.0), m_CoolingFanSpeedRatio(0.0),
+          m_NoHeatCoolSpeedRatio(0.0), m_MyFanFlag(true), m_MyCheckFlag(true), m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false),
+          m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0), m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0),
+          m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false), m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true),
+          m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true), m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true),
+          m_SmallLoadTolerance(5.0), m_TemperatureOffsetControlActive(false), m_minAirToWaterTempOffset(0.0), m_HRcoolCoilFluidInletNode(0),
+          m_HRcoolCoilAirInNode(0), m_minWaterLoopTempForHR(0.0), m_waterSideEconomizerFlag(false), m_WaterHRPlantLoopModel(false),
+          UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0),
+          CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0),
+          MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0),
+          LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0),
+          CoolCoilFluidOutletNodeNum(0), CoolCoilFluidInletNode(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0),
+          HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr),
+          LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0)
     {
     }
 
@@ -1275,6 +1277,7 @@ namespace UnitarySystems {
         this->m_HeatingCycRatio = 0.0;
         this->m_HeatingSpeedRatio = 0.0;
         this->m_HeatingSpeedNum = 0;
+        this->m_SuppHeatingSpeedNum = 0;
         this->m_HeatingCoilSensDemand = 0.0;
         this->m_CoolingCoilSensDemand = 0.0;
         this->m_CoolingCoilLatentDemand = 0.0;
@@ -5433,6 +5436,7 @@ namespace UnitarySystems {
             this->m_SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
         } else if (UtilityRoutines::SameString(loc_suppHeatCoilType, "Coil:Heating:Fuel") ||
                    UtilityRoutines::SameString(loc_suppHeatCoilType, "Coil:Heating:Electric") ||
+                   UtilityRoutines::SameString(loc_suppHeatCoilType, "Coil:Heating:Electric:MultiStage") ||
                    UtilityRoutines::SameString(loc_suppHeatCoilType, "Coil:Heating:DesuperHeater")) {
             this->m_SuppHeatCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, loc_suppHeatCoilType, loc_m_SuppHeatCoilName, errFlag);
         } else if (UtilityRoutines::SameString(loc_suppHeatCoilType, "Coil:UserDefined")) {
@@ -5443,6 +5447,7 @@ namespace UnitarySystems {
 
             if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel ||
                 this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
+                this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                 this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater) {
 
                 this->m_SuppHeatCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, loc_suppHeatCoilType, loc_m_SuppHeatCoilName, errFlag);
@@ -5474,6 +5479,18 @@ namespace UnitarySystems {
                         if (errFlag) {
                             ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
+                        }
+
+                        // Get the number of speeds
+                        if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
+                            errFlag = false;
+                            this->m_NumOfSpeedSuppHeating =
+                                HeatingCoils::GetHeatingCoilNumberOfStages(state, loc_suppHeatCoilType, loc_m_SuppHeatCoilName, errFlag);
+
+                            if (errFlag) {
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            }
                         }
 
                         // Get the Reheat Coil Inlet Node
@@ -7445,6 +7462,19 @@ namespace UnitarySystems {
             HeatingCoils::SimulateHeatingCoilComponents(
                 state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
 
+        } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
+            HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                        CompName,
+                                                        FirstHVACIteration,
+                                                        _,
+                                                        this->m_SuppHeatCoilIndex,
+                                                        _,
+                                                        _,
+                                                        this->m_FanOpMode,
+                                                        this->m_SuppHeatPartLoadFrac,
+                                                        this->m_SuppHeatingSpeedNum,
+                                                        this->m_SuppHeatingSpeedRatio);
+
         } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater) {
             HeatingCoils::SimulateHeatingCoilComponents(
                 state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
@@ -7563,9 +7593,6 @@ namespace UnitarySystems {
                 // (i.e., this line calc's a supp heater load, then next line also calc's it?)
                 if (state.dataUnitarySystems->MoistureLoad < 0.0) this->m_SupHeaterLoad = SupHeaterLoad;
                 // so it look's like this next line should only be valid for HP's.
-                if (this->m_DesignSuppHeatingCapacity > 0.0) {
-                    this->m_SuppHeatPartLoadFrac = min(1.0, SupHeaterLoad / this->m_DesignSuppHeatingCapacity);
-                }
             } else {
                 SupHeaterLoad = 0.0;
                 this->m_SuppHeatPartLoadFrac = 0.0;
@@ -7590,9 +7617,8 @@ namespace UnitarySystems {
 
         // check supplemental heating coil outlet temp based on maximum allowed
         if (this->m_SuppCoilExists) {
-            SuppPLR = this->m_SuppHeatPartLoadFrac;
             // only need to test for high supply air temp if supplemental coil is operating
-            if (SuppPLR > 0.0) {
+            if (SupHeaterLoad > 0.0 && this->m_DesignSuppHeatingCapacity > 0.0) {
                 this->calcUnitarySystemToLoad(state,
                                               AirLoopNum,
                                               FirstHVACIteration,
@@ -7606,7 +7632,9 @@ namespace UnitarySystems {
                                               SupHeaterLoad,
                                               CompressorOn);
                 if (this->m_DesignSuppHeatingCapacity > 0.0) {
-                    this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
+                    if (this->m_NumOfSpeedSuppHeating == 0) {
+                        this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
+                    }
                 } else {
                     this->m_SuppHeatPartLoadFrac = 0.0;
                 }
@@ -9010,7 +9038,7 @@ namespace UnitarySystems {
                                                       CompressorONFlag);
                         PartLoadRatio = HeatPLR;
                     } else if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->HeatingLoad &&
-                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                               this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         CoolPLR = 0.0;
                         if (this->m_HeatingSpeedNum == 1) {
                             this->m_HeatingCycRatio = (ZoneLoad - SensOutputOff) / (this->FullOutput[this->m_HeatingSpeedNum] - SensOutputOff);
@@ -10886,9 +10914,12 @@ namespace UnitarySystems {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
-
-        Real64 SuppPLR = this->m_SuppHeatPartLoadFrac;
         if (this->m_SuppCoilExists) {
+            Real64 SuppPLR = 0.0;
+            if (this->m_NumOfSpeedSuppHeating > 0) {
+                this->calcMultiStageSuppCoilStageByLoad(state, SuppCoilLoad, FirstHVACIteration);
+            }
+            SuppPLR = this->m_SuppHeatPartLoadFrac;
             this->calcUnitarySuppHeatingSystem(state, FirstHVACIteration, SuppPLR, SuppCoilLoad);
             if ((state.dataLoopNodes->Node(this->m_SuppCoilAirOutletNode).Temp > this->DesignMaxOutletTemp) && SuppPLR > 0.0 &&
                 !this->m_SimASHRAEModel) {
@@ -10910,6 +10941,87 @@ namespace UnitarySystems {
         }
 
         calculateCapacity(state, SensOutput, LatOutput);
+    }
+
+    void UnitarySys::calcMultiStageSuppCoilStageByLoad(EnergyPlusData &state, Real64 &SuppHeatLoad, bool const FirstHVACIteration)
+    {
+        if (SuppHeatLoad <= 0.0) {
+            this->m_SuppHeatPartLoadFrac = 0.0;
+            this->m_SuppHeatingSpeedRatio = 0.0;
+            this->m_SuppHeatingCycRatio = 0.0;
+            return;
+        }
+        constexpr bool SuppHeatingCoilFlag(true);
+        Real64 PartLoadFrac = 0.0;
+        Real64 SpeedRatio = 0.0;
+        Real64 CycRatio = 0.0;
+        std::string CompName = this->m_SuppHeatCoilName;
+        int CompIndex = this->m_SuppHeatCoilIndex;
+        int FanOpMode = this->m_FanOpMode;
+        Real64 QCoilActual = 0.0; // Heating coil operating capacity [W]
+        int OutletNode = this->m_SuppCoilAirOutletNode;
+        int InletNode = this->m_SuppCoilAirInletNode;
+        int SpeedNum = 0;
+        // Get full load result
+        PartLoadFrac = 1.0;
+        CycRatio = 1.0;
+        SpeedRatio = 1.0;
+        int SolFla = 0.0;
+
+        std::vector<Real64> Par(8); // Parameter array passed to solver
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        int constexpr MaxIte(500);    // Maximum number of iterations for solver
+        Real64 constexpr Acc(1.0e-3); // Accuracy of solver result
+        int constexpr SolveMaxIter(50);
+
+        for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedSuppHeating; ++SpeedNum) {
+            this->m_SuppHeatingSpeedNum = SpeedNum;
+            HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                        CompName,
+                                                        FirstHVACIteration,
+                                                        SuppHeatLoad,
+                                                        CompIndex,
+                                                        QCoilActual,
+                                                        SuppHeatingCoilFlag,
+                                                        FanOpMode,
+                                                        PartLoadFrac,
+                                                        SpeedNum,
+                                                        SpeedRatio);
+            SpeedRatio = double(SpeedNum) - 1.0;
+            if (QCoilActual > SuppHeatLoad) break;
+        }
+        if (QCoilActual < SuppHeatLoad) {
+            this->m_SuppHeatPartLoadFrac = 1.0;
+            this->m_SuppHeatingSpeedRatio = 1.0;
+            this->m_SuppHeatingCycRatio = 1.0;
+            this->m_SuppHeatingSpeedNum = this->m_NumOfSpeedSuppHeating;
+            return;
+        } else {
+
+            Par[1] = double(this->m_SuppHeatCoilIndex);
+            Par[2] = SuppHeatLoad;
+            Par[3] = double(this->m_UnitarySysNum);
+            // Par(4) = CycRatio or SpeedRatio
+            Par[5] = this->m_SuppHeatingSpeedNum;
+            Par[6] = double(FanOpMode);
+            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
+            if (this->m_SuppHeatingSpeedNum > 1.0) {
+                Par[4] = CycRatio;
+                General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, this->calcMultiStageSuppCoilLoadResidual, 0.0, 1.0, Par);
+                this->m_SuppHeatingCycRatio = CycRatio;
+                this->m_SuppHeatingSpeedRatio = SpeedRatio;
+                this->m_SuppHeatPartLoadFrac = SpeedRatio;
+                PartLoadFrac = SpeedRatio;
+            } else {
+                SpeedRatio = 0.0;
+                this->m_SuppHeatingSpeedRatio = SpeedRatio;
+                Par[4] = SpeedRatio;
+                General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, this->calcMultiStageSuppCoilLoadCycResidual, 0.0, 1.0, Par);
+                this->m_SuppHeatingCycRatio = CycRatio;
+                this->m_SuppHeatPartLoadFrac = CycRatio;
+                PartLoadFrac = CycRatio;
+            }
+        }
     }
 
     void UnitarySys::calculateCapacity(EnergyPlusData &state, Real64 &SensOutput, Real64 &LatOutput)
@@ -11537,15 +11649,34 @@ namespace UnitarySystems {
         {
             auto const SELECT_CASE_var(this->m_SuppHeatCoilType_Num);
 
-            if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
+            if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) ||
+                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage)) {
                 switch (this->m_ControlType) {
                 case UnitarySysCtrlType::Setpoint: {
-                    HeatingCoils::SimulateHeatingCoilComponents(
-                        state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
+                    HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                                CompName,
+                                                                FirstHVACIteration,
+                                                                _,
+                                                                this->m_SuppHeatCoilIndex,
+                                                                _,
+                                                                true,
+                                                                this->m_FanOpMode,
+                                                                PartLoadRatio,
+                                                                this->m_SuppHeatingSpeedNum,
+                                                                this->m_SuppHeatingSpeedRatio);
                 } break;
                 default: {
-                    HeatingCoils::SimulateHeatingCoilComponents(
-                        state, CompName, FirstHVACIteration, SuppHeatCoilLoad, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
+                    HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                                CompName,
+                                                                FirstHVACIteration,
+                                                                SuppHeatCoilLoad,
+                                                                this->m_SuppHeatCoilIndex,
+                                                                _,
+                                                                true,
+                                                                this->m_FanOpMode,
+                                                                PartLoadRatio,
+                                                                this->m_SuppHeatingSpeedNum,
+                                                                this->m_SuppHeatingSpeedRatio);
                 } break;
                 }
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
@@ -14081,6 +14212,11 @@ namespace UnitarySystems {
         Real64 PartLoadFrac = 0.0;
         int SolFla = 0.0;
         bool SensibleLoad = false;
+        bool LatentLoad = false;
+        Real64 OutletTemp = 0.0;
+        Real64 SpeedRatio = 0.0;
+        Real64 CycRatio = 0.0;
+        int SpeedNum = 0;
 
         // Set local variables
         int OutletNode = this->m_SuppCoilAirOutletNode;
@@ -14089,6 +14225,7 @@ namespace UnitarySystems {
         std::string CompName = this->m_SuppHeatCoilName;
         int CompIndex = this->m_SuppHeatCoilIndex;
         int FanOpMode = this->m_FanOpMode;
+        DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
@@ -14150,6 +14287,19 @@ namespace UnitarySystems {
                                 PartLoadFrac = 0.0;
                             }
                         }
+                    } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
+                        SpeedRatio = 0.0;
+                        HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                                    CompName,
+                                                                    FirstHVACIteration,
+                                                                    DataLoopNode::SensedLoadFlagValue,
+                                                                    CompIndex,
+                                                                    QCoilActual,
+                                                                    SuppHeatingCoilFlag,
+                                                                    FanOpMode,
+                                                                    PartLoadFrac,
+                                                                    0,
+                                                                    SpeedRatio);
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
                         WaterCoils::SimulateWaterCoilComponents(
@@ -14209,6 +14359,26 @@ namespace UnitarySystems {
                                                                         PartLoadFrac);
                             PartLoadFrac = QCoilActual / this->m_DesignSuppHeatingCapacity;
 
+                        } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
+                            CycRatio = 1.0;
+                            SpeedRatio = 1.0;
+                            for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedSuppHeating; ++SpeedNum) {
+                                this->m_SuppHeatingSpeedNum = SpeedNum;
+                                HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                                            CompName,
+                                                                            FirstHVACIteration,
+                                                                            DataLoopNode::SensedLoadFlagValue,
+                                                                            CompIndex,
+                                                                            QCoilActual,
+                                                                            SuppHeatingCoilFlag,
+                                                                            FanOpMode,
+                                                                            PartLoadFrac,
+                                                                            SpeedNum,
+                                                                            SpeedRatio);
+                                OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
+                                SpeedRatio = double(SpeedNum) - 1.0;
+                                if (OutletTemp > DesOutTemp && SensibleLoad) break;
+                            }
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
 
                             HeatingCoils::SimulateHeatingCoilComponents(
@@ -14256,6 +14426,8 @@ namespace UnitarySystems {
                     //         run the coil at PartLoadFrac = 1.
                     if (state.dataLoopNodes->Node(OutletNode).Temp < (DesOutTemp + Acc)) {
                         PartLoadFrac = 1.0;
+                        CycRatio = 1.0;
+                        SpeedRatio = 1.0;
                     } else {
 
                         {
@@ -14280,6 +14452,35 @@ namespace UnitarySystems {
                                 Par[5] = double(FanOpMode);
                                 Par[6] = this->m_DesignSuppHeatingCapacity;
                                 General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->gasElecHeatingCoilResidual, 0.0, 1.0, Par);
+
+                            } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
+
+                                Par[1] = double(this->m_SuppHeatCoilIndex);
+                                Par[2] = DesOutTemp;
+                                Par[3] = double(this->m_UnitarySysNum);
+                                // Par(4) = CycRatio or SpeedRatio
+                                Par[5] = this->m_SuppHeatingSpeedNum;
+                                Par[6] = double(FanOpMode);
+                                Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
+                                Par[8] = ReqOutput;
+                                if (this->m_SuppHeatingSpeedNum > 1.0) {
+                                    Par[4] = CycRatio;
+                                    General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, this->heatingCoilVarSpeedResidual, 0.0, 1.0, Par);
+                                    this->m_SuppHeatingCycRatio = CycRatio;
+                                    this->m_SuppHeatingSpeedRatio = SpeedRatio;
+                                    this->m_SuppHeatPartLoadFrac = SpeedRatio;
+                                    this->calcPassiveSystem(state, AirLoopNum, FirstHVACIteration);
+                                    PartLoadFrac = SpeedRatio;
+                                } else {
+                                    SpeedRatio = 0.0;
+                                    this->m_SuppHeatingSpeedRatio = SpeedRatio;
+                                    Par[4] = SpeedRatio;
+                                    General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, this->heatingCoilVarSpeedCycResidual, 0.0, 1.0, Par);
+                                    this->m_SuppHeatingCycRatio = CycRatio;
+                                    this->m_SuppHeatPartLoadFrac = CycRatio;
+                                    this->calcPassiveSystem(state, AirLoopNum, FirstHVACIteration);
+                                    PartLoadFrac = CycRatio;
+                                }
 
                             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
@@ -14389,6 +14590,8 @@ namespace UnitarySystems {
         }     // IF (SolFla == -1) THEN
 
         this->m_SuppHeatPartLoadFrac = PartLoadFrac;
+        this->m_SuppHeatingCycRatio = CycRatio;
+        this->m_SuppHeatingSpeedRatio = SpeedRatio;
 
         // LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
         if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
@@ -15510,6 +15713,94 @@ namespace UnitarySystems {
         return Residuum;
     }
 
+    Real64 UnitarySys::calcMultiStageSuppCoilLoadResidual(EnergyPlusData &state,
+                                                          Real64 const SpeedRatio,
+                                                          std::vector<Real64> const &Par // Function parameters
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Yueyue Zhou
+        //       DATE WRITTEN   May 2022
+
+        // PURPOSE OF THIS FUNCTION:
+        // Calculates part load ratio for multistage supplemental coil.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls calc routines of  multistage electric Coil to get delivered heating at the given stage
+        // and calculates the residual as defined above
+
+        // Return value
+        Real64 Residuum; // residual to be minimized to zero
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 CycRatio;
+        Real64 QActual;
+        int SpeedNum;
+        int FanOpMode;
+        DataHVACGlobals::CompressorOperation CompressorOp;
+        Real64 ReqOutput;
+        Real64 OnOffAirFlowRatio;
+        Real64 SensLoad;
+        Real64 LatLoad;
+
+        int CoilIndex = int(Par[1]);
+        int UnitarySysNum = int(Par[3]);
+        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
+        CycRatio = Par[4];
+        SpeedNum = int(Par[5]);
+        FanOpMode = int(Par[6]);
+
+        HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual);
+
+        Residuum = Par[2] - QActual;
+
+        return Residuum;
+    }
+
+    Real64 UnitarySys::calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
+                                                             Real64 const CycRatio,
+                                                             std::vector<Real64> const &Par // Function parameters
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Yueyue Zhou
+        //       DATE WRITTEN   May 2022
+
+        // PURPOSE OF THIS FUNCTION:
+        // Calculates part load ratio for multistage supplemental coil.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls calc routines of  multistage electric Coil to get delivered heating at the given stage
+        // and calculates the residual as defined above
+
+        // Return value
+        Real64 Residuum; // residual to be minimized to zero
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 SpeedRatio;
+        Real64 QActual;
+        int SpeedNum;
+        int FanOpMode;
+        DataHVACGlobals::CompressorOperation CompressorOp;
+        Real64 ReqOutput;
+        Real64 OnOffAirFlowRatio;
+        Real64 SensLoad;
+        Real64 LatLoad;
+
+        int CoilIndex = int(Par[1]);
+        int UnitarySysNum = int(Par[3]);
+        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
+        SpeedRatio = Par[4];
+        SpeedNum = int(Par[5]);
+        FanOpMode = int(Par[6]);
+
+        HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual);
+
+        Residuum = Par[2] - QActual;
+
+        return Residuum;
+    }
+
     Real64 UnitarySys::HXAssistedCoolCoilTempResidual(EnergyPlusData &state,
                                                       Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                       std::vector<Real64> const &Par // par(1) = DX coil number
@@ -15727,6 +16018,7 @@ namespace UnitarySystems {
         Real64 OnOffAirFlowRatio;
         Real64 SensLoad;
         Real64 LatLoad;
+        Real64 QActual;
 
         int CoilIndex = int(Par[1]);
         int UnitarySysNum = int(Par[3]);
@@ -15784,7 +16076,7 @@ namespace UnitarySystems {
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
 
-                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
+                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual);
 
                 OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
@@ -15794,7 +16086,7 @@ namespace UnitarySystems {
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
 
-                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
+                HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
                 OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
@@ -16147,6 +16439,7 @@ namespace UnitarySystems {
         Real64 SensLoad;
         Real64 LatLoad;
         Real64 OnOffAirFlowRatio;
+        Real64 QActual;
 
         //            Par(1) = REAL(UnitarySystem(UnitarySysNum)%CoolingCoilIndex,r64)
         //            Par(2) = DesOutTemp
@@ -16211,7 +16504,7 @@ namespace UnitarySystems {
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
 
-                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
+                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual);
 
                 OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
