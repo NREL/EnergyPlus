@@ -583,12 +583,12 @@ namespace UnitarySystems {
                                                     Real64 const PartLoadRatio,    // DX cooling coil part load ratio
                                                     std::vector<Real64> const &Par // Function parameters
         );
-        static Real64 UnitarySys::calcMultiStageSuppCoilLoadResidual(EnergyPlusData &state,
+        static Real64 calcMultiStageSuppCoilLoadResidual(EnergyPlusData &state,
                                                                      Real64 const SpeedRatio,
                                                                      std::vector<Real64> const &Par // Function parameters
         );
 
-        static Real64 UnitarySys::calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
+        static Real64 calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
                                                                         Real64 const CycRatio,
                                                                         std::vector<Real64> const &Par // Function parameters
         );
