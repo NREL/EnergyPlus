@@ -584,13 +584,13 @@ namespace UnitarySystems {
                                                     std::vector<Real64> const &Par // Function parameters
         );
         static Real64 calcMultiStageSuppCoilLoadResidual(EnergyPlusData &state,
-                                                                     Real64 const SpeedRatio,
-                                                                     std::vector<Real64> const &Par // Function parameters
+                                                         Real64 const SpeedRatio,
+                                                         std::vector<Real64> const &Par // Function parameters
         );
 
         static Real64 calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
-                                                                        Real64 const CycRatio,
-                                                                        std::vector<Real64> const &Par // Function parameters
+                                                            Real64 const CycRatio,
+                                                            std::vector<Real64> const &Par // Function parameters
         );
 
         static Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state,
