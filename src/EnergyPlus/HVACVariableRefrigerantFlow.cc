@@ -15562,7 +15562,6 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
     }
 
     SuppCoilLoad = SuppHeatCoilLoad;
-
 }
 
 Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(EnergyPlusData &state,
