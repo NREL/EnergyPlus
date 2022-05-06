@@ -905,8 +905,6 @@ namespace AirflowNetwork {
         }
     }
 
-    //*****************************************************************************************
-
 } // namespace AirflowNetwork
 
 } // namespace EnergyPlus

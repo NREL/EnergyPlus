@@ -63,9 +63,11 @@ namespace EnergyPlus {
 // forward declare all structs
 struct AirLoopHVACDOASData;
 struct AirSystemsData;
+namespace AirflowNetwork {
 struct AirflowNetworkBalanceManagerData;
-struct AirflowNetworkData;
 struct AirflowNetworkSolverData;
+} // namespace AirflowNetwork
+struct AirflowNetworkData;
 struct BSDFWindowData;
 struct BaseSizerWithFanHeatInputsData;
 struct BaseSizerWithScalableInputsData;
@@ -325,9 +327,9 @@ struct EnergyPlusData : BaseGlobalStruct
     // module globals
     std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
     std::unique_ptr<AirSystemsData> dataAirSystemsData;
-    std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
+    std::unique_ptr<AirflowNetwork::AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
     std::unique_ptr<AirflowNetworkData> dataAirflowNetwork;
-    std::unique_ptr<AirflowNetworkSolverData> dataAFNSolver;
+    std::unique_ptr<AirflowNetwork::AirflowNetworkSolverData> dataAFNSolver;
     std::unique_ptr<BSDFWindowData> dataBSDFWindow;
     std::unique_ptr<BaseSizerWithFanHeatInputsData> dataBaseSizerFanHeatInputs;
     std::unique_ptr<BaseSizerWithScalableInputsData> dataBaseSizerScalableInputs;

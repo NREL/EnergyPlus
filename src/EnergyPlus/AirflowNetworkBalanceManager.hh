@@ -341,8 +341,6 @@ namespace AirflowNetwork {
                 int const FLAG               // mode of operation
     );
 
-} // namespace AirflowNetwork
-
 struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
 {
 
@@ -589,6 +587,8 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
         dos.clear();
     }
 };
+
+} // namespace AirflowNetwork
 
 } // namespace EnergyPlus
 

@@ -5550,8 +5550,6 @@ namespace AirflowNetwork {
         }
     }
 
-} // namespace AirflowNetwork
-
 void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -5851,8 +5849,6 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
     TimeStepSysLast = TimeStepSys;
     CurrentEndTimeLast = CurrentEndTime;
 }
-
-namespace AirflowNetwork {
 
     void AllocateAndInitData(EnergyPlusData &state)
     {
@@ -7167,8 +7163,6 @@ namespace AirflowNetwork {
         return CurveNum;
     }
 
-} // namespace AirflowNetwork
-
 void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusData &state)
 {
 
@@ -7482,8 +7476,6 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
             curveIndex[state.dataAirflowNetwork->MultizoneExternalNodeData(ExtNum).facadeNum - 1];
     }
 }
-
-namespace AirflowNetwork {
 
     Real64 CalcWindPressure(EnergyPlusData &state,
                             int const curve,           // Curve index, change this to pointer after curve refactor
