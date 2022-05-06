@@ -1144,8 +1144,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        auto &solver = state.dataAFNSolver->solver;
-        C = solver.AFECTL(i);
+        C = control;
         if (C < FlowMin) C = FlowMin;
         if (C > FlowMax) C = FlowMax;
         C = A0 + C * (A1 + C * (A2 + C * A3));
@@ -2048,7 +2047,7 @@ namespace AirflowNetwork {
 
         int n = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0];
         int m = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1];
-        auto &solver = state.dataAFNSolver->solver;
+        auto &solver = state.dataAFNSolver;
 
         // Get component properties
         // A  = Cross section area [m2]
@@ -2060,11 +2059,11 @@ namespace AirflowNetwork {
         } else {
             for (k = 1; k <= state.dataAFNSolver->NetworkNumOfLinks; ++k) {
                 if (state.dataAirflowNetwork->AirflowNetworkLinkageData(k).NodeNums[1] == n) {
-                    F[0] = solver.AFLOW(k);
+                    F[0] = solver->AFLOW(k);
                     break;
                 }
             }
-            solver.PZ(m) = solver.PZ(n) - DP;
+            solver->PZ(m) = solver->PZ(n) - DP;
             Co = F[0] / DP;
             DF[0] = 10.e10;
         }

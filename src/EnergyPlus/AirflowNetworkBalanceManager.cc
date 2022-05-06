@@ -382,7 +382,7 @@ namespace AirflowNetwork {
             return false;
         }
 
-        auto &solver = state.dataAFNSolver->solver;
+        auto &solver = state.dataAFNSolver;
 
         // *** Read AirflowNetwork simulation surface crack component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
@@ -434,7 +434,7 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).reference_viscosity = AIRDYNAMICVISCOSITY(refT);
 
                 // This is the first element that is being added to the lookup table, so no check of naming overlaps
-                solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceCrackData(i); // Yet another workaround
+                solver->elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceCrackData(i); // Yet another workaround
 
                 ++i;
             }
@@ -528,8 +528,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->MultizoneCompExhaustFanData(i).StandardW = refW;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompExhaustFanData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompExhaustFanData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -603,8 +603,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompOutdoorAirData(i).StandardW = refW;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompOutdoorAirData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompOutdoorAirData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -677,8 +677,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompReliefAirData(i).StandardW = refW;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompReliefAirData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompReliefAirData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -977,8 +977,8 @@ namespace AirflowNetwork {
                 }
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompDetOpeningData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompDetOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1020,8 +1020,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->MultizoneCompSimpleOpeningData(i).DischCoeff = dischargeCoeff; // Discharge coefficient at full opening
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompSimpleOpeningData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompSimpleOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1065,8 +1065,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->MultizoneCompHorOpeningData(i).DischCoeff = dischargeCoeff; // Discharge coefficient at full opening
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompHorOpeningData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompHorOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1115,8 +1115,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->MultizoneSurfaceELAData(i).TestDisCoef = 0.0;     // Testing Discharge coefficient
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceELAData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceELAData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     success = false;
@@ -1151,7 +1151,7 @@ namespace AirflowNetwork {
                 }
 
                 // Check for name overlaps
-                if (solver.elements.find(thisObjectName) != solver.elements.end()) {
+                if (solver->elements.find(thisObjectName) != solver->elements.end()) {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     success = false;
                 }
@@ -1160,13 +1160,13 @@ namespace AirflowNetwork {
                     state.dataAirflowNetwork->SpecifiedMassFlowData.emplace_back();
                     state.dataAirflowNetwork->SpecifiedMassFlowData[i_mass].name = thisObjectName;
                     state.dataAirflowNetwork->SpecifiedMassFlowData[i_mass].mass_flow = flow_rate;
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->SpecifiedMassFlowData[i_mass]; // Yet another workaround
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->SpecifiedMassFlowData[i_mass]; // Yet another workaround
                     ++i_mass;
                 } else {
                     state.dataAirflowNetwork->SpecifiedVolumeFlowData.emplace_back();
                     state.dataAirflowNetwork->SpecifiedVolumeFlowData[i_vol].name = thisObjectName;
                     state.dataAirflowNetwork->SpecifiedVolumeFlowData[i_vol].volume_flow = flow_rate;
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->SpecifiedVolumeFlowData[i_vol]; // Yet another workaround
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->SpecifiedVolumeFlowData[i_vol]; // Yet another workaround
                     ++i_vol;
                 }
             }
@@ -1197,8 +1197,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompLeakData(i).FlowExpo = expnt;      // Air Mass Flow exponent
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompLeakData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompLeakData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1238,8 +1238,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompELRData(i).FlowExpo = expnt;                                // Air Mass Flow exponent
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompELRData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompELRData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1315,8 +1315,8 @@ namespace AirflowNetwork {
                     state.dataAirflowNetwork->DisSysCompDuctData(i).A1; // 1/sqrt(Darcy friction factor)
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompDuctData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompDuctData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1447,8 +1447,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompCVFData(i).OutletNode = outletNode;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(fan_name) == solver.elements.end()) {
-                    solver.elements[fan_name] = &state.dataAirflowNetwork->DisSysCompCVFData(i); // Yet another workaround
+                if (solver->elements.find(fan_name) == solver->elements.end()) {
+                    solver->elements[fan_name] = &state.dataAirflowNetwork->DisSysCompCVFData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + fan_name);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1485,8 +1485,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompCoilData(i).hydraulicDiameter = D; // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(state.dataAirflowNetwork->DisSysCompCoilData(i).name) == solver.elements.end()) {
-                    solver.elements[state.dataAirflowNetwork->DisSysCompCoilData(i).name] =
+                if (solver->elements.find(state.dataAirflowNetwork->DisSysCompCoilData(i).name) == solver->elements.end()) {
+                    solver->elements[state.dataAirflowNetwork->DisSysCompCoilData(i).name] =
                         &state.dataAirflowNetwork->DisSysCompCoilData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state,
@@ -1528,8 +1528,8 @@ namespace AirflowNetwork {
                     HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent(state, hx_type, hx_name);
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(state.dataAirflowNetwork->DisSysCompHXData(i).name) == solver.elements.end()) {
-                    solver.elements[state.dataAirflowNetwork->DisSysCompHXData(i).name] =
+                if (solver->elements.find(state.dataAirflowNetwork->DisSysCompHXData(i).name) == solver->elements.end()) {
+                    solver->elements[state.dataAirflowNetwork->DisSysCompHXData(i).name] =
                         &state.dataAirflowNetwork->DisSysCompHXData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state,
@@ -1569,8 +1569,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompTermUnitData(i).hydraulicDiameter = D; // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(state.dataAirflowNetwork->DisSysCompTermUnitData(i).name) == solver.elements.end()) {
-                    solver.elements[state.dataAirflowNetwork->DisSysCompTermUnitData(i).name] =
+                if (solver->elements.find(state.dataAirflowNetwork->DisSysCompTermUnitData(i).name) == solver->elements.end()) {
+                    solver->elements[state.dataAirflowNetwork->DisSysCompTermUnitData(i).name] =
                         &state.dataAirflowNetwork->DisSysCompTermUnitData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state,
@@ -1605,8 +1605,8 @@ namespace AirflowNetwork {
                 state.dataAirflowNetwork->DisSysCompCPDData(i).DP = dp;               // Pressure difference across the component
 
                 // Add the element to the lookup table, check for name overlaps
-                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompCPDData(i); // Yet another workaround
+                if (solver->elements.find(thisObjectName) == solver->elements.end()) {
+                    solver->elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompCPDData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -3232,7 +3232,7 @@ namespace AirflowNetwork {
 
         // Read AirflowNetwork simulation horizontal openings
         // Moved into getAirflowElementInput
-        auto &solver = state.dataAFNSolver->solver;
+        auto &solver = state.dataAFNSolver;
 
         // Check status of control level for each surface with an opening
         j = 0;
@@ -3241,8 +3241,8 @@ namespace AirflowNetwork {
             if (state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum == 0) continue;
             bool has_Opening{false};
             // This is terrible, should not do it this way
-            auto afe = solver.elements.find(state.dataAirflowNetwork->MultizoneSurfaceData(i).OpeningName);
-            if (afe != solver.elements.end()) {
+            auto afe = solver->elements.find(state.dataAirflowNetwork->MultizoneSurfaceData(i).OpeningName);
+            if (afe != solver->elements.end()) {
                 auto type = afe->second->type();
                 has_Opening = (type == ComponentType::DOP) || (type == ComponentType::SOP) || (type == ComponentType::HOP);
             }
@@ -4297,8 +4297,8 @@ namespace AirflowNetwork {
                 if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlExhaust) {
                     // This is not great
                     bool is_EXF{false};
-                    auto afe = solver.elements.find(Alphas(4));
-                    if (afe != solver.elements.end()) {
+                    auto afe = solver->elements.find(Alphas(4));
+                    if (afe != solver->elements.end()) {
                         is_EXF = afe->second->type() == ComponentType::EXF;
                     }
                     if (!is_EXF) {
@@ -4310,8 +4310,8 @@ namespace AirflowNetwork {
                 if (state.dataAirflowNetwork->PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
                     // This is not great
                     bool is_REL{false};
-                    auto afe = solver.elements.find(Alphas(4));
-                    if (afe != solver.elements.end()) {
+                    auto afe = solver->elements.find(Alphas(4));
+                    if (afe != solver->elements.end()) {
                         is_REL = afe->second->type() == ComponentType::REL;
                     }
                     if (!is_REL) {
@@ -4508,7 +4508,7 @@ namespace AirflowNetwork {
 
         for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings; ++i) { // Detailed opening component
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->MultizoneCompDetOpeningData(i).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::DOP;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4521,7 +4521,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings + j; ++i) { // Simple opening component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->MultizoneCompSimpleOpeningData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::SOP;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4534,7 +4534,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks + j; ++i) { // Surface crack component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->MultizoneSurfaceCrackData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::SCR;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4547,7 +4547,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA + j; ++i) { // Surface crack component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->MultizoneSurfaceELAData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::SEL;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4560,7 +4560,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetwork->AirflowNetworkNumOfExhFan + j; ++i) { // Zone exhaust fan component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->MultizoneCompExhaustFanData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::EXF;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4574,7 +4574,7 @@ namespace AirflowNetwork {
              ++i) { // Distribution system crack component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->MultizoneCompHorOpeningData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::HOP;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4587,7 +4587,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks + j; ++i) { // Distribution system crack component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompLeakData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::PLR;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4601,7 +4601,7 @@ namespace AirflowNetwork {
              ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompELRData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::ELR;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4615,7 +4615,7 @@ namespace AirflowNetwork {
              ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompDuctData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::DWC;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4629,7 +4629,7 @@ namespace AirflowNetwork {
              ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompDamperData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::DMP;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4643,7 +4643,7 @@ namespace AirflowNetwork {
              ++i) { // Distribution system constant volume fan component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompCVFData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::CVF;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4657,7 +4657,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDetFans + j; ++i) { // Distribution system fan component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompDetFanData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::FAN;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4672,7 +4672,7 @@ namespace AirflowNetwork {
              ++i) { // Distribution system constant pressure drop component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompCPDData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::CPD;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4685,7 +4685,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils + j; ++i) { // Distribution system coil component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompCoilData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::COI;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4699,7 +4699,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits + j; ++i) { // Terminal unit component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompTermUnitData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::TMU;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4713,7 +4713,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs + j; ++i) { // Distribution system heat exchanger component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompHXData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::HEX;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4727,7 +4727,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->NumOfOAFans + j; ++i) { // OA fan component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompOutdoorAirData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::OAF;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4740,7 +4740,7 @@ namespace AirflowNetwork {
         for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->NumOfReliefFans + j; ++i) { // OA fan component
             n = i - j;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).Name = state.dataAirflowNetwork->DisSysCompReliefAirData(n).name;
-            solver.compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
+            solver->compnum[state.dataAirflowNetwork->AirflowNetworkCompData(i).Name] = i;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::REL;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).TypeNum = n;
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusName = "";
@@ -4755,7 +4755,7 @@ namespace AirflowNetwork {
         int type_i = 1;
         for (auto &el : state.dataAirflowNetwork->SpecifiedMassFlowData) {
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).Name = el.name;
-            solver.compnum[el.name] = ii;
+            solver->compnum[el.name] = ii;
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).CompTypeNum = iComponentTypeNum::SMF;
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).TypeNum = type_i;
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusName = "";
@@ -4769,7 +4769,7 @@ namespace AirflowNetwork {
         type_i = 1;
         for (auto &el : state.dataAirflowNetwork->SpecifiedVolumeFlowData) {
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).Name = el.name;
-            solver.compnum[el.name] = ii;
+            solver->compnum[el.name] = ii;
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).CompTypeNum = iComponentTypeNum::SVF;
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).TypeNum = type_i;
             state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusName = "";
@@ -4828,14 +4828,14 @@ namespace AirflowNetwork {
                 }
             }
             // Find component number
-            auto afe = solver.elements.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
-            if (afe != solver.elements.end()) {
+            auto afe = solver->elements.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
+            if (afe != solver->elements.end()) {
                 // found = false;
                 // for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfComps; ++i) {
                 state.dataAirflowNetwork->AirflowNetworkLinkageData(count).element = afe->second;
                 // Get CompTypeNum here, this is a hack to hold us over until the introspection is dealt with
-                auto compnum_iter = solver.compnum.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
-                assert(compnum_iter != solver.compnum.end());
+                auto compnum_iter = solver->compnum.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
+                assert(compnum_iter != solver->compnum.end());
                 int compnum = compnum_iter->second;
                 state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum = compnum;
 
@@ -5015,12 +5015,12 @@ namespace AirflowNetwork {
             state.dataAirflowNetwork->AirflowNetworkLinkageData(count).NodeHeights[1] =
                 state.dataAirflowNetwork->IntraZoneLinkageData(count - state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces).NodeHeights[1];
             // Find component number
-            auto afe = solver.elements.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
-            if (afe != solver.elements.end()) {
+            auto afe = solver->elements.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
+            if (afe != solver->elements.end()) {
                 state.dataAirflowNetwork->AirflowNetworkLinkageData(count).element = afe->second;
                 // Get CompTypeNum here, this is a hack to hold us over until the introspection is dealt with
-                auto compnum_iter = solver.compnum.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
-                assert(compnum_iter != solver.compnum.end());
+                auto compnum_iter = solver->compnum.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
+                assert(compnum_iter != solver->compnum.end());
                 int compnum = compnum_iter->second;
                 state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum = compnum;
                 if (state.dataAirflowNetwork->AirflowNetworkLinkageData(count).element->type() != ComponentType::SCR &&
@@ -5153,13 +5153,13 @@ namespace AirflowNetwork {
                     ErrorsFound = true;
                 }
                 // Find component number
-                auto afe = solver.elements.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
-                if (afe != solver.elements.end()) {
+                auto afe = solver->elements.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
+                if (afe != solver->elements.end()) {
                     state.dataAirflowNetwork->AirflowNetworkLinkageData(count).element = afe->second;
 
                     // Get CompTypeNum here, this is a hack to hold us over until the introspection is dealt with
-                    auto compnum_iter = solver.compnum.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
-                    assert(compnum_iter != solver.compnum.end());
+                    auto compnum_iter = solver->compnum.find(state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompName);
+                    assert(compnum_iter != solver->compnum.end());
                     int compnum = compnum_iter->second;
                     state.dataAirflowNetwork->AirflowNetworkLinkageData(count).CompNum = compnum;
                 } else {
@@ -5898,8 +5898,8 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
             state.dataAirflowNetwork->ANCO.allocate(state.dataGlobal->NumOfZones); // Local zone CO2 for rollback use
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
             state.dataAirflowNetwork->ANGC.allocate(state.dataGlobal->NumOfZones); // Local zone generic contaminant for rollback use
-        auto &solver = state.dataAFNSolver->solver;
-        solver.allocate(state);
+        auto &solver = state.dataAFNSolver;
+        solver->allocate(state);
 
         bool OnOffFanFlag = false;
         for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
@@ -6889,11 +6889,11 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
                 PressureSet = GetCurrentScheduleValue(state, state.dataAirflowNetwork->PressureControllerData(1).PresSetpointSchedPtr);
             }
         }
-        auto &solver = state.dataAFNSolver->solver;
-        solver.initialize(state);
+        auto &solver = state.dataAFNSolver;
+        solver->initialize(state);
 
         if (!(state.dataAirflowNetwork->PressureSetFlag > 0 && state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
-            solver.airmov(state);
+            solver->airmov(state);
         } else if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlExhaust) {
             AirLoopNum = state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
@@ -6903,7 +6903,7 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
                 MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             state.dataAirflowNetwork->ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
-            solver.airmov(state);
+            solver->airmov(state);
             ZonePressure1 = state.dataAirflowNetwork->AirflowNetworkNodeSimu(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).PZ;
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
@@ -6928,7 +6928,7 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
                 }
             } else {
                 state.dataAirflowNetwork->ExhaustFanMassFlowRate = MaxExhaustMassFlowrate;
-                solver.airmov(state);
+                solver->airmov(state);
                 ZonePressure2 = state.dataAirflowNetwork->AirflowNetworkNodeSimu(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -6997,8 +6997,8 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
                 MaxReliefMassFlowrate = MaxReliefMassFlowrate / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             state.dataAirflowNetwork->ReliefMassFlowRate = MinReliefMassFlowrate;
-            solver.initialize(state);
-            solver.airmov(state);
+            solver->initialize(state);
+            solver->airmov(state);
             ZonePressure1 = state.dataAirflowNetwork->AirflowNetworkNodeSimu(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).PZ;
 
             if (ZonePressure1 <= PressureSet) {
@@ -7024,8 +7024,8 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
                 }
             } else {
                 state.dataAirflowNetwork->ReliefMassFlowRate = MaxReliefMassFlowrate;
-                solver.initialize(state);
-                solver.airmov(state);
+                solver->initialize(state);
+                solver->airmov(state);
                 ZonePressure2 = state.dataAirflowNetwork->AirflowNetworkNodeSimu(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -7121,9 +7121,9 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
         if (state.dataAirflowNetwork->PressureSetFlag == PressureCtrlRelief) {
             state.dataAirflowNetwork->ReliefMassFlowRate = ControllerMassFlowRate;
         }
-        auto &solver = state.dataAFNSolver->solver;
-        solver.initialize(state);
-        solver.airmov(state);
+        auto &solver = state.dataAFNSolver;
+        solver->initialize(state);
+        solver->airmov(state);
 
         ZonePressure = state.dataAirflowNetwork->AirflowNetworkNodeSimu(state.dataAirflowNetwork->PressureControllerData(1).AFNNodeNum).PZ;
 
@@ -12604,7 +12604,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
 
         // Object Data
         Array1D<AFNExtSurfacesProp> AFNExtSurfaces; // Surface numbers of all exterior openings
-        auto &solver = state.dataAFNSolver->solver;
+        auto &solver = state.dataAFNSolver;
         // Count the total number of exterior simple and detailed openings and the number in each zone
         // Verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
         // If it doesn't have two openings, change "ADVANCED" to "STANDARD"
@@ -12620,8 +12620,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
                             &MultizoneZoneProp::ZoneName);
                         if (MZDZoneNum == AFNZnNum) {
                             // This is terrible, should not do it this way
-                            auto afe = solver.elements.find(state.dataAirflowNetwork->MultizoneSurfaceData(SrfNum).OpeningName);
-                            if (afe != solver.elements.end()) {
+                            auto afe = solver->elements.find(state.dataAirflowNetwork->MultizoneSurfaceData(SrfNum).OpeningName);
+                            if (afe != solver->elements.end()) {
                                 auto type = afe->second->type();
                                 if (type == ComponentType::DOP) {
                                     ++state.dataAirflowNetworkBalanceManager->AFNNumOfExtOpenings;
@@ -12696,8 +12696,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
                 if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(SrfNum).SurfNum).ExtBoundCond ==
                     ExternalEnvironment) { // check if outdoor boundary condition
                     // This is terrible, should not do it this way
-                    auto afe = solver.elements.find(state.dataAirflowNetwork->MultizoneSurfaceData(SrfNum).OpeningName);
-                    if (afe != solver.elements.end()) {
+                    auto afe = solver->elements.find(state.dataAirflowNetwork->MultizoneSurfaceData(SrfNum).OpeningName);
+                    if (afe != solver->elements.end()) {
                         auto type = afe->second->type();
                         if (type == ComponentType::DOP) {
                             ++state.dataAirflowNetworkBalanceManager->AFNNumOfExtOpenings;
@@ -13421,7 +13421,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
         }
     }
 
-    void Solver::allocate(EnergyPlusData &state)
+    void AirflowNetworkSolverData::allocate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -13582,8 +13582,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
             ObjexxFCL::gio::write(Unit11, Format_900) << 0;
         }
         */
-        auto &solver = state.dataAFNSolver->solver;
-        solver.setsky(state);
+        auto &solver = state.dataAFNSolver;
+        solver->setsky(state);
 
         // SETSKY figures out the IK stuff -- which is why E+ doesn't allocate AU until here
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
@@ -13601,7 +13601,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
         AU.allocate(IK(NetworkNumOfNodes + 1));
     }
 
-    void Solver::initialize(EnergyPlusData &state)
+    void AirflowNetworkSolverData::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -13659,7 +13659,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
         }
     }
 
-    void Solver::setsky(EnergyPlusData &state)
+    void AirflowNetworkSolverData::setsky(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -13730,7 +13730,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
         }
     }
 
-    void Solver::airmov(EnergyPlusData &state)
+    void AirflowNetworkSolverData::airmov(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -13826,9 +13826,9 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
         }
 
         // Calculate pressure field in a large opening
-        state.dataAFNSolver->dos.pstack(state, state.dataAFNSolver->solver.properties, state.dataAFNSolver->solver.PZ);
-        auto &solver = state.dataAFNSolver->solver;
-        solver.solvzp(state, ITER);
+        state.dataAFNSolver->dos.pstack(state, state.dataAFNSolver->properties, state.dataAFNSolver->PZ);
+        auto &solver = state.dataAFNSolver;
+        solver->solvzp(state, ITER);
 
         // Report element flows and zone pressures.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -13898,7 +13898,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
         }
     }
 
-    void Solver::solvzp(EnergyPlusData &state, int &ITER) // number of iterations
+    void AirflowNetworkSolverData::solvzp(EnergyPlusData &state, int &ITER) // number of iterations
     {
 
         // SUBROUTINE INFORMATION:
@@ -13986,8 +13986,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
             // Initialize node/zone pressure values by assuming only linear relationship between
             // airflows and pressure drops.
             LFLAG = true;
-            auto &solver = state.dataAFNSolver->solver;
-            solver.filjac(state, NNZE, LFLAG);
+            auto &solver = state.dataAFNSolver;
+            solver->filjac(state, NNZE, LFLAG);
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
             }
@@ -14008,7 +14008,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
             // if (LIST >= 2) DUMPVD("PZ:", PZ, NetworkNumOfNodes, outputFile);
         }
         // Solve nonlinear airflow network equations by modified Newton's method.
-        auto &solver = state.dataAFNSolver->solver;
+        auto &solver = state.dataAFNSolver;
         while (ITER < state.dataAirflowNetwork->AirflowNetworkSimu.MaxIteration) {
             LFLAG = false;
             ++ITER;
@@ -14016,7 +14016,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
             //                print(outputFile, "Begin iteration {}\n", ITER);
             //            }
             // Set up the Jacobian matrix.
-            solver.filjac(state, NNZE, LFLAG);
+            solver->filjac(state, NNZE, LFLAG);
             // Data dump.
             //            if (LIST >= 3) {
             //                DUMPVR("SUMF:", SUMF, NetworkNumOfNodes, outputFile);
@@ -14109,7 +14109,7 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
         }
     }
 
-    void Solver::filjac(EnergyPlusData &state,
+    void AirflowNetworkSolverData::filjac(EnergyPlusData &state,
                         int const NNZE,  // number of nonzero entries in the "AU" array.
                         bool const LFLAG // if = 1, use laminar relationship (initialization).
     )
