@@ -1051,6 +1051,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface(SurfNum).Zone = 1;
     state->dataSurface->Surface(SurfNum).Construction = 1;
     state->dataSurface->SurfTAirRef.allocate(1);
+    state->dataSurface->SurfTAirRefRpt.allocate(1);
     state->dataSurface->SurfTAirRef(SurfNum) = 0;
     state->dataConstruction->Construct(1).TypeIsWindow = false;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
@@ -1082,7 +1083,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
@@ -1094,7 +1095,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
@@ -1106,7 +1107,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Case 2 - High ACH
@@ -1122,7 +1123,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 4.122;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
@@ -1133,7 +1134,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 9.476;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
@@ -1144,7 +1145,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 3.212;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 }
 
@@ -1179,7 +1180,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 
     // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
-    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->SurfIntConvCoeffIndex(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
@@ -1190,7 +1191,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     EXPECT_NEAR(Hn, 1.520, 0.001);
 
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
-    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->SurfIntConvCoeffIndex(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
