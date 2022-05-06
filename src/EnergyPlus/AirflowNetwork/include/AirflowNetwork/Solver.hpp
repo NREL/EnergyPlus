@@ -61,77 +61,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-// define this variable to get new code, commenting should yield original
-#define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS // Delete this one ASAP
-
 namespace AirflowNetwork {
-
-int constexpr NrInt = 20; // Number of intervals for a large opening
-
-struct DetailedOpeningSolver
-{
-    // Large opening variables
-    EPVector<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    EPVector<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    EPVector<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
-    Array2D<Real64> DpL;       // Array of stack pressures in link
-
-    void allocate(int number_of_links, int n_dop)
-    {
-        DpProf.allocate(n_dop * (NrInt + 2));
-        RhoProfF.allocate(n_dop * (NrInt + 2));
-        RhoProfT.allocate(n_dop * (NrInt + 2));
-        DpL.allocate(number_of_links, 2);
-    }
-
-    void clear()
-    {
-        DpProf.clear();
-        RhoProfF.clear();
-        RhoProfT.clear();
-        DpL.clear();
-    }
-
-    void presprofile(EnergyPlusData &state,
-                     int const il,                  // Linkage number
-                     int const Pprof,               // Opening number
-                     Real64 const G,                // gravitation field strength [N/kg]
-                     const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers
-                     const Array1D<Real64> &DpT,    // Stack pressures at start heights of Layers
-                     const Array1D<Real64> &BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-                     const Array1D<Real64> &BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-                     const Array1D<Real64> &RhoStF, // Density at the start heights of Layers in the FROM zone
-                     const Array1D<Real64> &RhoStT, // Density at the start heights of Layers in the TO zone
-                     int const From,                // Number of FROM zone
-                     int const To,                  // Number of To zone
-                     Real64 const ActLh,            // Actual height of opening [m]
-                     Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
-    );
-
-    void pstack(EnergyPlusData &state, std::vector<AirflowNetwork::AirProperties> &props, Array1D<Real64> &pz);
-
-    Real64 psz(Real64 const Pz0,  // Pressure at altitude z0 [Pa]
-               Real64 const Rho0, // density at altitude z0 [kg/m3]
-               Real64 const beta, // density gradient [kg/m4]
-               Real64 const z0,   // reference altitude [m]
-               Real64 const z,    // altitude[m]
-               Real64 const g     // gravity field strength [N/kg]
-    );
-
-    void lclimb(EnergyPlusData &state,
-                Real64 const G,   // gravity field strength [N/kg]
-                Real64 &Rho,      // Density link level (initialized with rho zone) [kg/m3]
-                Real64 const Z,   // Height of the link above the zone reference [m]
-                Real64 &T,        // temperature at link level [C]
-                Real64 &X,        // absolute humidity at link level [kg/kg]
-                Real64 &Dp,       // Stackpressure to the linklevel [Pa]
-                int const zone,   // Zone number
-                Real64 const PZ,  // Zone Pressure (reflevel) [Pa]
-                Real64 const Pbz, // Barometric pressure at entrance level [Pa]
-                Real64 &RhoDr     // Air density of dry air on the link level used
-    );
-
-};
 
 } // namespace AirflowNetwork
 
