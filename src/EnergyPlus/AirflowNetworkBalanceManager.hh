@@ -48,6 +48,9 @@
 #ifndef AirflowNetworkBalanceManager_hh_INCLUDED
 #define AirflowNetworkBalanceManager_hh_INCLUDED
 
+// define this variable to get new code, commenting should yield original
+#define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+
 // C++ Headers
 #include <unordered_map>
 
@@ -67,7 +70,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace AirflowNetworkBalanceManager {
+namespace AirflowNetwork {
 
     struct AirflowNetworkReportVars
     {
@@ -221,7 +224,124 @@ namespace AirflowNetworkBalanceManager {
         bool closingProbability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
-} // namespace AirflowNetworkBalanceManager
+    struct Solver
+    {
+        Solver() : PB(0.0)
+        {
+        }
+
+        void allocate(EnergyPlusData &state);
+        void initialize(EnergyPlusData &state);
+        void setsky(EnergyPlusData &state);
+        void airmov(EnergyPlusData &state);
+        void solvzp(EnergyPlusData &state, int &ITER); // number of iterations
+        void filjac(EnergyPlusData &state,
+                    int const NNZE,  // number of nonzero entries in the "AU" array.
+                    bool const LFLAG // if = 1, use laminar relationship (initialization).
+        );
+
+        void clear()
+        {
+            PB = 0.0;
+            // LIST = 0;
+            elements.clear();
+            compnum.clear();
+            properties.clear();
+            AFECTL.deallocate();
+            AFLOW2.deallocate();
+            AFLOW.deallocate();
+            PS.deallocate();
+            PW.deallocate();
+            SUMAF.deallocate();
+            PZ.deallocate();
+            ID.deallocate();
+            IK.deallocate();
+            AD.deallocate();
+            AU.deallocate();
+
+#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+            newIK.deallocate();
+            newAU.deallocate();
+#endif
+            SUMF.deallocate();
+        }
+
+        std::unordered_map<std::string, AirflowElement *> elements;
+        std::unordered_map<std::string, int> compnum; // Stopgap until all the introspection is dealt with
+
+        std::vector<AirProperties> properties;
+
+        // int NetworkNumOfLinks;
+        // int NetworkNumOfNodes;
+
+        // int const NrInt; // Number of intervals for a large opening
+
+        // Common block AFEDAT
+        Array1D<Real64> AFECTL; // This gets used in calculate, encapsulation fail
+        Array1D<Real64> AFLOW2;
+        Array1D<Real64> AFLOW; // This gets used in calculate, encapsulation fail
+        Array1D<Real64> PS;
+        Array1D<Real64> PW;
+
+        // Common block CONTRL
+        Real64 PB;
+        // int LIST;
+
+        // Common block ZONL
+        // Array1D<Real64> RHOZ;
+        // Array1D<Real64> SQRTDZ;
+        // Array1D<Real64> VISCZ;
+        Array1D<Real64> SUMAF;
+        // Array1D<Real64> TZ; // Temperature [C]
+        // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
+        Array1D<Real64> PZ; // Pressure [Pa]
+
+        // Other array variables
+        Array1D_int ID;
+        Array1D_int IK;
+        Array1D<Real64> AD;
+        Array1D<Real64> AU;
+
+#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+        Array1D_int newIK;     // noel
+        Array1D<Real64> newAU; // noel
+#endif
+
+        // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
+        Array1D<Real64> SUMF;
+    };
+
+    // Functions
+
+    void FACSKY(EnergyPlusData &state,
+                Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
+                const Array1D_int &IK, // pointer to the top of column/row "K"
+                int const NEQ,         // number of equations
+                int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
+    );
+
+    void SLVSKY(EnergyPlusData &state,
+                const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+                const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
+                Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
+                const Array1D_int &IK,     // pointer to the top of column/row "K"
+                int const NEQ,             // number of equations
+                int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
+    );
+
+    void FILSKY(EnergyPlusData &state,
+                const Array1D<Real64> &X,    // element array (row-wise sequence)
+                std::array<int, 2> const LM, // location matrix
+                const Array1D_int &IK,       // pointer to the top of column/row "K"
+                Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,         // the main diagonal of [A] before and after factoring
+                int const FLAG               // mode of operation
+    );
+
+} // namespace AirflowNetwork
 
 struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
 {
@@ -229,7 +349,7 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
     void initialize(EnergyPlusData &state);
     void calculateWindPressureCoeffs(EnergyPlusData &state);
 
-    EPVector<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
+    EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
     Array1D_int SplitterNodeNumbers;
     int AirflowNetworkNumOfExtSurfaces = 0;
     // Inverse matrix
@@ -300,7 +420,7 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
     int ErrIndexLowPre = 0;
 
     // Object Data
-    EPVector<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
+    EPVector<AirflowNetwork::AirflowNetworkReportVars> AirflowNetworkZnRpt;
     std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
     // AirflowNetwork::Solver solver;
@@ -401,6 +521,72 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
         this->HybridGlobalErrCount = 0;
         this->AFNNumOfExtOpenings = 0;
         this->OpenNuminZone = 0;
+    }
+};
+
+struct AirflowNetworkSolverData : BaseGlobalStruct
+{
+    AirflowNetwork::Solver solver;
+
+    AirflowNetwork::DetailedOpeningSolver dos;
+
+    // Data
+    int NetworkNumOfLinks = 0;
+    int NetworkNumOfNodes = 0;
+
+    // Common block AFEDAT
+    Array1D<Real64> AFECTL;
+    Array1D<Real64> AFLOW2;
+    Array1D<Real64> AFLOW;
+    Array1D<Real64> PS;
+    Array1D<Real64> PW;
+
+    // Common block CONTRL
+    Real64 PB = 0.0;
+    int LIST = 0;
+
+    // Common block ZONL
+    // Array1D<Real64> RHOZ;
+    // Array1D<Real64> SQRTDZ;
+    // Array1D<Real64> VISCZ;
+    Array1D<Real64> SUMAF;
+    // Array1D<Real64> TZ; // Temperature [C]
+    // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
+    Array1D<Real64> PZ; // Pressure [Pa]
+
+    // Other array variables
+    Array1D_int ID;
+    Array1D_int IK;
+    Array1D<Real64> AD;
+    Array1D<Real64> AU;
+
+#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+    Array1D_int newIK;     // noel
+    Array1D<Real64> newAU; // noel
+#endif
+
+    // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
+    Array1D<Real64> SUMF;
+
+    void clear_state() override
+    {
+        NetworkNumOfLinks = 0;
+        NetworkNumOfNodes = 0;
+        AFECTL.clear();
+        AFLOW2.clear();
+        AFLOW.clear();
+        PS.clear();
+        PW.clear();
+        PB = 0.0;
+        LIST = 0;
+        SUMAF.clear();
+        PZ.clear();
+        ID.clear();
+        IK.clear();
+        AD.clear();
+        AU.clear();
+        solver.clear();
+        dos.clear();
     }
 };
 

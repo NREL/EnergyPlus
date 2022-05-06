@@ -226,6 +226,26 @@ namespace AirflowNetwork {
     int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
                                                     // and multizone calculations during off time
 
+    void generic_crack(Real64 &coef,               // Flow coefficient
+                       Real64 const expn,          // Flow exponent
+                       bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirProperties &propN, // Node 1 properties
+                       const AirProperties &propM, // Node 2 properties
+                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    );
+
+    int GenericDuct(Real64 const Length,        // Duct length
+                    Real64 const Diameter,      // Duct diameter
+                    bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                    Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                    const AirProperties &propN, // Node 1 properties
+                    const AirProperties &propM, // Node 2 properties
+                    std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                    std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    );
+
     // Types
 
     struct AirflowNetworkSimuProp // Basic parameters for AirflowNetwork simulation

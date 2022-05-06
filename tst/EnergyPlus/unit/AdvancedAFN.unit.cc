@@ -61,7 +61,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::AirflowNetworkBalanceManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace CurveManager;
 

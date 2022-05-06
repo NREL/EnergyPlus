@@ -81,29 +81,42 @@ struct EnergyPlusData;
 
 namespace AirflowNetwork {
 
-    Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
-    );
+Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
+);
 
-    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
-    );
+Real64 airDynamicVisc(Real64 T // Temperature in Celsius
+);
 
-    Real64 airKinematicVisc(EnergyPlusData &state,
-                            Real64 T, // Temperature in Celsius
-                            Real64 W, // Humidity ratio
-                            Real64 P  // Barometric pressure
-    );
+Real64 airKinematicVisc(EnergyPlusData &state,
+                        Real64 T, // Temperature in Celsius
+                        Real64 W, // Humidity ratio
+                        Real64 P  // Barometric pressure
+);
 
-    Real64 airThermalDiffusivity(EnergyPlusData &state,
-                                 Real64 T, // Temperature in Celsius
-                                 Real64 W, // Humidity ratio
-                                 Real64 P  // Barometric pressure
-    );
+Real64 airThermalDiffusivity(EnergyPlusData &state,
+                             Real64 T, // Temperature in Celsius
+                             Real64 W, // Humidity ratio
+                             Real64 P  // Barometric pressure
+);
 
-    Real64 airPrandtl(EnergyPlusData &state,
-                      Real64 T, // Temperature in Celsius
-                      Real64 W, // Humidity ratio
-                      Real64 P  // Barometric pressure
-    );
+Real64 airPrandtl(EnergyPlusData &state,
+                  Real64 T, // Temperature in Celsius
+                  Real64 W, // Humidity ratio
+                  Real64 P  // Barometric pressure
+);
+
+struct AirProperties
+{
+    Real64 temperature{20.0};
+    // Real64 pressure;      //{0.0}; // gage pressure
+    Real64 humidity_ratio{0.0};
+    Real64 density{0.0};
+    Real64 sqrt_density{0.0};
+    Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
+
+    AirProperties();
+    explicit AirProperties(double const airDensity);
+};
 
 } // namespace AirflowNetwork
 

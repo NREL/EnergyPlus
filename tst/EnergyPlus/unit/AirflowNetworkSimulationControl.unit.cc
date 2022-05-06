@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::AirflowNetworkBalanceManager unit tests
+// EnergyPlus::AirflowNetwork unit tests
 
 // Google test headers
 #include <gtest/gtest.h>
@@ -69,7 +69,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace AirflowNetworkBalanceManager;
+using namespace AirflowNetwork;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;

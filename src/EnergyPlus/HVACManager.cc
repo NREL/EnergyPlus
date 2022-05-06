@@ -147,7 +147,7 @@ void ManageHVAC(EnergyPlusData &state)
     //  manage variable time step and when zone air histories are updated.
 
     // Using/Aliasing
-    using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
+    using AirflowNetwork::ManageAirflowNetworkBalance;
     using DemandManager::ManageDemand;
     using DemandManager::UpdateDemandManagers;
     using EMSManager::ManageEMS;
@@ -1813,7 +1813,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // Each flag is checked and the appropriate manager is then called.
 
     // Using/Aliasing
-    using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
+    using AirflowNetwork::ManageAirflowNetworkBalance;
     using NonZoneEquipmentManager::ManageNonZoneEquipment;
     using PlantManager::ManagePlantLoops;
     using PlantUtilities::AnyPlantLoopSidesNeedSim;
@@ -2382,7 +2382,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     // This subroutine updates the report variables for the AirHeatBalance.
 
     // Using/Aliasing
-    using AirflowNetworkBalanceManager::ReportAirflowNetwork;
+    using AirflowNetwork::ReportAirflowNetwork;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::CycleOnZoneFansOnly;
     using DataHVACGlobals::FanType_ZoneExhaust;

@@ -53,10 +53,9 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array2D.hh>
-
 #include "AirflowNetwork/Properties.hpp"
-
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 
@@ -64,178 +63,37 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 // define this variable to get new code, commenting should yield original
-#define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+#define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS // Delete this one ASAP
 
 namespace AirflowNetwork {
 
-    int constexpr NrInt = 20; // Number of intervals for a large opening
+int constexpr NrInt = 20; // Number of intervals for a large opening
 
-    struct AirProperties
+struct DetailedOpeningSolver
+{
+    // Large opening variables
+    EPVector<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
+    EPVector<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
+    EPVector<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
+    Array2D<Real64> DpL;       // Array of stack pressures in link
+
+    void allocate(int number_of_links, int n_dop)
     {
-        Real64 temperature{20.0};
-        // Real64 pressure;      //{0.0}; // gage pressure
-        Real64 humidity_ratio{0.0};
-        Real64 density{0.0};
-        Real64 sqrt_density{0.0};
-        Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
+        DpProf.allocate(n_dop * (NrInt + 2));
+        RhoProfF.allocate(n_dop * (NrInt + 2));
+        RhoProfT.allocate(n_dop * (NrInt + 2));
+        DpL.allocate(number_of_links, 2);
+    }
 
-        AirProperties();
-        explicit AirProperties(double const airDensity);
-    };
-
-    // Forward declaration
-    struct AirflowElement;
-
-    struct Solver
+    void clear()
     {
-        Solver() : PB(0.0)
-        {
-        }
+        DpProf.clear();
+        RhoProfF.clear();
+        RhoProfT.clear();
+        DpL.clear();
+    }
 
-        void allocate(EnergyPlusData &state);
-        void initialize(EnergyPlusData &state);
-        void setsky(EnergyPlusData &state);
-        void airmov(EnergyPlusData &state);
-        void solvzp(EnergyPlusData &state, int &ITER); // number of iterations
-        void filjac(EnergyPlusData &state,
-                    int const NNZE,  // number of nonzero entries in the "AU" array.
-                    bool const LFLAG // if = 1, use laminar relationship (initialization).
-        );
-
-        void clear()
-        {
-            PB = 0.0;
-            // LIST = 0;
-            elements.clear();
-            compnum.clear();
-            properties.clear();
-            AFECTL.deallocate();
-            AFLOW2.deallocate();
-            AFLOW.deallocate();
-            PS.deallocate();
-            PW.deallocate();
-            SUMAF.deallocate();
-            PZ.deallocate();
-            ID.deallocate();
-            IK.deallocate();
-            AD.deallocate();
-            AU.deallocate();
-
-#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-            newIK.deallocate();
-            newAU.deallocate();
-#endif
-            SUMF.deallocate();
-        }
-
-        std::unordered_map<std::string, AirflowElement *> elements;
-        std::unordered_map<std::string, int> compnum; // Stopgap until all the introspection is dealt with
-
-        std::vector<AirProperties> properties;
-
-        // int NetworkNumOfLinks;
-        // int NetworkNumOfNodes;
-
-        // int const NrInt; // Number of intervals for a large opening
-
-        // Common block AFEDAT
-        Array1D<Real64> AFECTL; // This gets used in calculate, encapsulation fail
-        Array1D<Real64> AFLOW2;
-        Array1D<Real64> AFLOW; // This gets used in calculate, encapsulation fail
-        Array1D<Real64> PS;
-        Array1D<Real64> PW;
-
-        // Common block CONTRL
-        Real64 PB;
-        // int LIST;
-
-        // Common block ZONL
-        // Array1D<Real64> RHOZ;
-        // Array1D<Real64> SQRTDZ;
-        // Array1D<Real64> VISCZ;
-        Array1D<Real64> SUMAF;
-        // Array1D<Real64> TZ; // Temperature [C]
-        // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-        Array1D<Real64> PZ; // Pressure [Pa]
-
-        // Other array variables
-        Array1D_int ID;
-        Array1D_int IK;
-        Array1D<Real64> AD;
-        Array1D<Real64> AU;
-
-#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-        Array1D_int newIK;     // noel
-        Array1D<Real64> newAU; // noel
-#endif
-
-        // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-        Array1D<Real64> SUMF;
-    };
-
-    // Functions
-
-    void generic_crack(Real64 &coef,               // Flow coefficient
-                       Real64 const expn,          // Flow exponent
-                       bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                       const AirProperties &propN, // Node 1 properties
-                       const AirProperties &propM, // Node 2 properties
-                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
-    );
-
-    int GenericDuct(Real64 const Length,        // Duct length
-                    Real64 const Diameter,      // Duct diameter
-                    bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                    Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                    const AirProperties &propN, // Node 1 properties
-                    const AirProperties &propM, // Node 2 properties
-                    std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                    std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
-    );
-
-    void FACSKY(EnergyPlusData &state,
-                Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
-                Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
-                Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
-                const Array1D_int &IK, // pointer to the top of column/row "K"
-                int const NEQ,         // number of equations
-                int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
-    );
-
-    void SLVSKY(EnergyPlusData &state,
-                const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
-                const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
-                const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
-                Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
-                const Array1D_int &IK,     // pointer to the top of column/row "K"
-                int const NEQ,             // number of equations
-                int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
-    );
-
-    void FILSKY(EnergyPlusData &state,
-                const Array1D<Real64> &X,    // element array (row-wise sequence)
-                std::array<int, 2> const LM, // location matrix
-                const Array1D_int &IK,       // pointer to the top of column/row "K"
-                Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
-                Array1D<Real64> &AD,         // the main diagonal of [A] before and after factoring
-                int const FLAG               // mode of operation
-    );
-
-    void DUMPVD(std::string const &S,     // Description
-                const Array1D<Real64> &V, // Output values
-                int const n,              // Array size
-                std::ostream &UOUT        // Output file
-    );
-
-    void DUMPVR(std::string const &S,     // Description
-                const Array1D<Real64> &V, // Output values
-                int const n,              // Array size
-                std::ostream &UOUT        // Output file
-    );
-
-    void PresProfile(EnergyPlusData &state,
+    void presprofile(EnergyPlusData &state,
                      int const il,                  // Linkage number
                      int const Pprof,               // Opening number
                      Real64 const G,                // gravitation field strength [N/kg]
@@ -251,7 +109,7 @@ namespace AirflowNetwork {
                      Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
     );
 
-    void PStack(EnergyPlusData &state);
+    void pstack(EnergyPlusData &state, std::vector<AirflowNetwork::AirProperties> &props, Array1D<Real64> &pz);
 
     Real64 psz(Real64 const Pz0,  // Pressure at altitude z0 [Pa]
                Real64 const Rho0, // density at altitude z0 [kg/m3]
@@ -261,7 +119,7 @@ namespace AirflowNetwork {
                Real64 const g     // gravity field strength [N/kg]
     );
 
-    void LClimb(EnergyPlusData &state,
+    void lclimb(EnergyPlusData &state,
                 Real64 const G,   // gravity field strength [N/kg]
                 Real64 &Rho,      // Density link level (initialized with rho zone) [kg/m3]
                 Real64 const Z,   // Height of the link above the zone reference [m]
@@ -274,78 +132,9 @@ namespace AirflowNetwork {
                 Real64 &RhoDr     // Air density of dry air on the link level used
     );
 
-    //*****************************************************************************************
+};
 
 } // namespace AirflowNetwork
-
-struct AirflowNetworkSolverData : BaseGlobalStruct
-{
-    AirflowNetwork::Solver solver;
-
-    // Data
-    int NetworkNumOfLinks = 0;
-    int NetworkNumOfNodes = 0;
-
-    // Common block AFEDAT
-    Array1D<Real64> AFECTL;
-    Array1D<Real64> AFLOW2;
-    Array1D<Real64> AFLOW;
-    Array1D<Real64> PS;
-    Array1D<Real64> PW;
-
-    // Common block CONTRL
-    Real64 PB = 0.0;
-    int LIST = 0;
-
-    // Common block ZONL
-    // Array1D<Real64> RHOZ;
-    // Array1D<Real64> SQRTDZ;
-    // Array1D<Real64> VISCZ;
-    Array1D<Real64> SUMAF;
-    // Array1D<Real64> TZ; // Temperature [C]
-    // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-    Array1D<Real64> PZ; // Pressure [Pa]
-
-    // Other array variables
-    Array1D_int ID;
-    Array1D_int IK;
-    Array1D<Real64> AD;
-    Array1D<Real64> AU;
-
-#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-    Array1D_int newIK;     // noel
-    Array1D<Real64> newAU; // noel
-#endif
-
-    // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-    Array1D<Real64> SUMF;
-
-    // Large opening variables
-    Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
-    Array2D<Real64> DpL;      // Array of stack pressures in link
-
-    void clear_state() override
-    {
-        NetworkNumOfLinks = 0;
-        NetworkNumOfNodes = 0;
-        AFECTL.clear();
-        AFLOW2.clear();
-        AFLOW.clear();
-        PS.clear();
-        PW.clear();
-        PB = 0.0;
-        LIST = 0;
-        SUMAF.clear();
-        PZ.clear();
-        ID.clear();
-        IK.clear();
-        AD.clear();
-        AU.clear();
-        solver.clear();
-    }
-};
 
 } // namespace EnergyPlus
 

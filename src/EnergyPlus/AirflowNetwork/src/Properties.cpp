@@ -53,6 +53,18 @@ namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
+AirProperties::AirProperties(double const density)
+{
+    this->density = density;
+    this->sqrt_density = sqrt(density);
+}
+
+AirProperties::AirProperties()
+    : temperature(20.0), humidity_ratio(0.0), density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
+    sqrt_density(std::sqrt(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0))), viscosity(AIRDYNAMICVISCOSITY(20.0))
+{
+}
+
     Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
     )
     {
