@@ -116,43 +116,47 @@ void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Rea
     Real64 bexp;
 
     // calculation of convection component of exterior film coefficient using the :
-    {
-        auto const SELECT_CASE_var(ibc);
-        if (SELECT_CASE_var == 0) { // ISO 15099
-            hcout = 4.0 + 4.0 * ws;
-        } else if (SELECT_CASE_var == -1) { // old ASHRAE SPC142 correlation
-            if (iwd == 0) {                 // windward
-                if (ws > 2.0) {
-                    vc = 0.25 * ws;
-                } else {
-                    vc = 0.5;
-                }
-            } else { // leeward
-                vc = 0.3 + 0.05 * ws;
+    switch (ibc) {
+    case 0: { // ISO 15099
+        hcout = 4.0 + 4.0 * ws;
+    } break;
+    case -1: {          // old ASHRAE SPC142 correlation
+        if (iwd == 0) { // windward
+            if (ws > 2.0) {
+                vc = 0.25 * ws;
+            } else {
+                vc = 0.5;
             }
-            hcout = 3.28 * std::pow(vc, 0.605);
-            hcout *= conv;                  // convert to metric
-        } else if (SELECT_CASE_var == -2) { // Yazdanian-Klems correlation:
-            if (iwd == 0) {                 // windward
-                acoef = 2.38;
-                bexp = 0.89;
-            } else { // leeward
-                acoef = 2.86;
-                bexp = 0.617;
-            }
-            hcout = std::sqrt(pow_2(0.84 * std::pow(tw - tex, 0.33)) + pow_2(acoef * std::pow(ws, bexp)));
-        } else if (SELECT_CASE_var == -3) { // Kimura correlation (Section 8.4.2.3 in ISO 15099-2001):
-            if (iwd == 0) {                 // windward
-                if (ws > 2.0) {
-                    vc = 0.25 * ws;
-                } else {
-                    vc = 0.5 * ws;
-                }
-            } else { // leeward
-                vc = 0.3 + 0.05 * ws;
-            }
-            hcout = 4.7 + 7.6 * vc;
+        } else { // leeward
+            vc = 0.3 + 0.05 * ws;
         }
+        hcout = 3.28 * std::pow(vc, 0.605);
+        hcout *= conv; // convert to metric
+    } break;
+    case -2: {          // Yazdanian-Klems correlation:
+        if (iwd == 0) { // windward
+            acoef = 2.38;
+            bexp = 0.89;
+        } else { // leeward
+            acoef = 2.86;
+            bexp = 0.617;
+        }
+        hcout = std::sqrt(pow_2(0.84 * std::pow(tw - tex, 0.33)) + pow_2(acoef * std::pow(ws, bexp)));
+    } break;
+    case -3: {          // Kimura correlation (Section 8.4.2.3 in ISO 15099-2001):
+        if (iwd == 0) { // windward
+            if (ws > 2.0) {
+                vc = 0.25 * ws;
+            } else {
+                vc = 0.5 * ws;
+            }
+        } else { // leeward
+            vc = 0.3 + 0.05 * ws;
+        }
+        hcout = 4.7 + 7.6 * vc;
+    } break;
+    default:
+        break;
     }
 }
 
@@ -2512,14 +2516,16 @@ void filmi(EnergyPlusData &state,
     Real64 Gnui(0.0);
 
     if (wsi > 0.0) { // main IF
-        {
-            auto const SELECT_CASE_var(ibc);
-            if (SELECT_CASE_var == 0) {
-                hcin = 4.0 + 4.0 * wsi;
-            } else if (SELECT_CASE_var == -1) {
-                hcin = 5.6 + 3.8 * wsi; // SPC142 correlation
-                return;
-            }
+        switch (ibc) {
+        case 0: {
+            hcin = 4.0 + 4.0 * wsi;
+        } break;
+        case -1: {
+            hcin = 5.6 + 3.8 * wsi; // SPC142 correlation
+            return;
+        } break;
+        default:
+            break;
         }
     } else {                                                  // main IF - else
         tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
