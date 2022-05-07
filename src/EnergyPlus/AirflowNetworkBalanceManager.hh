@@ -262,7 +262,7 @@ namespace AirflowNetwork {
 struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
 {
 
-    void initialize(EnergyPlusData &state);
+    void initialize_balance_manager(EnergyPlusData &state);
     void calculateWindPressureCoeffs(EnergyPlusData &state);
 
     EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
@@ -499,38 +499,6 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
     Array1D<Real64> SUMF;
 
-    void clear_state() override
-    {
-        NetworkNumOfLinks = 0;
-        NetworkNumOfNodes = 0;
-        AFECTL.clear();
-        AFLOW2.clear();
-        AFLOW.clear();
-        PS.clear();
-        PW.clear();
-        PB = 0.0;
-        SUMAF.clear();
-        PZ.clear();
-        ID.clear();
-        IK.clear();
-        AD.clear();
-        AU.clear();
-        elements.clear();
-        compnum.clear();
-        properties.clear();
-
-#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-        newIK.deallocate();
-        newAU.deallocate();
-#endif
-        SUMF.deallocate();
-        dos.clear();
-    }
-};
-
-struct AirflowNetworkData : BaseGlobalStruct
-{
-
     int SimulateAirflowNetwork = 1;
     Array1D_bool AirflowNetworkZoneFlag;
     int NumOfNodesMultiZone = 0;    // Number of nodes for multizone calculation
@@ -617,6 +585,31 @@ struct AirflowNetworkData : BaseGlobalStruct
 
     void clear_state() override
     {
+        NetworkNumOfLinks = 0;
+        NetworkNumOfNodes = 0;
+        AFECTL.clear();
+        AFLOW2.clear();
+        AFLOW.clear();
+        PS.clear();
+        PW.clear();
+        PB = 0.0;
+        SUMAF.clear();
+        PZ.clear();
+        ID.clear();
+        IK.clear();
+        AD.clear();
+        AU.clear();
+        elements.clear();
+        compnum.clear();
+        properties.clear();
+
+#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+        newIK.deallocate();
+        newAU.deallocate();
+#endif
+        SUMF.deallocate();
+        dos.clear();
+
         this->SimulateAirflowNetwork = 1;
         this->AirflowNetworkNodeSimu.clear();
         this->AirflowNetworkLinkSimu.clear();

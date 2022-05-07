@@ -57,10 +57,10 @@ EnergyPlusData::EnergyPlusData()
     this->dataAirLoop = std::make_unique<DataAirLoopData>();
     this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
     this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-    this->dataAirflowNetwork = std::make_unique<AirflowNetwork::AirflowNetworkData>();
+    //this->dataAirflowNetwork = std::make_unique<AirflowNetwork::AirflowNetworkData>();
     this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetwork::AirflowNetworkBalanceManagerData>();
     this->dataAFNProps = std::make_unique<DataAFNProps>();
-    this->dataAFNSolver = std::make_unique<AirflowNetwork::AirflowNetworkSolverData>();
+    this->afn = std::make_unique<AirflowNetwork::AirflowNetworkSolverData>();
     this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
     this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
     this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();
@@ -318,9 +318,9 @@ void EnergyPlusData::clear_state()
     this->dataAirLoop->clear_state();
     this->dataAirLoopHVACDOAS->clear_state();
     this->dataAirSystemsData->clear_state();
-    this->dataAirflowNetwork->clear_state();
+    //this->afn->clear_state();
     this->dataAirflowNetworkBalanceManager->clear_state();
-    this->dataAFNSolver->clear_state();
+    this->afn->clear_state();
     this->dataAFNProps->clear_state();
     this->dataBSDFWindow->clear_state();
     this->dataBaseSizerFanHeatInputs->clear_state();

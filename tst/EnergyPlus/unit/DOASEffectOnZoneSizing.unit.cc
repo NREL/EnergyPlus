@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    state->dataAirflowNetwork->AirflowNetworkNumOfExhFan = 0;
+    state->afn->AirflowNetworkNumOfExhFan = 0;
     state->dataHeatBalFanSys->TempControlType(1) = 4;
     state->dataHeatBalFanSys->TempControlType(2) = 4;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 0.0;
