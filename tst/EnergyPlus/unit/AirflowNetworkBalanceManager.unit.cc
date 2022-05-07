@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestOtherSideCoefficients)
 
     int i = 2;
 
-    state->dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces = 2;
+    state->afn->AirflowNetworkNumOfExtSurfaces = 2;
     state->afn->AirflowNetworkNumOfSurfaces = 2;
 
     state->afn->MultizoneSurfaceData.allocate(i);
@@ -120,7 +120,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestOtherSideCoefficients)
     state->afn->MultizoneSurfaceData(1).SurfNum = 1;
     state->afn->MultizoneSurfaceData(2).SurfNum = 2;
 
-    state->dataAirflowNetworkBalanceManager->calculateWindPressureCoeffs(*state);
+    state->afn->calculateWindPressureCoeffs(*state);
     EXPECT_EQ(1, state->afn->MultizoneSurfaceData(1).NodeNums[1]);
     EXPECT_EQ(2, state->afn->MultizoneSurfaceData(2).NodeNums[1]);
     EXPECT_EQ(1, state->afn->MultizoneExternalNodeData(1).curve);
@@ -2375,14 +2375,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
     state->afn->AirflowNetworkFanActivated = false;
 
-    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(state->dataGlobal->NumOfZones);
+    state->afn->exchangeData.allocate(state->dataGlobal->NumOfZones);
 
     UpdateAirflowNetwork(*state);
 
     EXPECT_NEAR(0.0, state->afn->AirflowNetworkNodeSimu(10).PZ, 0.0001);
     EXPECT_NEAR(0.0, state->afn->AirflowNetworkNodeSimu(20).PZ, 0.0001);
-    EXPECT_NEAR(0.0, state->dataAirflowNetworkBalanceManager->linkReport(20).FLOW, 0.0001);
-    EXPECT_NEAR(0.0, state->dataAirflowNetworkBalanceManager->linkReport(50).FLOW, 0.0001);
+    EXPECT_NEAR(0.0, state->afn->linkReport(20).FLOW, 0.0001);
+    EXPECT_NEAR(0.0, state->afn->linkReport(50).FLOW, 0.0001);
 
     // Start a test for #6005
     state->afn->ANZT = 26.0;
@@ -4485,7 +4485,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_UserDefinedDuctViewFactors)
 
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
-    state->dataAirflowNetworkBalanceManager->initialize_balance_manager(*state);
+    state->afn->initialize_balance_manager(*state);
 
     // Check inputs
     EXPECT_EQ(state->afn->AirflowNetworkLinkageViewFactorData(1).LinkageName, "ZONESUPPLYLINK1");
@@ -9252,7 +9252,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
         "   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    state->dataAirflowNetworkBalanceManager->initialize_balance_manager(*state);
+    state->afn->initialize_balance_manager(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -13395,7 +13395,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(4).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(5).IsControlled = false;
-    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(5);
+    state->afn->exchangeData.allocate(5);
     state->afn->AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
     ReportAirflowNetwork(*state);
 
@@ -13414,21 +13414,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     // Ventilation
     UpdateAirflowNetwork(*state);
     ReportAirflowNetwork(*state);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMVCp, 2.38012, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMVCpT, -41.1529, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).VentilVolume, 0.7314456, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).VentilAirChangeRate, 0.2438, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).VentilMass, 0.85114, 0.001);
+    EXPECT_NEAR(state->afn->exchangeData(1).SumMVCp, 2.38012, 0.001);
+    EXPECT_NEAR(state->afn->exchangeData(1).SumMVCpT, -41.1529, 0.001);
+    EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilVolume, 0.7314456, 0.001);
+    EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilAirChangeRate, 0.2438, 0.001);
+    EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilMass, 0.85114, 0.001);
     // Infiltration
     state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum =
         AirflowNetwork::iComponentTypeNum::SCR;
     UpdateAirflowNetwork(*state);
     ReportAirflowNetwork(*state);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMCp, 2.38012, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->exchangeData(1).SumMCpT, -41.1529, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).InfilVolume, 0.7314456, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).InfilAirChangeRate, 0.2438, 0.001);
-    EXPECT_NEAR(state->dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(1).InfilMass, 0.85114, 0.001);
+    EXPECT_NEAR(state->afn->exchangeData(1).SumMCp, 2.38012, 0.001);
+    EXPECT_NEAR(state->afn->exchangeData(1).SumMCpT, -41.1529, 0.001);
+    EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).InfilVolume, 0.7314456, 0.001);
+    EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).InfilAirChangeRate, 0.2438, 0.001);
+    EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).InfilMass, 0.85114, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
@@ -13898,8 +13898,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 
     state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     AirflowNetwork::GetAirflowNetworkInput(*state);
-    state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
-    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
+    state->afn->AirflowNetworkGetInputFlag = false;
+    state->afn->exchangeData.allocate(1);
     ManageAirflowNetworkBalance(*state, First, iter, resimu);
     EXPECT_FALSE(resimu);
 }
@@ -16043,9 +16043,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->afn->AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
     state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
 
     // MixedAir::NumOAMixers.allocate(1);
     ValidateDistributionSystem(*state);
@@ -20293,7 +20293,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
 
-    state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
+    state->afn->AirflowNetworkGetInputFlag = false;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
@@ -20513,9 +20513,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
     state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = false;
@@ -20690,9 +20690,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
     state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;
@@ -20858,9 +20858,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
     state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;
@@ -21033,9 +21033,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
     state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
     state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = false;
@@ -21169,9 +21169,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
     state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;
@@ -21298,9 +21298,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
     state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
     state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
-    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
     state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;

@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->NonAirSystemResponse(1) = 0.0;
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.allocate(1);
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged(1) = 0.0;
-    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
+    state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
@@ -560,7 +560,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.deallocate();
-    state->dataAirflowNetworkBalanceManager->exchangeData.deallocate();
+    state->afn->exchangeData.deallocate();
     state->dataLoopNodes->Node.deallocate();
     state->dataHeatBalFanSys->TempTstatAir.deallocate();
     state->dataHeatBalFanSys->LoadCorrectionFactor.deallocate();
@@ -628,7 +628,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->NonAirSystemResponse(1) = 0.0;
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.allocate(1);
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged(1) = 0.0;
-    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
+    state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
@@ -888,7 +888,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.deallocate();
-    state->dataAirflowNetworkBalanceManager->exchangeData.deallocate();
+    state->afn->exchangeData.deallocate();
     state->dataLoopNodes->Node.deallocate();
     state->dataHeatBalFanSys->TempTstatAir.deallocate();
     state->dataHeatBalFanSys->LoadCorrectionFactor.deallocate();

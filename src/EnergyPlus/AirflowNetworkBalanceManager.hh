@@ -259,8 +259,8 @@ namespace AirflowNetwork {
                 int const FLAG               // mode of operation
     );
 
-struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
-{
+struct AirflowNetworkSolverData : BaseGlobalStruct
+    {
 
     void initialize_balance_manager(EnergyPlusData &state);
     void calculateWindPressureCoeffs(EnergyPlusData &state);
@@ -356,92 +356,6 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
     int HybridGlobalErrCount = 0;
     int AFNNumOfExtOpenings = 0; // Total number of external openings in the model
     int OpenNuminZone = 0;       // Counts which opening this is in the zone, 1 or 2
-
-    void clear_state() override
-    {
-        this->OccupantVentilationControl.deallocate();
-        this->SplitterNodeNumbers.deallocate();
-        this->AirflowNetworkNumOfExtSurfaces = 0;
-        this->MA.deallocate();
-        this->MV.deallocate();
-        this->IVEC.deallocate();
-        this->VentilationCtrl = 0;
-        this->NumOfExhaustFans = 0;
-        this->NumAirflowNetwork = 0;
-        this->AirflowNetworkNumOfDetOpenings = 0;
-        this->AirflowNetworkNumOfSimOpenings = 0;
-        this->AirflowNetworkNumOfHorOpenings = 0;
-        this->AirflowNetworkNumOfSurCracks = 0;
-        this->AirflowNetworkNumOfSurELA = 0;
-        this->AirflowNetworkNumOfSFR = 0;
-        this->AirflowNetworkNumOfExtNode = 0;
-        this->AirflowNetworkNumOfOutAirNode = 0;
-        this->AirflowNetworkNumOfSingleSideZones = 0;
-        this->DisSysNumOfNodes = 0;
-        this->DisSysNumOfLeaks = 0;
-        this->DisSysNumOfELRs = 0;
-        this->DisSysNumOfDucts = 0;
-        this->DisSysNumOfDuctViewFactors = 0;
-        this->DisSysNumOfDampers = 0;
-        this->DisSysNumOfCVFs = 0;
-        this->DisSysNumOfDetFans = 0;
-        this->DisSysNumOfCoils = 0;
-        this->DisSysNumOfHXs = 0;
-        this->DisSysNumOfCPDs = 0;
-        this->DisSysNumOfTermUnits = 0;
-        this->DisSysNumOfLinks = 0;
-        this->NumOfExtNodes = 0;
-        this->IncAng = 0.0;
-        this->SupplyFanType = 0;
-        this->MaxOnOffFanRunTimeFraction = 0.0;
-        this->CurrentEndTimeLast = 0.0;
-        this->TimeStepSysLast = 0.0;
-        this->AirflowNetworkNumOfOccuVentCtrls = 0;
-        this->IntraZoneNumOfNodes = 0;
-        this->IntraZoneNumOfLinks = 0;
-        this->IntraZoneNumOfZones = 0;
-        this->NumOfPressureControllers = 0;
-        this->NumOfOAFans = 0;
-        this->NumOfReliefFans = 0;
-        this->AirflowNetworkGetInputFlag = true;
-        this->AssignFanAirLoopNumFlag = true;
-        this->ValidateDistributionSystemFlag = true;
-        this->FacadeAng = Array1D<Real64>(5);
-        this->AirflowNetworkZnRpt.deallocate();
-        this->LoopPartLoadRatio.deallocate();
-        this->LoopOnOffFanRunTimeFraction.deallocate();
-        this->LoopOnOffFlag.deallocate();
-        this->UniqueAirflowNetworkSurfaceName.clear();
-        this->ValidateExhaustFanInputOneTimeFlag = true;
-        this->initializeOneTimeFlag = true;
-        this->initializeMyEnvrnFlag = true;
-        this->CalcAirflowNetworkAirBalanceOneTimeFlag = true;
-        this->CalcAirflowNetworkAirBalanceErrorsFound = false;
-        this->UpdateAirflowNetworkMyOneTimeFlag = true;
-        this->UpdateAirflowNetworkMyOneTimeFlag1 = true;
-        this->exchangeData.deallocate();
-        this->multiExchangeData.deallocate();
-        this->linkReport.deallocate();
-        this->nodeReport.deallocate();
-        this->linkReport1.deallocate();
-        this->ErrCountVar = 0;
-        this->ErrCountHighPre = 0;
-        this->ErrCountLowPre = 0;
-        this->ErrIndexHighPre = 0;
-        this->ErrIndexVar = 0;
-        this->ErrIndexLowPre = 0;
-        this->onceZoneFlag.clear();
-        this->onceSurfFlag.clear();
-        this->onetime = false;
-        this->HybridGlobalErrIndex = 0;
-        this->HybridGlobalErrCount = 0;
-        this->AFNNumOfExtOpenings = 0;
-        this->OpenNuminZone = 0;
-    }
-};
-
-struct AirflowNetworkSolverData : BaseGlobalStruct
-{
 
     void allocate(EnergyPlusData &state);
     void initialize(EnergyPlusData &state);
@@ -585,6 +499,85 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
 
     void clear_state() override
     {
+        this->OccupantVentilationControl.deallocate();
+        this->SplitterNodeNumbers.deallocate();
+        this->AirflowNetworkNumOfExtSurfaces = 0;
+        this->MA.deallocate();
+        this->MV.deallocate();
+        this->IVEC.deallocate();
+        this->VentilationCtrl = 0;
+        this->NumOfExhaustFans = 0;
+        this->NumAirflowNetwork = 0;
+        this->AirflowNetworkNumOfDetOpenings = 0;
+        this->AirflowNetworkNumOfSimOpenings = 0;
+        this->AirflowNetworkNumOfHorOpenings = 0;
+        this->AirflowNetworkNumOfSurCracks = 0;
+        this->AirflowNetworkNumOfSurELA = 0;
+        this->AirflowNetworkNumOfSFR = 0;
+        this->AirflowNetworkNumOfExtNode = 0;
+        this->AirflowNetworkNumOfOutAirNode = 0;
+        this->AirflowNetworkNumOfSingleSideZones = 0;
+        this->DisSysNumOfNodes = 0;
+        this->DisSysNumOfLeaks = 0;
+        this->DisSysNumOfELRs = 0;
+        this->DisSysNumOfDucts = 0;
+        this->DisSysNumOfDuctViewFactors = 0;
+        this->DisSysNumOfDampers = 0;
+        this->DisSysNumOfCVFs = 0;
+        this->DisSysNumOfDetFans = 0;
+        this->DisSysNumOfCoils = 0;
+        this->DisSysNumOfHXs = 0;
+        this->DisSysNumOfCPDs = 0;
+        this->DisSysNumOfTermUnits = 0;
+        this->DisSysNumOfLinks = 0;
+        this->NumOfExtNodes = 0;
+        this->IncAng = 0.0;
+        this->SupplyFanType = 0;
+        this->MaxOnOffFanRunTimeFraction = 0.0;
+        this->CurrentEndTimeLast = 0.0;
+        this->TimeStepSysLast = 0.0;
+        this->AirflowNetworkNumOfOccuVentCtrls = 0;
+        this->IntraZoneNumOfNodes = 0;
+        this->IntraZoneNumOfLinks = 0;
+        this->IntraZoneNumOfZones = 0;
+        this->NumOfPressureControllers = 0;
+        this->NumOfOAFans = 0;
+        this->NumOfReliefFans = 0;
+        this->AirflowNetworkGetInputFlag = true;
+        this->AssignFanAirLoopNumFlag = true;
+        this->ValidateDistributionSystemFlag = true;
+        this->FacadeAng = Array1D<Real64>(5);
+        this->AirflowNetworkZnRpt.deallocate();
+        this->LoopPartLoadRatio.deallocate();
+        this->LoopOnOffFanRunTimeFraction.deallocate();
+        this->LoopOnOffFlag.deallocate();
+        this->UniqueAirflowNetworkSurfaceName.clear();
+        this->ValidateExhaustFanInputOneTimeFlag = true;
+        this->initializeOneTimeFlag = true;
+        this->initializeMyEnvrnFlag = true;
+        this->CalcAirflowNetworkAirBalanceOneTimeFlag = true;
+        this->CalcAirflowNetworkAirBalanceErrorsFound = false;
+        this->UpdateAirflowNetworkMyOneTimeFlag = true;
+        this->UpdateAirflowNetworkMyOneTimeFlag1 = true;
+        this->exchangeData.deallocate();
+        this->multiExchangeData.deallocate();
+        this->linkReport.deallocate();
+        this->nodeReport.deallocate();
+        this->linkReport1.deallocate();
+        this->ErrCountVar = 0;
+        this->ErrCountHighPre = 0;
+        this->ErrCountLowPre = 0;
+        this->ErrIndexHighPre = 0;
+        this->ErrIndexVar = 0;
+        this->ErrIndexLowPre = 0;
+        this->onceZoneFlag.clear();
+        this->onceSurfFlag.clear();
+        this->onetime = false;
+        this->HybridGlobalErrIndex = 0;
+        this->HybridGlobalErrCount = 0;
+        this->AFNNumOfExtOpenings = 0;
+        this->OpenNuminZone = 0;
+
         NetworkNumOfLinks = 0;
         NetworkNumOfNodes = 0;
         AFECTL.clear();

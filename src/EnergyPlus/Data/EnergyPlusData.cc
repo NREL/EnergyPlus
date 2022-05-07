@@ -57,8 +57,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataAirLoop = std::make_unique<DataAirLoopData>();
     this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
     this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-    //this->dataAirflowNetwork = std::make_unique<AirflowNetwork::AirflowNetworkData>();
-    this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetwork::AirflowNetworkBalanceManagerData>();
     this->dataAFNProps = std::make_unique<DataAFNProps>();
     this->afn = std::make_unique<AirflowNetwork::AirflowNetworkSolverData>();
     this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
@@ -319,7 +317,7 @@ void EnergyPlusData::clear_state()
     this->dataAirLoopHVACDOAS->clear_state();
     this->dataAirSystemsData->clear_state();
     //this->afn->clear_state();
-    this->dataAirflowNetworkBalanceManager->clear_state();
+    this->afn->clear_state();
     this->afn->clear_state();
     this->dataAFNProps->clear_state();
     this->dataBSDFWindow->clear_state();

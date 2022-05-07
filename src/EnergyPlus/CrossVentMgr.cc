@@ -938,12 +938,12 @@ namespace CrossVentMgr {
                      state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
 
         if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
-            MCp_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
-                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp +
-                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
-            MCpT_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
-                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT +
-                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
+            MCp_Total = state.afn->exchangeData(ZoneNum).SumMCp +
+                        state.afn->exchangeData(ZoneNum).SumMVCp +
+                        state.afn->exchangeData(ZoneNum).SumMMCp;
+            MCpT_Total = state.afn->exchangeData(ZoneNum).SumMCpT +
+                         state.afn->exchangeData(ZoneNum).SumMVCpT +
+                         state.afn->exchangeData(ZoneNum).SumMMCpT;
         }
 
         EvolveParaUCSDCV(state, ZoneNum);
