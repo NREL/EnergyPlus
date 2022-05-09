@@ -6,7 +6,7 @@ Allow Multiple Ground Surface Temperature and Reflectance Objects
 **Florida Solar Energy Center**
 
  - First draft: April 26, 2022
- - Modified Date: NA
+ - Modified Date: May 6, 2022
 
 ## Justification for New Feature ##
 
@@ -18,7 +18,9 @@ Currently EnergyPlus only allows one single ground surface with user defined gro
 
 ## E-mail and  Conference Call Conclusions ##
 
-NA
+- technicalities call: May 4, 2022
+
+- technicalities call recap is on github.
 
 ## Overview ##
 
@@ -26,7 +28,7 @@ NA
 
 (1) Exterior surface LWR exchange with the ground is calculated using outside air dryblub temperature (default)
 
-(2) Currently ground surface temperature can be specified using `SurfaceProperty:SurroundingSurfaces` object 
+(2) Currently single ground surface temperature can be specified using `SurfaceProperty:SurroundingSurfaces` object 
 
 (3) Existing model uses global Site:GroundReflectance object
 
@@ -34,100 +36,34 @@ NA
 
 ## Implementation Approach ##
 
-*(1) This new feature can be implemented using the following two existing Objects:
+*(1) This new feature oe enhancemnt can be implemented using an existing object and one new Object:
 
-     `SurfaceProperty:LocalEnvironment` and `SurfaceProperty:SurroundingSurfaces`
+     Existing object: `SurfaceProperty:LocalEnvironment`
 
-*(2) Requires modifying SurfaceProperty:SurroundingSurfaces object
+     New Object: `SurfaceProperty:GroundSurfaces`
+	 
+	 The new object will have multiple ground surfaces properties of ground view factor, ground temperature and ground reflectance
+	 
+	 Ground surfaces are assumed horizontal surfaces for solar reflection calculations and relected solar radiations are assumed diffuse.
+	 
+*(2) Requires modifying SurfaceProperty:LocalEnvironment object:
 
-*(3) Adds new input fields for Ground Reflectance Schedule Name
+     Add a new field `Ground Suraces Object Name` to this object. This field will be used to specify the name of the new object.
 
-*(4) Adds new input fields for Surrounding Surface X Reflectance Schedule Name
+*(3) Two redundant input fields in SurfaceProperty:SurroundingSurfaces will be deprecated
 
-*(5) View factor weighed ground reflectance will be calculated for each exterior surface
-
-### Exsting SurfaceProperty:SurroundingSurfaces ###
-
-
+*(4) Ground surfaces are assumed horizontal surfaces for solar reflection calculations
 
 ![Figure 1](GroundSurfaceProperties.PNG)
 
 
 ** Figure 1. Surface Property Object **
 
- 
-``` 
-SurfaceProperty:SurroundingSurfaces,
-       \min-fields 10
-       \memo This object defines a list of surrounding surfaces for an exterior surface.
-       \extensible:4 -- duplicate last set of surrounding surface properties (the last four fields), remembering to remove ; from "inner" fields.
-   A1, \field Name
-       \required-field
-       \type alpha
-       \reference SurroundingSurfacesNames
-   N1, \field Sky View Factor
-       \minimum 0.0
-       \maximum 1.0
-       \default 0.5
-       \note optional
-   A2, \field Sky Temperature Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C
-       \note optional
-   N2, \field Ground View Factor
-       \minimum 0.0
-       \maximum 1.0
-       \default 0.5
-       \note optional
-   A3, \field Ground Temperature Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C
-       \note optional
-`   A4, \field Ground Reflectance Schedule Name
-`       \required-field
-`       \type object-list
-`       \object-list ScheduleNames
-`       \note Schedule values are fractions, 0.0 to 1.0, dimensionless
-   A5, \field Surrounding Surface 1 Name
-       \begin-extensible
-       \required-field
-       \type alpha
-   N3, \field Surrounding Surface 1 View Factor
-       \required-field
-       \minimum 0.0
-       \maximum 1.0
-       \default 0.0
-   A6, \field Surrounding Surface 1 Temperature Schedule Name
-       \required-field
-       \type object-list
-       \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
-`   A7, \field Surrounding Surface 1 Reflectance Schedule Name
-`       \required-field
-`       \type object-list
-`       \object-list ScheduleNames
-`       \note Schedule values are fractions, 0.0 to 1.0, dimensionless`
- 
-        ...
-		
-  A32, \field Surrounding Surface 10 Name
-       \type alpha
-  N12, \field Surrounding Surface 10 View Factor
-       \minimum 0.0
-       \maximum 1.0
-       \default 0.0
-  A33, \field Surrounding Surface 10 Temperature Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C
-`  A34; \field Surrounding Surface 10 Reflectance Schedule Name
-`       \type object-list
-`       \object-list ScheduleNames
-`       \note Schedule values are fractions, 0.0 to 1.0, dimensionless
-`       \note optional	
 
+### Exsting Object SurfaceProperty:LocalEnvironment ###
+
+ 
+```
 SurfaceProperty:LocalEnvironment,
        \min-fields 3
        \memo This object defines the local environment properties of an exterior surface.
@@ -148,30 +84,293 @@ SurfaceProperty:LocalEnvironment,
        \type object-list
        \object-list SurroundingSurfacesNames
        \note Enter the name of a SurfaceProperty:SurroundingSurfaces object
-   A5; \field Outdoor Air Node Name
+   A5, \field Outdoor Air Node Name
        \type object-list
        \object-list OutdoorAirNodeNames
        \note Enter the name of an OutdoorAir:Node object
+   A6; \field Ground Surfaces Object Name
+       \type object-list
+       \object-list GroundSurfacesNames
+       \note Enter the name of a SurfaceProperty:GroundSurfaces object
+	   \note This field is a required for use with SurfaceProperty:GroundSurfaces only
 ```
+
+
+### New Object SurfaceProperty:GroundSurfaces ###
+
+```
+SurfaceProperty:GroundSurfaces,
+       \min-fields 5
+       \memo This object defines a list of ground surfaces for use with an exterior surface.
+       \extensible:4 -- duplicate last set of ground surface properties (the last four fields), remembering to remove ; from "inner" fields.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference SurroundingSurfacesNames
+   A2, \field Ground Surface 1 Name
+       \begin-extensible
+       \required-field
+       \type alpha
+   N1, \field Ground Surface 1 View Factor
+       \required-field
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+   A3, \field Ground Surface 1 Temperature Schedule Name
+       \required-field
+	   \type alpha
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A4, \field Ground Surface 1 Reflectance Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are fraction, 0.0 to 1.0, units dimensionless
+   A5, \field Ground Surface 2 Name
+       \type alpha
+       \note optional
+   N2, \field Ground Surface 2 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+       \note optional
+   A6, \field Ground Surface 2 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+   A7, \field Ground Surface 2 Reflectance Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are fraction, 0.0 to 1.0, units dimensionless
+       \note optional
+   A8, \field Ground Surface 3 Name
+       \type alpha
+       \note optional
+   N3, \field Ground Surface 3 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+       \note optional
+   A9, \field Ground Surface 3 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+  A10, \field Ground Surface 3 Reflectance Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are fraction, 0.0 to 1.0, units dimensionless
+       \note optional
+  A11, \field Ground Surface 4 Name
+       \type alpha
+       \note optional
+   N4, \field Ground Surface 4 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+       \note optional
+  A12, \field Ground Surface 4 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+  A13, \field Ground Surface 4 Reflectance Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are fraction, 0.0 to 1.0, units dimensionless
+       \note optional
+  A14, \field Ground Surface 5 Name
+       \type alpha
+       \note optional
+   N5, \field Ground Surface 5 View Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+       \note optional
+  A15, \field Ground Surface 5 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+  A16; \field Ground Surface 5 Reflectance Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are fraction, 0.0 to 1.0, units dimensionless
+       \note optional
+```
+
+
+
+### Existing Object SurfaceProperty:SurroundingSurfaces ###
+
+Requires removing or deprecating the following two redundant input fields from SurfaceProperty:SurroundingSurfaces object since ground view factors and ground surface temperatures are now specified in the new object SurfaceProperty:GroundSurfaces.
+
+```
+SurfaceProperty:SurroundingSurfaces,
+       \min-fields 10
+       \memo This object defines a list of surrounding surfaces for an exterior surface.
+       \extensible:4 -- duplicate last set of surrounding surface properties (the last four fields), remembering to remove ; from "inner" fields.
+
+		...
+
+   N2, \field Ground View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+       \note optional
+   A3, \field Ground Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+```
+
+
 	   
 ## Testing/Validation/Data Source(s): ##
 
-Demonstrate that the new approach duplicates the current results using exact set of inputs
-Unit tests will be added to demonstrate the new feature.
+Demonstrate that the new approach duplicates the current results using exact set of inputs. Unit tests will be added to demonstrate the new feature.
 
 ## Input Output Reference Documentation ##
 
-Update the documentations for changed sections
+\subsection{SurfaceProperty:GroundSurfaces}\label{surfacePropertyGroundSurfaces}
+
+This object is used for calculating building exterior surfaces long-wave radation exchange with the ground, and calculation of solar radiation reflection from ground surfaces to a building exterior surface. A given exterior surface can view multiple ground surfaces with different surface properties and view factors. Thus, this object allows to specify multiple ground view factors, ground surfaces temperature, and ground surfaces refelectance properties viewed by a given exterior surface. View factors are assumed to be constant values. The ground surface temperature and ground surface reflectance are specified using schedule object. At least one ground surface should be defined in this object.
+
+The sum of all defined view factors that includes sky virew factor, ground surfaces view factors and surrounding surfaces view factors seen by a given building exterior surface should be 1.0, or the sum of the ground view factors for a given exterior surface should not exceed 1 minus the sky view plus the sum of view factors of surrounding surfaces defined in SurfaceProperty:GroundSurfaces object.
+
+\subsubsection{Field: Name}\label{field-name}
+
+This is a unique name of the surface property ground surfaces object.
+
+\subsubsection{Field: Ground Surface 1 Name}\label{field-ground-surface-1-name}
+
+This is a unique name for ground surface 1. 
+
+\subsubsection{Field: Ground Surface 1 View Factor}\label{field-ground-surface-1-view-factor}
+
+This field defines the constant ground view factor of a building exterior surface to ground surface 1. The ground surface view factor is used in long-wave radiation exchange and ground surface solar reflectance calculations.
+
+\subsubsection{Field: Ground Surface 1 Temperature Schedule Name}\label{field-ground-surface-1-temp-schedule-name}
+
+This field is used to provide a schedule name of the ground surface 1 temperature. The ground surface temperature used in long-wave radiation exchange calculation of a building exterior surface with the ground surface. If the field is left blank, the default method will be used.
+
+\subsubsection{Field: Ground Surface 1 Reflectance Schedule Name}\label{field-ground-surface-1-reflectance-schedule-name}
+
+This field is used to provide a schedule name of the of a ground surface reflectance. The ground surface reflectance is used to calculate ground surface reflected solar radition to a building exterior surface. If the field is left blank, the global reflectance object defined else where or default values will be used.
+
+This object is extensible, so the last four fields can be repeated to define ground surface name, ground surface view factor, ground surface temperature, and ground surface reflectace sets.
+
+An example IDF objects.
+
+\begin{lstlisting}
+SurfaceProperty:GroundSurfaces,
+  GndSurfs:South,              !- Name
+  GndSurfSouth_Parking,        !- Ground Surface 1 Name
+  0.2,                         !- Ground Surface 1 View Factor
+  GndSurfsSouth_Parking_Sch,   !- Ground Surface 1 Temperature Schedule Name
+  GndSurfsSouth_Parking_Sch,   !- Ground Surface 1 Reflectance Schedule Name
+  GndSurfSouth_Grass,          !- Ground Surface 2 Name
+  0.2,                         !- Ground Surface 2 View Factor
+  GndSurfsSouth_Grass_Sch,     !- Ground Surface 2 Temperature Schedule Name
+  GndSurfsSouth_Grass_Sch,     !- Ground Surface 2 Reflectance Schedule Name
+  GndSurfSouth_Water,          !- Ground Surface 3 Name
+  0.1,                         !- Ground Surface 3 View Factor
+  GndSurfsSouth_Water_Sch,     !- Ground Surface 3 Temperature Schedule Name
+  GndSurfsSouth_Water_Sch;     !- Ground Surface 3 Reflectance Schedule Name
+\end{lstlisting}
+
+
+\begin{lstlisting}
+SurfaceProperty:LocalEnvironment,
+    LocEnv:Zn001:Wall001,      !- Name
+    Zn001:Wall001,             !- Exterior Surface Name
+    ,                          !- External Shading Fraction Schedule Name
+    ,                          !- Surrounding Surfaces Object Name
+    OutdoorAirNode:0001,       !- Outdoor Air Node Name
+	GndSurfs:South;            !- Ground Surfaces Object Name
+\end{lstlisting}
 
 ## Engineering Reference ##
 
-As needed.
+### External Longwave Radiation ###
+
+The total longwave radiative heat flux is the sum of components due to radiation exchange with the ground, sky, air, and surrounding surfaces.
+
+\begin{equation}
+{q''_{LWR}} = {q''_{gnd}} + {q''_{sky}} + {q''_{air} + {q''_{sur_surf)}}
+\end{equation}
+
+
+Long-wave radiation exchange of a building exterior surface with multiple ground surfaces is given by:
+
+\begin{equation}
+{q''_{gnd}} = \varepsilon \sigma \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {F_{gnd,j}} \left(T_{gnd,j}^4 - T_{surf}^4 \right)
+\end{equation}
+
+
+$\varepsilon$ = long-wave emittance of a building exterior surface
+
+$\sigma$ = Stefan-Boltzmann constant
+
+F\(_{gnd, j}\) = view factor of a building exterior surface to jth ground surface
+
+T\(_{gnd, j}\) = jth ground surface temperature
+
+T\(_{surf}\) = building outside surface temperature
+
+N\(_{gnd_surfaces}\) = Number ground surfaces seen by a building exterior surface
+
+
+### Ground Surfaces Solar Reflectance ###
+
+Ground reflected solar radiation is calculated for beam and diffuse components separately.
+
+\subsection{Sky Solar Radiation Diffusely Reflected from the Ground}\label{sky-solar-radiation-diffusely-reflected-from-the-ground}
+
+The diffuse irradiance received on a building exterior surface due to sky solar radiation reflected from multiple ground surfaces at each time step is given by:
+
+\begin{equation}
+\begin{array}{l}
+{QRadSWOutIncSkyDiffReflGnd(RecSurfNum)} = \\{DifSolarRad * {\rho_{gnd}} * SurfReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})}
+\end{array}
+\end{equation}
+
+rho\(_{gnd}\) = view factor weighed ground solar reflectance of multiple ground surfaces seen by an exterior surface for each time step.
+
+The view factor weighed ground reflectance of multiple ground surfaces is calculated from the ground refelctances and view factors of the ground surfaces seen by the exterior surface and is given by:
+
+\begin{equation}
+{\rho_{gnd}} = \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {\rho_{gnd}, j} * {F_{gnd,j}}
+\end{equation}
+
+rho\(_{gnd, j}\) = reflectance of the jth ground surface seen by a building exterior surface specified by the user for each time step
+
+
+\subsection{Beam Solar Radiation Diffusely Reflected from Obstructions}\label{beam-solar-radiation-diffusely-reflected-from-ground}
+
+The beam radiation is assumed to be reflected uniformaly to all directions. The diffuse irradiance received by a building exterior surface due to beam solar diffusely reflected from multiple ground surfaces is given by:
+
+\begin{equation}
+\begin{split}
+QRadSWOutIncBmToDiffReflGnd(RecSurfNum) =
+\\BeamSolarRad * {\rho_{gnd}} * (WeightNow * SurfReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay)
+\\+ WeightPreviousHour * SurfReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
+\end{split}
+\end{equation}
+
 
 ## Example File and Transition Changes ##
 
 An example file will be modified to demonstrate the use of multiple ground surface objects. Simulation results will be examined and sample results will be provided.
 
-Transition is required.
+Transition is required to remove two redundant fields in SurfaceProperty:SurroundingSurfaces object. These redundant fields are "Ground View Factor" and "Ground Temperature Schedule Name".
 
 ## Proposed Report Variables: ##
 
