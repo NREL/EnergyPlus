@@ -1273,23 +1273,21 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
         {
         }
     };
-    std::vector<ClassType> classesToInput = {ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRCooling, // 2022-05-08: Need set up new type and change type name here
+    std::vector<ClassType> classesToInput = {ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling,
                                                        "Chilled Water Nodes",
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add},
-                                             ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRHeating, // 2022-05-08: Need set up new type and change type name here
+                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
+                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
+                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add},
+                                             ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating,
                                                        "Hot Water Nodes",
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
-                                                       EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract}};
+                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
+                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
+                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract}};
 
     bool errorsFound = false;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     for (auto &classToInput : classesToInput) {
-        // 2022-05-08: temporaily changed the following with a const string to let compiler to go through
-        // cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
-        cCurrentModuleObject = "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING";
+        cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
 
         auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC,
                                                                                UtilityRoutines::MakeUPPERCase(cCurrentModuleObject));
