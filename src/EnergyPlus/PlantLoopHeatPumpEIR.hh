@@ -283,6 +283,33 @@ namespace EIRFuelFiredHeatPumps {
         virtual ~EIRFuelFiredHeatPump() = default;
 
         EIRFuelFiredHeatPump() = default;
+
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
+
+        void setOperatingFlowRatesASHP(EnergyPlusData &state);
+
+        void resetReportingVariables();
+
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
+
+        static void pairUpCompanionCoils(EnergyPlusData &state);
+
+        static void processInputForEIRFFHP(EnergyPlusData &state);
+
+        static Real64 add(Real64 const a, Real64 const b)
+        {
+            return a + b;
+        }
+
+        static Real64 subtract(Real64 const a, Real64 const b)
+        {
+            return a - b;
+        }
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 } // namespace EIRFuelFiredHeatPumps
 
