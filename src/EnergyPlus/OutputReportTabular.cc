@@ -12608,8 +12608,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             columnHead(1) = "SET ≤ 12.2°C Degree-Hours [°C·hr]";
             columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]";
             columnHead(3) = "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]";
-            columnHead(4) = "Longest SET ≤ 12.2°C Duration [hr]";
-            columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration";
+            columnHead(4) = "Longest SET ≤ 12.2°C Duration for Occupied Period [hr]";
+            columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
 
             if (unitsStyle_cur == UnitsStyle::InchPound) {
                 int indexUnitConv;
@@ -12633,8 +12633,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             columnHead(1) = "SET > 30°C Degree-Hours [°C·hr]";
             columnHead(2) = "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]";
             columnHead(3) = "SET > 30°C Occupied Degree-Hours [°C·hr]";
-            columnHead(4) = "Longest SET > 30°C Duration [hr]";
-            columnHead(5) = "Start Time of the Longest SET > 30°C Duration";
+            columnHead(4) = "Longest SET > 30°C Duration for Occupied Period [hr]";
+            columnHead(5) = "Start Time of the Longest SET > 30°C Duration for Occupied Period";
 
             if (unitsStyle_cur == UnitsStyle::InchPound) {
                 int indexUnitConv;

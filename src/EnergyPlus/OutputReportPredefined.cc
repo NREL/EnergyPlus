@@ -1283,15 +1283,15 @@ namespace OutputReportPredefined {
         s->pdchHeatingSETHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Degree-Hours [°C·hr]");
         s->pdchHeatingSETOccuHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]");
         s->pdchHeatingSETOccupiedHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]");
-        s->pdchHeatingSETUnmetDuration = newPreDefColumn(state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration [hr]");
-        s->pdchHeatingSETUnmetTime = newPreDefColumn(state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration");
+        s->pdchHeatingSETUnmetDuration = newPreDefColumn(state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration Duration for Occupied Period [hr]");
+        s->pdchHeatingSETUnmetTime = newPreDefColumn(state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period");
 
         s->pdstCoolingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Cooling SET Degree-Hours");
         s->pdchCoolingSETHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Degree-Hours [°C·hr]");
         s->pdchCoolingSETOccuHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]");
         s->pdchCoolingSETOccupiedHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Occupied Degree-Hours [°C·hr]");
-        s->pdchCoolingSETUnmetDuration = newPreDefColumn(state, s->pdstCoolingSETHours, "Longest SET > 30°C Duration [hr]");
-        s->pdchCoolingSETUnmetTime = newPreDefColumn(state, s->pdstCoolingSETHours, "Start Time of the Longest SET > 30°C Duration");
+        s->pdchCoolingSETUnmetDuration = newPreDefColumn(state, s->pdstCoolingSETHours, "Longest SET > 30°C Duration for Occupied Period [hr]");
+        s->pdchCoolingSETUnmetTime = newPreDefColumn(state, s->pdstCoolingSETHours, "Start Time of the Longest SET > 30°C Duration for Occupied Period");
 
         s->pdstHourOfSafetyColdEvent = newPreDefSubTable(state, s->pdrThermalResilience, "Hours of Safety for Cold Events");
         s->pdchColdHourOfSafety = newPreDefColumn(state, s->pdstHourOfSafetyColdEvent, "Hours of Safety [hr]");
