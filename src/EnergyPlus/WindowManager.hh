@@ -551,9 +551,10 @@ struct WindowManagerData : BaseGlobalStruct
     Array1D<Real64> AbsRadShadeFace = Array1D<Real64>(2); // Solar radiation, short-wave radiation from lights, and long-wave
     Array1D<Real64> RhoIR = Array1D<Real64>(10);          // Face IR reflectance
 
-    std::array<Real64, 10> vv = {0.0}; // Stores the implicit scaling of each row
-    std::array<Real64, 10> kprime = {0.0};  // Monotonic thermal conductivity
-    std::array<Real64, 10> kdblprm = {0.0}; // Conductivity term accounting for additional energy moved by the diffusional transport of internal energy in polyatomic gases.
+    std::array<Real64, 10> vv = {0.0};     // Stores the implicit scaling of each row
+    std::array<Real64, 10> kprime = {0.0}; // Monotonic thermal conductivity
+    std::array<Real64, 10> kdblprm = {
+        0.0}; // Conductivity term accounting for additional energy moved by the diffusional transport of internal energy in polyatomic gases.
     std::array<Real64, 10> mukpdwn = {0.0}; // Denominator term
     std::array<Real64, 10> kpdown = {0.0};  // Denominator terms
     std::array<Real64, 10> kdpdown = {0.0};

@@ -508,7 +508,7 @@ namespace WindowManager {
                     }
                 }
 
-                state.dataWindowManager->LayerNum[IGlass-1] = LayNum;
+                state.dataWindowManager->LayerNum[IGlass - 1] = LayNum;
                 LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayNum);
                 SpecDataNum = state.dataMaterial->Material(LayPtr).GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
@@ -659,7 +659,7 @@ namespace WindowManager {
                 // For each wavelength, get glass layer properties at this angle of incidence
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                    LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum[IGlass-1]);
+                    LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
                     if (!state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass - 1]; ++ILam) {
                             TransAndReflAtPhi(CosPhi,
@@ -843,7 +843,7 @@ namespace WindowManager {
                         if (IGlass == 3) LayNum = 1;
                     }
                 }
-                state.dataWindowManager->LayerNum[IGlass-1] = LayNum;
+                state.dataWindowManager->LayerNum[IGlass - 1] = LayNum;
                 LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayNum);
 
                 SpecDataNum = state.dataMaterial->Material(LayPtr).GlassSpectralDataPtr;
@@ -901,7 +901,7 @@ namespace WindowManager {
                 // For each wavelength, get glass layer properties at this angle of incidence
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                    LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum[IGlass-1]);
+                    LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
                     if (!state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass - 1]; ++ILam) {
 
@@ -4750,7 +4750,7 @@ namespace WindowManager {
                 if (std::abs(ajac(j, i)) > aamax) aamax = std::abs(ajac(j, i));
             }
             if (aamax == 0.0) ShowFatalError(state, "Singular matrix in LUdecomposition, window calculations");
-            vv[i-1] = 1.0 / aamax;
+            vv[i - 1] = 1.0 / aamax;
         }
         for (j = 1; j <= n; ++j) {
             for (i = 1; i <= j - 1; ++i) {
@@ -4767,7 +4767,7 @@ namespace WindowManager {
                     sum -= ajac(k, i) * ajac(j, k);
                 }
                 ajac(j, i) = sum;
-                dum = vv[i-1] * std::abs(sum);
+                dum = vv[i - 1] * std::abs(sum);
                 if (dum >= aamax) {
                     imax = i;
                     aamax = dum;
@@ -4780,7 +4780,7 @@ namespace WindowManager {
                     ajac(k, j) = dum;
                 }
                 d = -d;
-                vv[imax-1] = vv[j-1];
+                vv[imax - 1] = vv[j - 1];
             }
             indx(j) = imax;
             if (ajac(j, j) == 0.0) ajac(j, j) = DataGlobalConstants::rTinyValue;
@@ -4915,7 +4915,7 @@ namespace WindowManager {
         NMix = state.dataWindowManager->gnmix[IGap - 1];
 
         for (IMix = 1; IMix <= NMix; ++IMix) {
-            frct[IMix-1] = state.dataWindowManager->gfract[IMix - 1][IGap - 1];
+            frct[IMix - 1] = state.dataWindowManager->gfract[IMix - 1][IGap - 1];
         }
 
         Real64 const tmean(0.5 * (tleft + tright)); // Average gap gas temperature (K)
@@ -4951,49 +4951,49 @@ namespace WindowManager {
 
             // Calculate properties of mixture constituents
             for (i = 2; i <= NMix; ++i) {
-                fcon[i-1] = state.dataWindowManager->gcon[0][i - 1][IGap - 1] + state.dataWindowManager->gcon[1][i - 1][IGap - 1] * tmean +
-                          state.dataWindowManager->gcon[2][i - 1][IGap - 1] * tmean_2;
-                fvis[i-1] = state.dataWindowManager->gvis[0][i - 1][IGap - 1] + state.dataWindowManager->gvis[1][i - 1][IGap - 1] * tmean +
-                          state.dataWindowManager->gvis[2][i - 1][IGap - 1] * tmean_2;
-                fcp[i-1] = state.dataWindowManager->gcp[0][i - 1][IGap - 1] + state.dataWindowManager->gcp[1][i - 1][IGap - 1] * tmean +
-                         state.dataWindowManager->gcp[2][i - 1][IGap - 1] * tmean_2;
-                fdens[i-1] = pres * state.dataWindowManager->gwght[i - 1][IGap - 1] / (gaslaw * tmean);
-                molmix += frct[i-1] * state.dataWindowManager->gwght[i - 1][IGap - 1];                   // eq. 56
-                cpmixm += frct[i-1] * fcp[i-1] * state.dataWindowManager->gwght[i - 1][IGap - 1];          // eq. 58-59
-                kprime[i-1] = 3.75 * gaslaw / state.dataWindowManager->gwght[i - 1][IGap - 1] * fvis[i-1]; // eq. 67
-                kdblprm[i-1] = fcon[i-1] - kprime[i-1];                                                      // eq. 68
-                mukpdwn[i-1] = 1.0;                                                                      // initialize denomonator of eq. 60
-                kpdown[i-1] = 1.0;                                                                       // initialize denomonator of eq. 63
-                kdpdown[i-1] = 1.0;                                                                      // initialize denomonator of eq. 65
+                fcon[i - 1] = state.dataWindowManager->gcon[0][i - 1][IGap - 1] + state.dataWindowManager->gcon[1][i - 1][IGap - 1] * tmean +
+                              state.dataWindowManager->gcon[2][i - 1][IGap - 1] * tmean_2;
+                fvis[i - 1] = state.dataWindowManager->gvis[0][i - 1][IGap - 1] + state.dataWindowManager->gvis[1][i - 1][IGap - 1] * tmean +
+                              state.dataWindowManager->gvis[2][i - 1][IGap - 1] * tmean_2;
+                fcp[i - 1] = state.dataWindowManager->gcp[0][i - 1][IGap - 1] + state.dataWindowManager->gcp[1][i - 1][IGap - 1] * tmean +
+                             state.dataWindowManager->gcp[2][i - 1][IGap - 1] * tmean_2;
+                fdens[i - 1] = pres * state.dataWindowManager->gwght[i - 1][IGap - 1] / (gaslaw * tmean);
+                molmix += frct[i - 1] * state.dataWindowManager->gwght[i - 1][IGap - 1];                       // eq. 56
+                cpmixm += frct[i - 1] * fcp[i - 1] * state.dataWindowManager->gwght[i - 1][IGap - 1];          // eq. 58-59
+                kprime[i - 1] = 3.75 * gaslaw / state.dataWindowManager->gwght[i - 1][IGap - 1] * fvis[i - 1]; // eq. 67
+                kdblprm[i - 1] = fcon[i - 1] - kprime[i - 1];                                                  // eq. 68
+                mukpdwn[i - 1] = 1.0;                                                                          // initialize denomonator of eq. 60
+                kpdown[i - 1] = 1.0;                                                                           // initialize denomonator of eq. 63
+                kdpdown[i - 1] = 1.0;                                                                          // initialize denomonator of eq. 65
             }
 
             for (i = 1; i <= NMix; ++i) {
                 for (j = 1; j <= NMix; ++j) {
                     // numerator of equation 61
-                    phimup = pow_2(1.0 + std::sqrt(fvis[i-1] / fvis[j-1]) * root_4(state.dataWindowManager->gwght[j - 1][IGap - 1] /
-                                                                               state.dataWindowManager->gwght[i - 1][IGap - 1]));
+                    phimup = pow_2(1.0 + std::sqrt(fvis[i - 1] / fvis[j - 1]) * root_4(state.dataWindowManager->gwght[j - 1][IGap - 1] /
+                                                                                       state.dataWindowManager->gwght[i - 1][IGap - 1]));
                     // denomonator of eq. 61, 64 and 66
                     downer = two_sqrt_2 *
                              std::sqrt(1 + (state.dataWindowManager->gwght[i - 1][IGap - 1] / state.dataWindowManager->gwght[j - 1][IGap - 1]));
                     // calculate the denominator of eq. 60
-                    if (i != j) mukpdwn[i-1] += phimup / downer * frct[j-1] / frct[i-1];
+                    if (i != j) mukpdwn[i - 1] += phimup / downer * frct[j - 1] / frct[i - 1];
                     // numerator of eq. 64; psiterm is the multiplied term in backets
-                    psiup = pow_2(1.0 + std::sqrt(kprime[i-1] / kprime[j-1]) * root_4(state.dataWindowManager->gwght[i - 1][IGap - 1] /
-                                                                                  state.dataWindowManager->gwght[j - 1][IGap - 1]));
+                    psiup = pow_2(1.0 + std::sqrt(kprime[i - 1] / kprime[j - 1]) * root_4(state.dataWindowManager->gwght[i - 1][IGap - 1] /
+                                                                                          state.dataWindowManager->gwght[j - 1][IGap - 1]));
                     psiterm = 1.0 + 2.41 * (state.dataWindowManager->gwght[i - 1][IGap - 1] - state.dataWindowManager->gwght[j - 1][IGap - 1]) *
                                         (state.dataWindowManager->gwght[i - 1][IGap - 1] - 0.142 * state.dataWindowManager->gwght[j - 1][IGap - 1]) /
                                         pow_2(state.dataWindowManager->gwght[i - 1][IGap - 1] + state.dataWindowManager->gwght[j - 1][IGap - 1]);
                     // using the common denominator, downer, calculate the denominator for eq. 63
-                    if (i != j) kpdown[i-1] += psiup * (psiterm / downer) * (frct[j-1] / frct[i-1]);
+                    if (i != j) kpdown[i - 1] += psiup * (psiterm / downer) * (frct[j - 1] / frct[i - 1]);
                     // calculate the numerator of eq. 66
-                    phikup = pow_2(1.0 + std::sqrt(kprime[i-1] / kprime[j-1]) * root_4(state.dataWindowManager->gwght[i - 1][IGap - 1] /
-                                                                                   state.dataWindowManager->gwght[j - 1][IGap - 1]));
+                    phikup = pow_2(1.0 + std::sqrt(kprime[i - 1] / kprime[j - 1]) * root_4(state.dataWindowManager->gwght[i - 1][IGap - 1] /
+                                                                                           state.dataWindowManager->gwght[j - 1][IGap - 1]));
                     // using the common denominator, downer, calculate the denomonator for eq. 65
-                    if (i != j) kdpdown[i-1] += (phikup / downer) * (frct[j-1] / frct[i-1]);
+                    if (i != j) kdpdown[i - 1] += (phikup / downer) * (frct[j - 1] / frct[i - 1]);
                 }
-                mumix += fvis[i-1] / mukpdwn[i-1];     // eq. 60
-                kpmix += kprime[i-1] / kpdown[i-1];    // eq. 63
-                kdpmix += kdblprm[i-1] / kdpdown[i-1]; // eq. 65
+                mumix += fvis[i - 1] / mukpdwn[i - 1];     // eq. 60
+                kpmix += kprime[i - 1] / kpdown[i - 1];    // eq. 63
+                kdpmix += kdblprm[i - 1] / kdpdown[i - 1]; // eq. 65
             }
 
             // Calculate the density of the mixture assuming an ideal gas
