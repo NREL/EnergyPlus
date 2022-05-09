@@ -1233,13 +1233,13 @@ void EIRFuelFiredHeatPump::resetReportingVariables()
 
 PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name)
 {
-    if (state.dataEIRPlantLoopHeatPump->getInputsPLHP) {
+    if (state.dataEIRFuelFiredHeatPump->getInputsFFHP) {
         EIRFuelFiredHeatPump::processInputForEIRFFHP(state);
         EIRFuelFiredHeatPump::pairUpCompanionCoils(state);
-        state.dataEIRPlantLoopHeatPump->getInputsPLHP = false;
+        state.dataEIRFuelFiredHeatPump->getInputsFFHP = false;
     }
 
-    for (auto &plhp : state.dataEIRPlantLoopHeatPump->heatPumps) { // 2022-05-08: Need set up new data variable and change the name
+    for (auto &plhp : state.dataEIRFuelFiredHeatPump->heatPumps) {
         if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.EIRHPType == hp_type_of_num) {
             return &plhp;
         }
@@ -1470,8 +1470,7 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
                 thisPLHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
 
                 if (!errorsFound) {
-                    // 2022-05-08: Temporaily comment out the following line, need add data definition in the next commit:
-                    // state.dataEIRPlantLoopHeatPump->heatPumps.push_back(thisPLHP);
+                    state.dataEIRFuelFiredHeatPump->heatPumps.push_back(thisPLHP);
                 }
             }
         }
