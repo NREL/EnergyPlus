@@ -1903,21 +1903,12 @@ namespace WindowManager {
                     state.dataWindowManager->rbadjPhi[in - 1][iwl - 1] = state.dataWindowManager->rbPhi[in - 1][iquasi - 1];
                 } else {
                     // Interpolate to get properties at the solar spectrum wavelengths
-                    Interpolate(state.dataWindowManager->wlt[in - 1],
-                                state.dataWindowManager->tPhi[in - 1],
-                                state.dataWindowManager->numpt[in - 1],
-                                wl,
-                                state.dataWindowManager->tadjPhi[in - 1][iwl - 1]);
-                    Interpolate(state.dataWindowManager->wlt[in - 1],
-                                state.dataWindowManager->rfPhi[in - 1],
-                                state.dataWindowManager->numpt[in - 1],
-                                wl,
-                                state.dataWindowManager->rfadjPhi[in - 1][iwl - 1]);
-                    Interpolate(state.dataWindowManager->wlt[in - 1],
-                                state.dataWindowManager->rbPhi[in - 1],
-                                state.dataWindowManager->numpt[in - 1],
-                                wl,
-                                state.dataWindowManager->rbadjPhi[in - 1][iwl - 1]);
+                    state.dataWindowManager->tadjPhi[in - 1][iwl - 1] = Interpolate(
+                        state.dataWindowManager->wlt[in - 1], state.dataWindowManager->tPhi[in - 1], state.dataWindowManager->numpt[in - 1], wl);
+                    state.dataWindowManager->rfadjPhi[in - 1][iwl - 1] = Interpolate(
+                        state.dataWindowManager->wlt[in - 1], state.dataWindowManager->rfPhi[in - 1], state.dataWindowManager->numpt[in - 1], wl);
+                    state.dataWindowManager->rbadjPhi[in - 1][iwl - 1] = Interpolate(
+                        state.dataWindowManager->wlt[in - 1], state.dataWindowManager->rbPhi[in - 1], state.dataWindowManager->numpt[in - 1], wl);
                 }
             }
         }
@@ -2120,11 +2111,8 @@ namespace WindowManager {
             // values prevented this violation from occurring in practice
             // Restrict to visible range
             if (state.dataWindowManager->wle[i - 1] >= 0.37 && state.dataWindowManager->wle[i - 1] <= 0.78) {
-                Interpolate(state.dataWindowManager->wlt3,
-                            state.dataWindowManager->y30,
-                            state.dataWindowManager->numt3,
-                            state.dataWindowManager->wle[i - 1],
-                            y30new);
+                y30new = Interpolate(
+                    state.dataWindowManager->wlt3, state.dataWindowManager->y30, state.dataWindowManager->numt3, state.dataWindowManager->wle[i - 1]);
                 Real64 evis = state.dataWindowManager->e[i - 2] * 0.5 * (y30new + y30ils1) *
                               (state.dataWindowManager->wle[i - 1] - state.dataWindowManager->wle[i - 2]);
                 num += 0.5 * (p[i - 1] + p[i - 2]) * evis;
@@ -2135,11 +2123,10 @@ namespace WindowManager {
         return num / denom; // dangerous, doesn't check for zero denominator
     }
 
-    void Interpolate(gsl::span<Real64> x, // Array of data points for independent variable
-                     gsl::span<Real64> y, // Array of data points for dependent variable
-                     int const npts,      // Number of data pairs
-                     Real64 const xin,    // Given value of x
-                     Real64 &yout         // Interpolated value of y at xin
+    Real64 Interpolate(gsl::span<Real64> x, // Array of data points for independent variable
+                       gsl::span<Real64> y, // Array of data points for dependent variable
+                       int const npts,      // Number of data pairs
+                       Real64 const xin     // Given value of x
     )
     {
 
@@ -2156,16 +2143,15 @@ namespace WindowManager {
         for (int i = 1; i <= npts; ++i) {
             if (xin <= x[i - 1]) {
                 if (i - 1 == 0) {
-                    yout = y[0];
+                    return y[0];
                 } else {
-                    yout = y[i - 2] + (y[i - 1] - y[i - 2]) * (xin - x[i - 2]) / (x[i - 1] - x[i - 2]);
+                    return y[i - 2] + (y[i - 1] - y[i - 2]) * (xin - x[i - 2]) / (x[i - 1] - x[i - 2]);
                 }
-                return;
             }
         }
 
         // Past the end of the array, so return endpoint
-        yout = y[npts - 1];
+        return y[npts - 1];
     }
 
     //***********************************************************************************

@@ -672,43 +672,6 @@ namespace ZoneDehumidifier {
             state.dataLoopNodes->Node(AirInletNode).Temp; // Zone Dehumidifier Outlet Air Temperature [C]
     }
 
-    void SizeZoneDehumidifier()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Don Shirey, FSEC
-        //       DATE WRITTEN   July 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // No automatic sizing for this model (yet).  Left in place for later (autosize based on latent requirements)
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-    }
-
     void CalcZoneDehumidifier(EnergyPlusData &state,
                               int const ZoneDehumNum,     // Index number of the current zone dehumidifier being simulated
                               Real64 const QZnDehumidReq, // Dehumidification load to be met (kg/s), negative value means dehumidification load

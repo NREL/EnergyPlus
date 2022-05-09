@@ -601,29 +601,29 @@ namespace WindTurbine {
                 ErrorsFound = true;
             }
 
-            windTurbine.PowerCoeffC1 = state.dataIPShortCut->rNumericArgs(17); // Empirical power coefficient C1
+            windTurbine.PowerCoeffs[0] = state.dataIPShortCut->rNumericArgs(17); // Empirical power coefficient C1
             if (lNumericBlanks(17)) {
-                windTurbine.PowerCoeffC1 = 0.0;
+                windTurbine.PowerCoeffs[0] = 0.0;
             }
-            windTurbine.PowerCoeffC2 = state.dataIPShortCut->rNumericArgs(18); // Empirical power coefficient C2
+            windTurbine.PowerCoeffs[1] = state.dataIPShortCut->rNumericArgs(18); // Empirical power coefficient C2
             if (lNumericBlanks(18)) {
-                windTurbine.PowerCoeffC2 = 0.0;
+                windTurbine.PowerCoeffs[1] = 0.0;
             }
-            windTurbine.PowerCoeffC3 = state.dataIPShortCut->rNumericArgs(19); // Empirical power coefficient C3
+            windTurbine.PowerCoeffs[2] = state.dataIPShortCut->rNumericArgs(19); // Empirical power coefficient C3
             if (lNumericBlanks(19)) {
-                windTurbine.PowerCoeffC3 = 0.0;
+                windTurbine.PowerCoeffs[2] = 0.0;
             }
-            windTurbine.PowerCoeffC4 = state.dataIPShortCut->rNumericArgs(20); // Empirical power coefficient C4
+            windTurbine.PowerCoeffs[3] = state.dataIPShortCut->rNumericArgs(20); // Empirical power coefficient C4
             if (lNumericBlanks(20)) {
-                windTurbine.PowerCoeffC4 = 0.0;
+                windTurbine.PowerCoeffs[3] = 0.0;
             }
-            windTurbine.PowerCoeffC5 = state.dataIPShortCut->rNumericArgs(21); // Empirical power coefficient C5
+            windTurbine.PowerCoeffs[4] = state.dataIPShortCut->rNumericArgs(21); // Empirical power coefficient C5
             if (lNumericBlanks(21)) {
-                windTurbine.PowerCoeffC5 = 0.0;
+                windTurbine.PowerCoeffs[4] = 0.0;
             }
-            windTurbine.PowerCoeffC6 = state.dataIPShortCut->rNumericArgs(22); // Empirical power coefficient C6
+            windTurbine.PowerCoeffs[5] = state.dataIPShortCut->rNumericArgs(22); // Empirical power coefficient C6
             if (lNumericBlanks(22)) {
-                windTurbine.PowerCoeffC6 = 0.0;
+                windTurbine.PowerCoeffs[5] = 0.0;
             }
         }
 
@@ -953,12 +953,12 @@ namespace WindTurbine {
             case RotorType::HorizontalAxis: { // Horizontal axis wind turbine
                 MaxPowerCoeff = windTurbine.MaxPowerCoeff;
                 // Check if empirical constants are available
-                C1 = windTurbine.PowerCoeffC1;
-                C2 = windTurbine.PowerCoeffC2;
-                C3 = windTurbine.PowerCoeffC3;
-                C4 = windTurbine.PowerCoeffC4;
-                C5 = windTurbine.PowerCoeffC5;
-                C6 = windTurbine.PowerCoeffC6;
+                C1 = windTurbine.PowerCoeffs[0];
+                C2 = windTurbine.PowerCoeffs[1];
+                C3 = windTurbine.PowerCoeffs[2];
+                C4 = windTurbine.PowerCoeffs[3];
+                C5 = windTurbine.PowerCoeffs[4];
+                C6 = windTurbine.PowerCoeffs[5];
 
                 Real64 const LocalWindSpeed_3(pow_3(LocalWindSpeed));
                 if (C1 > 0.0 && C2 > 0.0 && C3 > 0.0 && C4 >= 0.0 && C5 > 0.0 && C6 > 0.0) {

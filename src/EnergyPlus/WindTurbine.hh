@@ -107,12 +107,7 @@ namespace WindTurbine {
         Real64 ChordArea = 0.0;                         // Chord area of a single blade for VAWTs in m2
         Real64 DragCoeff = 0.0;                         // Empirical blade drag coefficient for VAWTs
         Real64 LiftCoeff = 0.0;                         // Empirical blade lift coefficient for VAWTs
-        Real64 PowerCoeffC1 = 0.0;                      // Empirical power coefficient 1 for analytical calculation
-        Real64 PowerCoeffC2 = 0.0;                      // Empirical power coefficient 2 for analytical calculation
-        Real64 PowerCoeffC3 = 0.0;                      // Empirical power coefficient 3 for analytical calculation
-        Real64 PowerCoeffC4 = 0.0;                      // Empirical power coefficient 4 for analytical calculation
-        Real64 PowerCoeffC5 = 0.0;                      // Empirical power coefficient 5 for analytical calculation
-        Real64 PowerCoeffC6 = 0.0;                      // Empirical power coefficient 6 for analytical calculation
+        std::array<Real64, 6> PowerCoeffs = {0.0};      // Empirical power coefficients for analytical calculation
         Real64 TotPower = 0.0;                          // Maximum power produced from the wind in Watts
         Real64 Power = 0.0;                             // Actual power wind turbine supplies to the building in Watts
         Real64 TotEnergy = 0.0;                         // Maximum energy produced from the wind in Joules

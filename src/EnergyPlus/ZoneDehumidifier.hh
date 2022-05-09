@@ -68,7 +68,7 @@ namespace ZoneDehumidifier {
         Invalid = -1,
         Discarded, // Default mode where water is "lost"
         ToTank,    // Collect coil condensate from air and store in water storage tank
-        Num = 2
+        Num
     };
 
     struct ZoneDehumidifierParams
@@ -140,8 +140,6 @@ namespace ZoneDehumidifier {
 
     void InitZoneDehumidifier(EnergyPlusData &state, int ZoneDehumNum); // Number of the current zone dehumidifier being simulated
 
-    void SizeZoneDehumidifier();
-
     void CalcZoneDehumidifier(EnergyPlusData &state,
                               int ZoneDehumNum,       // Index number of the current zone dehumidifier being simulated
                               Real64 QZnDehumidReq,   // Dehumidification load to be met (kg/s), negative value means dehumidification load
@@ -160,7 +158,7 @@ namespace ZoneDehumidifier {
 struct ZoneDehumidifierData : BaseGlobalStruct
 {
     bool GetInputFlag = true; // Set to FALSE after first time input is "gotten"
-    Array1D<ZoneDehumidifier::ZoneDehumidifierParams> ZoneDehumid;
+    EPVector<ZoneDehumidifier::ZoneDehumidifierParams> ZoneDehumid;
 
     void clear_state() override
     {
