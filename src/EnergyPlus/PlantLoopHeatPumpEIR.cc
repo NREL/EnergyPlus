@@ -1273,16 +1273,18 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
         {
         }
     };
-    std::vector<ClassType> classesToInput = {ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling,
-                                                       "Chilled Water Nodes",
-                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
-                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
-                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add},
-                                             ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating,
-                                                       "Hot Water Nodes",
-                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
-                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
-                                                       EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract}};
+    std::vector<ClassType> classesToInput = {
+        ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating,
+                  "Hot Water Nodes",
+                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
+                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
+                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract},
+        ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling,
+                  "Chilled Water Nodes",
+                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
+                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
+                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add},
+    };
 
     bool errorsFound = false;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
