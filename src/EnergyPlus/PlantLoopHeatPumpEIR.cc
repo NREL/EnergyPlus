@@ -1004,6 +1004,7 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
         }
     }
 }
+
 void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 {
     // This function does all the one-time initialization
@@ -1193,3 +1194,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
     }
 }
 } // namespace EnergyPlus::EIRPlantLoopHeatPumps
+
+namespace EnergyPlus::EIRFuelFiredHeatPumps {
+
+} // namespace EnergyPlus::EIRFuelFiredHeatPumps
