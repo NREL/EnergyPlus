@@ -2749,8 +2749,13 @@ namespace WaterToAirHeatPumpSimple {
 
                     //       use companion heating coil capacity to calculate volumetric flow rate
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
-                        SystemCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
-                                             .ReferenceCapHeatAtRefCdts;
+                        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
+                                .ReferenceCapHeatAtRefCdts > 0) {
+                            SystemCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
+                                                 .ReferenceCapHeatAtRefCdts;
+                        } else {
+                            SystemCapacity = DataSizing::AutoSize;
+                        }
                     } else {
                         SystemCapacity = simpleWatertoAirHP.ReferenceCapCoolAtRefCdts;
                     }
@@ -3705,10 +3710,14 @@ namespace WaterToAirHeatPumpSimple {
                 if (UtilityRoutines::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT")) {
                     CoilCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).ReferenceCapHeat;
                 } else {
-                    if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).ReferenceCapCoolTotal != DataSizing::AutoSize) {
-                        CoilCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).ReferenceCapCoolTotal;
+                    if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).ReferenceCapCoolTotal == DataSizing::AutoSize) {
+                        if (state.dataSize->DXCoolCap > 0) {
+                            CoilCapacity = state.dataSize->DXCoolCap; // Coil has already been sized
+                        } else {
+                            CoilCapacity = DataSizing::AutoSize; // Coil has not already been sized
+                        }
                     } else {
-                        CoilCapacity = state.dataSize->DXCoolCap;
+                        CoilCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).ReferenceCapCoolTotal;
                     }
                 }
             }
