@@ -1165,13 +1165,13 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
     };
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ZoneControl:ContaminantController";
-    state.dataContaminantBalance->NumContControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int NumContControlledZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-    if (state.dataContaminantBalance->NumContControlledZones > 0) {
-        state.dataContaminantBalance->ContaminantControlledZone.allocate(state.dataContaminantBalance->NumContControlledZones);
+    if (NumContControlledZones > 0) {
+        state.dataContaminantBalance->ContaminantControlledZone.allocate(NumContControlledZones);
     }
 
-    for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
+    for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  ContControlledZoneNum,
@@ -1569,7 +1569,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     }
 
     if (allocated(state.dataZoneEquip->ZoneEquipConfig) && state.dataZoneContaminantPredictorCorrector->MyConfigOneTimeFlag) {
-        for (ContZoneNum = 1; ContZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContZoneNum) {
+        for (ContZoneNum = 1; ContZoneNum <= (int)state.dataContaminantBalance->ContaminantControlledZone.size(); ++ContZoneNum) {
             ZoneNum = state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).ActualZoneNum;
             for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
                 int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(zoneInNode);
@@ -1611,7 +1611,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
         }
     }
 
-    for (int Loop = 1; Loop <= state.dataContaminantBalance->NumContControlledZones; ++Loop) {
+    for (int Loop = 1; Loop <= (int)state.dataContaminantBalance->ContaminantControlledZone.size(); ++Loop) {
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ZoneNum = state.dataContaminantBalance->ContaminantControlledZone(Loop).ActualZoneNum;
             state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum) =
@@ -1875,7 +1875,8 @@ void PredictZoneContaminants(EnergyPlusData &state,
             // Check to see if this is a "CO2 controlled zone"
             ControlledCO2ZoneFlag = false;
             // Check all the controlled zones to see if it matches the zone simulated
-            for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
+            for (ContControlledZoneNum = 1; ContControlledZoneNum <= (int)state.dataContaminantBalance->ContaminantControlledZone.size();
+                 ++ContControlledZoneNum) {
                 if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
                     if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) >
                         0.0) {
@@ -1891,7 +1892,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 }
             }
             if (!ControlledCO2ZoneFlag) {
-                for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones;
+                for (ContControlledZoneNum = 1; ContControlledZoneNum <= (int)state.dataContaminantBalance->ContaminantControlledZone.size();
                      ++ContControlledZoneNum) {
                     if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) >
                         0.0) {
@@ -2007,7 +2008,8 @@ void PredictZoneContaminants(EnergyPlusData &state,
             // Check to see if this is a "GC controlled zone"
             ControlledGCZoneFlag = false;
             // Check all the controlled zones to see if it matches the zone simulated
-            for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
+            for (ContControlledZoneNum = 1; ContControlledZoneNum <= (int)state.dataContaminantBalance->ContaminantControlledZone.size();
+                 ++ContControlledZoneNum) {
                 if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
                     if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) >
                         0.0) {
@@ -2023,7 +2025,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 }
             }
             if (!ControlledGCZoneFlag) {
-                for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones;
+                for (ContControlledZoneNum = 1; ContControlledZoneNum <= (int)state.dataContaminantBalance->ContaminantControlledZone.size();
                      ++ContControlledZoneNum) {
                     if (GetCurrentScheduleValue(state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) >
                         0.0) {

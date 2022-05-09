@@ -218,6 +218,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
 
     std::string SizingString = "Rated Gross Total Cooling Capacity [W]";
     state.dataSize->DataFlowUsedForSizing = this->ratedEvapAirFlowRate;
+    state.dataSize->DataTotCapCurveIndex = this->speeds[this->nominalSpeedIndex].indexCapFT;
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);

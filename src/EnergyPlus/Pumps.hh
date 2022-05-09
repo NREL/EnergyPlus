@@ -102,11 +102,11 @@ namespace Pumps {
     enum class PumpType : int
     {
         Invalid = -1,
-        VarSpeed = 0,
-        ConSpeed = 1,
-        Cond = 2,
-        Bank_VarSpeed = 3,
-        Bank_ConSpeed = 4,
+        VarSpeed,
+        ConSpeed,
+        Cond,
+        Bank_VarSpeed,
+        Bank_ConSpeed,
         Num
     };
 

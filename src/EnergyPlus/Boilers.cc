@@ -168,9 +168,9 @@ void GetBoilerInput(EnergyPlusData &state)
 
     // GET NUMBER OF ALL EQUIPMENT
     state.dataIPShortCut->cCurrentModuleObject = "Boiler:HotWater";
-    state.dataBoilers->numBoilers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    int numBoilers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-    if (state.dataBoilers->numBoilers <= 0) {
+    if (numBoilers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " Equipment specified in input file");
         ErrorsFound = true;
     }
@@ -178,11 +178,11 @@ void GetBoilerInput(EnergyPlusData &state)
     // See if load distribution manager has already gotten the input
     if (allocated(state.dataBoilers->Boiler)) return;
 
-    state.dataBoilers->Boiler.allocate(state.dataBoilers->numBoilers);
+    state.dataBoilers->Boiler.allocate(numBoilers);
 
     // LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
-    for (int BoilerNum = 1; BoilerNum <= state.dataBoilers->numBoilers; ++BoilerNum) {
+    for (int BoilerNum = 1; BoilerNum <= numBoilers; ++BoilerNum) {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
