@@ -1616,6 +1616,8 @@ namespace UnitarySystems {
         // until this is implemented, unbalanced air flow warning show up in VS coil PTUnits
         // state.dataSize->DataFanIndex = -1;
 
+        bool coolingAirFlowIsAutosized = this->m_MaxCoolAirVolFlow == DataSizing::AutoSize;
+        bool heatingAirFlowIsAutosized = this->m_MaxHeatAirVolFlow == DataSizing::AutoSize;
         if (this->m_CoolCoilExists) {
             if (!this->m_HeatCoilExists) state.dataSize->ZoneCoolingOnlyFan = true;
             TempSize = this->m_MaxCoolAirVolFlow;
@@ -1889,23 +1891,32 @@ namespace UnitarySystems {
             if (this->m_sysType == SysType::PackagedAC) EqSizing.HeatingCapacity = false;
         }
 
-        // STEP 3A: Find VS cooling coil air flow to capacity ratio
-        Real64 coilAirFlowToCapacityRatio = 1.0;
-        if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed && this->m_MaxCoolAirVolFlow == DataSizing::AutoSize &&
-            (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP)) {
-            int numSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
-            coilAirFlowToCapacityRatio =
-                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(numSpeeds);
-            EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coilAirFlowToCapacityRatio;
+        // STEP 3A: Find VS cooling coil air flow to capacity ratio and adjust design air flow
+        // this does not use nominal speed level air flow (VarSpeedCoil(WhichCoil).NormSpedLevel), should it?
+        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+            if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+                int numSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
+                Real64 coolingAirFlowToCapacityRatio =
+                    state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(numSpeeds);
+                EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
+            }
+            // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
+            //if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+            //     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
+            //    this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
+            //    int numSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
+            //    Real64 heatingAirFlowToCapacityRatio =
+            //        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(numSpeeds);
+            //    EqSizing.HeatingAirVolFlow = EqSizing.DesHeatingLoad * heatingAirFlowToCapacityRatio;
+            //}
         }
 
-        // STEP 3B: use the greater of cooling and heating air flow rates for system flow
+        // STEP 3B: if not a PTUnit use the greater of cooling and heating air flow rates for system flow
         // previous version of E+ used maximum flow rate for unitary systems. Keep this methodology for now.
-        // Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow
-        // rates (might require additional change to if block logic).
-        EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
-        // PTUnit allows heating and cooling air flow rates to differ, even for HPs
         if (this->m_sysType != SysType::PackagedAC && this->m_sysType != SysType::PackagedHP && this->m_sysType != SysType::PackagedWSHP) {
+            EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
             EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
         }
 
@@ -1913,8 +1924,6 @@ namespace UnitarySystems {
         if (this->m_HeatPump && this->m_HVACSizingIndex <= 0) { // if a heat pump, use maximum values and set main air flow and capacity variables
             EqSizing.AirFlow = true;
             EqSizing.AirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
-            //            EqSizing.CoolingAirVolFlow = EqSizing.AirVolFlow;
-            //            EqSizing.HeatingAirVolFlow = EqSizing.AirVolFlow;
             EqSizing.Capacity = true;
             EqSizing.DesCoolingLoad = max(EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad);
             EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
@@ -2122,11 +2131,6 @@ namespace UnitarySystems {
                             NoLoadCoolingAirFlowRateRatio =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
                         }
-                        // PTUnit sizes no load air flow to max of cooling and heating
-                        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
-                            this->m_sysType == SysType::PackagedWSHP) {
-                            NoLoadCoolingAirFlowRateRatio = 1.0;
-                        }
                     }
                     if (this->m_HeatCoilExists && this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
                         Real64 MaxSpeedFlowRate =
@@ -2135,11 +2139,6 @@ namespace UnitarySystems {
                         if (MaxSpeedFlowRate > 0.0) {
                             NoLoadHeatingAirFlowRateRatio =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
-                        }
-                        // PTUnit sizes no load air flow to max of cooling and heating
-                        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
-                            this->m_sysType == SysType::PackagedWSHP) {
-                            NoLoadHeatingAirFlowRateRatio = 1.0;
                         }
                     }
                     this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
@@ -2403,6 +2402,49 @@ namespace UnitarySystems {
         }
         if (this->m_sysType >= SysType::PackagedHP) PrintFlag = false;
 
+        if (this->m_sysType >= SysType::PackagedAC || this->m_sysType >= SysType::PackagedHP || this->m_sysType >= SysType::PackagedWSHP) {
+            if (this->m_AirFlowControl == UseCompFlow::On) {
+                this->m_MaxNoCoolHeatAirVolFlow = min(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
+            }
+            if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    if (this->m_AirFlowControl == UseCompFlow::On) {
+                        Real64 airFlowAdjustmentRatio = 1.0;
+                        if (!coolingAirFlowIsAutosized) {
+                            airFlowAdjustmentRatio =
+                                this->m_MaxCoolAirVolFlow /
+                                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex)
+                                    .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds);
+                        }
+                        this->m_MaxNoCoolHeatAirVolFlow =
+                            airFlowAdjustmentRatio * state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1);
+                    }
+                }
+                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                    if (this->m_AirFlowControl == UseCompFlow::On) {
+                        Real64 airFlowAdjustmentRatio = 1.0;
+                        if (!heatingAirFlowIsAutosized) {
+                            airFlowAdjustmentRatio =
+                                this->m_MaxHeatAirVolFlow /
+                                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex)
+                                    .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds);
+                        }
+                        if (this->m_CoolCoilExists) {
+                            this->m_MaxNoCoolHeatAirVolFlow =
+                                min(this->m_MaxNoCoolHeatAirVolFlow,
+                                    airFlowAdjustmentRatio *
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1));
+                        } else {
+                            this->m_MaxNoCoolHeatAirVolFlow =
+                                airFlowAdjustmentRatio *
+                                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1);
+                        }
+                    }
+                }
+            }
+        }
+
         // Change the Volume Flow Rates to Mass Flow Rates
         this->m_DesignMassFlowRate = this->m_DesignFanVolFlowRate * state.dataEnvrn->StdRhoAir;
         this->MaxCoolAirMassFlow = this->m_MaxCoolAirVolFlow * state.dataEnvrn->StdRhoAir;
@@ -2459,9 +2501,20 @@ namespace UnitarySystems {
             EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
-                this->m_CoolVolumeFlowRate[Iter] = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(Iter);
-                this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
-                this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                // using only for PTUnit to UnitarySystem conversion for the time being, should use this all the time
+                if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+                    this->m_MSCoolingSpeedRatio[Iter] =
+                        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(Iter) /
+                        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(this->m_NumOfSpeedCooling);
+                    this->m_CoolVolumeFlowRate[Iter] = this->m_MaxCoolAirVolFlow * this->m_MSCoolingSpeedRatio[Iter];
+                    this->m_CoolMassFlowRate[Iter] = this->MaxCoolAirMassFlow * this->m_MSCoolingSpeedRatio[Iter];
+                } else {
+                    this->m_CoolVolumeFlowRate[Iter] =
+                        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(Iter);
+                    this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
+                    // this is divided by the system max air flow, not the cooling coil max air flow, doesn't seem correct
+                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                }
             }
 
             if (MSHPIndex > -1) {
@@ -2736,13 +2789,26 @@ namespace UnitarySystems {
                 if (this->m_MSHeatingSpeedRatio.empty()) this->m_MSHeatingSpeedRatio.resize(this->m_NumOfSpeedHeating + 1);
             }
 
-            for (Iter = 1; Iter <= this->m_NumOfSpeedHeating; ++Iter) {
-                this->m_HeatVolumeFlowRate[Iter] = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(Iter);
-                this->m_HeatMassFlowRate[Iter] = this->m_HeatVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
-                if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
-                    this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+            for (Iter = this->m_NumOfSpeedHeating; Iter >= 1; --Iter) {
+                // using only for PTUnit to UnitarySystem conversion for the time being, should use this all the time
+                if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+                    // SpeedRatio is only used in OnOff fan and should represent the ratio of flow to fan max flow
+                    this->m_MSHeatingSpeedRatio[Iter] =
+                        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(Iter) /
+                        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(this->m_NumOfSpeedHeating);
+                    this->m_HeatVolumeFlowRate[Iter] = this->m_MaxHeatAirVolFlow * this->m_MSHeatingSpeedRatio[Iter];
+                    this->m_HeatMassFlowRate[Iter] = this->MaxHeatAirMassFlow * this->m_MSHeatingSpeedRatio[Iter];
                 } else {
-                    this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_HeatVolumeFlowRate[this->m_NumOfSpeedHeating];
+                    this->m_HeatVolumeFlowRate[Iter] =
+                        state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(Iter);
+                    this->m_HeatMassFlowRate[Iter] = this->m_HeatVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
+                    if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
+                        // this is divided by the system max air flow, not the heating coil max air flow
+                        this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                    } else {
+                        // if there is no fan this doesn't matter? Should calculate SpeedRatio in fan model? and get rid of SpeedRatio variable?
+                        this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_HeatVolumeFlowRate[this->m_NumOfSpeedHeating];
+                    }
                 }
             }
 
@@ -2764,13 +2830,17 @@ namespace UnitarySystems {
                     this->m_NoLoadAirFlowRateRatio = this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] *
                                                      state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                 } else if (!this->m_CoolVolumeFlowRate.empty()) {
-                    // what the heck is this next line?
+                    // what the heck is this next line? should be min of min cooling and min heating flow rates?
+                    // this is calculated above so likely not even needed here, just have to be sure it's always calculated
                     this->m_MaxNoCoolHeatAirVolFlow = min(this->m_MaxNoCoolHeatAirVolFlow, this->m_MaxNoCoolHeatAirVolFlow);
                     if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
                         this->m_sysType == SysType::PackagedWSHP) {
-                        this->m_MaxNoCoolHeatAirVolFlow = min(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
+                        if (!this->m_MultiOrVarSpeedCoolCoil && !this->m_MultiOrVarSpeedHeatCoil) {
+                            this->m_MaxNoCoolHeatAirVolFlow = min(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
+                        }
                         this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
                     } else {
+                        // this should be min of min cooling and min heating flow rates?
                         this->MaxNoCoolHeatAirMassFlow = min(this->MaxNoCoolHeatAirMassFlow, this->MaxNoCoolHeatAirMassFlow);
                     }
                     this->m_NoLoadAirFlowRateRatio =
@@ -11063,14 +11133,13 @@ namespace UnitarySystems {
                         } else {
                             state.dataUnitarySystems->CompOffMassFlow = this->m_HeatMassFlowRate[HeatSpeedNum - 1];
                             state.dataUnitarySystems->CompOffFlowRatio = this->m_MSHeatingSpeedRatio[HeatSpeedNum - 1];
-                            // this should happen all the time, adding for PTUnit to UnitarySystem conversion
-                            // cooling mode below has a check for constant fan mode, that need to replace this code
-                            if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
-                                this->m_sysType == SysType::PackagedWSHP) {
-                                state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
-                            }
                         }
                         state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
+                        // only used for PTUnit to UnitarySystem conversion, should use all the time
+                        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
+                            this->m_sysType == SysType::PackagedWSHP) {
+                            state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                        }
                     }
                 } else { // cycling fan mode
                     if (HeatSpeedNum <= 1) {
@@ -11079,6 +11148,11 @@ namespace UnitarySystems {
                     } else {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_HeatMassFlowRate[HeatSpeedNum - 1];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSHeatingSpeedRatio[HeatSpeedNum - 1];
+                    }
+                    // only used for PTUnit to UnitarySystem conversion, should use all the time
+                    if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
+                        this->m_sysType == SysType::PackagedWSHP) {
+                        state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
                     }
                 }
             } else { // IF(MultiOrVarSpeedHeatCoil) THEN
@@ -11107,18 +11181,44 @@ namespace UnitarySystems {
                     }
                     state.dataUnitarySystems->OACompOnMassFlow = this->m_CoolOutAirMassFlow;
                 } else { // Heating load but no moisture load
-                    state.dataUnitarySystems->CompOnMassFlow = this->MaxHeatAirMassFlow;
-                    state.dataUnitarySystems->CompOnFlowRatio = this->m_HeatingFanSpeedRatio;
-                    state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
-                    if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                        if (this->m_AirFlowControl == UseCompFlow::On) {
-                            state.dataUnitarySystems->CompOffMassFlow = this->MaxHeatAirMassFlow;
-                            state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
-                            state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                    if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
+                        this->m_sysType == SysType::PackagedWSHP) {
+                        // this was missing for heating mode where multi speed coils are used
+                        if (this->m_MultiOrVarSpeedHeatCoil) {
+                            if (HeatSpeedNum == 0) {
+                                state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
+                                state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;
+                            } else if (HeatSpeedNum == 1) {
+                                state.dataUnitarySystems->CompOnMassFlow = this->m_HeatMassFlowRate[1];
+                                state.dataUnitarySystems->CompOnFlowRatio = this->m_MSHeatingSpeedRatio[1];
+                            } else if (HeatSpeedNum > 1) {
+                                state.dataUnitarySystems->CompOnMassFlow = this->m_HeatMassFlowRate[HeatSpeedNum];
+                                state.dataUnitarySystems->CompOnFlowRatio = this->m_MSHeatingSpeedRatio[HeatSpeedNum];
+                            }
                         } else {
+                            state.dataUnitarySystems->CompOnMassFlow = this->MaxHeatAirMassFlow;
+                            state.dataUnitarySystems->CompOnFlowRatio = this->m_HeatingFanSpeedRatio;
+                            state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
+                        }
+                        if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
                             state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
-                            state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
-                            state.dataUnitarySystems->OACompOffMassFlow = this->m_NoCoolHeatOutAirMassFlow;
+                            state.dataUnitarySystems->CompOffFlowRatio = this->m_NoLoadAirFlowRateRatio;
+                            state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                        }
+                    } else {
+                        state.dataUnitarySystems->CompOnMassFlow = this->MaxHeatAirMassFlow;
+                        state.dataUnitarySystems->CompOnFlowRatio = this->m_HeatingFanSpeedRatio;
+                        state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
+                        if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
+                            if (this->m_AirFlowControl == UseCompFlow::On) {
+                                state.dataUnitarySystems->CompOffMassFlow = this->MaxHeatAirMassFlow;
+                                state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
+                                state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                            } else {
+                                state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
+                                state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
+                                state.dataUnitarySystems->OACompOffMassFlow = this->m_NoCoolHeatOutAirMassFlow;
+                            }
                         }
                     }
                 }
@@ -11259,6 +11359,18 @@ namespace UnitarySystems {
                         state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                         state.dataUnitarySystems->CompOnFlowRatio = 1.0;
                     }
+                    // this needs to happen regardless of system except maybe the CoilSystem objects
+                    // do this only for PTUnit for the time being to reduce diffs for the PTUnit to UnitarySystem conversion
+                    if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
+                        this->m_sysType == SysType::PackagedWSHP) {
+                        if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
+                            if (this->m_AirFlowControl == UseCompFlow::On) {
+                                state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
+                                state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
+                                state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                            }
+                        }
+                    }
                 } else {
                     // this needs to be corrected to include UseCompressorOnFlow
                     if (this->m_MultiOrVarSpeedCoolCoil) {
@@ -11327,9 +11439,22 @@ namespace UnitarySystems {
                                     state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
                                 }
                             } else {
-                                state.dataUnitarySystems->CompOffMassFlow = this->MaxHeatAirMassFlow;
-                                state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
-                                state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                                // this is a no load case, added if for PTUnit to correct this for PTUnit to UnitarySystem conversion
+                                // the else is incorrect?
+                                if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
+                                    this->m_sysType == SysType::PackagedWSHP) {
+                                    if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
+                                        if (this->m_AirFlowControl == UseCompFlow::On) {
+                                            state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
+                                            state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
+                                            state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                                        }
+                                    }
+                                } else {
+                                    state.dataUnitarySystems->CompOffMassFlow = this->MaxHeatAirMassFlow;
+                                    state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
+                                    state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                                }
                             }
                         } else { // IF(UnitarySystem(UnitarySysNum)%LastMode .EQ. HeatingMode)THEN
                             if (this->m_MultiOrVarSpeedCoolCoil) {
@@ -11376,6 +11501,17 @@ namespace UnitarySystems {
                 }     // IF(UnitarySystem(UnitarySysNum)%FanOpMode == DataHVACGlobals::ContFanCycCoil)THEN
             }         // ELSE ! No Moisture Load
         }             // No Heating/Cooling Load
+
+        if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
+            if (this->m_AirFlowControl == UseCompFlow::On &&
+                (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP)) {
+                if (this->m_LastMode == HeatingMode) {
+                    state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                } else {
+                    state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
+                }
+            }
+        }
 
         if (this->m_MultiSpeedHeatingCoil && (state.dataUnitarySystems->HeatingLoad && HeatSpeedNum == 1)) {
             state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow;
