@@ -931,7 +931,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     thisSys.MaxHeatAirMassFlow = HVACInletMassFlowRate;
     thisSys.m_HeatingSpeedRatio = 1.0;
     thisSys.m_HeatOutAirMassFlow = PrimaryAirMassFlowRate;
-    thisSys.MaxNoCoolHeatAirMassFlow = PrimaryAirMassFlowRate;
+    thisSys.MaxNoCoolHeatAirMassFlow = HVACInletMassFlowRate;
     thisSys.m_NoHeatCoolSpeedRatio = 1.0;
     thisSys.m_NoCoolHeatOutAirMassFlow = PrimaryAirMassFlowRate;
     thisSys.m_AirFlowControl = UnitarySystems::UnitarySys::UseCompFlow::On;
