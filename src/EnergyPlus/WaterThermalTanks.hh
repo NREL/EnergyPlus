@@ -247,6 +247,13 @@ namespace WaterThermalTanks {
                                                                                         "OTHERFUEL2",
                                                                                         "DISTRICTHEATING"};
 
+    enum class TankOperatingMode {
+        Heating,  // heating source is on, source will not turn off until setpoint temp is reached
+        Floating, // heating source is off, source will not turn on until cut-in temp is reached
+        Venting,  // tank temp is above maximum temperature and water is venting
+        Cooling  // cooling source is on, source will not turn off until setpoint temp is reached
+    };
+
     struct StratifiedNodeData
     {
         // Members
@@ -378,9 +385,9 @@ namespace WaterThermalTanks {
         int WaterHeaterTankNum;                             // Index of Water Heater Tank
         int OutletAirSplitterSchPtr;                        // Index to air-side outlet air splitter schedule
         int InletAirMixerSchPtr;                            // Index to air-side inlet air mixer schedule
-        int Mode;                                           // HP mode (0 = float, 1 = heating [-1 = venting na for HP])
-        int SaveMode;                                       // HP mode on first iteration
-        int SaveWHMode;                                     // mode of water heater tank element (backup element)
+        TankOperatingMode Mode = TankOperatingMode::Floating;  // HP mode (0 = float, 1 = heating [-1 = venting na for HP])
+        TankOperatingMode SaveMode = TankOperatingMode::Floating;  // HP mode on first iteration
+        TankOperatingMode SaveWHMode = TankOperatingMode::Floating;  // mode of water heater tank element (backup element)
         Real64 Power;                                       // HP power used for reporting
         Real64 Energy;                                      // HP energy used for reporting
         Real64 HeatingPLR;                                  // HP PLR used for reporting
@@ -465,8 +472,8 @@ namespace WaterThermalTanks {
               RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0),
               HeatPumpAirOutletNode(0), OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0),
               WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0),
-              FanNum(0), FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0),
-              SaveMode(0), SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
+              FanNum(0), FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0),
+              Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
               MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0),
               InletAirConfiguration(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0),
               CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0), OffCycParaLoad(0.0),
@@ -527,8 +534,8 @@ namespace WaterThermalTanks {
         Real64 OffCycLossFracToZone;                              // Fraction of off-cycle losses added to zone
         Real64 OnCycLossCoeff;                                    // On-cycle overall tank heat loss coefficient, UA (W/K)
         Real64 OnCycLossFracToZone;                               // Fraction of on-cycle losses added to zone
-        int Mode;                                                 // Indicator for current operating mode
-        int SavedMode;                                            // Mode indicator saved from previous time step
+        TankOperatingMode Mode = TankOperatingMode::Floating;     // Indicator for current operating mode
+        TankOperatingMode SavedMode = TankOperatingMode::Floating; // Mode indicator saved from previous time step
         HeaterControlMode ControlType;                            // Indicator for Heater Control type
         PriorityControlMode StratifiedControlMode;                // Indicator for Stratified Water Heaters Priority Control Type
         Fuel FuelType;                                            // Fuel type
@@ -711,7 +718,7 @@ namespace WaterThermalTanks {
             : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
               VolumeWasAutoSized(false), Mass(0.0), TimeElapsed(0.0), AmbientTempIndicator(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0),
               AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
-              OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(HeaterControlMode::Cycle),
+              OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), ControlType(HeaterControlMode::Cycle),
               StratifiedControlMode(PriorityControlMode::Invalid), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),
               Efficiency(0.0), PLFCurve(0), SetPointTempSchedule(0), SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0),
               IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0), OnCycParaLoad(0.0), OnCycParaFracToTank(0.0),
@@ -943,9 +950,9 @@ namespace WaterThermalTanks {
         Real64 OnCycParaFuelRate;                   // Electric consumption rate for on-cycle parasitic load (W)
         Real64 OffCycParaFuelEnergy;                // Electric energy consumption for off-cycle parasitic load (J)
         Real64 OffCycParaFuelRate;                  // Electric consumption rate for off-cycle parasitic load (W)
-        int Mode;                                   // mode (0 = float, 1 = heating [-1=venting na for desuperheater])
-        int SaveMode;                               // desuperheater mode on first iteration
-        int SaveWHMode;                             // mode of water heater tank element (backup element)
+        TankOperatingMode Mode = TankOperatingMode::Floating; // mode
+        TankOperatingMode SaveMode = TankOperatingMode::Floating; // desuperheater mode on first iteration
+        TankOperatingMode SaveWHMode = TankOperatingMode::Floating; // mode of water heater tank element (backup element)
         Real64 BackupElementCapacity;               // Tank backup element capacity (W)
         Real64 DXSysPLR;                            // runtime fraction of desuperheater heating coil
         int ReclaimHeatingSourceIndexNum;           // Index to reclaim heating source (condenser) of a specific type
@@ -975,7 +982,7 @@ namespace WaterThermalTanks {
               TankTypeNum(DataPlant::PlantEquipmentType::Invalid), TankNum(0), StandAlone(false), HeaterRate(0.0), HeaterEnergy(0.0), PumpPower(0.0),
               PumpEnergy(0.0), PumpElecPower(0.0), PumpFracToWater(0.0), OperatingWaterFlowRate(0.0), HEffFTemp(0), HEffFTempOutput(0.0),
               SetPointTemp(0.0), WaterHeaterTankNum(0), DesuperheaterPLR(0.0), OnCycParaLoad(0.0), OffCycParaLoad(0.0), OnCycParaFuelEnergy(0.0),
-              OnCycParaFuelRate(0.0), OffCycParaFuelEnergy(0.0), OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0),
+              OnCycParaFuelRate(0.0), OffCycParaFuelEnergy(0.0), OffCycParaFuelRate(0.0),
               BackupElementCapacity(0.0), DXSysPLR(0.0), ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(ReclaimHeatObjectType::DXCooling),
               SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0),
               RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0),
@@ -1015,17 +1022,12 @@ namespace WaterThermalTanks {
 
     int getHPTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex);
 
-    bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumber);
+    bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int NodeNumber);
 
 } // namespace WaterThermalTanks
 
 struct WaterThermalTanksData : BaseGlobalStruct
 {
-
-    int const heatMode;  // heating source is on, source will not turn off until setpoint temp is reached
-    int const floatMode; // heating source is off, source will not turn on until cut-in temp is reached
-    int const ventMode;  // tank temp is above maximum temperature and water is venting
-    int const coolMode;  // cooling source is on, source will not turn off until setpoint temp is reached
 
     int numChilledWaterMixed;        // number of mixed chilled water tanks
     int numChilledWaterStratified;   // number of stratified chilled water tanks
@@ -1071,7 +1073,7 @@ struct WaterThermalTanksData : BaseGlobalStruct
 
     // Default Constructor
     WaterThermalTanksData()
-        : heatMode(1), floatMode(0), ventMode(-1), coolMode(2), numChilledWaterMixed(0), numChilledWaterStratified(0), numWaterHeaterMixed(0),
+        : numChilledWaterMixed(0), numChilledWaterStratified(0), numWaterHeaterMixed(0),
           numWaterHeaterStratified(0), numWaterThermalTank(0), numWaterHeaterDesuperheater(0), numHeatPumpWaterHeater(0), numWaterHeaterSizing(0),
           hpPartLoadRatio(0.0), mixerInletAirSchedule(0.0), mdotAir(0.0), getWaterThermalTankInputFlag(true),
           calcWaterThermalTankZoneGainsMyEnvrnFlag(true)
