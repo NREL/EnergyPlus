@@ -499,6 +499,9 @@ CHECKED_AND_OKED = {
         # Updated docstring
         "ManageZoneEquipment": [
             "SimZone"
+        ],
+        "ReportZoneSizingDOASInputs": [
+            "headerAlreadyPrinted"
         ]
     }
 }
