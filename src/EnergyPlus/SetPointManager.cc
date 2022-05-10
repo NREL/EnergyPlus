@@ -158,6 +158,11 @@ constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> contr
                                                                                                 "MAXIMUMMASSFLOWRATE",
                                                                                                 "MINIMUMMASSFLOWRATE"};
 
+constexpr std::array<std::string_view, static_cast<int>(ControlStrategy::Num)> strategyNameUC = {
+    "TEMPERATUREFIRST",
+    "FLOWFIRST",
+};
+
 constexpr std::array<std::string_view, static_cast<int>(SetPointManagerType::Num)> managerTypeName = {
     "SetpointManager:Scheduled",
     "SetpointManager:Scheduled:DualSetpoint",
@@ -1662,25 +1667,22 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        // setup program flow control integers.
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType));
 
-            if (SELECT_CASE_var == "TEMPERATURE") {
-                state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
-            } else if (SELECT_CASE_var == "HUMIDITYRATIO") {
-                state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::HumRat;
-            } else if (SELECT_CASE_var == "MAXIMUMHUMIDITYRATIO") {
-                state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxHumRat;
-            } else if (SELECT_CASE_var == "MINIMUMHUMIDITYRATIO") {
-                state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinHumRat;
-            } else {
-                // should not come here if idd type choice and key list is working
-                ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                ShowContinueError(state, R"(..Valid values are "Temperature","HumidityRatio","MaximumHumidityRatio" or "MinimumHumidityRatio".)");
-                ErrorsFound = true;
-            }
+        // setup program flow control integers.
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(getEnumerationValue(
+            controlTypeNameUC, UtilityRoutines::MakeUPPERCase(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
+        switch (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+        case CtrlVarType::Temp:
+        case CtrlVarType::HumRat:
+        case CtrlVarType::MaxHumRat:
+        case CtrlVarType::MinHumRat:
+            break; // these are all valid cases
+        default:
+            // should not come here if idd type choice and key list is working
+            ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+            ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+            ShowContinueError(state, R"(..Valid values are "Temperature","HumidityRatio","MaximumHumidityRatio" or "MinimumHumidityRatio".)");
+            ErrorsFound = true;
         }
 
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
@@ -1868,16 +1870,13 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
-            if (SELECT_CASE_var == "MAXIMUMTEMPERATURE") {
-                state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MaxTemp;
-            } else {
-                ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
-                ShowContinueError(state, "..Valid value is \"MaximumTemperature\".");
-                ErrorsFound = true;
-            }
+        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MaxTemp)]) {
+            state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MaxTemp;
+        } else {
+            ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+            ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+            ShowContinueError(state, "..Valid value is \"MaximumTemperature\".");
+            ErrorsFound = true;
         }
 
         NodeListError = false;
@@ -1971,16 +1970,13 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
-            if (SELECT_CASE_var == "MINIMUMTEMPERATURE") {
-                state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MinTemp;
-            } else {
-                ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
-                ShowContinueError(state, "..Valid value is \"MinimumTemperature\".");
-                ErrorsFound = true;
-            }
+        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MinTemp)]) {
+            state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MinTemp;
+        } else {
+            ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+            ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+            ShowContinueError(state, "..Valid value is \"MinimumTemperature\".");
+            ErrorsFound = true;
         }
 
         NodeListError = false;
@@ -2084,18 +2080,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown));
             ShowContinueError(state, "...typical values for " + cNumericFieldNames(3) + " are less than 0.8.");
         }
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
-            if (SELECT_CASE_var == "TEMPERATUREFIRST") {
-                state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy = ControlStrategy::TempFirst;
-            } else if (SELECT_CASE_var == "FLOWFIRST") {
-                state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy = ControlStrategy::FlowFirst;
-            } else {
-                ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
-                ShowContinueError(state, R"(..Valid values are "TemperatureFirst" or "FlowFirst".)");
-                ErrorsFound = true;
-            }
+
+        state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy =
+            static_cast<ControlStrategy>(getEnumerationValue(strategyNameUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+        if (state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy == ControlStrategy::Invalid) {
+            ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+            ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+            ShowContinueError(state, R"(..Valid values are "TemperatureFirst" or "FlowFirst".)");
+            ErrorsFound = true;
         }
 
         NodeListError = false;
