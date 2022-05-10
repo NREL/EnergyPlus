@@ -10287,85 +10287,119 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
 
+            enum Month
             {
-                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOn);
+                January = 1,
+                February,
+                March,
+                April,
+                May,
+                June,
+                July,
+                August,
+                September,
+                October,
+                November,
+                December
+            };
 
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 31) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 30) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 29) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else {
+            switch (state.dataSurface->StormWindow(StormWinNum).MonthOn) {
+            case January:
+            case March:
+            case May:
+            case July:
+            case August:
+            case October:
+            case December:
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 31) {
                     ShowSevereError(state,
-                                    format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                    format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->StormWindow(StormWinNum).MonthOn,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
+                break;
+            case April:
+            case June:
+            case September:
+            case November:
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 30) {
+                    ShowSevereError(state,
+                                    format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                           cCurrentModuleObject,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
+                                           StormWinNum));
+                    ErrorsFound = true;
+                }
+                break;
+            case February:
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 29) {
+                    ShowSevereError(state,
+                                    format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                           cCurrentModuleObject,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
+                                           StormWinNum));
+                    ErrorsFound = true;
+                }
+                break;
+            default:
+                ShowSevereError(state,
+                                format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                       cCurrentModuleObject,
+                                       state.dataSurface->StormWindow(StormWinNum).MonthOn,
+                                       StormWinNum));
+                ErrorsFound = true;
             }
-            {
-                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOff);
 
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 31) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 30) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 29) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else {
+            switch (state.dataSurface->StormWindow(StormWinNum).MonthOff) {
+
+            case January:
+            case March:
+            case May:
+            case July:
+            case August:
+            case October:
+            case December:
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 31) {
                     ShowSevereError(state,
-                                    format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                    format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->StormWindow(StormWinNum).MonthOff,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
+                break;
+            case April:
+            case June:
+            case September:
+            case November:
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 30) {
+                    ShowSevereError(state,
+                                    format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                           cCurrentModuleObject,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
+                                           StormWinNum));
+                    ErrorsFound = true;
+                }
+                break;
+            case February:
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 29) {
+                    ShowSevereError(state,
+                                    format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                           cCurrentModuleObject,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
+                                           StormWinNum));
+                    ErrorsFound = true;
+                }
+                break;
+            default:
+                ShowSevereError(state,
+                                format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                       cCurrentModuleObject,
+                                       state.dataSurface->StormWindow(StormWinNum).MonthOff,
+                                       StormWinNum));
+                ErrorsFound = true;
             }
         }
 
@@ -11691,7 +11725,10 @@ namespace SurfaceGeometry {
         int SurfNum;
         int MaterNum;
         int SchNum;
-        int InslType;
+
+        enum class InsulationType {Invalid = -1, Outside, Inside, Num};
+        constexpr std::array<std::string_view, static_cast<int>(InsulationType::Num)> insulationTypeNames = {"OUTSIDE", "INSIDE"};
+
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceControl:MovableInsulation";
         NMatInsul = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -11713,12 +11750,8 @@ namespace SurfaceGeometry {
             MaterNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "Outside")) {
-                InslType = 1;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "Inside")) {
-                InslType = 2;
-            } else {
-                InslType = 0;
+            InsulationType insulationType = static_cast<InsulationType>(getEnumerationValue(insulationTypeNames, state.dataIPShortCut->cAlphaArgs(1)));
+            if (insulationType == InsulationType::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(2) + "\", invalid data.");
@@ -11790,8 +11823,8 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     } else {
                         {
-                            auto const SELECT_CASE_var(InslType);
-                            if (SELECT_CASE_var == 1) {
+                            switch(insulationType) {
+                            case InsulationType::Outside:
                                 if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0) {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -11837,7 +11870,8 @@ namespace SurfaceGeometry {
                                         ErrorsFound = true;
                                     }
                                 }
-                            } else if (SELECT_CASE_var == 2) {
+                                break;
+                            case InsulationType::Inside:
                                 if (state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -11870,7 +11904,9 @@ namespace SurfaceGeometry {
                                             state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
                                     }
                                 }
-                            } else {
+                                break;
+                            default:
+                                assert(false);
                             }
                         }
                         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
@@ -14513,102 +14549,98 @@ namespace SurfaceGeometry {
 
             auto const &vertex(surface.Vertex);
 
-            {
-                auto const SELECT_CASE_var(surface.Sides); // is this a 3- or 4-sided surface
+            if (surface.Sides == 3) { // 3-sided polygon
 
-                if (SELECT_CASE_var == 3) { // 3-sided polygon
+                centroid = cen(vertex(1), vertex(2), vertex(3));
 
-                    centroid = cen(vertex(1), vertex(2), vertex(3));
+            } else if (surface.Sides == 4) { // 4-sided polygon
 
-                } else if (SELECT_CASE_var == 4) { // 4-sided polygon
+                // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                Triangle1(1) = vertex(1);
+                Triangle1(2) = vertex(2);
+                Triangle1(3) = vertex(3);
+                Triangle2(1) = vertex(1);
+                Triangle2(2) = vertex(3);
+                Triangle2(3) = vertex(4);
 
-                    // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                // get total Area of quad.
+                Real64 TotalArea(surface.GrossArea);
+                if (TotalArea <= 0.0) {
+                    // catch a problem....
+                    ShowWarningError(state, "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name);
+                    continue;
+                }
+
+                // get area fraction of triangles.
+                Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
+                Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
+
+                // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
+                // quadralateral using the wrong two triangles
+                if ((Tri1Area + Tri2Area) > 1.05) {
+
+                    // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
+                    // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
                     Triangle1(1) = vertex(1);
                     Triangle1(2) = vertex(2);
-                    Triangle1(3) = vertex(3);
-                    Triangle2(1) = vertex(1);
+                    Triangle1(3) = vertex(4);
+                    Triangle2(1) = vertex(2);
                     Triangle2(2) = vertex(3);
                     Triangle2(3) = vertex(4);
 
-                    // get total Area of quad.
-                    Real64 TotalArea(surface.GrossArea);
-                    if (TotalArea <= 0.0) {
-                        // catch a problem....
-                        ShowWarningError(state, "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name);
-                        continue;
-                    }
-
                     // get area fraction of triangles.
-                    Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
-                    Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
-
-                    // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
-                    // quadralateral using the wrong two triangles
-                    if ((Tri1Area + Tri2Area) > 1.05) {
-
-                        // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
-                        // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
-                        Triangle1(1) = vertex(1);
-                        Triangle1(2) = vertex(2);
-                        Triangle1(3) = vertex(4);
-                        Triangle2(1) = vertex(2);
-                        Triangle2(2) = vertex(3);
-                        Triangle2(3) = vertex(4);
-
-                        // get area fraction of triangles.
-                        Real64 AreaTriangle1 = AreaPolygon(3, Triangle1);
-                        Real64 AreaTriangle2 = AreaPolygon(3, Triangle2);
-                        TotalArea = AreaTriangle1 + AreaTriangle2;
-                        Tri1Area = AreaTriangle1 / TotalArea;
-                        Tri2Area = AreaTriangle2 / TotalArea;
-                    }
-
-                    // get centroid of Triangle 1
-                    Vector cen1(cen(Triangle1(1), Triangle1(2), Triangle1(3)));
-
-                    // get centroid of Triangle 2
-                    Vector cen2(cen(Triangle2(1), Triangle2(2), Triangle2(3)));
-
-                    // find area weighted combination of the two centroids (coded to avoid temporary Vectors)
-                    cen1 *= Tri1Area;
-                    cen2 *= Tri2Area;
-                    centroid = cen1;
-                    centroid += cen2;
-
-                } else if ((SELECT_CASE_var >= 5)) { // multi-sided polygon
-                    // (Maybe triangulate?  For now, use old "z" average method")
-                    // and X and Y -- straight average
-
-                    //        X1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
-                    //        X2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
-                    //        Y1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
-                    //        Y2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
-                    //        Z1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
-                    //        Z2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
-                    //        Xcm=(X1+X2)/2.0d0
-                    //        Ycm=(Y1+Y2)/2.0d0
-                    //        Zcm=(Z1+Z2)/2.0d0
-
-                    // Calc centroid as average of surfaces
-                    centroid = 0.0;
-                    for (int vert = 1; vert <= surface.Sides; ++vert) {
-                        centroid += vertex(vert);
-                    }
-                    centroid /= double(surface.Sides);
-
-                } else {
-
-                    if (!surface.Name.empty()) {
-                        ShowWarningError(state, "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + surface.Name);
-                        ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
-                    } else {
-                        ShowWarningError(state, format("CalcSurfaceCentroid: caught problem with # of sides, for surface=#{}", ThisSurf));
-                        ShowContinueError(state,
-                                          "...surface name is blank. Examine surfaces -- this may be a problem with ill-formed interzone surfaces.");
-                        ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
-                    }
-                    centroid = 0.0;
+                    Real64 AreaTriangle1 = AreaPolygon(3, Triangle1);
+                    Real64 AreaTriangle2 = AreaPolygon(3, Triangle2);
+                    TotalArea = AreaTriangle1 + AreaTriangle2;
+                    Tri1Area = AreaTriangle1 / TotalArea;
+                    Tri2Area = AreaTriangle2 / TotalArea;
                 }
+
+                // get centroid of Triangle 1
+                Vector cen1(cen(Triangle1(1), Triangle1(2), Triangle1(3)));
+
+                // get centroid of Triangle 2
+                Vector cen2(cen(Triangle2(1), Triangle2(2), Triangle2(3)));
+
+                // find area weighted combination of the two centroids (coded to avoid temporary Vectors)
+                cen1 *= Tri1Area;
+                cen2 *= Tri2Area;
+                centroid = cen1;
+                centroid += cen2;
+
+            } else if (surface.Sides >= 5) { // multi-sided polygon
+                // (Maybe triangulate?  For now, use old "z" average method")
+                // and X and Y -- straight average
+
+                //        X1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
+                //        X2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
+                //        Y1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
+                //        Y2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
+                //        Z1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
+                //        Z2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
+                //        Xcm=(X1+X2)/2.0d0
+                //        Ycm=(Y1+Y2)/2.0d0
+                //        Zcm=(Z1+Z2)/2.0d0
+
+                // Calc centroid as average of surfaces
+                centroid = 0.0;
+                for (int vert = 1; vert <= surface.Sides; ++vert) {
+                    centroid += vertex(vert);
+                }
+                centroid /= double(surface.Sides);
+
+            } else {
+
+                if (!surface.Name.empty()) {
+                    ShowWarningError(state, "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + surface.Name);
+                    ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
+                } else {
+                    ShowWarningError(state, format("CalcSurfaceCentroid: caught problem with # of sides, for surface=#{}", ThisSurf));
+                    ShowContinueError(state,
+                                      "...surface name is blank. Examine surfaces -- this may be a problem with ill-formed interzone surfaces.");
+                    ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
+                }
+                centroid = 0.0;
             }
 
             // store result in the surface structure in DataSurfaces
