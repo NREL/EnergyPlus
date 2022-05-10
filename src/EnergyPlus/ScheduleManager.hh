@@ -68,11 +68,6 @@ struct EnergyPlusData;
 
 namespace ScheduleManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     int constexpr MaxDayTypes(12);
 
     enum class SchedType : int
@@ -86,11 +81,7 @@ namespace ScheduleManager {
         Num
     };
 
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // MODULE VARIABLE DECLARATIONS:
+    enum class OutputScheduleReportLevel {Invalid = -1, Hourly, TimeStep, Num};
 
     enum class ScheduleInterpolation
     {
@@ -100,10 +91,6 @@ namespace ScheduleManager {
         Linear,  // linear interpolation from the previous time to the current time for the entire schedule
         Num
     };
-
-    // Derived Types Variables
-
-    // Types
 
     struct ScheduleTypeData
     {
@@ -179,7 +166,7 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput(EnergyPlusData &state);
 
-    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(EnergyPlusData &state, OutputScheduleReportLevel const LevelOfDetail);
 
     // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex);
