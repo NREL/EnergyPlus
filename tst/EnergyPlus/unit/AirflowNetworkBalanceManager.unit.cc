@@ -4485,7 +4485,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_UserDefinedDuctViewFactors)
 
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
-    state->afn->initialize_balance_manager(*state);
+    state->afn->initialize(*state);
 
     // Check inputs
     EXPECT_EQ(state->afn->AirflowNetworkLinkageViewFactorData(1).LinkageName, "ZONESUPPLYLINK1");
@@ -9252,7 +9252,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
         "   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    state->afn->initialize_balance_manager(*state);
+    state->afn->initialize(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());

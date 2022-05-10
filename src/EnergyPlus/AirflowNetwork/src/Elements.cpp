@@ -813,7 +813,7 @@ namespace AirflowNetwork {
             // Check VAV termals with a damper
             SumTermFlow = 0.0;
             SumFracSuppLeak = 0.0;
-            for (k = 1; k <= state.afn->NetworkNumOfLinks; ++k) {
+            for (k = 1; k <= state.afn->ActualNumOfLinks; ++k) {
                 if (state.afn->AirflowNetworkLinkageData(k).VAVTermDamper &&
                     state.afn->AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
                     k1 = state.afn->AirflowNetworkNodeData(state.afn->AirflowNetworkLinkageData(k).NodeNums[0])
@@ -2059,7 +2059,7 @@ namespace AirflowNetwork {
             F[0] = std::sqrt(2.0 * propN.density) * A * std::sqrt(DP);
             DF[0] = 0.5 * F[0] / DP;
         } else {
-            for (k = 1; k <= state.afn->NetworkNumOfLinks; ++k) {
+            for (k = 1; k <= state.afn->ActualNumOfLinks; ++k) {
                 if (state.afn->AirflowNetworkLinkageData(k).NodeNums[1] == n) {
                     F[0] = solver->AFLOW(k);
                     break;

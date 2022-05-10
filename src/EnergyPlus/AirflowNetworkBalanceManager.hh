@@ -224,14 +224,21 @@ namespace AirflowNetwork {
         bool closingProbability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
-    struct Solver
+struct AirflowNetworkSolverData : BaseGlobalStruct
     {
-        
-    };
 
-    // Functions
-
-    void FACSKY(EnergyPlusData &state,
+    void initialize(EnergyPlusData &state);
+    void calculateWindPressureCoeffs(EnergyPlusData &state);
+    void allocate(EnergyPlusData &state);
+    void initialize_calculation();
+    void setsky();
+    void airmov(EnergyPlusData &state);
+    void solvzp(EnergyPlusData &state, int &ITER); // number of iterations
+    void filjac(EnergyPlusData &state,
+                int const NNZE,  // number of nonzero entries in the "AU" array.
+                bool const LFLAG // if = 1, use laminar relationship (initialization).
+    );
+    void facsky(EnergyPlusData &state,
                 Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
                 Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
                 Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
@@ -240,8 +247,7 @@ namespace AirflowNetwork {
                 int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void SLVSKY(EnergyPlusData &state,
-                const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+    void slvsky(const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
                 const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
                 const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
                 Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
@@ -250,20 +256,13 @@ namespace AirflowNetwork {
                 int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void FILSKY(EnergyPlusData &state,
-                const Array1D<Real64> &X,    // element array (row-wise sequence)
+    void filsky(const Array1D<Real64> &X,    // element array (row-wise sequence)
                 std::array<int, 2> const LM, // location matrix
                 const Array1D_int &IK,       // pointer to the top of column/row "K"
                 Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
                 Array1D<Real64> &AD,         // the main diagonal of [A] before and after factoring
                 int const FLAG               // mode of operation
     );
-
-struct AirflowNetworkSolverData : BaseGlobalStruct
-    {
-
-    void initialize_balance_manager(EnergyPlusData &state);
-    void calculateWindPressureCoeffs(EnergyPlusData &state);
 
     EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
     Array1D_int SplitterNodeNumbers;
@@ -357,16 +356,6 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
     int AFNNumOfExtOpenings = 0; // Total number of external openings in the model
     int OpenNuminZone = 0;       // Counts which opening this is in the zone, 1 or 2
 
-    void allocate(EnergyPlusData &state);
-    void initialize(EnergyPlusData &state);
-    void setsky(EnergyPlusData &state);
-    void airmov(EnergyPlusData &state);
-    void solvzp(EnergyPlusData &state, int &ITER); // number of iterations
-    void filjac(EnergyPlusData &state,
-                int const NNZE,  // number of nonzero entries in the "AU" array.
-                bool const LFLAG // if = 1, use laminar relationship (initialization).
-    );
-
     std::unordered_map<std::string, AirflowElement *> elements;
     std::unordered_map<std::string, int> compnum; // Stopgap until all the introspection is dealt with
 
@@ -377,8 +366,8 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
     AirflowNetwork::DetailedOpeningSolver dos;
 
     // Data
-    int NetworkNumOfLinks = 0;
-    int NetworkNumOfNodes = 0;
+    int ActualNumOfLinks = 0;
+    int ActualNumOfNodes = 0;
 
     // Common block AFEDAT
     Array1D<Real64> AFECTL;
@@ -578,8 +567,8 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
         this->AFNNumOfExtOpenings = 0;
         this->OpenNuminZone = 0;
 
-        NetworkNumOfLinks = 0;
-        NetworkNumOfNodes = 0;
+        ActualNumOfLinks = 0;
+        ActualNumOfNodes = 0;
         AFECTL.clear();
         AFLOW2.clear();
         AFLOW.clear();
