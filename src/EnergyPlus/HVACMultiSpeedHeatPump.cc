@@ -4684,109 +4684,114 @@ namespace HVACMultiSpeedHeatPump {
 
         if (HeatingLoad > SmallLoad) {
 
-            {
-                auto const SELECT_CASE_var(HeatCoilType);
-                if ((SELECT_CASE_var == SuppHeatingCoilGas) || (SELECT_CASE_var == SuppHeatingCoilElec)) {
-                    SimulateHeatingCoilComponents(
-                        state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    if (present(PartLoadFrac)) {
-                        MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
-                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
-                        SimulateWaterCoilComponents(
-                            state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
-                    } else {
-                        MaxHotWaterFlow = MaxCoilFluidFlow;
-                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
-                        SimulateWaterCoilComponents(
-                            state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
-                        if (QCoilActual > (HeatingLoad + SmallLoad)) {
-                            // control water flow to obtain output matching HeatingLoad
-                            SolFlag = 0;
-                            MinWaterFlow = 0.0;
-                            Par(1) = double(MSHeatPumpNum);
-                            if (FirstHVACIteration) {
-                                Par(2) = 1.0;
-                            } else {
-                                Par(2) = 0.0;
-                            }
-                            Par(3) = HeatingLoad;
-                            SolveRoot(
-                                state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
-                            if (SolFlag == -1) {
-                                if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
-                                    ShowWarningMessage(state,
-                                                       "CalcNonDXHeatingCoils: Hot water coil control failed for " +
-                                                           std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
-                                    ShowContinueErrorTimeStamp(state, "");
-                                    ShowContinueError(
-                                        state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
-                                }
-                                ShowRecurringWarningErrorAtEnd(
-                                    state,
-                                    format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
-                                           SolveMaxIter,
-                                           CurrentModuleObject,
-                                           MSHeatPump(MSHeatPumpNum).Name),
-                                    MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex);
-                            } else if (SolFlag == -2) {
-                                if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2 == 0) {
-                                    ShowWarningMessage(state,
-                                                       "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
-                                                           std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
-                                    ShowContinueErrorTimeStamp(state, "");
-                                    ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                    ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
-                                    ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
-                                }
-                                ShowRecurringWarningErrorAtEnd(state,
-                                                               "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
-                                                                   std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
-                                                               MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2,
-                                                               MaxHotWaterFlow,
-                                                               MinWaterFlow,
-                                                               _,
-                                                               "[kg/s]",
-                                                               "[kg/s]");
-                            }
-                            // simulate hot water supplemental heating coil
-                            SimulateWaterCoilComponents(
-                                state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+            switch (HeatCoilType) {
+            case SuppHeatingCoilGas:
+            case SuppHeatingCoilElec: {
+                SimulateHeatingCoilComponents(
+                    state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
+            } break;
+            case Coil_HeatingWater: {
+                if (present(PartLoadFrac)) {
+                    MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
+                    SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                } else {
+                    MaxHotWaterFlow = MaxCoilFluidFlow;
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
+                    SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                    if (QCoilActual > (HeatingLoad + SmallLoad)) {
+                        // control water flow to obtain output matching HeatingLoad
+                        SolFlag = 0;
+                        MinWaterFlow = 0.0;
+                        Par(1) = double(MSHeatPumpNum);
+                        if (FirstHVACIteration) {
+                            Par(2) = 1.0;
+                        } else {
+                            Par(2) = 0.0;
                         }
+                        Par(3) = HeatingLoad;
+                        SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                        if (SolFlag == -1) {
+                            if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
+                                ShowWarningMessage(state,
+                                                   "CalcNonDXHeatingCoils: Hot water coil control failed for " + std::string{CurrentModuleObject} +
+                                                       "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
+                                ShowContinueErrorTimeStamp(state, "");
+                                ShowContinueError(state,
+                                                  format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
+                            }
+                            ShowRecurringWarningErrorAtEnd(
+                                state,
+                                format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                       SolveMaxIter,
+                                       CurrentModuleObject,
+                                       MSHeatPump(MSHeatPumpNum).Name),
+                                MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex);
+                        } else if (SolFlag == -2) {
+                            if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2 == 0) {
+                                ShowWarningMessage(state,
+                                                   "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
+                                                       std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
+                                ShowContinueErrorTimeStamp(state, "");
+                                ShowContinueError(state, "...Bad hot water maximum flow rate limits");
+                                ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
+                                ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
+                            }
+                            ShowRecurringWarningErrorAtEnd(state,
+                                                           "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
+                                                               std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
+                                                           MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2,
+                                                           MaxHotWaterFlow,
+                                                           MinWaterFlow,
+                                                           _,
+                                                           "[kg/s]",
+                                                           "[kg/s]");
+                        }
+                        // simulate hot water supplemental heating coil
+                        SimulateWaterCoilComponents(
+                            state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                     }
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    if (present(PartLoadFrac)) {
-                        mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow * PartLoadFrac;
-                        SteamCoilHeatingLoad = HeatingLoad * PartLoadFrac;
-                    } else {
-                        mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
-                        SteamCoilHeatingLoad = HeatingLoad;
-                    }
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
-                    // simulate steam supplemental heating coil
-                    SimulateSteamCoilComponents(
-                        state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, SteamCoilHeatingLoad, QCoilActual, FanMode);
                 }
+            } break;
+            case Coil_HeatingSteam: {
+                if (present(PartLoadFrac)) {
+                    mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow * PartLoadFrac;
+                    SteamCoilHeatingLoad = HeatingLoad * PartLoadFrac;
+                } else {
+                    mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
+                    SteamCoilHeatingLoad = HeatingLoad;
+                }
+                SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
+                // simulate steam supplemental heating coil
+                SimulateSteamCoilComponents(
+                    state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, SteamCoilHeatingLoad, QCoilActual, FanMode);
+            } break;
+            default:
+                break;
             }
 
         } else { // end of IF (HeatingLoad > SmallLoad) THEN
 
-            {
-                auto const SELECT_CASE_var(HeatCoilType);
-                if ((SELECT_CASE_var == SuppHeatingCoilGas) || (SELECT_CASE_var == SuppHeatingCoilElec)) {
-                    SimulateHeatingCoilComponents(
-                        state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
-                    SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
-                    // simulate the steam supplemental heating coil
-                    SimulateSteamCoilComponents(
-                        state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, HeatingLoad, QCoilActual, FanMode);
-                }
+            switch (HeatCoilType) {
+            case SuppHeatingCoilGas:
+            case SuppHeatingCoilElec: {
+                SimulateHeatingCoilComponents(
+                    state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
+            } break;
+            case Coil_HeatingWater: {
+                mdot = 0.0;
+                SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
+                SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = 0.0;
+                SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
+                // simulate the steam supplemental heating coil
+                SimulateSteamCoilComponents(
+                    state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, HeatingLoad, QCoilActual, FanMode);
+            } break;
+            default:
+                break;
             }
         }
         HeatCoilLoadmet = QCoilActual;

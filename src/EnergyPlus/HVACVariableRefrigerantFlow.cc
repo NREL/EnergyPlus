@@ -413,8 +413,10 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     bool HRHeatRequestFlag;           // flag indicating VRF TU could operate in heating mode
     bool HRCoolRequestFlag;           // flag indicating VRF TU could operate in cooling mode
 
+    auto &vrf = state.dataHVACVarRefFlow->VRF(VRFCond);
+
     // variable initializations
-    int TUListNum = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
+    int TUListNum = vrf.ZoneTUListPtr;
     int NumTUInList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList;
     int NumTUInCoolingMode = 0;            // number of terminal units actually cooling
     int NumTUInHeatingMode = 0;            // number of terminal units actually heating
@@ -433,26 +435,26 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     Real64 TotalTUCoolingCapacity = 0.0;   // sum of TU's cooling capacity including piping losses (W)
     Real64 TotalTUHeatingCapacity = 0.0;   // sum of TU's heating capacity including piping losses (W)
 
-    state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpElecPower = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).EvapWaterConsumpRate = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).DefrostPower = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).OperatingCoolingCOP = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).OperatingHeatingCOP = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).OperatingCOP = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).SCHE = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterPower = 0.0;
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFHeatRec = 0.0;
+    vrf.ElecCoolingPower = 0.0;
+    vrf.ElecHeatingPower = 0.0;
+    vrf.CrankCaseHeaterPower = 0.0;
+    vrf.EvapCondPumpElecPower = 0.0;
+    vrf.EvapWaterConsumpRate = 0.0;
+    vrf.DefrostPower = 0.0;
+    vrf.OperatingCoolingCOP = 0.0;
+    vrf.OperatingHeatingCOP = 0.0;
+    vrf.OperatingCOP = 0.0;
+    vrf.SCHE = 0.0;
+    vrf.BasinHeaterPower = 0.0;
+    vrf.VRFHeatRec = 0.0;
 
     // set condenser entering air conditions
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum != 0) {
-        OutdoorDryBulb = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp;
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType != DataHeatBalance::RefrigCondenserType::Water) {
-            OutdoorHumRat = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).HumRat;
-            OutdoorPressure = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Press;
-            OutdoorWetBulb = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;
+    if (vrf.CondenserNodeNum != 0) {
+        OutdoorDryBulb = state.dataLoopNodes->Node(vrf.CondenserNodeNum).Temp;
+        if (vrf.CondenserType != DataHeatBalance::RefrigCondenserType::Water) {
+            OutdoorHumRat = state.dataLoopNodes->Node(vrf.CondenserNodeNum).HumRat;
+            OutdoorPressure = state.dataLoopNodes->Node(vrf.CondenserNodeNum).Press;
+            OutdoorWetBulb = state.dataLoopNodes->Node(vrf.CondenserNodeNum).OutAirWetBulb;
         } else {
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
@@ -465,22 +467,22 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
     }
 
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+    if (vrf.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
         CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
-    } else if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
+    } else if (vrf.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
-        CondAirMassFlow = RhoAir * state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondAirVolFlowRate;
+        CondAirMassFlow = RhoAir * vrf.EvapCondAirVolFlowRate;
         // (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
-        CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondEffectiveness);
+        CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - vrf.EvapCondEffectiveness);
         CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, OutdoorPressure);
-    } else if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
+    } else if (vrf.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
         CondInletTemp = OutdoorDryBulb; // node inlet temp from above
         OutdoorWetBulb = CondInletTemp; // for watercooled
-        CondWaterMassFlow = state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow;
+        CondWaterMassFlow = vrf.WaterCondenserDesignMassFlow;
     } else {
         assert(false);
     }
-    state.dataHVACVarRefFlow->VRF(VRFCond).CondenserInletTemp = CondInletTemp;
+    vrf.CondenserInletTemp = CondInletTemp;
 
     // sum loads on TU coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
@@ -488,70 +490,65 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         TUHeatingLoad += state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalHeatLoad(NumTU);
     }
 
-    state.dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad = TUCoolingLoad;
-    state.dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad = TUHeatingLoad;
+    vrf.TUCoolingLoad = TUCoolingLoad;
+    vrf.TUHeatingLoad = TUHeatingLoad;
 
     // no need to do anything else if the terminal units are off
     if (TUCoolingLoad == 0.0 && TUHeatingLoad == 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
-        state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
+        vrf.SUMultiplier = 0.0;
+        vrf.VRFCondPLR = 0.0;
+        vrf.VRFCondRTF = 0.0;
+        vrf.VRFCondCyclingRatio = 0.0;
+        vrf.QCondenser = 0.0;
+        vrf.TotalCoolingCapacity = 0.0;
+        vrf.TotalHeatingCapacity = 0.0;
+        vrf.OperatingMode = 0.0;
+        vrf.HRHeatingActive = false;
+        vrf.HRCoolingActive = false;
         state.dataHVACVarRefFlow->CurrentEndTimeLast = double((state.dataGlobal->DayOfSim - 1) * 24) + state.dataGlobal->CurrentTime -
                                                        state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
+        if (vrf.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
             state.dataHVACVarRefFlow->CondenserWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(state,
-                                 state.dataHVACVarRefFlow->CondenserWaterMassFlowRate,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc);
-            state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = state.dataHVACVarRefFlow->CondenserWaterMassFlowRate;
-            state.dataHVACVarRefFlow->VRF(VRFCond).CondenserSideOutletTemp = CondInletTemp;
+            SetComponentFlowRate(
+                state, state.dataHVACVarRefFlow->CondenserWaterMassFlowRate, vrf.CondenserNodeNum, vrf.CondenserOutletNodeNum, vrf.SourcePlantLoc);
+            vrf.WaterCondenserMassFlow = state.dataHVACVarRefFlow->CondenserWaterMassFlowRate;
+            vrf.CondenserSideOutletTemp = CondInletTemp;
         }
         return;
     }
 
     // switch modes if summed coil capacity shows opposite operating mode
     // if total TU heating exceeds total TU cooling * ( 1 + 1/COP) then system is in heating mode
-    if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) &&
-        TUHeatingLoad > (TUCoolingLoad * (1.0 + 1.0 / state.dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP))) {
+    if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) && TUHeatingLoad > (TUCoolingLoad * (1.0 + 1.0 / vrf.CoolingCOP))) {
         state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
         state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-        state.dataHVACVarRefFlow->VRF(VRFCond).ModeChange = true;
+        vrf.ModeChange = true;
         if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
             state.dataHVACVarRefFlow->LastModeHeating(VRFCond) = true;
             // reset heat recovery startup timer
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = 0.0;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
+            vrf.HRTimer = 0.0;
+            vrf.HRHeatingActive = false;
+            vrf.HRCoolingActive = false;
         }
-    } else if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) &&
-               (TUCoolingLoad * (1.0 + 1.0 / state.dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP)) > TUHeatingLoad) {
+    } else if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && (TUCoolingLoad * (1.0 + 1.0 / vrf.CoolingCOP)) > TUHeatingLoad) {
         state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
         state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-        state.dataHVACVarRefFlow->VRF(VRFCond).ModeChange = true;
+        vrf.ModeChange = true;
         if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
             state.dataHVACVarRefFlow->LastModeCooling(VRFCond) = true;
             // reset heat recovery startup timer
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = 0.0;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
+            vrf.HRTimer = 0.0;
+            vrf.HRHeatingActive = false;
+            vrf.HRCoolingActive = false;
         }
     } else if (TUCoolingLoad > 0.0 && TUHeatingLoad > 0.0 &&
                ((state.dataHVACVarRefFlow->CoolingLoad(VRFCond) && state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) ||
                 (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && state.dataHVACVarRefFlow->LastModeCooling(VRFCond)))) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).ModeChange = true;
+        vrf.ModeChange = true;
         // reset heat recovery startup timer
-        state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
-        state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
+        vrf.HRTimer = 0.0;
+        vrf.HRHeatingActive = false;
+        vrf.HRCoolingActive = false;
     }
 
     // loop through TU's and calculate average inlet conditions for active coils
@@ -583,30 +580,28 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     // calculate capacities and energy use
     if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) && CoolingCoilAvailableFlag) {
         InletAirWetBulbC = SumCoolInletWB;
-        TotCoolCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT, InletAirWetBulbC, CondInletTemp);
-        TotCoolEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFT, InletAirWetBulbC, CondInletTemp);
+        TotCoolCapTempModFac = CurveValue(state, vrf.CoolCapFT, InletAirWetBulbC, CondInletTemp);
+        TotCoolEIRTempModFac = CurveValue(state, vrf.CoolEIRFT, InletAirWetBulbC, CondInletTemp);
 
         // recalculate cooling Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolBoundaryCurvePtr > 0) {
-            CoolOABoundary = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
+        if (vrf.CoolBoundaryCurvePtr > 0) {
+            CoolOABoundary = CurveValue(state, vrf.CoolBoundaryCurvePtr, InletAirWetBulbC);
             if (OutdoorDryBulb > CoolOABoundary) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTHi > 0)
-                    TotCoolCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, CondInletTemp);
+                if (vrf.CoolCapFTHi > 0) TotCoolCapTempModFac = CurveValue(state, vrf.CoolCapFTHi, InletAirWetBulbC, CondInletTemp);
             }
         }
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).EIRCoolBoundaryCurvePtr > 0) {
-            CoolOABoundary = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
+        if (vrf.EIRCoolBoundaryCurvePtr > 0) {
+            CoolOABoundary = CurveValue(state, vrf.EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
             if (OutdoorDryBulb > CoolOABoundary) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFTHi > 0)
-                    TotCoolEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, CondInletTemp);
+                if (vrf.CoolEIRFTHi > 0) TotCoolEIRTempModFac = CurveValue(state, vrf.CoolEIRFTHi, InletAirWetBulbC, CondInletTemp);
             }
         }
 
         //   Warn user if curve output goes negative
         if (TotCoolCapTempModFac < 0.0) {
             if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTErrorIndex == 0) {
-                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name + "\":");
+                if (vrf.CoolCapFTErrorIndex == 0) {
+                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
                     ShowContinueError(
                         state,
                         format(" Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotCoolCapTempModFac));
@@ -621,8 +616,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     state,
                     format("{} \"{}\": Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
-                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
-                    state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTErrorIndex,
+                           vrf.Name),
+                    vrf.CoolCapFTErrorIndex,
                     TotCoolCapTempModFac,
                     TotCoolCapTempModFac);
                 TotCoolCapTempModFac = 0.0;
@@ -632,8 +627,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         //   Warn user if curve output goes negative
         if (TotCoolEIRTempModFac < 0.0) {
             if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempCoolErrorIndex == 0) {
-                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name + "\":");
+                if (vrf.EIRFTempCoolErrorIndex == 0) {
+                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
                     ShowContinueError(state,
                                       format(" Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                              TotCoolEIRTempModFac));
@@ -648,20 +643,19 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     state,
                     format("{} \"{}\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
-                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
-                    state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempCoolErrorIndex,
+                           vrf.Name),
+                    vrf.EIRFTempCoolErrorIndex,
                     TotCoolEIRTempModFac,
                     TotCoolEIRTempModFac);
                 TotCoolEIRTempModFac = 0.0;
             }
         }
 
-        TotalCondCoolingCapacity =
-            state.dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * state.dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFac;
-        TotalTUCoolingCapacity = TotalCondCoolingCapacity * state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling;
+        TotalCondCoolingCapacity = vrf.CoolingCapacity * state.dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) * TotCoolCapTempModFac;
+        TotalTUCoolingCapacity = TotalCondCoolingCapacity * vrf.PipingCorrectionCooling;
 
         if (TotalCondCoolingCapacity > 0.0) {
-            CoolingPLR = (TUCoolingLoad / state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacity;
+            CoolingPLR = (TUCoolingLoad / vrf.PipingCorrectionCooling) / TotalCondCoolingCapacity;
         } else {
             CoolingPLR = 0.0;
         }
@@ -669,8 +663,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         //   Warn user if curve output goes negative
         if (TotCoolCapTempModFac < 0.0) {
             if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTErrorIndex == 0) {
-                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name + "\":");
+                if (vrf.CoolCapFTErrorIndex == 0) {
+                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
                     ShowContinueError(
                         state,
                         format(" Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotCoolCapTempModFac));
@@ -685,8 +679,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     state,
                     format("{} \"{}\": Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
-                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
-                    state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTErrorIndex,
+                           vrf.Name),
+                    vrf.CoolCapFTErrorIndex,
                     TotCoolCapTempModFac,
                     TotCoolCapTempModFac);
                 TotCoolCapTempModFac = 0.0;
@@ -695,8 +689,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         //   Warn user if curve output goes negative
         if (TotCoolEIRTempModFac < 0.0) {
             if (!state.dataGlobal->WarmupFlag && NumTUInCoolingMode > 0) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempCoolErrorIndex == 0) {
-                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name + "\":");
+                if (vrf.EIRFTempCoolErrorIndex == 0) {
+                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
                     ShowContinueError(state,
                                       format(" Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                              TotCoolEIRTempModFac));
@@ -711,8 +705,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     state,
                     format("{} \"{}\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
-                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
-                    state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempCoolErrorIndex,
+                           vrf.Name),
+                    vrf.EIRFTempCoolErrorIndex,
                     TotCoolEIRTempModFac,
                     TotCoolEIRTempModFac);
                 TotCoolEIRTempModFac = 0.0;
@@ -722,96 +716,95 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     } else if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && HeatingCoilAvailableFlag) {
         InletAirDryBulbC = SumHeatInletDB;
         InletAirWetBulbC = SumHeatInletWB;
-        {
-            auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-            if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                TotHeatCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, CondInletTemp);
-                TotHeatEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, CondInletTemp);
-            } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                TotHeatCapTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFT, InletAirDryBulbC, OutdoorWetBulb);
-                TotHeatEIRTempModFac = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, OutdoorWetBulb);
-            } else {
-                TotHeatCapTempModFac = 1.0;
-                TotHeatEIRTempModFac = 1.0;
-            }
+        switch (vrf.HeatingPerformanceOATType) {
+        case DataHVACGlobals::DryBulbIndicator: {
+            TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFT, InletAirDryBulbC, CondInletTemp);
+            TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFT, InletAirDryBulbC, CondInletTemp);
+        } break;
+        case DataHVACGlobals::WetBulbIndicator: {
+            TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFT, InletAirDryBulbC, OutdoorWetBulb);
+            TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFT, InletAirDryBulbC, OutdoorWetBulb);
+        } break;
+        default: {
+            TotHeatCapTempModFac = 1.0;
+            TotHeatEIRTempModFac = 1.0;
+        } break;
         }
         // recalculate heating Cap and EIR curve output if using boundary curve along with dual Cap and EIR curves.
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatBoundaryCurvePtr > 0) {
-            HeatOABoundary = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
-            {
-                auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                    if (OutdoorDryBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi > 0)
-                            TotHeatCapTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, CondInletTemp);
-                    }
-                } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                    if (OutdoorWetBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi > 0)
-                            TotHeatCapTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, OutdoorWetBulb);
-                    }
-                } else {
-                    TotHeatCapTempModFac = 1.0;
+        if (vrf.HeatBoundaryCurvePtr > 0) {
+            HeatOABoundary = CurveValue(state, vrf.HeatBoundaryCurvePtr, InletAirDryBulbC);
+            switch (vrf.HeatingPerformanceOATType) {
+            case DataHVACGlobals::DryBulbIndicator: {
+                if (OutdoorDryBulb > HeatOABoundary) {
+                    if (vrf.HeatCapFTHi > 0) TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFTHi, InletAirDryBulbC, CondInletTemp);
                 }
+            } break;
+            case DataHVACGlobals::WetBulbIndicator: {
+                if (OutdoorWetBulb > HeatOABoundary) {
+                    if (vrf.HeatCapFTHi > 0) TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFTHi, InletAirDryBulbC, OutdoorWetBulb);
+                }
+            } break;
+            default: {
+                TotHeatCapTempModFac = 1.0;
+            } break;
             }
         }
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).EIRHeatBoundaryCurvePtr > 0) {
-            HeatOABoundary = CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
-            {
-                auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                    if (OutdoorDryBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi > 0)
-                            TotHeatEIRTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, CondInletTemp);
-                    }
-                } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                    if (OutdoorWetBulb > HeatOABoundary) {
-                        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi > 0)
-                            TotHeatEIRTempModFac =
-                                CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, OutdoorWetBulb);
-                    }
-                } else {
-                    TotHeatEIRTempModFac = 1.0;
+        if (vrf.EIRHeatBoundaryCurvePtr > 0) {
+            HeatOABoundary = CurveValue(state, vrf.EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+            switch (vrf.HeatingPerformanceOATType) {
+            case DataHVACGlobals::DryBulbIndicator: {
+                if (OutdoorDryBulb > HeatOABoundary) {
+                    if (vrf.HeatEIRFTHi > 0) TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFTHi, InletAirDryBulbC, CondInletTemp);
                 }
+            } break;
+            case DataHVACGlobals::WetBulbIndicator: {
+                if (OutdoorWetBulb > HeatOABoundary) {
+                    if (vrf.HeatEIRFTHi > 0) TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFTHi, InletAirDryBulbC, OutdoorWetBulb);
+                }
+            } break;
+            default: {
+                TotHeatEIRTempModFac = 1.0;
+            } break;
             }
         }
 
         //   Warn user if curve output goes negative
         if (TotHeatCapTempModFac < 0.0) {
             if (!state.dataGlobal->WarmupFlag && NumTUInHeatingMode > 0) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTErrorIndex == 0) {
-                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name + "\":");
+                if (vrf.HeatCapFTErrorIndex == 0) {
+                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
                     ShowContinueError(
                         state,
                         format(" Heating Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotHeatCapTempModFac));
 
-                    auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                    if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
+                    switch (vrf.HeatingPerformanceOATType) {
+                    case DataHVACGlobals::DryBulbIndicator: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air temperature of {:.1T} C and an average indoor air "
                                                  "dry-bulb temperature of {:.1T} C.",
                                                  CondInletTemp,
                                                  InletAirDryBulbC));
-                    } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
+                    } break;
+                    case DataHVACGlobals::WetBulbIndicator: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an average "
                                                  "indoor air wet-bulb temperature of {:.1T} C.",
                                                  OutdoorWetBulb,
                                                  InletAirWetBulbC));
-                    } else {
+                    } break;
+                    default:
                         // should never get here
+                        break;
                     }
+
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     state,
                     format("{} \"{}\": Heating Capacity Ratio Modifier curve (function of temperature) output is negative warning continues...",
                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
-                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
-                    state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTErrorIndex,
+                           vrf.Name),
+                    vrf.HeatCapFTErrorIndex,
                     TotHeatCapTempModFac,
                     TotHeatCapTempModFac);
                 TotHeatCapTempModFac = 0.0;
@@ -820,28 +813,28 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         //   Warn user if curve output goes negative
         if (TotHeatEIRTempModFac < 0.0) {
             if (!state.dataGlobal->WarmupFlag && NumTUInHeatingMode > 0) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempHeatErrorIndex == 0) {
-                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name + "\":");
+                if (vrf.EIRFTempHeatErrorIndex == 0) {
+                    ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
                     ShowContinueError(state,
                                       format(" Heating Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                              TotHeatEIRTempModFac));
-                    {
-                        auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                        if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                            ShowContinueError(state,
-                                              format(" Negative value occurs using an outdoor air dry-bulb temperature of {:.1T} C and an "
-                                                     "average indoor air dry-bulb temperature of {:.1T} C.",
-                                                     CondInletTemp,
-                                                     InletAirDryBulbC));
-                        } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-
-                            ShowContinueError(state,
-                                              format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an "
-                                                     "average indoor air wet-bulb temperature of {:.1T} C.",
-                                                     OutdoorWetBulb,
-                                                     InletAirWetBulbC));
-                        } else {
-                        }
+                    switch (vrf.HeatingPerformanceOATType) {
+                    case DataHVACGlobals::DryBulbIndicator: {
+                        ShowContinueError(state,
+                                          format(" Negative value occurs using an outdoor air dry-bulb temperature of {:.1T} C and an "
+                                                 "average indoor air dry-bulb temperature of {:.1T} C.",
+                                                 CondInletTemp,
+                                                 InletAirDryBulbC));
+                    } break;
+                    case DataHVACGlobals::WetBulbIndicator: {
+                        ShowContinueError(state,
+                                          format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an "
+                                                 "average indoor air wet-bulb temperature of {:.1T} C.",
+                                                 OutdoorWetBulb,
+                                                 InletAirWetBulbC));
+                    } break;
+                    default:
+                        break;
                     }
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
@@ -849,8 +842,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     state,
                     format("{} \"{}\": Heating Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
-                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
-                    state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempHeatErrorIndex,
+                           vrf.Name),
+                    vrf.EIRFTempHeatErrorIndex,
                     TotHeatEIRTempModFac,
                     TotHeatEIRTempModFac);
                 TotHeatEIRTempModFac = 0.0;
@@ -864,8 +857,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         InputPowerMultiplier = 1.0;
 
         // Check outdoor temperature to determine of defrost is active
-        if (OutdoorDryBulb <= state.dataHVACVarRefFlow->VRF(VRFCond).MaxOATDefrost &&
-            state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType != DataHeatBalance::RefrigCondenserType::Water) {
+        if (OutdoorDryBulb <= vrf.MaxOATDefrost && vrf.CondenserType != DataHeatBalance::RefrigCondenserType::Water) {
 
             // Calculating adjustment factors for defrost
             // Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
@@ -873,8 +865,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
             OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(state, OutdoorCoilT, OutdoorPressure)));
 
             // Calculate defrost adjustment factors depending on defrost control type
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
-                FractionalDefrostTime = state.dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction;
+            if (vrf.DefrostControl == StandardRatings::HPdefrostControl::Timed) {
+                FractionalDefrostTime = vrf.DefrostFraction;
                 if (FractionalDefrostTime > 0.0) {
                     HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
                     InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
@@ -887,18 +879,15 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
             if (FractionalDefrostTime > 0.0) {
                 // Calculate defrost adjustment factors depending on defrost control strategy
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
-                    LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) *
-                                       (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667);
-                    DefrostEIRTempModFac = CurveValue(
-                        state, state.dataHVACVarRefFlow->VRF(VRFCond).DefrostEIRPtr, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
+                if (vrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
+                    LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (vrf.HeatingCapacity / 1.01667);
+                    DefrostEIRTempModFac = CurveValue(state, vrf.DefrostEIRPtr, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
 
                     //         Warn user if curve output goes negative
                     if (DefrostEIRTempModFac < 0.0) {
                         if (!state.dataGlobal->WarmupFlag) {
-                            if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostHeatErrorIndex == 0) {
-                                ShowSevereMessage(state,
-                                                  std::string(cVRFTypes(VRF_HeatPump)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name + "\":");
+                            if (vrf.DefrostHeatErrorIndex == 0) {
+                                ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
                                 ShowContinueError(
                                     state,
                                     format(" Defrost Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
@@ -914,39 +903,36 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                                                            format("{} \"{}\": Defrost Energy Input Ratio Modifier curve (function of temperature) "
                                                                   "output is negative warning continues...",
                                                                   PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
-                                                                  state.dataHVACVarRefFlow->VRF(VRFCond).Name),
-                                                           state.dataHVACVarRefFlow->VRF(VRFCond).DefrostHeatErrorIndex,
+                                                                  vrf.Name),
+                                                           vrf.DefrostHeatErrorIndex,
                                                            DefrostEIRTempModFac,
                                                            DefrostEIRTempModFac);
                             DefrostEIRTempModFac = 0.0;
                         }
                     }
 
-                    state.dataHVACVarRefFlow->VRF(VRFCond).DefrostPower =
-                        DefrostEIRTempModFac * (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667) * FractionalDefrostTime;
+                    vrf.DefrostPower = DefrostEIRTempModFac * (vrf.HeatingCapacity / 1.01667) * FractionalDefrostTime;
 
                 } else { // Defrost strategy is resistive
-                    state.dataHVACVarRefFlow->VRF(VRFCond).DefrostPower =
-                        state.dataHVACVarRefFlow->VRF(VRFCond).DefrostCapacity * FractionalDefrostTime;
+                    vrf.DefrostPower = vrf.DefrostCapacity * FractionalDefrostTime;
                 }
             }
         }
 
-        TotalCondHeatingCapacity = state.dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity * state.dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) *
-                                   TotHeatCapTempModFac * HeatingCapacityMultiplier;
-        TotalTUHeatingCapacity = TotalCondHeatingCapacity * state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating;
+        TotalCondHeatingCapacity =
+            vrf.HeatingCapacity * state.dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) * TotHeatCapTempModFac * HeatingCapacityMultiplier;
+        TotalTUHeatingCapacity = TotalCondHeatingCapacity * vrf.PipingCorrectionHeating;
         if (TotalCondHeatingCapacity > 0.0) {
-            HeatingPLR = (TUHeatingLoad / state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacity;
+            HeatingPLR = (TUHeatingLoad / vrf.PipingCorrectionHeating) / TotalCondHeatingCapacity;
             HeatingPLR += (LoadDueToDefrost * HeatingPLR) / TotalCondHeatingCapacity;
         } else {
             HeatingPLR = 0.0;
         }
     }
 
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR = max(CoolingPLR, HeatingPLR);
+    vrf.VRFCondPLR = max(CoolingPLR, HeatingPLR);
     Real64 tmpVRFCondPLR = 0.0;
-    if (CoolingPLR > 0.0 || HeatingPLR > 0.0)
-        tmpVRFCondPLR = max(state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR, state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+    if (CoolingPLR > 0.0 || HeatingPLR > 0.0) tmpVRFCondPLR = max(vrf.MinPLR, vrf.VRFCondPLR);
 
     HRHeatRequestFlag = any(state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).HRHeatRequest);
     HRCoolRequestFlag = any(state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).HRCoolRequest);
@@ -956,108 +942,92 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
         if (HRHeatRequestFlag && HRCoolRequestFlag) {
             // determine operating mode change
-            if (!state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive && !state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive) {
-                state.dataHVACVarRefFlow->VRF(VRFCond).ModeChange = true;
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = 0.0;
+            if (!vrf.HRCoolingActive && !vrf.HRHeatingActive) {
+                vrf.ModeChange = true;
+                vrf.HRTimer = 0.0;
             }
             if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond)) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive && !state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive) {
-                    state.dataHVACVarRefFlow->VRF(VRFCond).HRModeChange = true;
+                if (vrf.HRHeatingActive && !vrf.HRCoolingActive) {
+                    vrf.HRModeChange = true;
                 }
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = true;
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
-                HRCAPFT = state.dataHVACVarRefFlow->VRF(VRFCond)
-                              .HRCAPFTCool; // Index to cool capacity as a function of temperature\PLR curve for heat recovery
+                vrf.HRCoolingActive = true;
+                vrf.HRHeatingActive = false;
+                HRCAPFT = vrf.HRCAPFTCool; // Index to cool capacity as a function of temperature\PLR curve for heat recovery
                 if (HRCAPFT > 0) {
                     //         VRF(VRFCond)%HRCAPFTCoolConst = 0.9d0 ! initialized to 0.9
-                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTCool).NumDims ==
-                        2) { // Curve type for HRCAPFTCool
-                        state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTCoolConst = CurveValue(state, HRCAPFT, InletAirWetBulbC, CondInletTemp);
+                    if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTCool).NumDims == 2) { // Curve type for HRCAPFTCool
+                        vrf.HRCAPFTCoolConst = CurveValue(state, HRCAPFT, InletAirWetBulbC, CondInletTemp);
                     } else {
-                        state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTCoolConst = CurveValue(state, HRCAPFT, tmpVRFCondPLR);
+                        vrf.HRCAPFTCoolConst = CurveValue(state, HRCAPFT, tmpVRFCondPLR);
                     }
                 }
-                HRCAPFTConst = state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTCoolConst;
-                HRInitialCapFrac = state.dataHVACVarRefFlow->VRF(VRFCond)
-                                       .HRInitialCoolCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
-                HRCapTC = state.dataHVACVarRefFlow->VRF(VRFCond)
-                              .HRCoolCapTC; // Time constant used to recover from initial degradation in cooling heat recovery
+                HRCAPFTConst = vrf.HRCAPFTCoolConst;
+                HRInitialCapFrac = vrf.HRInitialCoolCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
+                HRCapTC = vrf.HRCoolCapTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
 
-                HREIRFT =
-                    state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
+                HREIRFT = vrf.HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
                 if (HREIRFT > 0) {
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTCool).NumDims ==
-                        2) { // Curve type for HREIRFTCool
-                        state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTCoolConst = CurveValue(state, HREIRFT, InletAirWetBulbC, CondInletTemp);
+                    if (state.dataCurveManager->PerfCurve(vrf.HREIRFTCool).NumDims == 2) { // Curve type for HREIRFTCool
+                        vrf.HREIRFTCoolConst = CurveValue(state, HREIRFT, InletAirWetBulbC, CondInletTemp);
                     } else {
-                        state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTCoolConst = CurveValue(state, HREIRFT, tmpVRFCondPLR);
+                        vrf.HREIRFTCoolConst = CurveValue(state, HREIRFT, tmpVRFCondPLR);
                     }
                 }
-                HREIRFTConst = state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTCoolConst;
-                HRInitialEIRFrac = state.dataHVACVarRefFlow->VRF(VRFCond)
-                                       .HRInitialCoolEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
-                HREIRTC = state.dataHVACVarRefFlow->VRF(VRFCond)
-                              .HRCoolEIRTC; // Time constant used to recover from initial degradation in cooling heat recovery
+                HREIRFTConst = vrf.HREIRFTCoolConst;
+                HRInitialEIRFrac = vrf.HRInitialCoolEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
+                HREIRTC = vrf.HRCoolEIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
             } else if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond)) {
-                if (!state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive && state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive) {
-                    state.dataHVACVarRefFlow->VRF(VRFCond).HRModeChange = true;
+                if (!vrf.HRHeatingActive && vrf.HRCoolingActive) {
+                    vrf.HRModeChange = true;
                 }
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = true;
-                HRCAPFT = state.dataHVACVarRefFlow->VRF(VRFCond)
-                              .HRCAPFTHeat; // Index to heat capacity as a function of temperature\PLR curve for heat recovery
+                vrf.HRCoolingActive = false;
+                vrf.HRHeatingActive = true;
+                HRCAPFT = vrf.HRCAPFTHeat; // Index to heat capacity as a function of temperature\PLR curve for heat recovery
                 if (HRCAPFT > 0) {
                     //         VRF(VRFCond)%HRCAPFTHeatConst = 1.1d0 ! initialized to 1.1
-                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeat).NumDims ==
-                        2) { // Curve type for HRCAPFTCool
-                        {
-                            auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                            if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, CondInletTemp);
-                            } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst =
-                                    CurveValue(state, HRCAPFT, InletAirDryBulbC, OutdoorWetBulb);
-                            } else {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = 1.0;
-                            }
+                    if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTHeat).NumDims == 2) { // Curve type for HRCAPFTCool
+                        switch (vrf.HeatingPerformanceOATType) {
+                        case DataHVACGlobals::DryBulbIndicator: {
+                            vrf.HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, CondInletTemp);
+                        } break;
+                        case DataHVACGlobals::WetBulbIndicator: {
+                            vrf.HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, OutdoorWetBulb);
+                        } break;
+                        default: {
+                            vrf.HRCAPFTHeatConst = 1.0;
+                        } break;
                         }
                     } else {
-                        state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst = CurveValue(state, HRCAPFT, tmpVRFCondPLR);
+                        vrf.HRCAPFTHeatConst = CurveValue(state, HRCAPFT, tmpVRFCondPLR);
                     }
                 }
-                HRCAPFTConst = state.dataHVACVarRefFlow->VRF(VRFCond).HRCAPFTHeatConst;
-                HRInitialCapFrac = state.dataHVACVarRefFlow->VRF(VRFCond)
-                                       .HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from cooling mode
-                HRCapTC = state.dataHVACVarRefFlow->VRF(VRFCond)
-                              .HRHeatCapTC; // Time constant used to recover from initial degradation in heating heat recovery
+                HRCAPFTConst = vrf.HRCAPFTHeatConst;
+                HRInitialCapFrac = vrf.HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from cooling mode
+                HRCapTC = vrf.HRHeatCapTC;                   // Time constant used to recover from initial degradation in heating heat recovery
 
-                HREIRFT =
-                    state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
+                HREIRFT = vrf.HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
                 if (HREIRFT > 0) {
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                    if (state.dataCurveManager->PerfCurve(state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeat).NumDims ==
-                        2) { // Curve type for HREIRFTHeat
-                        {
-                            auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).HeatingPerformanceOATType);
-                            if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, CondInletTemp);
-                            } else if (SELECT_CASE_var == DataHVACGlobals::WetBulbIndicator) {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst =
-                                    CurveValue(state, HREIRFT, InletAirDryBulbC, OutdoorWetBulb);
-                            } else {
-                                state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = 1.0;
-                            }
+                    if (state.dataCurveManager->PerfCurve(vrf.HREIRFTHeat).NumDims == 2) { // Curve type for HREIRFTHeat
+                        switch (vrf.HeatingPerformanceOATType) {
+                        case DataHVACGlobals::DryBulbIndicator: {
+                            vrf.HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, CondInletTemp);
+                        } break;
+                        case DataHVACGlobals::WetBulbIndicator: {
+                            vrf.HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, OutdoorWetBulb);
+                        } break;
+                        default: {
+                            vrf.HREIRFTHeatConst = 1.0;
+                        } break;
                         }
                     } else {
-                        state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst = CurveValue(state, HREIRFT, tmpVRFCondPLR);
+                        vrf.HREIRFTHeatConst = CurveValue(state, HREIRFT, tmpVRFCondPLR);
                     }
                 }
-                HREIRFTConst = state.dataHVACVarRefFlow->VRF(VRFCond).HREIRFTHeatConst;
-                HRInitialEIRFrac = state.dataHVACVarRefFlow->VRF(VRFCond)
-                                       .HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
-                HREIRTC = state.dataHVACVarRefFlow->VRF(VRFCond)
-                              .HRHeatEIRTC; // Time constant used to recover from initial degradation in heating heat recovery
+                HREIRFTConst = vrf.HREIRFTHeatConst;
+                HRInitialEIRFrac = vrf.HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
+                HREIRTC = vrf.HRHeatEIRTC;                   // Time constant used to recover from initial degradation in heating heat recovery
             } else {
                 //   zone thermostats satisfied, condenser is off. Set values anyway
                 HRCAPFTConst = 1.0;
@@ -1066,11 +1036,11 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 HREIRFTConst = 1.0;
                 HRInitialEIRFrac = 1.0;
                 HREIRTC = 1.0;
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive || state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive) {
-                    state.dataHVACVarRefFlow->VRF(VRFCond).HRModeChange = true;
+                if (vrf.HRHeatingActive || vrf.HRCoolingActive) {
+                    vrf.HRModeChange = true;
                 }
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
+                vrf.HRCoolingActive = false;
+                vrf.HRHeatingActive = false;
             }
 
         } else { // IF(HRHeatRequestFlag .AND. HRCoolRequestFlag)THEN -- Heat recovery turned off
@@ -1080,177 +1050,156 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
             HREIRFTConst = 1.0;
             HRInitialEIRFrac = 1.0;
             HREIRTC = 0.0;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRModeChange = false;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = 0.0;
+            vrf.HRModeChange = false;
+            vrf.HRCoolingActive = false;
+            vrf.HRHeatingActive = false;
+            vrf.HRTimer = 0.0;
         }
 
         // Calculate the capacity modification factor (SUMultiplier) for the HR mode transition period
         CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone +
                          state.dataHVACGlobal->SysTimeElapsed;
 
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).ModeChange || state.dataHVACVarRefFlow->VRF(VRFCond).HRModeChange) {
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive && state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer == 0.0) {
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = state.dataHVACVarRefFlow->CurrentEndTimeLast;
-            } else if (state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive && state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer == 0.0) {
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = state.dataHVACVarRefFlow->CurrentEndTimeLast;
-            } else if (!state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive && !state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive) {
-                state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = 0.0;
+        if (vrf.ModeChange || vrf.HRModeChange) {
+            if (vrf.HRCoolingActive && vrf.HRTimer == 0.0) {
+                vrf.HRTimer = state.dataHVACVarRefFlow->CurrentEndTimeLast;
+            } else if (vrf.HRHeatingActive && vrf.HRTimer == 0.0) {
+                vrf.HRTimer = state.dataHVACVarRefFlow->CurrentEndTimeLast;
+            } else if (!vrf.HRCoolingActive && !vrf.HRHeatingActive) {
+                vrf.HRTimer = 0.0;
             }
         }
 
-        state.dataHVACVarRefFlow->VRF(VRFCond).HRTime = max(0.0, CurrentEndTime - state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer);
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).HRTime < (HRCapTC * 5.0)) {
+        vrf.HRTime = max(0.0, CurrentEndTime - vrf.HRTimer);
+        if (vrf.HRTime < (HRCapTC * 5.0)) {
             if (HRCapTC > 0.0) {
-                SUMultiplier = min(1.0, 1.0 - std::exp(-state.dataHVACVarRefFlow->VRF(VRFCond).HRTime / HRCapTC));
+                SUMultiplier = min(1.0, 1.0 - std::exp(-vrf.HRTime / HRCapTC));
             } else {
                 SUMultiplier = 1.0;
             }
         } else {
             SUMultiplier = 1.0;
-            state.dataHVACVarRefFlow->VRF(VRFCond).ModeChange = false;
-            state.dataHVACVarRefFlow->VRF(VRFCond).HRModeChange = false;
+            vrf.ModeChange = false;
+            vrf.HRModeChange = false;
         }
-        state.dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier = SUMultiplier;
+        vrf.SUMultiplier = SUMultiplier;
 
         state.dataHVACVarRefFlow->CurrentEndTimeLast = CurrentEndTime;
 
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive) {
+        if (vrf.HeatRecoveryUsed && vrf.HRCoolingActive) {
             TotalCondCoolingCapacity *= HRCAPFTConst;
             TotalCondCoolingCapacity =
                 HRInitialCapFrac * TotalCondCoolingCapacity + (1.0 - HRInitialCapFrac) * TotalCondCoolingCapacity * SUMultiplier;
-            TotalTUCoolingCapacity = TotalCondCoolingCapacity * state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling;
+            TotalTUCoolingCapacity = TotalCondCoolingCapacity * vrf.PipingCorrectionCooling;
             if (TotalCondCoolingCapacity > 0.0) {
-                CoolingPLR = min(1.0, (TUCoolingLoad / state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling) / TotalCondCoolingCapacity);
+                CoolingPLR = min(1.0, (TUCoolingLoad / vrf.PipingCorrectionCooling) / TotalCondCoolingCapacity);
             } else {
                 CoolingPLR = 0.0;
             }
             HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * SUMultiplier;
-            state.dataHVACVarRefFlow->VRF(VRFCond).VRFHeatRec = TUHeatingLoad;
-        } else if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive) {
+            vrf.VRFHeatRec = TUHeatingLoad;
+        } else if (vrf.HeatRecoveryUsed && vrf.HRHeatingActive) {
             TotalCondHeatingCapacity *= HRCAPFTConst;
             TotalCondHeatingCapacity =
                 HRInitialCapFrac * TotalCondHeatingCapacity + (1.0 - HRInitialCapFrac) * TotalCondHeatingCapacity * SUMultiplier;
-            TotalTUHeatingCapacity = TotalCondHeatingCapacity * state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating;
+            TotalTUHeatingCapacity = TotalCondHeatingCapacity * vrf.PipingCorrectionHeating;
             if (TotalCondHeatingCapacity > 0.0) {
-                HeatingPLR = min(1.0, (TUHeatingLoad / state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating) / TotalCondHeatingCapacity);
+                HeatingPLR = min(1.0, (TUHeatingLoad / vrf.PipingCorrectionHeating) / TotalCondHeatingCapacity);
             } else {
                 HeatingPLR = 0.0;
             }
             HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * SUMultiplier;
-            state.dataHVACVarRefFlow->VRF(VRFCond).VRFHeatRec = TUCoolingLoad;
+            vrf.VRFHeatRec = TUCoolingLoad;
         }
-        state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR = max(CoolingPLR, HeatingPLR);
+        vrf.VRFCondPLR = max(CoolingPLR, HeatingPLR);
     }
 
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR > 0.0) {
-        CyclingRatio = min(1.0, state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR / state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR);
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR < state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR &&
-            state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR > 0.0) {
-            state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR = state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR;
-            if (CoolingPLR > 0.0) CoolingPLR = state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR; // also adjust local PLR variables
-            if (HeatingPLR > 0.0) HeatingPLR = state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR; // also adjust local PLR variables
+    if (vrf.MinPLR > 0.0) {
+        CyclingRatio = min(1.0, vrf.VRFCondPLR / vrf.MinPLR);
+        if (vrf.VRFCondPLR < vrf.MinPLR && vrf.VRFCondPLR > 0.0) {
+            vrf.VRFCondPLR = vrf.MinPLR;
+            if (CoolingPLR > 0.0) CoolingPLR = vrf.MinPLR; // also adjust local PLR variables
+            if (HeatingPLR > 0.0) HeatingPLR = vrf.MinPLR; // also adjust local PLR variables
         }
     }
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
-    state.dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR * CyclingRatio;
-    state.dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * CyclingRatio;
+    vrf.VRFCondCyclingRatio = CyclingRatio; // report variable for cycling rate
+    vrf.TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR * CyclingRatio;
+    vrf.TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * CyclingRatio;
 
-    state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = 0; // report variable for heating or cooling mode
+    vrf.OperatingMode = 0; // report variable for heating or cooling mode
     EIRFPLRModFac = 1.0;
     VRFRTF = 0.0;
     // cooling and heating is optional (only one may exist), if so then performance curve for missing coil are not required
     if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) && CoolingPLR > 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = ModeCoolingOnly;
+        vrf.OperatingMode = ModeCoolingOnly;
         if (CoolingPLR > 1.0) {
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR2 > 0)
-                EIRFPLRModFac = CurveValue(
-                    state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR2, max(state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR, CoolingPLR));
+            if (vrf.CoolEIRFPLR2 > 0) EIRFPLRModFac = CurveValue(state, vrf.CoolEIRFPLR2, max(vrf.MinPLR, CoolingPLR));
         } else {
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR1 > 0)
-                EIRFPLRModFac = CurveValue(
-                    state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR1, max(state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR, CoolingPLR));
+            if (vrf.CoolEIRFPLR1 > 0) EIRFPLRModFac = CurveValue(state, vrf.CoolEIRFPLR1, max(vrf.MinPLR, CoolingPLR));
         }
         // find part load fraction to calculate RTF
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolPLFFPLR > 0) {
-            PartLoadFraction = max(0.7, CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).CoolPLFFPLR, CyclingRatio));
+        if (vrf.CoolPLFFPLR > 0) {
+            PartLoadFraction = max(0.7, CurveValue(state, vrf.CoolPLFFPLR, CyclingRatio));
         } else {
             PartLoadFraction = 1.0;
         }
         VRFRTF = min(1.0, (CyclingRatio / PartLoadFraction));
 
-        state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower = (state.dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFac) *
-                                                                  TotCoolEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF;
+        vrf.ElecCoolingPower = (vrf.RatedCoolingPower * TotCoolCapTempModFac) * TotCoolEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF;
     }
     if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && HeatingPLR > 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = ModeHeatingOnly;
+        vrf.OperatingMode = ModeHeatingOnly;
         if (HeatingPLR > 1.0) {
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR2 > 0)
-                EIRFPLRModFac = CurveValue(
-                    state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR2, max(state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR, HeatingPLR));
+            if (vrf.HeatEIRFPLR2 > 0) EIRFPLRModFac = CurveValue(state, vrf.HeatEIRFPLR2, max(vrf.MinPLR, HeatingPLR));
         } else {
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1 > 0)
-                EIRFPLRModFac = CurveValue(
-                    state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1, max(state.dataHVACVarRefFlow->VRF(VRFCond).MinPLR, HeatingPLR));
+            if (vrf.HeatEIRFPLR1 > 0) EIRFPLRModFac = CurveValue(state, vrf.HeatEIRFPLR1, max(vrf.MinPLR, HeatingPLR));
         }
         // find part load fraction to calculate RTF
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatPLFFPLR > 0) {
-            PartLoadFraction = max(0.7, CurveValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).HeatPLFFPLR, CyclingRatio));
+        if (vrf.HeatPLFFPLR > 0) {
+            PartLoadFraction = max(0.7, CurveValue(state, vrf.HeatPLFFPLR, CyclingRatio));
         } else {
             PartLoadFraction = 1.0;
         }
         VRFRTF = min(1.0, (CyclingRatio / PartLoadFraction));
 
-        state.dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower = (state.dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFac) *
-                                                                  TotHeatEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF *
-                                                                  InputPowerMultiplier;
+        vrf.ElecHeatingPower =
+            (vrf.RatedHeatingPower * TotHeatCapTempModFac) * TotHeatEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF * InputPowerMultiplier;
 
         // adjust defrost power based on heating RTF
-        state.dataHVACVarRefFlow->VRF(VRFCond).DefrostPower *= VRFRTF;
+        vrf.DefrostPower *= VRFRTF;
     }
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF = VRFRTF;
+    vrf.VRFCondRTF = VRFRTF;
 
     // calculate crankcase heater power
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).MaxOATCCHeater > OutdoorDryBulb) {
+    if (vrf.MaxOATCCHeater > OutdoorDryBulb) {
         // calculate crankcase heater power
-        state.dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower = state.dataHVACVarRefFlow->VRF(VRFCond).CCHeaterPower * (1.0 - VRFRTF);
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).NumCompressors > 1) {
-            UpperStageCompressorRatio =
-                (1.0 - state.dataHVACVarRefFlow->VRF(VRFCond).CompressorSizeRatio) / (state.dataHVACVarRefFlow->VRF(VRFCond).NumCompressors - 1);
-            for (Stage = 1; Stage <= state.dataHVACVarRefFlow->VRF(VRFCond).NumCompressors - 2; ++Stage) {
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR <
-                    (state.dataHVACVarRefFlow->VRF(VRFCond).CompressorSizeRatio + Stage * UpperStageCompressorRatio)) {
-                    state.dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower += state.dataHVACVarRefFlow->VRF(VRFCond).CCHeaterPower;
+        vrf.CrankCaseHeaterPower = vrf.CCHeaterPower * (1.0 - VRFRTF);
+        if (vrf.NumCompressors > 1) {
+            UpperStageCompressorRatio = (1.0 - vrf.CompressorSizeRatio) / (vrf.NumCompressors - 1);
+            for (Stage = 1; Stage <= vrf.NumCompressors - 2; ++Stage) {
+                if (vrf.VRFCondPLR < (vrf.CompressorSizeRatio + Stage * UpperStageCompressorRatio)) {
+                    vrf.CrankCaseHeaterPower += vrf.CCHeaterPower;
                 }
             }
         }
     } else {
-        state.dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower = 0.0;
+        vrf.CrankCaseHeaterPower = 0.0;
     }
 
-    CondCapacity = max(state.dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, state.dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity);
-    CondPower = max(state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, state.dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower);
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower > 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser =
-            CondCapacity + CondPower -
-            state.dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad / state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating;
-    } else if (state.dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower > 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser =
-            -CondCapacity + CondPower +
-            state.dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad / state.dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling;
+    CondCapacity = max(vrf.TotalCoolingCapacity, vrf.TotalHeatingCapacity);
+    CondPower = max(vrf.ElecCoolingPower, vrf.ElecHeatingPower);
+    if (vrf.ElecCoolingPower > 0.0) {
+        vrf.QCondenser = CondCapacity + CondPower - vrf.TUHeatingLoad / vrf.PipingCorrectionHeating;
+    } else if (vrf.ElecHeatingPower > 0.0) {
+        vrf.QCondenser = -CondCapacity + CondPower + vrf.TUCoolingLoad / vrf.PipingCorrectionCooling;
     } else {
-        state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser = 0.0;
+        vrf.QCondenser = 0.0;
     }
 
-    if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
+    if (vrf.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         // Calculate basin heater power
-        CalcBasinHeaterPower(state,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterPowerFTempDiff,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterSchedulePtr,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterSetPointTemp,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterPower);
-        state.dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterPower *= (1.0 - VRFRTF);
+        CalcBasinHeaterPower(state, vrf.BasinHeaterPowerFTempDiff, vrf.BasinHeaterSchedulePtr, vrf.BasinHeaterSetPointTemp, vrf.BasinHeaterPower);
+        vrf.BasinHeaterPower *= (1.0 - VRFRTF);
 
         // calculate evaporative condenser pump power and water consumption
         if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) && CoolingPLR > 0.0) {
@@ -1260,73 +1209,61 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
             //                    /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(OutdoorDryBulb);
-            state.dataHVACVarRefFlow->VRF(VRFCond).EvapWaterConsumpRate =
-                (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoWater * state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR;
-            state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpElecPower = state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpPower * VRFRTF;
+            vrf.EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoWater * vrf.VRFCondPLR;
+            vrf.EvapCondPumpElecPower = vrf.EvapCondPumpPower * VRFRTF;
         }
-    } else if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
+    } else if (vrf.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
 
         if (CondCapacity > 0.0) {
             state.dataHVACVarRefFlow->CondenserWaterMassFlowRate = CondWaterMassFlow;
         } else {
             state.dataHVACVarRefFlow->CondenserWaterMassFlowRate = 0.0;
         }
-        SetComponentFlowRate(state,
-                             state.dataHVACVarRefFlow->CondenserWaterMassFlowRate,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc);
+        SetComponentFlowRate(
+            state, state.dataHVACVarRefFlow->CondenserWaterMassFlowRate, vrf.CondenserNodeNum, vrf.CondenserOutletNodeNum, vrf.SourcePlantLoc);
 
         // should be the same as above just entering this function
         //            VRF( VRFCond ).CondenserInletTemp = state.dataLoopNodes->Node(VRF(VRFCond).CondenserNodeNum).Temp;
-        state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow =
-            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).MassFlowRate;
+        vrf.WaterCondenserMassFlow = state.dataLoopNodes->Node(vrf.CondenserNodeNum).MassFlowRate;
 
         CpCond = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
-                                       state.dataHVACVarRefFlow->VRF(VRFCond).CondenserInletTemp,
-                                       state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(vrf.SourcePlantLoc.loopNum).FluidName,
+                                       vrf.CondenserInletTemp,
+                                       state.dataPlnt->PlantLoop(vrf.SourcePlantLoc.loopNum).FluidIndex,
                                        RoutineName);
         if (CondWaterMassFlow > 0.0) {
-            CondOutletTemp = state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser / (CondWaterMassFlow * CpCond) + CondInletTemp;
+            CondOutletTemp = vrf.QCondenser / (CondWaterMassFlow * CpCond) + CondInletTemp;
         } else {
             CondOutletTemp = CondInletTemp;
         }
-        state.dataHVACVarRefFlow->VRF(VRFCond).CondenserSideOutletTemp = CondOutletTemp;
+        vrf.CondenserSideOutletTemp = CondOutletTemp;
     }
 
     // calculate operating COP
     if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) && CoolingPLR > 0.0) {
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower != 0.0) {
+        if (vrf.ElecCoolingPower != 0.0) {
             // this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond)%TUCoolingLoad
-            state.dataHVACVarRefFlow->VRF(VRFCond).OperatingCoolingCOP =
-                (state.dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity) /
-                (state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower + state.dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower +
-                 state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpElecPower + state.dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
+            vrf.OperatingCoolingCOP =
+                (vrf.TotalCoolingCapacity) / (vrf.ElecCoolingPower + vrf.CrankCaseHeaterPower + vrf.EvapCondPumpElecPower + vrf.DefrostPower);
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFCond).OperatingCoolingCOP = 0.0;
+            vrf.OperatingCoolingCOP = 0.0;
         }
     }
     if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && HeatingPLR > 0.0) {
-        if (state.dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower != 0.0) {
+        if (vrf.ElecHeatingPower != 0.0) {
             // this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond)%TUHeatingLoad
-            state.dataHVACVarRefFlow->VRF(VRFCond).OperatingHeatingCOP =
-                (state.dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity) /
-                (state.dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower + state.dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower +
-                 state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpElecPower + state.dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
+            vrf.OperatingHeatingCOP =
+                (vrf.TotalHeatingCapacity) / (vrf.ElecHeatingPower + vrf.CrankCaseHeaterPower + vrf.EvapCondPumpElecPower + vrf.DefrostPower);
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFCond).OperatingHeatingCOP = 0.0;
+            vrf.OperatingHeatingCOP = 0.0;
         }
     }
 
-    TotPower = TUParasiticPower + TUFanPower + state.dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower +
-               state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower + state.dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower +
-               state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpElecPower + state.dataHVACVarRefFlow->VRF(VRFCond).DefrostPower;
+    TotPower = TUParasiticPower + TUFanPower + vrf.ElecHeatingPower + vrf.ElecCoolingPower + vrf.CrankCaseHeaterPower + vrf.EvapCondPumpElecPower +
+               vrf.DefrostPower;
     if (TotPower > 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingCOP =
-            (state.dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad + state.dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad) / TotPower;
-        state.dataHVACVarRefFlow->VRF(VRFCond).SCHE =
-            state.dataHVACVarRefFlow->VRF(VRFCond).OperatingCOP * 3.412141633; // see StandardRatings::ConvFromSIToIP
+        vrf.OperatingCOP = (vrf.TUCoolingLoad + vrf.TUHeatingLoad) / TotPower;
+        vrf.SCHE = vrf.OperatingCOP * 3.412141633; // see StandardRatings::ConvFromSIToIP
     }
 
     // limit the TU capacity when the condenser is maxed out on capacity
@@ -15581,69 +15518,60 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
         SuppHeatCoilLoad = 0.0;
     }
 
-    {
-        auto const SELECT_CASE_var(this->SuppHeatCoilType_Num);
-
-        if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-            HeatingCoils::SimulateHeatingCoilComponents(state,
-                                                        this->SuppHeatCoilName,
-                                                        FirstHVACIteration,
-                                                        SuppHeatCoilLoad,
-                                                        this->SuppHeatCoilIndex,
-                                                        QActual,
-                                                        true,
-                                                        this->OpMode,
-                                                        PartLoadRatio);
-            SuppHeatCoilLoad = QActual;
-        } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
-            if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
-                //     see if HW coil has enough capacity to meet the load
-                Real64 mdot = this->SuppHeatCoilFluidMaxFlow;
-                state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-                //     simulate hot water coil to find the full flow operating capacity
-                WaterCoils::SimulateWaterCoilComponents(
-                    state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
-                if (QActual > SuppHeatCoilLoad) {
-                    Par[1] = double(VRFTUNum);
-                    if (FirstHVACIteration) {
-                        Par[2] = 1.0;
-                    } else {
-                        Par[2] = 0.0;
-                    }
-                    Par[3] = SuppHeatCoilLoad;
-
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
-                    this->SuppHeatPartLoadRatio = PartLoadFrac;
-                } else {
-                    this->SuppHeatPartLoadRatio = 1.0;
-                    SuppHeatCoilLoad = QActual;
-                }
-            } else {
-                this->SuppHeatPartLoadRatio = 0.0;
-                Real64 mdot = 0.0;
-                SuppHeatCoilLoad = 0.0;
-                PlantUtilities::SetComponentFlowRate(
-                    state, mdot, this->SuppHeatCoilFluidInletNode, this->SuppHeatCoilFluidOutletNode, this->SuppHeatCoilPlantLoc);
-            }
-            //     simulate water heating coil
-            WaterCoils::SimulateWaterCoilComponents(state,
-                                                    this->SuppHeatCoilName,
-                                                    FirstHVACIteration,
-                                                    this->SuppHeatCoilIndex,
-                                                    SuppHeatCoilLoad,
-                                                    this->OpMode,
-                                                    this->SuppHeatPartLoadRatio);
-
-        } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
-            //     simulate steam heating coil
-            Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
+    switch (this->SuppHeatCoilType_Num) {
+    case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
+    case DataHVACGlobals::Coil_HeatingElectric: {
+        HeatingCoils::SimulateHeatingCoilComponents(
+            state, this->SuppHeatCoilName, FirstHVACIteration, SuppHeatCoilLoad, this->SuppHeatCoilIndex, QActual, true, this->OpMode, PartLoadRatio);
+        SuppHeatCoilLoad = QActual;
+    } break;
+    case DataHVACGlobals::Coil_HeatingWater: {
+        if (SuppHeatCoilLoad > DataHVACGlobals::SmallLoad) {
+            //     see if HW coil has enough capacity to meet the load
+            Real64 mdot = this->SuppHeatCoilFluidMaxFlow;
             state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(
-                state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
-            SuppHeatCoilLoad = QActual;
+            //     simulate hot water coil to find the full flow operating capacity
+            WaterCoils::SimulateWaterCoilComponents(
+                state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
+            if (QActual > SuppHeatCoilLoad) {
+                Par[1] = double(VRFTUNum);
+                if (FirstHVACIteration) {
+                    Par[2] = 1.0;
+                } else {
+                    Par[2] = 0.0;
+                }
+                Par[3] = SuppHeatCoilLoad;
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
+                this->SuppHeatPartLoadRatio = PartLoadFrac;
+            } else {
+                this->SuppHeatPartLoadRatio = 1.0;
+                SuppHeatCoilLoad = QActual;
+            }
+        } else {
+            this->SuppHeatPartLoadRatio = 0.0;
+            Real64 mdot = 0.0;
+            SuppHeatCoilLoad = 0.0;
+            PlantUtilities::SetComponentFlowRate(
+                state, mdot, this->SuppHeatCoilFluidInletNode, this->SuppHeatCoilFluidOutletNode, this->SuppHeatCoilPlantLoc);
         }
-        SuppCoilLoad = SuppHeatCoilLoad;
+        //     simulate water heating coil
+        WaterCoils::SimulateWaterCoilComponents(
+            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, this->OpMode, this->SuppHeatPartLoadRatio);
+    } break;
+    case DataHVACGlobals::Coil_HeatingSteam: {
+        //     simulate steam heating coil
+        Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
+        state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+        SteamCoils::SimulateSteamCoilComponents(
+            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
+        SuppHeatCoilLoad = QActual;
+    } break;
+    default:
+        break;
     }
+
+    SuppCoilLoad = SuppHeatCoilLoad;
 }
 
 Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(EnergyPlusData &state,

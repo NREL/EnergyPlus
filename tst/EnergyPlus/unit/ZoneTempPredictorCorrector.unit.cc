@@ -924,9 +924,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
               state->dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(
                   state->dataEnvrn->DayOfYear)); // Tstat should show CEN 15251 Upper III LINE model set point
     ASSERT_EQ(25.55,
-              state->dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(1)); // Tstat should show ASH 55 CENTRAL LINE model set point
+              state->dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay[0]); // Tstat should show ASH 55 CENTRAL LINE model set point
     ASSERT_EQ(27.05,
-              state->dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(4)); // Tstat should show CEN 15251 CENTRAL LINE model set point
+              state->dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay[3]); // Tstat should show CEN 15251 CENTRAL LINE model set point
 
     state->dataZoneCtrls->TempControlledZone.allocate(ZoneNum);
     state->dataZoneCtrls->TempControlledZone(CoolZoneASHNum).AdaptiveComfortTempControl = true;

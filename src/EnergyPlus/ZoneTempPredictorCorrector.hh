@@ -111,42 +111,29 @@ namespace ZoneTempPredictorCorrector {
 
     struct ZoneTempControl
     {
-        // Members
         std::string Name;          // Name of the zone
         std::string TempSchedName; // Name of the schedule which determines the zone temp setpoint
-        int TempSchedIndex;
+        int TempSchedIndex = 0;
         std::string HeatTempSetptSchedName;
-        int HeatTempSchedIndex;
+        int HeatTempSchedIndex = 0;
         std::string CoolTempSetptSchedName;
         int CoolTempSchedIndex;
-
-        // Default Constructor
-        ZoneTempControl() : TempSchedIndex(0), HeatTempSchedIndex(0), CoolTempSchedIndex(0)
-        {
-        }
     };
 
     struct ZoneComfortFangerControl
     {
-        // Members
         std::string Name;                  // Name of the zone
         std::string PMVSchedName;          // Name of the schedule which determines the zone temp setpoint
-        int PMVSchedIndex;                 // Index to PMV dual set point schedule
+        int PMVSchedIndex = 0;             // Index to PMV dual set point schedule
         std::string HeatPMVSetptSchedName; // Name of PMV heating set point schedule
-        int HeatPMVSchedIndex;             // Index to PMV heating set point schedule
+        int HeatPMVSchedIndex = 0;         // Index to PMV heating set point schedule
         std::string CoolPMVSetptSchedName; // Name of PMV cooling set point schedule
         int CoolPMVSchedIndex;             // INdex to PMV cooling set point schedule
-
-        // Default Constructor
-        ZoneComfortFangerControl() : PMVSchedIndex(0), HeatPMVSchedIndex(0), CoolPMVSchedIndex(0)
-        {
-        }
     };
 
     struct AdaptiveComfortDailySetPointSchedule
     {
-        // Members
-        bool initialized;
+        bool initialized = false;
         Array1D<Real64> ThermalComfortAdaptiveASH55_Upper_90;
         Array1D<Real64> ThermalComfortAdaptiveASH55_Upper_80;
         Array1D<Real64> ThermalComfortAdaptiveASH55_Central;
@@ -154,21 +141,16 @@ namespace ZoneTempPredictorCorrector {
         Array1D<Real64> ThermalComfortAdaptiveCEN15251_Upper_II;
         Array1D<Real64> ThermalComfortAdaptiveCEN15251_Upper_III;
         Array1D<Real64> ThermalComfortAdaptiveCEN15251_Central;
-
-        // Default Constructor
-        AdaptiveComfortDailySetPointSchedule() : initialized(false)
-        {
-        }
     };
 
     // Functions
 
     void ManageZoneAirUpdates(EnergyPlusData &state,
-                              DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                              Real64 &ZoneTempChange,                                     // Temp change in zone air btw previous and current timestep
-                              bool const ShortenTimeStepSys,
-                              bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-                              Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                              DataHeatBalFanSys::PredictorCorrectorCtrl UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                              Real64 &ZoneTempChange,                               // Temp change in zone air btw previous and current timestep
+                              bool ShortenTimeStepSys,
+                              bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                              Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
     void GetZoneAirSetPoints(EnergyPlusData &state);
@@ -176,9 +158,9 @@ namespace ZoneTempPredictorCorrector {
     void InitZoneAirSetPoints(EnergyPlusData &state);
 
     void PredictSystemLoads(EnergyPlusData &state,
-                            bool const ShortenTimeStepSys,
-                            bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-                            Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                            bool ShortenTimeStepSys,
+                            bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                            Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
     void CalcZoneAirTempSetPoints(EnergyPlusData &state);
@@ -188,7 +170,7 @@ namespace ZoneTempPredictorCorrector {
     void
     CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
-    void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
+    void CalcPredictedSystemLoad(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
 
     void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
                                            Real64 &TotalHeatLoad,
@@ -196,13 +178,13 @@ namespace ZoneTempPredictorCorrector {
                                            Real64 &SensLoadSingleZone,
                                            Real64 &SensLoadHeatSingleZone,
                                            Real64 &SensLoadCoolSingleZone,
-                                           Real64 const OutputHeatSP,
-                                           Real64 const OutputCoolSP,
-                                           Real64 const LoadCorrFactor,
-                                           Real64 const ZoneMultiplier,
-                                           Real64 const ZoneMultiplierList);
+                                           Real64 OutputHeatSP,
+                                           Real64 OutputCoolSP,
+                                           Real64 LoadCorrFactor,
+                                           Real64 ZoneMultiplier,
+                                           Real64 ZoneMultiplierList);
 
-    void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
+    void CalcPredictedHumidityRatio(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
 
     void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
@@ -210,14 +192,14 @@ namespace ZoneTempPredictorCorrector {
                                         Real64 &MoistLoadSingleZone,
                                         Real64 &MoistLoadHumidSingleZone,
                                         Real64 &MoistLoadDehumidSingleZone,
-                                        Real64 const ZoneMultiplier,
-                                        Real64 const ZoneMultiplierList);
+                                        Real64 ZoneMultiplier,
+                                        Real64 ZoneMultiplierList);
 
     void CorrectZoneAirTemp(EnergyPlusData &state,
                             Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
-                            bool const ShortenTimeStepSys,
-                            bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-                            Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                            bool ShortenTimeStepSys,
+                            bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
+                            Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
     void PushZoneTimestepHistories(EnergyPlusData &state);
@@ -226,10 +208,10 @@ namespace ZoneTempPredictorCorrector {
 
     void RevertZoneTimestepHistories(EnergyPlusData &state);
 
-    void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum);
+    void CorrectZoneHumRat(EnergyPlusData &state, int ZoneNum);
 
-    void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
-                                       Real64 const NewTimeStep,
+    void DownInterpolate4HistoryValues(Real64 OldTimeStep,
+                                       Real64 NewTimeStep,
                                        Real64 &oldVal0,
                                        Real64 &oldVal1,
                                        Real64 &oldVal2,
@@ -243,7 +225,7 @@ namespace ZoneTempPredictorCorrector {
     );
 
     void InverseModelTemperature(EnergyPlusData &state,
-                                 int const ZoneNum,              // Zone number
+                                 int ZoneNum,                    // Zone number
                                  Real64 &SumIntGain,             // Zone sum of convective internal gains
                                  Real64 &SumIntGainExceptPeople, // Zone sum of convective internal gains except for people
                                  Real64 &SumHA,                  // Zone sum of Hc*Area
@@ -257,7 +239,7 @@ namespace ZoneTempPredictorCorrector {
     );
 
     void InverseModelHumidity(EnergyPlusData &state,
-                              int const ZoneNum,              // Zone number
+                              int ZoneNum,                    // Zone number
                               Real64 &LatentGain,             // Zone sum of latent gain
                               Real64 &LatentGainExceptPeople, // Zone sum of latent gain except for people
                               Real64 &ZoneMassFlowRate,       // Zone air mass flow rate
@@ -267,32 +249,32 @@ namespace ZoneTempPredictorCorrector {
     );
 
     void CalcZoneSums(EnergyPlusData &state,
-                      int const ZoneNum,              // Zone number
-                      Real64 &SumIntGain,             // Zone sum of convective internal gains
-                      Real64 &SumHA,                  // Zone sum of Hc*Area
-                      Real64 &SumHATsurf,             // Zone sum of Hc*Area*Tsurf
-                      Real64 &SumHATref,              // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-                      Real64 &SumMCp,                 // Zone sum of MassFlowRate*Cp
-                      Real64 &SumMCpT,                // Zone sum of MassFlowRate*Cp*T
-                      Real64 &SumSysMCp,              // Zone sum of air system MassFlowRate*Cp
-                      Real64 &SumSysMCpT,             // Zone sum of air system MassFlowRate*Cp*T
-                      bool const CorrectorFlag = true // Corrector call flag
+                      int ZoneNum,              // Zone number
+                      Real64 &SumIntGain,       // Zone sum of convective internal gains
+                      Real64 &SumHA,            // Zone sum of Hc*Area
+                      Real64 &SumHATsurf,       // Zone sum of Hc*Area*Tsurf
+                      Real64 &SumHATref,        // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
+                      Real64 &SumMCp,           // Zone sum of MassFlowRate*Cp
+                      Real64 &SumMCpT,          // Zone sum of MassFlowRate*Cp*T
+                      Real64 &SumSysMCp,        // Zone sum of air system MassFlowRate*Cp
+                      Real64 &SumSysMCpT,       // Zone sum of air system MassFlowRate*Cp*T
+                      bool CorrectorFlag = true // Corrector call flag
     );
 
     void CalcZoneComponentLoadSums(EnergyPlusData &state,
-                                   int const ZoneNum,        // Zone number
-                                   Real64 const TempDepCoef, // Dependent coefficient
-                                   Real64 const TempIndCoef, // Independent coefficient
-                                   Real64 &SumIntGains,      // Zone sum of convective internal gains
-                                   Real64 &SumHADTsurfs,     // Zone sum of Hc*Area*(Tsurf - Tz)
-                                   Real64 &SumMCpDTzones,    // zone sum of MassFlowRate*cp*(TremotZone - Tz) transfer air from other zone, Mixing
-                                   Real64 &SumMCpDtInfil,    // Zone sum of MassFlowRate*Cp*(Tout - Tz) transfer from outside, ventil, earth tube
-                                   Real64 &SumMCpDTsystem,   // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
-                                   Real64 &SumNonAirSystem,  // Zone sum of non air system convective heat gains
-                                   Real64 &CzdTdt,           // Zone air energy storage term.
-                                   Real64 &imBalance,        // put all terms in eq. 5 on RHS , should be zero
-                                   Real64 &SumEnthalpyM,     // Zone sum of phase change material melting enthlpy
-                                   Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
+                                   int ZoneNum,             // Zone number
+                                   Real64 TempDepCoef,      // Dependent coefficient
+                                   Real64 TempIndCoef,      // Independent coefficient
+                                   Real64 &SumIntGains,     // Zone sum of convective internal gains
+                                   Real64 &SumHADTsurfs,    // Zone sum of Hc*Area*(Tsurf - Tz)
+                                   Real64 &SumMCpDTzones,   // zone sum of MassFlowRate*cp*(TremotZone - Tz) transfer air from other zone, Mixing
+                                   Real64 &SumMCpDtInfil,   // Zone sum of MassFlowRate*Cp*(Tout - Tz) transfer from outside, ventil, earth tube
+                                   Real64 &SumMCpDTsystem,  // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
+                                   Real64 &SumNonAirSystem, // Zone sum of non air system convective heat gains
+                                   Real64 &CzdTdt,          // Zone air energy storage term.
+                                   Real64 &imBalance,       // put all terms in eq. 5 on RHS , should be zero
+                                   Real64 &SumEnthalpyM,    // Zone sum of phase change material melting enthlpy
+                                   Real64 &SumEnthalpyH     // Zone sum of phase change material freezing enthalpy
     );
 
     bool VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
@@ -301,27 +283,27 @@ namespace ZoneTempPredictorCorrector {
 
     void DetectOscillatingZoneTemp(EnergyPlusData &state);
 
-    void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
+    void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int TempControlledZoneID, int ActualZoneNum, Real64 &ZoneAirSetPoint);
 
-    void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state, int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
+    void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state, int TempControlledZoneID, Real64 &ZoneAirSetPoint);
 
     void CalcZoneAirComfortSetPoints(EnergyPlusData &state);
 
     void GetComfortSetPoints(EnergyPlusData &state,
-                             int const PeopleNum,
-                             int const ComfortControlNum,
-                             Real64 const PMVSet,
+                             int PeopleNum,
+                             int ComfortControlNum,
+                             Real64 PMVSet,
                              Real64 &Tset // drybulb setpoint temperature for a given PMV value
     );
 
     Real64 PMVResidual(EnergyPlusData &state,
-                       Real64 const Tset,
+                       Real64 Tset,
                        Array1D<Real64> const &Par // par(1) = PMV set point
     );
 
     void AdjustCoolingSetPointforTempAndHumidityControl(EnergyPlusData &state,
-                                                        int const TempControlledZoneID,
-                                                        int const ActualZoneNum // controlled zone actual zone number
+                                                        int TempControlledZoneID,
+                                                        int ActualZoneNum // controlled zone actual zone number
     );
 
     void OverrideAirSetPointsforEMSCntrl(EnergyPlusData &state);
@@ -335,27 +317,21 @@ namespace ZoneTempPredictorCorrector {
 
 struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
 {
-    Array1D_string const ValidControlTypes;
-
-    Array1D_string const ValidComfortControlTypes;
-
-    Array1D_string const cZControlTypes;
-
-    int NumSingleTempHeatingControls;
-    int NumSingleTempCoolingControls;
-    int NumSingleTempHeatCoolControls;
-    int NumDualTempHeatCoolControls;
+    int NumSingleTempHeatingControls = 0;
+    int NumSingleTempCoolingControls = 0;
+    int NumSingleTempHeatCoolControls = 0;
+    int NumDualTempHeatCoolControls = 0;
 
     // Number of Thermal comfort control types
-    int NumSingleFangerHeatingControls;
-    int NumSingleFangerCoolingControls;
-    int NumSingleFangerHeatCoolControls;
-    int NumDualFangerHeatCoolControls;
+    int NumSingleFangerHeatingControls = 0;
+    int NumSingleFangerCoolingControls = 0;
+    int NumSingleFangerHeatCoolControls = 0;
+    int NumDualFangerHeatCoolControls = 0;
 
     // Number of zone with staged controlled objects
-    int NumStageCtrZone;
+    int NumStageCtrZone = 0;
     // Number of zone with onoff thermostat
-    int NumOnOffCtrZone;
+    int NumOnOffCtrZone = 0;
 
     Array1D<Real64> ZoneSetPointLast;
     Array1D<Real64> TempIndZnLd;
@@ -367,16 +343,16 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
     Array1D<Real64> ZoneTempOscillate;
     Array1D<Real64> ZoneTempOscillateDuringOccupancy;
     Array1D<Real64> ZoneTempOscillateInDeadband;
-    Real64 AnyZoneTempOscillate;
-    Real64 AnyZoneTempOscillateDuringOccupancy;
-    Real64 AnyZoneTempOscillateInDeadband;
-    Real64 AnnualAnyZoneTempOscillate;
-    Real64 AnnualAnyZoneTempOscillateDuringOccupancy;
-    Real64 AnnualAnyZoneTempOscillateInDeadband;
-    bool OscillationVariablesNeeded;
+    Real64 AnyZoneTempOscillate = 0.0;
+    Real64 AnyZoneTempOscillateDuringOccupancy = 0.0;
+    Real64 AnyZoneTempOscillateInDeadband = 0.0;
+    Real64 AnnualAnyZoneTempOscillate = 0.0;
+    Real64 AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
+    Real64 AnnualAnyZoneTempOscillateInDeadband = 0.0;
+    bool OscillationVariablesNeeded = false;
 
-    bool InitZoneAirSetPointsOneTimeFlag;
-    bool SetupOscillationOutputFlag;
+    bool InitZoneAirSetPointsOneTimeFlag = true;
+    bool SetupOscillationOutputFlag = true;
 
     // Object Data
     std::unordered_set<std::string> HumidityControlZoneUniqueNames;
@@ -390,7 +366,7 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
     EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointDualHeatCoolFanger;
     ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
 
-    Array1D<Real64> AdapComfortSetPointSummerDesDay;
+    std::array<Real64, 7> AdapComfortSetPointSummerDesDay = {-1};
 
     bool CalcZoneAirComfortSetPointsFirstTimeFlag = true; // Flag set to make sure you get input once
     bool MyEnvrnFlag = true;
@@ -405,71 +381,7 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->HumidityControlZoneUniqueNames.clear();
-        this->NumSingleTempHeatingControls = 0;
-        this->NumSingleTempCoolingControls = 0;
-        this->NumSingleTempHeatCoolControls = 0;
-        this->NumDualTempHeatCoolControls = 0;
-        this->NumSingleFangerHeatingControls = 0;
-        this->NumSingleFangerCoolingControls = 0;
-        this->NumSingleFangerHeatCoolControls = 0;
-        this->NumDualFangerHeatCoolControls = 0;
-        this->NumStageCtrZone = 0;
-        this->InitZoneAirSetPointsOneTimeFlag = true;
-        this->SetupOscillationOutputFlag = true;
-        this->OscillationVariablesNeeded = false;
-        this->ZoneSetPointLast.deallocate();
-        this->TempIndZnLd.deallocate();
-        this->TempDepZnLd.deallocate();
-        this->ZoneAirRelHum.deallocate();
-        this->ZoneTempHist.deallocate();
-        this->ZoneTempOscillate.deallocate();
-        this->AnyZoneTempOscillate = 0.0;
-        this->AnyZoneTempOscillateDuringOccupancy = 0.0;
-        this->AnyZoneTempOscillateInDeadband = 0.0;
-        this->AnnualAnyZoneTempOscillate = 0.0;
-        this->AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
-        this->AnnualAnyZoneTempOscillateInDeadband = 0.0;
-        this->SetPointSingleHeating.deallocate();
-        this->SetPointSingleCooling.deallocate();
-        this->SetPointSingleHeatCool.deallocate();
-        this->SetPointDualHeatCool.deallocate();
-        this->SetPointSingleHeatingFanger.deallocate();
-        this->SetPointSingleCoolingFanger.deallocate();
-        this->SetPointSingleHeatCoolFanger.deallocate();
-        this->SetPointDualHeatCoolFanger.deallocate();
-        this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.deallocate();
-        this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.deallocate();
-        this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.deallocate();
-        this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.deallocate();
-        this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.deallocate();
-        this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.deallocate();
-        this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
-        this->NumOnOffCtrZone = 0;
-        this->AdapComfortSetPointSummerDesDay = Array1D<Real64>(7, -1);
-        this->CalcZoneAirComfortSetPointsFirstTimeFlag = true;
-        this->MyEnvrnFlag = true;
-        this->MyDayFlag = true;
-        this->ErrorsFound = false;
-        this->ControlledZonesChecked = false;
-        this->IterLimitExceededNum1 = 0;
-        this->IterLimitErrIndex1 = 0;
-        this->IterLimitExceededNum2 = 0;
-        this->IterLimitErrIndex2 = 0;
-    }
-
-    // Default Constructor
-    ZoneTempPredictorCorrectorData()
-        : NumSingleTempHeatingControls(0), NumSingleTempCoolingControls(0), NumSingleTempHeatCoolControls(0), NumDualTempHeatCoolControls(0),
-          NumSingleFangerHeatingControls(0), NumSingleFangerCoolingControls(0), NumSingleFangerHeatCoolControls(0), NumDualFangerHeatCoolControls(0),
-          NumStageCtrZone(0), NumOnOffCtrZone(0), AnyZoneTempOscillate(0.0), AnyZoneTempOscillateDuringOccupancy(0.0),
-          AnyZoneTempOscillateInDeadband(0.0), AnnualAnyZoneTempOscillate(0.0), AnnualAnyZoneTempOscillateDuringOccupancy(0.0),
-          AnnualAnyZoneTempOscillateInDeadband(0.0), OscillationVariablesNeeded(false), InitZoneAirSetPointsOneTimeFlag(true),
-          SetupOscillationOutputFlag(true), CalcZoneAirComfortSetPointsFirstTimeFlag(true), MyEnvrnFlag(true), MyDayFlag(true), ErrorsFound(false),
-          ControlledZonesChecked(false)
-    {
-        AdapComfortSetPointSummerDesDay.allocate(7);
-        AdapComfortSetPointSummerDesDay = -1;
+        *this = ZoneTempPredictorCorrectorData();
     }
 };
 
