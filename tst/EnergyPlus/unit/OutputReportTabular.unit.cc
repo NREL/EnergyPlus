@@ -74,9 +74,11 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -85,6 +87,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -10134,4 +10137,139 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
     }
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
+{
+    // when multiple people objects are defined for one zone, a warning is thrown, as people-dependent resilience metrics are not meaningful in these
+    // settings
+    std::string const idf_objects = delimited_string({
+
+        "Zone,",
+        "ZONE ONE,                !- Name",
+        "0,                       !- Direction of Relative North {deg}",
+        "0,                       !- X Origin {m}",
+        "0,                       !- Y Origin {m}",
+        "0,                       !- Z Origin {m}",
+        "1,                       !- Type",
+        "1,                       !- Multiplier",
+        "autocalculate,           !- Ceiling Height {m}",
+        "autocalculate;           !- Volume {m3}",
+
+        "People,",
+        "ZONE ONE People 1,       !- Name",
+        "ZONE ONE,                !- Zone or ZoneList Name",
+        "BLDG_OCC_SCH,            !- Number of People Schedule Name",
+        "People,                  !- Number of People Calculation Method",
+        "10,                      !- Number of People",
+        ",                        !- People per Zone Floor Area {person/m2}",
+        ",                        !- Zone Floor Area per Person {m2/person}",
+        "0.3000,                  !- Fraction Radiant",
+        "AUTOCALCULATE,           !- Sensible Heat Fraction",
+        "ACTIVITY_SCH,            !- Activity Level Schedule Name",
+        ",                        !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "10.5,                    !- Cold Stress Temperature Thresh [C]",
+        "32.5,                    !- Heat Stress Temperature Thresh [C]",
+        "No,                      !- Enable ASHRAE 55 Comfort Warnings",
+        "ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        ",                        !- Surface Name/Angle Factor List Name",
+        "WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
+        "ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        ",                        !- Clothing Insulation Calculation Method Schedule Name",
+        "CLOTHING_SCH,            !- Clothing Insulation Schedule Name",
+        "AIR_VELO_SCH,            !- Air Velocity Schedule Name",
+        "PIERCE;                  !- Thermal Comfort Model 1 Type",
+
+        "People,",
+        "ZONE ONE People 2,       !- Name",
+        "ZONE ONE,                !- Zone or ZoneList Name",
+        "BLDG_OCC_SCH,            !- Number of People Schedule Name",
+        "People,                  !- Number of People Calculation Method",
+        "10,                      !- Number of People",
+        ",                        !- People per Zone Floor Area {person/m2}",
+        ",                        !- Zone Floor Area per Person {m2/person}",
+        "0.3000,                  !- Fraction Radiant",
+        "AUTOCALCULATE,           !- Sensible Heat Fraction",
+        "ACTIVITY_SCH,            !- Activity Level Schedule Name",
+        ",                        !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "10.5,                    !- Cold Stress Temperature Thresh [C]",
+        "32.5,                    !- Heat Stress Temperature Thresh [C]",
+        "No,                      !- Enable ASHRAE 55 Comfort Warnings",
+        "ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        ",                        !- Surface Name/Angle Factor List Name",
+        "WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
+        "ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        ",                        !- Clothing Insulation Calculation Method Schedule Name",
+        "CLOTHING_SCH,            !- Clothing Insulation Schedule Name",
+        "AIR_VELO_SCH,            !- Air Velocity Schedule Name",
+        "PIERCE;                  !- Thermal Comfort Model 1 Type",
+
+        "ScheduleTypeLimits,",
+        "Any Number;              !- Name",
+        "ScheduleTypeLimits,",
+        "Fraction,                !- Name",
+        "0.0,                     !- Lower Limit Value",
+        "1.0,                     !- Upper Limit Value",
+        "CONTINUOUS;              !- Numeric Type",
+
+        "Schedule:Compact,",
+        "ACTIVITY_SCH,            !- Name",
+        "Any Number,              !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: AllDays,            !- Field 2",
+        "Until: 24:00,120.;       !- Field 3",
+
+        "Schedule:Compact,",
+        "WORK_EFF_SCH,            !- Name",
+        "Fraction,                !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: AllDays,            !- Field 2",
+        "Until: 24:00,0.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "BLDG_OCC_SCH,            !- Name",
+        "Fraction,                !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: AllDays,            !- Field 2",
+        "Until: 24:00,1.0;        !- Field 3",
+
+        "Schedule:Compact,",
+        "AIR_VELO_SCH,            !- Name",
+        "Any Number,              !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: AllDays,            !- Field 2",
+        "Until: 24:00,0.2;        !- Field 3",
+
+        "Schedule:Compact,",
+        "CLOTHING_SCH,            !- Name",
+        "Any Number,              !- Schedule Type Limits Name",
+        "Through: 04/30,          !- Field 1",
+        "For: AllDays,            !- Field 2",
+        "Until: 24:00,1.0,        !- Field 3",
+        "Through: 09/30,          !- Field 5",
+        "For: AllDays,            !- Field 6",
+        "Until: 24:00,0.5,        !- Field 7",
+        "Through: 12/31,          !- Field 9",
+        "For: AllDays,            !- Field 10",
+        "Until: 24:00,1.0;        !- Field 11",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+
+    state->dataOutRptTab->displayThermalResilienceSummary = true;
+    UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
+
+    std::string const error_string = delimited_string({"   ** Warning ** Thermal resilience tabular report assumes at most one people object per "
+                                                       "zone, but multiple people objects are defined for Zone 1"});
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
