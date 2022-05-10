@@ -2377,7 +2377,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     state->afn->exchangeData.allocate(state->dataGlobal->NumOfZones);
 
-    UpdateAirflowNetwork(*state);
+    state->afn->update(*state);
 
     EXPECT_NEAR(0.0, state->afn->AirflowNetworkNodeSimu(10).PZ, 0.0001);
     EXPECT_NEAR(0.0, state->afn->AirflowNetworkNodeSimu(20).PZ, 0.0001);
@@ -2422,7 +2422,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->afn->AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
     state->afn->AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
 
-    ReportAirflowNetwork(*state);
+    state->afn->report(*state);
 
     // Original results
     // EXPECT_NEAR(34.3673036, state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
@@ -4506,29 +4506,29 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_UserDefinedDuctViewFactors)
 
     // Outside convection coefficients
     // Calculate convection resistance given a convection coefficient
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1, 2, 5), 0.2, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1, 2, 20), 0.05, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1, 2, 0.1), 10, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1, 2, 5), 0.2, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1, 2, 20), 0.05, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1, 2, 0.1), 10, tol);
 
     //// Calculate convection resistance from correlation
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 0.1, 2, 0), 0.2297, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.0, 2, 0), 0.4093, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.5, 2, 0), 0.4531, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 0.1, 2, 0), 0.2297, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1.0, 2, 0), 0.4093, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1.5, 2, 0), 0.4531, tol);
 
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 0.1, 2, 0), 0.2368, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.0, 2, 0), 0.4218, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.5, 2, 0), 0.4670, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 10, 20, 0.001, 101000, 0.1, 2, 0), 0.2368, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 10, 20, 0.001, 101000, 1.0, 2, 0), 0.4218, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 10, 20, 0.001, 101000, 1.5, 2, 0), 0.4670, tol);
 
     // Calculate convection resistance given a convection coefficient
-    EXPECT_NEAR(CalcDuctInsideConvResist(20, 0.1, 1, 5), 0.2, tol);
-    EXPECT_NEAR(CalcDuctInsideConvResist(20, 0.1, 1, 20), 0.05, tol);
-    EXPECT_NEAR(CalcDuctInsideConvResist(20, 0.1, 1, 0.1), 10, tol);
+    EXPECT_NEAR(state->afn->duct_inside_convection_resistance(20, 0.1, 1, 5), 0.2, tol);
+    EXPECT_NEAR(state->afn->duct_inside_convection_resistance(20, 0.1, 1, 20), 0.05, tol);
+    EXPECT_NEAR(state->afn->duct_inside_convection_resistance(20, 0.1, 1, 0.1), 10, tol);
 
     // Calculate convection resistance from correlation
-    EXPECT_NEAR(CalcDuctInsideConvResist(20, 0.1, 1, 0), 1.611, tol);
-    EXPECT_NEAR(CalcDuctInsideConvResist(20, 1.0, 1, 0), 0.2554, tol);
-    EXPECT_NEAR(CalcDuctInsideConvResist(40, 0.1, 1, 0), 1.5879, tol);
-    EXPECT_NEAR(CalcDuctInsideConvResist(40, 1.0, 1, 0), 0.2516, tol);
+    EXPECT_NEAR(state->afn->duct_inside_convection_resistance(20, 0.1, 1, 0), 1.611, tol);
+    EXPECT_NEAR(state->afn->duct_inside_convection_resistance(20, 1.0, 1, 0), 0.2554, tol);
+    EXPECT_NEAR(state->afn->duct_inside_convection_resistance(40, 0.1, 1, 0), 1.5879, tol);
+    EXPECT_NEAR(state->afn->duct_inside_convection_resistance(40, 1.0, 1, 0), 0.2516, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_AirThermConductivity)
@@ -13397,14 +13397,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataZoneEquip->ZoneEquipConfig(5).IsControlled = false;
     state->afn->exchangeData.allocate(5);
     state->afn->AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
-    ReportAirflowNetwork(*state);
+    state->afn->report(*state);
 
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
     state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum =
         AirflowNetwork::iComponentTypeNum::DOP;
-    ReportAirflowNetwork(*state);
+    state->afn->report(*state);
 
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.969147, 0.001);
@@ -13412,8 +13412,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataHVACGlobal->TimeStepSys = 0.1;
     state->dataHeatBal->Zone(1).Volume = 30.0;
     // Ventilation
-    UpdateAirflowNetwork(*state);
-    ReportAirflowNetwork(*state);
+    state->afn->update(*state);
+    state->afn->report(*state);
     EXPECT_NEAR(state->afn->exchangeData(1).SumMVCp, 2.38012, 0.001);
     EXPECT_NEAR(state->afn->exchangeData(1).SumMVCpT, -41.1529, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilVolume, 0.7314456, 0.001);
@@ -13422,8 +13422,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     // Infiltration
     state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum =
         AirflowNetwork::iComponentTypeNum::SCR;
-    UpdateAirflowNetwork(*state);
-    ReportAirflowNetwork(*state);
+    state->afn->update(*state);
+    state->afn->report(*state);
     EXPECT_NEAR(state->afn->exchangeData(1).SumMCp, 2.38012, 0.001);
     EXPECT_NEAR(state->afn->exchangeData(1).SumMCpT, -41.1529, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).InfilVolume, 0.7314456, 0.001);
@@ -13443,7 +13443,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CVF";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "VAV";
 
-    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: An AirLoop branch, , has two or more fans: CVF,VAV",
@@ -15955,7 +15955,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
@@ -16048,7 +16048,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // MixedAir::NumOAMixers.allocate(1);
-    ValidateDistributionSystem(*state);
+    state->afn->validate_distribution(*state);
 
     EXPECT_TRUE(compare_err_stream("", true));
 }
@@ -20593,7 +20593,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
-    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
@@ -20770,7 +20770,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected warning
-    ValidateDistributionSystem(*state);
+    state->afn->validate_distribution(*state);
 
     EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an "
                                    "AirflowNetwork but is not included in the AirflowNetwork.\n",
@@ -20938,7 +20938,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
-    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
@@ -21077,7 +21077,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected errors
-    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
@@ -21213,7 +21213,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected warning
-    ValidateDistributionSystem(*state);
+    state->afn->validate_distribution(*state);
     EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: Heat pump water heater is simulated along with an AirflowNetwork "
                                    "but is not included in the AirflowNetwork.\n",
                                    true));
@@ -21342,7 +21342,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected errors
-    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
         "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",

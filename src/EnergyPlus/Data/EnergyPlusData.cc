@@ -57,7 +57,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataAirLoop = std::make_unique<DataAirLoopData>();
     this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
     this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-    this->afn = std::make_unique<AirflowNetwork::AirflowNetworkSolverData>(*this);
+    this->afn = std::make_unique<AirflowNetwork::Solver>(*this);
     this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
     this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
     this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();

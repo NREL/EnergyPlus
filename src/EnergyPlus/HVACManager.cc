@@ -2380,7 +2380,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     // This subroutine updates the report variables for the AirHeatBalance.
 
     // Using/Aliasing
-    using AirflowNetwork::ReportAirflowNetwork;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::CycleOnZoneFansOnly;
     using DataHVACGlobals::FanType_ZoneExhaust;
@@ -2426,7 +2425,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     // Ensure no airflownetwork and simple calculations
     if (state.afn->SimulateAirflowNetwork == 0) return;
 
-    if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork(state);
+    if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) state.afn->report(state);
 
     // Reports zone exhaust loss by exhaust fans
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
