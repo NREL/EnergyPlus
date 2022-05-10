@@ -637,22 +637,24 @@ void PrepVariablesISO15099(int const nlayer,
     tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
 
     // external radiation term
-    {
-        auto const SELECT_CASE_var(isky);
-        if (SELECT_CASE_var == 3) {
-            Gout = outir;
-            trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann);
-        } else if (SELECT_CASE_var == 2) { // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
-            Rsky = 5.31e-13 * pow_6(tout);
-            esky = Rsky / (DataGlobalConstants::StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
-        } else if (SELECT_CASE_var == 1) {
-            esky = pow_4(tsky) / pow_4(tout);
-        } else if (SELECT_CASE_var == 0) { // for isky=0 it is assumed that actual values for esky and Tsky are specified
-            esky *= pow_4(tsky) / pow_4(tout);
-        } else {
-            nperr = 1; // error 2010: isky can be: 0(esky,Tsky input), 1(Tsky input), or 2(Swinbank model)
-            return;
-        }
+    switch(isky) {
+    case 3:
+        Gout = outir;
+        trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann);
+        break;
+    case 2: // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
+        Rsky = 5.31e-13 * pow_6(tout);
+        esky = Rsky / (DataGlobalConstants::StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
+        break;
+    case 1:
+        esky = pow_4(tsky) / pow_4(tout);
+        break;
+    case 0: // for isky=0 it is assumed that actual values for esky and Tsky are specified
+        esky *= pow_4(tsky) / pow_4(tout);
+        break;
+    default:
+        nperr = 1; // error 2010: isky can be: 0(esky,Tsky input), 1(Tsky input), or 2(Swinbank model)
+        return;
     }
 
     // Simon: In this case we do not need to recalculate Gout and Trmout again

@@ -337,43 +337,41 @@ namespace SteamCoils {
                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
-            {
-                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(7)));
-                // TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
-                if (SELECT_CASE_var == "TEMPERATURESETPOINTCONTROL") {
-                    state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = TemperatureSetPointControl;
-                    state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum =
-                        GetOnlySingleNode(state,
-                                          AlphArray(8),
-                                          ErrorsFound,
-                                          DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
-                                          AlphArray(1),
-                                          DataLoopNode::NodeFluidType::Air,
-                                          DataLoopNode::ConnectionType::Sensor,
-                                          NodeInputManager::CompFluidStream::Primary,
-                                          ObjectIsNotParent);
-                    if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
-                        ShowContinueError(state, "..required for Temperature Setpoint Controlled Coils.");
-                        ErrorsFound = true;
-                    }
-
-                } else if (SELECT_CASE_var == "ZONELOADCONTROL") {
-                    state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = ZoneLoadControl;
-
-                    if (!lAlphaBlanks(8)) {
-                        ShowWarningError(state, std::string{RoutineName} + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
-                        ShowContinueError(state, "for " + CurrentModuleObject + " = " + AlphArray(1));
-                        state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = 0;
-                    }
-
-                } else {
+            auto const controlMode(UtilityRoutines::MakeUPPERCase(AlphArray(7)));
+            // TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
+            if (controlMode == "TEMPERATURESETPOINTCONTROL") {
+                state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = TemperatureSetPointControl;
+                state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum =
+                    GetOnlySingleNode(state,
+                                      AlphArray(8),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
+                                      AlphArray(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Sensor,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
+                if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " +
-                                        CurrentModuleObject + " = " + AlphArray(1));
+                                    std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowContinueError(state, "..required for Temperature Setpoint Controlled Coils.");
                     ErrorsFound = true;
                 }
+
+            } else if (controlMode == "ZONELOADCONTROL") {
+                state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = ZoneLoadControl;
+
+                if (!lAlphaBlanks(8)) {
+                    ShowWarningError(state, std::string{RoutineName} + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
+                    ShowContinueError(state, "for " + CurrentModuleObject + " = " + AlphArray(1));
+                    state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = 0;
+                }
+
+            } else {
+                ShowSevereError(state,
+                                std::string{RoutineName} + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " +
+                                    CurrentModuleObject + " = " + AlphArray(1));
+                ErrorsFound = true;
             }
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Steam Nodes");
@@ -756,7 +754,7 @@ namespace SteamCoils {
 
                         state.dataSize->DataDesicRegCoil = true;
                         state.dataSize->DataDesicDehumNum = state.dataSteamCoils->SteamCoil(CoilNum).DesiccantDehumNum;
-                        CompType = state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType;
+                        CompType = state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType;  // this is casting an int to a string
                         CompName = state.dataSteamCoils->SteamCoil(CoilNum).Name;
                         bPRINT = false;
                         HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
@@ -778,21 +776,23 @@ namespace SteamCoils {
                     }
 
                     // Set the duct flow rate
-                    {
-                        auto const SELECT_CASE_var(state.dataSize->CurDuctType);
-                        if (SELECT_CASE_var == Main) {
-                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                         state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        } else if (SELECT_CASE_var == Cooling) {
-                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                         state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
-                        } else if (SELECT_CASE_var == Heating) {
-                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
-                        } else if (SELECT_CASE_var == Other) {
-                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        } else {
-                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        }
+                    switch(state.dataSize->CurDuctType) {
+                    case Main:
+                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
+                                     state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        break;
+                    case Cooling:
+                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
+                                     state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                        break;
+                    case Heating:
+                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                        break;
+                    case Other:
+                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        break;
+                    default:
+                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                     }
                     if (state.dataSize->DataDesicRegCoil) {
                         bPRINT = false;
@@ -1140,55 +1140,183 @@ namespace SteamCoils {
         //  across the coil, so do the simulation. If not set outlet to inlet and no load.
         //  Also the coil has to be scheduled to be available
         //  Control output to meet load QCoilReq. Load Controlled Coil.
-        {
-            auto const SELECT_CASE_var(state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil);
+        switch(state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil) {
 
-            if (SELECT_CASE_var == ZoneLoadControl) {
-                if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
-                    (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 ||
-                     state.dataSteamCoils->MySizeFlag(CoilNum)) &&
-                    (QCoilReq > 0.0)) {
+        case ZoneLoadControl:
+            if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
+                (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 ||
+                 state.dataSteamCoils->MySizeFlag(CoilNum)) &&
+                (QCoilReq > 0.0)) {
 
-                    // Steam heat exchangers would not have effectivness, since all of the steam is
-                    // converted to water and only then the steam trap allows it to leave the heat
-                    // exchanger, subsequently heat exchange is latent heat + subcooling.
-                    EnthSteamInDry = GetSatEnthalpyRefrig(
-                        state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-                    EnthSteamOutWet = GetSatEnthalpyRefrig(
-                        state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                // Steam heat exchangers would not have effectivness, since all of the steam is
+                // converted to water and only then the steam trap allows it to leave the heat
+                // exchanger, subsequently heat exchange is latent heat + subcooling.
+                EnthSteamInDry = GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamOutWet = GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
-                    LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
+                LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
-                    //          CpWater = GetSpecificHeatGlycol('WATER',  &
-                    //                                           TempSteamIn, &
-                    //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
-                    //                                           'CalcSteamAirCoil')
+                //          CpWater = GetSpecificHeatGlycol('WATER',  &
+                //                                           TempSteamIn, &
+                //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
+                //                                           'CalcSteamAirCoil')
 
-                    CpWater = GetSatSpecificHeatRefrig(
-                        state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+                CpWater = GetSatSpecificHeatRefrig(
+                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
-                    // Max Heat Transfer
-                    QSteamCoilMaxHT = state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                    state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity = QSteamCoilMaxHT;
+                // Max Heat Transfer
+                QSteamCoilMaxHT = state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+                state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity = QSteamCoilMaxHT;
 
-                    // Determine the Max coil capacity and check for the same.
-                    if (QCoilReq > QSteamCoilMaxHT) {
-                        QCoilCap = QSteamCoilMaxHT;
-                    } else {
-                        QCoilCap = QCoilReq;
-                    }
+                // Determine the Max coil capacity and check for the same.
+                if (QCoilReq > QSteamCoilMaxHT) {
+                    QCoilCap = QSteamCoilMaxHT;
+                } else {
+                    QCoilCap = QCoilReq;
+                }
+
+                // Steam Mass Flow Rate Required
+                SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+
+                SetComponentFlowRate(state,
+                                     SteamMassFlowRate,
+                                     state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                     state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                     state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
+
+                // recalculate if mass flow rate changed in previous call.
+                QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+
+                // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
+                // This is required for outlet water temperature, otherwise it will be saturation temperature.
+                // Steam Trap drains off all the Water formed.
+                // Here Degree of Subcooling is used to calculate hot water return temperature.
+
+                // Calculating Water outlet temperature
+                TempWaterOut = TempSteamIn - SubcoolDeltaTemp;
+
+                // Total Heat Transfer to air
+                HeatingCoilLoad = QCoilCap;
+
+                // Temperature of air at outlet
+                TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
+
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
+                state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
+
+                //************************* Loop Losses *****************************
+                // Loop pressure return considerations included in steam coil since the pipes are
+                // perfect and do not account for losses.
+                // Return water is condensate at atmoshperic pressure
+                // Process is considered constant enthalpy expansion
+                // No quality function in EnergyPlus hence no option left apart from
+                // considering saturated state.
+                //              StdBaroPress=101325
+
+                TempWaterAtmPress = GetSatTemperatureRefrig(
+                    state, fluidNameSteam, state.dataEnvrn->StdBaroPress, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+
+                // Point 4 at atm - loop delta subcool during return journery back to pump
+                TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
+
+                // Actual Steam Coil Outlet Enthalpy
+                EnthCoilOutlet = GetSatEnthalpyRefrig(
+                                     state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                                 CpWater * SubcoolDeltaTemp;
+
+                // Enthalpy at Point 4
+                EnthAtAtmPress = GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+
+                // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
+                CpWater = GetSatSpecificHeatRefrig(
+                    state, fluidNameSteam, TempLoopOutToPump, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+
+                EnthPumpInlet = EnthAtAtmPress - CpWater * state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
+
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = EnthPumpInlet;
+
+                // Point 3-Point 5,
+                EnergyLossToEnvironment = SteamMassFlowRate * (EnthCoilOutlet - EnthPumpInlet);
+
+                // Loss to enviornment due to pressure drop
+                state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = EnergyLossToEnvironment;
+                //************************* Loop Losses *****************************
+            } else { // Coil is not running.
+
+                TempAirOut = TempAirIn;
+                TempWaterOut = TempSteamIn;
+                HeatingCoilLoad = 0.0;
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
+                state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
+                TempLoopOutToPump = TempWaterOut;
+            }
+            break;
+        case TemperatureSetPointControl:
+            // Control coil output to meet a Setpoint Temperature.
+            if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
+                (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 ||
+                 state.dataSteamCoils->MySizeFlag(CoilNum)) &&
+                (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
+
+                // Steam heat exchangers would not have effectivness, since all of the steam is
+                // converted to water and only then the steam trap allows it to leave the heat
+                // exchanger, subsequently heat exchange is latent heat + subcooling.
+                EnthSteamInDry = GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamOutWet = GetSatEnthalpyRefrig(
+                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
+
+                //          CpWater = GetSpecificHeatGlycol('WATER',  &
+                //                                           TempSteamIn, &
+                //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
+                //                                           'CalcSteamAirCoil')
+                CpWater = GetSatSpecificHeatRefrig(
+                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+
+                // Max Heat Transfer
+                QSteamCoilMaxHT = state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+
+                // Coil Load in case of temperature setpoint
+                QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
+
+                // Check to see if setpoint above enetering temperature. If not, set
+                // output to zero.
+                if (QCoilCap <= 0.0) {
+                    QCoilCap = 0.0;
+                    TempAirOut = TempAirIn;
 
                     // Steam Mass Flow Rate Required
-                    SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-
+                    SteamMassFlowRate = 0.0;
                     SetComponentFlowRate(state,
                                          SteamMassFlowRate,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
+                    // Inlet equal to outlet when not required to run.
+                    TempWaterOut = TempSteamIn;
 
-                    // recalculate if mass flow rate changed in previous call.
-                    QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+                    // Total Heat Transfer to air
+                    HeatingCoilLoad = QCoilCap;
+
+                    // The HeatingCoilLoad is the change in the enthalpy of the water
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
+
+                    // Outlet flow rate set to inlet
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
+                    state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
+
+                } else if (QCoilCap > QSteamCoilMaxHT) {
+                    // Setting to Maximum Coil Capacity
+                    QCoilCap = QSteamCoilMaxHT;
+
+                    // Temperature of air at outlet
+                    TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
 
                     // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
                     // This is required for outlet water temperature, otherwise it will be saturation temperature.
@@ -1198,11 +1326,53 @@ namespace SteamCoils {
                     // Calculating Water outlet temperature
                     TempWaterOut = TempSteamIn - SubcoolDeltaTemp;
 
+                    // Steam Mass Flow Rate Required
+                    SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+                    SetComponentFlowRate(state,
+                                         SteamMassFlowRate,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
+
+                    // recalculate in case previous call changed mass flow rate
+                    QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+                    TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
+
                     // Total Heat Transfer to air
                     HeatingCoilLoad = QCoilCap;
 
-                    // Temperature of air at outlet
+                    // The HeatingCoilLoad is the change in the enthalpy of the water
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy =
+                        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy - HeatingCoilLoad / SteamMassFlowRate;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
+                    state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
+
+                } else {
+                    // Temp air out is temperature Setpoint
+                    TempAirOut = TempSetPoint;
+
+                    // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
+                    // This is required for outlet water temperature, otherwise it will be saturation temperature.
+                    // Steam Trap drains off all the Water formed.
+                    // Here Degree of Subcooling is used to calculate hot water return temperature.
+
+                    // Calculating Water outlet temperature
+                    TempWaterOut = TempSteamIn - SubcoolDeltaTemp;
+
+                    // Steam Mass Flow Rate Required
+                    SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+                    SetComponentFlowRate(state,
+                                         SteamMassFlowRate,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
+
+                    // recalculate in case previous call changed mass flow rate
+                    QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
                     TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
+
+                    // Total Heat Transfer to air
+                    HeatingCoilLoad = QCoilCap;
 
                     state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
                     state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
@@ -1210,6 +1380,7 @@ namespace SteamCoils {
                     //************************* Loop Losses *****************************
                     // Loop pressure return considerations included in steam coil since the pipes are
                     // perfect and do not account for losses.
+
                     // Return water is condensate at atmoshperic pressure
                     // Process is considered constant enthalpy expansion
                     // No quality function in EnergyPlus hence no option left apart from
@@ -1223,18 +1394,23 @@ namespace SteamCoils {
                     TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                     // Actual Steam Coil Outlet Enthalpy
-                    EnthCoilOutlet = GetSatEnthalpyRefrig(
-                                         state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
-                                     CpWater * SubcoolDeltaTemp;
+                    EnthCoilOutlet =
+                        GetSatEnthalpyRefrig(
+                            state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                        CpWater * SubcoolDeltaTemp;
 
                     // Enthalpy at Point 4
                     EnthAtAtmPress = GetSatEnthalpyRefrig(
                         state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
-                    // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
-                    CpWater = GetSatSpecificHeatRefrig(
-                        state, fluidNameSteam, TempLoopOutToPump, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+                    CpWater = GetSatSpecificHeatRefrig(state,
+                                                       fluidNameSteam,
+                                                       TempLoopOutToPump,
+                                                       0.0,
+                                                       state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex,
+                                                       RoutineNameSizeSteamCoil);
 
+                    // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
                     EnthPumpInlet = EnthAtAtmPress - CpWater * state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                     state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = EnthPumpInlet;
@@ -1245,201 +1421,23 @@ namespace SteamCoils {
                     // Loss to enviornment due to pressure drop
                     state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = EnergyLossToEnvironment;
                     //************************* Loop Losses *****************************
-                } else { // Coil is not running.
-
-                    TempAirOut = TempAirIn;
-                    TempWaterOut = TempSteamIn;
-                    HeatingCoilLoad = 0.0;
-                    state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
-                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
-                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
-                    state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
-                    TempLoopOutToPump = TempWaterOut;
                 }
 
-            } else if (SELECT_CASE_var == TemperatureSetPointControl) {
-                // Control coil output to meet a Setpoint Temperature.
-                if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
-                    (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 ||
-                     state.dataSteamCoils->MySizeFlag(CoilNum)) &&
-                    (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
-
-                    // Steam heat exchangers would not have effectivness, since all of the steam is
-                    // converted to water and only then the steam trap allows it to leave the heat
-                    // exchanger, subsequently heat exchange is latent heat + subcooling.
-                    EnthSteamInDry = GetSatEnthalpyRefrig(
-                        state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-                    EnthSteamOutWet = GetSatEnthalpyRefrig(
-                        state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-                    LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-
-                    //          CpWater = GetSpecificHeatGlycol('WATER',  &
-                    //                                           TempSteamIn, &
-                    //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
-                    //                                           'CalcSteamAirCoil')
-                    CpWater = GetSatSpecificHeatRefrig(
-                        state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
-
-                    // Max Heat Transfer
-                    QSteamCoilMaxHT = state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-
-                    // Coil Load in case of temperature setpoint
-                    QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
-
-                    // Check to see if setpoint above enetering temperature. If not, set
-                    // output to zero.
-                    if (QCoilCap <= 0.0) {
-                        QCoilCap = 0.0;
-                        TempAirOut = TempAirIn;
-
-                        // Steam Mass Flow Rate Required
-                        SteamMassFlowRate = 0.0;
-                        SetComponentFlowRate(state,
-                                             SteamMassFlowRate,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
-                        // Inlet equal to outlet when not required to run.
-                        TempWaterOut = TempSteamIn;
-
-                        // Total Heat Transfer to air
-                        HeatingCoilLoad = QCoilCap;
-
-                        // The HeatingCoilLoad is the change in the enthalpy of the water
-                        state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
-
-                        // Outlet flow rate set to inlet
-                        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
-                        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
-
-                    } else if (QCoilCap > QSteamCoilMaxHT) {
-                        // Setting to Maximum Coil Capacity
-                        QCoilCap = QSteamCoilMaxHT;
-
-                        // Temperature of air at outlet
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
-
-                        // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
-                        // This is required for outlet water temperature, otherwise it will be saturation temperature.
-                        // Steam Trap drains off all the Water formed.
-                        // Here Degree of Subcooling is used to calculate hot water return temperature.
-
-                        // Calculating Water outlet temperature
-                        TempWaterOut = TempSteamIn - SubcoolDeltaTemp;
-
-                        // Steam Mass Flow Rate Required
-                        SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        SetComponentFlowRate(state,
-                                             SteamMassFlowRate,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
-
-                        // recalculate in case previous call changed mass flow rate
-                        QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
-
-                        // Total Heat Transfer to air
-                        HeatingCoilLoad = QCoilCap;
-
-                        // The HeatingCoilLoad is the change in the enthalpy of the water
-                        state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy =
-                            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy - HeatingCoilLoad / SteamMassFlowRate;
-                        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
-                        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
-
-                    } else {
-                        // Temp air out is temperature Setpoint
-                        TempAirOut = TempSetPoint;
-
-                        // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
-                        // This is required for outlet water temperature, otherwise it will be saturation temperature.
-                        // Steam Trap drains off all the Water formed.
-                        // Here Degree of Subcooling is used to calculate hot water return temperature.
-
-                        // Calculating Water outlet temperature
-                        TempWaterOut = TempSteamIn - SubcoolDeltaTemp;
-
-                        // Steam Mass Flow Rate Required
-                        SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        SetComponentFlowRate(state,
-                                             SteamMassFlowRate,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
-
-                        // recalculate in case previous call changed mass flow rate
-                        QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
-
-                        // Total Heat Transfer to air
-                        HeatingCoilLoad = QCoilCap;
-
-                        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
-                        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
-
-                        //************************* Loop Losses *****************************
-                        // Loop pressure return considerations included in steam coil since the pipes are
-                        // perfect and do not account for losses.
-
-                        // Return water is condensate at atmoshperic pressure
-                        // Process is considered constant enthalpy expansion
-                        // No quality function in EnergyPlus hence no option left apart from
-                        // considering saturated state.
-                        //              StdBaroPress=101325
-
-                        TempWaterAtmPress = GetSatTemperatureRefrig(
-                            state, fluidNameSteam, state.dataEnvrn->StdBaroPress, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-
-                        // Point 4 at atm - loop delta subcool during return journery back to pump
-                        TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
-
-                        // Actual Steam Coil Outlet Enthalpy
-                        EnthCoilOutlet =
-                            GetSatEnthalpyRefrig(
-                                state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
-                            CpWater * SubcoolDeltaTemp;
-
-                        // Enthalpy at Point 4
-                        EnthAtAtmPress = GetSatEnthalpyRefrig(
-                            state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-
-                        CpWater = GetSatSpecificHeatRefrig(state,
-                                                           fluidNameSteam,
-                                                           TempLoopOutToPump,
-                                                           0.0,
-                                                           state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex,
-                                                           RoutineNameSizeSteamCoil);
-
-                        // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
-                        EnthPumpInlet = EnthAtAtmPress - CpWater * state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
-
-                        state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = EnthPumpInlet;
-
-                        // Point 3-Point 5,
-                        EnergyLossToEnvironment = SteamMassFlowRate * (EnthCoilOutlet - EnthPumpInlet);
-
-                        // Loss to enviornment due to pressure drop
-                        state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = EnergyLossToEnvironment;
-                        //************************* Loop Losses *****************************
-                    }
-
-                } else { // If not running Conditions do not change across coil from inlet to outlet
-                    SteamMassFlowRate = 0.0;
-                    SetComponentFlowRate(state,
-                                         SteamMassFlowRate,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
-                    TempAirOut = TempAirIn;
-                    TempWaterOut = TempSteamIn;
-                    HeatingCoilLoad = 0.0;
-                    state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
-                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
-                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
-                    state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
-                    TempLoopOutToPump = TempWaterOut;
-                }
+            } else { // If not running Conditions do not change across coil from inlet to outlet
+                SteamMassFlowRate = 0.0;
+                SetComponentFlowRate(state,
+                                     SteamMassFlowRate,
+                                     state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                     state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                     state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
+                TempAirOut = TempAirIn;
+                TempWaterOut = TempSteamIn;
+                HeatingCoilLoad = 0.0;
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
+                state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
+                state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
+                TempLoopOutToPump = TempWaterOut;
             }
         }
 
@@ -1595,7 +1593,7 @@ namespace SteamCoils {
         }
 
         if (IndexNum == 0) {
-            ShowSevereError(state, format("GetSteamCoilIndex: Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
+            ShowSevereError(state, format(R"(GetSteamCoilIndex: Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
             ErrorsFound = true;
         }
 
