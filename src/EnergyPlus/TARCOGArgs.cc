@@ -637,7 +637,7 @@ void PrepVariablesISO15099(int const nlayer,
     tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
 
     // external radiation term
-    switch(isky) {
+    switch (isky) {
     case 3:
         Gout = outir;
         trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann);

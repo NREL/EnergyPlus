@@ -341,16 +341,15 @@ namespace SteamCoils {
             // TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
             if (controlMode == "TEMPERATURESETPOINTCONTROL") {
                 state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = TemperatureSetPointControl;
-                state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum =
-                    GetOnlySingleNode(state,
-                                      AlphArray(8),
-                                      ErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
-                                      AlphArray(1),
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::Sensor,
-                                      NodeInputManager::CompFluidStream::Primary,
-                                      ObjectIsNotParent);
+                state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
+                                                                                                 AlphArray(8),
+                                                                                                 ErrorsFound,
+                                                                                                 DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
+                                                                                                 AlphArray(1),
+                                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                                 DataLoopNode::ConnectionType::Sensor,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                                                 ObjectIsNotParent);
                 if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
@@ -754,7 +753,7 @@ namespace SteamCoils {
 
                         state.dataSize->DataDesicRegCoil = true;
                         state.dataSize->DataDesicDehumNum = state.dataSteamCoils->SteamCoil(CoilNum).DesiccantDehumNum;
-                        CompType = state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType;  // this is casting an int to a string
+                        CompType = state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType; // this is casting an int to a string
                         CompName = state.dataSteamCoils->SteamCoil(CoilNum).Name;
                         bPRINT = false;
                         HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
@@ -776,7 +775,7 @@ namespace SteamCoils {
                     }
 
                     // Set the duct flow rate
-                    switch(state.dataSize->CurDuctType) {
+                    switch (state.dataSize->CurDuctType) {
                     case Main:
                         DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
                                      state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
@@ -1140,7 +1139,7 @@ namespace SteamCoils {
         //  across the coil, so do the simulation. If not set outlet to inlet and no load.
         //  Also the coil has to be scheduled to be available
         //  Control output to meet load QCoilReq. Load Controlled Coil.
-        switch(state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil) {
+        switch (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil) {
 
         case ZoneLoadControl:
             if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
@@ -1151,10 +1150,10 @@ namespace SteamCoils {
                 // Steam heat exchangers would not have effectivness, since all of the steam is
                 // converted to water and only then the steam trap allows it to leave the heat
                 // exchanger, subsequently heat exchange is latent heat + subcooling.
-                EnthSteamInDry = GetSatEnthalpyRefrig(
-                    state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-                EnthSteamOutWet = GetSatEnthalpyRefrig(
-                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamInDry =
+                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamOutWet =
+                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
@@ -1222,9 +1221,9 @@ namespace SteamCoils {
                 TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                 // Actual Steam Coil Outlet Enthalpy
-                EnthCoilOutlet = GetSatEnthalpyRefrig(
-                                     state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
-                                 CpWater * SubcoolDeltaTemp;
+                EnthCoilOutlet =
+                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                    CpWater * SubcoolDeltaTemp;
 
                 // Enthalpy at Point 4
                 EnthAtAtmPress = GetSatEnthalpyRefrig(
@@ -1266,10 +1265,10 @@ namespace SteamCoils {
                 // Steam heat exchangers would not have effectivness, since all of the steam is
                 // converted to water and only then the steam trap allows it to leave the heat
                 // exchanger, subsequently heat exchange is latent heat + subcooling.
-                EnthSteamInDry = GetSatEnthalpyRefrig(
-                    state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
-                EnthSteamOutWet = GetSatEnthalpyRefrig(
-                    state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamInDry =
+                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                EnthSteamOutWet =
+                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
                 //          CpWater = GetSpecificHeatGlycol('WATER',  &
@@ -1394,21 +1393,16 @@ namespace SteamCoils {
                     TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                     // Actual Steam Coil Outlet Enthalpy
-                    EnthCoilOutlet =
-                        GetSatEnthalpyRefrig(
-                            state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
-                        CpWater * SubcoolDeltaTemp;
+                    EnthCoilOutlet = GetSatEnthalpyRefrig(
+                                         state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                                     CpWater * SubcoolDeltaTemp;
 
                     // Enthalpy at Point 4
                     EnthAtAtmPress = GetSatEnthalpyRefrig(
                         state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
-                    CpWater = GetSatSpecificHeatRefrig(state,
-                                                       fluidNameSteam,
-                                                       TempLoopOutToPump,
-                                                       0.0,
-                                                       state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex,
-                                                       RoutineNameSizeSteamCoil);
+                    CpWater = GetSatSpecificHeatRefrig(
+                        state, fluidNameSteam, TempLoopOutToPump, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                     // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
                     EnthPumpInlet = EnthAtAtmPress - CpWater * state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;

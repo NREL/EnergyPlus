@@ -240,7 +240,7 @@ namespace SolarCollectors {
                                     Real64 &AbsCover2,                 // Outer cover solar absorbtance
                                     Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
                                     Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
-        );
+        ) const;
 
         void CalcSolarCollector(EnergyPlusData &state);
 
@@ -281,7 +281,7 @@ namespace SolarCollectors {
 
         static void GetExtVentedCavityIndex(EnergyPlusData &state, int SurfacePtr, int &VentCavIndex);
 
-        void update(EnergyPlusData &state);
+        void update(EnergyPlusData &state) const;
 
         void report(EnergyPlusData &state);
 
