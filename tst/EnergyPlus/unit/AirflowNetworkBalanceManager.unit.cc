@@ -4536,14 +4536,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AirThermConductivity)
 
     Real64 constexpr tol = 0.00001;
 
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -30), 0.02212, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -20), 0.02212, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 0), 0.02364, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 20), 0.02514, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 40), 0.02662, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 60), 0.02808, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 70), 0.02881, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 80), 0.02881, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(-30), 0.02212, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(-20), 0.02212, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(0), 0.02364, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(20), 0.02514, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(40), 0.02662, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(60), 0.02808, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(70), 0.02881, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_conductivity(80), 0.02881, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_AirDynamicVisc)
@@ -4551,14 +4551,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AirDynamicVisc)
 
     Real64 constexpr tol = 0.000001;
 
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-30), 1.635e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(-20), 1.635e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(0), 1.729e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(20), 1.823e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(40), 1.917e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(60), 2.011e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(70), 2.058e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airDynamicVisc(80), 2.058e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(-30), 1.635e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(-20), 1.635e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(0), 1.729e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(20), 1.823e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(40), 1.917e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(60), 2.011e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(70), 2.058e-5, tol);
+    EXPECT_NEAR(state->afn->properties.dynamic_viscosity(80), 2.058e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_AirKinematicVisc)
@@ -4566,14 +4566,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AirKinematicVisc)
 
     Real64 constexpr tol = 0.000001;
 
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -30, 0.001, 101000), 1.169e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, -20, 0.001, 101000), 1.169e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 0, 0.001, 101000), 1.338e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 20, 0.001, 101000), 1.516e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 40, 0.001, 101000), 1.702e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 60, 0.001, 101000), 1.896e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 70, 0.001, 101000), 1.995e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airKinematicVisc(*state, 80, 0.001, 101000), 1.995e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, -30, 0.001), 1.169e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, -20, 0.001), 1.169e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, 0, 0.001), 1.338e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, 20, 0.001), 1.516e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, 40, 0.001), 1.702e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, 60, 0.001), 1.896e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, 70, 0.001), 1.995e-5, tol);
+    EXPECT_NEAR(state->afn->properties.kinematic_viscosity(101000, 80, 0.001), 1.995e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_AirThermalDiffusivity)
@@ -4581,14 +4581,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AirThermalDiffusivity)
 
     Real64 constexpr tol = 0.000001;
 
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -30, 0.001, 101000), 1.578e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, -20, 0.001, 101000), 1.578e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 0, 0.001, 101000), 1.818e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 20, 0.001, 101000), 2.074e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 40, 0.001, 101000), 2.346e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 60, 0.001, 101000), 2.632e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 70, 0.001, 101000), 2.780e-5, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermalDiffusivity(*state, 80, 0.001, 101000), 2.780e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, -30, 0.001), 1.578e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, -20, 0.001), 1.578e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, 0, 0.001), 1.818e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, 20, 0.001), 2.074e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, 40, 0.001), 2.346e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, 60, 0.001), 2.632e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, 70, 0.001), 2.780e-5, tol);
+    EXPECT_NEAR(state->afn->properties.thermal_diffusivity(101000, 80, 0.001), 2.780e-5, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_AirPrandtl)
@@ -4596,14 +4596,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AirPrandtl)
 
     Real64 constexpr tol = 0.0001;
 
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -30, 0.001, 101000), 0.7362, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, -20, 0.001, 101000), 0.7362, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 0, 0.001, 101000), 0.7300, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 20, 0.001, 101000), 0.7251, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 40, 0.001, 101000), 0.7213, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 60, 0.001, 101000), 0.7184, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 70, 0.001, 101000), 0.7172, tol);
-    EXPECT_NEAR(AirflowNetwork::airPrandtl(*state, 80, 0.001, 101000), 0.7172, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, -30, 0.001), 0.7362, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, -20, 0.001), 0.7362, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, 0, 0.001), 0.7300, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, 20, 0.001), 0.7251, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, 40, 0.001), 0.7213, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, 60, 0.001), 0.7184, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, 70, 0.001), 0.7172, tol);
+    EXPECT_NEAR(state->afn->properties.prandtl_number(101000, 80, 0.001), 0.7172, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
@@ -24125,15 +24125,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestReferenceConditionsLeftBlank)
     Real64 refP1 = 101325.0;
     Real64 refT1 = 20.0;
     Real64 refW1 = 0.0;
-    Real64 expected_density1 = AIRDENSITY(*state, refP1, refT1, refW1);
-    Real64 expected_viscosity1 = AirflowNetwork::airDynamicVisc(refT1);
+    Real64 expected_density1 = state->afn->properties.density(refP1, refT1, refW1);
+    Real64 expected_viscosity1 = state->afn->properties.dynamic_viscosity(refT1);
     EXPECT_EQ(expected_density1, state->afn->MultizoneSurfaceCrackData(1).reference_density);
     EXPECT_EQ(expected_viscosity1, state->afn->MultizoneSurfaceCrackData(1).reference_viscosity);
     Real64 refP2 = 50000.0;
     Real64 refT2 = 30.0;
     Real64 refW2 = 0.002;
-    Real64 expected_density2 = AIRDENSITY(*state, refP2, refT2, refW2);
-    Real64 expected_viscosity2 = AirflowNetwork::airDynamicVisc(refT2);
+    Real64 expected_density2 = state->afn->properties.density(refP2, refT2, refW2);
+    Real64 expected_viscosity2 = state->afn->properties.dynamic_viscosity(refT2);
     EXPECT_EQ(expected_density2, state->afn->MultizoneSurfaceCrackData(2).reference_density);
     EXPECT_EQ(expected_viscosity2, state->afn->MultizoneSurfaceCrackData(2).reference_viscosity);
 }

@@ -590,7 +590,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
+        Real64 RhozNorm = state.afn->properties.density(101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         Real64 coef = FlowCoef;
 
@@ -684,7 +684,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
+        Real64 RhozNorm = state.afn->properties.density(101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         Real64 coef = FlowCoef;
 
@@ -3059,7 +3059,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = state.afn->MultizoneSurfaceData(i).Factor;
-            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
+            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3184,7 +3184,7 @@ namespace AirflowNetwork {
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
-            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
+            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3504,7 +3504,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
+            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3625,7 +3625,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
+            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -4206,7 +4206,7 @@ namespace AirflowNetwork {
         Real64 RhoREF;
         Real64 CONV;
 
-        RhoREF = AIRDENSITY(state, PSea, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+        RhoREF = state.afn->properties.density(PSea, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
         CONV = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));
@@ -4290,8 +4290,8 @@ namespace AirflowNetwork {
             }
 
             // RhoDrL is Rho at link level without pollutant but with humidity
-            RhoDrL(i, 1) = AIRDENSITY(state, state.dataEnvrn->OutBaroPress + PzFrom, TempL1, Xhl1);
-            RhoDrL(i, 2) = AIRDENSITY(state, state.dataEnvrn->OutBaroPress + PzTo, TempL2, Xhl2);
+            RhoDrL(i, 1) = state.afn->properties.density(state.dataEnvrn->OutBaroPress + PzFrom, TempL1, Xhl1);
+            RhoDrL(i, 2) = state.afn->properties.density(state.dataEnvrn->OutBaroPress + PzTo, TempL2, Xhl2);
 
             // End initialisation
 
@@ -4600,15 +4600,15 @@ namespace AirflowNetwork {
                     Htop = Z;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho0 = state.afn->properties.density(Pbz + P, T, X);
                         T += (Htop - Hbot) * BetaT;
                         X += (Htop - Hbot) * BetaXfct * X0;
-                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho1 = state.afn->properties.density(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp += psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    RhoDr = state.afn->properties.density(Pbz + PZ + Dp, T, X);
+                    Rho = state.afn->properties.density(Pbz + PZ + Dp, T, X);
                     return;
 
                 } else {
@@ -4617,16 +4617,16 @@ namespace AirflowNetwork {
                     // P is the pressure up to the start height of the layer we just reached
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho0 = state.afn->properties.density(Pbz + P, T, X);
                         T += (Htop - Hbot) * BetaT;
                         X += (Htop - Hbot) * BetaXfct * X0;
-                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho1 = state.afn->properties.density(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp += psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
 
-                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    RhoDr = state.afn->properties.density(Pbz + PZ + Dp, T, X);
+                    Rho = state.afn->properties.density(Pbz + PZ + Dp, T, X);
 
                     // place current values Hbot and Beta's
                     Hbot = H;
@@ -4678,31 +4678,31 @@ namespace AirflowNetwork {
                     Hbot = Z;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho1 = state.afn->properties.density(Pbz + P, T, X);
                         T += (Hbot - Htop) * BetaT;
                         X += (Hbot - Htop) * BetaXfct * X0;
-                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho0 = state.afn->properties.density(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp -= psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    RhoDr = state.afn->properties.density(Pbz + PZ + Dp, T, X);
+                    Rho = state.afn->properties.density(Pbz + PZ + Dp, T, X);
                     return;
                 } else {
                     // bottom of the layer is below Z  (Z below ref)
                     Hbot = H;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho1 = state.afn->properties.density(Pbz + P, T, X);
                         // T,X,C calculated for the lower height
                         T += (Hbot - Htop) * BetaT;
                         X += (Hbot - Htop) * BetaXfct * X0;
-                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
+                        Rho0 = state.afn->properties.density(Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp -= psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    RhoDr = state.afn->properties.density(Pbz + PZ + Dp, T, X);
+                    Rho = state.afn->properties.density(Pbz + PZ + Dp, T, X);
 
                     // place current values Hbot and Beta's
                     Htop = H;

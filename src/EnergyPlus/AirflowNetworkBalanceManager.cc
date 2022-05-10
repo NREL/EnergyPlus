@@ -142,9 +142,9 @@ namespace AirflowNetwork {
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
 
-    // AirflowNetwork::Solver solver;
-
-    // Functions
+    AirflowNetworkSolverData::AirflowNetworkSolverData(EnergyPlusData &state) : properties(state)
+    {
+    }
 
     int constexpr NumOfVentCtrTypes(6); // Number of zone level venting control types
 
@@ -430,8 +430,8 @@ namespace AirflowNetwork {
                 state.afn->MultizoneSurfaceCrackData(i).name = thisObjectName; // Name of surface crack component
                 state.afn->MultizoneSurfaceCrackData(i).coefficient = coeff;   // Air Mass Flow Coefficient
                 state.afn->MultizoneSurfaceCrackData(i).exponent = expnt;      // Air Mass Flow exponent
-                state.afn->MultizoneSurfaceCrackData(i).reference_density = AIRDENSITY(state, refP, refT, refW);
-                state.afn->MultizoneSurfaceCrackData(i).reference_viscosity = AIRDYNAMICVISCOSITY(refT);
+                state.afn->MultizoneSurfaceCrackData(i).reference_density = properties.density(refP, refT, refW);
+                state.afn->MultizoneSurfaceCrackData(i).reference_viscosity = properties.dynamic_viscosity(refT);
 
                 // This is the first element that is being added to the lookup table, so no check of naming overlaps
                 solver->elements[thisObjectName] = &state.afn->MultizoneSurfaceCrackData(i); // Yet another workaround
@@ -5899,8 +5899,7 @@ void AirflowNetworkSolverData::initialize(EnergyPlusData &state)
             ANCO.allocate(state.dataGlobal->NumOfZones); // Local zone CO2 for rollback use
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
             ANGC.allocate(state.dataGlobal->NumOfZones); // Local zone generic contaminant for rollback use
-        auto &solver = state.afn;
-        solver->allocate(state);
+        allocate();
 
         bool OnOffFanFlag = false;
         for (i = 1; i <= DisSysNumOfCVFs; i++) {
@@ -6889,11 +6888,11 @@ void AirflowNetworkSolverData::initialize(EnergyPlusData &state)
                 PressureSet = GetCurrentScheduleValue(state, PressureControllerData(1).PresSetpointSchedPtr);
             }
         }
-        auto &solver = state.afn;
-        solver->initialize_calculation();
+
+        initialize_calculation();
 
         if (!(PressureSetFlag > 0 && AirflowNetworkFanActivated)) {
-            solver->airmov(state);
+            airmov(state);
         } else if (PressureSetFlag == PressureCtrlExhaust) {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
@@ -6903,7 +6902,7 @@ void AirflowNetworkSolverData::initialize(EnergyPlusData &state)
                 MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
-            solver->airmov(state);
+            airmov(state);
             ZonePressure1 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
@@ -6928,7 +6927,7 @@ void AirflowNetworkSolverData::initialize(EnergyPlusData &state)
                 }
             } else {
                 ExhaustFanMassFlowRate = MaxExhaustMassFlowrate;
-                solver->airmov(state);
+                airmov(state);
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -6997,8 +6996,8 @@ void AirflowNetworkSolverData::initialize(EnergyPlusData &state)
                 MaxReliefMassFlowrate = MaxReliefMassFlowrate / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ReliefMassFlowRate = MinReliefMassFlowrate;
-            solver->initialize_calculation();
-            solver->airmov(state);
+            initialize_calculation();
+            airmov(state);
             ZonePressure1 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
 
             if (ZonePressure1 <= PressureSet) {
@@ -7024,8 +7023,8 @@ void AirflowNetworkSolverData::initialize(EnergyPlusData &state)
                 }
             } else {
                 ReliefMassFlowRate = MaxReliefMassFlowrate;
-                solver->initialize_calculation();
-                solver->airmov(state);
+                initialize_calculation();
+                airmov(state);
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -7598,7 +7597,7 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
         // REFERENCES:
         // ASTM C1340
 
-        Real64 k = airThermConductivity(state, Ts);
+        Real64 k = state.afn->properties.thermal_conductivity(Ts);
         auto &Zone(state.dataHeatBal->Zone);
 
         Real64 hOut_final = 0;
@@ -7606,8 +7605,8 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
         if (hOut == 0) {
 
             // Free convection
-            Real64 Pr = airPrandtl(state, (Ts + Tamb) / 2, Wamb, Pamb);
-            Real64 KinVisc = airKinematicVisc(state, (Ts + Tamb) / 2, Wamb, Pamb);
+            Real64 Pr = state.afn->properties.prandtl_number(Pamb, (Ts + Tamb) / 2, Wamb);
+            Real64 KinVisc = state.afn->properties.kinematic_viscosity(Pamb, (Ts + Tamb) / 2, Wamb);
             Real64 Beta = 2.0 / ((Tamb + DataGlobalConstants::KelvinConv) + (Ts + DataGlobalConstants::KelvinConv));
             Real64 Gr = DataGlobalConstants::GravityConstant * Beta * std::abs(Ts - Tamb) * pow_3(Dh) / pow_2(KinVisc);
             Real64 Ra = Gr * Pr;
@@ -13421,7 +13420,7 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
         }
     }
 
-    void AirflowNetworkSolverData::allocate(EnergyPlusData &state)
+    void AirflowNetworkSolverData::allocate()
     {
 
         // SUBROUTINE INFORMATION:
@@ -13487,7 +13486,7 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
         SUMAF.allocate(NetworkNumOfNodes);
 
         for (int it = 0; it <= NetworkNumOfNodes + 1; ++it)
-            properties.emplace_back(AIRDENSITY(state, 20.0, 101325.0, 0.0));
+            node_states.emplace_back(properties.density(101325.0, 20.0, 0.0));
 
         ID.allocate(NetworkNumOfNodes);
         IK.allocate(NetworkNumOfNodes + 1);
@@ -13524,8 +13523,8 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
             // TZ(i) = AirflowNetworkNodeSimu(i).TZ;
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = AirflowNetworkNodeSimu(i).PZ;
-            properties[i].temperature = AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidity_ratio = AirflowNetworkNodeSimu(i).WZ;
+            node_states[i].temperature = AirflowNetworkNodeSimu(i).TZ;
+            node_states[i].humidity_ratio = AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
 
@@ -13649,8 +13648,8 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
             // TZ(i) = AirflowNetworkNodeSimu(i).TZ;
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = AirflowNetworkNodeSimu(i).PZ;
-            properties[i].temperature = AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidity_ratio = AirflowNetworkNodeSimu(i).WZ;
+            node_states[i].temperature = AirflowNetworkNodeSimu(i).TZ;
+            node_states[i].humidity_ratio = AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
     }
@@ -13784,16 +13783,16 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidity_ratio);
+            node_states[n].density = properties.density(state.dataEnvrn->StdBaroPress + PZ(n), node_states[n].temperature, node_states[n].humidity_ratio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (AirflowNetworkNodeData(n).ExtNodeNum > 0) {
-                properties[n].density =
-                    AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
-                properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
-                properties[n].humidity_ratio = state.dataEnvrn->OutHumRat;
+                node_states[n].density = properties.density(
+                    state.dataEnvrn->StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+                node_states[n].temperature = state.dataEnvrn->OutDryBulbTemp;
+                node_states[n].humidity_ratio = state.dataEnvrn->OutHumRat;
             }
-            properties[n].sqrt_density = std::sqrt(properties[n].density);
-            properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
+            node_states[n].sqrt_density = std::sqrt(node_states[n].density);
+            node_states[n].viscosity = 1.71432e-5 + 4.828e-8 * node_states[n].temperature;
             // if (LIST >= 2) ObjexxFCL::gio::write(outputFile, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
         }
         // Compute stack pressures.
@@ -13802,25 +13801,25 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
             m = AirflowNetworkLinkageData(i).NodeNums[1];
             if (AFLOW(i) > 0.0) {
                 PS(i) =
-                    9.80 * (properties[n].density * (AirflowNetworkNodeData(n).NodeHeight -
+                    9.80 * (node_states[n].density * (AirflowNetworkNodeData(n).NodeHeight -
                                                      AirflowNetworkNodeData(m).NodeHeight) +
-                            state.afn->AirflowNetworkLinkageData(i).NodeHeights[1] * (properties[m].density - properties[n].density));
+                            state.afn->AirflowNetworkLinkageData(i).NodeHeights[1] * (node_states[m].density - node_states[n].density));
             } else if (AFLOW(i) < 0.0) {
                 PS(i) =
-                    9.80 * (properties[m].density * (AirflowNetworkNodeData(n).NodeHeight -
+                    9.80 * (node_states[m].density * (AirflowNetworkNodeData(n).NodeHeight -
                                                      AirflowNetworkNodeData(m).NodeHeight) +
-                            AirflowNetworkLinkageData(i).NodeHeights[0] * (properties[m].density - properties[n].density));
+                            AirflowNetworkLinkageData(i).NodeHeights[0] * (node_states[m].density - node_states[n].density));
             } else {
-                PS(i) = 4.90 * ((properties[n].density + properties[m].density) * (AirflowNetworkNodeData(n).NodeHeight -
+                PS(i) = 4.90 * ((node_states[n].density + node_states[m].density) * (AirflowNetworkNodeData(n).NodeHeight -
                                                                                    AirflowNetworkNodeData(m).NodeHeight) +
                                 (AirflowNetworkLinkageData(i).NodeHeights[0] +
                                  AirflowNetworkLinkageData(i).NodeHeights[1]) *
-                                    (properties[m].density - properties[n].density));
+                                    (node_states[m].density - node_states[n].density));
             }
         }
 
         // Calculate pressure field in a large opening
-        dos.pstack(state, properties, PZ);
+        dos.pstack(state, node_states, PZ);
         solvzp(state, ITER);
 
         // Report element flows and zone pressures.
@@ -14202,7 +14201,7 @@ void AirflowNetworkSolverData::calculateWindPressureCoeffs(EnergyPlusData &state
             j = AirflowNetworkLinkageData(i).CompNum;
 
             NF = AirflowNetworkLinkageData(i).element->calculate(
-                state, LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
+                state, LFLAG, DP, i, multiplier, control, node_states[n], node_states[m], F, DF);
             if (AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
                 DP = DisSysCompCPDData(state.afn->AirflowNetworkCompData(j).TypeNum).DP;
             }

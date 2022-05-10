@@ -761,7 +761,7 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
         // Default Constructor
         SurfaceCrack()
             : coefficient(0.0), exponent(0.0), reference_density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
-              reference_viscosity(AIRDYNAMICVISCOSITY(20.0))
+              reference_viscosity(AIRDYNAMICVISCOSITY_CONSTEXPR(20.0))
         {
         }
 

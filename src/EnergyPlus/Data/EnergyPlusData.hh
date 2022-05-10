@@ -95,7 +95,6 @@ struct CrossVentMgrData;
 struct CurveManagerData;
 struct DXCoilsData;
 struct DXFEarClippingData;
-struct DataAFNProps;
 struct DataAirLoopData;
 struct DataBranchAirLoopPlantData;
 struct DataDaylightingDevicesData;
@@ -355,7 +354,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<CurveManagerData> dataCurveManager;
     std::unique_ptr<DXCoilsData> dataDXCoils;
     std::unique_ptr<DXFEarClippingData> dataDXFEarClipping;
-    std::unique_ptr<DataAFNProps> dataAFNProps;
     std::unique_ptr<DataAirLoopData> dataAirLoop;
     std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<DataDaylightingDevicesData> dataDaylightingDevicesData;
