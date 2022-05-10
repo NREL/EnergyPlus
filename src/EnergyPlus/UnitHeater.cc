@@ -358,7 +358,7 @@ namespace UnitHeater {
                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
 
                     {
-                        switch(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num) {
+                        switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num) {
                         case FanType_SimpleConstVolume:
                         case FanType_SimpleVAV:
                         case FanType_SimpleOnOff:

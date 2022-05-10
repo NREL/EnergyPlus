@@ -784,7 +784,7 @@ namespace InternalHeatGains {
                                 {
                                     auto const clothingType(AlphaName(10));
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
-                                        thisPeople.ClothingType = 1;
+                                        thisPeople.clothingType = ClothingType::InsulationSchedule;
                                         thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
                                         if (thisPeople.ClothingPtr == 0 && ModelWithAdditionalInputs) {
                                             if (Item1 == 1) {
@@ -840,10 +840,10 @@ namespace InternalHeatGains {
                                         }
 
                                     } else if (clothingType == "DYNAMICCLOTHINGMODELASHRAE55") {
-                                        thisPeople.ClothingType = 2;
+                                        thisPeople.clothingType = ClothingType::DynamicAshrae55;
 
                                     } else if (clothingType == "CALCULATIONMETHODSCHEDULE") {
-                                        thisPeople.ClothingType = 3;
+                                        thisPeople.clothingType = ClothingType::CalculationSchedule;
                                         thisPeople.ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
                                         if (thisPeople.ClothingMethodPtr == 0) {
                                             if (Item1 == 1) {
@@ -3451,17 +3451,17 @@ namespace InternalHeatGains {
                 }
                 print(state.files.eio, "{},", GetScheduleName(state, state.dataHeatBal->People(Loop).WorkEffPtr));
 
-                if (state.dataHeatBal->People(Loop).ClothingType == 1) {
+                if (state.dataHeatBal->People(Loop).clothingType == ClothingType::InsulationSchedule) {
                     print(state.files.eio, "Clothing Insulation Schedule,");
-                } else if (state.dataHeatBal->People(Loop).ClothingType == 2) {
+                } else if (state.dataHeatBal->People(Loop).clothingType == ClothingType::DynamicAshrae55) {
                     print(state.files.eio, "Dynamic Clothing Model ASHRAE55,");
-                } else if (state.dataHeatBal->People(Loop).ClothingType == 3) {
+                } else if (state.dataHeatBal->People(Loop).clothingType == ClothingType::CalculationSchedule) {
                     print(state.files.eio, "Calculation Method Schedule,");
                 } else {
                     print(state.files.eio, "N/A,");
                 }
 
-                if (state.dataHeatBal->People(Loop).ClothingType == 3) {
+                if (state.dataHeatBal->People(Loop).clothingType == ClothingType::CalculationSchedule) {
                     print(state.files.eio, "{},", GetScheduleName(state, state.dataHeatBal->People(Loop).ClothingMethodPtr));
                 } else {
                     print(state.files.eio, "N/A,");
