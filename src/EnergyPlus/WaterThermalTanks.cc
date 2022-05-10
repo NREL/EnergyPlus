@@ -7179,6 +7179,8 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
             // Update summed values
             Event += Qvent * TimeNeeded;
             Eoffcycfuel += Qoffcycfuel * TimeNeeded;
+        default:
+            assert(false); // should never get here
         }
 
         Real64 deltaTsum = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(TankTemp_loc,

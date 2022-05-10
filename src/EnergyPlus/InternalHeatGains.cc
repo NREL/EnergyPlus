@@ -782,7 +782,7 @@ namespace InternalHeatGains {
 
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(10) || AlphaName(10) != "") {
                                 {
-                                    auto const clothingType(AlphaName(10));
+                                    std::string_view const clothingType(AlphaName(10));
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
                                         thisPeople.clothingType = ClothingType::InsulationSchedule;
                                         thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));

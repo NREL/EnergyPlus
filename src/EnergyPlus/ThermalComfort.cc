@@ -2527,10 +2527,6 @@ namespace ThermalComfort {
         using namespace OutputReportPredefined;
         auto &deviationFromSetPtThresholdClg = state.dataHVACGlobal->deviationFromSetPtThresholdClg;
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
-        using DataHVACGlobals::DualSetPointWithDeadBand;
-        using DataHVACGlobals::SingleCoolingSetPoint;
-        using DataHVACGlobals::SingleHeatCoolSetPoint;
-        using DataHVACGlobals::SingleHeatingSetPoint;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SensibleLoadPredictedNoAdj;
@@ -2553,21 +2549,8 @@ namespace ThermalComfort {
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCoolingOccupied = 0.0;
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeatingOccupied = 0.0;
 
-            switch (state.dataHeatBalFanSys->TempControlType(iZone)) {
-            case SingleHeatingSetPoint:
-                testHeating = true;
-                testCooling = false;
-                break;
-            case SingleCoolingSetPoint:
-                testHeating = false;
-                testCooling = true;
-                break;
-            case SingleHeatCoolSetPoint:
-            case DualSetPointWithDeadBand:
-            default:
-                testHeating = true;
-                testCooling = true;
-            }
+            testHeating = (state.dataHeatBalFanSys->TempControlType(iZone) != DataHVACGlobals::SingleCoolingSetPoint);
+            testCooling = (state.dataHeatBalFanSys->TempControlType(iZone) != DataHVACGlobals::SingleHeatingSetPoint);
 
             if (testHeating && (SensibleLoadPredictedNoAdj > 0)) { // heating
                 if (state.dataRoomAirMod->AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
