@@ -459,7 +459,6 @@ void GetPTUnit(EnergyPlusData &state)
     using SteamCoils::GetCoilSteamInletNode;
     using SteamCoils::GetSteamCoilIndex;
     auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
-    using SteamCoils::GetTypeOfCoil;
     using WaterCoils::GetCoilMaxWaterFlowRate;
     using WaterCoils::GetCoilWaterInletNode;
     auto &GetWaterCoilInletNode(WaterCoils::GetCoilInletNode);
@@ -1888,7 +1887,8 @@ void GetPTUnit(EnergyPlusData &state)
                         state, "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ErrorsFound = true;
                 }
-                if (GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) != SteamCoils::ZoneLoadControl) {
+                if (SteamCoils::GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) !=
+                    SteamCoils::CoilControlType::ZoneLoadControl) {
                     if (errFlag) {
                         ShowContinueError(state,
                                           "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" +
