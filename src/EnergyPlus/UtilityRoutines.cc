@@ -96,19 +96,6 @@ namespace EnergyPlus {
 
 namespace UtilityRoutines {
 
-    const std::map<std::string, std::string> fuelDictionary = {
-        {"ELECTRICITY", "Electricity"},
-        {"NATURALGAS", "NaturalGas"},
-        {"DIESEL", "Diesel"},
-        {"GASOLINE", "Gasoline"},
-        {"COAL", "Coal"},
-        {"FUELOILNO1", "FuelOilNo1"},
-        {"FUELOILNO2", "FuelOilNo2"},
-        {"PROPANE", "Propane"},
-        {"OTHERFUEL1", "OtherFuel1"},
-        {"OTHERFUEL2", "OtherFuel2"},
-    };
-
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag)
     {
 
@@ -207,8 +194,6 @@ namespace UtilityRoutines {
         // for most inputs -- they are automatically turned to UPPERCASE.
         // If you need case insensitivity use FindItem.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
         }
@@ -230,8 +215,6 @@ namespace UtilityRoutines {
         // found.  This routine is not case insensitive and doesn't need
         // for most inputs -- they are automatically turned to UPPERCASE.
         // If you need case insensitivity use FindItem.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
@@ -416,12 +399,9 @@ namespace UtilityRoutines {
         // list of names for this item (i.e., that there isn't one of that
         // name already and that this name is not blank).
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Found;
-
         ErrorFound = false;
         if (NumOfNames > 0) {
-            Found = FindItem(NameToVerify, NamesList, NumOfNames);
+            int Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
                 ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
@@ -471,7 +451,7 @@ namespace UtilityRoutines {
             return;
         }
 
-        // accumuate the row until ready to be written to the file.
+        // accumulate the row until ready to be written to the file.
         state.dataUtilityRoutines->appendPerfLog_headerRow = state.dataUtilityRoutines->appendPerfLog_headerRow + colHeader + ",";
         state.dataUtilityRoutines->appendPerfLog_valuesRow = state.dataUtilityRoutines->appendPerfLog_valuesRow + colValue + ",";
 
@@ -503,6 +483,26 @@ namespace UtilityRoutines {
         }
     }
 
+    enum class CoreFuelType {
+        Invalid = -1, Electricity, NaturalGas, Diesel, Gasoline, Coal, FuelOilNo1, FuelOilNo2, Propane, OtherFuel1, OtherFuel2, Num
+    };
+    constexpr std::array<std::string_view, static_cast<int>(CoreFuelType::Num)> coreFuelNames = {
+        "Electricity", "NaturalGas", "Diesel", "Gasoline", "Coal", "FuelOilNo1", "FuelOilNo2", "Propane", "OtherFuel1", "OtherFuel2"
+    };
+    constexpr std::array<std::string_view, static_cast<int>(CoreFuelType::Num)> coreFuelNamesUC = {
+        "ELECTRICITY", "NATURALGAS", "DIESEL", "GASOLINE", "COAL", "FUELOILNO1", "FUELOILNO2", "PROPANE", "OTHERFUEL1", "OTHERFUEL2"
+    };
+    enum class ExtendedFuelType {
+        Invalid = -1, Steam, DistrictHeating, DistrictCooling, Num
+    };
+    constexpr std::array<std::string_view, static_cast<int>(ExtendedFuelType::Num)> extendedFuelNames = {
+        "Steam", "DistrictHeating", "DistrictCooling"
+    };
+    constexpr std::array<std::string_view, static_cast<int>(ExtendedFuelType::Num)> extendedFuelNamesUC = {
+        "STEAM", "DISTRICTHEATING", "DISTRICTCOOLING"
+    };
+
+
     bool ValidateFuelType([[maybe_unused]] EnergyPlusData &state,
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
@@ -516,25 +516,25 @@ namespace UtilityRoutines {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
 
-        std::string ucInputFuelType = UtilityRoutines::MakeUPPERCase(FuelTypeInput);
-        if (fuelDictionary.find(ucInputFuelType) != fuelDictionary.end()) {
-            FuelTypeOutput = fuelDictionary.at(ucInputFuelType);
-        } else {
-            if (AllowSteamAndDistrict) {
-                if (ucInputFuelType == "STEAM") {
-                    FuelTypeOutput = "Steam";
-                } else if (ucInputFuelType == "DISTRICTHEATING") {
-                    FuelTypeOutput = "DistrictHeating";
-                } else if (ucInputFuelType == "DISTRICTCOOLING") {
-                    FuelTypeOutput = "DistrictCooling";
-                } else {
-                    FuelTypeErrorsFound = true;
-                }
-            } else {
-                FuelTypeErrorsFound = true;
+        // It first searches the core list, and returns if found.
+        auto fuelInputUpperCase = UtilityRoutines::MakeUPPERCase(FuelTypeInput);
+        CoreFuelType fuel = static_cast<CoreFuelType>(getEnumerationValue(coreFuelNamesUC, fuelInputUpperCase)); // NOLINT(modernize-use-auto)
+        if (fuel != CoreFuelType::Invalid) {
+            FuelTypeOutput = coreFuelNames[static_cast<int>(fuel)];
+            return FuelTypeErrorsFound;
+        }
+
+        // If it doesn't find it in the core list, it checks the steam/district flag to determine whether to check those specific fuel types
+        if (AllowSteamAndDistrict) {
+            ExtendedFuelType extendedFuel = static_cast<ExtendedFuelType>(getEnumerationValue(extendedFuelNamesUC, fuelInputUpperCase)); // NOLINT(modernize-use-auto)
+            if (extendedFuel != ExtendedFuelType::Invalid) {
+                FuelTypeOutput = extendedFuelNames[static_cast<int>(extendedFuel)];
+                return FuelTypeErrorsFound;
             }
         }
 
+        // If we make it this far, we have not found a match, so just set the error flag and return
+        FuelTypeErrorsFound = true;
         return FuelTypeErrorsFound;
     }
 
@@ -549,12 +549,17 @@ namespace UtilityRoutines {
 
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings with DataGlobalConstants::AssignResourceTypeNum() (Boilers.cc and boilerSteam.cc)
-        if (fuelDictionary.find(FuelTypeInput) != fuelDictionary.end()) {
-            FuelTypeOutput = fuelDictionary.at(FuelTypeInput);
+
+        // this function is expecting the fuel type in upper case already, and does not check the extended fuel list, just the core
+        CoreFuelType fuel = static_cast<CoreFuelType>(getEnumerationValue(coreFuelNamesUC, FuelTypeInput)); // NOLINT(modernize-use-auto)
+        if (fuel != CoreFuelType::Invalid) {
+            FuelTypeOutput = coreFuelNames[static_cast<int>(fuel)];
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum(FuelTypeInput);
-        } else {
-            FuelTypeErrorsFound = true;
+            return FuelTypeErrorsFound;
         }
+
+        // if we didn't get a match, we set the error flag and return
+        FuelTypeErrorsFound = true;
         return FuelTypeErrorsFound;
     }
 
