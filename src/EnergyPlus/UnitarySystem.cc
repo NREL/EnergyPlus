@@ -1611,10 +1611,13 @@ namespace UnitarySystems {
         // BaseSizerWithFanHeatInputs::initializeWithinEP so the fan doesn't size until the parent wants it to size.
         // see PackagedTerminalHeatPumpVSAS.idf where fan is not sized large enough for cooling coil air flow rate.
 
-        // delay fan sizing in case a VS fan is used and air flow needs to be modified
+        // delay fan sizing in case a VS fan is used and air flow needs to be modified above max design flow
+        // this may also mean capacity result does not include fan heat? and table diffs?
+        // and causes unit test failures, e.g., UnitarySystemModel_MultispeedDXCoilSizing.
         // comment this out until the PTUnit to UnitarySystem #9273 branch is merged, so nothing changes
-        // until this is implemented, unbalanced air flow warning show up in VS coil PTUnits
-        state.dataSize->DataFanIndex = -1;
+        // until this is implemented, unbalanced air flow warnings show up in VS coil PTUnits
+        //  int saveDataFanIndex = state.dataSize->DataFanIndex;
+        //  state.dataSize->DataFanIndex = -1;
 
         bool coolingAirFlowIsAutosized = this->m_MaxCoolAirVolFlow == DataSizing::AutoSize;
         bool heatingAirFlowIsAutosized = this->m_MaxHeatAirVolFlow == DataSizing::AutoSize;
@@ -1935,7 +1938,7 @@ namespace UnitarySystems {
         // now size fans as necessary
         // comment this out until the PTUnit to UnitarySystem #9273 branch is merged, so nothing changes
         // until this is implemented, unbalanced air flow warning show up in VS coil PTUnits
-        state.dataSize->DataFanIndex = this->m_FanIndex;
+        // state.dataSize->DataFanIndex = saveDataFanIndex;
 
         // Some parent objects report sizing, some do not
         // other cases below will toggle on or off specific reports based on system type
@@ -11155,6 +11158,7 @@ namespace UnitarySystems {
                     if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
                         this->m_sysType == SysType::PackagedWSHP) {
                         state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
+                        // does this assume OA flow <= min speed flow? wihtout this there are SolveRoot failures.
                         if (HeatSpeedNum > 1) {
                             state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
                         }
