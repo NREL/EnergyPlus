@@ -71,8 +71,7 @@ namespace SteamCoils {
         ZoneLoadControl,
         Num
     };
-    constexpr std::array<std::string_view, static_cast<int>(CoilControlType::Num)> coilControlTypeNames = {"TEMPERATURESETPOINTCONTROL",
-                                                                                                           "ZONELOADCONTROL"};
+    extern const std::array<std::string_view, static_cast<int>(CoilControlType::Num)> coilControlTypeNames;
 
     struct SteamCoilEquipConditions
     {

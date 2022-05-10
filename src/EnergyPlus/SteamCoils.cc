@@ -105,6 +105,8 @@ namespace SteamCoils {
     using namespace ScheduleManager;
 
     static constexpr std::string_view fluidNameSteam("STEAM");
+    constexpr std::array<std::string_view, static_cast<int>(CoilControlType::Num)> coilControlTypeNames = {"TEMPERATURESETPOINTCONTROL",
+                                                                                                           "ZONELOADCONTROL"};
 
     void SimulateSteamCoilComponents(EnergyPlusData &state,
                                      std::string_view CompName,
