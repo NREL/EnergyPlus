@@ -1004,7 +1004,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).Pierce = true;
     state->dataHeatBal->People(1).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
     state->dataHeatBal->People(1).WorkEffPtr = 0;
-    state->dataHeatBal->People(1).ClothingType = 1;
+    state->dataHeatBal->People(1).clothingType = ClothingType::InsulationSchedule;
 
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
     state->dataHeatBalFanSys->ZoneQHTRadSysToPerson(1) = 0.0;

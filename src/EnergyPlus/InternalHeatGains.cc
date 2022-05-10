@@ -794,13 +794,90 @@ namespace InternalHeatGains {
                                 }
                             }
 
-                            if (!state.dataIPShortCut->lAlphaFieldBlanks(10) || AlphaName(10) != "") {
-                                {
-                                    auto const clothingType(AlphaName(10));
-                                    if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
-                                        thisPeople.ClothingType = 1;
+                            if (!state.dataIPShortCut->lAlphaFieldBlanks(10) || !AlphaName(10).empty()) {
+                                thisPeople.clothingType = static_cast<ClothingType>(getEnumerationValue(clothingTypeNamesUC, AlphaName(10)));
+                                if (thisPeople.clothingType == ClothingType::Invalid) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", invalid " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(10) + ", value  =" + AlphaName(10));
+                                    ShowContinueError(state,
+                                                      format(R"(...Valid values are "{}", "{}", "{}")",
+                                                             clothingTypeNamesUC[0],
+                                                             clothingTypeNamesUC[1],
+                                                             clothingTypeNamesUC[2]));
+                                    ErrorsFound = true;
+                                }
+                                switch (thisPeople.clothingType) {
+                                case ClothingType::InsulationSchedule:
+                                    thisPeople.clothingType = ClothingType::InsulationSchedule;
+                                    thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
+                                    if (thisPeople.ClothingPtr == 0 && ModelWithAdditionalInputs) {
+                                        if (Item1 == 1) {
+                                            ShowSevereError(state,
+                                                            std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                                state.dataIPShortCut->cAlphaFieldNames(12) + " entered=\"" + AlphaName(12) + "\".");
+                                            ErrorsFound = true;
+                                        }
+                                    } else { // check min/max on schedule
+                                        SchMin = GetScheduleMinValue(state, thisPeople.ClothingPtr);
+                                        SchMax = GetScheduleMaxValue(state, thisPeople.ClothingPtr);
+                                        if (SchMin < 0.0 || SchMax < 0.0) {
+                                            if (SchMin < 0.0) {
+                                                if (Item1 == 1) {
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                        state.dataIPShortCut->cAlphaFieldNames(12) + ", minimum is < 0.0");
+                                                    ShowContinueError(state,
+                                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.",
+                                                                             AlphaName(12),
+                                                                             SchMin));
+                                                    ErrorsFound = true;
+                                                }
+                                            }
+                                            if (SchMax < 0.0) {
+                                                if (Item1 == 1) {
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                        state.dataIPShortCut->cAlphaFieldNames(12) + ", maximum is < 0.0");
+                                                    ShowContinueError(state,
+                                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.",
+                                                                             AlphaName(12),
+                                                                             SchMax));
+                                                    ErrorsFound = true;
+                                                }
+                                            }
+                                        }
+                                        if (SchMax > 2.0) {
+                                            if (Item1 == 1) {
+                                                ShowWarningError(state,
+                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                     state.dataIPShortCut->cAlphaFieldNames(12) + ", maximum is > 2.0");
+                                                ShowContinueError(state,
+                                                                  format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Clothing.",
+                                                                         AlphaName(12),
+                                                                         SchMin,
+                                                                         SchMax));
+                                            }
+                                        }
+                                    }
+                                    break;
+
+                                case ClothingType::DynamicAshrae55:
+                                    break; // nothing extra to do, at least for now
+
+                                case ClothingType::CalculationSchedule:
+                                    thisPeople.ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
+                                    if (thisPeople.ClothingMethodPtr == 0) {
+                                        if (Item1 == 1) {
+                                            ShowSevereError(state,
+                                                            std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                                state.dataIPShortCut->cAlphaFieldNames(11) + " entered=\"" + AlphaName(11) + "\".");
+                                            ErrorsFound = true;
+                                        }
+                                    }
+                                    if (CheckScheduleValue(state, thisPeople.ClothingMethodPtr, 1)) {
                                         thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                        if (thisPeople.ClothingPtr == 0 && ModelWithAdditionalInputs) {
+                                        if (thisPeople.ClothingPtr == 0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
@@ -808,88 +885,11 @@ namespace InternalHeatGains {
                                                                     AlphaName(12) + "\".");
                                                 ErrorsFound = true;
                                             }
-                                        } else { // check min/max on schedule
-                                            SchMin = GetScheduleMinValue(state, thisPeople.ClothingPtr);
-                                            SchMax = GetScheduleMaxValue(state, thisPeople.ClothingPtr);
-                                            if (SchMin < 0.0 || SchMax < 0.0) {
-                                                if (SchMin < 0.0) {
-                                                    if (Item1 == 1) {
-                                                        ShowSevereError(state,
-                                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                            "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
-                                                                            ", minimum is < 0.0");
-                                                        ShowContinueError(state,
-                                                                          format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.",
-                                                                                 AlphaName(12),
-                                                                                 SchMin));
-                                                        ErrorsFound = true;
-                                                    }
-                                                }
-                                                if (SchMax < 0.0) {
-                                                    if (Item1 == 1) {
-                                                        ShowSevereError(state,
-                                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                            "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
-                                                                            ", maximum is < 0.0");
-                                                        ShowContinueError(state,
-                                                                          format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.",
-                                                                                 AlphaName(12),
-                                                                                 SchMax));
-                                                        ErrorsFound = true;
-                                                    }
-                                                }
-                                            }
-                                            if (SchMax > 2.0) {
-                                                if (Item1 == 1) {
-                                                    ShowWarningError(state,
-                                                                     std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                                         state.dataIPShortCut->cAlphaFieldNames(12) + ", maximum is > 2.0");
-                                                    ShowContinueError(state,
-                                                                      format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Clothing.",
-                                                                             AlphaName(12),
-                                                                             SchMin,
-                                                                             SchMax));
-                                                }
-                                            }
                                         }
-
-                                    } else if (clothingType == "DYNAMICCLOTHINGMODELASHRAE55") {
-                                        thisPeople.ClothingType = 2;
-
-                                    } else if (clothingType == "CALCULATIONMETHODSCHEDULE") {
-                                        thisPeople.ClothingType = 3;
-                                        thisPeople.ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
-                                        if (thisPeople.ClothingMethodPtr == 0) {
-                                            if (Item1 == 1) {
-                                                ShowSevereError(state,
-                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                    "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + " entered=\"" +
-                                                                    AlphaName(11) + "\".");
-                                                ErrorsFound = true;
-                                            }
-                                        }
-                                        if (CheckScheduleValue(state, thisPeople.ClothingMethodPtr, 1)) {
-                                            thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                            if (thisPeople.ClothingPtr == 0) {
-                                                if (Item1 == 1) {
-                                                    ShowSevereError(state,
-                                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                        "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + " entered=\"" +
-                                                                        AlphaName(12) + "\".");
-                                                    ErrorsFound = true;
-                                                }
-                                            }
-                                        }
-
-                                    } else {
-                                        ShowSevereError(state,
-                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", invalid " +
-                                                            state.dataIPShortCut->cAlphaFieldNames(10) + ", value  =" + AlphaName(10));
-                                        ShowContinueError(state,
-                                                          "...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", "
-                                                          "\"CalculationMethodSchedule\".");
-                                        ErrorsFound = true;
                                     }
+                                    break;
+                                default:
+                                    break; // nothing to do for the other cases
                                 }
                             }
 
@@ -943,7 +943,7 @@ namespace InternalHeatGains {
                             }
 
                             int indexAnkleAirVelPtr = 21;
-                            if (!state.dataIPShortCut->lAlphaFieldBlanks(indexAnkleAirVelPtr) || AlphaName(indexAnkleAirVelPtr) != "") {
+                            if (!state.dataIPShortCut->lAlphaFieldBlanks(indexAnkleAirVelPtr) || !AlphaName(indexAnkleAirVelPtr).empty()) {
                                 thisPeople.AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
                                 if (thisPeople.AnkleAirVelocityPtr == 0) {
                                     if (Item1 == 1) {
@@ -1235,7 +1235,7 @@ namespace InternalHeatGains {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"LightingLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                ShowContinueError(state, R"(...Valid values are "LightingLevel", "Watts/Area", "Watts/Person".)");
                                 ErrorsFound = true;
                             }
                         }
@@ -3465,17 +3465,9 @@ namespace InternalHeatGains {
                 }
                 print(state.files.eio, "{},", GetScheduleName(state, state.dataHeatBal->People(Loop).WorkEffPtr));
 
-                if (state.dataHeatBal->People(Loop).ClothingType == 1) {
-                    print(state.files.eio, "Clothing Insulation Schedule,");
-                } else if (state.dataHeatBal->People(Loop).ClothingType == 2) {
-                    print(state.files.eio, "Dynamic Clothing Model ASHRAE55,");
-                } else if (state.dataHeatBal->People(Loop).ClothingType == 3) {
-                    print(state.files.eio, "Calculation Method Schedule,");
-                } else {
-                    print(state.files.eio, "N/A,");
-                }
+                print(state.files.eio, clothingTypeEIOStrings[static_cast<int>(state.dataHeatBal->People(Loop).clothingType)]);
 
-                if (state.dataHeatBal->People(Loop).ClothingType == 3) {
+                if (state.dataHeatBal->People(Loop).clothingType == ClothingType::CalculationSchedule) {
                     print(state.files.eio, "{},", GetScheduleName(state, state.dataHeatBal->People(Loop).ClothingMethodPtr));
                 } else {
                     print(state.files.eio, "N/A,");
