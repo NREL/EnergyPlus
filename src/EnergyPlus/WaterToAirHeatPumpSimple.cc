@@ -1207,42 +1207,42 @@ namespace WaterToAirHeatPumpSimple {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 rhoair;
-        Real64 MixTemp;           // Mixed air temperature at cooling desing conditions
-        Real64 HeatMixTemp;       // Mixed air temperature at heating design conditions
-        Real64 MixHumRat;         // Mixed air humidity ratio at cooling design conditions
-        Real64 HeatMixHumRat;     // Mixed air humidity ratio at heating design conditions
-        Real64 MixEnth;           // Mixed air enthalpy at cooling design conditions
-        Real64 MixWetBulb;        // Mixed air wet-bulb temperature at cooling design conditions
-        Real64 RefMixWetBulb;     // Reference mixed air wetbulb temperature
-        Real64 RefMixDryBulb;     // Reference mixed air drybulb temperature
-        Real64 RefHeatMixDryBulb; // Reference mixed air drybulb temperature at heating design conditions
-        Real64 SupTemp;           // Supply air temperature at cooling design conditions
-        Real64 HeatSupTemp;       // Supply air temperature at heating design conditions
-        Real64 SupHumRat;         // Supply air humidity ratio at cooling design conditions
-        Real64 SupEnth;           // Supply air enthalpy at cooling design conditions
-        Real64 OutTemp;           // Outdoor aur dry-bulb temperature at cooling design conditions
-        Real64 ratioTDB;          // Load-side dry-bulb temperature ratio at cooling design conditions
-        Real64 HeatratioTDB;      // Load-side dry-bulb temperature ratio at heating design conditions
-        Real64 ratioTWB;          // Load-side wet-bulb temperature ratio at cooling design conditions
-        Real64 ratioTS;           // Source-side temperature ratio at cooling design conditions
-        Real64 HeatratioTS;       // Source-side temperature ratio at heating design conditions
-        Real64 RefratioTDB;       // Reference cooling load-side dry-bulb temperature ratio
-        Real64 RefHeatratioTDB;   // Reference cooling load-side dry-bulb temperature ratio
-        Real64 RefratioTWB;       // Reference cooling load-side wet-bulb temperature ratio
-        Real64 RefratioTS;        // Reference cooling source-side temperature ratio
-        Real64 RefHeatratioTS;    // Reference heating source-side temperature ratio
-        Real64 OutAirFrac;        // Outdoor air fraction at cooling design conditions
-        Real64 HeatOutAirFrac;    // Outdoor air fraction at heating design conditions
+        Real64 MixTemp;                 // Mixed air temperature at cooling desing conditions
+        Real64 HeatMixTemp;             // Mixed air temperature at heating design conditions
+        Real64 MixHumRat;               // Mixed air humidity ratio at cooling design conditions
+        Real64 HeatMixHumRat;           // Mixed air humidity ratio at heating design conditions
+        Real64 MixEnth;                 // Mixed air enthalpy at cooling design conditions
+        Real64 MixWetBulb;              // Mixed air wet-bulb temperature at cooling design conditions
+        Real64 RefMixWetBulb = 0.0;     // Reference mixed air wetbulb temperature
+        Real64 RefMixDryBulb = 0.0;     // Reference mixed air drybulb temperature
+        Real64 RefHeatMixDryBulb = 0.0; // Reference mixed air drybulb temperature at heating design conditions
+        Real64 SupTemp;                 // Supply air temperature at cooling design conditions
+        Real64 HeatSupTemp;             // Supply air temperature at heating design conditions
+        Real64 SupHumRat;               // Supply air humidity ratio at cooling design conditions
+        Real64 SupEnth;                 // Supply air enthalpy at cooling design conditions
+        Real64 OutTemp;                 // Outdoor aur dry-bulb temperature at cooling design conditions
+        Real64 ratioTDB;                // Load-side dry-bulb temperature ratio at cooling design conditions
+        Real64 HeatratioTDB;            // Load-side dry-bulb temperature ratio at heating design conditions
+        Real64 ratioTWB;                // Load-side wet-bulb temperature ratio at cooling design conditions
+        Real64 ratioTS;                 // Source-side temperature ratio at cooling design conditions
+        Real64 HeatratioTS;             // Source-side temperature ratio at heating design conditions
+        Real64 RefratioTDB;             // Reference cooling load-side dry-bulb temperature ratio
+        Real64 RefHeatratioTDB = 0.0;   // Reference cooling load-side dry-bulb temperature ratio
+        Real64 RefratioTWB;             // Reference cooling load-side wet-bulb temperature ratio
+        Real64 RefratioTS;              // Reference cooling source-side temperature ratio
+        Real64 RefHeatratioTS;          // Reference heating source-side temperature ratio
+        Real64 OutAirFrac;              // Outdoor air fraction at cooling design conditions
+        Real64 HeatOutAirFrac;          // Outdoor air fraction at heating design conditions
         Real64 VolFlowRate;
         Real64 CoolCapAtPeak;              // Load on the cooling coil at cooling design conditions
         Real64 HeatCapAtPeak;              // Load on the heating coil at heating design conditions
-        Real64 PeakTotCapTempModFac = 1.0; // Peak total cooling capacity curve modifier
-        Real64 RefTotCapTempModFac = 1.0;  // Reference total cooling capacity curve modifier
+        Real64 PeakTotCapTempModFac = 0.0; // Peak total cooling capacity curve modifier
+        Real64 RefTotCapTempModFac = 0.0;  // Reference total cooling capacity curve modifier
         Real64 PeakHeatCapTempModFac;      // Peak heating capacity curve modifier
         Real64 SensCapAtPeak;              // Sensible load on the cooling coil at cooling design conditions
         Real64 PeakSensCapTempModFac;      // Peak sensible cooling capacity curve modifier
         Real64 RefSensCapTempModFac = 0.0; // Reference sensible cooling capacity curve modifier
-        Real64 RefHeatCapTempModFac;       // Reference heating capacity curve modifier
+        Real64 RefHeatCapTempModFac = 0.0; // Reference heating capacity curve modifier
         Real64 RefCoolPowerTempModFac;     // Reference cooling power curve modifier
         Real64 RefHeatPowerTempModFac;     // Reference heating power curve modifier
         Real64 RefCapCoolTotalDesCDD;      // Reference total cooling coil capacity determined at cooling design conditions
@@ -2778,7 +2778,9 @@ namespace WaterToAirHeatPumpSimple {
                                              simpleWatertoAirHP.Name,
                                              "Design Size Reference Water Flow Rate [m3/s]",
                                              ReferenceWaterVolFlowRateDes);
-                if (simpleWatertoAirHP.WatertoAirHPType == "HEATING") {
+                if (simpleWatertoAirHP.WatertoAirHPType == "HEATING" && simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
+                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).ReferenceWaterVolFlowRate =
+                        ReferenceWaterVolFlowRateDes;
                     BaseSizer::reportSizerOutput(
                         state,
                         "COIL:" +
@@ -2787,7 +2789,9 @@ namespace WaterToAirHeatPumpSimple {
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
                         "Design Size Reference Water Flow Rate [m3/s]",
                         ReferenceWaterVolFlowRateDes);
-                } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING") {
+                } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING" && simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
+                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).ReferenceWaterVolFlowRate =
+                        ReferenceWaterVolFlowRateDes;
                     BaseSizer::reportSizerOutput(
                         state,
                         "COIL:" +
