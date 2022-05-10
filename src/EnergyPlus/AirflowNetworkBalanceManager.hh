@@ -103,19 +103,7 @@ namespace AirflowNetwork {
         }
     };
 
-    // Functions
 
-    void ManageAirflowNetworkBalance(EnergyPlusData &state,
-                                     Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
-                                     Optional_int_const Iter = _,                // Iteration number
-                                     Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
-    );
-
-    void GetAirflowNetworkInput(EnergyPlusData &state);
-
-    void AllocateAndInitData(EnergyPlusData &state);
-
-    void CalcAirflowNetworkAirBalance(EnergyPlusData &state);
 
     Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
                                     Real64 mdot, // Mass flow rate
@@ -131,17 +119,6 @@ namespace AirflowNetwork {
                                      Real64 Dh,      // Hydraulic diameter
                                      Real64 ZoneNum, // Zone number
                                      Real64 hOut     // User defined convection coefficient
-    );
-
-    Real64 CalcWindPressure(EnergyPlusData &state,
-                            int curve,           // Curve index, change this to pointer after curve refactor
-                            bool symmetricCurve, // True if the curve is symmetric (0 to 180)
-                            bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
-                            Real64 azimuth,      // Azimuthal angle of surface
-                            Real64 windSpeed,    // Wind velocity
-                            Real64 windDir,      // Wind direction
-                            Real64 dryBulbTemp,  // Air node dry bulb temperature
-                            Real64 humRat        // Air node humidity ratio
     );
 
     void CalcAirflowNetworkHeatBalance(EnergyPlusData &state);
@@ -264,6 +241,29 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
                 int const FLAG               // mode of operation
     );
 
+    void manage_balance(EnergyPlusData &state,
+                        Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
+                        Optional_int_const Iter = _,                // Iteration number
+                        Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
+    );
+
+    void get_input(EnergyPlusData &state);
+
+    void allocate_and_initialize(EnergyPlusData &state);
+
+    void calculate_balance(EnergyPlusData &state);
+
+    Real64 calculate_wind_pressure(EnergyPlusData &state,
+                            int curve,           // Curve index, change this to pointer after curve refactor
+                            bool symmetricCurve, // True if the curve is symmetric (0 to 180)
+                            bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
+                            Real64 azimuth,      // Azimuthal angle of surface
+                            Real64 windSpeed,    // Wind velocity
+                            Real64 windDir,      // Wind direction
+                            Real64 dryBulbTemp,  // Air node dry bulb temperature
+                            Real64 humRat        // Air node humidity ratio
+    );
+
     EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
     Array1D_int SplitterNodeNumbers;
     int AirflowNetworkNumOfExtSurfaces = 0;
@@ -359,7 +359,7 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
     std::unordered_map<std::string, AirflowElement *> elements;
     std::unordered_map<std::string, int> compnum; // Stopgap until all the introspection is dealt with
 
-    std::vector<AirProperties> properties;
+    std::vector<AirState> properties;
 
     // int const NrInt; // Number of intervals for a large opening
 
@@ -655,6 +655,9 @@ struct AirflowNetworkSolverData : BaseGlobalStruct
         this->DisSysCompReliefAirData.clear();
         this->AirflowNetworkLinkageViewFactorData.clear();
     }
+
+private:
+    bool get_element_input(EnergyPlusData &state);
 };
 
 } // namespace AirflowNetwork

@@ -4680,7 +4680,6 @@ namespace SystemAvailabilityManager {
 
         using namespace DataAirLoop;
         using AirflowNetwork::GetZoneOutdoorAirChangeRate;
-        using AirflowNetwork::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using Psychrometrics::PsyHFnTdbW;
@@ -4778,7 +4777,7 @@ namespace SystemAvailabilityManager {
                 }
 
                 if (hybridVentMgr.ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
-                    ManageAirflowNetworkBalance(state, true);
+                    state.afn->manage_balance(state, true);
                     ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum);
                 }
                 if (ACH > OASetPoint) {

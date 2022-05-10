@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->afn->AirflowNetworkSimu.solver));
 
@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->afn->AirflowNetworkSimu.solver));
 

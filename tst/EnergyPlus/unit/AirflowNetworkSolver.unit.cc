@@ -85,7 +85,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
 
     state->afn->properties.clear();
     for (int it = 0; it < 2; ++it)
-        state->afn->properties.emplace_back(AirProperties(AIRDENSITY(*state, 20.0, 101325.0, 0.0)));
+        state->afn->properties.emplace_back(AirState(AIRDENSITY(*state, 20.0, 101325.0, 0.0)));
     state->afn->properties[0].density = 1.2;
     state->afn->properties[1].density = 1.18;
 
@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
 
     state->afn->properties.clear();
     for (int it = 0; it < 2; ++it)
-        state->afn->properties.emplace_back(AirProperties(AIRDENSITY(*state, 20.0, 101325.0, 0.0)));
+        state->afn->properties.emplace_back(AirState(AIRDENSITY(*state, 20.0, 101325.0, 0.0)));
     state->afn->properties[0].density = 1.2;
     state->afn->properties[1].density = 1.2;
 
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
     crack.coefficient = 0.001;
     crack.exponent = 0.65;
 
-    AirflowNetwork::AirProperties state0, state1;
+    AirflowNetwork::AirState state0, state1;
     Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
     Real64 viscosity = state0.viscosity;       // = state1.viscosity
 
@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_GenericCrack)
     Real64 coef{0.001};
     Real64 expo{0.65};
 
-    AirflowNetwork::AirProperties state0, state1;
+    AirflowNetwork::AirState state0, state1;
     Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
     Real64 viscosity = state0.viscosity;       // = state1.viscosity
 
@@ -269,7 +269,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedMassFlow)
     AirflowNetwork::SpecifiedMassFlow element;
     element.mass_flow = 0.1;
 
-    AirflowNetwork::AirProperties state0, state1;
+    AirflowNetwork::AirState state0, state1;
 
     Real64 dp{10.0};
     Real64 f = element.mass_flow;
@@ -315,7 +315,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedVolumeFlow)
     AirflowNetwork::SpecifiedVolumeFlow element;
     element.volume_flow = 0.1;
 
-    AirflowNetwork::AirProperties state0, state1;
+    AirflowNetwork::AirState state0, state1;
     Real64 density = state0.density; // = state1.density
 
     Real64 dp{10.0};

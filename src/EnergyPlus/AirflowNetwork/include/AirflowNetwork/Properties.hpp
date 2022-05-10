@@ -105,7 +105,7 @@ Real64 airPrandtl(EnergyPlusData &state,
                   Real64 P  // Barometric pressure
 );
 
-struct AirProperties
+struct AirState
 {
     Real64 temperature{20.0};
     // Real64 pressure;      //{0.0}; // gage pressure
@@ -114,8 +114,8 @@ struct AirProperties
     Real64 sqrt_density{0.0};
     Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
 
-    AirProperties();
-    explicit AirProperties(double const airDensity);
+    AirState();
+    explicit AirState(double const airDensity);
 };
 
 } // namespace AirflowNetwork

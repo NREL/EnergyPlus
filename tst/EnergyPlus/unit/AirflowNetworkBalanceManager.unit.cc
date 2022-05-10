@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     auto GetIndex = UtilityRoutines::FindItemInList(state->afn->MultizoneZoneData(1).VentingSchName,
@@ -349,7 +349,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestTriangularWindowWarning)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
     std::string const error_string = delimited_string({
         "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
         "   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
@@ -2292,7 +2292,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     Real64 PressureSet = 0.5;
 
@@ -2366,7 +2366,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     state->afn->PressureControllerData(1).OANodeNum = state->afn->DisSysCompReliefAirData(1).OutletNode;
-    CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
 
     // Check indoor pressure and mass flow rate
     EXPECT_NEAR(PressureSet, state->afn->AirflowNetworkNodeSimu(3).PZ, 0.0001);
@@ -2389,7 +2389,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->afn->MultizoneSurfaceData(2).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(5).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(14).HybridVentClose = true;
-    CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
     EXPECT_EQ(0.0, state->afn->MultizoneSurfaceData(2).OpenFactor);
     EXPECT_EQ(0.0, state->afn->MultizoneSurfaceData(5).OpenFactor);
     EXPECT_EQ(0.0, state->afn->MultizoneSurfaceData(14).OpenFactor);
@@ -2534,7 +2534,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // The original value before fix is zero. After the fix, the correct schedule number is assigned.
 
@@ -3077,7 +3077,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPolygonalWindows)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // Choice: Height; Base Surface: Vertical Rectangular
     EXPECT_NEAR(1.0, state->afn->MultizoneSurfaceData(1).Width, 0.0001);
@@ -4484,7 +4484,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_UserDefinedDuctViewFactors)
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
     state->afn->initialize(*state);
 
     // Check inputs
@@ -4701,15 +4701,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     Real64 azimuth = 0.0;
     Real64 windDir = state->dataEnvrn->WindDir;
     Real64 humRat = state->dataEnvrn->OutHumRat;
-    Real64 p = AirflowNetwork::CalcWindPressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
+    Real64 p = state->afn->calculate_wind_pressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.54 * 0.5 * 1.1841123742118911, p);
     // Test on an east wall, which has a relative angle of 15 (for wind direction 105)
     azimuth = 90.0;
-    p = AirflowNetwork::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 1.1841123742118911, p);
     // Test on a wall with azimuth 105, for a zero relative angle
     azimuth = 105.0;
-    p = AirflowNetwork::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 }
 
@@ -4781,15 +4781,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
 
     // Compute wind pressure with current defaults
-    Real64 p = AirflowNetwork::CalcWindPressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
+    Real64 p = state->afn->calculate_wind_pressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
     // Test on an east wall, which has a relative angle of 15 (for wind direction 105)
     azimuth = 90.0;
-    p = AirflowNetwork::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.54 * 0.5 * 1.1841123742118911, p);
     // Test on a wall with azimuth 105, for a zero relative angle
     azimuth = 105.0;
-    p = AirflowNetwork::CalcWindPressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.6 * 0.5 * 1.1841123742118911, p);
 }
 
@@ -5777,7 +5777,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
-    AirflowNetwork::GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -5808,7 +5808,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetwork::CalcWindPressure(*state,
+    Real64 p = state->afn->calculate_wind_pressure(*state,
                                                               state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
@@ -5825,7 +5825,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetwork::CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
@@ -6502,7 +6502,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
-    AirflowNetwork::GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -6533,7 +6533,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetwork::CalcWindPressure(*state,
+    Real64 p = state->afn->calculate_wind_pressure(*state,
                                                               state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
@@ -6550,7 +6550,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetwork::CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
@@ -7146,7 +7146,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    AirflowNetwork::GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     EXPECT_EQ(state->dataCurveManager->NumCurves, 6);
 
@@ -7189,7 +7189,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetwork::CalcWindPressure(*state,
+    Real64 p = state->afn->calculate_wind_pressure(*state,
                                                               state->afn->MultizoneExternalNodeData(2).curve,
                                                               false,
                                                               false,
@@ -7199,7 +7199,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
                                                               DataEnvironment::OutDryBulbTempAt(*state, 10.0),
                                                               state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 1.1841123742118911, p);
-    p = AirflowNetwork::CalcWindPressure(*state,
+    p = state->afn->calculate_wind_pressure(*state,
                                                        state->afn->MultizoneExternalNodeData(1).curve,
                                                        false,
                                                        false,
@@ -7216,7 +7216,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetwork::CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
 
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
     EXPECT_DOUBLE_EQ(cp105S * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
@@ -7857,7 +7857,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    AirflowNetwork::GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -7888,7 +7888,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetwork::CalcWindPressure(*state,
+    Real64 p = state->afn->calculate_wind_pressure(*state,
                                                               state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
@@ -7905,7 +7905,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetwork::CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
@@ -8512,7 +8512,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    AirflowNetwork::GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -8552,7 +8552,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = AirflowNetwork::CalcWindPressure(*state,
+    Real64 p = state->afn->calculate_wind_pressure(*state,
                                                               state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
@@ -8569,7 +8569,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    AirflowNetwork::CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
 
     EXPECT_NEAR(cp105N * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ, 1e-13);
     EXPECT_NEAR(cp105S * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ, 1e-13);
@@ -9244,7 +9244,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     state->dataGlobal->AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes(*state);
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
     // Issue 7656
     std::string const error_string = delimited_string({
         //"   ** Warning ** No Timestep object found.  Number of TimeSteps in Hour defaulted to 4.",
@@ -9280,7 +9280,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_DOUBLE_EQ(1.2252059842834473, rho_1);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho_2);
 
-    Real64 p = AirflowNetwork::CalcWindPressure(*state,
+    Real64 p = state->afn->calculate_wind_pressure(*state,
                                                               state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
@@ -9293,7 +9293,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
 
-    AirflowNetwork::CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
     // Make sure we set the right temperature
     EXPECT_DOUBLE_EQ(25.0, state->afn->AirflowNetworkNodeSimu(4).TZ);
     EXPECT_DOUBLE_EQ(15.0, state->afn->AirflowNetworkNodeSimu(5).TZ);
@@ -9726,7 +9726,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    AirflowNetwork::GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
     EXPECT_EQ(7, state->dataCurveManager->NumCurves);
@@ -13304,7 +13304,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     Real64 PresssureSet = 0.5;
     // Assign values
@@ -13366,7 +13366,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataAirLoop->AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
     state->dataAirLoop->AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
 
-    CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
 
     // Check mass flow rate
     EXPECT_NEAR(1.40, state->afn->AirflowNetworkLinkSimu(42).FLOW, 0.0001);
@@ -13377,7 +13377,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     state->afn->AirflowNetworkFanActivated = false;
     // #7977
-    CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
     state->dataHeatBalFanSys->MAT.allocate(5);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(5);
@@ -13897,10 +13897,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     bool resimu = false;
 
     state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    AirflowNetwork::GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
     state->afn->AirflowNetworkGetInputFlag = false;
     state->afn->exchangeData.allocate(1);
-    ManageAirflowNetworkBalance(*state, First, iter, resimu);
+    state->afn->manage_balance(*state, First, iter, resimu);
     EXPECT_FALSE(resimu);
 }
 
@@ -15832,7 +15832,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 100.0;
@@ -15872,7 +15872,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     state->afn->AirflowNetworkLinkageData(17).AirLoopNum = 1;
     state->dataLoopNodes->Node(4).MassFlowRate = 1.23;
 
-    CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
     // Fan:SystemModel
     EXPECT_NEAR(1.23, state->afn->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
     EXPECT_TRUE(state->afn->DisSysCompCVFData(1).FanModelFlag);
@@ -15888,7 +15888,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     }
     // Fan:OnOff
     state->afn->DisSysCompCVFData(1).FanModelFlag = false;
-    CalcAirflowNetworkAirBalance(*state);
+    state->afn->calculate_balance(*state);
     EXPECT_NEAR(1.23, state->afn->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
     state->dataAirLoop->AirLoopAFNInfo.deallocate();
@@ -17425,7 +17425,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuplicatedNodeNameTest)
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
 
     // Read AirflowNetwork inputs
-    ASSERT_THROW(GetAirflowNetworkInput(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->get_input(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.",
@@ -20234,7 +20234,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     state->afn->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
@@ -20291,7 +20291,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     SimAirServingZones::GetAirPathData(*state);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     state->afn->AirflowNetworkGetInputFlag = false;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
@@ -20300,7 +20300,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     state->afn->DisSysNodeData(9).EPlusNodeNum = 50;
     // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
-    ManageAirflowNetworkBalance(*state, true);
+    state->afn->manage_balance(*state, true);
     EXPECT_EQ(state->afn->DisSysCompCVFData(1).AirLoopNum, 1);
 }
 
@@ -20408,7 +20408,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
     // Expect warnings about the air boundary surface
     EXPECT_TRUE(has_err_output(false));
     std::string const expectedErrString =
@@ -21436,7 +21436,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     EXPECT_TRUE(state->afn->AFNDefaultControlFlag);
@@ -23961,7 +23961,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
 
     EXPECT_EQ(state->afn->IntraZoneNodeData(1).AFNZoneNum, 1);
     EXPECT_EQ(state->afn->IntraZoneNodeData(1).ZoneNum, 3);
@@ -24120,7 +24120,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestReferenceConditionsLeftBlank)
     SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input(*state);
     // check correct values for reference conditions of crack surface when reference conditions were left blank.
     Real64 refP1 = 101325.0;
     Real64 refT1 = 20.0;

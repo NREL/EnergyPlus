@@ -147,7 +147,6 @@ void ManageHVAC(EnergyPlusData &state)
     //  manage variable time step and when zone air histories are updated.
 
     // Using/Aliasing
-    using AirflowNetwork::ManageAirflowNetworkBalance;
     using DemandManager::ManageDemand;
     using DemandManager::UpdateDemandManagers;
     using EMSManager::ManageEMS;
@@ -200,7 +199,7 @@ void ManageHVAC(EnergyPlusData &state)
     if (state.dataHVACMgr->TriggerGetAFN) {
         state.dataHVACMgr->TriggerGetAFN = false;
         DisplayString(state, "Initializing HVAC");
-        ManageAirflowNetworkBalance(state); // first call only gets input and returns.
+        state.afn->manage_balance(state); // first call only gets input and returns.
     }
 
     state.dataHeatBalFanSys->ZT = state.dataHeatBalFanSys->MAT;
@@ -263,7 +262,7 @@ void ManageHVAC(EnergyPlusData &state)
     CalcAirFlowSimple(state);
     if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
         state.afn->RollBackFlag = false;
-        ManageAirflowNetworkBalance(state, false);
+        state.afn->manage_balance(state, false);
     }
 
     SetHeatToReturnAirFlag(state);
@@ -328,7 +327,7 @@ void ManageHVAC(EnergyPlusData &state)
             CalcAirFlowSimple(state, SysTimestepLoop);
             if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 state.afn->RollBackFlag = false;
-                ManageAirflowNetworkBalance(state, false);
+                state.afn->manage_balance(state, false);
             }
 
             UpdateInternalGainValues(state, true, true);
@@ -1813,7 +1812,6 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // Each flag is checked and the appropriate manager is then called.
 
     // Using/Aliasing
-    using AirflowNetwork::ManageAirflowNetworkBalance;
     using NonZoneEquipmentManager::ManageNonZoneEquipment;
     using PlantManager::ManagePlantLoops;
     using PlantUtilities::AnyPlantLoopSidesNeedSim;
@@ -1861,7 +1859,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         state.dataHVACMgr->RepIterAir = 0;
         // Call AirflowNetwork simulation to calculate air flows and pressures
         if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-            ManageAirflowNetworkBalance(state, FirstHVACIteration);
+            state.afn->manage_balance(state, FirstHVACIteration);
         }
         ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
         state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
@@ -1887,7 +1885,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             // Call AirflowNetwork simulation to calculate air flows and pressures
             ResimulateAirZone = false;
             if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
+                state.afn->manage_balance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
                 ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
