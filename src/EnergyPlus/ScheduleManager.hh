@@ -81,7 +81,13 @@ namespace ScheduleManager {
         Num
     };
 
-    enum class OutputScheduleReportLevel {Invalid = -1, Hourly, TimeStep, Num};
+    enum class OutputScheduleReportLevel
+    {
+        Invalid = -1,
+        Hourly,
+        TimeStep,
+        Num
+    };
 
     enum class ScheduleInterpolation
     {

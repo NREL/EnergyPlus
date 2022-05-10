@@ -131,7 +131,8 @@ namespace ScheduleManager {
                                                "Mode"});
 
     constexpr std::array<std::string_view, static_cast<int>(OutputScheduleReportLevel::Num)> outputScheduleReportLevelNames = {"Hourly", "Timestep"};
-    constexpr std::array<std::string_view, static_cast<int>(OutputScheduleReportLevel::Num)> outputScheduleReportLevelNamesUC = {"HOURLY", "TIMESTEP"};
+    constexpr std::array<std::string_view, static_cast<int>(OutputScheduleReportLevel::Num)> outputScheduleReportLevelNamesUC = {"HOURLY",
+                                                                                                                                 "TIMESTEP"};
 
     void ProcessScheduleInput(EnergyPlusData &state)
     {
@@ -2190,10 +2191,10 @@ namespace ScheduleManager {
                 //      RptSchedule=.TRUE.
 
                 // IDD only allows Hourly or Timestep as valid values on the required field, anything else should be an error in the input processor
-                OutputScheduleReportLevel reportLevel = static_cast<OutputScheduleReportLevel>(getEnumerationValue(outputScheduleReportLevelNamesUC, Alphas(1))); // NOLINT(modernize-use-auto)
+                OutputScheduleReportLevel reportLevel = static_cast<OutputScheduleReportLevel>(
+                    getEnumerationValue(outputScheduleReportLevelNamesUC, Alphas(1))); // NOLINT(modernize-use-auto)
                 if (reportLevel == OutputScheduleReportLevel::Invalid) {
-                    ShowWarningError(state,
-                                     format("{}Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")", RoutineName));
+                    ShowWarningError(state, format("{}Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")", RoutineName));
                     ShowContinueError(state, "HOURLY report will be done");
                     reportLevel = OutputScheduleReportLevel::Hourly;
                 }
@@ -2211,7 +2212,8 @@ namespace ScheduleManager {
         print(state.files.audit, "{}\n", "  Processing Schedule Input -- Complete");
     }
 
-    void ReportScheduleDetails(EnergyPlusData &state, OutputScheduleReportLevel const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(EnergyPlusData &state,
+                               OutputScheduleReportLevel const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
     {
 
         // SUBROUTINE INFORMATION:
@@ -2259,7 +2261,7 @@ namespace ScheduleManager {
         }
         ShowMinute(state.dataGlobal->NumOfTimeStepInHour) = "00";
 
-        switch(LevelOfDetail) {
+        switch (LevelOfDetail) {
         case OutputScheduleReportLevel::Hourly:
         case OutputScheduleReportLevel::TimeStep:
             NumF = 1;
@@ -2417,132 +2419,132 @@ namespace ScheduleManager {
 
         // So this section of the code was not accessible.  The input processor would never have let anything but hourly or timestep on the object
         // This code is obviously not covered by any of our integration or unit tests.
-//            for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
-//                print(state.files.debug, "\n");
-//                print(state.files.debug, "  Schedule:Compact,\n");
-//                print(state.files.debug, "    {},           !- Name\n", state.dataScheduleMgr->Schedule(Count).Name);
-//                print(state.files.debug,
-//                      "    {},          !- ScheduleTypeLimits\n",
-//                      state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
-//                NumF = 1;
-//                while (NumF <= 366) {
-//                    TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
-//                    while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
-//                        if (NumF == 366) {
-//                            General::InvOrdinalDay(NumF, PMon, PDay, 1);
-//                            print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
-//                            iDayP = 0;
-//                            for (DT = 2; DT <= 6; ++DT) {
-//                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-//                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-//                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-//                                if (iDay != iDayP) {
-//                                    for (Hr = 1; Hr <= 24; ++Hr) {
-//                                        print(state.files.debug,
-//                                              "    Until: {}:{},{:.2R},\n",
-//                                              Hr,
-//                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-//                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-//                                    }
-//                                } else {
-//                                    print(state.files.debug, "    Same as previous\n");
-//                                }
-//                                iDayP = iDay;
-//                            }
-//                            DT = 1;
-//                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-//                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-//                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-//                            if (iDay != iDayP) {
-//                                for (Hr = 1; Hr <= 24; ++Hr) {
-//                                    print(state.files.debug,
-//                                          "    Until: {}:{},{:.2R},\n",
-//                                          Hr,
-//                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-//                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-//                                }
-//                            } else {
-//                                print(state.files.debug, "    Same as previous\n");
-//                            }
-//                            iDayP = iDay;
-//                            for (DT = 7; DT <= MaxDayTypes; ++DT) {
-//                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-//                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-//                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-//                                if (iDay != iDayP) {
-//                                    for (Hr = 1; Hr <= 24; ++Hr) {
-//                                        print(state.files.debug,
-//                                              "    Until: {}:{},{:.2R},\n",
-//                                              Hr,
-//                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-//                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-//                                    }
-//                                } else {
-//                                    print(state.files.debug, "    Same as previous\n");
-//                                }
-//                                iDayP = iDay;
-//                            }
-//                        }
-//                        ++NumF;
-//                        if (NumF > 366) break; // compound If might have a problem unless this included.
-//                    }
-//                    if (NumF <= 366) {
-//                        General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-//                        print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
-//                        iDayP = 0;
-//                        for (DT = 2; DT <= 6; ++DT) {
-//                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-//                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-//                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-//                            if (iDay != iDayP) {
-//                                for (Hr = 1; Hr <= 24; ++Hr) {
-//                                    print(state.files.debug,
-//                                          "    Until: {}:{},{:.2R},\n",
-//                                          Hr,
-//                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-//                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-//                                }
-//                            } else {
-//                                print(state.files.debug, "    Same as previous\n");
-//                            }
-//                            iDayP = iDay;
-//                        }
-//                        DT = 1;
-//                        print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-//                        iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-//                        iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-//                        if (iDay != iDayP) {
-//                            for (Hr = 1; Hr <= 24; ++Hr) {
-//                                print(state.files.debug,
-//                                      "    Until: {}:{},{:.2R},\n",
-//                                      Hr,
-//                                      ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-//                                      state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-//                            }
-//                        } else {
-//                            print(state.files.debug, "    Same as previous\n");
-//                        }
-//                        iDayP = iDay;
-//                        for (DT = 7; DT <= MaxDayTypes; ++DT) {
-//                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-//                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
-//                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
-//                            if (iDay != iDayP) {
-//                                for (Hr = 1; Hr <= 24; ++Hr) {
-//                                    print(state.files.debug,
-//                                          "    Until: {}:{},{:.2R},\n",
-//                                          Hr,
-//                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-//                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-//                                }
-//                            } else {
-//                                print(state.files.debug, "    Same as previous\n");
-//                            }
-//                            iDayP = iDay;
-//                        }
-//                    }
-//                }
-//            }
+        //            for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
+        //                print(state.files.debug, "\n");
+        //                print(state.files.debug, "  Schedule:Compact,\n");
+        //                print(state.files.debug, "    {},           !- Name\n", state.dataScheduleMgr->Schedule(Count).Name);
+        //                print(state.files.debug,
+        //                      "    {},          !- ScheduleTypeLimits\n",
+        //                      state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
+        //                NumF = 1;
+        //                while (NumF <= 366) {
+        //                    TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
+        //                    while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
+        //                        if (NumF == 366) {
+        //                            General::InvOrdinalDay(NumF, PMon, PDay, 1);
+        //                            print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
+        //                            iDayP = 0;
+        //                            for (DT = 2; DT <= 6; ++DT) {
+        //                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+        //                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+        //                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+        //                                if (iDay != iDayP) {
+        //                                    for (Hr = 1; Hr <= 24; ++Hr) {
+        //                                        print(state.files.debug,
+        //                                              "    Until: {}:{},{:.2R},\n",
+        //                                              Hr,
+        //                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+        //                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+        //                                    }
+        //                                } else {
+        //                                    print(state.files.debug, "    Same as previous\n");
+        //                                }
+        //                                iDayP = iDay;
+        //                            }
+        //                            DT = 1;
+        //                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+        //                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+        //                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+        //                            if (iDay != iDayP) {
+        //                                for (Hr = 1; Hr <= 24; ++Hr) {
+        //                                    print(state.files.debug,
+        //                                          "    Until: {}:{},{:.2R},\n",
+        //                                          Hr,
+        //                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+        //                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+        //                                }
+        //                            } else {
+        //                                print(state.files.debug, "    Same as previous\n");
+        //                            }
+        //                            iDayP = iDay;
+        //                            for (DT = 7; DT <= MaxDayTypes; ++DT) {
+        //                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+        //                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+        //                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+        //                                if (iDay != iDayP) {
+        //                                    for (Hr = 1; Hr <= 24; ++Hr) {
+        //                                        print(state.files.debug,
+        //                                              "    Until: {}:{},{:.2R},\n",
+        //                                              Hr,
+        //                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+        //                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+        //                                    }
+        //                                } else {
+        //                                    print(state.files.debug, "    Same as previous\n");
+        //                                }
+        //                                iDayP = iDay;
+        //                            }
+        //                        }
+        //                        ++NumF;
+        //                        if (NumF > 366) break; // compound If might have a problem unless this included.
+        //                    }
+        //                    if (NumF <= 366) {
+        //                        General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
+        //                        print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
+        //                        iDayP = 0;
+        //                        for (DT = 2; DT <= 6; ++DT) {
+        //                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+        //                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+        //                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+        //                            if (iDay != iDayP) {
+        //                                for (Hr = 1; Hr <= 24; ++Hr) {
+        //                                    print(state.files.debug,
+        //                                          "    Until: {}:{},{:.2R},\n",
+        //                                          Hr,
+        //                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+        //                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+        //                                }
+        //                            } else {
+        //                                print(state.files.debug, "    Same as previous\n");
+        //                            }
+        //                            iDayP = iDay;
+        //                        }
+        //                        DT = 1;
+        //                        print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+        //                        iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+        //                        iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+        //                        if (iDay != iDayP) {
+        //                            for (Hr = 1; Hr <= 24; ++Hr) {
+        //                                print(state.files.debug,
+        //                                      "    Until: {}:{},{:.2R},\n",
+        //                                      Hr,
+        //                                      ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+        //                                      state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+        //                            }
+        //                        } else {
+        //                            print(state.files.debug, "    Same as previous\n");
+        //                        }
+        //                        iDayP = iDay;
+        //                        for (DT = 7; DT <= MaxDayTypes; ++DT) {
+        //                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+        //                            iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+        //                            iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
+        //                            if (iDay != iDayP) {
+        //                                for (Hr = 1; Hr <= 24; ++Hr) {
+        //                                    print(state.files.debug,
+        //                                          "    Until: {}:{},{:.2R},\n",
+        //                                          Hr,
+        //                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+        //                                          state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+        //                                }
+        //                            } else {
+        //                                print(state.files.debug, "    Same as previous\n");
+        //                            }
+        //                            iDayP = iDay;
+        //                        }
+        //                    }
+        //                }
+        //            }
 
         ShowMinute.deallocate();
         TimeHHMM.deallocate();
