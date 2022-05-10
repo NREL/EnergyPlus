@@ -1284,6 +1284,25 @@ namespace DataSurfaces {
         }
     };
 
+    struct GroundSurfacesProperty
+    {
+        // Members
+        std::string Name;              // name of multiple ground surfaces object
+        //int TotGndSurfs;               // number of ground surfaces viewed by an exterior surface
+        Array1D<std::string> SurfName; // string holding list names of ground surfaces
+        int NumGndSurfs;               // number of groundSurfaces
+        Array1D<Real64> ViewFactor;    // view factors to ground surfaces
+        Array1D_int TempSchPtr;        // pointers to groundSurfaces temperature schedule objects
+        Array1D_int ReflSchPtr;        // pointers to groundSurfaces reflectance schedule objects
+        Real64 SurfsTempAvg;           // groundSurfaces average temperature at each time step
+        Real64 SurfsReflAvg;           // groundSurfaces average reflectance at each time step
+
+        // Default Constructor
+        GroundSurfacesProperty() : NumGndSurfs(0), ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0), SurfsReflAvg(0.0)
+        {
+        }
+    };
+
     struct SurfaceLocalEnvironment
     {
         // Members
@@ -1292,9 +1311,11 @@ namespace DataSurfaces {
         int ExtShadingSchedPtr;  // schedule pointer
         int SurroundingSurfsPtr; // schedule pointer
         int OutdoorAirNodePtr;   // schedule pointer
+        //GroundSurfacesProperty GndSurf; // ground surfaces object
+        int GndSurfsPtr;         // pointer to multiple ground surfaces object
 
         // Default Constructor
-        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0)
+        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0), GndSurfsPtr(0)
         {
         }
     };
@@ -1509,6 +1530,9 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsPool;                       // true if this is a pool
     Array1D<int> SurfICSPtr;                        // Index to ICS collector
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
+
+    Array1D<bool> SurfHasGroundSurfProperties;      // true if ground surfaces properties are listed for an external surface
+    Array1D<int> SurfGroundSurfacesNum;             // Index of a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
@@ -1771,6 +1795,8 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
     EPVector<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
     EPVector<DataSurfaces::IntMassObject> IntMassObjects;
+    EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
+
 
     int actualMaxSlatAngs = DataSurfaces::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
 
@@ -1912,6 +1938,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIntConvWindowLocation.deallocate();
         this->SurfIntConvSurfGetsRadiantHeat.deallocate();
         this->SurfIntConvSurfHasActiveInIt.deallocate();
+        this->SurfHasGroundSurfProperties.deallocate();
+        this->SurfGroundSurfacesNum.deallocate();
 
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
