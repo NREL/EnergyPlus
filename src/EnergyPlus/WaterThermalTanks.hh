@@ -249,10 +249,12 @@ namespace WaterThermalTanks {
 
     enum class TankOperatingMode
     {
+        Invalid = -1,
         Heating,  // heating source is on, source will not turn off until setpoint temp is reached
         Floating, // heating source is off, source will not turn on until cut-in temp is reached
         Venting,  // tank temp is above maximum temperature and water is venting
-        Cooling   // cooling source is on, source will not turn off until setpoint temp is reached
+        Cooling,  // cooling source is on, source will not turn off until setpoint temp is reached
+        Num
     };
 
     struct StratifiedNodeData

@@ -757,7 +757,8 @@ namespace DataHeatBalance {
         Invalid = -1,
         InsulationSchedule,
         DynamicAshrae55,
-        CalculationSchedule
+        CalculationSchedule,
+        Num
     };
 
     struct PeopleData
