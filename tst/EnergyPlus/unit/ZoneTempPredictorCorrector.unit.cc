@@ -1137,7 +1137,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
     state->dataZoneCtrls->ComfortControlledZone(1).ActualZoneNum = 1;
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideHeatingSetPointOn = true;
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideCoolingSetPointOn = true;
-    state->dataHeatBalFanSys->ComfortControlType(1) = DataHVACGlobals::ThermalComfortCtrlType::DualSetPointFanger;
+    state->dataHeatBalFanSys->ComfortControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideHeatingSetPointValue = 22;
     state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideCoolingSetPointValue = 25;
 

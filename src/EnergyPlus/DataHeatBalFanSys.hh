@@ -251,7 +251,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
     EPVector<DataHVACGlobals::ThermostatType> TempControlType;
     EPVector<int> TempControlTypeRpt;
-    EPVector<DataHVACGlobals::ThermalComfortCtrlType> ComfortControlType;
+    EPVector<DataHVACGlobals::ThermostatType> ComfortControlType;
     EPVector<int> ComfortControlTypeRpt;
 
     Array1D<Real64> ZoneHeatIndex;
