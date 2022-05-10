@@ -1030,55 +1030,30 @@ namespace WaterThermalTanks {
 
 struct WaterThermalTanksData : BaseGlobalStruct
 {
+    int numChilledWaterMixed = 0;        // number of mixed chilled water tanks
+    int numChilledWaterStratified = 0;   // number of stratified chilled water tanks
+    int numWaterHeaterMixed = 0;         // number of mixed water heaters
+    int numWaterHeaterStratified = 0;    // number of stratified water heaters
+    int numWaterThermalTank = 0;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
+    int numWaterHeaterDesuperheater = 0; // number of desuperheater heating coils
+    int numHeatPumpWaterHeater = 0;      // number of heat pump water heaters
+    int numWaterHeaterSizing = 0;        // Number of sizing/design objects for water heaters.
 
-    int numChilledWaterMixed;        // number of mixed chilled water tanks
-    int numChilledWaterStratified;   // number of stratified chilled water tanks
-    int numWaterHeaterMixed;         // number of mixed water heaters
-    int numWaterHeaterStratified;    // number of stratified water heaters
-    int numWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
-    int numWaterHeaterDesuperheater; // number of desuperheater heating coils
-    int numHeatPumpWaterHeater;      // number of heat pump water heaters
-    int numWaterHeaterSizing;        // Number of sizing/design objects for water heaters.
-
-    Real64 hpPartLoadRatio;       // part load ratio of HPWH
-    Real64 mixerInletAirSchedule; // output of inlet air mixer node schedule
-    Real64 mdotAir;               // mass flow rate of evaporator air, kg/s
+    Real64 hpPartLoadRatio = 0.0;       // part load ratio of HPWH
+    Real64 mixerInletAirSchedule = 0.0; // output of inlet air mixer node schedule
+    Real64 mdotAir = 0.0;               // mass flow rate of evaporator air, kg/s
 
     Array1D<WaterThermalTanks::WaterThermalTankData> WaterThermalTank;
     Array1D<WaterThermalTanks::HeatPumpWaterHeaterData> HPWaterHeater;
     Array1D<WaterThermalTanks::WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
     std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
 
-    bool getWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
-    bool calcWaterThermalTankZoneGainsMyEnvrnFlag;
+    bool getWaterThermalTankInputFlag = true; // Calls to Water Heater from multiple places in code
+    bool calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
 
     void clear_state() override
     {
-        this->numChilledWaterMixed = 0;
-        this->numChilledWaterStratified = 0;
-        this->numWaterHeaterMixed = 0;
-        this->numWaterHeaterStratified = 0;
-        this->numWaterThermalTank = 0;
-        this->numWaterHeaterDesuperheater = 0;
-        this->numHeatPumpWaterHeater = 0;
-        this->numWaterHeaterSizing = 0;
-        this->hpPartLoadRatio = 0.0;
-        this->mixerInletAirSchedule = 0.0;
-        this->mdotAir = 0.0;
-        this->WaterThermalTank.deallocate();
-        this->HPWaterHeater.deallocate();
-        this->WaterHeaterDesuperheater.deallocate();
-        this->UniqueWaterThermalTankNames.clear();
-        this->getWaterThermalTankInputFlag = true;
-        this->calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
-    }
-
-    // Default Constructor
-    WaterThermalTanksData()
-        : numChilledWaterMixed(0), numChilledWaterStratified(0), numWaterHeaterMixed(0), numWaterHeaterStratified(0), numWaterThermalTank(0),
-          numWaterHeaterDesuperheater(0), numHeatPumpWaterHeater(0), numWaterHeaterSizing(0), hpPartLoadRatio(0.0), mixerInletAirSchedule(0.0),
-          mdotAir(0.0), getWaterThermalTankInputFlag(true), calcWaterThermalTankZoneGainsMyEnvrnFlag(true)
-    {
+        *this = WaterThermalTanksData();
     }
 };
 

@@ -186,11 +186,9 @@ namespace SteamCoils {
             QCoilReqLocal = 0.0;
         }
 
-        if (state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num == SteamCoil_AirHeating) {
-            CalcSteamAirCoil(
-                state, CoilNum, QCoilReqLocal, QCoilActualTemp, OpMode, PartLoadFrac); // Autodesk:OPTIONAL QCoilReq used without PRESENT check
-            if (present(QCoilActual)) QCoilActual = QCoilActualTemp;
-        }
+        CalcSteamAirCoil(
+            state, CoilNum, QCoilReqLocal, QCoilActualTemp, OpMode, PartLoadFrac); // Autodesk:OPTIONAL QCoilReq used without PRESENT check
+        if (present(QCoilActual)) QCoilActual = QCoilActualTemp;
 
         // Update the current SteamCoil to the outlet nodes
         UpdateSteamCoil(state, CoilNum);
@@ -294,7 +292,6 @@ namespace SteamCoils {
             }
 
             state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
-            state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = SteamCoil_AirHeating;
             state.dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = NumArray(1);
             state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = NumArray(2);
@@ -338,9 +335,10 @@ namespace SteamCoils {
                                                                                           ObjectIsNotParent);
 
             auto const controlMode(UtilityRoutines::MakeUPPERCase(AlphArray(7)));
-            // TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
-            if (controlMode == "TEMPERATURESETPOINTCONTROL") {
-                state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = TemperatureSetPointControl;
+            state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil =
+                static_cast<CoilControlType>(getEnumerationValue(coilControlTypeNames, controlMode));
+            switch (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil) {
+            case CoilControlType::TemperatureSetPoint:
                 state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
                                                                                                  AlphArray(8),
                                                                                                  ErrorsFound,
@@ -356,17 +354,15 @@ namespace SteamCoils {
                     ShowContinueError(state, "..required for Temperature Setpoint Controlled Coils.");
                     ErrorsFound = true;
                 }
-
-            } else if (controlMode == "ZONELOADCONTROL") {
-                state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = ZoneLoadControl;
-
+                break;
+            case CoilControlType::ZoneLoadControl:
                 if (!lAlphaBlanks(8)) {
                     ShowWarningError(state, std::string{RoutineName} + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
                     ShowContinueError(state, "for " + CurrentModuleObject + " = " + AlphArray(1));
                     state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = 0;
                 }
-
-            } else {
+                break;
+            default:
                 ShowSevereError(state,
                                 std::string{RoutineName} + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " +
                                     CurrentModuleObject + " = " + AlphArray(1));
@@ -745,6 +741,8 @@ namespace SteamCoils {
         if (PltSizSteamNum > 0) {
             // If this is a central air system heating coil
             if (state.dataSize->CurSysNum > 0) {
+                auto &finalSysSizing = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum);
+
                 // If the coil water volume flow rate needs autosizing, then do it
                 if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
                     CheckSysSizing(state, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name);
@@ -768,8 +766,7 @@ namespace SteamCoils {
 
                         if (state.dataSize->CurOASysNum > 0) {
                             OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
-                            OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow =
-                                state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                            OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = finalSysSizing.DesOutAirVolFlow;
                         }
                         TempSize = AutoSize; // reset back
                     }
@@ -777,21 +774,19 @@ namespace SteamCoils {
                     // Set the duct flow rate
                     switch (state.dataSize->CurDuctType) {
                     case Main:
-                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                     state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        DesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesMainVolFlow;
                         break;
                     case Cooling:
-                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                     state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                        DesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesCoolVolFlow;
                         break;
                     case Heating:
-                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                        DesVolFlow = finalSysSizing.DesHeatVolFlow;
                         break;
                     case Other:
-                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        DesVolFlow = finalSysSizing.DesMainVolFlow;
                         break;
                     default:
-                        DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        DesVolFlow = finalSysSizing.DesMainVolFlow;
                     }
                     if (state.dataSize->DataDesicRegCoil) {
                         bPRINT = false;
@@ -805,9 +800,9 @@ namespace SteamCoils {
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
                     // get the outside air fraction
-                    if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOAOption == MinOA) {
+                    if (finalSysSizing.HeatOAOption == MinOA) {
                         if (DesVolFlow > 0.0) {
-                            OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / DesVolFlow;
+                            OutAirFrac = finalSysSizing.DesOutAirVolFlow / DesVolFlow;
                         } else {
                             OutAirFrac = 1.0;
                         }
@@ -820,10 +815,9 @@ namespace SteamCoils {
                         DesCoilLoad = CpAirStd * DesMassFlow * (state.dataSize->DataDesOutletAirTemp - state.dataSize->DataDesInletAirTemp);
                     } else {
                         // mixed air temp
-                        CoilInTemp = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutTemp +
-                                     (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
+                        CoilInTemp = OutAirFrac * finalSysSizing.HeatOutTemp + (1.0 - OutAirFrac) * finalSysSizing.HeatRetTemp;
                         // coil load
-                        DesCoilLoad = CpAirStd * DesMassFlow * (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp - CoilInTemp);
+                        DesCoilLoad = CpAirStd * DesMassFlow * (finalSysSizing.HeatSupTemp - CoilInTemp);
                     }
                     // AUTOSTEAMCOIL
                     if (DesCoilLoad >= SmallLoad) {
@@ -1141,7 +1135,7 @@ namespace SteamCoils {
         //  Control output to meet load QCoilReq. Load Controlled Coil.
         switch (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil) {
 
-        case ZoneLoadControl:
+        case CoilControlType::ZoneLoadControl:
             if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
                 (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 ||
                  state.dataSteamCoils->MySizeFlag(CoilNum)) &&
@@ -1255,7 +1249,7 @@ namespace SteamCoils {
                 TempLoopOutToPump = TempWaterOut;
             }
             break;
-        case TemperatureSetPointControl:
+        case CoilControlType::TemperatureSetPoint:
             // Control coil output to meet a Setpoint Temperature.
             if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
                 (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 ||
@@ -1433,6 +1427,8 @@ namespace SteamCoils {
                 state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
                 TempLoopOutToPump = TempWaterOut;
             }
+        default:
+            assert(false);
         }
 
         if (FanOpMode == CycFanCycCoil) {
@@ -2097,10 +2093,10 @@ namespace SteamCoils {
         return Capacity;
     }
 
-    int GetTypeOfCoil(EnergyPlusData &state,
-                      int const CoilIndex,         // must match coil types in this module
-                      std::string const &CoilName, // must match coil names for the coil type
-                      bool &ErrorsFound            // set to true if problem
+    CoilControlType GetTypeOfCoil(EnergyPlusData &state,
+                                  int const CoilIndex,         // must match coil types in this module
+                                  std::string const &CoilName, // must match coil names for the coil type
+                                  bool &ErrorsFound            // set to true if problem
     )
     {
 
@@ -2115,14 +2111,6 @@ namespace SteamCoils {
         // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
         // as zero.
 
-        // Return value
-        int TypeOfCoil; // returned coil type of matched coil (W)
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // 1 = TemperatureSetPointControl
-        // 3 = ZoneLoadControl
-
         // Obtains and Allocates SteamCoil related parameters from input file
         if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
@@ -2132,12 +2120,10 @@ namespace SteamCoils {
         if (CoilIndex == 0) {
             ShowSevereError(state, "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName);
             ErrorsFound = true;
-            TypeOfCoil = 0;
+            return CoilControlType::Invalid;
         } else {
-            TypeOfCoil = state.dataSteamCoils->SteamCoil(CoilIndex).TypeOfCoil;
+            return state.dataSteamCoils->SteamCoil(CoilIndex).TypeOfCoil;
         }
-
-        return TypeOfCoil;
     }
 
     int GetSteamCoilControlNodeNum(EnergyPlusData &state,

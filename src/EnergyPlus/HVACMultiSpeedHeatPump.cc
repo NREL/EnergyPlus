@@ -528,7 +528,6 @@ namespace HVACMultiSpeedHeatPump {
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
         using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
         using FluidProperties::GetSatDensityRefrig;
-        using SteamCoils::GetTypeOfCoil;
 
         // Locals
         // PARAMETERS

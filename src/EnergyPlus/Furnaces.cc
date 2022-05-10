@@ -842,7 +842,6 @@ namespace Furnaces {
         using HVACControllers::CheckCoilWaterInletNode;
         using IntegratedHeatPump::GetCoilIndexIHP;
         using OutAirNodeManager::CheckOutAirNodeNumber;
-        using SteamCoils::GetTypeOfCoil;
 
         // Locals
         std::string CurrentModuleObject; // Object type for getting and error messages
