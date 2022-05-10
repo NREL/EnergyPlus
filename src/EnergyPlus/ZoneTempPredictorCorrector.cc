@@ -263,7 +263,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     bool ValidScheduleControlType;
     bool ValidRadFractSched;          // check for if radiative fraction schedule has valid numbers
     bool ValidZoneOvercoolRangeSched; // check for if Zone Overcool range schedule has valid numbers
-    int TempIndex;
     int SchedMin;
     int SchedMax;
     int ActualZoneNum;
@@ -272,19 +271,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     int ComfortControlledZoneNum; // The Splitter that you are currently loading input into
     int i;
     int IZoneCount;
-
-    int OpTempContrlNum; // do loop index
     int found;
-
-    int TempHumidityCntrlNum; // do loop index for overcooled controlled zone
-
-    int SingleFangerHeatingControlNum;
-    int SingleFangerCoolingControlNum;
-    int SingleFangerHeatCoolControlNum;
-    int DualFangerHeatCoolControlNum;
-    int ComfortIndex;
-    int ZoneAssigned;
-
     int NumStageControlledZones; // Number of staged controlled objects
     int StageControlledZoneNum;  // Index for staged controlled zones
 
@@ -416,7 +403,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (TStatObjects(Item).ZoneListActive) {
                     cAlphaArgs(2) = Zone(ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
-                ZoneAssigned =
+                int ZoneAssigned =
                     UtilityRoutines::FindItemInList(cAlphaArgs(2), TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     TempControlledZone(TempControlledZoneNum).ZoneName = cAlphaArgs(2);
@@ -736,6 +723,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
         for (ControlTypeNum = SchedMin; ControlTypeNum <= SchedMax; ++ControlTypeNum) {
 
+            int TempIndex = 0;
             switch (static_cast<DataHVACGlobals::ThermostatType>(ControlTypeNum)) {
             case DataHVACGlobals::ThermostatType::Uncontrolled:
                 break;
@@ -1018,7 +1006,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (ComfortTStatObjects(Item).ZoneListActive) {
                     cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
-                ZoneAssigned = UtilityRoutines::FindItemInList(
+                int ZoneAssigned = UtilityRoutines::FindItemInList(
                     cAlphaArgs(2), ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     ComfortControlledZone(ComfortControlledZoneNum).ZoneName = cAlphaArgs(2);
@@ -1260,11 +1248,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger.allocate(
             state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls);
 
-    for (SingleFangerHeatingControlNum = 1; SingleFangerHeatingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls;
-         ++SingleFangerHeatingControlNum) {
+    for (int idx = 1; idx <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls; ++idx) {
         inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
-                                      SingleFangerHeatingControlNum,
+                                      idx,
                                       cAlphaArgs,
                                       NumAlphas,
                                       rNumericArgs,
@@ -1275,23 +1262,16 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
-        state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).Name = cAlphaArgs(1);
-        state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedName = cAlphaArgs(2);
-        state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex =
-            GetScheduleIndex(state, cAlphaArgs(2));
-        if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex == 0) {
+        auto &singleSetpointHtgFanger = state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(idx);
+        singleSetpointHtgFanger.Name = cAlphaArgs(1);
+        singleSetpointHtgFanger.PMVSchedName = cAlphaArgs(2);
+        singleSetpointHtgFanger.PMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+        if (singleSetpointHtgFanger.PMVSchedIndex == 0) {
             ShowSevereError(
                 state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found.");
             ErrorsFound = true;
         } else {
-            ValidScheduleControlType = CheckScheduleValueMinMax(
-                state,
-                state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex,
-                ">=",
-                -3.0,
-                "<=",
-                3.0);
+            ValidScheduleControlType = CheckScheduleValueMinMax(state, singleSetpointHtgFanger.PMVSchedIndex, ">=", -3.0, "<=", 3.0);
             if (!ValidScheduleControlType) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
@@ -1310,11 +1290,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls);
     }
 
-    for (SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls;
-         ++SingleFangerCoolingControlNum) {
+    for (int idx = 1; idx <= state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls; ++idx) {
         inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
-                                      SingleFangerCoolingControlNum,
+                                      idx,
                                       cAlphaArgs,
                                       NumAlphas,
                                       rNumericArgs,
@@ -1325,23 +1304,16 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
-        state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).Name = cAlphaArgs(1);
-        state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedName = cAlphaArgs(2);
-        state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex =
-            GetScheduleIndex(state, cAlphaArgs(2));
-        if (state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex == 0) {
+        auto &singleSetpointClgFanger = state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(idx);
+        singleSetpointClgFanger.Name = cAlphaArgs(1);
+        singleSetpointClgFanger.PMVSchedName = cAlphaArgs(2);
+        singleSetpointClgFanger.PMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+        if (singleSetpointClgFanger.PMVSchedIndex == 0) {
             ShowSevereError(
                 state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found.");
             ErrorsFound = true;
         } else {
-            ValidScheduleControlType = CheckScheduleValueMinMax(
-                state,
-                state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex,
-                ">=",
-                -3.0,
-                "<=",
-                3.0);
+            ValidScheduleControlType = CheckScheduleValueMinMax(state, singleSetpointClgFanger.PMVSchedIndex, ">=", -3.0, "<=", 3.0);
             if (!ValidScheduleControlType) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
@@ -1360,11 +1332,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger.allocate(
             state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls);
 
-    for (SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls;
-         ++SingleFangerHeatCoolControlNum) {
+    for (int idx = 1; idx <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls; ++idx) {
         inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
-                                      SingleFangerHeatCoolControlNum,
+                                      idx,
                                       cAlphaArgs,
                                       NumAlphas,
                                       rNumericArgs,
@@ -1375,23 +1346,16 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
-        state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).Name = cAlphaArgs(1);
-        state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedName = cAlphaArgs(2);
-        state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex =
-            GetScheduleIndex(state, cAlphaArgs(2));
-        if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex == 0) {
+        auto &singleSetpointHeatCoolFanger = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(idx);
+        singleSetpointHeatCoolFanger.Name = cAlphaArgs(1);
+        singleSetpointHeatCoolFanger.PMVSchedName = cAlphaArgs(2);
+        singleSetpointHeatCoolFanger.PMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+        if (singleSetpointHeatCoolFanger.PMVSchedIndex == 0) {
             ShowSevereError(
                 state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found.");
             ErrorsFound = true;
         } else {
-            ValidScheduleControlType = CheckScheduleValueMinMax(
-                state,
-                state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex,
-                ">=",
-                -3.0,
-                "<=",
-                3.0);
+            ValidScheduleControlType = CheckScheduleValueMinMax(state, singleSetpointHeatCoolFanger.PMVSchedIndex, ">=", -3.0, "<=", 3.0);
             if (!ValidScheduleControlType) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
@@ -1410,11 +1374,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger.allocate(
             state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls);
 
-    for (DualFangerHeatCoolControlNum = 1; DualFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls;
-         ++DualFangerHeatCoolControlNum) {
+    for (int idx = 1; idx <= state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls; ++idx) {
         inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
-                                      DualFangerHeatCoolControlNum,
+                                      idx,
                                       cAlphaArgs,
                                       NumAlphas,
                                       rNumericArgs,
@@ -1425,31 +1388,23 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
-        state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).Name = cAlphaArgs(1);
-        state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSetptSchedName = cAlphaArgs(2);
-        state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex =
-            GetScheduleIndex(state, cAlphaArgs(2));
-        if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex == 0) {
+        auto dualSetpointHeatCoolFanger = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(idx);
+        dualSetpointHeatCoolFanger.Name = cAlphaArgs(1);
+        dualSetpointHeatCoolFanger.HeatPMVSetptSchedName = cAlphaArgs(2);
+        dualSetpointHeatCoolFanger.HeatPMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
+        if (dualSetpointHeatCoolFanger.HeatPMVSchedIndex == 0) {
             ShowSevereError(
                 state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found.");
             ErrorsFound = true;
         }
-        state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSetptSchedName = cAlphaArgs(3);
-        state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex =
-            GetScheduleIndex(state, cAlphaArgs(3));
-        if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex == 0) {
+        dualSetpointHeatCoolFanger.CoolPMVSetptSchedName = cAlphaArgs(3);
+        dualSetpointHeatCoolFanger.CoolPMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+        if (dualSetpointHeatCoolFanger.CoolPMVSchedIndex == 0) {
             ShowSevereError(
                 state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\" not found.");
             ErrorsFound = true;
         } else {
-            ValidScheduleControlType = CheckScheduleValueMinMax(
-                state,
-                state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex,
-                ">=",
-                -3.0,
-                "<=",
-                3.0);
+            ValidScheduleControlType = CheckScheduleValueMinMax(state, dualSetpointHeatCoolFanger.HeatPMVSchedIndex, ">=", -3.0, "<=", 3.0);
             if (!ValidScheduleControlType) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
@@ -1457,13 +1412,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 ShowContinueError(state, "..Values outside of range [-3,+3].");
                 ErrorsFound = true;
             }
-            ValidScheduleControlType = CheckScheduleValueMinMax(
-                state,
-                state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex,
-                ">=",
-                -3.0,
-                "<=",
-                3.0);
+            ValidScheduleControlType = CheckScheduleValueMinMax(state, dualSetpointHeatCoolFanger.CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0);
             if (!ValidScheduleControlType) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(3) + "=\"" +
@@ -1477,9 +1426,9 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     // Finish filling in Schedule pointing indexes for Thermal Comfort Control
     for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++ComfortControlledZoneNum) {
-        ComfortIndex = UtilityRoutines::FindItem(ValidComfortControlTypes(static_cast<int>(DataHVACGlobals::ThermostatType::SingleHeating)),
-                                                 ComfortControlledZone(ComfortControlledZoneNum).ControlType,
-                                                 ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
+        int ComfortIndex = UtilityRoutines::FindItem(ValidComfortControlTypes(static_cast<int>(DataHVACGlobals::ThermostatType::SingleHeating)),
+                                                     ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                                     ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
         ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SingleHeating = ComfortIndex;
         if (ComfortIndex > 0) {
             ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) =
@@ -1545,6 +1494,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
         for (ControlTypeNum = SchedMin; ControlTypeNum <= SchedMax; ++ControlTypeNum) {
 
+            int ComfortIndex;
             switch (static_cast<DataHVACGlobals::ThermostatType>(ControlTypeNum)) {
             case DataHVACGlobals::ThermostatType::Uncontrolled:
                 break;
@@ -1856,10 +1806,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     if (state.dataZoneCtrls->NumOpTempControlledZones > 0) {
         state.dataZoneCtrls->AnyOpTempControl = true;
 
-        for (OpTempContrlNum = 1; OpTempContrlNum <= state.dataZoneCtrls->NumOpTempControlledZones; ++OpTempContrlNum) {
+        for (int idx = 1; idx <= state.dataZoneCtrls->NumOpTempControlledZones; ++idx) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
-                                          OpTempContrlNum,
+                                          idx,
                                           cAlphaArgs,
                                           NumAlphas,
                                           rNumericArgs,
@@ -2086,10 +2036,10 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     if (state.dataZoneCtrls->NumTempAndHumidityControlledZones > 0) {
         state.dataZoneCtrls->AnyZoneTempAndHumidityControl = true;
 
-        for (TempHumidityCntrlNum = 1; TempHumidityCntrlNum <= state.dataZoneCtrls->NumTempAndHumidityControlledZones; ++TempHumidityCntrlNum) {
+        for (int idx = 1; idx <= state.dataZoneCtrls->NumTempAndHumidityControlledZones; ++idx) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
-                                          TempHumidityCntrlNum,
+                                          idx,
                                           cAlphaArgs,
                                           NumAlphas,
                                           rNumericArgs,
@@ -2359,7 +2309,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     cAlphaArgs(2) =
                         state.dataHeatBal->Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
-                ZoneAssigned =
+                int ZoneAssigned =
                     UtilityRoutines::FindItemInList(cAlphaArgs(2), StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2);
