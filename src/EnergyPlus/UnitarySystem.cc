@@ -1614,7 +1614,7 @@ namespace UnitarySystems {
         // delay fan sizing in case a VS fan is used and air flow needs to be modified
         // comment this out until the PTUnit to UnitarySystem #9273 branch is merged, so nothing changes
         // until this is implemented, unbalanced air flow warning show up in VS coil PTUnits
-        // state.dataSize->DataFanIndex = -1;
+        state.dataSize->DataFanIndex = -1;
 
         bool coolingAirFlowIsAutosized = this->m_MaxCoolAirVolFlow == DataSizing::AutoSize;
         bool heatingAirFlowIsAutosized = this->m_MaxHeatAirVolFlow == DataSizing::AutoSize;
@@ -1903,7 +1903,7 @@ namespace UnitarySystems {
                 EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
             }
             // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
-            //if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+            // if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
             //     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
             //    this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
             //    int numSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
@@ -1935,7 +1935,7 @@ namespace UnitarySystems {
         // now size fans as necessary
         // comment this out until the PTUnit to UnitarySystem #9273 branch is merged, so nothing changes
         // until this is implemented, unbalanced air flow warning show up in VS coil PTUnits
-        // state.dataSize->DataFanIndex = this->m_FanIndex;
+        state.dataSize->DataFanIndex = this->m_FanIndex;
 
         // Some parent objects report sizing, some do not
         // other cases below will toggle on or off specific reports based on system type
@@ -9133,6 +9133,7 @@ namespace UnitarySystems {
                     this->m_CoolingSpeedNum = 1;
                 }
             }
+            // calcUnitarySystemToLoad calls setOnOffMassFlowRate so probably no need to call this here
             this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
             this->calcUnitarySystemToLoad(state,
                                           AirLoopNum,
@@ -9206,6 +9207,7 @@ namespace UnitarySystems {
                     this->m_HeatingSpeedNum = min(this->m_StageNum, this->m_NumOfSpeedHeating);
                     this->m_HeatingSpeedRatio = 0.0;
                 }
+                // calcUnitarySystemToLoad calls setOnOffMassFlowRate so probably no need to call this here
                 this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
                 this->calcUnitarySystemToLoad(state,
                                               AirLoopNum,
@@ -11153,6 +11155,9 @@ namespace UnitarySystems {
                     if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
                         this->m_sysType == SysType::PackagedWSHP) {
                         state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
+                        if (HeatSpeedNum > 1) {
+                            state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
+                        }
                     }
                 }
             } else { // IF(MultiOrVarSpeedHeatCoil) THEN
@@ -12417,9 +12422,13 @@ namespace UnitarySystems {
         case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit: {
             if (this->m_HeatingSpeedNum > 1) {
                 HeatPLR = 1.0;
+                if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+                    this->m_HeatingSpeedRatio = PartLoadRatio;
+                }
             } else {
                 HeatPLR = PartLoadRatio;
             }
+
             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                       CompName,
                                                       this->m_HeatingCoilIndex,
