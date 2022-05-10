@@ -309,15 +309,18 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
         ErlVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
         state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type = Value::Null;
         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
-        {
-            auto const SELECT_CASE_var(state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
-            if (SELECT_CASE_var == PtrDataType::Real) {
-                *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
-            } else if (SELECT_CASE_var == PtrDataType::Integer) {
-                *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
-            } else if (SELECT_CASE_var == PtrDataType::Logical) {
-                *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
-            }
+        switch (state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed) {
+        case PtrDataType::Real:
+            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
+            break;
+        case PtrDataType::Integer:
+            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
+            break;
+        case PtrDataType::Logical:
+            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+            break;
+        default:
+            break; // nothing to do for those
         }
     }
 
@@ -416,236 +419,230 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
         //    Keyword = UtilityRoutines::MakeUPPERCase(Line(1:Pos-1))
         Keyword = Line.substr(0, Pos);
 
-        {
-            auto const SELECT_CASE_var(Keyword);
+        // the functionality in each block of this parser structure is so different that a regular IF block seems reasonable
+        if (Keyword == "RETURN") {
+            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
+            if (Remainder.empty()) {
+                InstructionNum = AddInstruction(state, StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::Return);
+            } else {
+                ParseExpression(state, Remainder, StackNum, ExpressionNum, Line);
+                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Return, ExpressionNum);
+            }
 
-            if (SELECT_CASE_var == "RETURN") {
-                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
-                if (Remainder.empty()) {
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::Return);
+        } else if (Keyword == "SET") {
+            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "SET \"{}\"\n", Line);
+            Pos = scan(Remainder, '=');
+            if (Pos == std::string::npos) {
+                AddError(state, StackNum, LineNum, "Equal sign missing for the SET instruction.");
+            } else if (Pos == 0) {
+                AddError(state, StackNum, LineNum, "Variable name missing for the SET instruction.");
+            } else {
+                Variable = stripped(Remainder.substr(0, Pos)); // VariableName would be more expressive
+                VariableNum = NewEMSVariable(state, Variable, StackNum);
+                // Check for invalid variable name
+
+                if (Pos + 1 < Remainder.length()) {
+                    Expression = stripped(Remainder.substr(Pos + 1));
                 } else {
-                    ParseExpression(state, Remainder, StackNum, ExpressionNum, Line);
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Return, ExpressionNum);
+                    Expression.clear();
                 }
-
-            } else if (SELECT_CASE_var == "SET") {
-                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "SET \"{}\"\n", Line);
-                Pos = scan(Remainder, '=');
-                if (Pos == std::string::npos) {
-                    AddError(state, StackNum, LineNum, "Equal sign missing for the SET instruction.");
-                } else if (Pos == 0) {
-                    AddError(state, StackNum, LineNum, "Variable name missing for the SET instruction.");
+                if (Expression.empty()) {
+                    AddError(state, StackNum, LineNum, "Expression missing for the SET instruction.");
                 } else {
-                    Variable = stripped(Remainder.substr(0, Pos)); // VariableName would be more expressive
-                    VariableNum = NewEMSVariable(state, Variable, StackNum);
-                    // Check for invalid variable name
-
-                    if (Pos + 1 < Remainder.length()) {
-                        Expression = stripped(Remainder.substr(Pos + 1));
-                    } else {
-                        Expression.clear();
-                    }
-                    if (Expression.empty()) {
-                        AddError(state, StackNum, LineNum, "Expression missing for the SET instruction.");
-                    } else {
-                        ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
-                        InstructionNum =
-                            AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Set, VariableNum, ExpressionNum);
-                    }
-                }
-
-            } else if (SELECT_CASE_var == "RUN") {
-                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RUN \"{}\"\n", Line);
-                if (Remainder.empty()) {
-                    AddError(state, StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
-                } else {
-                    Pos = scan(Remainder, ' ');
-                    if (Pos == std::string::npos) Pos = Remainder.length();
-                    Variable =
-                        UtilityRoutines::MakeUPPERCase(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
-                    StackNum2 = UtilityRoutines::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
-                    if (StackNum2 == 0) {
-                        AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
-                    } else {
-                        InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Run, StackNum2);
-                    }
-                }
-
-            } else if (SELECT_CASE_var == "IF") {
-                if (state.dataSysVars->DeveloperFlag) {
-                    print(state.files.debug, "IF \"{}\"\n", Line);
-                    print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
-                }
-                if (Remainder.empty()) {
-                    AddError(state, StackNum, LineNum, "Expression missing for the IF instruction.");
-                    ExpressionNum = 0;
-                } else {
-                    Expression = stripped(Remainder);
                     ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Set, VariableNum, ExpressionNum);
                 }
+            }
 
-                ++NestedIfDepth;
-                ReadyForElse(NestedIfDepth) = true;
-                ReadyForEndif(NestedIfDepth) = true;
-                if (NestedIfDepth > IfDepthAllowed) {
-                    AddError(state, StackNum, LineNum, "Detected IF nested deeper than is allowed; need to terminate an earlier IF instruction.");
-                    break;
+        } else if (Keyword == "RUN") {
+            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RUN \"{}\"\n", Line);
+            if (Remainder.empty()) {
+                AddError(state, StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
+            } else {
+                Pos = scan(Remainder, ' ');
+                if (Pos == std::string::npos) Pos = Remainder.length();
+                Variable =
+                    UtilityRoutines::MakeUPPERCase(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
+                StackNum2 = UtilityRoutines::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
+                if (StackNum2 == 0) {
+                    AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
                 } else {
-                    InstructionNum = AddInstruction(state,
-                                                    StackNum,
-                                                    LineNum,
-                                                    DataRuntimeLanguage::ErlKeywordParam::If,
-                                                    ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
-                    SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Run, StackNum2);
                 }
+            }
 
-            } else if (SELECT_CASE_var == "ELSEIF") {
-                if (state.dataSysVars->DeveloperFlag) {
-                    print(state.files.debug, "ELSEIF \"{}\"\n", Line);
-                    print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
-                }
-                if (NestedIfDepth == 0) {
-                    AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
-                    break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
-                }
+        } else if (Keyword == "IF") {
+            if (state.dataSysVars->DeveloperFlag) {
+                print(state.files.debug, "IF \"{}\"\n", Line);
+                print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
+            }
+            if (Remainder.empty()) {
+                AddError(state, StackNum, LineNum, "Expression missing for the IF instruction.");
+                ExpressionNum = 0;
+            } else {
+                Expression = stripped(Remainder);
+                ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
+            }
 
-                // Complete the preceding block with a GOTO instruction
-                InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::Goto); // Arg2 is added at the ENDIF
-                ++NumGotos(NestedIfDepth);
-                if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
-                    AddError(state, StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction.");
-                    break;
-                } else {
-                    SavedGotoInstructionNum(NumGotos(NestedIfDepth), NestedIfDepth) = InstructionNum;
-                }
-
-                if (Remainder.empty()) {
-                    AddError(state, StackNum, LineNum, "Expression missing for the ELSEIF instruction.");
-                    ExpressionNum = 0;
-                } else {
-                    Expression = stripped(Remainder);
-                    ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
-                }
-
+            ++NestedIfDepth;
+            ReadyForElse(NestedIfDepth) = true;
+            ReadyForEndif(NestedIfDepth) = true;
+            if (NestedIfDepth > IfDepthAllowed) {
+                AddError(state, StackNum, LineNum, "Detected IF nested deeper than is allowed; need to terminate an earlier IF instruction.");
+                break;
+            } else {
                 InstructionNum = AddInstruction(state,
                                                 StackNum,
                                                 LineNum,
                                                 DataRuntimeLanguage::ErlKeywordParam::If,
                                                 ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                 SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
-
-            } else if (SELECT_CASE_var == "ELSE") {
-                if (state.dataSysVars->DeveloperFlag) {
-                    print(state.files.debug, "ELSE \"{}\"\n", Line);
-                    print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
-                }
-                if (NestedIfDepth == 0) {
-                    AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
-                    break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
-                }
-                if (!ReadyForElse(NestedIfDepth)) {
-                    AddError(state, StackNum, LineNum, "ELSE statement without corresponding IF statement.");
-                }
-                ReadyForElse(NestedIfDepth) = false;
-
-                // Complete the preceding block with a GOTO instruction
-                InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::Goto); // Arg2 is added at the ENDIF
-                ++NumGotos(NestedIfDepth);
-                if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
-                    AddError(state, StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed.");
-                    break;
-                } else {
-                    SavedGotoInstructionNum(NumGotos(NestedIfDepth), NestedIfDepth) = InstructionNum;
-                }
-
-                if (!Remainder.empty()) {
-                    AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ELSE instruction.");
-                }
-
-                InstructionNum =
-                    AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Else); // can make this into a KeywordIf?
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
-                SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
-
-            } else if (SELECT_CASE_var == "ENDIF") {
-                if (state.dataSysVars->DeveloperFlag) {
-                    print(state.files.debug, "ENDIF \"{}\"\n", Line);
-                    print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
-                }
-                if (NestedIfDepth == 0) {
-                    AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
-                    break; // PE Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
-                }
-
-                if (!ReadyForEndif(NestedIfDepth)) {
-                    AddError(state, StackNum, LineNum, "ENDIF statement without corresponding IF stetement.");
-                }
-                ReadyForEndif(NestedIfDepth) = false;
-                ReadyForElse(NestedIfDepth) = false;
-
-                if (!Remainder.empty()) {
-                    AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction.");
-                }
-
-                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndIf);
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
-
-                // Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
-                for (GotoNum = 1; GotoNum <= NumGotos(NestedIfDepth); ++GotoNum) {
-                    InstructionNum2 = SavedGotoInstructionNum(GotoNum, NestedIfDepth);
-                    state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum2).Argument1 = InstructionNum;
-                    SavedGotoInstructionNum(GotoNum, NestedIfDepth) = 0;
-                }
-
-                NumGotos(NestedIfDepth) = 0;
-                SavedIfInstructionNum(NestedIfDepth) = 0;
-                --NestedIfDepth;
-
-            } else if (SELECT_CASE_var == "WHILE") {
-                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "WHILE \"{}\"\n", Line);
-                if (Remainder.empty()) {
-                    AddError(state, StackNum, LineNum, "Expression missing for the WHILE instruction.");
-                    ExpressionNum = 0;
-                } else {
-                    Expression = stripped(Remainder);
-                    ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
-                }
-
-                ++NestedWhileDepth;
-                if (NestedWhileDepth > WhileDepthAllowed) {
-                    AddError(
-                        state, StackNum, LineNum, "Detected WHILE nested deeper than is allowed; need to terminate an earlier WHILE instruction.");
-                    break;
-                } else {
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::While, ExpressionNum);
-                    SavedWhileInstructionNum = InstructionNum;
-                    SavedWhileExpressionNum = ExpressionNum;
-                }
-
-            } else if (SELECT_CASE_var == "ENDWHILE") {
-                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ENDWHILE \"{}\"\n", Line);
-                if (NestedWhileDepth == 0) {
-                    AddError(state, StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
-                    break;
-                }
-                if (!Remainder.empty()) {
-                    AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction.");
-                }
-
-                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndWhile);
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
-                state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
-
-                NestedWhileDepth = 0;
-                SavedWhileInstructionNum = 0;
-                SavedWhileExpressionNum = 0;
-
-            } else {
-                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", Line);
-                AddError(state, StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
             }
+
+        } else if (Keyword == "ELSEIF") {
+            if (state.dataSysVars->DeveloperFlag) {
+                print(state.files.debug, "ELSEIF \"{}\"\n", Line);
+                print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
+            }
+            if (NestedIfDepth == 0) {
+                AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
+                break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
+            }
+
+            // Complete the preceding block with a GOTO instruction
+            InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::Goto); // Arg2 is added at the ENDIF
+            ++NumGotos(NestedIfDepth);
+            if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
+                AddError(state, StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction.");
+                break;
+            } else {
+                SavedGotoInstructionNum(NumGotos(NestedIfDepth), NestedIfDepth) = InstructionNum;
+            }
+
+            if (Remainder.empty()) {
+                AddError(state, StackNum, LineNum, "Expression missing for the ELSEIF instruction.");
+                ExpressionNum = 0;
+            } else {
+                Expression = stripped(Remainder);
+                ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
+            }
+
+            InstructionNum = AddInstruction(state,
+                                            StackNum,
+                                            LineNum,
+                                            DataRuntimeLanguage::ErlKeywordParam::If,
+                                            ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+            SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
+
+        } else if (Keyword == "ELSE") {
+            if (state.dataSysVars->DeveloperFlag) {
+                print(state.files.debug, "ELSE \"{}\"\n", Line);
+                print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
+            }
+            if (NestedIfDepth == 0) {
+                AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
+                break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
+            }
+            if (!ReadyForElse(NestedIfDepth)) {
+                AddError(state, StackNum, LineNum, "ELSE statement without corresponding IF statement.");
+            }
+            ReadyForElse(NestedIfDepth) = false;
+
+            // Complete the preceding block with a GOTO instruction
+            InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::Goto); // Arg2 is added at the ENDIF
+            ++NumGotos(NestedIfDepth);
+            if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
+                AddError(state, StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed.");
+                break;
+            } else {
+                SavedGotoInstructionNum(NumGotos(NestedIfDepth), NestedIfDepth) = InstructionNum;
+            }
+
+            if (!Remainder.empty()) {
+                AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ELSE instruction.");
+            }
+
+            InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::Else); // can make this into a KeywordIf?
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+            SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
+
+        } else if (Keyword == "ENDIF") {
+            if (state.dataSysVars->DeveloperFlag) {
+                print(state.files.debug, "ENDIF \"{}\"\n", Line);
+                print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
+            }
+            if (NestedIfDepth == 0) {
+                AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
+                break; // PE Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
+            }
+
+            if (!ReadyForEndif(NestedIfDepth)) {
+                AddError(state, StackNum, LineNum, "ENDIF statement without corresponding IF stetement.");
+            }
+            ReadyForEndif(NestedIfDepth) = false;
+            ReadyForElse(NestedIfDepth) = false;
+
+            if (!Remainder.empty()) {
+                AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction.");
+            }
+
+            InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndIf);
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+
+            // Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
+            for (GotoNum = 1; GotoNum <= NumGotos(NestedIfDepth); ++GotoNum) {
+                InstructionNum2 = SavedGotoInstructionNum(GotoNum, NestedIfDepth);
+                state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum2).Argument1 = InstructionNum;
+                SavedGotoInstructionNum(GotoNum, NestedIfDepth) = 0;
+            }
+
+            NumGotos(NestedIfDepth) = 0;
+            SavedIfInstructionNum(NestedIfDepth) = 0;
+            --NestedIfDepth;
+
+        } else if (Keyword == "WHILE") {
+            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "WHILE \"{}\"\n", Line);
+            if (Remainder.empty()) {
+                AddError(state, StackNum, LineNum, "Expression missing for the WHILE instruction.");
+                ExpressionNum = 0;
+            } else {
+                Expression = stripped(Remainder);
+                ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
+            }
+
+            ++NestedWhileDepth;
+            if (NestedWhileDepth > WhileDepthAllowed) {
+                AddError(state, StackNum, LineNum, "Detected WHILE nested deeper than is allowed; need to terminate an earlier WHILE instruction.");
+                break;
+            } else {
+                InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::While, ExpressionNum);
+                SavedWhileInstructionNum = InstructionNum;
+                SavedWhileExpressionNum = ExpressionNum;
+            }
+
+        } else if (Keyword == "ENDWHILE") {
+            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ENDWHILE \"{}\"\n", Line);
+            if (NestedWhileDepth == 0) {
+                AddError(state, StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
+                break;
+            }
+            if (!Remainder.empty()) {
+                AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction.");
+            }
+
+            InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::EndWhile);
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
+
+            NestedWhileDepth = 0;
+            SavedWhileInstructionNum = 0;
+            SavedWhileExpressionNum = 0;
+
+        } else {
+            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", Line);
+            AddError(state, StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
         }
 
         ++LineNum;
@@ -787,6 +784,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     int ESVariableNum;
     int WhileLoopExitCounter;      // to avoid infinite loop in While loop
     bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
+    bool breakOutOfWhile = false;
 
     WhileLoopExitCounter = 0;
     ReturnValue.Type = Value::Number;
@@ -795,113 +793,120 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     InstructionNum = 1;
     while (InstructionNum <= state.dataRuntimeLang->ErlStack(StackNum).NumInstructions) {
 
-        {
-            auto const SELECT_CASE_var(state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword);
+        switch (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword) {
 
-            if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::None) {
-                // There probably shouldn't be any of these
+        case DataRuntimeLanguage::ErlKeywordParam::None:
+            // There probably shouldn't be any of these
+            break;
 
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Return) {
-                if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
-                    ReturnValue =
-                        EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
-                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                break; // RETURN always terminates an instruction stack
-
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Set) {
-
+        case DataRuntimeLanguage::ErlKeywordParam::Return:
+            if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                 ReturnValue =
-                    EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
-                ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) &&
-                    (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
-                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
-                } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
-                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
-                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
-                }
+                    EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
+            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+            breakOutOfWhile = true;
+            break; // RETURN always terminates an instruction stack -- Need to break from WHILE loop as well
 
-                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+        case DataRuntimeLanguage::ErlKeywordParam::Set:
+            ReturnValue =
+                EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
+            ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+            if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) &&
+                (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
+                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
+            } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
+                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
+                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
+            }
+            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+            break;
 
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Run) {
-                ReturnValue.Type = Value::String;
-                ReturnValue.String = "";
-                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
-            } else if ((SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::If) ||
-                       (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Else)) { // same???
-                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                if (ExpressionNum > 0) { // could be 0 if this was an ELSE
-                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
-                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    if (ReturnValue.Number == 0.0) { //  This is the FALSE case
-                        // Eventually should handle strings and arrays too
-                        InstructionNum = InstructionNum2;
-                        continue;
-                    }
-                } else {
-                    // KeywordELSE  -- kind of a kludge
-                    ReturnValue.Type = Value::Number;
-                    ReturnValue.Number = 1.0;
-                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                }
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Goto) {
-                InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+        case DataRuntimeLanguage::ErlKeywordParam::Run:
+            ReturnValue.Type = Value::String;
+            ReturnValue.String = "";
+            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+            ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+            break;
 
-                // For debug purposes only...
-                ReturnValue.Type = Value::String;
-                ReturnValue.String = ""; // IntegerToString(InstructionNum)
-
-                continue;
-                // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
-
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::EndIf) {
-                ReturnValue.Type = Value::String;
-                ReturnValue.String = "";
-                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::While) {
-                // evaluate expression at while, skip to past endwhile if not true
-                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+        case DataRuntimeLanguage::ErlKeywordParam::If:
+        case DataRuntimeLanguage::ErlKeywordParam::Else:
+            ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+            InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+            if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                 ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                     // Eventually should handle strings and arrays too
                     InstructionNum = InstructionNum2;
-                    // CYCLE
-                }
-            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::EndWhile) {
-
-                // reevaluate expression at While and goto there if true, otherwise continue
-                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
-                if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
-                    // Eventually should handle strings and arrays too
-                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
-                    InstructionNum = InstructionNum2;
-                    ++WhileLoopExitCounter;
-
                     continue;
-                } else { // false, leave while block
-                    if (WhileLoopExitCounter > MaxWhileLoopIterations) {
-                        WhileLoopExitCounter = 0;
-                        ReturnValue.Type = Value::Error;
-                        ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-                        WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    } else {
-                        ReturnValue.Type = Value::Number;
-                        ReturnValue.Number = 0.0;
-                        WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                        WhileLoopExitCounter = 0;
-                    }
                 }
             } else {
-                ShowFatalError(state, "Fatal error in RunStack:  Unknown keyword.");
+                // KeywordELSE  -- kind of a kludge
+                ReturnValue.Type = Value::Number;
+                ReturnValue.Number = 1.0;
+                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
             }
+            break;
+
+        case DataRuntimeLanguage::ErlKeywordParam::Goto:
+            InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+
+            // For debug purposes only...
+            ReturnValue.Type = Value::String;
+            ReturnValue.String = ""; // IntegerToString(InstructionNum)
+
+            break; // but just continue the WHILE loop
+            // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
+
+        case DataRuntimeLanguage::ErlKeywordParam::EndIf:
+            ReturnValue.Type = Value::String;
+            ReturnValue.String = "";
+            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+            break;
+
+        case DataRuntimeLanguage::ErlKeywordParam::While:
+            // evaluate expression at while, skip to past endwhile if not true
+            ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+            InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+            ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
+            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+            if (ReturnValue.Number == 0.0) { //  This is the FALSE case
+                // Eventually should handle strings and arrays too
+                InstructionNum = InstructionNum2;
+                // CYCLE
+            }
+            break;
+
+        case DataRuntimeLanguage::ErlKeywordParam::EndWhile:
+
+            // reevaluate expression at While and goto there if true, otherwise continue
+            ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+            InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+            ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
+            if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
+                // Eventually should handle strings and arrays too
+                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
+                InstructionNum = InstructionNum2;
+                ++WhileLoopExitCounter;
+            } else { // false, leave while block
+                if (WhileLoopExitCounter > MaxWhileLoopIterations) {
+                    WhileLoopExitCounter = 0;
+                    ReturnValue.Type = Value::Error;
+                    ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                } else {
+                    ReturnValue.Type = Value::Number;
+                    ReturnValue.Number = 0.0;
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WhileLoopExitCounter = 0;
+                }
+            }
+            break;
+
+        default:
+            ShowFatalError(state, "Fatal error in RunStack:  Unknown keyword.");
         }
+        if (breakOutOfWhile) break;
 
         ++InstructionNum;
     } // InstructionNum

@@ -11726,7 +11726,13 @@ namespace SurfaceGeometry {
         int MaterNum;
         int SchNum;
 
-        enum class InsulationType {Invalid = -1, Outside, Inside, Num};
+        enum class InsulationType
+        {
+            Invalid = -1,
+            Outside,
+            Inside,
+            Num
+        };
         constexpr std::array<std::string_view, static_cast<int>(InsulationType::Num)> insulationTypeNames = {"OUTSIDE", "INSIDE"};
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -11750,7 +11756,8 @@ namespace SurfaceGeometry {
             MaterNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-            InsulationType insulationType = static_cast<InsulationType>(getEnumerationValue(insulationTypeNames, state.dataIPShortCut->cAlphaArgs(1)));
+            InsulationType insulationType =
+                static_cast<InsulationType>(getEnumerationValue(insulationTypeNames, state.dataIPShortCut->cAlphaArgs(1)));
             if (insulationType == InsulationType::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -11823,7 +11830,7 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     } else {
                         {
-                            switch(insulationType) {
+                            switch (insulationType) {
                             case InsulationType::Outside:
                                 if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0) {
                                     ShowSevereError(state,
