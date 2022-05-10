@@ -134,7 +134,7 @@ namespace WindowManager {
             Real64 aTemp = 0;
             for (auto aSide : FenestrationCommon::EnumSide()) {
                 aTemp = aLayer->getTemperature(aSide);
-                state.dataWindowManager->thetas(i) = aTemp;
+                state.dataWindowManager->thetas[i - 1] = aTemp;
                 if (i == 1) {
                     SurfOutsideTemp = aTemp - DataGlobalConstants::KelvinConv;
                 }
@@ -159,7 +159,7 @@ namespace WindowManager {
                 }
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp +
-                     EffGlEmiss * (state.dataWindowManager->thetas(2 * totSolidLayers - 2) - state.dataWindowManager->TKelvin)) /
+                     EffGlEmiss * (state.dataWindowManager->thetas[2 * totSolidLayers - 3] - state.dataWindowManager->TKelvin)) /
                     (EffShBlEmiss + EffGlEmiss);
             }
         }
@@ -189,15 +189,15 @@ namespace WindowManager {
             auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
-                    (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
-                EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1), 4) - rmir) *
+                    (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1], 4) - rmir) +
+                EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 2], 4) - rmir) *
                     RhoGlIR2 * TauShIR / ShGlReflFacIR;
             auto NetIRHeatGainGlass =
                 ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) *
-                (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
+                (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglface - 1], 4) - rmir);
             auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
             auto ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
-                                                 (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
+                                                 (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1] - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
 
@@ -249,12 +249,12 @@ namespace WindowManager {
         state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
+            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas[2 * k - 2];
+            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas[2 * k - 1];
 
             // temperatures for reporting
-            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas(2 * k - 1) - DataGlobalConstants::KelvinConv;
-            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas(2 * k) - DataGlobalConstants::KelvinConv;
+            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 2] - DataGlobalConstants::KelvinConv;
+            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 1] - DataGlobalConstants::KelvinConv;
         }
     }
 
