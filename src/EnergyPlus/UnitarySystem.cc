@@ -7845,18 +7845,18 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum)
                                                                  .SequencedOutputRequiredToHeatingSP(this->m_ZoneSequenceHeatingNum);
                     if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0 &&
-                        state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
+                        state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling) {
                         ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
                         state.dataUnitarySystems->HeatingLoad = true;
                     } else if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0 &&
-                               state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) == DataHVACGlobals::SingleCoolingSetPoint) {
+                               state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) {
                         ZoneLoad = 0.0;
                     } else if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0 &&
-                               state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
+                               state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
                         ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
                         state.dataUnitarySystems->CoolingLoad = true;
                     } else if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0 &&
-                               state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) == DataHVACGlobals::SingleHeatingSetPoint) {
+                               state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) == DataHVACGlobals::ThermostatType::SingleHeating) {
                         ZoneLoad = 0.0;
                     } else if (state.dataUnitarySystems->QToHeatSetPt <= 0.0 && state.dataUnitarySystems->QToCoolSetPt >= 0.0) {
                         ZoneLoad = 0.0;
@@ -8244,7 +8244,7 @@ namespace UnitarySystems {
 
         // determine if PLR=0 meets the load
         switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
-        case DataHVACGlobals::SingleHeatingSetPoint: {
+        case DataHVACGlobals::ThermostatType::SingleHeating: {
             if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
                 (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                 return;
@@ -8252,7 +8252,7 @@ namespace UnitarySystems {
                 (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                 return;
         } break;
-        case DataHVACGlobals::SingleCoolingSetPoint: {
+        case DataHVACGlobals::ThermostatType::SingleCooling: {
             if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
                 (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                 return;
@@ -8260,8 +8260,8 @@ namespace UnitarySystems {
                 (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                 return;
         } break;
-        case DataHVACGlobals::SingleHeatCoolSetPoint:
-        case DataHVACGlobals::DualSetPointWithDeadBand: {
+        case DataHVACGlobals::ThermostatType::SingleHeatCool:
+        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
             if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
                 (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                 return;
@@ -8310,7 +8310,7 @@ namespace UnitarySystems {
             FullSensibleOutput = SensOutputOff;
 
             switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
-            case DataHVACGlobals::SingleHeatingSetPoint: {
+            case DataHVACGlobals::ThermostatType::SingleHeating: {
                 if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
                     (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                     return;
@@ -8318,7 +8318,7 @@ namespace UnitarySystems {
                     (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                     return;
             } break;
-            case DataHVACGlobals::SingleCoolingSetPoint: {
+            case DataHVACGlobals::ThermostatType::SingleCooling: {
                 if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad && this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat)
                     return;
                 if (state.dataUnitarySystems->CoolingLoad && SensOutputOff < ZoneLoad &&
@@ -8328,8 +8328,8 @@ namespace UnitarySystems {
                     (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                     return;
             } break;
-            case DataHVACGlobals::SingleHeatCoolSetPoint:
-            case DataHVACGlobals::DualSetPointWithDeadBand: {
+            case DataHVACGlobals::ThermostatType::SingleHeatCool:
+            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
                 if (state.dataUnitarySystems->HeatingLoad && SensOutputOff > ZoneLoad &&
                     (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad > LatOutputOff))
                     return;
@@ -8463,7 +8463,7 @@ namespace UnitarySystems {
         if ((state.dataUnitarySystems->HeatingLoad && this->m_NumOfSpeedHeating <= 1) ||
             (state.dataUnitarySystems->CoolingLoad && this->m_NumOfSpeedCooling <= 1)) {
             switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
-            case DataHVACGlobals::SingleHeatingSetPoint: {
+            case DataHVACGlobals::ThermostatType::SingleHeating: {
                 if (state.dataUnitarySystems->HeatingLoad && SensOutputOn < ZoneLoad) {
                     this->m_HeatingPartLoadFrac = 1.0;
                     this->m_WSHPRuntimeFrac = 1.0;
@@ -8473,7 +8473,7 @@ namespace UnitarySystems {
                     (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn))
                     return;
             } break;
-            case DataHVACGlobals::SingleCoolingSetPoint: {
+            case DataHVACGlobals::ThermostatType::SingleCooling: {
                 if (state.dataUnitarySystems->CoolingLoad && SensOutputOn > ZoneLoad) {
                     this->m_CoolingPartLoadFrac = 1.0;
                     this->m_WSHPRuntimeFrac = 1.0;
@@ -8483,8 +8483,8 @@ namespace UnitarySystems {
                     (state.dataUnitarySystems->MoistureLoad >= 0.0 || state.dataUnitarySystems->MoistureLoad < LatOutputOn))
                     return;
             } break;
-            case DataHVACGlobals::SingleHeatCoolSetPoint:
-            case DataHVACGlobals::DualSetPointWithDeadBand: {
+            case DataHVACGlobals::ThermostatType::SingleHeatCool:
+            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
                 if (state.dataUnitarySystems->HeatingLoad && SensOutputOn < ZoneLoad) {
                     this->m_HeatingPartLoadFrac = 1.0;
                     this->m_WSHPRuntimeFrac = 1.0;
@@ -9963,11 +9963,11 @@ namespace UnitarySystems {
         state.dataUnitarySystems->HeatingLoad = false;
 
         if (QZnReq > this->m_SmallLoadTolerance) { // no need to check deadband flag, QZnReq is correct.
-            if (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
+            if (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling) {
                 state.dataUnitarySystems->HeatingLoad = true;
             }
         } else if (QZnReq < -this->m_SmallLoadTolerance) {
-            if (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
+            if (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
                 state.dataUnitarySystems->CoolingLoad = true;
             }
         }
@@ -9990,8 +9990,9 @@ namespace UnitarySystems {
                                           HeatCoilLoad,
                                           SupHeaterLoad,
                                           CompressorOn);
+
             switch (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum)) {
-            case DataHVACGlobals::SingleHeatingSetPoint: {
+            case DataHVACGlobals::ThermostatType::SingleHeating:
                 state.dataUnitarySystems->CoolingLoad = false;
                 // No heating load and constant fan pushes zone below heating set point
                 if (SensOutputOff < 0.0 && state.dataUnitarySystems->QToHeatSetPt < 0.0 &&
@@ -10000,8 +10001,8 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->CoolingLoad = false;
                     ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
                 }
-            } break;
-            case DataHVACGlobals::SingleCoolingSetPoint: {
+                break;
+            case DataHVACGlobals::ThermostatType::SingleCooling:
                 state.dataUnitarySystems->HeatingLoad = false;
                 // No heating load and constant fan pushes zone above cooling set point
                 if (SensOutputOff > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0 &&
@@ -10010,8 +10011,8 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->CoolingLoad = true;
                     ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
                 }
-            } break;
-            case DataHVACGlobals::SingleHeatCoolSetPoint: {
+                break;
+            case DataHVACGlobals::ThermostatType::SingleHeatCool:
                 // zone temp above cooling and heating set point temps
                 if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0) {
                     // zone pushed below heating set point
@@ -10029,8 +10030,8 @@ namespace UnitarySystems {
                         ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
                     }
                 }
-            } break;
-            case DataHVACGlobals::DualSetPointWithDeadBand: {
+                break;
+            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
                 // zone temp above cooling and heating set point temps
                 if (state.dataUnitarySystems->QToHeatSetPt < 0.0 && state.dataUnitarySystems->QToCoolSetPt < 0.0) {
                     // zone pushed into deadband
@@ -10073,7 +10074,7 @@ namespace UnitarySystems {
                         ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
                     }
                 }
-            } break;
+                break;
             default:
                 break;
             }
