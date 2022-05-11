@@ -6362,7 +6362,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
 
     int ZoneSizIndex;
     bool ErrorsFound;
-
+    bool headerAlreadyPrinted = false;
     ErrorsFound = false;
     for (ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         if (state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS) {
@@ -6384,7 +6384,8 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName,
                                            "NeutralSupplyAir",
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
-                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
+                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint,
+                                           headerAlreadyPrinted);
             } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy == DOANeutralDehumSup) {
                 if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint == AutoSize &&
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
@@ -6401,7 +6402,8 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName,
                                            "NeutralDehumidifiedSupplyAir",
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
-                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
+                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint,
+                                           headerAlreadyPrinted);
             } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy == DOACoolSup) {
                 if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint == AutoSize &&
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
@@ -6420,7 +6422,8 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName,
                                            "ColdSupplyAir",
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
-                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
+                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint,
+                                           headerAlreadyPrinted);
             }
             if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint) {
                 ShowSevereError(state, "For Sizing:Zone = " + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName);
@@ -6438,8 +6441,8 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
                                 std::string const &ZoneName,         // the name of the zone
                                 std::string const &DOASCtrlStrategy, // DOAS control strategy
                                 Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
-                                Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
-)
+                                Real64 const DOASHighTemp,           // DOAS design high setpoint temperature [C]
+                                bool &headerAlreadyPrinted)
 {
 
     // SUBROUTINE INFORMATION:
@@ -6458,9 +6461,9 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
         "! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
         "{C}, DOAS Design High Setpoint Temperature {C} ");
 
-    if (state.dataZoneEquipmentManager->reportDOASZoneSizingHeader) {
+    if (!headerAlreadyPrinted) {
         print(state.files.eio, "{}\n", Format_990);
-        state.dataZoneEquipmentManager->reportDOASZoneSizingHeader = false;
+        headerAlreadyPrinted = true;
     }
 
     static constexpr std::string_view Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
