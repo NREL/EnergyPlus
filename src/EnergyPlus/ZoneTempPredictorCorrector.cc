@@ -1380,7 +1380,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       cAlphaFieldNames,
                                       cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-        auto dualSetpointHeatCoolFanger = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(idx);
+        auto & dualSetpointHeatCoolFanger = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(idx);
         dualSetpointHeatCoolFanger.Name = cAlphaArgs(1);
         dualSetpointHeatCoolFanger.HeatPMVSetptSchedName = cAlphaArgs(2);
         dualSetpointHeatCoolFanger.HeatPMVSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
