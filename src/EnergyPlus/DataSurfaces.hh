@@ -1298,7 +1298,7 @@ namespace DataSurfaces {
         Real64 SurfsReflAvg;           // groundSurfaces average reflectance at each time step
 
         // Default Constructor
-        GroundSurfacesProperty() : NumGndSurfs(0), ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0), SurfsReflAvg(0.0)
+        GroundSurfacesProperty() : NumGndSurfs(0), ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0)
         {
         }
     };

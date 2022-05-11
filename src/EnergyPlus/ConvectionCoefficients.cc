@@ -421,6 +421,10 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         }
     }
 
+    if (state.dataSurface->SurfHasGroundSurfProperties(SurfNum)) {
+        TGround = GetGroundSurfacesTemperatureAverage(state, SurfNum);
+    }
+
     BaseSurf = Surface(SurfNum).BaseSurf; // If this is a base surface, BaseSurf = SurfNum
 
     SurfWindDir = state.dataSurface->SurfOutWindDir(SurfNum);
@@ -9193,4 +9197,34 @@ ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const Til
     }
 }
 
+Real64 GetGroundSurfacesTemperatureAverage(EnergyPlusData &state, int const SurfNum)
+{
+    // purpose of subroutine:
+    // returns average ground surfaces tmperature in degree C 
+    // ground temperature seen by a building exterior surface
+
+    // methodology:
+    // view factor weighted average ground surfaces temperature
+
+    using ScheduleManager::GetCurrentScheduleValue;
+    
+    Real64 GndSurgfacesAverageTemp;
+    GndSurgfacesAverageTemp = 0.0;
+    if (state.dataSurface->SurfHasGroundSurfProperties(SurfNum)) {
+        Real64 GndSurfaceTemp = 0.0;
+        Real64 GndSurfaceTempSum = 0.0;
+        Real64 GndSurfViewFactor = 0.0;
+        Real64 GndSurfsViewFactor = 0.0;
+        auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->SurfGroundSurfacesNum(SurfNum));
+        for (int gSurfNum = 1; gSurfNum <= GndSurfsProperty.NumGndSurfs; gSurfNum++) {
+            GndSurfViewFactor = GndSurfsProperty.ViewFactor(gSurfNum);
+            GndSurfsViewFactor += GndSurfViewFactor;
+            GndSurfaceTemp = GetCurrentScheduleValue(state, GndSurfsProperty.TempSchPtr(gSurfNum)) + DataGlobalConstants::KelvinConv;
+            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp);
+        }
+        GndSurgfacesAverageTemp = root_4(GndSurfaceTempSum / GndSurfsViewFactor);
+        GndSurfsProperty.SurfsTempAvg = GndSurgfacesAverageTemp - DataGlobalConstants::KelvinConv;
+    } 
+    return GndSurgfacesAverageTemp;
+}
 } // namespace EnergyPlus::ConvectionCoefficients
