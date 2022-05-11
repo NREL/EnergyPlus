@@ -113,6 +113,7 @@ namespace PlantPipingSystemsManager {
     std::string const ObjName_HorizTrench("GroundHeatExchanger:HorizontalTrench");
     std::string const ObjName_ZoneCoupled_Slab("Site:GroundDomain:Slab");
     std::string const ObjName_ZoneCoupled_Basement("Site:GroundDomain:Basement");
+    constexpr std::array<std::string_view, static_cast<int>(SegmentFlow::Num)> flowDirectionNames = {"INCREASINGZ", "DECREASINGZ"};
 
 #pragma clang diagnostic pop
 
@@ -138,7 +139,7 @@ namespace PlantPipingSystemsManager {
         state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
-    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] DataPlant::PlantEquipmentType objectType, std::string objectName)
+    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] DataPlant::PlantEquipmentType objectType, const std::string &objectName)
     {
         // Process the input data for circuits if it hasn't been done already
         if (state.dataPlantPipingSysMgr->GetInputFlag) {
@@ -1691,7 +1692,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    Segment *Segment::factory(EnergyPlusData &state, std::string segmentName)
+    Segment *Segment::factory(EnergyPlusData &state, const std::string &segmentName)
     {
         if (state.dataPlantPipingSysMgr->GetSegmentInputFlag) {
             bool errorsFound = false;
@@ -1711,7 +1712,7 @@ namespace PlantPipingSystemsManager {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    Circuit *Circuit::factory(EnergyPlusData &state, std::string circuitName, bool &errorsFound)
+    Circuit *Circuit::factory(EnergyPlusData &state, const std::string &circuitName, bool &errorsFound)
     {
         if (state.dataPlantPipingSysMgr->GetCircuitInputFlag) {
             ReadPipeCircuitInputs(state, errorsFound);
@@ -1778,23 +1779,18 @@ namespace PlantPipingSystemsManager {
             thisSegment.PipeLocation = PointF(state.dataIPShortCut->rNumericArgs(1), state.dataIPShortCut->rNumericArgs(2));
 
             // Read in the flow direction
-            {
-                auto const SELECT_CASE_var(stripped(state.dataIPShortCut->cAlphaArgs(2)));
-                if (SELECT_CASE_var == "INCREASINGZ") {
-                    thisSegment.FlowDirection = SegmentFlow::IncreasingZ;
-                } else if (SELECT_CASE_var == "DECREASINGZ") {
-                    thisSegment.FlowDirection = SegmentFlow::DecreasingZ;
-                } else {
-                    CurIndex = 2;
-                    IssueSevereInputFieldError(state,
-                                               RoutineName,
-                                               ObjName_Segment,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                               state.dataIPShortCut->cAlphaArgs(CurIndex),
-                                               "Invalid flow direction, use one of the available keys.",
-                                               ErrorsFound);
-                }
+            thisSegment.FlowDirection =
+                static_cast<SegmentFlow>(getEnumerationValue(flowDirectionNames, stripped(state.dataIPShortCut->cAlphaArgs(2))));
+            if (thisSegment.FlowDirection == SegmentFlow::Invalid) {
+                CurIndex = 2;
+                IssueSevereInputFieldError(state,
+                                           RoutineName,
+                                           ObjName_Segment,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                           state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                           "Invalid flow direction, use one of the available keys.",
+                                           ErrorsFound);
             }
 
             state.dataPlantPipingSysMgr->segments.push_back(thisSegment);
@@ -2484,7 +2480,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    bool Domain::CheckForOutOfRangeTemps()
+    bool Domain::CheckForOutOfRangeTemps() const
     {
 
         // FUNCTION INFORMATION:
@@ -2496,9 +2492,8 @@ namespace PlantPipingSystemsManager {
         Real64 const MaxLimit = this->SimControls.MaximumTemperatureLimit;
         Real64 const MinLimit = this->SimControls.MinimumTemperatureLimit;
 
-        auto const &Cells(this->Cells);
-        for (std::size_t i = 0, e = Cells.size(); i < e; ++i) {
-            double const Temperature(Cells[i].Temperature);
+        for (std::size_t i = 0, e = this->Cells.size(); i < e; ++i) {
+            double const Temperature(this->Cells[i].Temperature);
             if ((Temperature > MaxLimit) || (Temperature < MinLimit)) return true;
         }
         return false;
@@ -2515,15 +2510,12 @@ namespace PlantPipingSystemsManager {
 
         switch (direction) {
         case Direction::PositiveY:
-            return this->YNormalArea();
         case Direction::NegativeY:
             return this->YNormalArea();
         case Direction::PositiveX:
-            return this->XNormalArea();
         case Direction::NegativeX:
             return this->XNormalArea();
         case Direction::PositiveZ:
-            return this->ZNormalArea();
         case Direction::NegativeZ:
             return this->ZNormalArea();
         default:
@@ -3895,7 +3887,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    int Domain::getCellWidthsCount(RegionType const dir)
+    int Domain::getCellWidthsCount(RegionType const dir) const
     {
 
         // FUNCTION INFORMATION:
@@ -3916,7 +3908,7 @@ namespace PlantPipingSystemsManager {
         return 0;
     }
 
-    void Domain::getCellWidths(GridRegion &g, RegionType const direction)
+    void Domain::getCellWidths(GridRegion &g, RegionType const direction) const
     {
 
         // FUNCTION INFORMATION:
@@ -4828,7 +4820,7 @@ namespace PlantPipingSystemsManager {
         this->ResetHeatFluxFlag = true;
     }
 
-    Real64 Domain::GetAverageTempByType(EnergyPlusData &state, CellType const cellType)
+    Real64 Domain::GetAverageTempByType(EnergyPlusData &state, CellType const cellType) const
     {
 
         // FUNCTION INFORMATION:
@@ -5860,7 +5852,7 @@ namespace PlantPipingSystemsManager {
         this->Moisture.rhoCP_soil_ice = this->Moisture.rhoCp_soil_liq_1 * (1.0 - Theta_sat) + rho_ice * CP_ice * Theta_ice; //'!J / m3K
     }
 
-    void Domain::EvaluateSoilRhoCp(Real64 const CellTemp, Real64 &rhoCp)
+    void Domain::EvaluateSoilRhoCp(Real64 const CellTemp, Real64 &rhoCp) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -5891,7 +5883,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void CartesianCell::EvaluateNeighborCoordinates(Direction const CurDirection, int &NX, int &NY, int &NZ)
+    void CartesianCell::EvaluateNeighborCoordinates(Direction const CurDirection, int &NX, int &NY, int &NZ) const
     {
 
         // SUBROUTINE INFORMATION:
