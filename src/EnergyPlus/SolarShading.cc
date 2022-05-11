@@ -2498,7 +2498,6 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     Real64 Delta;                  // Sky brightness parameter
     Real64 CosIncAngBeamOnSurface; // Cosine of incidence angle of beam solar on surface
     Real64 IncAng;                 // Incidence angle of beam solar on surface (radians)
-    int SurfNum;                   // Surface number
     int EpsilonBin;                // Sky clearness (Epsilon) bin index
     Real64 AirMass;                // Relative air mass
     Real64 AirMassH;               // Intermediate variable for relative air mass calculation
@@ -2535,8 +2534,7 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     F1 = max(0.0, F11R[EpsilonBin] + F12R[EpsilonBin] * Delta + F13R[EpsilonBin] * ZenithAng);
     F2 = F21R[EpsilonBin] + F22R[EpsilonBin] * Delta + F23R[EpsilonBin] * ZenithAng;
 
-    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (!state.dataSurface->Surface(SurfNum).ExtSolar) continue;
+    for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
 
         CosIncAngBeamOnSurface = state.dataEnvrn->SOLCOS(1) * state.dataSurface->Surface(SurfNum).OutNormVec(1) +
                                  state.dataEnvrn->SOLCOS(2) * state.dataSurface->Surface(SurfNum).OutNormVec(2) +
@@ -10307,8 +10305,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
         state.dataSolarShading->SurfDifShdgRatioHorizHRTS = 1.0;
     }
 
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (!state.dataSurface->Surface(SurfNum).ExtSolar) continue;
+    for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
 
         // CurrentModuleObject='Surfaces'
         if (detailedShading) {
