@@ -752,6 +752,19 @@ namespace DataHeatBalance {
         EPVector<std::string> names; // Names for each instance created from this input object
     };
 
+    enum class ClothingType
+    {
+        Invalid = -1,
+        InsulationSchedule,
+        DynamicAshrae55,
+        CalculationSchedule,
+        Num
+    };
+    constexpr std::array<std::string_view, static_cast<int>(ClothingType::Num)> clothingTypeNamesUC = {
+        "CLOTHINGINSULATIONSCHEDULE", "DYNAMICCLOTHINGMODELASHRAE55", "CALCULATIONMETHODSCHEDULE"};
+    constexpr std::array<std::string_view, static_cast<int>(ClothingType::Num)> clothingTypeEIOStrings = {
+        "Clothing Insulation Schedule,", "Dynamic Clothing Model ASHRAE55,", "Calculation Method Schedule,"};
+
     struct PeopleData
     {
         // Members
@@ -774,13 +787,13 @@ namespace DataHeatBalance {
         int WorkEffPtr = -1;             // Pointer to schedule for work efficiency
         int ClothingPtr = -1;            // Pointer to schedule for clothing insulation
         int ClothingMethodPtr = -1;
-        int ClothingType = -1;        // Name of clothing type
-        int AirVelocityPtr = -1;      // Pointer to schedule for air velocity in zone
-        int AnkleAirVelocityPtr = -1; // Pointer to schedule for air velocity in zone
-        bool Fanger = false;          // True when Fanger calculation to be performed
-        bool Pierce = false;          // True when Pierce 2-node calculation to be performed
-        bool KSU = false;             // True when KSU 2-node calculation to be performed
-        bool AdaptiveASH55 = false;   // True when ASHRAE Standard 55 adaptive comfort calculation
+        ClothingType clothingType = ClothingType::Invalid; // Clothing type
+        int AirVelocityPtr = -1;                           // Pointer to schedule for air velocity in zone
+        int AnkleAirVelocityPtr = -1;                      // Pointer to schedule for air velocity in zone
+        bool Fanger = false;                               // True when Fanger calculation to be performed
+        bool Pierce = false;                               // True when Pierce 2-node calculation to be performed
+        bool KSU = false;                                  // True when KSU 2-node calculation to be performed
+        bool AdaptiveASH55 = false;                        // True when ASHRAE Standard 55 adaptive comfort calculation
         //   to be performed
         bool AdaptiveCEN15251 = false; // True when CEN Standard 15251 adaptive comfort calculation
         //   to be performed
