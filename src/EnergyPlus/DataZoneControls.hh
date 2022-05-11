@@ -55,11 +55,21 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
 namespace DataZoneControls {
+
+    // Average method parameter with multiple people objects in a zone
+    enum class AverageMethod
+    {
+        Invalid = -1,
+        NO,  // No multiple people objects
+        SPE, // Specific people object
+        OBJ, // People object average
+        PEO, // People number average
+        Num
+    };
 
     struct ZoneTempControls
     {
@@ -165,38 +175,38 @@ namespace DataZoneControls {
     struct ZoneComfortControls
     {
         // Members
-        std::string Name;                                        // Name of the thermostat
-        std::string ZoneName;                                    // Name of the zone
-        int ActualZoneNum;                                       // Index number of zone
-        std::string ControlTypeSchedName;                        // Name of the schedule which determines the zone temp setpoint
-        int ComfortSchedIndex;                                   // Index for this schedule
-        int NumControlTypes;                                     // Number of control types in ZoneControl:ThermalComfort object
-        Array1D_string ControlType;                              // Type of control
-        Array1D_string ControlTypeName;                          // Name of control type
-        Array1D_int ControlTypeSchIndx;                          // Index to control type schedule
-        int SchIndx_SingleHeating;                               // Index to fanger single heating setpoint schedule
-        int SchIndx_SingleCooling;                               // Index to fanger single cooling setpoint schedule
-        int SchIndx_SingleHeatCool;                              // Index to fanger single heating/cooling setpoint schedule
-        int SchIndx_DualSetPointWithDeadBand;                    // Index to fanger dual setpoint schedule
-        bool ManageDemand;                                       // Flag to indicate whether to use demand limiting
-        Real64 HeatingResetLimit;                                // Lowest heating setpoint that can be set by demand manager [C]
-        Real64 CoolingResetLimit;                                // Highest cooling setpoint that can be set by demand manager [C]
-        bool EMSOverrideHeatingSetPointOn;                       // EMS is calling to override heating setpoint
-        Real64 EMSOverrideHeatingSetPointValue;                  // value EMS is directing to use for heating setpoint
-        bool EMSOverrideCoolingSetPointOn;                       // EMS is calling to override cooling setpoint
-        Real64 EMSOverrideCoolingSetPointValue;                  // value EMS is directing to use for cooling setpoint
-        Real64 TdbMaxSetPoint;                                   // Maximum dry-bulb temperature setpoint [C]
-        Real64 TdbMinSetPoint;                                   // Minimum dry-bulb temperature setpoint [C]
-        std::string AverageMethodName;                           // Averaging Method for Zones with Multiple People Objects
-        std::string AverageObjectName;                           // Object Name for Specific Object Average
-        ZoneTempPredictorCorrector::AverageMethod AverageMethod; // Averaging method
-        int SpecificObjectNum;                                   // People Object number used for Specific people object choice
-        int PeopleAverageErrIndex;                               // People average error index
-        int TdbMaxErrIndex;                                      // Single cooling setpoint error index
-        int TdbMinErrIndex;                                      // Single heating setpoint error index
-        int TdbHCErrIndex;                                       // Single heating cooling setpoint error index
-        int TdbDualMaxErrIndex;                                  // Dual cooling setpoint error index
-        int TdbDualMinErrIndex;                                  // Dual heating setpoint error index
+        std::string Name;                              // Name of the thermostat
+        std::string ZoneName;                          // Name of the zone
+        int ActualZoneNum;                             // Index number of zone
+        std::string ControlTypeSchedName;              // Name of the schedule which determines the zone temp setpoint
+        int ComfortSchedIndex;                         // Index for this schedule
+        int NumControlTypes;                           // Number of control types in ZoneControl:ThermalComfort object
+        Array1D_string ControlType;                    // Type of control
+        Array1D_string ControlTypeName;                // Name of control type
+        Array1D_int ControlTypeSchIndx;                // Index to control type schedule
+        int SchIndx_SingleHeating;                     // Index to fanger single heating setpoint schedule
+        int SchIndx_SingleCooling;                     // Index to fanger single cooling setpoint schedule
+        int SchIndx_SingleHeatCool;                    // Index to fanger single heating/cooling setpoint schedule
+        int SchIndx_DualSetPointWithDeadBand;          // Index to fanger dual setpoint schedule
+        bool ManageDemand;                             // Flag to indicate whether to use demand limiting
+        Real64 HeatingResetLimit;                      // Lowest heating setpoint that can be set by demand manager [C]
+        Real64 CoolingResetLimit;                      // Highest cooling setpoint that can be set by demand manager [C]
+        bool EMSOverrideHeatingSetPointOn;             // EMS is calling to override heating setpoint
+        Real64 EMSOverrideHeatingSetPointValue;        // value EMS is directing to use for heating setpoint
+        bool EMSOverrideCoolingSetPointOn;             // EMS is calling to override cooling setpoint
+        Real64 EMSOverrideCoolingSetPointValue;        // value EMS is directing to use for cooling setpoint
+        Real64 TdbMaxSetPoint;                         // Maximum dry-bulb temperature setpoint [C]
+        Real64 TdbMinSetPoint;                         // Minimum dry-bulb temperature setpoint [C]
+        std::string AverageMethodName;                 // Averaging Method for Zones with Multiple People Objects
+        std::string AverageObjectName;                 // Object Name for Specific Object Average
+        DataZoneControls::AverageMethod AverageMethod; // Averaging method
+        int SpecificObjectNum;                         // People Object number used for Specific people object choice
+        int PeopleAverageErrIndex;                     // People average error index
+        int TdbMaxErrIndex;                            // Single cooling setpoint error index
+        int TdbMinErrIndex;                            // Single heating setpoint error index
+        int TdbHCErrIndex;                             // Single heating cooling setpoint error index
+        int TdbDualMaxErrIndex;                        // Dual cooling setpoint error index
+        int TdbDualMinErrIndex;                        // Dual heating setpoint error index
 
         // Default Constructor
         ZoneComfortControls()
@@ -204,7 +214,7 @@ namespace DataZoneControls {
               SchIndx_SingleHeatCool(0), SchIndx_DualSetPointWithDeadBand(0), ManageDemand(false), HeatingResetLimit(0.0), CoolingResetLimit(0.0),
               EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0), EMSOverrideCoolingSetPointOn(false),
               EMSOverrideCoolingSetPointValue(0.0), TdbMaxSetPoint(50.0), TdbMinSetPoint(0.0), AverageMethodName("PEOPLE AVERGAE"),
-              AverageMethod(ZoneTempPredictorCorrector::AverageMethod::NO), SpecificObjectNum(0), PeopleAverageErrIndex(0), TdbMaxErrIndex(0),
+              AverageMethod(DataZoneControls::AverageMethod::NO), SpecificObjectNum(0), PeopleAverageErrIndex(0), TdbMaxErrIndex(0),
               TdbMinErrIndex(0), TdbHCErrIndex(0), TdbDualMaxErrIndex(0), TdbDualMinErrIndex(0)
         {
         }

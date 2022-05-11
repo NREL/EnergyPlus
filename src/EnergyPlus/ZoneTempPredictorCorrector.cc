@@ -1049,25 +1049,25 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         "\" - cannot use Comfort Control.");
                     ErrorsFound = true;
                 }
-                ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::NO;
+                ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = DataZoneControls::AverageMethod::NO;
                 if (IZoneCount > 1) {
                     ComfortControlledZone(ComfortControlledZoneNum).AverageMethodName = cAlphaArgs(3);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "SpecificObject")) {
-                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::SPE;
+                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = DataZoneControls::AverageMethod::SPE;
                     }
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "ObjectAverage")) {
-                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::OBJ;
+                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = DataZoneControls::AverageMethod::OBJ;
                     }
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "PeopleAverage")) {
-                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = AverageMethod::PEO;
+                        ComfortControlledZone(ComfortControlledZoneNum).AverageMethod = DataZoneControls::AverageMethod::PEO;
                     }
-                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethod == AverageMethod::NO) {
+                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethod == DataZoneControls::AverageMethod::NO) {
                         ShowSevereError(
                             state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                         ShowContinueError(state, "Allowed keys are SpecificObject, ObjectAverage, or PeopleAverage");
                         ErrorsFound = true;
                     }
-                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethod == AverageMethod::SPE) {
+                    if (ComfortControlledZone(ComfortControlledZoneNum).AverageMethod == DataZoneControls::AverageMethod::SPE) {
                         ComfortControlledZone(ComfortControlledZoneNum).AverageObjectName = cAlphaArgs(4);
                         if (UtilityRoutines::FindItem(cAlphaArgs(4), state.dataHeatBal->People) == 0) {
                             ShowSevereError(state,
@@ -7450,7 +7450,7 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
 
         // Check Average method
         switch (ComfortControlledZone(RelativeZoneNum).AverageMethod) {
-        case AverageMethod::NO:
+        case DataZoneControls::AverageMethod::NO:
             PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
             if (ComfortControlType(ActualZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) {
                 GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
@@ -7460,7 +7460,7 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
             if (ComfortControlType(ActualZoneNum) == DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand)
                 GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
             break;
-        case AverageMethod::SPE:
+        case DataZoneControls::AverageMethod::SPE:
             PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
             if (ComfortControlType(ActualZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) {
                 GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
@@ -7470,7 +7470,7 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
             if (ComfortControlType(ActualZoneNum) == DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand)
                 GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
             break;
-        case AverageMethod::OBJ:
+        case DataZoneControls::AverageMethod::OBJ:
             ObjectCount = 0;
             SetPointLo = 0.0;
             SetPointHi = 0.0;
@@ -7488,7 +7488,7 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
             SetPointLo /= ObjectCount;
             if (ComfortControlType(ActualZoneNum) == DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand) SetPointHi /= ObjectCount;
             break;
-        case AverageMethod::PEO:
+        case DataZoneControls::AverageMethod::PEO:
             PeopleCount = 0.0;
             SetPointLo = 0.0;
             SetPointHi = 0.0;

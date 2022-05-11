@@ -98,17 +98,6 @@ namespace ZoneTempPredictorCorrector {
         Num
     };
 
-    // Average method parameter with multiple people objects in a zone
-    enum class AverageMethod
-    {
-        Invalid = -1,
-        NO,  // No multiple people objects
-        SPE, // Specific people object
-        OBJ, // People object average
-        PEO, // People number average
-        Num
-    };
-
     struct ZoneTempControl
     {
         std::string Name;          // Name of the zone
