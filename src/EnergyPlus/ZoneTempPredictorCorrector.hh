@@ -98,41 +98,7 @@ namespace ZoneTempPredictorCorrector {
         Num
     };
 
-    // The numbers are used to access zone comfort control type, see ValidComfortControlTypes
-    enum class ComfortControl
-    {
-        Invalid = -1,
-        SglHeatSetPoint = 1,
-        SglCoolSetPoint = 2,
-        SglHCSetPoint = 3,
-        DualSetPoint = 4,
-        SglHeatSetPointFanger = 1,
-        SglCoolSetPointFanger = 2,
-        SglHCSetPointFanger = 3,
-        DualSetPointFanger = 4,
-        SglHeatSetPointPierce = 5, // Unused
-        SglCoolSetPointPierce = 6,
-        SglHCSetPointPierce = 7, // Unused
-        DualSetPointPierce = 8,
-        SglHeatSetPointKSU = 9,  // Unused
-        SglCoolSetPointKSU = 10, // Unused
-        SglHCSetPointKSU = 11,   // Unused
-        DualSetPointKSU = 12,    // Unused
-        Num
-    };
-
-    // Average method parameter with multiple people objects in a zone
-    enum class AverageMethod
-    {
-        Invalid = -1,
-        NO,  // No multiple people objects
-        SPE, // Specific people object
-        OBJ, // People object average
-        PEO, // People number average
-        Num
-    };
-
-    struct ZoneTempControlType
+    struct ZoneTempControl
     {
         std::string Name;          // Name of the zone
         std::string TempSchedName; // Name of the schedule which determines the zone temp setpoint
@@ -140,10 +106,10 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatTempSetptSchedName;
         int HeatTempSchedIndex = 0;
         std::string CoolTempSetptSchedName;
-        int CoolTempSchedIndex = 0;
+        int CoolTempSchedIndex;
     };
 
-    struct ZoneComfortFangerControlType
+    struct ZoneComfortFangerControl
     {
         std::string Name;                  // Name of the zone
         std::string PMVSchedName;          // Name of the schedule which determines the zone temp setpoint
@@ -151,7 +117,7 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatPMVSetptSchedName; // Name of PMV heating set point schedule
         int HeatPMVSchedIndex = 0;         // Index to PMV heating set point schedule
         std::string CoolPMVSetptSchedName; // Name of PMV cooling set point schedule
-        int CoolPMVSchedIndex = 0;         // INdex to PMV cooling set point schedule
+        int CoolPMVSchedIndex;             // INdex to PMV cooling set point schedule
     };
 
     struct AdaptiveComfortDailySetPointSchedule
@@ -379,14 +345,14 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
 
     // Object Data
     std::unordered_set<std::string> HumidityControlZoneUniqueNames;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeating;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleCooling;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeatCool;
-    EPVector<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointDualHeatCool;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
-    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointSingleHeating;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointSingleCooling;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointSingleHeatCool;
+    EPVector<ZoneTempPredictorCorrector::ZoneTempControl> SetPointDualHeatCool;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointSingleHeatingFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointSingleCoolingFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointSingleHeatCoolFanger;
+    EPVector<ZoneTempPredictorCorrector::ZoneComfortFangerControl> SetPointDualHeatCoolFanger;
     ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
 
     std::array<Real64, 7> AdapComfortSetPointSummerDesDay = {-1};

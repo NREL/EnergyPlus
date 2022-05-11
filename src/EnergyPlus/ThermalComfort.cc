@@ -2549,8 +2549,8 @@ namespace ThermalComfort {
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCoolingOccupied = 0.0;
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeatingOccupied = 0.0;
 
-            testHeating = (state.dataHeatBalFanSys->TempControlType(iZone) != DataHVACGlobals::SingleCoolingSetPoint);
-            testCooling = (state.dataHeatBalFanSys->TempControlType(iZone) != DataHVACGlobals::SingleHeatingSetPoint);
+            testHeating = (state.dataHeatBalFanSys->TempControlType(iZone) != DataHVACGlobals::ThermostatType::SingleCooling);
+            testCooling = (state.dataHeatBalFanSys->TempControlType(iZone) != DataHVACGlobals::ThermostatType::SingleHeating);
 
             if (testHeating && (SensibleLoadPredictedNoAdj > 0)) { // heating
                 if (state.dataRoomAirMod->AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
