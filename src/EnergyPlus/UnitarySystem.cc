@@ -165,8 +165,8 @@ namespace UnitarySystems {
           m_CoolingCoilLatentDemand(0.0), m_HeatingCoilSensDemand(0.0), m_SenLoadLoss(0.0), m_LatLoadLoss(0.0), m_DesignHeatRecMassFlowRate(0.0),
           m_HeatRecoveryMassFlowRate(0.0), m_HeatRecoveryRate(0.0), m_HeatRecoveryEnergy(0.0), m_HeatRecoveryInletTemp(0.0),
           m_HeatRecoveryOutletTemp(0.0), m_IterationCounter(0), m_DesiredOutletTemp(0.0), m_DesiredOutletHumRat(0.0), m_FrostControlStatus(0),
-          m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0), m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_SuppHeatingCycRatio(0.0),
-          m_HeatingSpeedRatio(0.0), m_SuppHeatingSpeedRatio(0.0), m_HeatingSpeedNum(0), m_SuppHeatingSpeedNum(0), m_SpeedNum(0),
+          m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0), m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_HeatingSpeedRatio(0.0),
+          m_HeatingSpeedNum(0), m_SpeedNum(0), m_SuppHeatingCycRatio(0.0), m_SuppHeatingSpeedRatio(0.0), m_SuppHeatingSpeedNum(0),
           m_EMSOverrideCoilSpeedNumOn(false), m_EMSOverrideCoilSpeedNumValue(0.0), m_CoilSpeedErrIdx(0), m_DehumidInducedHeatingDemandRate(0.0),
           m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0), m_CoolingAuxElecConsumption(0.0), m_ElecPower(0.0), m_ElecPowerConsumption(0.0),
           m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0), m_SensCoolEnergyRate(0.0), m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0),
@@ -7509,8 +7509,6 @@ namespace UnitarySystems {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
-
-        Real64 SuppPLR = 0.0;       // supplemental heating part-load ratio
         Real64 ZoneLoad = 0.0;      // zone load (W)
         Real64 SupHeaterLoad = 0.0; // additional heating required by supplemental heater (W)
         Real64 OnOffAirFlowRatio = 1.0;
@@ -10943,7 +10941,7 @@ namespace UnitarySystems {
         calculateCapacity(state, SensOutput, LatOutput);
     }
 
-    void UnitarySys::calcMultiStageSuppCoilStageByLoad(EnergyPlusData &state, Real64 &SuppHeatLoad, bool const FirstHVACIteration)
+    void UnitarySys::calcMultiStageSuppCoilStageByLoad(EnergyPlusData &state, Real64 const SuppHeatLoad, bool const FirstHVACIteration)
     {
         if (SuppHeatLoad <= 0.0) {
             this->m_SuppHeatPartLoadFrac = 0.0;
@@ -10959,8 +10957,6 @@ namespace UnitarySystems {
         int CompIndex = this->m_SuppHeatCoilIndex;
         int FanOpMode = this->m_FanOpMode;
         Real64 QCoilActual = 0.0; // Heating coil operating capacity [W]
-        int OutletNode = this->m_SuppCoilAirOutletNode;
-        int InletNode = this->m_SuppCoilAirInletNode;
         int SpeedNum = 0;
         // Get full load result
         PartLoadFrac = 1.0;
@@ -10972,7 +10968,6 @@ namespace UnitarySystems {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIte(500);    // Maximum number of iterations for solver
         Real64 constexpr Acc(1.0e-3); // Accuracy of solver result
-        int constexpr SolveMaxIter(50);
 
         for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedSuppHeating; ++SpeedNum) {
             this->m_SuppHeatingSpeedNum = SpeedNum;
@@ -14212,7 +14207,6 @@ namespace UnitarySystems {
         Real64 PartLoadFrac = 0.0;
         int SolFla = 0.0;
         bool SensibleLoad = false;
-        bool LatentLoad = false;
         Real64 OutletTemp = 0.0;
         Real64 SpeedRatio = 0.0;
         Real64 CycRatio = 0.0;
@@ -14225,7 +14219,6 @@ namespace UnitarySystems {
         std::string CompName = this->m_SuppHeatCoilName;
         int CompIndex = this->m_SuppHeatCoilIndex;
         int FanOpMode = this->m_FanOpMode;
-        DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
@@ -15737,15 +15730,8 @@ namespace UnitarySystems {
         Real64 QActual;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompressorOp;
-        Real64 ReqOutput;
-        Real64 OnOffAirFlowRatio;
-        Real64 SensLoad;
-        Real64 LatLoad;
 
         int CoilIndex = int(Par[1]);
-        int UnitarySysNum = int(Par[3]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         CycRatio = Par[4];
         SpeedNum = int(Par[5]);
         FanOpMode = int(Par[6]);
@@ -15781,15 +15767,8 @@ namespace UnitarySystems {
         Real64 QActual;
         int SpeedNum;
         int FanOpMode;
-        DataHVACGlobals::CompressorOperation CompressorOp;
-        Real64 ReqOutput;
-        Real64 OnOffAirFlowRatio;
-        Real64 SensLoad;
-        Real64 LatLoad;
 
         int CoilIndex = int(Par[1]);
-        int UnitarySysNum = int(Par[3]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         SpeedRatio = Par[4];
         SpeedNum = int(Par[5]);
         FanOpMode = int(Par[6]);

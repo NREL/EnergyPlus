@@ -778,12 +778,12 @@ namespace UnitarySystems {
                                Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to AVERAGE airflow over timestep
         );
 
+        void calcMultiStageSuppCoilStageByLoad(EnergyPlusData &state, Real64 const SuppHeatload, bool const FirstHVACIteration);
+
         void calculateCapacity(EnergyPlusData &state,
                                Real64 &SensOutput, // sensible output of AirloopHVAC:UnitarySystem
                                Real64 &LatOutput   // latent output of AirloopHVAC:UnitarySystem
         );
-
-        void calcMultiStageSuppCoilStageByLoad(EnergyPlusData &state, Real64 &SuppHeatload, bool const FirstHVACIteration);
 
         void calcUnitaryCoolingSystem(EnergyPlusData &state,
                                       int const AirLoopNum,                              // index to air loop
