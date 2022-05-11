@@ -5057,11 +5057,11 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
             }     // End of Theta loop
         }         // End of Phi loop
 
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
 
-            if (!state.dataSurface->Surface(SurfNum).IsShadowing &&
-                (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar))
-                continue;
+            // if (!state.dataSurface->Surface(SurfNum).IsShadowing &&
+            //    (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar))
+            //    continue;
 
             if (std::abs(state.dataSolarShading->SurfWoShdgIsoSky(SurfNum)) > Eps) {
                 state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(iTimeStep, iHour, SurfNum) =
@@ -5094,15 +5094,13 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
 
     } // test for shading surfaces
 
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+    for (int SurfNum : state.dataSurface->AllExtSolWindowSurfaceList) {
         // For exterior windows with frame/divider that are partially or fully sunlit,
         // correct SunlitFrac due to shadowing of frame and divider projections onto window glass.
         // Note: if SunlitFrac = 0.0 the window is either completely shaded or the sun is in back
         // of the window; in either case, frame/divider shadowing doesn't have to be done.
 
-        if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window &&
-            state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
-            state.dataHeatBal->SurfSunlitFrac(iHour, iTimeStep, SurfNum) > 0.0 && state.dataSurface->Surface(SurfNum).FrameDivider > 0)
+        if (state.dataHeatBal->SurfSunlitFrac(iHour, iTimeStep, SurfNum) > 0.0 && state.dataSurface->Surface(SurfNum).FrameDivider > 0)
             CalcFrameDividerShadow(state, SurfNum, state.dataSurface->Surface(SurfNum).FrameDivider, iHour);
     }
 }

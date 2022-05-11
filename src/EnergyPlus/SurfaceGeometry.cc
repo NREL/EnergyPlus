@@ -2690,12 +2690,16 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
                     state.dataSurface->AllHTWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
+                    if (state.dataSurface->Surface(SurfNum).ExtSolar) {
+                        state.dataSurface->AllExtSolWindowSurfaceList.push_back(SurfNum);
+                    }
                 } else {
                     state.dataSurface->AllHTNonWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                 }
                 if (state.dataSurface->Surface(SurfNum).ExtSolar) {
                     surfZone.ZoneExtSolarSurfaceList.push_back(SurfNum);
+                    state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
                 }
                 int const surfExtBoundCond(state.dataSurface->Surface(SurfNum).ExtBoundCond);
                 // Build zone and interzone surface lists
@@ -4123,8 +4127,6 @@ namespace SurfaceGeometry {
                 ArgPointer += 2;
                 // Set the logical flag for the exterior solar
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ArgPointer), "SunExposed")) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar = true;
-
                     if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) &&
                         (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) {
                         ShowWarningError(state,
@@ -4132,8 +4134,9 @@ namespace SurfaceGeometry {
                                              state.dataIPShortCut->cAlphaFieldNames(ArgPointer) + "=\"" +
                                              state.dataIPShortCut->cAlphaArgs(ArgPointer) + "\".");
                         ShowContinueError(state, "..This surface is not exposed to External Environment.  Sun exposure has no effect.");
+                    } else {
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar = true;
                     }
-
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ArgPointer), "NoSun")) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar = false;
                 } else {

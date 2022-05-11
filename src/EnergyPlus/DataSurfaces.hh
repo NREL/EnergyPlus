@@ -1417,12 +1417,14 @@ struct SurfacesData : BaseGlobalStruct
         RepresentativeSurfaceMap; // A map that categorizes similar surfaces with
                                   // a single representative surface index
 
-    std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
-    std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
-    std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
-    std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
-    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
-    std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
+    std::vector<int> AllHTSurfaceList;           // List of all heat transfer surfaces
+    std::vector<int> AllExtSolarSurfaceList;     // List of all exterior solar surfaces, all are heat transfer surfaces
+    std::vector<int> AllIZSurfaceList;           // List of all interzone heat transfer surfaces
+    std::vector<int> AllHTNonWindowSurfaceList;  // List of all non-window heat transfer surfaces
+    std::vector<int> AllHTWindowSurfaceList;     // List of all window surfaces
+    std::vector<int> AllExtSolWindowSurfaceList; // List of all exterior solar window surfaces
+    std::vector<int> AllHTKivaSurfaceList;       // List of all window surfaces
+    std::vector<int> AllSurfaceListReportOrder;  // List of all surfaces - output reporting order
 
     // Surface HB arrays
     Array1D<Real64> SurfOutDryBulbTemp; // Surface outside dry bulb air temperature, for surface heat balance (C)
@@ -1817,9 +1819,11 @@ struct SurfacesData : BaseGlobalStruct
         this->Z0.deallocate();
         this->RepresentativeSurfaceMap.clear();
         this->AllHTSurfaceList.clear();
+        this->AllExtSolarSurfaceList.clear();
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
+        this->AllExtSolWindowSurfaceList.clear();
         this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
 
