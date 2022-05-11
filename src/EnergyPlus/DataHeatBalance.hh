@@ -760,6 +760,10 @@ namespace DataHeatBalance {
         CalculationSchedule,
         Num
     };
+    constexpr std::array<std::string_view, static_cast<int>(ClothingType::Num)> clothingTypeNamesUC = {
+        "CLOTHINGINSULATIONSCHEDULE", "DYNAMICCLOTHINGMODELASHRAE55", "CALCULATIONMETHODSCHEDULE"};
+    constexpr std::array<std::string_view, static_cast<int>(ClothingType::Num)> clothingTypeEIOStrings = {
+        "Clothing Insulation Schedule,", "Dynamic Clothing Model ASHRAE55,", "Calculation Method Schedule,"};
 
     struct PeopleData
     {

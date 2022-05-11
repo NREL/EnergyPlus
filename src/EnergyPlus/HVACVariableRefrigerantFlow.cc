@@ -7277,8 +7277,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             if (TempOutput < LoadToHeatingSP) {
                 // Don't count as heating load unless mode is allowed. Also check for floating zone.
                 if (state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
-                        DataHVACGlobals::SingleCoolingSetPoint &&
-                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
+                        DataHVACGlobals::ThermostatType::SingleCooling &&
+                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
+                        DataHVACGlobals::ThermostatType::Uncontrolled) {
                     if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                         // system last operated in cooling mode, change air flows and repeat coil off capacity test
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
@@ -7335,8 +7336,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             if (TempOutput > LoadToCoolingSP) {
                 //         Don't count as cooling load unless mode is allowed. Also check for floating zone.
                 if (state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
-                        DataHVACGlobals::SingleHeatingSetPoint &&
-                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
+                        DataHVACGlobals::ThermostatType::SingleHeating &&
+                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
+                        DataHVACGlobals::ThermostatType::Uncontrolled) {
                     if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
                             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate =
@@ -7377,8 +7379,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             } else if (TempOutput < LoadToHeatingSP) {
                 //         Don't count as heating load unless mode is allowed. Also check for floating zone.
                 if (state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
-                        DataHVACGlobals::SingleCoolingSetPoint &&
-                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
+                        DataHVACGlobals::ThermostatType::SingleCooling &&
+                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
+                        DataHVACGlobals::ThermostatType::Uncontrolled) {
                     if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
                             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate =
@@ -7433,8 +7436,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             //       If the net heating capacity overshoots the cooling setpoint count as cooling load
             //       Don't count as cooling load unless mode is allowed. Also check for floating zone.
             if (state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
-                    DataHVACGlobals::SingleHeatingSetPoint &&
-                state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
+                    DataHVACGlobals::ThermostatType::SingleHeating &&
+                state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
+                    DataHVACGlobals::ThermostatType::Uncontrolled) {
                 if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate =
@@ -7479,8 +7483,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         } else if (TempOutput < 0.0 && LoadToHeatingSP > 0.0) {
             // Don't count as heating load unless mode is allowed. Also check for floating zone.
             if (state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
-                    DataHVACGlobals::SingleCoolingSetPoint &&
-                state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != 0) {
+                    DataHVACGlobals::ThermostatType::SingleCooling &&
+                state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
+                    DataHVACGlobals::ThermostatType::Uncontrolled) {
                 if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                     // system last operated in cooling mode, change air flows and repeat coil off capacity test
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
@@ -10364,26 +10369,30 @@ void InitializeOperatingMode(EnergyPlusData &state,
                 if (ThisZoneNum > 0) {
                     SPTempHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ThisZoneNum);
                     SPTempLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ThisZoneNum);
+
                     switch (state.dataHeatBalFanSys->TempControlType(ThisZoneNum)) {
-                    case DataHVACGlobals::SingleHeatingSetPoint: {
+                    case DataHVACGlobals::ThermostatType::Uncontrolled:
+                        // MaxDeltaT denotes cooling, MinDeltaT denotes heating
+                        break;
+                    case DataHVACGlobals::ThermostatType::SingleHeating:
                         // if heating load, ZoneDeltaT will be negative
                         ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
                         state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
-                    } break;
-                    case DataHVACGlobals::SingleCoolingSetPoint: {
+                        break;
+                    case DataHVACGlobals::ThermostatType::SingleCooling:
                         // if cooling load, ZoneDeltaT will be positive
                         ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
                         state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
-                    } break;
-                    case DataHVACGlobals::SingleHeatCoolSetPoint: {
+                        break;
+                    case DataHVACGlobals::ThermostatType::SingleHeatCool:
                         ZoneDeltaT = state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi; //- SPTempHi and SPTempLo are same value
                         if (ZoneDeltaT > 0.0) {
                             state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
                         } else {
                             state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
                         }
-                    } break;
-                    case DataHVACGlobals::DualSetPointWithDeadBand: {
+                        break;
+                    case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
                         if (state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi > 0.0) {
                             ZoneDeltaT = max(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempHi);
                             state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) = max(state.dataHVACVarRefFlow->MaxDeltaT(VRFCond), ZoneDeltaT);
@@ -10391,7 +10400,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
                             ZoneDeltaT = min(0.0, state.dataHeatBalFanSys->ZT(ThisZoneNum) - SPTempLo);
                             state.dataHVACVarRefFlow->MinDeltaT(VRFCond) = min(state.dataHVACVarRefFlow->MinDeltaT(VRFCond), ZoneDeltaT);
                         }
-                    } break;
+                        break;
                     default:
                         break;
                     }
@@ -10417,8 +10426,8 @@ void InitializeOperatingMode(EnergyPlusData &state,
                         //             If the net cooling capacity overshoots the heating setpoint count as heating load
                         if (TempOutput < LoadToHeatingSP) {
                             //               Don't count as heating load unless mode is allowed. Also check for floating zone.
-                            if (state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != DataHVACGlobals::SingleCoolingSetPoint &&
-                                state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != 0) {
+                            if (state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling &&
+                                state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != DataHVACGlobals::ThermostatType::Uncontrolled) {
                                 if (!state.dataHVACVarRefFlow->LastModeHeating(VRFCond)) {
                                     // if last mode was cooling, make sure heating flow rate is used
                                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerUsed) {
@@ -10472,8 +10481,8 @@ void InitializeOperatingMode(EnergyPlusData &state,
                         //             If the net heating capacity overshoots the cooling setpoint count as cooling load
                         if (TempOutput > LoadToCoolingSP) {
                             //               Don't count as cooling load unless mode is allowed. Also check for floating zone.
-                            if (state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != DataHVACGlobals::SingleHeatingSetPoint &&
-                                state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != 0) {
+                            if (state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating &&
+                                state.dataHeatBalFanSys->TempControlType(ThisZoneNum) != DataHVACGlobals::ThermostatType::Uncontrolled) {
                                 if (!state.dataHVACVarRefFlow->LastModeCooling(VRFCond)) {
                                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).OAMixerUsed) {
                                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOAMixerRetNodeNum).MassFlowRate =
@@ -10943,19 +10952,20 @@ void getVRFTUZoneLoad(
                               .SequencedOutputRequiredToHeatingSP(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceHeatingNum) /
                           state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
         if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
-            state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
+            state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
+                DataHVACGlobals::ThermostatType::SingleCooling) {
             zoneLoad = LoadToHeatingSP;
         } else if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) ==
-                       DataHVACGlobals::SingleCoolingSetPoint) {
+                       DataHVACGlobals::ThermostatType::SingleCooling) {
             zoneLoad = 0.0;
         } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) !=
-                       DataHVACGlobals::SingleHeatingSetPoint) {
+                       DataHVACGlobals::ThermostatType::SingleHeating) {
             zoneLoad = LoadToCoolingSP;
         } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
                    state.dataHeatBalFanSys->TempControlType(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum) ==
-                       DataHVACGlobals::SingleHeatingSetPoint) {
+                       DataHVACGlobals::ThermostatType::SingleHeating) {
             zoneLoad = 0.0;
         } else if (LoadToHeatingSP <= 0.0 && LoadToCoolingSP >= 0.0) {
             zoneLoad = 0.0;

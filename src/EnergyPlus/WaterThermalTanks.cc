@@ -7179,6 +7179,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
             // Update summed values
             Event += Qvent * TimeNeeded;
             Eoffcycfuel += Qoffcycfuel * TimeNeeded;
+            break;
         default:
             assert(false); // should never get here
         }

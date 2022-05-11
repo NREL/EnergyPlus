@@ -741,7 +741,7 @@ namespace SimulationManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            static const std::array<std::string_view, 4> condFDTypes = {
+            static constexpr std::array<std::string_view, 4> condFDTypes = {
                 "CONDUCTIONFINITEDIFFERENCE", "CONDFD", "CONDUCTIONFINITEDIFFERENCEDETAILED", "CONDUCTIONFINITEDIFFERENCESIMPLIFIED"};
             CondFDAlgo = std::find(condFDTypes.begin(), condFDTypes.end(), Alphas(1)) != condFDTypes.end();
         }
