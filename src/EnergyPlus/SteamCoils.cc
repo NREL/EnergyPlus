@@ -1429,6 +1429,7 @@ namespace SteamCoils {
                 state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
                 TempLoopOutToPump = TempWaterOut;
             }
+            break;
         default:
             assert(false);
         }
