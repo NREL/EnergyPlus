@@ -107,7 +107,7 @@ void SimTESCoil(EnergyPlusData &state,
                 std::string_view CompName, // name of the fan coil unit
                 int &CompIndex,
                 int const FanOpMode, // allows parent object to control fan mode
-                int &TESOpMode,
+                PTSCOperatingMode &TESOpMode,
                 Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
 )
 {
@@ -153,26 +153,32 @@ void SimTESCoil(EnergyPlusData &state,
         }
     }
 
-    TESOpMode = CoolingOnlyMode;
+    TESOpMode = PTSCOperatingMode::CoolingOnly;
 
     InitTESCoil(state, TESCoilNum);
 
     TESOpMode = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode;
-    {
-        auto const SELECT_CASE_var(TESOpMode);
-        if (SELECT_CASE_var == OffMode) {
-            CalcTESCoilOffMode(state, TESCoilNum);
-        } else if (SELECT_CASE_var == CoolingOnlyMode) {
-            CalcTESCoilCoolingOnlyMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-            CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-            CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == ChargeOnlyMode) {
-            CalcTESCoilChargeOnlyMode(state, TESCoilNum);
-        } else if (SELECT_CASE_var == DischargeOnlyMode) {
-            CalcTESCoilDischargeOnlyMode(state, TESCoilNum, PartLoadRatio);
-        }
+    switch (TESOpMode) {
+    case PTSCOperatingMode::Off:
+        CalcTESCoilOffMode(state, TESCoilNum);
+        break;
+    case PTSCOperatingMode::CoolingOnly:
+        CalcTESCoilCoolingOnlyMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        break;
+    case PTSCOperatingMode::CoolingAndCharge:
+        CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        break;
+    case PTSCOperatingMode::CoolingAndDischarge:
+        CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        break;
+    case PTSCOperatingMode::ChargeOnly:
+        CalcTESCoilChargeOnlyMode(state, TESCoilNum);
+        break;
+    case PTSCOperatingMode::DischargeOnly:
+        CalcTESCoilDischargeOnlyMode(state, TESCoilNum, PartLoadRatio);
+        break;
+    default:
+        assert(false);
     }
 }
 
@@ -1883,7 +1889,7 @@ void GetTESCoilInput(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Cooling Coil Operating Mode Index",
                             OutputProcessor::Unit::None,
-                            state.dataPackagedThermalStorageCoil->TESCoil(item).CurControlMode,
+                            state.dataPackagedThermalStorageCoil->TESCoil(item).curControlModeReport,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
@@ -2277,7 +2283,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     }
 
     if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).QdotPlant = 0.0;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Q_Plant = 0.0;
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).QdotAmbient = 0.0;
@@ -2328,41 +2334,57 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     if (GetCurrentScheduleValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == PTSCCtrlType::ScheduledOpModes) {
             tmpSchedValue = GetCurrentScheduleValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeSchedNum);
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = tmpSchedValue;
             // check if value is valid
-            {
-                auto const SELECT_CASE_var(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode);
-                if ((SELECT_CASE_var == OffMode) || (SELECT_CASE_var == CoolingOnlyMode) || (SELECT_CASE_var == CoolingAndChargeMode) ||
-                    (SELECT_CASE_var == CoolingAndDischargeMode) || (SELECT_CASE_var == ChargeOnlyMode) || (SELECT_CASE_var == DischargeOnlyMode)) {
-                    // do nothing, these are okay
-                } else {
-                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+            if (tmpSchedValue > static_cast<int>(PTSCOperatingMode::Invalid) and tmpSchedValue < static_cast<int>(PTSCOperatingMode::Num)) {
+                state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = static_cast<PTSCOperatingMode>(tmpSchedValue);
+            } else {
+                state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
+                if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeErrorIndex == 0) {
+                    ShowSevereMessage(state, "InitTESCoil: Invalid control schedule value for operating mode");
+                    ShowContinueError(state,
+                                      "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " +
+                                          state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
+                    ShowContinueError(state, format("Value returned from schedule ={:.8R}", tmpSchedValue));
+                    ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
+                }
+                ShowRecurringSevereErrorAtEnd(state,
+                                              "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
+                                              state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeErrorIndex,
+                                              tmpSchedValue,
+                                              tmpSchedValue);
+            }
+
+        } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == PTSCCtrlType::EMSActuatedOpModes) {
+            if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeOn) {
+                int tmpEMSValue = std::floor(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue);
+
+                // check for invalid value first
+                if (tmpEMSValue <= static_cast<int>(PTSCOperatingMode::Invalid) || tmpEMSValue >= static_cast<int>(PTSCOperatingMode::Num)) {
+                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
                     if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeErrorIndex == 0) {
-                        ShowSevereMessage(state, "InitTESCoil: Invalid control schedule value for operating mode");
+                        ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
                         ShowContinueError(state,
                                           "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " +
                                               state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
-                        ShowContinueError(state, format("Value returned from schedule ={:.8R}", tmpSchedValue));
+                        ShowContinueError(
+                            state,
+                            format("Value returned from EMS ={:.8R}", state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue));
                         ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                     }
                     ShowRecurringSevereErrorAtEnd(state,
                                                   "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeErrorIndex,
-                                                  tmpSchedValue,
-                                                  tmpSchedValue);
-                }
-            }
+                                                  state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue,
+                                                  state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue);
+                } else {
+                    // at this point we have a valid value, we can cast it and assign it
+                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = static_cast<PTSCOperatingMode>(tmpEMSValue);
+                    // but then we need to do some error handling for certain cases
+                    switch (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode) {
+                    case PTSCOperatingMode::Off:
+                        break; // nothing to check
 
-        } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == PTSCCtrlType::EMSActuatedOpModes) {
-            if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeOn) {
-                state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode =
-                    std::floor(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue);
-                // check if value is valid
-                {
-                    auto const SELECT_CASE_var(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode);
-                    if (SELECT_CASE_var == OffMode) {
-
-                    } else if (SELECT_CASE_var == CoolingOnlyMode) {
+                    case PTSCOperatingMode::CoolingOnly:
                         if (!(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyModeIsAvailable)) {
                             ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
                             ShowContinueError(state,
@@ -2370,9 +2392,10 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                             ShowContinueError(state, "Value returned from EMS indicates Cooling Only Mode but that mode is not available.");
                             ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
-                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
                         }
-                    } else if (SELECT_CASE_var == CoolingAndChargeMode) {
+                        break;
+                    case PTSCOperatingMode::CoolingAndCharge:
                         if (!(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndChargeModeAvailable)) {
                             ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
                             ShowContinueError(state,
@@ -2380,9 +2403,10 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                             ShowContinueError(state, "Value returned from EMS indicates Cooling And Charge Mode but that mode is not available.");
                             ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
-                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
                         }
-                    } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
+                        break;
+                    case PTSCOperatingMode::CoolingAndDischarge:
                         if (!(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable)) {
                             ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
                             ShowContinueError(state,
@@ -2390,9 +2414,10 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                             ShowContinueError(state, "Value returned from EMS indicates Cooling And Discharge Mode but that mode is not available.");
                             ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
-                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
                         }
-                    } else if (SELECT_CASE_var == ChargeOnlyMode) {
+                        break;
+                    case PTSCOperatingMode::ChargeOnly:
                         if (!(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ChargeOnlyModeAvailable)) {
                             ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
                             ShowContinueError(state,
@@ -2400,9 +2425,10 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                             ShowContinueError(state, "Value returned from EMS indicates Charge Only Mode but that mode is not available.");
                             ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
-                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
                         }
-                    } else if (SELECT_CASE_var == DischargeOnlyMode) {
+                        break;
+                    case PTSCOperatingMode::DischargeOnly:
                         if (!(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyModeAvailable)) {
                             ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
                             ShowContinueError(state,
@@ -2410,34 +2436,26 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                                   state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                             ShowContinueError(state, "Value returned from EMS indicates Discharge Only Mode but that mode is not available.");
                             ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
-                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+                            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
                         }
-                    } else {
-                        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
-                        if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeErrorIndex == 0) {
-                            ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
-                            ShowContinueError(state,
-                                              "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " +
-                                                  state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
-                            ShowContinueError(state,
-                                              format("Value returned from EMS ={:.8R}",
-                                                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue));
-                            ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
-                        }
-                        ShowRecurringSevereErrorAtEnd(state,
-                                                      "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
-                                                      state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeErrorIndex,
-                                                      state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue,
-                                                      state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue);
+                        break;
+                    default:
+                        // no need to handle other cases
+                        break;
                     }
                 }
+
             } else {
-                state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+                state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
             }
         }
     } else {
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = OffMode;
+        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
     }
+
+    // update the integer report variable
+    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).curControlModeReport =
+        static_cast<int>(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode);
 
     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).QdotPlant = 0.0; // heat exchange rate for plant connection to TES tank [W]
     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Q_Plant = 0.0;   //  heat exchange energy for plant connection to TES tank [J]
@@ -4711,352 +4729,6 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
             state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat,
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum);
     }
-}
-
-void ControlTESIceStorageTankCoil(
-    EnergyPlusData &state,
-    std::string const &CoilName,                       // child object coil name
-    int CoilIndex,                                     // child object coil index
-    std::string SystemType,                            // parent object system type
-    int const FanOpMode,                               // parent object fan operating mode
-    Real64 const DesiredOutletTemp,                    // desired outlet temperature [C]
-    Real64 const DesiredOutletHumRat,                  // desired outlet humidity ratio [kg/kg]
-    Real64 &PartLoadFrac,                              // value based on coil operation, if possible, as PLR required to meet T or w set point
-    int &TESOpMode,                                    // value determined in InitTESCoil and passed back to parent for use in iteration routines
-    HVACUnitaryBypassVAV::DehumidControl &ControlType, // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
-    int &SensPLRIter,                                  // iteration number of Sensible PLR Iteration warning message
-    int &SensPLRIterIndex,                             // index to Sensible PLR Iteration warning message
-    int &SensPLRFail,                                  // iteration number of Sensible PLR Iteration fail warning message
-    int &SensPLRFailIndex,                             // index to Sensible PLR Iteration fail warning message
-    int &LatPLRIter,                                   // iteration number of Latent PLR Iteration warning message
-    int &LatPLRIterIndex,                              // index to Latent PLR Iteration warning message
-    int &LatPLRFail,                                   // iteration number of Latent PLR Iteration fail warning message
-    int &LatPLRFailIndex                               // index to Latent PLR Iteration fail warning message
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         R. Raustad (based on HVACDXSystem code)
-    //       DATE WRITTEN   July 13, 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Provides a common routine for parent objects. Parent objects will call this routine to determine the coil PLR.
-
-    using General::SolveRoot;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int constexpr MaxIte(500);         // Maximum number of iterations for solver
-    Real64 constexpr Acc(1.e-3);       // Accuracy of solver result
-    Real64 constexpr HumRatAcc(1.e-6); // Accuracy of solver result
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
-    int OutletNode;
-    Real64 NoOutput;
-    Real64 NoLoadHumRatOut;
-    Real64 FullOutput;
-    Real64 FullLoadHumRatOut;
-    Real64 ReqOutput;
-    Real64 OutletHumRatDXCoil;
-    int SolFlag;            // return flag from RegulaFalsi for sensible load
-    Array1D<Real64> Par(5); // Parameter array passed to solver
-
-    InletNode = state.dataPackagedThermalStorageCoil->TESCoil(CoilIndex).EvapAirInletNodeNum;
-    OutletNode = state.dataPackagedThermalStorageCoil->TESCoil(CoilIndex).EvapAirOutletNodeNum;
-
-    // First get the control mode that the child coil is in
-    SimTESCoil(state, CoilName, CoilIndex, FanOpMode, TESOpMode, PartLoadFrac);
-    if (TESOpMode == OffMode || TESOpMode == ChargeOnlyMode) { // cannot cool
-        PartLoadFrac = 0.0;
-    } else {
-        // Get no load result
-        PartLoadFrac = 0.0;
-        SimTESCoil(state, CoilName, CoilIndex, FanOpMode, TESOpMode, PartLoadFrac);
-        NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
-                   (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
-                    PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
-        NoLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
-
-        // Get full load result
-        PartLoadFrac = 1.0;
-        SimTESCoil(state, CoilName, CoilIndex, FanOpMode, TESOpMode, PartLoadFrac);
-        FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
-                     (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
-                      PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
-        FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
-
-        ReqOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
-                    (PsyHFnTdbW(DesiredOutletTemp, state.dataLoopNodes->Node(OutletNode).HumRat) -
-                     PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
-        //         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
-        if ((NoOutput - ReqOutput) < Acc) {
-            PartLoadFrac = 0.0;
-            //         If the FullOutput is greater than (insufficient cooling) or very near the ReqOutput,
-            //         run the compressor at PartLoadFrac = 1.
-        } else if ((FullOutput - ReqOutput) > Acc) {
-            PartLoadFrac = 1.0;
-            //         Else find the PLR to meet the load
-        } else {
-            if (state.dataLoopNodes->Node(OutletNode).Temp > DesiredOutletTemp) {
-                PartLoadFrac = 1.0;
-            } else {
-                Par(1) = double(CoilIndex);
-                Par(2) = DesiredOutletTemp;
-                Par(3) = TESOpMode;
-                Par(4) = OutletNode;
-                Par(5) = double(FanOpMode);
-                General::SolveRoot(state, Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par);
-                if (SolFlag == -1) {
-                    if (!state.dataGlobal->WarmupFlag) {
-                        if (SensPLRIter < 1) {
-                            ++SensPLRIter;
-                            ShowWarningError(state,
-                                             SystemType +
-                                                 " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + CoilName);
-                            ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", ReqOutput / FullOutput));
-                            ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                            ShowContinueErrorTimeStamp(state,
-                                                       "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                        }
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       SystemType + " \"" + CoilName +
-                                                           "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
-                                                           "Sensible PLR statistics follow.",
-                                                       SensPLRIterIndex,
-                                                       PartLoadFrac,
-                                                       PartLoadFrac);
-                    }
-                } else if (SolFlag == -2) {
-                    PartLoadFrac = ReqOutput / FullOutput;
-                    if (!state.dataGlobal->WarmupFlag) {
-                        if (SensPLRFail < 1) {
-                            ++SensPLRFail;
-                            ShowWarningError(
-                                state,
-                                SystemType + " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                    CoilName);
-                            ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                            ShowContinueErrorTimeStamp(state,
-                                                       "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                        }
-                        ShowRecurringWarningErrorAtEnd(
-                            state,
-                            SystemType + " \"" + CoilName +
-                                "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
-                            SensPLRFailIndex,
-                            PartLoadFrac,
-                            PartLoadFrac);
-                    }
-                }
-            }
-            //         If system does not operate to meet sensible load, use no load humidity ratio to test against humidity setpoint,
-            //         else use operating humidity ratio to test against humidity setpoint
-            if (PartLoadFrac == 0.0) {
-                OutletHumRatDXCoil = NoLoadHumRatOut;
-            } else {
-                OutletHumRatDXCoil = state.dataLoopNodes->Node(OutletNode).HumRat;
-            }
-            // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
-            // then overcool to meet moisture load
-
-            if ((OutletHumRatDXCoil > DesiredOutletHumRat) && (PartLoadFrac < 1.0) &&
-                (ControlType == HVACUnitaryBypassVAV::DehumidControl::CoolReheat)) {
-                //           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
-                //           do not run the compressor
-                if ((NoLoadHumRatOut - DesiredOutletHumRat) < HumRatAcc) {
-                    // PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
-                    //           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
-                    //           run the compressor at PartLoadFrac = 1.
-                } else if ((DesiredOutletHumRat - FullLoadHumRatOut) < HumRatAcc) {
-                    PartLoadFrac = 1.0;
-                    //           Else find the PLR to meet the load
-                } else {
-                    Par(1) = double(CoilIndex);
-                    Par(2) = DesiredOutletHumRat;
-                    Par(3) = TESOpMode;
-                    Par(4) = OutletNode;
-                    Par(5) = double(FanOpMode);
-                    General::SolveRoot(state, HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par);
-                    if (SolFlag == -1) {
-                        if (!state.dataGlobal->WarmupFlag) {
-                            if (LatPLRIter < 1) {
-                                ++LatPLRIter;
-                                ShowWarningError(state,
-                                                 SystemType +
-                                                     " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + CoilName);
-                                ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", ReqOutput / FullOutput));
-                                ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                ShowContinueErrorTimeStamp(
-                                    state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                            }
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           SystemType + " \"" + CoilName +
-                                                               "\" - Iteration limit exceeded calculating latent part-load ratio error "
-                                                               "continues. Latent PLR statistics follow.",
-                                                           LatPLRIterIndex,
-                                                           PartLoadFrac,
-                                                           PartLoadFrac);
-                        }
-                    } else if (SolFlag == -2) {
-                        //               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
-                        if (NoLoadHumRatOut - FullLoadHumRatOut != 0.0) {
-                            PartLoadFrac = (NoLoadHumRatOut - DesiredOutletHumRat) / (NoLoadHumRatOut - FullLoadHumRatOut);
-                        } else {
-                            PartLoadFrac = 1.0;
-                        }
-                        if (!state.dataGlobal->WarmupFlag) {
-                            if (LatPLRFail < 1) {
-                                ++LatPLRFail;
-                                ShowWarningError(
-                                    state,
-                                    SystemType +
-                                        " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                        CoilName);
-                                ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                ShowContinueErrorTimeStamp(
-                                    state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                            }
-                            ShowRecurringWarningErrorAtEnd(
-                                state,
-                                SystemType + " \"" + CoilName +
-                                    "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
-                                LatPLRFailIndex,
-                                PartLoadFrac,
-                                PartLoadFrac);
-                        }
-                    }
-                }
-            } // End if humidity ratio setpoint not met - CoolReheat humidity control
-
-        } // operating mode can cool
-        if (PartLoadFrac > 1.0) {
-            PartLoadFrac = 1.0;
-        } else if (PartLoadFrac < 0.0) {
-            PartLoadFrac = 0.0;
-        }
-    }
-}
-
-Real64 TESCoilResidualFunction(EnergyPlusData &state,
-                               Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par  // par(1) = DX coil number
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   April 2013
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (desired outlet temp - actual outlet temp)
-    // TES Coil output depends on the part load ratio which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls appropriate calculation routine depending on operating mode
-    // to get outlet temperature at the given cycling ratio
-    // and calculates the residual as defined above
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // par(2) = desired air outlet temperature [C]
-    // par(3) = TES coil operating mode
-    // par(4) = outlet node number
-    // par(5) = supply air fan operating mode (ContFanCycCoil)
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int CoilIndex;        // index of this coil
-    Real64 OutletAirTemp; // outlet air temperature [C]
-    int FanOpMode;        // Supply air fan operating mode
-    int TESOpMode;
-    int OutletNodeNum;
-
-    CoilIndex = int(Par(1));
-    FanOpMode = int(Par(5));
-    OutletNodeNum = int(Par(4));
-    TESOpMode = int(Par(3));
-
-    {
-        auto const SELECT_CASE_var(TESOpMode);
-        if (SELECT_CASE_var == CoolingOnlyMode) {
-            CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-            CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-            CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == DischargeOnlyMode) {
-            CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
-        }
-    }
-
-    OutletAirTemp = state.dataLoopNodes->Node(OutletNodeNum).Temp;
-    Residuum = Par(2) - OutletAirTemp;
-
-    return Residuum;
-}
-
-Real64 TESCoilHumRatResidualFunction(EnergyPlusData &state,
-                                     Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                     Array1D<Real64> const &Par  // par(1) = DX coil number
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   April 2013
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (desired outlet humrat - actual outlet humrat)
-    // TES Coil output depends on the part load ratio which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls appropriate calculation routine depending on operating mode
-    // to get outlet hum rat at the given cycling ratio
-    // and calculates the residual as defined above
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // par(2) = desired air outlet hum rat [kgWater/kgDryAir]
-    // par(3) = TES coil operating mode
-    // par(4) = outlet node number
-    // par(5) = supply air fan operating mode (ContFanCycCoil)
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int CoilIndex;          // index of this coil
-    Real64 OutletAirHumRat; // outlet air humidity ratio [kgWater/kgDryAir]
-    int FanOpMode;          // Supply air fan operating mode
-    int TESOpMode;
-    int OutletNodeNum;
-
-    CoilIndex = int(Par(1));
-    FanOpMode = int(Par(5));
-    OutletNodeNum = int(Par(4));
-    TESOpMode = int(Par(3));
-
-    {
-        auto const SELECT_CASE_var(TESOpMode);
-        if (SELECT_CASE_var == CoolingOnlyMode) {
-            CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-            CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-            CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
-        } else if (SELECT_CASE_var == DischargeOnlyMode) {
-            CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
-        }
-    }
-
-    OutletAirHumRat = state.dataLoopNodes->Node(OutletNodeNum).HumRat;
-    Residuum = Par(2) - OutletAirHumRat;
-
-    return Residuum;
 }
 
 void UpdateTEStorage(EnergyPlusData &state, int const TESCoilNum)
