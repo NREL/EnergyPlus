@@ -1573,6 +1573,13 @@ namespace HeatBalFiniteDiffManager {
             auto TDT_i(TDT(i));
             auto const TDT_p(TDT(i + 1));
 
+            Real64 Tgndsurface = 0.0;
+            if (state.dataSurface->SurfHasGroundSurfProperties(Surf)) {
+                Tgndsurface = state.dataSurface->GroundSurfsProperty(Surf).SurfsTempAvg;
+            } else {
+                Tgndsurface = state.dataMstBal->TempOutsideAirFD(Surf);
+            }
+
             // Boundary Conditions from Simulation for Exterior
             Real64 const hconvo(state.dataMstBal->HConvExtFD(Surf));
 
@@ -1580,7 +1587,7 @@ namespace HeatBalFiniteDiffManager {
             Real64 const hsky(state.dataMstBal->HSkyFD(Surf));
             Real64 const hgnd(state.dataMstBal->HGrndFD(Surf));
             Real64 const Toa(state.dataMstBal->TempOutsideAirFD(Surf));
-            Real64 const Tgnd(state.dataMstBal->TempOutsideAirFD(Surf));
+            Real64 const Tgnd(Tgndsurface);
 
             if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
 

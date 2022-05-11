@@ -1288,7 +1288,6 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;              // name of multiple ground surfaces object
-        //int TotGndSurfs;               // number of ground surfaces viewed by an exterior surface
         Array1D<std::string> SurfName; // string holding list names of ground surfaces
         int NumGndSurfs;               // number of groundSurfaces
         Array1D<Real64> ViewFactor;    // view factors to ground surfaces
@@ -1530,9 +1529,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsPool;                       // true if this is a pool
     Array1D<int> SurfICSPtr;                        // Index to ICS collector
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
-
     Array1D<bool> SurfHasGroundSurfProperties;      // true if ground surfaces properties are listed for an external surface
-    Array1D<int> SurfGroundSurfacesNum;             // Index of a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+    Array1D<int> SurfGroundSurfacesNum;             // index of a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature

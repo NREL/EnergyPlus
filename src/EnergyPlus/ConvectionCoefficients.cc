@@ -420,7 +420,6 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                       DataGlobalConstants::KelvinConv;
         }
     }
-
     if (state.dataSurface->SurfHasGroundSurfProperties(SurfNum)) {
         TGround = GetGroundSurfacesTemperatureAverage(state, SurfNum);
     }

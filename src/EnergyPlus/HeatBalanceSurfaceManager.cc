@@ -8514,6 +8514,11 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
             TGround = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
         }
     }
+    // just set I just set 
+    if (state.dataSurface->SurfHasGroundSurfProperties(SurfNum)) {
+        //TGround = ConvectionCoefficients::GetGroundSurfacesTemperatureAverage(state, SurfNum);
+        TGround = state.dataSurface->GroundSurfsProperty(SurfNum).SurfsTempAvg;
+    }
 
     // Now, calculate the outside surface temperature using the proper heat balance equation.
     // Each case has been separated out into its own IF-THEN block for clarity.  Additional
