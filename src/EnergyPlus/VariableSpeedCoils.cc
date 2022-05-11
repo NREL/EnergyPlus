@@ -4739,7 +4739,7 @@ namespace VariableSpeedCoils {
                         }
                     }
                     OutTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
-                    rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = state.dataEnvrn->StdRhoAir;
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
@@ -4823,7 +4823,7 @@ namespace VariableSpeedCoils {
                     } else {
                         OutTemp = 0.0;
                     }
-                    rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = state.dataEnvrn->StdRhoAir;
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
