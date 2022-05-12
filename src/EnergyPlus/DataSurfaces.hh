@@ -1284,20 +1284,32 @@ namespace DataSurfaces {
         }
     };
 
+    struct GroundSurfacesData
+    {
+        // Members
+        std::string Name;  // name of a ground surface
+        Real64 ViewFactor; // view factor to a ground surface
+        int TempSchPtr;    // pointer to a ground surface temperature schedule object
+        int ReflSchPtr;    // pointer to a ground Surface reflectance schedule object
+
+        // Default Constructor
+        GroundSurfacesData() : ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0)
+        {
+        }
+    };
+
     struct GroundSurfacesProperty
     {
         // Members
-        std::string Name;              // name of multiple ground surfaces object
-        Array1D<std::string> SurfName; // string holding list names of ground surfaces
-        int NumGndSurfs;               // number of groundSurfaces
-        Array1D<Real64> ViewFactor;    // view factors to ground surfaces
-        Array1D_int TempSchPtr;        // pointers to groundSurfaces temperature schedule objects
-        Array1D_int ReflSchPtr;        // pointers to groundSurfaces reflectance schedule objects
-        Real64 SurfsTempAvg;           // groundSurfaces average temperature at each time step
-        Real64 SurfsReflAvg;           // groundSurfaces average reflectance at each time step
+        std::string Name;                     // name of multiple ground surfaces object
+        int NumGndSurfs;                      // number of groundSurfaces
+        Array1D<GroundSurfacesData> GndSurfs; // ground surfaces data
+        Real64 SurfsTempAvg;                  // ground Surfaces average temperature at each time step
+        Real64 SurfsReflAvg;                  // ground Surfaces average reflectance at each time step
+        Real64 SurfsViewFactorSum;            // sum of view factors of ground surfaces seen by an exterior surface
 
         // Default Constructor
-        GroundSurfacesProperty() : NumGndSurfs(0), ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0)
+        GroundSurfacesProperty() : NumGndSurfs(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0), SurfsViewFactorSum(0.0)
         {
         }
     };
@@ -1310,7 +1322,6 @@ namespace DataSurfaces {
         int ExtShadingSchedPtr;  // schedule pointer
         int SurroundingSurfsPtr; // schedule pointer
         int OutdoorAirNodePtr;   // schedule pointer
-        //GroundSurfacesProperty GndSurf; // ground surfaces object
         int GndSurfsPtr;         // pointer to multiple ground surfaces object
 
         // Default Constructor
@@ -1529,8 +1540,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsPool;                       // true if this is a pool
     Array1D<int> SurfICSPtr;                        // Index to ICS collector
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
-    Array1D<bool> SurfHasGroundSurfProperties;      // true if ground surfaces properties are listed for an external surface
-    Array1D<int> SurfGroundSurfacesNum;             // index of a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+    Array1D<bool> SurfHasGndSurfPropertyDefined;      // true if ground surfaces properties are listed for an external surface
+    Array1D<int> SurfGndSurfPropertyNum;             // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
@@ -1936,8 +1947,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIntConvWindowLocation.deallocate();
         this->SurfIntConvSurfGetsRadiantHeat.deallocate();
         this->SurfIntConvSurfHasActiveInIt.deallocate();
-        this->SurfHasGroundSurfProperties.deallocate();
-        this->SurfGroundSurfacesNum.deallocate();
+        this->SurfHasGndSurfPropertyDefined.deallocate();
+        this->SurfGndSurfPropertyNum.deallocate();
 
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();

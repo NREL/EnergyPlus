@@ -7,6 +7,8 @@ Allow Multiple Ground Surface Temperature and Reflectance Objects
 
  - First draft: April 26, 2022
  - Modified Date: May 6, 2022
+ - Added Design Document, May 12, 2022
+ 
 
 ## Justification for New Feature ##
 
@@ -21,6 +23,8 @@ Currently EnergyPlus only allows one single ground surface with user defined gro
 - technicalities call: May 4, 2022
 
 - technicalities call recap is on github.
+
+- additional comments and responses on github PR #9409
 
 ## Overview ##
 
@@ -92,11 +96,12 @@ SurfaceProperty:LocalEnvironment,
        \type object-list
        \object-list GroundSurfacesNames
        \note Enter the name of a SurfaceProperty:GroundSurfaces object
-	   \note This field is a required for use with SurfaceProperty:GroundSurfaces only
+	   \note This field is used with SurfaceProperty:GroundSurfaces object
 ```
 
 
 ### New Object SurfaceProperty:GroundSurfaces ###
+
 
 ```
 SurfaceProperty:GroundSurfaces,
@@ -106,13 +111,15 @@ SurfaceProperty:GroundSurfaces,
    A1, \field Name
        \required-field
        \type alpha
-       \reference SurroundingSurfacesNames
+       \reference GroundSurfacesNames
    A2, \field Ground Surface 1 Name
        \begin-extensible
        \required-field
        \type alpha
    N1, \field Ground Surface 1 View Factor
        \required-field
+	   \type real
+	   \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.5
@@ -132,6 +139,7 @@ SurfaceProperty:GroundSurfaces,
        \note optional
    N2, \field Ground Surface 2 View Factor
        \type real
+	   \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.0
@@ -151,6 +159,7 @@ SurfaceProperty:GroundSurfaces,
        \note optional
    N3, \field Ground Surface 3 View Factor
        \type real
+	   \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.0
@@ -170,6 +179,7 @@ SurfaceProperty:GroundSurfaces,
        \note optional
    N4, \field Ground Surface 4 View Factor
        \type real
+	   \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.0
@@ -189,6 +199,7 @@ SurfaceProperty:GroundSurfaces,
        \note optional
    N5, \field Ground Surface 5 View Factor
        \type real
+	   \units dimensionless	   
        \minimum 0.0
        \maximum 1.0
        \default 0.0
@@ -206,10 +217,10 @@ SurfaceProperty:GroundSurfaces,
 ```
 
 
-
 ### Existing Object SurfaceProperty:SurroundingSurfaces ###
 
 Requires removing or deprecating the following two redundant input fields from SurfaceProperty:SurroundingSurfaces object since ground view factors and ground surface temperatures are now specified in the new object SurfaceProperty:GroundSurfaces.
+
 
 ```
 SurfaceProperty:SurroundingSurfaces,
@@ -347,7 +358,7 @@ rho\(_{gnd}\) = view factor weighed ground solar reflectance of multiple ground 
 The view factor weighed ground reflectance of multiple ground surfaces is calculated from the ground refelctances and view factors of the ground surfaces seen by the exterior surface and is given by:
 
 \begin{equation}
-{\rho_{gnd}} = \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {\rho_{gnd}, j} * {F_{gnd,j}}
+{\rho_{gnd}} = \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {\rho_{gnd}, j} * {F_{gnd,j}} / \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {F_{gnd,j}}
 \end{equation}
 
 rho\(_{gnd, j}\) = reflectance of the jth ground surface seen by a building exterior surface specified by the user for each time step
@@ -374,9 +385,192 @@ Transition is required to remove two redundant fields in SurfaceProperty:Surroun
 
 ## Proposed Report Variables: ##
 
-As needed.
+Ground Surfaces Average Temperature
 
+Ground Surfaces Average Reflectance
+
+Other As Needed.
 
 ## References ##
 
 N/A
+
+
+
+
+## Design Documentation ##
+
+The new feature will modify modules: DataSurfaces, SurfaceGeomtery, HeatBalanceSurfaceManager, HeatBalFinieDiffMamanger and ConvectionCoefficients. Some functions will be modified and new functions will be added for getinput, average ground temperature and ground reflectance calculations.
+
+
+### Design GroundSurfaces Temperature ###
+
+Adds new function calculates ground surfaces average temperature for each SurfaceProperty:GroundSurfaces object.
+
+#### DataSurfaces.hh ####
+
+	*// adds module level new member vectors*
+	              SurfHasGndSurfPropertyDefined
+    Array1D<bool> SurfHasGroundSurfProperties;      // true if ground surfaces properties are listed for an external surface
+    Array1D<int> SurfGroundSurfacesNum;             // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+	
+    *Adds new struct for ground surfaces data:*
+
+    // ground surfaces data
+    struct GroundSurfacesData
+    {
+        // Members
+        std::string Name;  // name of a ground surface
+        Real64 ViewFactor; // view factor to a ground surface
+        int TempSchPtr;    // pointer to a ground surface temperature schedule object
+        int ReflSchPtr;    // pointer to a ground Surface reflectance schedule object
+
+        // Default Constructor
+        GroundSurfacesData() : ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0)
+        {
+        }
+    };
+	
+	*Adds new struct for ground surfaces properties:*
+	
+	*// ground surfaces object*
+    struct GroundSurfacesProperty
+    {
+        // Members
+        std::string Name;                     // name of multiple ground surfaces object
+        int NumGndSurfs;                      // number of groundSurfaces
+        Array1D<GroundSurfacesData> GndSurfs; // ground surfaces data
+        Real64 SurfsTempAvg;                  // ground Surfaces average temperature at each time step
+        Real64 SurfsReflAvg;                  // ground Surfaces average reflectance at each time step
+        Real64 SurfsViewFactorSum;            // sum of view factors of ground surfaces seen by an exterior surface
+
+        // Default Constructor
+        GroundSurfacesProperty() : NumGndSurfs(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0), SurfsViewFactorSum(0.0)
+        {
+        }
+    };
+
+    *Add a new member variables to SurfaceLocalEnvironment *
+
+    struct SurfaceLocalEnvironment
+    {
+        // Members
+        std::string Name;
+        int SurfPtr;                // surface pointer
+        int ExtShadingSchedPtr;     // schedule pointer
+        int SurroundingSurfsPtr;    // schedule pointer
+        int OutdoorAirNodePtr;      // schedule pointer
+		
+		*// add new member pointer to SurfaceProperty:GroundSurfaces object*
+		int GndSurfsPtr;            // pointer to multiple ground surfaces object
+		
+        // Default Constructor
+        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0), GndSurfsPtr(0)
+        {
+        }
+    };
+
+
+#### SurfaceGeomtery.cc ####
+
+    *// new getinput function for SurfaceProperty:GroundSurfaces object*
+    void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound)
+    {
+      *// read input data for ground surfaces properties used in building exterior surface*
+	}
+	
+    *// add a calling point for new getinput function*    
+	void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound)
+    {
+	  *// calling the new getinput function*	
+      GetSurfaceGroundSurfsData(state, ErrorsFound);
+    }
+
+	*// modify the getinput function for SurfaceProperty:LocalEnvironment*
+    void GetSurfaceLocalEnvData(EnergyPlusData &state, bool &ErrorsFound)
+    {
+	  *// read in new input field Ground Surfaces Object Name*
+	}
+	
+		
+#### HeatBalanceSurfaceManager.cc ####
+
+    *// adds a new function that calculates average ground surface temperature*
+    void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
+    {
+      *// returns ground surfaces average temperature in degree C*
+      *// ground temperature seen by a building exterior surface*
+      *// view factor weighted multiple ground surfaces average temperature*
+    }
+	
+
+    void CalcOutsideSurfTemp() 
+    {
+
+    ...
+    *// set average ground surfaces temperature for use with exterior surfaces*
+    if (IsSurfacePropertyGroundSurfacesDefined(SurfNum)) {
+        *TGround = set to ground surfaces average temperature*
+    }
+
+    ...
+   }
+   
+#### HeatBalFinieDiffMamanger.cc ####
+
+    void ExteriorBCEqns() 
+	{
+
+    *// Set ground surfaces temperature for use with outside surface heat balance (Finite Diff Method)*
+    if (IsSurfacePropertyGroundSurfacesDefined(SurfNum)) {
+        *TGround = set to ground surfaces average temperature*
+    }
+
+	}
+#### ConvectionCoefficients.cc ####
+
+
+    void InitExteriorConvectionCoeff() 
+    {
+
+    ...
+    // set average ground surfaces temperature for use with exterior surfaces
+    if (IsSurfacePropertyGroundSurfacesDefined(SurfNum)) {
+       *TGround = set to ground surfaces average temperature*
+    }
+
+    ...
+   }
+   
+
+
+### Design Ground Reflectance ###
+
+Ads new function that calculates ground surfaces average reflectance for each SurfaceProperty:GroundSurfaces object.
+
+#### HeatBalanceSurfaceManager.cc ###
+
+    *// add a functions that updates ground reflectance each time step*
+    void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
+    {
+       *// returns average ground surfaces reflectance for each timestep*
+       *// ground reflectance seen by a building exterior surface*
+    }
+	
+    void InitSolarHeatGains(EnergyPlusData &state)
+    {
+      *// Adds a calling point for the new function that updates ground surfaces average reflectance*
+  
+      *// updates ground surfaces average reflectance* 
+      GetGroundSurfacesReflectanceAverage(state);
+
+	  *// set ground surfaces average reflectance value in several places for reflected solar*
+	  *// radiation calculations for exteriour opaque surfaces and windows at each timestep*
+	  *// in InitSolarHeatGains() function.*
+	
+    }
+
+
+### Note: ###
+
+The ground surfaces temperature and reflectance are used for exterior surfaces only. Ground surfaces average temperature and average reflectance are used when the multiple ground surfaces are specified. Averaging the ground the temperature and reflectance values does not impcat results.

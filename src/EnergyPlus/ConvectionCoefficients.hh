@@ -433,8 +433,6 @@ namespace ConvectionCoefficients {
 
     void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int SurfNum, int UserCurveNum, Real64 &H);
 
-    Real64 GetGroundSurfacesTemperatureAverage(EnergyPlusData &state, int const SurfNum);
-
     //** Begin catalog of Hc equation functions. **** !*************************************************
 
     inline Real64 CalcASHRAEVerticalWall(Real64 const DeltaTemp) // [C] temperature difference between surface and air
