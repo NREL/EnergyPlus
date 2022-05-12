@@ -2681,7 +2681,16 @@ namespace SurfaceGeometry {
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = false;
+            if (state.dataSurface->Surface(SurfNum).ExtSolar) {
+                // This may include some attached shading surfaces
+                state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
+            }
+            if ((state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtSolar) || state.dataSurface->Surface(SurfNum).IsShadowing) {
+                // Some attached shading surfaces may be true for both
+                state.dataSurface->AllExtSolAndShadingSurfaceList.push_back(SurfNum);
+            }
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf) {
+                // Outside light shelves get tagged later as HeatTransSurf=true but they haven't been processed yet
                 state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(state.dataSurface->Surface(SurfNum).Zone);
                 auto &surfZone(state.dataHeatBal->Zone(zoneNum));
@@ -2692,14 +2701,13 @@ namespace SurfaceGeometry {
                     surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
                     if (state.dataSurface->Surface(SurfNum).ExtSolar) {
                         state.dataSurface->AllExtSolWindowSurfaceList.push_back(SurfNum);
+                        if (state.dataSurface->Surface(SurfNum).FrameDivider > 0) {
+                            state.dataSurface->AllExtSolWinWithFrameSurfaceList.push_back(SurfNum);
+                        }
                     }
                 } else {
                     state.dataSurface->AllHTNonWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
-                }
-                if (state.dataSurface->Surface(SurfNum).ExtSolar) {
-                    surfZone.ZoneExtSolarSurfaceList.push_back(SurfNum);
-                    state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
                 }
                 int const surfExtBoundCond(state.dataSurface->Surface(SurfNum).ExtBoundCond);
                 // Build zone and interzone surface lists

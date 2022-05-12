@@ -2820,56 +2820,54 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
         Array1D<Real64> currBeamSolar(state.dataSurface->TotSurfaces); // Local variable for BeamSolarRad
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            for (int SurfNum : state.dataHeatBal->Zone(zoneNum).ZoneExtSolarSurfaceList) {
-                // Regular surface
-                currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
-                // Cosine of incidence angle and solar incident on outside of surface, for reporting
-                state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) =
-                    state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
+        for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
+            // Regular surface
+            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
+            // Cosine of incidence angle and solar incident on outside of surface, for reporting
+            state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) =
+                state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
 
-                // Report variables for various incident solar quantities
-                // Incident direct (unreflected) beam
-                state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) =
-                    currBeamSolar(SurfNum) * state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) *
-                    state.dataHeatBal->SurfCosIncidenceAngle(SurfNum);
+            // Report variables for various incident solar quantities
+            // Incident direct (unreflected) beam
+            state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) =
+                currBeamSolar(SurfNum) * state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) *
+                state.dataHeatBal->SurfCosIncidenceAngle(SurfNum);
 
-                // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
-                // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
-                state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
-                // Incident diffuse solar from beam-to-diffuse reflection from ground
-                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
-                                                                              state.dataEnvrn->GndReflectance *
-                                                                              state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+            // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
+            state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
+                state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
+            // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
+            state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
+            // Incident diffuse solar from beam-to-diffuse reflection from ground
+            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
+                                                                          state.dataEnvrn->GndReflectance *
+                                                                          state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
 
-                // Incident diffuse solar from sky diffuse reflection from ground
-                state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
-                // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
-                // in SkySolarInc.
-                // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
-                // TH2 CR 9056
-                state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
-                    state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
-                    state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
+            // Incident diffuse solar from sky diffuse reflection from ground
+            state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
+                state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+            // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
+            // in SkySolarInc.
+            // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
+            // TH2 CR 9056
+            state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
+                state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
+                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
 
-                if (state.dataSurface->CalcSolRefl) {
-                    // Incident beam solar from beam-to-beam (specular) reflection from obstructions
-                    state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) =
-                        state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
-                    // Incident diffuse solar from beam-to-diffuse reflection from obstructions
-                    state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) =
-                        state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
-                    // Incident diffuse solar from sky diffuse reflection from obstructions
-                    state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum) =
-                        state.dataEnvrn->DifSolarRad * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
-                    // TH2 CR 9056: Add reflections from obstructions to the total incident
-                    state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) += state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) +
-                                                                         state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
-                                                                         state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum);
-                }
+            if (state.dataSurface->CalcSolRefl) {
+                // Incident beam solar from beam-to-beam (specular) reflection from obstructions
+                state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) =
+                    state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
+                // Incident diffuse solar from beam-to-diffuse reflection from obstructions
+                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) =
+                    state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
+                // Incident diffuse solar from sky diffuse reflection from obstructions
+                state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum) =
+                    state.dataEnvrn->DifSolarRad * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
+                // TH2 CR 9056: Add reflections from obstructions to the total incident
+                state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) += state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) +
+                                                                     state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
+                                                                     state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum);
             }
         }
         for (int PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
