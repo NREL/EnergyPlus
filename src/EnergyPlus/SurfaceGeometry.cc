@@ -10350,7 +10350,7 @@ namespace SurfaceGeometry {
             case November:
             case December:
                 if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff >
-                    oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOn]) {
+                    oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOff]) {
                     ShowSevereError(state,
                                     format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
