@@ -3060,8 +3060,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             switch (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum)) {
             case DataZoneEquipment::AirLoopHVACZone::Splitter: { // 'AirLoopHVAC:ZoneSplitter'
 
-                if (!(state.afn->AirflowNetworkFanActivated &&
-                      state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                if (!(state.afn->AirflowNetworkFanActivated && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                     SimAirLoopSplitter(state,
                                        state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                        FirstHVACIteration,
@@ -3591,8 +3590,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         for (CompNum = state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).NumOfComponents; CompNum >= 1; --CompNum) {
             switch (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum)) {
             case DataZoneEquipment::AirLoopHVACZone::Splitter: { // 'AirLoopHVAC:ZoneSplitter'
-                if (!(state.afn->AirflowNetworkFanActivated &&
-                      state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                if (!(state.afn->AirflowNetworkFanActivated && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                     SimAirLoopSplitter(state,
                                        state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                        FirstHVACIteration,

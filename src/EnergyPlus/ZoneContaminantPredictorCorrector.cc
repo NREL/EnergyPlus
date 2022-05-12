@@ -396,8 +396,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum = UtilityRoutines::FindItemInList(
-            AlphaName(2), state.afn->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
+        state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum =
+            UtilityRoutines::FindItemInList(AlphaName(2), state.afn->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum == 0) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -407,9 +407,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         // Ensure external surface
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum > 0 &&
-            state.dataSurface
-                    ->Surface(
-                        state.afn->MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum)
+            state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum)
                     .ExtBoundCond != ExternalEnvironment) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + ". The entered surface (" + AlphaName(2) +
@@ -485,11 +483,9 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                             state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name);
 
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum > 0) {
-            ZonePtr =
-                state.dataSurface
-                    ->Surface(
-                        state.afn->MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum)
-                    .Zone;
+            ZonePtr = state.dataSurface
+                          ->Surface(state.afn->MultizoneSurfaceData(state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum).SurfNum)
+                          .Zone;
         } else {
             ZonePtr = 0;
         }
@@ -1939,13 +1935,10 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Assume that the system will have flow
                 if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                     state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-                    (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                     state.afn->AirflowNetworkFanActivated)) {
+                    (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS && state.afn->AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
-                    B = CO2Gain + state.afn->exchangeData(ZoneNum).SumMHrCO +
-                        state.afn->exchangeData(ZoneNum).SumMMHrCO;
-                    A = state.afn->exchangeData(ZoneNum).SumMHr +
-                        state.afn->exchangeData(ZoneNum).SumMMHr;
+                    B = CO2Gain + state.afn->exchangeData(ZoneNum).SumMHrCO + state.afn->exchangeData(ZoneNum).SumMMHrCO;
+                    A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr;
                 } else {
                     B = CO2Gain +
                         ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
@@ -2072,13 +2065,10 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Assume that the system will have flow
                 if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                     state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-                    (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                     state.afn->AirflowNetworkFanActivated)) {
+                    (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS && state.afn->AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
-                    B = GCGain + state.afn->exchangeData(ZoneNum).SumMHrGC +
-                        state.afn->exchangeData(ZoneNum).SumMMHrGC;
-                    A = state.afn->exchangeData(ZoneNum).SumMHr +
-                        state.afn->exchangeData(ZoneNum).SumMMHr;
+                    B = GCGain + state.afn->exchangeData(ZoneNum).SumMHrGC + state.afn->exchangeData(ZoneNum).SumMMHrGC;
+                    A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr;
                 } else {
                     B = GCGain +
                         ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
@@ -2704,15 +2694,10 @@ void CorrectZoneContaminants(EnergyPlusData &state,
                 state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
             if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                 state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-                (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                 state.afn->AirflowNetworkFanActivated)) {
+                (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS && state.afn->AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
-                B = CO2Gain +
-                    (state.afn->exchangeData(ZoneNum).SumMHrCO +
-                     state.afn->exchangeData(ZoneNum).SumMMHrCO) +
-                    CO2MassFlowRate;
-                A = ZoneMassFlowRate + state.afn->exchangeData(ZoneNum).SumMHr +
-                    state.afn->exchangeData(ZoneNum).SumMMHr;
+                B = CO2Gain + (state.afn->exchangeData(ZoneNum).SumMHrCO + state.afn->exchangeData(ZoneNum).SumMMHrCO) + CO2MassFlowRate;
+                A = ZoneMassFlowRate + state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr;
             }
             C = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
         }
@@ -2781,15 +2766,10 @@ void CorrectZoneContaminants(EnergyPlusData &state,
                 state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
             if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
                 state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-                (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-                 state.afn->AirflowNetworkFanActivated)) {
+                (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS && state.afn->AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
-                B = GCGain +
-                    (state.afn->exchangeData(ZoneNum).SumMHrGC +
-                     state.afn->exchangeData(ZoneNum).SumMMHrGC) +
-                    GCMassFlowRate;
-                A = ZoneMassFlowRate + state.afn->exchangeData(ZoneNum).SumMHr +
-                    state.afn->exchangeData(ZoneNum).SumMMHr;
+                B = GCGain + (state.afn->exchangeData(ZoneNum).SumMHrGC + state.afn->exchangeData(ZoneNum).SumMMHrGC) + GCMassFlowRate;
+                A = ZoneMassFlowRate + state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr;
             }
             C = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
         }

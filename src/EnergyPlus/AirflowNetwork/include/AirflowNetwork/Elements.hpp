@@ -226,24 +226,24 @@ namespace AirflowNetwork {
     int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
                                                     // and multizone calculations during off time
 
-    void generic_crack(Real64 &coef,               // Flow coefficient
-                       Real64 const expn,          // Flow exponent
-                       bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                       const AirState &propN, // Node 1 properties
-                       const AirState &propM, // Node 2 properties
-                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    void generic_crack(Real64 &coef,             // Flow coefficient
+                       Real64 const expn,        // Flow exponent
+                       bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
+                       Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirState &propN,    // Node 1 properties
+                       const AirState &propM,    // Node 2 properties
+                       std::array<Real64, 2> &F, // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF // Partial derivative:  DF/DP
     );
 
-    int GenericDuct(Real64 const Length,        // Duct length
-                    Real64 const Diameter,      // Duct diameter
-                    bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                    Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                    const AirState &propN, // Node 1 properties
-                    const AirState &propM, // Node 2 properties
-                    std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                    std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int GenericDuct(Real64 const Length,      // Duct length
+                    Real64 const Diameter,    // Duct diameter
+                    bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
+                    Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
+                    const AirState &propN,    // Node 1 properties
+                    const AirState &propM,    // Node 2 properties
+                    std::array<Real64, 2> &F, // Airflow through the component [kg/s]
+                    std::array<Real64, 2> &DF // Partial derivative:  DF/DP
     );
 
     // Types
@@ -453,26 +453,26 @@ namespace AirflowNetwork {
         std::string name; // Name of airflow element
 
         virtual int calculate(EnergyPlusData &state,
-                              bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                              Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                              int const i,                // Linkage number
-                              const Real64 multiplier,    // Element multiplier
-                              const Real64 control,       // Element control signal
-                              const AirState &propN, // Node 1 properties
-                              const AirState &propM, // Node 2 properties
-                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+                              bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
+                              Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
+                              int const i,              // Linkage number
+                              const Real64 multiplier,  // Element multiplier
+                              const Real64 control,     // Element control signal
+                              const AirState &propN,    // Node 1 properties
+                              const AirState &propM,    // Node 2 properties
+                              std::array<Real64, 2> &F, // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF // Partial derivative:  DF/DP
                               ) = 0;
 
         // Make this abstract once all the classes implement it
         virtual int calculate([[maybe_unused]] EnergyPlusData &state,
-                              [[maybe_unused]] const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                              [[maybe_unused]] const Real64 multiplier,    // Element multiplier
-                              [[maybe_unused]] const Real64 control,       // Element control signal
-                              [[maybe_unused]] const AirState &propN, // Node 1 properties
-                              [[maybe_unused]] const AirState &propM, // Node 2 properties
-                              [[maybe_unused]] std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                              [[maybe_unused]] std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+                              [[maybe_unused]] const Real64 PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
+                              [[maybe_unused]] const Real64 multiplier,  // Element multiplier
+                              [[maybe_unused]] const Real64 control,     // Element control signal
+                              [[maybe_unused]] const AirState &propN,    // Node 1 properties
+                              [[maybe_unused]] const AirState &propM,    // Node 2 properties
+                              [[maybe_unused]] std::array<Real64, 2> &F, // Airflow through the component [kg/s]
+                              [[maybe_unused]] std::array<Real64, 2> &DF // Partial derivative:  DF/DP
         )
         {
             return 1;
@@ -481,8 +481,7 @@ namespace AirflowNetwork {
         virtual ComponentType type() = 0;
     };
 
-    
-int constexpr NrInt = 20; // Number of intervals for a large opening
+    int constexpr NrInt = 20; // Number of intervals for a large opening
 
     struct DetailedOpeningSolver
     {
@@ -548,7 +547,6 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
         );
     };
 
-
     struct DetailedOpening : public AirflowElement // Large detailed opening component
     {
         // Members
@@ -600,8 +598,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -632,8 +630,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -663,8 +661,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -686,15 +684,15 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
         }
 
         int calculate([[maybe_unused]] EnergyPlusData &state,
-                      [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                      [[maybe_unused]] Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      [[maybe_unused]] int const i,                // Linkage number
-                      const Real64 multiplier,                     // Element multiplier
-                      const Real64 control,                        // Element control signal
+                      [[maybe_unused]] bool const LFLAG,      // Initialization flag.If = 1, use laminar relationship
+                      [[maybe_unused]] Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i,           // Linkage number
+                      const Real64 multiplier,                // Element multiplier
+                      const Real64 control,                   // Element control signal
                       [[maybe_unused]] const AirState &propN, // Node 1 properties
                       [[maybe_unused]] const AirState &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
+                      std::array<Real64, 2> &F,               // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF               // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type()
@@ -719,8 +717,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       [[maybe_unused]] int const i,        // Linkage number
                       const Real64 multiplier,             // Element multiplier
                       const Real64 control,                // Element control signal
-                      const AirState &propN,          // Node 1 properties
-                      const AirState &propM,          // Node 2 properties
+                      const AirState &propN,               // Node 1 properties
+                      const AirState &propM,               // Node 2 properties
                       std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF            // Partial derivative:  DF/DP
         );
@@ -771,20 +769,20 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       [[maybe_unused]] int const i, // Linkage number
                       const Real64 multiplier,      // Element multiplier
                       const Real64 control,         // Element control signal
-                      const AirState &propN,   // Node 1 properties
-                      const AirState &propM,   // Node 2 properties
+                      const AirState &propN,        // Node 1 properties
+                      const AirState &propM,        // Node 2 properties
                       std::array<Real64, 2> &F,     // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF     // Partial derivative:  DF/DP
         );
 
         virtual int calculate(EnergyPlusData &state,
-                              const Real64 pdrop,         // Total pressure drop across a component (P1 - P2) [Pa]
-                              const Real64 multiplier,    // Element multiplier
-                              const Real64 control,       // Element control signal
-                              const AirState &propN, // Node 1 properties
-                              const AirState &propM, // Node 2 properties
-                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+                              const Real64 pdrop,       // Total pressure drop across a component (P1 - P2) [Pa]
+                              const Real64 multiplier,  // Element multiplier
+                              const Real64 control,     // Element control signal
+                              const AirState &propN,    // Node 1 properties
+                              const AirState &propM,    // Node 2 properties
+                              std::array<Real64, 2> &F, // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type()
@@ -814,8 +812,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       [[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -824,8 +822,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -864,8 +862,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -874,8 +872,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       const Real64 control,                     // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1000,8 +998,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1010,8 +1008,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1041,8 +1039,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       [[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1051,8 +1049,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1099,8 +1097,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       [[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1109,8 +1107,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1146,8 +1144,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1156,8 +1154,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       const Real64 control,                     // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1194,8 +1192,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1230,8 +1228,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1240,8 +1238,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       const Real64 control,                     // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1271,8 +1269,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1281,8 +1279,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1312,8 +1310,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       [[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1322,8 +1320,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1355,8 +1353,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1384,8 +1382,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                       int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirState &propN,               // Node 1 properties
-                      const AirState &propM,               // Node 2 properties
+                      const AirState &propN,                    // Node 1 properties
+                      const AirState &propM,                    // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1529,8 +1527,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                               int const i,                              // Linkage number
                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
                               [[maybe_unused]] const Real64 control,    // Element control signal
-                              const AirState &propN,               // Node 1 properties
-                              const AirState &propM,               // Node 2 properties
+                              const AirState &propN,                    // Node 1 properties
+                              const AirState &propM,                    // Node 2 properties
                               std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );
@@ -1555,8 +1553,8 @@ int constexpr NrInt = 20; // Number of intervals for a large opening
                               int const i,                              // Linkage number
                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
                               [[maybe_unused]] const Real64 control,    // Element control signal
-                              const AirState &propN,               // Node 1 properties
-                              const AirState &propM,               // Node 2 properties
+                              const AirState &propN,                    // Node 1 properties
+                              const AirState &propM,                    // Node 2 properties
                               std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
         );

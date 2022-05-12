@@ -68,69 +68,68 @@ struct EnergyPlusData;
 
 namespace AirflowNetwork {
 
-constexpr Real64 air_dynamic_viscosity(Real64 T // Temperature in Celsius
-)
-{
-    return 1.71432e-5 + 4.828e-8 * T;
-}
-
-struct AirProperties
-{
-    AirProperties(EnergyPlusData &state) : lowerLimitErrIdx(0), upperLimitErrIdx(0), m_state(state)
+    constexpr Real64 air_dynamic_viscosity(Real64 T // Temperature in Celsius
+    )
     {
+        return 1.71432e-5 + 4.828e-8 * T;
     }
 
-    Real64 density(Real64 P, // Barometric pressure
-                   Real64 T, // Temperature in Celsius
-                   Real64 W  // Humidity ratio
-    );
-
-    Real64 thermal_conductivity(Real64 T // Temperature in Celsius
-    );
-
-    Real64 dynamic_viscosity(Real64 T // Temperature in Celsius
-    );
-
-    Real64 kinematic_viscosity(Real64 P, // Barometric pressure
-                               Real64 T, // Temperature in Celsius
-                               Real64 W  // Humidity ratio
-    );
-
-    Real64 thermal_diffusivity(Real64 P, // Barometric pressure
-                               Real64 T, // Temperature in Celsius
-                               Real64 W  // Humidity ratio
-    );
-
-    Real64 prandtl_number(Real64 P, // Barometric pressure
-                          Real64 T, // Temperature in Celsius
-                          Real64 W  // Humidity ratio
-    );
-
-    int lowerLimitErrIdx = 0;
-    int upperLimitErrIdx = 0;
-    void clear()
+    struct AirProperties
     {
-        lowerLimitErrIdx = 0;
-        upperLimitErrIdx = 0;
-     }
+        AirProperties(EnergyPlusData &state) : lowerLimitErrIdx(0), upperLimitErrIdx(0), m_state(state)
+        {
+        }
 
-private:
-     EnergyPlusData &m_state;
+        Real64 density(Real64 P, // Barometric pressure
+                       Real64 T, // Temperature in Celsius
+                       Real64 W  // Humidity ratio
+        );
 
-};
+        Real64 thermal_conductivity(Real64 T // Temperature in Celsius
+        );
 
-struct AirState
-{
-    Real64 temperature;
-    // Real64 pressure;      //{0.0}; // gage pressure
-    Real64 humidity_ratio;
-    Real64 density;
-    Real64 sqrt_density;
-    Real64 viscosity;
+        Real64 dynamic_viscosity(Real64 T // Temperature in Celsius
+        );
 
-    AirState();
-    explicit AirState(double const airDensity);
-};
+        Real64 kinematic_viscosity(Real64 P, // Barometric pressure
+                                   Real64 T, // Temperature in Celsius
+                                   Real64 W  // Humidity ratio
+        );
+
+        Real64 thermal_diffusivity(Real64 P, // Barometric pressure
+                                   Real64 T, // Temperature in Celsius
+                                   Real64 W  // Humidity ratio
+        );
+
+        Real64 prandtl_number(Real64 P, // Barometric pressure
+                              Real64 T, // Temperature in Celsius
+                              Real64 W  // Humidity ratio
+        );
+
+        int lowerLimitErrIdx = 0;
+        int upperLimitErrIdx = 0;
+        void clear()
+        {
+            lowerLimitErrIdx = 0;
+            upperLimitErrIdx = 0;
+        }
+
+    private:
+        EnergyPlusData &m_state;
+    };
+
+    struct AirState
+    {
+        Real64 temperature;
+        // Real64 pressure;      //{0.0}; // gage pressure
+        Real64 humidity_ratio;
+        Real64 density;
+        Real64 sqrt_density;
+        Real64 viscosity;
+
+        AirState();
+        explicit AirState(double const airDensity);
+    };
 
 } // namespace AirflowNetwork
 

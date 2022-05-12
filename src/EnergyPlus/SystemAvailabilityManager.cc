@@ -4247,8 +4247,7 @@ namespace SystemAvailabilityManager {
                 }
             }
 
-            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 &&
-                state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                 ShowContinueError(state, "The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError(state,

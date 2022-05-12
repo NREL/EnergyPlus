@@ -64,7 +64,7 @@ namespace EnergyPlus {
 struct AirLoopHVACDOASData;
 struct AirSystemsData;
 namespace AirflowNetwork {
-struct Solver;
+    struct Solver;
 } // namespace AirflowNetwork
 struct BSDFWindowData;
 struct BaseSizerWithFanHeatInputsData;

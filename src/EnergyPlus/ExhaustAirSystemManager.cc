@@ -360,8 +360,7 @@ namespace ExhaustAirSystemManager {
         constexpr std::string_view RoutineName = "CalExhaustAirSystem: ";
         std::string cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
         bool ErrorsFound = false;
-        if (!(state.afn->AirflowNetworkFanActivated &&
-              state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+        if (!(state.afn->AirflowNetworkFanActivated && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
             MixerComponent::SimAirMixer(state, thisExhSys.ZoneMixerName, thisExhSys.ZoneMixerIndex);
         } else {
             // Give a warning that the current model does not work with AirflowNetwork for now

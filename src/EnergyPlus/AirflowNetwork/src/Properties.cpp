@@ -49,138 +49,138 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 
-
 namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
-AirState::AirState(double const density) : temperature(20.0), humidity_ratio(0.0), density(density), sqrt_density(sqrt(density)), viscosity(AIRDYNAMICVISCOSITY_CONSTEXPR(20.0))
-{
-}
+    AirState::AirState(double const density)
+        : temperature(20.0), humidity_ratio(0.0), density(density), sqrt_density(sqrt(density)), viscosity(AIRDYNAMICVISCOSITY_CONSTEXPR(20.0))
+    {
+    }
 
-AirState::AirState()
-    : temperature(20.0), humidity_ratio(0.0), density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
-    sqrt_density(std::sqrt(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0))), viscosity(AIRDYNAMICVISCOSITY_CONSTEXPR(20.0))
-{
-}
+    AirState::AirState()
+        : temperature(20.0), humidity_ratio(0.0), density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
+          sqrt_density(std::sqrt(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0))), viscosity(AIRDYNAMICVISCOSITY_CONSTEXPR(20.0))
+    {
+    }
 
-Real64 AirProperties::density(Real64 P, // Barometric pressure
-                              Real64 T, // Temperature in Celsius
-                              Real64 W  // Humidity ratio
+    Real64 AirProperties::density(Real64 P, // Barometric pressure
+                                  Real64 T, // Temperature in Celsius
+                                  Real64 W  // Humidity ratio
 
-)
-{
-    return Psychrometrics::PsyRhoAirFnPbTdbW(m_state, P, T, W);
-}
+    )
+    {
+        return Psychrometrics::PsyRhoAirFnPbTdbW(m_state, P, T, W);
+    }
 
-Real64 AirProperties::thermal_conductivity(Real64 T // Temperature in Celsius
-)
-{
-    // Dry air thermal conductivity {W/m-K}
-    // Correlated over the range -20C to 70C
-    // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+    Real64 AirProperties::thermal_conductivity(Real64 T // Temperature in Celsius
+    )
+    {
+        // Dry air thermal conductivity {W/m-K}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-    Real64 const LowerLimit = -20;
-    Real64 const UpperLimit = 70;
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-    Real64 const a = 0.02364;
-    Real64 const b = 0.0000754772569209165;
-    Real64 const c = -2.40977632412045e-8;
+        Real64 const a = 0.02364;
+        Real64 const b = 0.0000754772569209165;
+        Real64 const c = -2.40977632412045e-8;
 
-    if (T < LowerLimit) {
-        if (lowerLimitErrIdx == 0) {
-            ShowWarningMessage(m_state, "Air temperature below lower limit of -20C for conductivity calculation");
+        if (T < LowerLimit) {
+            if (lowerLimitErrIdx == 0) {
+                ShowWarningMessage(m_state, "Air temperature below lower limit of -20C for conductivity calculation");
+            }
+            ShowRecurringWarningErrorAtEnd(m_state,
+                                           format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
+                                                  "used for conductivity calculation.",
+                                                  LowerLimit),
+                                           lowerLimitErrIdx);
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            if (upperLimitErrIdx == 0) {
+                ShowWarningMessage(m_state, "Air temperature above upper limit of 70C for conductivity calculation");
+            }
+            ShowRecurringWarningErrorAtEnd(m_state,
+                                           format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
+                                                  "used for conductivity calculation.",
+                                                  UpperLimit),
+                                           upperLimitErrIdx);
+            T = UpperLimit;
         }
-        ShowRecurringWarningErrorAtEnd(m_state,
-                                        format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
-                                                "used for conductivity calculation.",
-                                                LowerLimit),
-                                        lowerLimitErrIdx);
-        T = LowerLimit;
-    } else if (T > UpperLimit) {
-        if (upperLimitErrIdx == 0) {
-            ShowWarningMessage(m_state, "Air temperature above upper limit of 70C for conductivity calculation");
+
+        return a + b * T + c * pow_2(T);
+    }
+
+    Real64 AirProperties::dynamic_viscosity(Real64 T // Temperature in Celsius
+    )
+    {
+        return 1.71432e-5 + 4.828e-8 * T;
+    }
+
+    Real64 AirProperties::kinematic_viscosity(Real64 P, // Barometric pressure
+                                              Real64 T, // Temperature in Celsius
+                                              Real64 W  // Humidity ratio
+
+    )
+    {
+        // Dry air kinematic viscosity {m2/s}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
+
+        if (T < LowerLimit) {
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            T = UpperLimit;
         }
-        ShowRecurringWarningErrorAtEnd(m_state,
-                                        format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
-                                                "used for conductivity calculation.",
-                                                UpperLimit),
-                                        upperLimitErrIdx);
-        T = UpperLimit;
+
+        return dynamic_viscosity(T) / Psychrometrics::PsyRhoAirFnPbTdbW(m_state, P, T, W);
     }
 
-    return a + b * T + c * pow_2(T);
-}
+    Real64 AirProperties::thermal_diffusivity(Real64 P, // Barometric pressure
+                                              Real64 T, // Temperature in Celsius
+                                              Real64 W  // Humidity ratio
+    )
+    {
+        // Dry air thermal diffusivity {-}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-Real64 AirProperties::dynamic_viscosity(Real64 T // Temperature in Celsius
-)
-{
-    return 1.71432e-5 + 4.828e-8 * T;
-}
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-Real64 AirProperties::kinematic_viscosity(Real64 P, // Barometric pressure
-                                          Real64 T, // Temperature in Celsius
-                                          Real64 W  // Humidity ratio
-                                          
-)
-{
-    // Dry air kinematic viscosity {m2/s}
-    // Correlated over the range -20C to 70C
-    // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+        if (T < LowerLimit) {
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            T = UpperLimit;
+        }
 
-    Real64 const LowerLimit = -20;
-    Real64 const UpperLimit = 70;
-
-    if (T < LowerLimit) {
-        T = LowerLimit;
-    } else if (T > UpperLimit) {
-        T = UpperLimit;
+        return thermal_conductivity(T) / (AIRCP(W) * Psychrometrics::PsyRhoAirFnPbTdbW(m_state, P, T, W));
     }
 
-    return dynamic_viscosity(T) / Psychrometrics::PsyRhoAirFnPbTdbW(m_state, P, T, W);
-}
+    Real64 AirProperties::prandtl_number(Real64 P, // Barometric pressure
+                                         Real64 T, // Temperature in Celsius
+                                         Real64 W  // Humidity ratio
+    )
+    {
+        // Dry air Prandtl number {-}
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-Real64 AirProperties::thermal_diffusivity(Real64 P, // Barometric pressure
-                                          Real64 T, // Temperature in Celsius
-                                          Real64 W  // Humidity ratio
-)
-{
-    // Dry air thermal diffusivity {-}
-    // Correlated over the range -20C to 70C
-    // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-    Real64 const LowerLimit = -20;
-    Real64 const UpperLimit = 70;
+        if (T < LowerLimit) {
+            T = LowerLimit;
+        } else if (T > UpperLimit) {
+            T = UpperLimit;
+        }
 
-    if (T < LowerLimit) {
-        T = LowerLimit;
-    } else if (T > UpperLimit) {
-        T = UpperLimit;
+        return kinematic_viscosity(P, T, W) / thermal_diffusivity(P, T, W);
     }
-
-    return thermal_conductivity(T) / (AIRCP(W) * Psychrometrics::PsyRhoAirFnPbTdbW(m_state, P, T, W));
-}
-
-Real64 AirProperties::prandtl_number(Real64 P,  // Barometric pressure
-                                     Real64 T,  // Temperature in Celsius
-                                     Real64 W   // Humidity ratio
-)
-{
-    // Dry air Prandtl number {-}
-    // Correlated over the range -20C to 70C
-    // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
-
-    Real64 const LowerLimit = -20;
-    Real64 const UpperLimit = 70;
-
-    if (T < LowerLimit) {
-        T = LowerLimit;
-    } else if (T > UpperLimit) {
-        T = UpperLimit;
-    }
-
-    return kinematic_viscosity(P, T, W) / thermal_diffusivity(P, T, W);
-}
 
 } // namespace AirflowNetwork
 
