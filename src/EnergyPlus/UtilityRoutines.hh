@@ -605,6 +605,19 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
     return -1;
 }
 
+enum class YesNo
+{
+    Invalid = -1,
+    No,
+    Yes,
+    Num
+};
+constexpr YesNo getYesNoValue(const std::string_view s)
+{
+    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
+    return static_cast<YesNo>(getEnumerationValue(yesNo, s));
+}
+
 struct UtilityRoutinesData : BaseGlobalStruct
 {
 
