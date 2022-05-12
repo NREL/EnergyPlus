@@ -5847,8 +5847,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                         state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
                     }
                     state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3]
-                        && state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0) {
+                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] &&
+                        state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0) {
                         state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
                         state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[4] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
                     }

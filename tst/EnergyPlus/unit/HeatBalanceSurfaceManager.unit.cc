@@ -3316,12 +3316,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[1], 1e-8); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[2], 1e-8); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[3], 1e-8);
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(1)[0], 1e-8); // # of People = 0
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(1)[0], 1e-8);     // # of People = 0
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBins(1)[0], 1e-8); // # of People = 0
 
-    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[0], 1e-8);     // Humidex <= 29
-    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[1], 1e-8);     // Humidex (29, 40]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBins(1)[0], 1e-8); // # of People = 0
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[0], 1e-8);         // Humidex <= 29
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[1], 1e-8);         // Humidex (29, 40]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBins(1)[0], 1e-8);     // # of People = 0
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBins(1)[0], 1e-8); // # of People = 0
 
     // SET Degree-Hr Test values
@@ -3458,10 +3458,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     //    20	0	1.2	1.2	 9.72	2.4	0	 1.5	  9.9	3	0
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8); // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8);     // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
@@ -3483,10 +3483,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8); // SET OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0], 1e-8);   // SET Degree-Hours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1], 1e-8); // SET OccupantHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2], 1e-8); // SET OccupiedHours
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[3], 1e-8);   // Longest SET ≤ 12.2°C Duration [hr]
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(7.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
@@ -3501,17 +3501,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(13.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(8.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(8.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[1], 1e-8);  // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(10.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupantHours
-    EXPECT_NEAR(6.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8); // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(6.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
     EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(8.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
@@ -3539,9 +3539,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
     // Hours of Safety for Heat Events
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
     EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
@@ -3550,17 +3550,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(14.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(11.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[1], 1e-8);  // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(11.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupantHours
-    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8); // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
     EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(9.9, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
@@ -3576,8 +3576,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     // Cooling SET Degree-Hours
     EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours
-    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8); // SET OccupiedHours
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1], 1e-8); // SET OccupantHours
@@ -3586,9 +3586,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
     // Hours of Safety for Heat Events
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
     EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
@@ -3604,10 +3604,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupantHours
-    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8); // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
     EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(9.9, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
@@ -3625,8 +3625,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     // Cooling SET Degree-Hours
     EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours
-    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8); // SET OccupiedHours
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
     EXPECT_NEAR(9.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(7.2, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1], 1e-8); // SET OccupantHours
@@ -3635,11 +3635,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(18.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
     // Hours of Safety for Heat Events
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[0], 1e-8);  // Hours of safety
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
     EXPECT_NEAR(11.2, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
     EXPECT_NEAR(11.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
@@ -3653,10 +3653,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupantHours
-    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8); // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
     EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(9.9, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
@@ -3676,21 +3676,21 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     // Cooling SET Degree-Hours
     EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours
-    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8); // SET OccupiedHours
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
     EXPECT_NEAR(11.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0], 1e-8); // SET Degree-Hours
-    EXPECT_NEAR(7.2, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1], 1e-8); // SET OccupantHours
-    EXPECT_NEAR(9.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2], 1e-8); // SET OccupiedHours
-    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+    EXPECT_NEAR(7.2, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1], 1e-8);  // SET OccupantHours
+    EXPECT_NEAR(9.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[3], 1e-8);  // Longest SET ≤ 12.2°C Duration [hr]
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(18.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
-    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
     // Hours of Safety for Heat Events
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[0], 1e-8);  // Hours of safety
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
     EXPECT_NEAR(11.2, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
     EXPECT_NEAR(11.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
@@ -3704,10 +3704,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupantHours
-    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8); // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
     EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(9.9, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins(1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
@@ -3744,7 +3744,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(1, state->dataHeatBalFanSys->ZoneLightingLevelHourBins(1)[2]);
     EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(1)[2]);
 }
-
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRepPeriod)
 {
@@ -3817,14 +3816,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                              state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                                   state->dataWeatherManager->TotReportPers);
+    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                                       state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
     state->dataHeatBalFanSys->CrossedColdThreshRepPeriod = false;
@@ -3904,12 +3906,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[1], 1e-8); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[2], 1e-8); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[3], 1e-8);
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(1, 1)[0], 1e-8);     // # of People = 0
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
 
-    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(1, 1)[0], 1e-8);     // Humidex <= 29
-    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(1, 1)[1], 1e-8);     // Humidex (29, 40]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(1, 1)[0], 1e-8);         // Humidex <= 29
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(1, 1)[1], 1e-8);         // Humidex (29, 40]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(1, 1)[0], 1e-8);     // # of People = 0
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
 
     // SET Degree-Hr Table Data: reporting period I
@@ -3981,10 +3983,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
 
     // Unmet Degree-Hours
     EXPECT_NEAR(2.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance table data: reporting period I
@@ -4011,10 +4015,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
@@ -4032,10 +4038,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[0], 1e-8);   // SET Degree-Hours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
-    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[3], 1e-8);   // Longest SET ≤ 12.2°C Duration [hr]
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(7.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
@@ -4050,21 +4056,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
 
     // Unmet Degree-Hours
     EXPECT_NEAR(13.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(8.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(
+        8.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(10.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8);  // Very-cold Exceedance OccupantHours
     EXPECT_NEAR(6.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupantHours
-    EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8);  // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8);  // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(
+        1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(8.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
     state->dataHeatBalFanSys->ZTAV(1) = 28;
@@ -4088,9 +4098,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
     // Hours of Safety for Heat Events
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
     EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
@@ -4099,21 +4109,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
 
     // Unmet Degree-Hours
     EXPECT_NEAR(14.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(11.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8);  // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(
+        11.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
-    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8);  // Very-cold Exceedance OccupantHours
     EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupantHours
-    EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8);  // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8);  // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(
+        1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(9.9, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupiedpantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
 
     // ---------------------------------------------------------------------
     // Report Period I end
@@ -4164,21 +4178,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
 
     // Unmet Degree-Hours
     EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(
+        12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[1], 1e-8); // Cool Exceedance OccupantHours
     EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[2], 1e-8); // Warm Exceedance OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8); // Warm Exceedance OccupiedpantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
     state->dataHeatBalFanSys->ZTAV(1) = 12;
@@ -4212,21 +4230,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
 
     // Unmet Degree-Hours
     EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(
+        12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[1], 1e-8); // Cool Exceedance OccupantHours
     EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[2], 1e-8); // Warm Exceedance OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupiedpantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8); // Cool Exceedance OccupiedpantHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8); // Warm Exceedance OccupiedpantHours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupiedpantHours
 
     // ---------------------------------------------------------------------
     // Report Period II end

@@ -10276,7 +10276,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable) {
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable)
+{
     // test unit conversion in SET Degree-Hour report table for run periods
 
     state->dataGlobal->NumOfZones = 1;
@@ -10287,10 +10288,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable) {
 
     auto &s(state->dataOutRptPredefined);
     s->pdchHeatingSETHours = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Degree-Hours [°C·hr]");
-    s->pdchHeatingSETOccuHours = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]");
-    s->pdchHeatingSETOccupiedHours = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]");
-    s->pdchHeatingSETUnmetDuration = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration Duration for Occupied Period [hr]");
-    s->pdchHeatingSETUnmetTime = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period");
+    s->pdchHeatingSETOccuHours =
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]");
+    s->pdchHeatingSETOccupiedHours =
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]");
+    s->pdchHeatingSETUnmetDuration =
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration Duration for Occupied Period [hr]");
+    s->pdchHeatingSETUnmetTime = OutputReportPredefined::newPreDefColumn(
+        *state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period");
 
     state->dataHeatBalFanSys->ZoneLowSETHours.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneLowSETHours(1).assign(5, 0.0);
@@ -10307,8 +10312,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable) {
     Real64 degreeHourConversion = 1.8;
 
     std::vector<int> columnHead = {state->dataOutRptPredefined->pdchHeatingSETHours,
-    state->dataOutRptPredefined->pdchHeatingSETOccuHours,
-    state->dataOutRptPredefined->pdchHeatingSETOccupiedHours,
+                                   state->dataOutRptPredefined->pdchHeatingSETOccuHours,
+                                   state->dataOutRptPredefined->pdchHeatingSETOccupiedHours,
                                    state->dataOutRptPredefined->pdchHeatingSETUnmetDuration,
                                    state->dataOutRptPredefined->pdchHeatingSETUnmetTime};
     WriteSETHoursTable(*state, columnNum, columnHead, state->dataHeatBalFanSys->ZoneLowSETHours, degreeHourConversion);
@@ -10331,16 +10336,18 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourUnitConv)
 
     auto &s(state->dataOutRptPredefined);
 
-    s->pdchCoolingUnmetDegreeHour = OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Degree-Hours [°C·hr]");
+    s->pdchCoolingUnmetDegreeHour =
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Degree-Hours [°C·hr]");
     s->pdchCoolingUnmetDegreeOccHour =
-    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
     s->pdchCoolingUnmetDegreeOccupiedHour =
-    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]");
-    s->pdchHeatingUnmetDegreeHour = OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Degree-Hours [°C·hr]");
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]");
+    s->pdchHeatingUnmetDegreeHour =
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Degree-Hours [°C·hr]");
     s->pdchHeatingUnmetDegreeOccHour =
-    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
     s->pdchHeatingUnmetDegreeOccupiedHour =
-    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]");
+        OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]");
 
     state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1).assign(6, 0.0);
