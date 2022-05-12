@@ -4859,7 +4859,7 @@ namespace VariableSpeedCoils {
                         if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) >
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
-                                        format("SizeVarSpeedCoil: Potential issue with equipment sizing for {} ()",
+                                        format("SizeVarSpeedCoil: Potential issue with equipment sizing for {} {}",
                                                varSpeedCoils.CoolHeatType,
                                                CurrentObjSubfix));
                             ShowContinueError(state, format("Coil Name = {}", varSpeedCoils.Name));
@@ -5134,10 +5134,8 @@ namespace VariableSpeedCoils {
 
         // size rated power
         if (varSpeedCoils.CoolHeatType == "COOLING") {
-
             varSpeedCoils.RatedCOPCool = varSpeedCoils.MSRatedCOP(varSpeedCoils.NormSpedLevel);
             varSpeedCoils.RatedPowerCool = varSpeedCoils.RatedCapCoolTotal / varSpeedCoils.RatedCOPCool;
-
         } else if (varSpeedCoils.CoolHeatType == "HEATING") {
             varSpeedCoils.RatedCOPHeat = varSpeedCoils.MSRatedCOP(varSpeedCoils.NormSpedLevel);
             varSpeedCoils.RatedPowerHeat = varSpeedCoils.RatedCapHeat / varSpeedCoils.RatedCOPHeat;
