@@ -3312,7 +3312,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(38, state->dataHeatBalFanSys->ZoneHumidex(1), 1);
 
     // Test categorization of the first 4 hours.
-    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[0], 1e-8); // Safe: Heat Index <= 80 °F (32.2 °C).
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[0], 1e-8); // Safe: Heat Index <= 80 °F (26.7 °C).
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[1], 1e-8); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[2], 1e-8); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[3], 1e-8);
@@ -3324,7 +3324,28 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBins(1)[0], 1e-8); // # of People = 0
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBins(1)[0], 1e-8); // # of People = 0
 
-    // Test SET-hours calculation - No occupant
+    // SET Degree-Hr Test values
+    //    hour  PierceSET  OccuSchedule  TotalHighSet	HiSetOccuHour	HiSetOccupied	TotalLowSet	LowOccuHour Low Occupied
+    //    1     31         0	         1	        0	        0	        0	        0	    0
+    //    2     31         0	         2	        0	        0	        0	        0	    0
+    //    3     31         0	         3	        0	        0	        0	        0	    0
+    //    4     31         0	         4	        0	        0	        0	        0	    0
+    //    5     11.2       0.4           4	        0	        0	        1	        0.8	    1
+    //    6     11.2       0.4           4	        0	        0	        2	        1.6	    2
+    //    7     11.2       0.4           4	        0	        0	        3	        2.4	    3
+    //    8     32         1	         6	        4	        2	        3	        2.4	    3
+    //    9     32         1	         8	        8	        4	        3	        2.4	    3
+    //    10    32         1	         10	        12	        6	        3	        2.4	    3
+    //    11    25         1	         10	        12	        6	        3	        2.4	    3
+    //    12    25         1	         10	        12	        6	        3	        2.4	    3
+    //    13    11.2       0.4	         10	        12	        6	        4	        3.2	    4
+    //    14    11.2       0.4	         10	        12	        6	        5	        4	    5
+    //    15    11.2       0.4	         10	        12	        6	        6	        4.8	    6
+    //    16    11.2       0.4	         10	        12	        6	        7	        5.6	    7
+    //    17    11.2       0.4	         10	        12	        6	        8	        6.4	    8
+    //    18    11.2       0.4	         10	        12	        6	        9	        7.2	    9
+    //    19    11.2       0	         10	        12	        6	        10	        7.2	    9
+    //    20    11.2       0	         10	        12	        6	        11	        7.2	    9
     // Cooling SET Degree-Hours
     EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours
@@ -3335,6 +3356,30 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1], 1e-8); // SET OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2], 1e-8); // SET OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hour of safety table data
+    //                  Cold                                          Heat
+    //    hour	ZTAV	HOS exceed-hr exceed-occuhour exceed occupied HOS exceed-hr exceed-occuhour exceed-occupied
+    //    1	25	1	0	 0	      0	              1	    0	     0	                  0
+    //    2	27	2	0	 0	      0	              2	    0	     0	                  0
+    //    3	27	3	0	 0	      0	              3	    0	     0	                  0
+    //    4	30	4	0	 0	      0	              3	    1	     0	                  0
+    //    5	31	5	0	 0	      0	              3	    2	     0.8	          1
+    //    6	31	6	0	 0	      0	              3	    3	     1.6	          2
+    //    7	31	7	0	 0	      0	              3	    4	     2.4	          3
+    //    8	28	8	0	 0	      0	              3	    4	     2.4	          3
+    //    9	28	9	0	 0	      0	              3	    4	     2.4	          3
+    //    10	28	10	0	 0	      0	              3	    4	     2.4	          3
+    //    11	31	11	0	 0	      0	              3	    5	     4.4	          4
+    //    12	31	12	0	 0	      0	              3	    6	     6.4	          5
+    //    13	30	13	0	 0	      0	              3	    7	     7.2	          6
+    //    14	30	14	0	 0	      0	              3	    8	     8	                  7
+    //    15	30	15	0	 0	      0	              3	    9	     8.8	          8
+    //    16	30	16	0	 0	      0	              3	    10	     9.6	          9
+    //    17	30	17	0	 0	      0	              3	    11	     10.4	          10
+    //    18	30	18	0	 0	      0	              3	    12	     11.2	          11
+    //    19	12	18	1	 0	      0	              3	    12	     11.2	          11
+    //    20	12	18	2	 0	      0	              3	    12	     11.2	          11
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(1)[0], 1e-8); // Hours of safety
@@ -3347,6 +3392,34 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBins(1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
 
+    //    Unmet Degree Hour table data
+    //    cooling setpoint	27.5
+    //    heating setpoint	15
+    //    number of people	2
+    //
+    //                              Cooling unmet                         Heating unmet
+    //    hour  OccuSche  ZTAV      deg-hr  deg-occu-hr  deg-occupied-hr  deg-hr deg-occu-hr deg-occupied-hr
+    //    1	    0	      25	0	0	     0	              0	     0	         0
+    //    2	    0	      27	0	0	     0	              0	     0	         0
+    //    3	    0	      27	0	0	     0	              0	     0	         0
+    //    4	    0	      30	2.5	0	     0	              0	     0	         0
+    //    5	    0.4	      31	6	2.8	     3.5	      0	     0	         0
+    //    6	    0.4	      31	9.5	5.6	     7	              0	     0	         0
+    //    7	    0.4	      31	13	8.4	     10.5	      0	     0	         0
+    //    8	    1	      28	13.5	9.4	     11	              0	     0	         0
+    //    9	    1	      28	14	10.4	     11.5	      0	     0	         0
+    //    10    1	      28	14.5	11.4	     12	              0      0	         0
+    //    11    1	      31	18	18.4	     15.5	      0	     0	         0
+    //    12    1	      31	21.5	25.4	     19	              0	     0	         0
+    //    13    0.4	      30	24	27.4	     21.5	      0	     0	         0
+    //    14    0.4	      30	26.5	29.4	     24	              0	     0	         0
+    //    15    0.4	      30	29	31.4	     26.5	      0	     0	         0
+    //    16    0.4	      30	31.5	33.4	     29	              0	     0	         0
+    //    17    0.4	      30	34	35.4	     31.5	      0	     0	         0
+    //    18    0.4	      30	36.5	37.4	     34	              0	     0	         0
+    //    19    0	      12	36.5	37.4	     34	              3	     0	         0
+    //    20    0	      12	36.5	37.4	     34	              6	     0	         0
+
     // Unmet Degree-Hours
     EXPECT_NEAR(2.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
@@ -3354,6 +3427,35 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance table data
+    //    VeryHotPMVThresh 	3
+    //    WarmPMVThresh 	0.7
+    //    CoolPMVThresh 	-0.7
+    //    VeryColdPMVThresh 	-3
+    //    num people	2
+    //                          Exceedance Occupant Hour         Exceedance Occupied Hour
+    //    hour	OccuSche  PMV	VeryCold cool   warm    VeryHot  VeryCold cool  warm    VeryHot
+    //    1	0	 -4	0	 0	0	0	 0	  0	0	0
+    //    2	0	-4	0	 0	0	0	 0	  0	0	0
+    //    3	0	-4	0	 0	0	0	 0	  0	0	0
+    //    4	0	-4	0	 0	0	0	 0	  0	0	0
+    //    5	0.4	-3.5	0.4	 2.24	0	0	 0.5	  2.8	0	0
+    //    6	0.4	-3.5	0.8	 4.48	0	0	 1	  5.6	0	0
+    //    7	0.4	-3.5	1.2	 6.72	0	0	 1.5	  8.4	0	0
+    //    8	1	-1.2	1.2	 7.72	0	0	 1.5	  8.9	0	0
+    //    9	1	-1.2	1.2	 8.72	0	0	 1.5	  9.4	0	0
+    //    10	1	-1.2	1.2	 9.72	0	0	 1.5	  9.9	0	0
+    //    11	1	0.5	1.2	 9.72	0	0	 1.5	  9.9	0	0
+    //    12	1	0.5	1.2	 9.72	0	0	 1.5	  9.9	0	0
+    //    13	0.4	1.2	1.2	 9.72	0.4	0	 1.5	  9.9	0.5	0
+    //    14	0.4	1.2	1.2	 9.72	0.8	0	 1.5	  9.9	1	0
+    //    15	0.4	1.2	1.2	 9.72	1.2	0	 1.5	  9.9	1.5	0
+    //    16	0.4	1.2	1.2	 9.72	1.6	0	 1.5	  9.9	2	0
+    //    17	0.4	1.2	1.2	 9.72	2	0	 1.5	  9.9	2.5	0
+    //    18	0.4	1.2	1.2	 9.72	2.4	0	 1.5	  9.9	3	0
+    //    19	0	1.2	1.2	 9.72	2.4	0	 1.5	  9.9	3	0
+    //    20	0	1.2	1.2	 9.72	2.4	0	 1.5	  9.9	3	0
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins(1)[0], 1e-8); // Very-cold Exceedance OccupantHours
@@ -3376,11 +3478,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     }
     // Test SET-hours calculation - Heating unmet
     // Cooling SET Degree-Hours
-    // fixme: change notes about set degree hour calc
-    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours = 4 + (32 - 30) * 3 Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 2 OCC
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8);  // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 1 (OCC > 0)
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0], 1e-8);   // SET Degree-Hours
     EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1], 1e-8); // SET OccupantHours
@@ -3426,9 +3527,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     }
     // Test SET-hours calculation - Cooling unmet
     // Cooling SET Degree-Hours
-    EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours = 4 + (32 - 30) * 3 Hours
-    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 2 OCC
-    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8);  // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 1 (OCC > 0)
+    EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2], 1e-8);  // SET OccupiedHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0], 1e-8); // SET Degree-Hours
@@ -3799,7 +3900,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(38, state->dataHeatBalFanSys->ZoneHumidex(1), 1);
 
     // Test categorization of the first 4 hours.
-    // fixme: value not right
     EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[0], 1e-8); // Safe: Heat Index <= 80 °F (32.2 °C).
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[1], 1e-8); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
     EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[2], 1e-8); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
@@ -3812,7 +3912,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
 
-    // Test SET-hours calculation - No occupant
+    // SET Degree-Hr Table Data: reporting period I
+    //    hour  PierceSET  OccuSchedule  TotalHighSet	HiSetOccuHour	HiSetOccupied	TotalLowSet	LowOccuHour Low Occupied
+    //    1     31         0	         1	        0	        0	        0	        0	    0
+    //    2     31         0	         2	        0	        0	        0	        0	    0
+    //    3     31         0	         3	        0	        0	        0	        0	    0
+    //    4     31         0	         4	        0	        0	        0	        0	    0
+    //    5     11.2       0.4           4	        0	        0	        1	        0.8	    1
+    //    6     11.2       0.4           4	        0	        0	        2	        1.6	    2
+    //    7     11.2       0.4           4	        0	        0	        3	        2.4	    3
+    //    8     32         1	         6	        4	        2	        3	        2.4	    3
+    //    9     32         1	         8	        8	        4	        3	        2.4	    3
+    //    10    32         1	         10	        12	        6	        3	        2.4	    3
+
     // Cooling SET Degree-Hours
     EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
@@ -3823,6 +3935,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hour of safety table data: reporting period I
+    //                  Cold                                          Heat
+    //    hour	ZTAV	HOS exceed-hr exceed-occuhour exceed occupied HOS exceed-hr exceed-occuhour exceed-occupied
+    //    1	25	1	0	 0	      0	              1	    0	     0	                  0
+    //    2	27	2	0	 0	      0	              2	    0	     0	                  0
+    //    3	27	3	0	 0	      0	              3	    0	     0	                  0
+    //    4	30	4	0	 0	      0	              3	    1	     0	                  0
+    //    5	31	5	0	 0	      0	              3	    2	     0.8	          1
+    //    6	31	6	0	 0	      0	              3	    3	     1.6	          2
+    //    7	31	7	0	 0	      0	              3	    4	     2.4	          3
+    //    8	28	8	0	 0	      0	              3	    4	     2.4	          3
+    //    9	28	9	0	 0	      0	              3	    4	     2.4	          3
+    //    10	28	10	0	 0	      0	              3	    4	     2.4	          3
 
     // Hours of Safety for Cold Events
     EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
@@ -3835,6 +3961,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
 
+    //    Unmet Degree Hour table data: reporting period I
+    //    cooling setpoint	27.5
+    //    heating setpoint	15
+    //    number of people	2
+    //
+    //                              Cooling unmet                         Heating unmet
+    //    hour  OccuSche  ZTAV      deg-hr  deg-occu-hr  deg-occupied-hr  deg-hr deg-occu-hr deg-occupied-hr
+    //    1	    0	      25	0	0	     0	              0	     0	         0
+    //    2	    0	      27	0	0	     0	              0	     0	         0
+    //    3	    0	      27	0	0	     0	              0	     0	         0
+    //    4	    0	      30	2.5	0	     0	              0	     0	         0
+    //    5	    0.4	      31	6	2.8	     3.5	      0	     0	         0
+    //    6	    0.4	      31	9.5	5.6	     7	              0	     0	         0
+    //    7	    0.4	      31	13	8.4	     10.5	      0	     0	         0
+    //    8	    1	      28	13.5	9.4	     11	              0	     0	         0
+    //    9	    1	      28	14	10.4	     11.5	      0	     0	         0
+    //    10        1	      28	14.5	11.4	     12	              0      0	         0
+
     // Unmet Degree-Hours
     EXPECT_NEAR(2.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
@@ -3842,6 +3986,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance table data: reporting period I
+    //    VeryHotPMVThresh 	3
+    //    WarmPMVThresh 	0.7
+    //    CoolPMVThresh 	-0.7
+    //    VeryColdPMVThresh 	-3
+    //    num people	2
+    //                          Exceedance Occupant Hour         Exceedance Occupied Hour
+    //    hour	OccuSche  PMV	VeryCold cool   warm    VeryHot  VeryCold cool  warm    VeryHot
+    //    1	0	 -4	0	 0	0	0	 0	  0	0	0
+    //    2	0	-4	0	 0	0	0	 0	  0	0	0
+    //    3	0	-4	0	 0	0	0	 0	  0	0	0
+    //    4	0	-4	0	 0	0	0	 0	  0	0	0
+    //    5	0.4	-3.5	0.4	 2.24	0	0	 0.5	  2.8	0	0
+    //    6	0.4	-3.5	0.8	 4.48	0	0	 1	  5.6	0	0
+    //    7	0.4	-3.5	1.2	 6.72	0	0	 1.5	  8.4	0	0
+    //    8	1	-1.2	1.2	 7.72	0	0	 1.5	  8.9	0	0
+    //    9	1	-1.2	1.2	 8.72	0	0	 1.5	  9.4	0	0
+    //    10	1	-1.2	1.2	 9.72	0	0	 1.5	  9.9	0	0
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupantHours
@@ -3864,11 +4027,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     }
     // Test SET-hours calculation - Heating unmet
     // Cooling SET Degree-Hours
-    // fixme: change notes about set degree hour calc
-    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours = 4 + (32 - 30) * 3 Hours
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 2 OCC
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8);  // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 1 (OCC > 0)
-    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[0], 1e-8);   // SET Degree-Hours
     EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
@@ -3914,9 +4076,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     }
     // Test SET-hours calculation - Cooling unmet
     // Cooling SET Degree-Hours
-    EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours = 4 + (32 - 30) * 3 Hours
-    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 2 OCC
-    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8);  // SET OccupantHours = 0 + (32 - 30) * 3 Hours * 1 (OCC > 0)
+    EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8);  // SET OccupiedHours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
     // Heating SET Degree-Hours
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
@@ -3957,6 +4119,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     // Report Period I end
     // ---------------------------------------------------------------------
 
+    state->dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
+    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 0.5;
+    for (int hour = 11; hour <= 12; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportThermalResilience(*state);
+    }
 
     // ---------------------------------------------------------------------
     // Report Period II start

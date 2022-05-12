@@ -10277,6 +10277,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable) {
+    // test unit conversion in SET Degree-Hour report table for run periods
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
@@ -10322,7 +10323,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable) {
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourUnitConv)
 {
-    // test unit conversion of unmet degree hour table
+    // test unit conversion in unmet degree hour table for run periods
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "Test";
@@ -10369,6 +10370,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourUnitConv)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPeriod)
 {
 
+    // test unit conversion in SET Degree-Hour report table for reporting periods
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "Test";
@@ -10450,7 +10452,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPer
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitConv)
 {
-    // test unit conversion of unmet degree hour table
+    // test unit conversion in unmet degree hour table for reporting periods
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "Test";
