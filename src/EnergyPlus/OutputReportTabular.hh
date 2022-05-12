@@ -669,6 +669,8 @@ namespace OutputReportTabular {
                                                  Array1D_string const &columnHead,
                                                  Array1D_int columnWidth,
                                                  Array2D<std::vector<Real64>> const &ZoneBins,
+                                                 Array1D_string &rowHead,
+                                                 Array2D_string &tableBody,
                                                  Real64 const unitConvMultiplier = 1.0);
 
     void WriteSETHoursTable(EnergyPlusData &state,
@@ -684,7 +686,12 @@ namespace OutputReportTabular {
                                            Array1D_string const &columnHead,
                                            Array1D_int columnWidth,
                                            Array2D<std::vector<Real64>> const &ZoneBins,
+                                           Array1D_string &rowHead,
+                                           Array2D_string &tableBody,
                                            Real64 const unitConvMultiplier = 1.0);
+
+    // return the table entry of the rowIndex-th row and columnIndex-th col
+    std::string RetrieveEntryFromTableBody(Array2D_string &tableBody, int const rowIndex, int const columnIndex);
 
     void WriteHourOfSafetyTable(EnergyPlusData &state,
                                 int const columnNum,
@@ -699,6 +706,8 @@ namespace OutputReportTabular {
                                                Array1D_string const &columnHead,
                                                Array1D_int columnWidth,
                                                Array2D<std::vector<Real64>> const &ZoneBins,
+                                               Array1D_string &rowHead,
+                                               Array2D_string &tableBody,
                                                int const dateColIdx);
 
     void WriteHeatEmissionTable(EnergyPlusData &state);
