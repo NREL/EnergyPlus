@@ -120,7 +120,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestOtherSideCoefficients)
     state->afn->MultizoneSurfaceData(1).SurfNum = 1;
     state->afn->MultizoneSurfaceData(2).SurfNum = 2;
 
-    state->afn->calculateWindPressureCoeffs(*state);
+    state->afn->calculate_Cps(*state);
     EXPECT_EQ(1, state->afn->MultizoneSurfaceData(1).NodeNums[1]);
     EXPECT_EQ(2, state->afn->MultizoneSurfaceData(2).NodeNums[1]);
     EXPECT_EQ(1, state->afn->MultizoneExternalNodeData(1).curve);

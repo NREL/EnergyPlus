@@ -155,7 +155,7 @@ namespace AirflowNetwork {
         Solver(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state);
-        void calculateWindPressureCoeffs(EnergyPlusData &state);
+        void calculate_Cps(EnergyPlusData &state);
         void allocate();
         void initialize_calculation();
         void setsky();

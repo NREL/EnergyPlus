@@ -1939,6 +1939,7 @@ namespace AirflowNetwork {
             }
 
             // Find a flag for possible combination of vent and distribution system
+            // This SELECT_CASE_var will go on input refactor, no need to fix
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AirflowNetworkSimu.Control));
                 if (SELECT_CASE_var == "NOMULTIZONEORDISTRIBUTION") {
@@ -2312,6 +2313,7 @@ namespace AirflowNetwork {
             }
 
             {
+                // These SELECT_CASE_vars will go on input refactor, no need to fix
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(MultizoneZoneData(i).VentControl));
                 if (SELECT_CASE_var == "TEMPERATURE") { // checks on Temperature control
                     if (MultizoneZoneData(i).LowValueTemp < 0.0) {
@@ -2577,6 +2579,7 @@ namespace AirflowNetwork {
                     // Name of ventilation temperature control schedule
                     if (!lAlphaBlanks(5)) MultizoneSurfaceData(i).VentSchName = Alphas(5);
                     {
+                        // This SELECT_CASE_var will go on input refactor, no need to fix
                         auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(MultizoneSurfaceData(i).VentControl));
                         if (SELECT_CASE_var == "TEMPERATURE") {
                             MultizoneSurfaceData(i).VentSurfCtrNum = VentControlType::Temp;
@@ -3216,7 +3219,7 @@ namespace AirflowNetwork {
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-            calculateWindPressureCoeffs(state);
+            calculate_Cps(state);
             // Ensure automatic generation is OK
             n = 0;
             for (j = 1; j <= 5; ++j) {
@@ -3959,6 +3962,7 @@ namespace AirflowNetwork {
                 PressureControllerData(i).ControlObjectName = Alphas(4); // Control Object Name
 
                 {
+                    // This SELECT_CASE_var will go on input refactor, no need to fix
                     auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(Alphas(3)));
                     if (SELECT_CASE_var == "AIRFLOWNETWORK:MULTIZONE:COMPONENT:ZONEEXHAUSTFAN") {
                         PressureControllerData(i).ControlTypeSet = PressureCtrlExhaust;
@@ -6661,7 +6665,7 @@ namespace AirflowNetwork {
         return CurveNum;
     }
 
-    void Solver::calculateWindPressureCoeffs(EnergyPlusData &state)
+    void Solver::calculate_Cps(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12102,6 +12106,7 @@ namespace AirflowNetwork {
             }
         }
 
+        // Fixed in #9399
         {
             auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // Check zone setpoints
             if (SELECT_CASE_var == 0) {                                                    // Uncontrolled
