@@ -198,7 +198,7 @@ void ManageHVAC(EnergyPlusData &state)
     if (state.dataHVACMgr->TriggerGetAFN) {
         state.dataHVACMgr->TriggerGetAFN = false;
         DisplayString(state, "Initializing HVAC");
-        state.afn->manage_balance(state); // first call only gets input and returns.
+        state.afn->manage_balance(); // first call only gets input and returns.
     }
 
     state.dataHeatBalFanSys->ZT = state.dataHeatBalFanSys->MAT;
@@ -261,7 +261,7 @@ void ManageHVAC(EnergyPlusData &state)
     CalcAirFlowSimple(state);
     if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
         state.afn->RollBackFlag = false;
-        state.afn->manage_balance(state, false);
+        state.afn->manage_balance(false);
     }
 
     SetHeatToReturnAirFlag(state);
@@ -326,7 +326,7 @@ void ManageHVAC(EnergyPlusData &state)
             CalcAirFlowSimple(state, SysTimestepLoop);
             if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 state.afn->RollBackFlag = false;
-                state.afn->manage_balance(state, false);
+                state.afn->manage_balance(false);
             }
 
             UpdateInternalGainValues(state, true, true);
@@ -1858,7 +1858,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         state.dataHVACMgr->RepIterAir = 0;
         // Call AirflowNetwork simulation to calculate air flows and pressures
         if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-            state.afn->manage_balance(state, FirstHVACIteration);
+            state.afn->manage_balance(FirstHVACIteration);
         }
         ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
         state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
@@ -1884,7 +1884,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             // Call AirflowNetwork simulation to calculate air flows and pressures
             ResimulateAirZone = false;
             if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                state.afn->manage_balance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
+                state.afn->manage_balance(FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
                 ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
@@ -2424,7 +2424,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     // Ensure no airflownetwork and simple calculations
     if (state.afn->SimulateAirflowNetwork == 0) return;
 
-    if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) state.afn->report(state);
+    if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) state.afn->report();
 
     // Reports zone exhaust loss by exhaust fans
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...

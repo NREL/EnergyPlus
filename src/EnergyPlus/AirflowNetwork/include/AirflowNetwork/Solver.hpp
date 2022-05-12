@@ -153,19 +153,17 @@ namespace AirflowNetwork {
 
         Solver(EnergyPlusData &state);
 
-        void initialize(EnergyPlusData &state);
-        void calculate_Cps(EnergyPlusData &state);
+        void initialize();
+        void calculate_Cps();
         void allocate();
         void initialize_calculation();
         void setsky();
-        void airmov(EnergyPlusData &state);
-        void solvzp(EnergyPlusData &state, int &ITER); // number of iterations
-        void filjac(EnergyPlusData &state,
-                    int const NNZE,  // number of nonzero entries in the "AU" array.
+        void airmov();
+        void solvzp(int &ITER);      // number of iterations
+        void filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
                     bool const LFLAG // if = 1, use laminar relationship (initialization).
         );
-        void facsky(EnergyPlusData &state,
-                    Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+        void facsky(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
                     Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
                     Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
                     const Array1D_int &IK, // pointer to the top of column/row "K"
@@ -190,20 +188,18 @@ namespace AirflowNetwork {
                     int const FLAG               // mode of operation
         );
 
-        void manage_balance(EnergyPlusData &state,
-                            Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
+        void manage_balance(Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
                             Optional_int_const Iter = _,                // Iteration number
                             Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
         );
 
-        void get_input(EnergyPlusData &state);
+        void get_input();
 
-        void allocate_and_initialize(EnergyPlusData &state);
+        void allocate_and_initialize();
 
-        void calculate_balance(EnergyPlusData &state);
+        void calculate_balance();
 
-        Real64 calculate_wind_pressure(EnergyPlusData &state,
-                                       int curve,           // Curve index, change this to pointer after curve refactor
+        Real64 calculate_wind_pressure(int curve,           // Curve index, change this to pointer after curve refactor
                                        bool symmetricCurve, // True if the curve is symmetric (0 to 180)
                                        bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                                        Real64 azimuth,      // Azimuthal angle of surface
@@ -219,8 +215,7 @@ namespace AirflowNetwork {
                                                  Real64 hIn   // User defined convection coefficient
         );
 
-        Real64 duct_outside_convection_resistance(EnergyPlusData &state,
-                                                  Real64 Ts,      // Surface temperature
+        Real64 duct_outside_convection_resistance(Real64 Ts,      // Surface temperature
                                                   Real64 Tamb,    // Free air temperature
                                                   Real64 Wamb,    // Free air humidity ratio
                                                   Real64 Pamb,    // Free air barometric pressure
@@ -229,25 +224,24 @@ namespace AirflowNetwork {
                                                   Real64 hOut     // User defined convection coefficient
         );
 
-        void calculate_heat_balance(EnergyPlusData &state);
-        void calculate_moisture_balance(EnergyPlusData &state);
-        void calculate_CO2_balance(EnergyPlusData &state);
-        void calculate_GC_balance(EnergyPlusData &state);
+        void calculate_heat_balance();
+        void calculate_moisture_balance();
+        void calculate_CO2_balance();
+        void calculate_GC_balance();
         void mrxinv(int NORDER);
-        void report(EnergyPlusData &state);
-        void update(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
-        void venting_control(EnergyPlusData &state,
-                             int i,             // AirflowNetwork surface number
-                             Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
+        void report();
+        void update(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
+        void venting_control(int i,                              // AirflowNetwork surface number
+                             Real64 &OpenFactor                  // Window or door opening factor (used to calculate airflow)
         );
-        void assign_fan_airloop(EnergyPlusData &state);
-        void validate_distribution(EnergyPlusData &state);
-        void validate_fan_flowrate(EnergyPlusData &state); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
-        void validate_exhaust_fan_input(EnergyPlusData &state);
-        void hybrid_ventilation_control(EnergyPlusData &state);
-        void single_sided_Cps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
-        Real64 zone_OA_change_rate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
-        int get_airloop_number(EnergyPlusData &state, int NodeNumber);  // Get air loop number for each distribution node and linkage
+        void assign_fan_airloop();
+        void validate_distribution();
+        void validate_fan_flowrate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
+        void validate_exhaust_fan_input();
+        void hybrid_ventilation_control();
+        void single_sided_Cps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
+        Real64 zone_OA_change_rate(int ZoneNum); // hybrid ventilation system controlled zone number
+        int get_airloop_number(int NodeNumber);  // Get air loop number for each distribution node and linkage
 
         EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
@@ -642,7 +636,9 @@ namespace AirflowNetwork {
         }
 
     private:
-        bool get_element_input(EnergyPlusData &state);
+        bool get_element_input();
+
+        EnergyPlusData &m_state;
     };
 
 } // namespace AirflowNetwork

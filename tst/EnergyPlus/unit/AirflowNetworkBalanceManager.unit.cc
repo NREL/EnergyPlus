@@ -120,7 +120,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestOtherSideCoefficients)
     state->afn->MultizoneSurfaceData(1).SurfNum = 1;
     state->afn->MultizoneSurfaceData(2).SurfNum = 2;
 
-    state->afn->calculate_Cps(*state);
+    state->afn->calculate_Cps();
     EXPECT_EQ(1, state->afn->MultizoneSurfaceData(1).NodeNums[1]);
     EXPECT_EQ(2, state->afn->MultizoneSurfaceData(2).NodeNums[1]);
     EXPECT_EQ(1, state->afn->MultizoneExternalNodeData(1).curve);
@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     auto GetIndex = UtilityRoutines::FindItemInList(state->afn->MultizoneZoneData(1).VentingSchName,
@@ -349,9 +349,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestTriangularWindowWarning)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    state->afn->get_input(*state);
+    state->afn->get_input();
     std::string const error_string = delimited_string({
-        "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
+        "   ** Warning ** AirflowNetwork::Solver::get_input: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
         "   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
     });
 
@@ -2292,7 +2292,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     Real64 PressureSet = 0.5;
 
@@ -2366,7 +2366,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     state->afn->PressureControllerData(1).OANodeNum = state->afn->DisSysCompReliefAirData(1).OutletNode;
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
 
     // Check indoor pressure and mass flow rate
     EXPECT_NEAR(PressureSet, state->afn->AirflowNetworkNodeSimu(3).PZ, 0.0001);
@@ -2377,7 +2377,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     state->afn->exchangeData.allocate(state->dataGlobal->NumOfZones);
 
-    state->afn->update(*state);
+    state->afn->update();
 
     EXPECT_NEAR(0.0, state->afn->AirflowNetworkNodeSimu(10).PZ, 0.0001);
     EXPECT_NEAR(0.0, state->afn->AirflowNetworkNodeSimu(20).PZ, 0.0001);
@@ -2389,7 +2389,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->afn->MultizoneSurfaceData(2).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(5).HybridVentClose = true;
     state->afn->MultizoneSurfaceData(14).HybridVentClose = true;
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
     EXPECT_EQ(0.0, state->afn->MultizoneSurfaceData(2).OpenFactor);
     EXPECT_EQ(0.0, state->afn->MultizoneSurfaceData(5).OpenFactor);
     EXPECT_EQ(0.0, state->afn->MultizoneSurfaceData(14).OpenFactor);
@@ -2422,7 +2422,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->afn->AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
     state->afn->AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
 
-    state->afn->report(*state);
+    state->afn->report();
 
     // Original results
     // EXPECT_NEAR(34.3673036, state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
@@ -2534,7 +2534,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // The original value before fix is zero. After the fix, the correct schedule number is assigned.
 
@@ -3077,7 +3077,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPolygonalWindows)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // Choice: Height; Base Surface: Vertical Rectangular
     EXPECT_NEAR(1.0, state->afn->MultizoneSurfaceData(1).Width, 0.0001);
@@ -4484,8 +4484,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_UserDefinedDuctViewFactors)
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
 
     // Read AirflowNetwork inputs
-    state->afn->get_input(*state);
-    state->afn->initialize(*state);
+    state->afn->get_input();
+    state->afn->initialize();
 
     // Check inputs
     EXPECT_EQ(state->afn->AirflowNetworkLinkageViewFactorData(1).LinkageName, "ZONESUPPLYLINK1");
@@ -4506,18 +4506,18 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_UserDefinedDuctViewFactors)
 
     // Outside convection coefficients
     // Calculate convection resistance given a convection coefficient
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1, 2, 5), 0.2, tol);
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1, 2, 20), 0.05, tol);
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1, 2, 0.1), 10, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(20, 10, 0.001, 101000, 1, 2, 5), 0.2, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(20, 10, 0.001, 101000, 1, 2, 20), 0.05, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(20, 10, 0.001, 101000, 1, 2, 0.1), 10, tol);
 
     //// Calculate convection resistance from correlation
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 0.1, 2, 0), 0.2297, tol);
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1.0, 2, 0), 0.4093, tol);
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 20, 10, 0.001, 101000, 1.5, 2, 0), 0.4531, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(20, 10, 0.001, 101000, 0.1, 2, 0), 0.2297, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(20, 10, 0.001, 101000, 1.0, 2, 0), 0.4093, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(20, 10, 0.001, 101000, 1.5, 2, 0), 0.4531, tol);
 
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 10, 20, 0.001, 101000, 0.1, 2, 0), 0.2368, tol);
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 10, 20, 0.001, 101000, 1.0, 2, 0), 0.4218, tol);
-    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(*state, 10, 20, 0.001, 101000, 1.5, 2, 0), 0.4670, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(10, 20, 0.001, 101000, 0.1, 2, 0), 0.2368, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(10, 20, 0.001, 101000, 1.0, 2, 0), 0.4218, tol);
+    EXPECT_NEAR(state->afn->duct_outside_convection_resistance(10, 20, 0.001, 101000, 1.5, 2, 0), 0.4670, tol);
 
     // Calculate convection resistance given a convection coefficient
     EXPECT_NEAR(state->afn->duct_inside_convection_resistance(20, 0.1, 1, 5), 0.2, tol);
@@ -4701,15 +4701,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     Real64 azimuth = 0.0;
     Real64 windDir = state->dataEnvrn->WindDir;
     Real64 humRat = state->dataEnvrn->OutHumRat;
-    Real64 p = state->afn->calculate_wind_pressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
+    Real64 p = state->afn->calculate_wind_pressure(1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.54 * 0.5 * 1.1841123742118911, p);
     // Test on an east wall, which has a relative angle of 15 (for wind direction 105)
     azimuth = 90.0;
-    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 1.1841123742118911, p);
     // Test on a wall with azimuth 105, for a zero relative angle
     azimuth = 105.0;
-    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 }
 
@@ -4781,15 +4781,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
 
     // Compute wind pressure with current defaults
-    Real64 p = state->afn->calculate_wind_pressure(*state, 1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
+    Real64 p = state->afn->calculate_wind_pressure(1, false, false, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
     // Test on an east wall, which has a relative angle of 15 (for wind direction 105)
     azimuth = 90.0;
-    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.54 * 0.5 * 1.1841123742118911, p);
     // Test on a wall with azimuth 105, for a zero relative angle
     azimuth = 105.0;
-    p = state->afn->calculate_wind_pressure(*state, 1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
+    p = state->afn->calculate_wind_pressure(1, false, true, azimuth, windSpeed, windDir, dryBulb, humRat);
     EXPECT_DOUBLE_EQ(0.6 * 0.5 * 1.1841123742118911, p);
 }
 
@@ -5777,7 +5777,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -5808,8 +5808,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = state->afn->calculate_wind_pressure(*state,
-                                                              state->afn->MultizoneExternalNodeData(1).curve,
+    Real64 p = state->afn->calculate_wind_pressure(state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -5825,7 +5824,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
@@ -6502,7 +6501,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -6533,15 +6532,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = state->afn->calculate_wind_pressure(*state,
-                                                              state->afn->MultizoneExternalNodeData(1).curve,
-                                                              false,
-                                                              false,
-                                                              0.0,
-                                                              1.0,
-                                                              state->dataEnvrn->WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
-                                                              state->dataEnvrn->OutHumRat);
+    Real64 p = state->afn->calculate_wind_pressure(state->afn->MultizoneExternalNodeData(1).curve,
+                                                   false,
+                                                   false,
+                                                   0.0,
+                                                   1.0,
+                                                   state->dataEnvrn->WindDir,
+                                                   DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                   state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
@@ -6550,7 +6548,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
@@ -7146,7 +7144,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     EXPECT_EQ(state->dataCurveManager->NumCurves, 6);
 
@@ -7189,25 +7187,23 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = state->afn->calculate_wind_pressure(*state,
-                                                              state->afn->MultizoneExternalNodeData(2).curve,
-                                                              false,
-                                                              false,
-                                                              0.0,
-                                                              1.0,
-                                                              state->dataEnvrn->WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
-                                                              state->dataEnvrn->OutHumRat);
+    Real64 p = state->afn->calculate_wind_pressure(state->afn->MultizoneExternalNodeData(2).curve,
+                                                   false,
+                                                   false,
+                                                   0.0,
+                                                   1.0,
+                                                   state->dataEnvrn->WindDir,
+                                                   DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                   state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 1.1841123742118911, p);
-    p = state->afn->calculate_wind_pressure(*state,
-                                                       state->afn->MultizoneExternalNodeData(1).curve,
-                                                       false,
-                                                       false,
-                                                       0.0,
-                                                       1.0,
-                                                       state->dataEnvrn->WindDir,
-                                                       DataEnvironment::OutDryBulbTempAt(*state, 10.0),
-                                                       state->dataEnvrn->OutHumRat);
+    p = state->afn->calculate_wind_pressure(state->afn->MultizoneExternalNodeData(1).curve,
+                                            false,
+                                            false,
+                                            0.0,
+                                            1.0,
+                                            state->dataEnvrn->WindDir,
+                                            DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                            state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(cp105S * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
@@ -7216,7 +7212,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
 
     EXPECT_DOUBLE_EQ(cp105N * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
     EXPECT_DOUBLE_EQ(cp105S * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
@@ -7857,7 +7853,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -7888,15 +7884,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = state->afn->calculate_wind_pressure(*state,
-                                                              state->afn->MultizoneExternalNodeData(1).curve,
-                                                              false,
-                                                              false,
-                                                              0.0,
-                                                              1.0,
-                                                              state->dataEnvrn->WindDir,
-                                                              DataEnvironment::OutDryBulbTempAt(*state, 10.0),
-                                                              state->dataEnvrn->OutHumRat);
+    Real64 p = state->afn->calculate_wind_pressure(state->afn->MultizoneExternalNodeData(1).curve,
+                                                   false,
+                                                   false,
+                                                   0.0,
+                                                   1.0,
+                                                   state->dataEnvrn->WindDir,
+                                                   DataEnvironment::OutDryBulbTempAt(*state, 10.0),
+                                                   state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 1.1841123742118911, p);
 
     // Make sure the reference velocity comes out right
@@ -7905,7 +7900,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
 
     EXPECT_DOUBLE_EQ(-0.56 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ);
     EXPECT_DOUBLE_EQ(-0.26 * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ);
@@ -8512,7 +8507,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 1);
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -8552,8 +8547,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     Real64 rho =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
-    Real64 p = state->afn->calculate_wind_pressure(*state,
-                                                              state->afn->MultizoneExternalNodeData(1).curve,
+    Real64 p = state->afn->calculate_wind_pressure(state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -8569,7 +8563,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_EQ(5u, state->afn->AirflowNetworkNodeSimu.size());
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
 
     EXPECT_NEAR(cp105N * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(4).PZ, 1e-13);
     EXPECT_NEAR(cp105S * 0.5 * 118.41123742118911, state->afn->AirflowNetworkNodeSimu(5).PZ, 1e-13);
@@ -9244,7 +9238,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     state->dataGlobal->AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes(*state);
-    state->afn->get_input(*state);
+    state->afn->get_input();
     // Issue 7656
     std::string const error_string = delimited_string({
         //"   ** Warning ** No Timestep object found.  Number of TimeSteps in Hour defaulted to 4.",
@@ -9252,7 +9246,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
         "   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    state->afn->initialize(*state);
+    state->afn->initialize();
 
     // Check the airflow elements
     EXPECT_EQ(2u, state->afn->MultizoneExternalNodeData.size());
@@ -9280,8 +9274,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_DOUBLE_EQ(1.2252059842834473, rho_1);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho_2);
 
-    Real64 p = state->afn->calculate_wind_pressure(*state,
-                                                              state->afn->MultizoneExternalNodeData(1).curve,
+    Real64 p = state->afn->calculate_wind_pressure(state->afn->MultizoneExternalNodeData(1).curve,
                                                               false,
                                                               false,
                                                               0.0,
@@ -9293,7 +9286,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     // Run the balance routine, for now only to get the pressure set at the external nodes
 
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
     // Make sure we set the right temperature
     EXPECT_DOUBLE_EQ(25.0, state->afn->AirflowNetworkNodeSimu(4).TZ);
     EXPECT_DOUBLE_EQ(15.0, state->afn->AirflowNetworkNodeSimu(5).TZ);
@@ -9726,7 +9719,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     CurveManager::GetCurveInput(*state);
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
     EXPECT_EQ(7, state->dataCurveManager->NumCurves);
@@ -13304,7 +13297,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     Real64 PresssureSet = 0.5;
     // Assign values
@@ -13366,7 +13359,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataAirLoop->AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
     state->dataAirLoop->AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
 
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
 
     // Check mass flow rate
     EXPECT_NEAR(1.40, state->afn->AirflowNetworkLinkSimu(42).FLOW, 0.0001);
@@ -13377,7 +13370,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     state->afn->AirflowNetworkFanActivated = false;
     // #7977
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
     state->dataHeatBalFanSys->MAT.allocate(5);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(5);
@@ -13397,14 +13390,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataZoneEquip->ZoneEquipConfig(5).IsControlled = false;
     state->afn->exchangeData.allocate(5);
     state->afn->AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
-    state->afn->report(*state);
+    state->afn->report();
 
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
     state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum =
         AirflowNetwork::iComponentTypeNum::DOP;
-    state->afn->report(*state);
+    state->afn->report();
 
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.969147, 0.001);
@@ -13412,8 +13405,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->dataHVACGlobal->TimeStepSys = 0.1;
     state->dataHeatBal->Zone(1).Volume = 30.0;
     // Ventilation
-    state->afn->update(*state);
-    state->afn->report(*state);
+    state->afn->update();
+    state->afn->report();
     EXPECT_NEAR(state->afn->exchangeData(1).SumMVCp, 2.38012, 0.001);
     EXPECT_NEAR(state->afn->exchangeData(1).SumMVCpT, -41.1529, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilVolume, 0.7314456, 0.001);
@@ -13422,8 +13415,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     // Infiltration
     state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum =
         AirflowNetwork::iComponentTypeNum::SCR;
-    state->afn->update(*state);
-    state->afn->report(*state);
+    state->afn->update();
+    state->afn->report();
     EXPECT_NEAR(state->afn->exchangeData(1).SumMCp, 2.38012, 0.001);
     EXPECT_NEAR(state->afn->exchangeData(1).SumMCpT, -41.1529, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).InfilVolume, 0.7314456, 0.001);
@@ -13443,16 +13436,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CVF";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "VAV";
 
-    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** ValidateDistributionSystem: An AirLoop branch, , has two or more fans: CVF,VAV",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: An AirLoop branch, , has two or more fans: CVF,VAV",
         "   **   ~~~   ** The AirflowNetwork model allows a single supply fan in an AirLoop only. Please make "
         "changes in the input file accordingly.",
-        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   **  Fatal  ** AirflowNetwork::Solver::validate_distribution: Program terminates for preceding reason(s).",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=ValidateDistributionSystem: An AirLoop branch, , has two or more fans: CVF,VAV",
+        "   ..... Last severe error=AirflowNetwork::Solver::validate_distribution: An AirLoop branch, , has two or more fans: CVF,VAV",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -13897,10 +13890,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     bool resimu = false;
 
     state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    state->afn->get_input(*state);
+    state->afn->get_input();
     state->afn->AirflowNetworkGetInputFlag = false;
     state->afn->exchangeData.allocate(1);
-    state->afn->manage_balance(*state, First, iter, resimu);
+    state->afn->manage_balance(First, iter, resimu);
     EXPECT_FALSE(resimu);
 }
 
@@ -15832,7 +15825,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 100.0;
@@ -15872,7 +15865,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     state->afn->AirflowNetworkLinkageData(17).AirLoopNum = 1;
     state->dataLoopNodes->Node(4).MassFlowRate = 1.23;
 
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
     // Fan:SystemModel
     EXPECT_NEAR(1.23, state->afn->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
     EXPECT_TRUE(state->afn->DisSysCompCVFData(1).FanModelFlag);
@@ -15888,7 +15881,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     }
     // Fan:OnOff
     state->afn->DisSysCompCVFData(1).FanModelFlag = false;
-    state->afn->calculate_balance(*state);
+    state->afn->calculate_balance();
     EXPECT_NEAR(1.23, state->afn->AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
     state->dataAirLoop->AirLoopAFNInfo.deallocate();
@@ -15955,16 +15948,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
         "   **   ~~~   ** This Node is the zone air node for Zone 'ATTIC ZONE'.",
-        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** AirflowNetwork::Solver::validate_distribution: Program terminates for preceding reason(s).",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=2",
-        "   ..... Last severe error=ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ..... Last severe error=AirflowNetwork::Solver::validate_distribution: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -16048,7 +16041,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // MixedAir::NumOAMixers.allocate(1);
-    state->afn->validate_distribution(*state);
+    state->afn->validate_distribution();
 
     EXPECT_TRUE(compare_err_stream("", true));
 }
@@ -17425,18 +17418,18 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuplicatedNodeNameTest)
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
 
     // Read AirflowNetwork inputs
-    ASSERT_THROW(state->afn->get_input(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->get_input(), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.",
         "   **   ~~~   ** Found first in surface=ZONE FLOOR",
         "   **   ~~~   ** Defaults, constant throughout the year of (0.0) will be used.",
-        "   ** Severe  ** GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR "
+        "   ** Severe  ** AirflowNetwork::Solver::get_input: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR "
         "LOOP INLET NODE\". Please make a correction.",
-        "   **  Fatal  ** GetAirflowNetworkInput: Errors found getting inputs. Previous error(s) cause program termination.",
+        "   **  Fatal  ** AirflowNetwork::Solver::get_input: Errors found getting inputs. Previous error(s) cause program termination.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node "
+        "   ..... Last severe error=AirflowNetwork::Solver::get_input: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node "
         "Name=\"AIR LOOP INLET NODE\". Please make a correction.",
     });
 
@@ -20234,7 +20227,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     state->afn->AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
@@ -20291,7 +20284,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     SimAirServingZones::GetAirPathData(*state);
 
     // Read AirflowNetwork inputs
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     state->afn->AirflowNetworkGetInputFlag = false;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
@@ -20300,7 +20293,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     state->afn->DisSysNodeData(9).EPlusNodeNum = 50;
     // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
-    state->afn->manage_balance(*state, true);
+    state->afn->manage_balance(true);
     EXPECT_EQ(state->afn->DisSysCompCVFData(1).AirLoopNum, 1);
 }
 
@@ -20408,13 +20401,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    state->afn->get_input(*state);
+    state->afn->get_input();
     // Expect warnings about the air boundary surface
     EXPECT_TRUE(has_err_output(false));
     std::string const expectedErrString =
-        delimited_string({"   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
+        delimited_string({"   ** Warning ** AirflowNetwork::Solver::get_input: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
                           "   **   ~~~   ** Ventilation Control Mode = TEMPERATURE is not valid. Resetting to Constant.",
-                          "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
+                          "   ** Warning ** AirflowNetwork::Solver::get_input: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
                           "   **   ~~~   ** Venting Availability Schedule will be ignored, venting is always available."});
     EXPECT_TRUE(compare_err_stream(expectedErrString, true));
 
@@ -20593,16 +20586,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** AirflowNetwork::Solver::validate_distribution: Program terminates for preceding reason(s).",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=4",
-        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
+        "   ..... Last severe error=AirflowNetwork::Solver::validate_distribution: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
         "object.",
     });
 
@@ -20770,9 +20763,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected warning
-    state->afn->validate_distribution(*state);
+    state->afn->validate_distribution();
 
-    EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an "
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** AirflowNetwork::Solver::validate_distribution: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an "
                                    "AirflowNetwork but is not included in the AirflowNetwork.\n",
                                    true));
 }
@@ -20938,16 +20931,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** AirflowNetwork::Solver::validate_distribution: Program terminates for preceding reason(s).",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=4",
-        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
+        "   ..... Last severe error=AirflowNetwork::Solver::validate_distribution: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
         "object.",
     });
 
@@ -21077,14 +21070,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** AirflowNetwork::Solver::validate_distribution: Program terminates for preceding reason(s).",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=2",
-        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ..... Last severe error=AirflowNetwork::Solver::validate_distribution: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -21213,8 +21206,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected warning
-    state->afn->validate_distribution(*state);
-    EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: Heat pump water heater is simulated along with an AirflowNetwork "
+    state->afn->validate_distribution();
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** AirflowNetwork::Solver::validate_distribution: Heat pump water heater is simulated along with an AirflowNetwork "
                                    "but is not included in the AirflowNetwork.\n",
                                    true));
 }
@@ -21342,14 +21335,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(*state), std::runtime_error);
+    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
-        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** AirflowNetwork::Solver::validate_distribution: Program terminates for preceding reason(s).",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=2",
-        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ..... Last severe error=AirflowNetwork::Solver::validate_distribution: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -21436,7 +21429,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     EXPECT_TRUE(state->afn->AFNDefaultControlFlag);
@@ -23961,7 +23954,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    state->afn->get_input(*state);
+    state->afn->get_input();
 
     EXPECT_EQ(state->afn->IntraZoneNodeData(1).AFNZoneNum, 1);
     EXPECT_EQ(state->afn->IntraZoneNodeData(1).ZoneNum, 3);
@@ -24120,7 +24113,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestReferenceConditionsLeftBlank)
     SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    state->afn->get_input(*state);
+    state->afn->get_input();
     // check correct values for reference conditions of crack surface when reference conditions were left blank.
     Real64 refP1 = 101325.0;
     Real64 refT1 = 20.0;

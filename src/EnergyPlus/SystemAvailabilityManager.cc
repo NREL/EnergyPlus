@@ -4778,8 +4778,8 @@ namespace SystemAvailabilityManager {
                 }
 
                 if (hybridVentMgr.ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
-                    state.afn->manage_balance(state, true);
-                    ACH = state.afn->zone_OA_change_rate(state, ZoneNum);
+                    state.afn->manage_balance(true);
+                    ACH = state.afn->zone_OA_change_rate(ZoneNum);
                 }
                 if (ACH > OASetPoint) {
                     hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
