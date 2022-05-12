@@ -2093,7 +2093,7 @@ namespace SystemAvailabilityManager {
 
                     switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) { // select on thermostat control
 
-                    case SingleHeatingSetPoint: {
+                    case DataHVACGlobals::ThermostatType::SingleHeating: {
                         if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
                             AvailStatus = CycleOn;
                         } else {
@@ -2101,7 +2101,7 @@ namespace SystemAvailabilityManager {
                         }
 
                     } break;
-                    case SingleCoolingSetPoint: {
+                    case DataHVACGlobals::ThermostatType::SingleCooling: {
                         if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
                             AvailStatus = CycleOn;
                         } else {
@@ -2109,7 +2109,7 @@ namespace SystemAvailabilityManager {
                         }
 
                     } break;
-                    case SingleHeatCoolSetPoint: {
+                    case DataHVACGlobals::ThermostatType::SingleHeatCool: {
                         if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
                              state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
                             (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
@@ -2120,7 +2120,7 @@ namespace SystemAvailabilityManager {
                         }
 
                     } break;
-                    case DualSetPointWithDeadBand: {
+                    case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
                         if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
                             (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
                             AvailStatus = CycleOn;
@@ -2190,7 +2190,7 @@ namespace SystemAvailabilityManager {
                         ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
 
                         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-                        case SingleHeatingSetPoint: {
+                        case DataHVACGlobals::ThermostatType::SingleHeating: {
                             if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
                                 AvailStatus = CycleOn;
@@ -2198,7 +2198,7 @@ namespace SystemAvailabilityManager {
                                 AvailStatus = NoAction;
                             }
                         } break;
-                        case SingleCoolingSetPoint: {
+                        case DataHVACGlobals::ThermostatType::SingleCooling: {
                             if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
                                 state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
                                 AvailStatus = CycleOn;
@@ -2206,7 +2206,7 @@ namespace SystemAvailabilityManager {
                                 AvailStatus = NoAction;
                             }
                         } break;
-                        case SingleHeatCoolSetPoint: {
+                        case DataHVACGlobals::ThermostatType::SingleHeatCool: {
                             if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
                                  state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
                                 (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
@@ -2216,7 +2216,7 @@ namespace SystemAvailabilityManager {
                                 AvailStatus = NoAction;
                             }
                         } break;
-                        case DualSetPointWithDeadBand: {
+                        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
                             if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
                                  state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
                                 (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
@@ -2302,19 +2302,21 @@ namespace SystemAvailabilityManager {
         // Check if any zone temperature is above the cooling setpoint plus tolerance
         for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
             int ZoneNum = ZonePtrList(Index);
-            {
-                auto const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
-                if ((tstatType == SingleCoolingSetPoint) || (tstatType == SingleHeatCoolSetPoint)) {
-                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >
-                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTolerance) {
-                        return true; // return on the first zone found
-                    }
-                } else if (tstatType == DualSetPointWithDeadBand) {
-                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTolerance) {
-                        return true; // return on the first zone found
-                    }
+            switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
+            case DataHVACGlobals::ThermostatType::SingleCooling:
+            case DataHVACGlobals::ThermostatType::SingleHeatCool:
+                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTolerance) {
+                    return true; // return on the first zone found
                 }
+                break;
+            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
+                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTolerance) {
+                    return true; // return on the first zone found
+                }
+                break;
+            default:
+                break;
             }
         }
         return false;
@@ -2332,12 +2334,12 @@ namespace SystemAvailabilityManager {
             {
                 auto const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
-                if ((tstatType == SingleHeatingSetPoint) || (tstatType == SingleHeatCoolSetPoint)) {
+                if ((tstatType == DataHVACGlobals::ThermostatType::SingleHeating) || (tstatType == DataHVACGlobals::ThermostatType::SingleHeatCool)) {
                     if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <
                         state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTolerance) {
                         return true; // return on the first zone found
                     }
-                } else if (tstatType == DualSetPointWithDeadBand) {
+                } else if (tstatType == DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand) {
                     if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTolerance) {
                         return true; // return on the first zone found
                     }
@@ -4872,19 +4874,19 @@ namespace SystemAvailabilityManager {
 
                     switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
 
-                    case SingleHeatingSetPoint: {
+                    case DataHVACGlobals::ThermostatType::SingleHeating: {
                         if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
                             hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                         }
 
                     } break;
-                    case SingleCoolingSetPoint: {
+                    case DataHVACGlobals::ThermostatType::SingleCooling: {
                         if (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
                             hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                         }
 
                     } break;
-                    case SingleHeatCoolSetPoint: {
+                    case DataHVACGlobals::ThermostatType::SingleHeatCool: {
                         hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;
                         ++hybridVentMgr.SingleHCErrCount;
                         if (hybridVentMgr.SingleHCErrCount < 2) {
@@ -4904,7 +4906,7 @@ namespace SystemAvailabilityManager {
                         }
 
                     } break;
-                    case DualSetPointWithDeadBand: {
+                    case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
                         if ((state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) ||
                             (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum))) {
                             hybridVentMgr.VentilationCtrl = HybridVentCtrl_Close;

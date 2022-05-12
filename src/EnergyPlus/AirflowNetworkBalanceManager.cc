@@ -12089,11 +12089,6 @@ namespace AirflowNetwork {
                                                             int const ZoneNum,
                                                             Real64 const TimeCloseDuration) // function to perform calculations of opening probability
     {
-        using DataHVACGlobals::DualSetPointWithDeadBand;
-        using DataHVACGlobals::SingleCoolingSetPoint;
-        using DataHVACGlobals::SingleHeatCoolSetPoint;
-        using DataHVACGlobals::SingleHeatingSetPoint;
-
         Real64 SchValue;
         Real64 RandomValue;
 
@@ -12106,27 +12101,27 @@ namespace AirflowNetwork {
             }
         }
 
-        // Fixed in #9399
-        {
-            auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // Check zone setpoints
-            if (SELECT_CASE_var == 0) {                                                    // Uncontrolled
-
-            } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                if (state.dataHeatBalFanSys->MAT(ZoneNum) <= state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) {
-                    return false;
-                }
-            } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                if (state.dataHeatBalFanSys->MAT(ZoneNum) >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
-                    return false;
-                }
-            } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
+        switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
+        case DataHVACGlobals::ThermostatType::SingleHeating:
+            if (state.dataHeatBalFanSys->MAT(ZoneNum) <= state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) {
                 return false;
-            } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) ||
-                    state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
-                    return false;
-                }
             }
+            break;
+        case DataHVACGlobals::ThermostatType::SingleCooling:
+            if (state.dataHeatBalFanSys->MAT(ZoneNum) >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
+                return false;
+            }
+            break;
+        case DataHVACGlobals::ThermostatType::SingleHeatCool:
+            return false;
+        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
+            if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) ||
+                state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
+                return false;
+            }
+            break;
+        default:
+            break;
         }
 
         if (OpeningProbSchNum == 0) {

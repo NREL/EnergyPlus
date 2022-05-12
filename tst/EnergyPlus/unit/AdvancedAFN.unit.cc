@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataHeatBal->ZoneIntGain.allocate(1);
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.5;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = 0;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::Uncontrolled;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
 
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
-    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 28.0;
     state->afn->OccupantVentilationControl(1).calc(
