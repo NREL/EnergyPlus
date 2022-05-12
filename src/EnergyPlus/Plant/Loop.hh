@@ -116,7 +116,7 @@ namespace DataPlant {
         DataPlant::LoadingScheme LoadDistribution;            // Load distribution scheme 1 for optimal, 2 for overloading
         int PlantSizNum;                                      // index to corresponding plant sizing data array
         DataPlant::LoopDemandCalcScheme LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
-        // 2 DualSetPointwithDeadBand
+        // 2 DualSetPointWithDeadBand
         DataPlant::CommonPipeType CommonPipeType;
         int EconPlantSideSensedNodeNum;
         int EconCondSideSensedNodeNum;
