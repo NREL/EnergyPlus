@@ -47,6 +47,7 @@
 
 #include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Properties.hpp"
+#include "AirflowNetwork/Solver.hpp"
 
 #include "../../Data/EnergyPlusData.hh"
 #include "../../DataAirLoop.hh"
@@ -54,7 +55,6 @@
 #include "../../DataHVACGlobals.hh"
 #include "../../DataLoopNode.hh"
 #include "../../DataSurfaces.hh"
-#include "../../AirflowNetworkBalanceManager.hh"
 
 namespace EnergyPlus {
 

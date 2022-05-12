@@ -45,11 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ELEMENTS_HPP
-#define ELEMENTS_HPP
+#ifndef AIRFLOWNETWORK_ELEMENTS_HPP
+#define AIRFLOWNETWORK_ELEMENTS_HPP
 
 #include "AirflowNetwork/Properties.hpp"
-#include "AirflowNetwork/Solver.hpp"
+#include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
 

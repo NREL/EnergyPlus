@@ -50,8 +50,6 @@
 #include <EnergyPlus/General.hh>
 
 
-
-
 namespace EnergyPlus {
 
 namespace AirflowNetwork {
