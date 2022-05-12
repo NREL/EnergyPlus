@@ -133,6 +133,8 @@ namespace ScheduleManager {
     constexpr std::array<std::string_view, static_cast<int>(OutputScheduleReportLevel::Num)> outputScheduleReportLevelNames = {"Hourly", "Timestep"};
     constexpr std::array<std::string_view, static_cast<int>(OutputScheduleReportLevel::Num)> outputScheduleReportLevelNamesUC = {"HOURLY",
                                                                                                                                  "TIMESTEP"};
+    constexpr std::array<std::string_view, static_cast<int>(ScheduleInterpolation::Num)> interpolationTypes = {"No", "Average", "Linear"};
+    constexpr std::array<std::string_view, static_cast<int>(ScheduleInterpolation::Num)> interpolationTypesUC = {"NO", "AVERAGE", "LINEAR"};
 
     void ProcessScheduleInput(EnergyPlusData &state)
     {
@@ -771,13 +773,9 @@ namespace ScheduleManager {
             }
 
             // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-            if (UtilityRoutines::SameString(Alphas(3), "NO")) {
-                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
-            } else if (UtilityRoutines::SameString(Alphas(3), "AVERAGE")) {
-                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Average;
-            } else if (UtilityRoutines::SameString(Alphas(3), "LINEAR")) {
-                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
-            } else {
+            state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated =
+                static_cast<ScheduleInterpolation>(getEnumerationValue(interpolationTypesUC, Alphas(3)));
+            if (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Invalid) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) +
                                     "\" field=\"" + Alphas(3) + "\"");
@@ -2226,19 +2224,15 @@ namespace ScheduleManager {
         // This subroutine puts the details of the Schedules on the .eio file (Inits file).
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
-        Array1D_string const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
-                                               "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"});
+        constexpr std::array<std::string_view, 12> Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        constexpr std::array<std::string_view, 25> HrField = {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+                                                              "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Count;
-        int Hr;
-        int TS;
         int NumF;
         int PMon;
         int PDay;
         Array1D_string ShowMinute;
-        int CurMinute;
         Array1D_string TimeHHMM;
         std::string NoAverageLinear;
         std::string YesNo2;
@@ -2254,8 +2248,8 @@ namespace ScheduleManager {
         TimeHHMM = std::string{};
         RoundTSValue = std::string{};
 
-        CurMinute = state.dataGlobal->MinutesPerTimeStep;
-        for (Count = 1; Count <= state.dataGlobal->NumOfTimeStepInHour - 1; ++Count) {
+        int CurMinute = state.dataGlobal->MinutesPerTimeStep;
+        for (int Count = 1; Count <= state.dataGlobal->NumOfTimeStepInHour - 1; ++Count) {
             ShowMinute(Count) = format("{:02}", CurMinute);
             CurMinute += state.dataGlobal->MinutesPerTimeStep;
         }
@@ -2265,49 +2259,43 @@ namespace ScheduleManager {
         case OutputScheduleReportLevel::Hourly:
         case OutputScheduleReportLevel::TimeStep:
             NumF = 1;
-            for (Hr = 1; Hr <= 24; ++Hr) {
+            for (int Hr = 1; Hr <= 24; ++Hr) {
                 if (LevelOfDetail == OutputScheduleReportLevel::TimeStep) {
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour - 1; ++TS) {
-                        TimeHHMM(NumF) = HrField(Hr - 1) + ':' + ShowMinute(TS);
+                    for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour - 1; ++TS) {
+                        TimeHHMM(NumF) = format("{}:{}", HrField[Hr - 1], ShowMinute(TS));
                         ++NumF;
                     }
                 }
-                TimeHHMM(NumF) = HrField(Hr) + ':' + ShowMinute(state.dataGlobal->NumOfTimeStepInHour);
+                TimeHHMM(NumF) = format("{}:{}", HrField[Hr], ShowMinute(state.dataGlobal->NumOfTimeStepInHour));
                 ++NumF;
             }
             --NumF;
 
             // SchTFmt Schedule Types Header
             {
-                auto constexpr SchTFmt0("! Schedule Details Report={} =====================\n");
-                auto constexpr SchDFmt{",{}"};
+                std::string_view constexpr SchTFmt0("! Schedule Details Report={} =====================\n");
+                std::string_view constexpr SchDFmt{",{}"};
                 print(state.files.eio, SchTFmt0, outputScheduleReportLevelNames[static_cast<int>(LevelOfDetail)]);
 
-                auto constexpr SchTFmt("! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
+                std::string_view constexpr SchTFmt("! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
                 print(state.files.eio, "{}\n", SchTFmt);
-                // SchDFmt Header (DaySchedule) builds the appropriate set of commas/times based on detail level
-                //      DO Count=1,NumF
-                //        SchDFmt=TRIM(SchDFmt)//'A'
-                //        IF (Count /= NumF) SchDFmt=TRIM(SchDFmt)//",',',"
-                //      ENDDO
-                //      SchDFmt=TRIM(SchDFmt)//')'
-                auto constexpr SchDFmt0("! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>");
+                std::string_view constexpr SchDFmt0("! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>");
                 print(state.files.eio, "{}", SchDFmt0);
-                for (Count = 1; Count <= NumF; ++Count) {
+                for (int Count = 1; Count <= NumF; ++Count) {
                     print(state.files.eio, SchDFmt, TimeHHMM(Count));
                 }
                 print(state.files.eio, "\n");
                 // SchWFmt Header (WeekSchedule)
                 std::string SchWFmt("! <WeekSchedule>,Name");
-                for (Count = 1; Count <= MaxDayTypes; ++Count) {
+                for (int Count = 1; Count <= MaxDayTypes; ++Count) {
                     SchWFmt += "," + ValidDayTypes(Count);
                 }
                 print(state.files.eio, "{}\n", SchWFmt);
-                auto constexpr SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
+                std::string_view constexpr SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
                 print(state.files.eio, "{}\n", SchSFmt);
             }
 
-            for (Count = 1; Count <= state.dataScheduleMgr->NumScheduleTypes; ++Count) {
+            for (int Count = 1; Count <= state.dataScheduleMgr->NumScheduleTypes; ++Count) {
                 if (state.dataScheduleMgr->ScheduleType(Count).Limited) {
                     NoAverageLinear = "Average";
                     Num1 = format("{:.2R}", state.dataScheduleMgr->ScheduleType(Count).Minimum);
@@ -2327,33 +2315,18 @@ namespace ScheduleManager {
                     Num2 = "N/A";
                     YesNo2 = "N/A";
                 }
-                auto constexpr SchTFmtdata("ScheduleTypeLimits,{},{},{},{},{}\n");
+                std::string_view constexpr SchTFmtdata("ScheduleTypeLimits,{},{},{},{},{}\n");
                 print(state.files.eio, SchTFmtdata, state.dataScheduleMgr->ScheduleType(Count).Name, NoAverageLinear, Num1, Num2, YesNo2);
             }
 
-            //      WRITE(Num1,*) NumOfTimeStepInHour*24
-            //      Num1=ADJUSTL(Num1)
-            //      SchDFmtdata=TRIM(SchDFmtdata)//TRIM(Num1)//"(',',A))"
-            for (Count = 1; Count <= state.dataScheduleMgr->NumDaySchedules; ++Count) {
-                switch (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated) {
-                case ScheduleInterpolation::Average:
-                    NoAverageLinear = "Average";
-                    break;
-                case ScheduleInterpolation::Linear:
-                    NoAverageLinear = "Linear";
-                    break;
-                case ScheduleInterpolation::No:
-                    NoAverageLinear = "No";
-                    break;
-                default:
-                    assert(false);
-                }
-                for (Hr = 1; Hr <= 24; ++Hr) {
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+            for (int Count = 1; Count <= state.dataScheduleMgr->NumDaySchedules; ++Count) {
+                NoAverageLinear = interpolationTypes[static_cast<int>(state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated)];
+                for (int Hr = 1; Hr <= 24; ++Hr) {
+                    for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                         RoundTSValue(TS, Hr) = format("{:.2R}", state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr));
                     }
                 }
-                auto constexpr SchDFmtdata0("DaySchedule,{},{},{},{}");
+                std::string_view constexpr SchDFmtdata0("DaySchedule,{},{},{},{}");
                 print(state.files.eio,
                       SchDFmtdata0,
                       state.dataScheduleMgr->DaySchedule(Count).Name,
@@ -2362,23 +2335,25 @@ namespace ScheduleManager {
                       "Values:");
                 switch (LevelOfDetail) {
                 case OutputScheduleReportLevel::Hourly:
-                    for (Hr = 1; Hr <= 24; ++Hr) {
+                    for (int Hr = 1; Hr <= 24; ++Hr) {
                         print(state.files.eio, SchDFmtdata, RoundTSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                     }
+                    break;
                 case OutputScheduleReportLevel::TimeStep:
-                    for (Hr = 1; Hr <= 24; ++Hr) {
-                        for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                    for (int Hr = 1; Hr <= 24; ++Hr) {
+                        for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                             print(state.files.eio, SchDFmtdata, RoundTSValue(TS, Hr));
                         }
                     }
+                    break;
                 default:
                     assert(false);
                 }
                 print(state.files.eio, "\n");
             }
 
-            for (Count = 1; Count <= state.dataScheduleMgr->NumWeekSchedules; ++Count) {
-                auto constexpr SchWFmtdata("Schedule:Week:Daily,{}");
+            for (int Count = 1; Count <= state.dataScheduleMgr->NumWeekSchedules; ++Count) {
+                std::string_view constexpr SchWFmtdata("Schedule:Week:Daily,{}");
                 print(state.files.eio, SchWFmtdata, state.dataScheduleMgr->WeekSchedule(Count).Name);
                 for (NumF = 1; NumF <= MaxDayTypes; ++NumF) {
                     print(state.files.eio,
@@ -2388,26 +2363,26 @@ namespace ScheduleManager {
                 print(state.files.eio, "\n");
             }
 
-            for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
+            for (int Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
                 NumF = 1;
                 print(state.files.eio,
                       "Schedule,{},{}",
                       state.dataScheduleMgr->Schedule(Count).Name,
                       state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
                 while (NumF <= 366) {
-                    TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
-                    auto constexpr ThruFmt(",Through {} {:02},{}");
+                    int TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
+                    std::string_view constexpr ThruFmt(",Through {} {:02},{}");
                     while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                         if (NumF == 366) {
                             General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                            print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
+                            print(state.files.eio, ThruFmt, Months[PMon - 1], PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
                         }
                         ++NumF;
                         if (NumF > 366) break; // compound If might have a problem unless this included.
                     }
                     if (NumF <= 366) {
                         General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                        print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
+                        print(state.files.eio, ThruFmt, Months[PMon - 1], PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
                     }
                 }
                 print(state.files.eio, "\n");

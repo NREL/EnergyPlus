@@ -113,7 +113,7 @@ namespace PlantPipingSystemsManager {
     std::string const ObjName_HorizTrench("GroundHeatExchanger:HorizontalTrench");
     std::string const ObjName_ZoneCoupled_Slab("Site:GroundDomain:Slab");
     std::string const ObjName_ZoneCoupled_Basement("Site:GroundDomain:Basement");
-    constexpr std::array<std::string_view, static_cast<int>(SegmentFlow::Num)> flowDirectionNames = {"INCREASINGZ", "DECREASINGZ"};
+    constexpr std::array<std::string_view, static_cast<int>(SegmentFlow::Num)> flowDirectionNamesUC = {"INCREASINGZ", "DECREASINGZ"};
 
 #pragma clang diagnostic pop
 
@@ -1780,7 +1780,7 @@ namespace PlantPipingSystemsManager {
 
             // Read in the flow direction
             thisSegment.FlowDirection =
-                static_cast<SegmentFlow>(getEnumerationValue(flowDirectionNames, stripped(state.dataIPShortCut->cAlphaArgs(2))));
+                static_cast<SegmentFlow>(getEnumerationValue(flowDirectionNamesUC, stripped(state.dataIPShortCut->cAlphaArgs(2))));
             if (thisSegment.FlowDirection == SegmentFlow::Invalid) {
                 CurIndex = 2;
                 IssueSevereInputFieldError(state,

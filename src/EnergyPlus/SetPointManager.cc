@@ -1671,13 +1671,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         // setup program flow control integers.
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(getEnumerationValue(
             controlTypeNameUC, UtilityRoutines::MakeUPPERCase(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
-        switch (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
-        case CtrlVarType::Temp:
-        case CtrlVarType::HumRat:
-        case CtrlVarType::MaxHumRat:
-        case CtrlVarType::MinHumRat:
-            break; // these are all valid cases
-        default:
+        if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");

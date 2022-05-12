@@ -104,7 +104,8 @@ using namespace CurveManager;
 
 constexpr std::array<std::string_view, static_cast<int>(PTSCCtrlType::Num)> modeControlStrings = {"SCHEDULEDMODES", "EMSCONTROLLED"};
 constexpr std::array<std::string_view, static_cast<int>(MediaType::Num)> mediaStrings = {"WATER", "USERDEFINEDFLUIDTYPE", "ICE"};
-constexpr std::array<std::string_view, static_cast<int>(TESCondenserType::Num)> condenserTypeStrings = {"AIRCOOLED", "EVAPORATIVELYCOOLED"};
+constexpr std::array<std::string_view, static_cast<int>(TESCondenserType::Num)> condenserTypesUC = {"AIRCOOLED", "EVAPORATIVELYCOOLED"};
+constexpr Real64 gigaJoulesToJoules = 1.e+09;
 
 void SimTESCoil(EnergyPlusData &state,
                 std::string_view CompName, // name of the fan coil unit
@@ -360,7 +361,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                     state.dataPackagedThermalStorageCoil->TESCoil(item).IceStorageCapacity = state.dataIPShortCut->rNumericArgs(2);
                 } else {
                     state.dataPackagedThermalStorageCoil->TESCoil(item).IceStorageCapacity =
-                        state.dataIPShortCut->rNumericArgs(2) * 1.e+09; // input in giga joules, used as joules internally
+                        state.dataIPShortCut->rNumericArgs(2) * gigaJoulesToJoules; // input in giga joules, used as joules internally
                 }
             } else if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
                 ShowSevereError(state,
@@ -430,10 +431,10 @@ void GetTESCoilInput(EnergyPlusData &state)
                     state.dataIPShortCut->cAlphaArgs(9),
                     "Air Nodes");
 
-        YesNo answer = getYesNoValue(state.dataIPShortCut->cAlphaArgs(10));
+        BooleanSwitch answer = getYesNoValue(state.dataIPShortCut->cAlphaArgs(10));
         switch (answer) {
-        case YesNo::Yes:
-        case YesNo::No:
+        case BooleanSwitch::Yes:
+        case BooleanSwitch::No:
             state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlyModeIsAvailable = static_cast<bool>(answer);
             break;
         default:
@@ -642,10 +643,10 @@ void GetTESCoilInput(EnergyPlusData &state)
             }
         }
 
-        YesNo answer2 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(18));
+        BooleanSwitch answer2 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(18));
         switch (answer2) {
-        case YesNo::Yes:
-        case YesNo::No:
+        case BooleanSwitch::Yes:
+        case BooleanSwitch::No:
             state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeModeAvailable = static_cast<bool>(answer2);
             break;
         default:
@@ -1012,10 +1013,10 @@ void GetTESCoilInput(EnergyPlusData &state)
 
         } // Cooling and Charge Mode available
 
-        YesNo answer3 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(31));
+        BooleanSwitch answer3 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(31));
         switch (answer3) {
-        case YesNo::Yes:
-        case YesNo::No:
+        case BooleanSwitch::Yes:
+        case BooleanSwitch::No:
             state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeModeAvailable = static_cast<bool>(answer3);
             break;
         default:
@@ -1411,10 +1412,10 @@ void GetTESCoilInput(EnergyPlusData &state)
 
         } // cooling and discharge mode available
 
-        YesNo answer4 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(45));
+        BooleanSwitch answer4 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(45));
         switch (answer4) {
-        case YesNo::Yes:
-        case YesNo::No:
+        case BooleanSwitch::Yes:
+        case BooleanSwitch::No:
             state.dataPackagedThermalStorageCoil->TESCoil(item).ChargeOnlyModeAvailable = static_cast<bool>(answer4);
             break;
         default:
@@ -1494,10 +1495,10 @@ void GetTESCoilInput(EnergyPlusData &state)
 
         } // Charge only mode available
 
-        YesNo answer5 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(48));
+        BooleanSwitch answer5 = getYesNoValue(state.dataIPShortCut->cAlphaArgs(48));
         switch (answer5) {
-        case YesNo::Yes:
-        case YesNo::No:
+        case BooleanSwitch::Yes:
+        case BooleanSwitch::No:
             state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlyModeAvailable = static_cast<bool>(answer5);
             break;
         default:
@@ -1746,7 +1747,7 @@ void GetTESCoilInput(EnergyPlusData &state)
         state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserAirFlowSizingFactor = state.dataIPShortCut->rNumericArgs(35);
 
         state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType =
-            static_cast<TESCondenserType>(getEnumerationValue(condenserTypeStrings, state.dataIPShortCut->cAlphaArgs(58)));
+            static_cast<TESCondenserType>(getEnumerationValue(condenserTypesUC, state.dataIPShortCut->cAlphaArgs(58)));
         if (state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType == TESCondenserType::Invalid) {
             ShowSevereError(state,
                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
@@ -2806,7 +2807,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                          "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name,
                                          "Ice Storage Capacity [GJ]",
-                                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / 1.e+09);
+                                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / gigaJoulesToJoules);
         }
     default:
         break;

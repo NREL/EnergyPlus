@@ -784,7 +784,6 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     int ESVariableNum;
     int WhileLoopExitCounter;      // to avoid infinite loop in While loop
     bool seriousErrorFound(false); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
-    bool breakOutOfWhile = false;
 
     WhileLoopExitCounter = 0;
     ReturnValue.Type = Value::Number;
@@ -792,6 +791,8 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
 
     InstructionNum = 1;
     while (InstructionNum <= state.dataRuntimeLang->ErlStack(StackNum).NumInstructions) {
+
+        bool breakOutOfWhile = false;
 
         switch (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword) {
 
@@ -804,19 +805,23 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 ReturnValue =
                     EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
             WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+
+            // RETURN always terminates an instruction stack, need to break from the switch as well as the outer WHILE loop
             breakOutOfWhile = true;
-            break; // RETURN always terminates an instruction stack -- Need to break from WHILE loop as well
+            break;
 
         case DataRuntimeLanguage::ErlKeywordParam::Set:
             ReturnValue =
                 EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
             ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-            if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) &&
-                (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
-                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
-            } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
-                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
-                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
+            {
+                auto &variable = state.dataRuntimeLang->ErlVariable(ESVariableNum);
+                if ((!variable.ReadOnly) && (!variable.Value.TrendVariable)) {
+                    variable.Value = ReturnValue;
+                } else if (variable.Value.TrendVariable) {
+                    variable.Value.Number = ReturnValue.Number;
+                    variable.Value.Error = ReturnValue.Error;
+                }
             }
             WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
             break;
@@ -838,7 +843,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                     // Eventually should handle strings and arrays too
                     InstructionNum = InstructionNum2;
-                    continue;
+                    break;
                 }
             } else {
                 // KeywordELSE  -- kind of a kludge
@@ -888,6 +893,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
                 InstructionNum = InstructionNum2;
                 ++WhileLoopExitCounter;
+                break;
             } else { // false, leave while block
                 if (WhileLoopExitCounter > MaxWhileLoopIterations) {
                     WhileLoopExitCounter = 0;
