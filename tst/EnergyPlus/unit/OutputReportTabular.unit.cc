@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -74,6 +75,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -10272,4 +10274,253 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
                                                        "zone, but multiple people objects are defined for Zone 1"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable) {
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Test";
+
+    int columnNum = 5;
+
+    auto &s(state->dataOutRptPredefined);
+    s->pdchHeatingSETHours = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Degree-Hours [°C·hr]");
+    s->pdchHeatingSETOccuHours = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]");
+    s->pdchHeatingSETOccupiedHours = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]");
+    s->pdchHeatingSETUnmetDuration = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration Duration for Occupied Period [hr]");
+    s->pdchHeatingSETUnmetTime = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period");
+
+    state->dataHeatBalFanSys->ZoneLowSETHours.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneLowSETHours(1).assign(5, 0.0);
+
+    // state->dataHeatBalFanSys->ZoneLowSETHours(1): [0, -1, 4, -9, 16]
+    for (int i = 0; i < 4; i++) {
+        state->dataHeatBalFanSys->ZoneLowSETHours(1)[i] = std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+    }
+
+    int encodedMonDayHrMin;
+    General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5, 30);
+    state->dataHeatBalFanSys->ZoneLowSETHours(1)[4] = encodedMonDayHrMin;
+
+    Real64 degreeHourConversion = 1.8;
+
+    std::vector<int> columnHead = {state->dataOutRptPredefined->pdchHeatingSETHours,
+    state->dataOutRptPredefined->pdchHeatingSETOccuHours,
+    state->dataOutRptPredefined->pdchHeatingSETOccupiedHours,
+                                   state->dataOutRptPredefined->pdchHeatingSETUnmetDuration,
+                                   state->dataOutRptPredefined->pdchHeatingSETUnmetTime};
+    WriteSETHoursTable(*state, columnNum, columnHead, state->dataHeatBalFanSys->ZoneLowSETHours, degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETHours, "Test"));
+    EXPECT_EQ("-1.8", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETOccuHours, "Test"));
+    EXPECT_EQ("7.20", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETOccupiedHours, "Test"));
+    //    duration hour don't change
+    EXPECT_EQ("-9.0", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETUnmetDuration, "Test"));
+    EXPECT_EQ("01-JAN-04:30", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETUnmetTime, "Test"));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourUnitConv)
+{
+    // test unit conversion of unmet degree hour table
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Test";
+    int columnNum = 6;
+
+    auto &s(state->dataOutRptPredefined);
+
+    s->pdchCoolingUnmetDegreeHour = OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Degree-Hours [°C·hr]");
+    s->pdchCoolingUnmetDegreeOccHour =
+    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
+    s->pdchCoolingUnmetDegreeOccupiedHour =
+    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]");
+    s->pdchHeatingUnmetDegreeHour = OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Degree-Hours [°C·hr]");
+    s->pdchHeatingUnmetDegreeOccHour =
+    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]");
+    s->pdchHeatingUnmetDegreeOccupiedHour =
+    OutputReportPredefined::newPreDefColumn(*state, s->pdstUnmetDegreeHour, "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]");
+
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1).assign(6, 0.0);
+    // state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1): [0, -1, 4, -9, 16, -25]
+    for (int i = 0; i < 6; i++) {
+        state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1)[i] = std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+    }
+
+    Real64 degreeHourConversion = 1.8;
+
+    std::vector<int> columnHeadUnmetDegHr = {state->dataOutRptPredefined->pdchCoolingUnmetDegreeHour,
+                                             state->dataOutRptPredefined->pdchCoolingUnmetDegreeOccHour,
+                                             state->dataOutRptPredefined->pdchCoolingUnmetDegreeOccupiedHour,
+                                             state->dataOutRptPredefined->pdchHeatingUnmetDegreeHour,
+                                             state->dataOutRptPredefined->pdchHeatingUnmetDegreeOccHour,
+                                             state->dataOutRptPredefined->pdchHeatingUnmetDegreeOccupiedHour};
+    WriteResilienceBinsTable(*state, columnNum, columnHeadUnmetDegHr, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins, degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchCoolingUnmetDegreeHour, "Test"));
+    EXPECT_EQ("-1.8", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchCoolingUnmetDegreeOccHour, "Test"));
+    EXPECT_EQ("7.20", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchCoolingUnmetDegreeOccupiedHour, "Test"));
+    EXPECT_EQ("-16.2", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingUnmetDegreeHour, "Test"));
+    EXPECT_EQ("28.80", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingUnmetDegreeOccHour, "Test"));
+    EXPECT_EQ("-45.0", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingUnmetDegreeOccupiedHour, "Test"));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPeriod)
+{
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Test";
+
+    int columnNum = 5;
+
+    Array1D_int columnWidth;
+    columnWidth.allocate(columnNum);
+    columnWidth = 10;
+    Array1D_string columnHead(columnNum);
+    columnHead(1) = "SET ≤ 12.2°C Degree-Hours [°C·hr]";
+    columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHead(3) = "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]";
+    columnHead(4) = "Longest SET ≤ 12.2°C Duration for Occupied Period [hr]";
+    columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
+
+    Real64 degreeHourConversion = 1.8;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, i).assign(5, 0.0);
+    }
+
+    int encodedMonDayHrMin;
+    // state->dataHeatBalFanSys->ZoneLowSETHours(1, 1): [0, -1, 4, -9]
+    // state->dataHeatBalFanSys->ZoneLowSETHours(1, 2): [0, -2, 8, -18]
+    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+        for (int i = 0; i < 4; i++) {
+            state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+        }
+        General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * k, 30);
+        state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, k)[4] = encodedMonDayHrMin;
+    }
+
+    std::string tableName = "Heating SET Degree-Hours";
+
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state->dataGlobal->NumOfZones + 3);
+    tableBody.allocate(columnNum, state->dataGlobal->NumOfZones + 3);
+
+    WriteSETHoursTableReportingPeriod(*state,
+                                      columnNum,
+                                      1,
+                                      tableName,
+                                      columnHead,
+                                      columnWidth,
+                                      state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod,
+                                      rowHead,
+                                      tableBody,
+                                      degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.8", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("7.20", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    //    duration hour don't change, 1, 1
+    EXPECT_EQ("-9.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+
+    WriteSETHoursTableReportingPeriod(*state,
+                                      columnNum,
+                                      2,
+                                      tableName,
+                                      columnHead,
+                                      columnWidth,
+                                      state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod,
+                                      rowHead,
+                                      tableBody,
+                                      degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-3.6", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("14.40", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    //    duration hour don't change
+    EXPECT_EQ("-18.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitConv)
+{
+    // test unit conversion of unmet degree hour table
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Test";
+
+    int columnNumUnmetDegHr = 6;
+    Array1D_string columnHeadUnmetDegHr(6);
+    // must initialize this otherwise it will only output 5 columns
+    Array1D_int columnWidthUnmetDegHr;
+    columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
+    columnWidthUnmetDegHr = 10;
+    columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+    std::string tableName = "Unmet Degree-Hours";
+
+    Real64 degreeHourConversion = 1.8;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, i).assign(columnNumUnmetDegHr, 0.0);
+    }
+    // state->dataHeatBalFanSys->ZoneUnmetDegreeHourBins(1): [0, -1, 4, -9, 16, -25]
+    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+        for (int i = 0; i < 6; i++) {
+            state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+        }
+    }
+
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state->dataGlobal->NumOfZones + 4);
+    tableBody.allocate(columnNumUnmetDegHr, state->dataGlobal->NumOfZones + 4);
+
+    WriteResilienceBinsTableReportingPeriod(*state,
+                                            columnNumUnmetDegHr,
+                                            1,
+                                            tableName,
+                                            columnHeadUnmetDegHr,
+                                            columnWidthUnmetDegHr,
+                                            state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody,
+                                            degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.8", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("7.20", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    EXPECT_EQ("-16.2", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("28.80", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("-45.0", RetrieveEntryFromTableBody(tableBody, 1, 6));
+
+    WriteResilienceBinsTableReportingPeriod(*state,
+                                            columnNumUnmetDegHr,
+                                            2,
+                                            tableName,
+                                            columnHeadUnmetDegHr,
+                                            columnWidthUnmetDegHr,
+                                            state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody,
+                                            degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("-3.6", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("14.40", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    EXPECT_EQ("-32.4", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("57.60", RetrieveEntryFromTableBody(tableBody, 2, 5));
+    EXPECT_EQ("-90.0", RetrieveEntryFromTableBody(tableBody, 2, 6));
 }
