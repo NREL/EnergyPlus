@@ -694,17 +694,19 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->UTSC(Item).ActualArea =
                 state.dataTranspiredCollector->UTSC(Item).ProjArea * state.dataTranspiredCollector->UTSC(Item).AreaRatio;
             //  need to update this for slots as well as holes
-            {
-                auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(Item).Layout);
-                if (SELECT_CASE_var == Layout_Triangle) { // 'TRIANGLE'
-                    state.dataTranspiredCollector->UTSC(Item).Porosity =
-                        0.907 * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia /
-                                      state.dataTranspiredCollector->UTSC(Item).Pitch); // Kutscher equation, Triangle layout
-                } else if (SELECT_CASE_var == Layout_Square) {                          // 'SQUARE'
-                    state.dataTranspiredCollector->UTSC(Item).Porosity =
-                        (DataGlobalConstants::Pi / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) /
-                        pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
-                }
+            switch (state.dataTranspiredCollector->UTSC(Item).Layout) {
+            case Layout_Triangle: { // 'TRIANGLE'
+                state.dataTranspiredCollector->UTSC(Item).Porosity =
+                    0.907 * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia /
+                                  state.dataTranspiredCollector->UTSC(Item).Pitch); // Kutscher equation, Triangle layout
+            } break;
+            case Layout_Square: { // 'SQUARE'
+                state.dataTranspiredCollector->UTSC(Item).Porosity =
+                    (DataGlobalConstants::Pi / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) /
+                    pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
+            } break;
+            default:
+                break;
             }
             TiltRads = std::abs(AvgTilt) * DataGlobalConstants::DegToRadians;
             tempHdeltaNPL = std::sin(TiltRads) * state.dataTranspiredCollector->UTSC(Item).Height / 4.0;
@@ -856,23 +858,27 @@ namespace TranspiredCollector {
             // do various one time setups and pitch adjustments across all UTSC
             for (thisUTSC = 1; thisUTSC <= state.dataTranspiredCollector->NumUTSC; ++thisUTSC) {
                 if (state.dataTranspiredCollector->UTSC(thisUTSC).Layout == Layout_Triangle) {
-                    {
-                        auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(thisUTSC).Correlation);
-                        if (SELECT_CASE_var == Correlation_Kutscher1994) { // Kutscher1994
-                            state.dataTranspiredCollector->UTSC(thisUTSC).Pitch = state.dataTranspiredCollector->UTSC(thisUTSC).Pitch;
-                        } else if (SELECT_CASE_var == Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
-                            state.dataTranspiredCollector->UTSC(thisUTSC).Pitch /= 1.6;
-                        }
+                    switch (state.dataTranspiredCollector->UTSC(thisUTSC).Correlation) {
+                    case Correlation_Kutscher1994: { // Kutscher1994
+                        state.dataTranspiredCollector->UTSC(thisUTSC).Pitch = state.dataTranspiredCollector->UTSC(thisUTSC).Pitch;
+                    } break;
+                    case Correlation_VanDeckerHollandsBrunger2001: { // VanDeckerHollandsBrunger2001
+                        state.dataTranspiredCollector->UTSC(thisUTSC).Pitch /= 1.6;
+                    } break;
+                    default:
+                        break;
                     }
                 }
                 if (state.dataTranspiredCollector->UTSC(thisUTSC).Layout == Layout_Square) {
-                    {
-                        auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(thisUTSC).Correlation);
-                        if (SELECT_CASE_var == Correlation_Kutscher1994) { // Kutscher1994
-                            state.dataTranspiredCollector->UTSC(thisUTSC).Pitch *= 1.6;
-                        } else if (SELECT_CASE_var == Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
-                            state.dataTranspiredCollector->UTSC(thisUTSC).Pitch = state.dataTranspiredCollector->UTSC(thisUTSC).Pitch;
-                        }
+                    switch (state.dataTranspiredCollector->UTSC(thisUTSC).Correlation) {
+                    case Correlation_Kutscher1994: { // Kutscher1994
+                        state.dataTranspiredCollector->UTSC(thisUTSC).Pitch *= 1.6;
+                    } break;
+                    case Correlation_VanDeckerHollandsBrunger2001: { // VanDeckerHollandsBrunger2001
+                        state.dataTranspiredCollector->UTSC(thisUTSC).Pitch = state.dataTranspiredCollector->UTSC(thisUTSC).Pitch;
+                    } break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -1201,35 +1207,34 @@ namespace TranspiredCollector {
 
         HXeff = 0.0; // init
 
-        {
-            auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(UTSCNum).Correlation);
+        switch (state.dataTranspiredCollector->UTSC(UTSCNum).Correlation) {
+        case Correlation_Kutscher1994: { // Kutscher1994
+            AlessHoles = A - holeArea;
 
-            if (SELECT_CASE_var == Correlation_Kutscher1994) { // Kutscher1994
-
-                AlessHoles = A - holeArea;
-
-                NuD = 2.75 * ((std::pow(P / D, -1.2) * std::pow(ReD, 0.43)) + (0.011 * Por * ReD * std::pow(Vwind / Vsuction, 0.48)));
-                U = k * NuD / D;
-                HXeff = 1.0 - std::exp(-1.0 * ((U * AlessHoles) / (Mdot * CpAir)));
-
-            } else if (SELECT_CASE_var == Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
-                t = state.dataTranspiredCollector->UTSC(UTSCNum).CollectThick;
-                ReS = Vsuction * P / nu;
-                ReW = Vwind * P / nu;
-                ReB = Vholes * P / nu;
-                ReH = (Vsuction * D) / (nu * Por);
-                if (ReD > 0.0) {
-                    if (ReW > 0.0) {
-                        HXeff = (1.0 - std::pow(1.0 + ReS * max(1.733 * std::pow(ReW, -0.5), 0.02136), -1.0)) *
-                                (1.0 - std::pow(1.0 + 0.2273 * std::sqrt(ReB), -1.0)) * std::exp(-0.01895 * (P / D) - (20.62 / ReH) * (t / D));
-                    } else {
-                        HXeff = (1.0 - std::pow(1.0 + ReS * 0.02136, -1.0)) * (1.0 - std::pow(1.0 + 0.2273 * std::sqrt(ReB), -1.0)) *
-                                std::exp(-0.01895 * (P / D) - (20.62 / ReH) * (t / D));
-                    }
+            NuD = 2.75 * ((std::pow(P / D, -1.2) * std::pow(ReD, 0.43)) + (0.011 * Por * ReD * std::pow(Vwind / Vsuction, 0.48)));
+            U = k * NuD / D;
+            HXeff = 1.0 - std::exp(-1.0 * ((U * AlessHoles) / (Mdot * CpAir)));
+        } break;
+        case Correlation_VanDeckerHollandsBrunger2001: { // VanDeckerHollandsBrunger2001
+            t = state.dataTranspiredCollector->UTSC(UTSCNum).CollectThick;
+            ReS = Vsuction * P / nu;
+            ReW = Vwind * P / nu;
+            ReB = Vholes * P / nu;
+            ReH = (Vsuction * D) / (nu * Por);
+            if (ReD > 0.0) {
+                if (ReW > 0.0) {
+                    HXeff = (1.0 - std::pow(1.0 + ReS * max(1.733 * std::pow(ReW, -0.5), 0.02136), -1.0)) *
+                            (1.0 - std::pow(1.0 + 0.2273 * std::sqrt(ReB), -1.0)) * std::exp(-0.01895 * (P / D) - (20.62 / ReH) * (t / D));
                 } else {
-                    HXeff = 0.0;
+                    HXeff = (1.0 - std::pow(1.0 + ReS * 0.02136, -1.0)) * (1.0 - std::pow(1.0 + 0.2273 * std::sqrt(ReB), -1.0)) *
+                            std::exp(-0.01895 * (P / D) - (20.62 / ReH) * (t / D));
                 }
+            } else {
+                HXeff = 0.0;
             }
+        } break;
+        default:
+            break;
         }
 
         // now calculate collector temperature
