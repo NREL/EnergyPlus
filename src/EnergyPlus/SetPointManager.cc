@@ -158,7 +158,7 @@ constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> contr
                                                                                                 "MAXIMUMMASSFLOWRATE",
                                                                                                 "MINIMUMMASSFLOWRATE"};
 
-constexpr std::array<std::string_view, static_cast<int>(ControlStrategy::Num)> strategyNameUC = {
+constexpr std::array<std::string_view, static_cast<int>(ControlStrategy::Num)> strategyNamesUC = {
     "TEMPERATUREFIRST",
     "FLOWFIRST",
 };
@@ -2076,7 +2076,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy =
-            static_cast<ControlStrategy>(getEnumerationValue(strategyNameUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+            static_cast<ControlStrategy>(getEnumerationValue(strategyNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
         if (state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy == ControlStrategy::Invalid) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");

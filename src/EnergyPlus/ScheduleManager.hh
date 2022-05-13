@@ -81,7 +81,7 @@ namespace ScheduleManager {
         Num
     };
 
-    enum class OutputScheduleReportLevel
+    enum class OutputReportLevel
     {
         Invalid = -1,
         Hourly,
@@ -172,7 +172,7 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput(EnergyPlusData &state);
 
-    void ReportScheduleDetails(EnergyPlusData &state, OutputScheduleReportLevel const LevelOfDetail);
+    void ReportScheduleDetails(EnergyPlusData &state, OutputReportLevel const LevelOfDetail);
 
     // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex);

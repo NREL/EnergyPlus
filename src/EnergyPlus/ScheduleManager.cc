@@ -130,9 +130,8 @@ namespace ScheduleManager {
                                                "Control",
                                                "Mode"});
 
-    constexpr std::array<std::string_view, static_cast<int>(OutputScheduleReportLevel::Num)> outputScheduleReportLevelNames = {"Hourly", "Timestep"};
-    constexpr std::array<std::string_view, static_cast<int>(OutputScheduleReportLevel::Num)> outputScheduleReportLevelNamesUC = {"HOURLY",
-                                                                                                                                 "TIMESTEP"};
+    constexpr std::array<std::string_view, static_cast<int>(OutputReportLevel::Num)> outputScheduleReportLevelNames = {"Hourly", "Timestep"};
+    constexpr std::array<std::string_view, static_cast<int>(OutputReportLevel::Num)> outputScheduleReportLevelNamesUC = {"HOURLY", "TIMESTEP"};
     constexpr std::array<std::string_view, static_cast<int>(ScheduleInterpolation::Num)> interpolationTypes = {"No", "Average", "Linear"};
     constexpr std::array<std::string_view, static_cast<int>(ScheduleInterpolation::Num)> interpolationTypesUC = {"NO", "AVERAGE", "LINEAR"};
 
@@ -2189,12 +2188,12 @@ namespace ScheduleManager {
                 //      RptSchedule=.TRUE.
 
                 // IDD only allows Hourly or Timestep as valid values on the required field, anything else should be an error in the input processor
-                OutputScheduleReportLevel reportLevel = static_cast<OutputScheduleReportLevel>(
-                    getEnumerationValue(outputScheduleReportLevelNamesUC, Alphas(1))); // NOLINT(modernize-use-auto)
-                if (reportLevel == OutputScheduleReportLevel::Invalid) {
+                OutputReportLevel reportLevel =
+                    static_cast<OutputReportLevel>(getEnumerationValue(outputScheduleReportLevelNamesUC, Alphas(1))); // NOLINT(modernize-use-auto)
+                if (reportLevel == OutputReportLevel::Invalid) {
                     ShowWarningError(state, format("{}Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")", RoutineName));
                     ShowContinueError(state, "HOURLY report will be done");
-                    reportLevel = OutputScheduleReportLevel::Hourly;
+                    reportLevel = OutputReportLevel::Hourly;
                 }
                 ReportScheduleDetails(state, reportLevel);
             }
@@ -2211,7 +2210,7 @@ namespace ScheduleManager {
     }
 
     void ReportScheduleDetails(EnergyPlusData &state,
-                               OutputScheduleReportLevel const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
+                               OutputReportLevel const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
     {
 
         // SUBROUTINE INFORMATION:
@@ -2239,7 +2238,7 @@ namespace ScheduleManager {
         std::string Num1;
         std::string Num2;
         Array2D_string RoundTSValue;
-        auto constexpr SchDFmtdata{",{}"};
+        std::string_view constexpr SchDFmtdata{",{}"};
 
         ShowMinute.allocate(state.dataGlobal->NumOfTimeStepInHour);
         TimeHHMM.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -2256,11 +2255,11 @@ namespace ScheduleManager {
         ShowMinute(state.dataGlobal->NumOfTimeStepInHour) = "00";
 
         switch (LevelOfDetail) {
-        case OutputScheduleReportLevel::Hourly:
-        case OutputScheduleReportLevel::TimeStep:
+        case OutputReportLevel::Hourly:
+        case OutputReportLevel::TimeStep:
             NumF = 1;
             for (int Hr = 1; Hr <= 24; ++Hr) {
-                if (LevelOfDetail == OutputScheduleReportLevel::TimeStep) {
+                if (LevelOfDetail == OutputReportLevel::TimeStep) {
                     for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour - 1; ++TS) {
                         TimeHHMM(NumF) = format("{}:{}", HrField[Hr - 1], ShowMinute(TS));
                         ++NumF;
@@ -2334,12 +2333,12 @@ namespace ScheduleManager {
                       NoAverageLinear,
                       "Values:");
                 switch (LevelOfDetail) {
-                case OutputScheduleReportLevel::Hourly:
+                case OutputReportLevel::Hourly:
                     for (int Hr = 1; Hr <= 24; ++Hr) {
                         print(state.files.eio, SchDFmtdata, RoundTSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                     }
                     break;
-                case OutputScheduleReportLevel::TimeStep:
+                case OutputReportLevel::TimeStep:
                     for (int Hr = 1; Hr <= 24; ++Hr) {
                         for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                             print(state.files.eio, SchDFmtdata, RoundTSValue(TS, Hr));

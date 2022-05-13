@@ -11699,7 +11699,7 @@ namespace SurfaceGeometry {
             Inside,
             Num
         };
-        constexpr std::array<std::string_view, static_cast<int>(InsulationType::Num)> insulationTypeNames = {"OUTSIDE", "INSIDE"};
+        constexpr std::array<std::string_view, static_cast<int>(InsulationType::Num)> insulationTypeNamesUC = {"OUTSIDE", "INSIDE"};
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceControl:MovableInsulation";
@@ -11723,7 +11723,7 @@ namespace SurfaceGeometry {
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
-                static_cast<InsulationType>(getEnumerationValue(insulationTypeNames, state.dataIPShortCut->cAlphaArgs(1)));
+                static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
             if (insulationType == InsulationType::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
