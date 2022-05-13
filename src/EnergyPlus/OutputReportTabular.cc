@@ -12666,10 +12666,10 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             }
 
             tableName = "Heating SET Degree-Hours";
-            Array1D_string rowHead;
-            Array2D_string tableBody;
-            rowHead.allocate(state.dataGlobal->NumOfZones + 3);
-            tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 3);
+            Array1D_string rowHeadSET;
+            Array2D_string tableBodySET;
+            rowHeadSET.allocate(state.dataGlobal->NumOfZones + 3);
+            tableBodySET.allocate(columnNum, state.dataGlobal->NumOfZones + 3);
             WriteSETHoursTableReportingPeriod(state,
                                               columnNum,
                                               periodIdx,
@@ -12677,8 +12677,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                               columnHead,
                                               columnWidth,
                                               state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod,
-                                              rowHead,
-                                              tableBody,
+                                              rowHeadSET,
+                                              tableBodySET,
                                               degreeHourConversion);
 
             columnHead(1) = "SET > 30°C Degree-Hours [°C·hr]";
@@ -12704,8 +12704,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                               columnHead,
                                               columnWidth,
                                               state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod,
-                                              rowHead,
-                                              tableBody,
+                                              rowHeadSET,
+                                              tableBodySET,
                                               degreeHourConversion);
         }
 
@@ -12760,6 +12760,9 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                 columnHeadUnmetDegHr(i) = curUnits;
             }
         }
+
+        Array2D_string tableBodyUnmetDegHr;
+        tableBodyUnmetDegHr.allocate(columnNumUnmetDegHr, state.dataGlobal->NumOfZones + 4);
         WriteResilienceBinsTableReportingPeriod(state,
                                                 columnNumUnmetDegHr,
                                                 periodIdx,
@@ -12768,7 +12771,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 columnWidthUnmetDegHr,
                                                 state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod,
                                                 rowHead,
-                                                tableBody,
+                                                tableBodyUnmetDegHr,
                                                 degreeHourConversion);
 
         columnHead(1) = "Very-cold Exceedance OccupiedHours [hr]";
