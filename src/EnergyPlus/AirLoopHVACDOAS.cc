@@ -940,13 +940,6 @@ namespace AirLoopHVACDOAS {
             this->SumMassFlowRate = 0.0;
         }
         state.dataLoopNodes->Node(this->m_InletNodeNum).MassFlowRate = this->SumMassFlowRate;
-
-        if (this->SumMassFlowRate == 0.0) {
-            for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; CompNum++) {
-                state.dataLoopNodes->Node(state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum)) =
-                    state.dataLoopNodes->Node(this->m_InletNodeNum);
-            }
-        }
     }
 
     void AirLoopDOAS::CalcAirLoopDOAS(EnergyPlusData &state, bool const FirstHVACIteration)
