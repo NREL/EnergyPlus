@@ -89,6 +89,10 @@ using namespace DataHeatBalance;
 using namespace DataSurfaces;
 using namespace Psychrometrics;
 
+constexpr std::array<std::string_view, static_cast<int>(EarthTubeVentilation::Num)> ventilationNamesUC = {"NATURAL", "INTAKE", "EXHAUST"};
+constexpr std::array<std::string_view, static_cast<int>(SoilType::Num)> soilTypesUC = {
+    "HEAVYANDSATURATED", "HEAVYANDDAMP", "HEAVYANDDRY", "LIGHTANDDRY"};
+
 void ManageEarthTube(EnergyPlusData &state)
 {
 
@@ -227,15 +231,13 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
 
         state.dataEarthTube->EarthTubeSys(Loop).DelTemperature = state.dataIPShortCut->rNumericArgs(4); //  3/12/03  Negative del temp now allowed COP
 
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3)); // Fan type character input-->convert to integer
-            if (SELECT_CASE_var == "EXHAUST") {
-                state.dataEarthTube->EarthTubeSys(Loop).FanType = EarthTubeVentilation::Exhaust;
-            } else if (SELECT_CASE_var == "INTAKE") {
-                state.dataEarthTube->EarthTubeSys(Loop).FanType = EarthTubeVentilation::Intake;
-            } else if ((SELECT_CASE_var == "NATURAL") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var.empty())) {
-                state.dataEarthTube->EarthTubeSys(Loop).FanType = EarthTubeVentilation::Natural;
-            } else {
+        // if we have a blank, then just set it to the Natural type, otherwise, search on it
+        if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
+            state.dataEarthTube->EarthTubeSys(Loop).FanType = EarthTubeVentilation::Natural;
+        } else {
+            state.dataEarthTube->EarthTubeSys(Loop).FanType =
+                static_cast<EarthTubeVentilation>(getEnumerationValue(ventilationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            if (state.dataEarthTube->EarthTubeSys(Loop).FanType == EarthTubeVentilation::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                     ", " + state.dataIPShortCut->cAlphaFieldNames(3) + " invalid=" + state.dataIPShortCut->cAlphaArgs(3));
@@ -344,26 +346,29 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             ErrorsFound = true;
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4)); // Soil type character input --> convert to number
-            if (SELECT_CASE_var == "HEAVYANDSATURATED") {
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.0781056;
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 2.42;
-            } else if (SELECT_CASE_var == "HEAVYANDDAMP") {
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.055728;
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 1.3;
-            } else if (SELECT_CASE_var == "HEAVYANDDRY") {
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.0445824;
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 0.865;
-            } else if (SELECT_CASE_var == "LIGHTANDDRY") {
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.024192;
-                state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 0.346;
-            } else {
-                ShowSevereError(state,
-                                cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ", " + state.dataIPShortCut->cAlphaFieldNames(4) + " invalid=" + state.dataIPShortCut->cAlphaArgs(4));
-                ErrorsFound = true;
-            }
+        auto soilType = static_cast<SoilType>(getEnumerationValue(soilTypesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        switch (soilType) {
+        case SoilType::HeavyAndSat:
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.0781056;
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 2.42;
+            break;
+        case SoilType::HeavyAndDamp:
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.055728;
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 1.3;
+            break;
+        case SoilType::HeavyAndDry:
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.0445824;
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 0.865;
+            break;
+        case SoilType::LightAndDry:
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermDiff = 0.024192;
+            state.dataEarthTube->EarthTubeSys(Loop).SoilThermCond = 0.346;
+            break;
+        default:
+            ShowSevereError(state,
+                            cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
+                                ", " + state.dataIPShortCut->cAlphaFieldNames(4) + " invalid=" + state.dataIPShortCut->cAlphaArgs(4));
+            ErrorsFound = true;
         }
 
         state.dataEarthTube->EarthTubeSys(Loop).AverSoilSurTemp = state.dataIPShortCut->rNumericArgs(12);

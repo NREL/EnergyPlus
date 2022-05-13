@@ -73,6 +73,16 @@ namespace EarthTube {
         Num
     };
 
+    enum class SoilType
+    {
+        Invalid = -1,
+        HeavyAndSat,
+        HeavyAndDamp,
+        HeavyAndDry,
+        LightAndDry,
+        Num
+    };
+
     struct EarthTubeData
     {
         // Members
