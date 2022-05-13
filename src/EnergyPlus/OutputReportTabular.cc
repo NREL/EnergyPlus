@@ -3405,19 +3405,30 @@ void WriteTableOfContents(EnergyPlusData &state)
                 int nReportPeriods = state.dataWeatherManager->TotReportPers;
                 std::string ReportPeriod_Thermal_Resilience_Summary = "";
                 for (int i = 1; i <= nReportPeriods; i++) {
-                    std::string kw;
-                    if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
-                        kw = "Thermal";
-                    } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
-                        kw = "CO2";
-                    } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
-                        kw = "Visual";
+                    if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
+                        std::string kws[3] = {"Thermal", "CO2", "Visual"};
+                        for (int j = 0; j < 3; j++) {
+                            ReportPeriod_Thermal_Resilience_Summary = fmt::format(
+                                "{} Resilience Summary for Reporting Period {}: {}", kws[j], i, state.dataWeatherManager->ReportPeriodInput(i).title);
+                            tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility) << "\">"
+                                       << kws[j] << " Resilience Summary for Reporting Period " << i << ": "
+                                       << state.dataWeatherManager->ReportPeriodInput(i).title << "</a>\n";
+                        }
+                    } else {
+                        std::string kw;
+                        if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
+                            kw = "Thermal";
+                        } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
+                            kw = "CO2";
+                        } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
+                            kw = "Visual";
+                        }
+                        ReportPeriod_Thermal_Resilience_Summary = fmt::format(
+                            "{} Resilience Summary for Reporting Period {}: {}", kw, i, state.dataWeatherManager->ReportPeriodInput(i).title);
+                        tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility) << "\">" << kw
+                                   << " Resilience Summary for Reporting Period " << i << ": " << state.dataWeatherManager->ReportPeriodInput(i).title
+                                   << "</a>\n";
                     }
-                    ReportPeriod_Thermal_Resilience_Summary =
-                        fmt::format("{} Resilience Summary for Reporting Period {}: {}", kw, i, state.dataWeatherManager->ReportPeriodInput(i).title);
-                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility) << "\">" << kw
-                               << " Resilience Summary for Reporting Period " << i << ": " << state.dataWeatherManager->ReportPeriodInput(i).title
-                               << "</a>\n";
                 }
             }
         }
