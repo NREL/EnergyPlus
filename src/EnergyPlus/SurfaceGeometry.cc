@@ -10304,19 +10304,8 @@ namespace SurfaceGeometry {
             };
             constexpr std::array<int, 13> oneBasedDaysInMonth = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-            switch (state.dataSurface->StormWindow(StormWinNum).MonthOn) {
-            case January:
-            case February:
-            case March:
-            case April:
-            case May:
-            case June:
-            case July:
-            case August:
-            case September:
-            case October:
-            case November:
-            case December:
+            int &monthOn = state.dataSurface->StormWindow(StormWinNum).MonthOn;
+            if (monthOn >= January && monthOn <= December) {
                 if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn >
                     oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOn]) {
                     ShowSevereError(state,
@@ -10327,7 +10316,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 break;
-            default:
+            } else {
                 ShowSevereError(state,
                                 format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
                                        cCurrentModuleObject,
@@ -10336,19 +10325,8 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
 
-            switch (state.dataSurface->StormWindow(StormWinNum).MonthOff) {
-            case January:
-            case February:
-            case March:
-            case April:
-            case May:
-            case June:
-            case July:
-            case August:
-            case September:
-            case October:
-            case November:
-            case December:
+            int &monthOff = state.dataSurface->StormWindow(StormWinNum).MonthOff;
+            if (monthOff >= January && monthOff <= December) {
                 if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff >
                     oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOff]) {
                     ShowSevereError(state,
@@ -10359,7 +10337,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 break;
-            default:
+            } else {
                 ShowSevereError(state,
                                 format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
                                        cCurrentModuleObject,
