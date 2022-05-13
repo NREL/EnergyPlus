@@ -6064,8 +6064,19 @@ namespace HeatBalanceManager {
                                                                                           state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                state.dataWeatherManager->TotReportPers);
         state.dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                 state.dataWeatherManager->TotReportPers);
+        state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                     state.dataWeatherManager->TotReportPers);
 
         state.dataHeatBalFanSys->ZonePierceSET.dimension(state.dataGlobal->NumOfZones, 0);
         state.dataHeatBalFanSys->ZonePierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);

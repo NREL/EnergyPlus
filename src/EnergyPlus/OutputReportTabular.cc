@@ -3405,9 +3405,19 @@ void WriteTableOfContents(EnergyPlusData &state)
                 int nReportPeriods = state.dataWeatherManager->TotReportPers;
                 std::string ReportPeriod_Thermal_Resilience_Summary = "";
                 for (int i = 1; i <= nReportPeriods; i++) {
-                    ReportPeriod_Thermal_Resilience_Summary = fmt::format("Thermal Resilience Summary for Reporting Period {}", i);
-                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility)
-                               << "\">Thermal Resilience Summary for Reporting Period " << i << "</a>\n";
+                    std::string kw;
+                    if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
+                        kw = "Thermal";
+                    } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
+                        kw = "CO2";
+                    } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
+                        kw = "Visual";
+                    }
+                    ReportPeriod_Thermal_Resilience_Summary =
+                        fmt::format("{} Resilience Summary for Reporting Period {}: {}", kw, i, state.dataWeatherManager->ReportPeriodInput(i).title);
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility) << "\">" << kw
+                               << " Resilience Summary for Reporting Period " << i << ": " << state.dataWeatherManager->ReportPeriodInput(i).title
+                               << "</a>\n";
                 }
             }
         }
@@ -5302,8 +5312,18 @@ void WriteTabularReports(EnergyPlusData &state)
         WriteHeatEmissionTable(state);
         if (ort->displayThermalResilienceSummary) {
             WriteThermalResilienceTables(state);
-            for (int i = 1; i <= state.dataWeatherManager->TotReportPers; i++) {
+        }
+        for (int i = 1; i <= state.dataWeatherManager->TotReportPers; i++) {
+            if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
                 WriteThermalResilienceTablesRepPeriod(state, i);
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
+                WriteCO2ResilienceTablesRepPeriod(state, i);
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
+                WriteVisualResilienceTablesRepPeriod(state, i);
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
+                WriteThermalResilienceTablesRepPeriod(state, i);
+                WriteCO2ResilienceTablesRepPeriod(state, i);
+                WriteVisualResilienceTablesRepPeriod(state, i);
             }
         }
         if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
@@ -12499,13 +12519,43 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
     }
 }
 
+void WriteReportHeaderReportingPeriod(EnergyPlusData &state, const std::string reportKeyWord, const int periodIdx)
+{
+    WriteReportHeaders(state,
+                       fmt::format("{} Resilience Summary for Reporting Period {}: {}",
+                                   reportKeyWord,
+                                   periodIdx,
+                                   state.dataWeatherManager->ReportPeriodInput(periodIdx).title),
+                       "Entire Facility",
+                       OutputProcessor::StoreType::Averaged);
+
+    if (state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear != 0) {
+        WriteSubtitle(state,
+                      format("Reporting period: {}/{}/{} {}:00 -- {}/{}/{} {}:00",
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endYear,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+    } else {
+        WriteSubtitle(state,
+                      format("Reporting period: {}/{} {}:00 -- {}/{} {}:00",
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
+                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+    }
+}
+
 void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const periodIdx)
 {
 
     auto &ort(state.dataOutRptTab);
-
-    // Should deallocate after writing table. - LKL
-
     if (ort->WriteTabularFiles) {
 
         Real64 degreeHourConversion;
@@ -12517,32 +12567,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             degreeHourConversion = 1.0;
         }
 
-        WriteReportHeaders(state,
-                           fmt::format("Thermal Resilience Summary for Reporting Period {}", periodIdx),
-                           "Entire Facility",
-                           OutputProcessor::StoreType::Averaged);
-
-        if (state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear != 0) {
-            WriteSubtitle(state,
-                          format("Reporting period: {}/{}/{} {}:00 -- {}/{}/{} {}:00",
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endYear,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
-        } else {
-            WriteSubtitle(state,
-                          format("Reporting period: {}/{} {}:00 -- {}/{} {}:00",
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
-                                 state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
-        }
+        WriteReportHeaderReportingPeriod(state, "Thermal", periodIdx);
 
         int columnNum = 5;
         Array1D_int columnWidth;
@@ -13223,6 +13248,66 @@ void WriteCO2ResilienceTables(EnergyPlusData &state)
                       state.dataOutRptPredefined->pdchCO2OccuHourCaution,
                       state.dataOutRptPredefined->pdchCO2OccuHourHazard};
         WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins);
+
+        columnHead = {state.dataOutRptPredefined->pdchCO2OccupiedHourSafe,
+                      state.dataOutRptPredefined->pdchCO2OccupiedHourCaution,
+                      state.dataOutRptPredefined->pdchCO2OccupiedHourHazard};
+        WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBins);
+    }
+}
+
+void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx)
+{
+    auto &ort(state.dataOutRptTab);
+    if (ort->WriteTabularFiles) {
+        WriteReportHeaderReportingPeriod(state, "CO2", periodIdx);
+
+        int columnNum = 3;
+        Array1D_int columnWidth;
+        columnWidth.allocate(columnNum);
+        columnWidth = 10;
+        Array1D_string columnHead(columnNum);
+        columnHead(1) = "Safe (<= 1000 ppm) [hr]";
+        columnHead(2) = "Caution (> 1000, <= 5000 ppm) [hr]";
+        columnHead(3) = "Hazard (> 5000 ppm) [hr]";
+
+        Array1D_string rowHead;
+        Array2D_string tableBody;
+        rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
+
+        std::string tableName = "CO2 Level Hours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
+
+        tableName = "CO2 Level OccupantHours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
+
+        tableName = "CO2 Level OccupiedHours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
     }
 }
 
@@ -13256,6 +13341,68 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
                       state.dataOutRptPredefined->pdchIllumOccuHourAdequate,
                       state.dataOutRptPredefined->pdchIllumOccuHourBright};
         WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins);
+
+        columnHead = {state.dataOutRptPredefined->pdchIllumOccupiedHourDark,
+                      state.dataOutRptPredefined->pdchIllumOccupiedHourDim,
+                      state.dataOutRptPredefined->pdchIllumOccupiedHourAdequate,
+                      state.dataOutRptPredefined->pdchIllumOccupiedHourBright};
+        WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBins);
+    }
+}
+
+void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx)
+{
+    auto &ort(state.dataOutRptTab);
+    if (ort->WriteTabularFiles) {
+        WriteReportHeaderReportingPeriod(state, "Visual", periodIdx);
+
+        int columnNum = 4;
+        Array1D_int columnWidth;
+        columnWidth.allocate(columnNum);
+        columnWidth = 10;
+        Array1D_string columnHead(columnNum);
+        columnHead(1) = "A Bit Dark (<= 100 lux) [hr]";
+        columnHead(2) = "Dim (> 100, <= 300 lux) [hr]";
+        columnHead(3) = "Adequate (> 300, <= 500 lux) [hr]";
+        columnHead(4) = "Bright (>500 lux) [hr]";
+
+        Array1D_string rowHead;
+        Array2D_string tableBody;
+        rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
+
+        std::string tableName = "Illuminance Level Hours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
+
+        tableName = "Illuminance Level OccupantHours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
+
+        tableName = "Illuminance Level OccupiedHours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
     }
 }
 

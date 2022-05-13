@@ -290,8 +290,16 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array2D<std::vector<Real64>> ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
     Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneCO2LevelOccupiedHourBins;
+    Array2D<std::vector<Real64>> ZoneCO2LevelHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneCO2LevelOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneCO2LevelOccupiedHourBinsRepPeriod;
     Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
     Array1D<std::vector<Real64>> ZoneLightingLevelOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneLightingLevelOccupiedHourBins;
+    Array2D<std::vector<Real64>> ZoneLightingLevelHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneLightingLevelOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneLightingLevelOccupiedHourBinsRepPeriod;
 
     Array1D<Real64> ZonePierceSET;
     Array1D<Real64> ZonePierceSETLastStep;

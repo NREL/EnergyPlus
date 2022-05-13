@@ -654,7 +654,11 @@ namespace OutputReportTabular {
 
     void WriteCO2ResilienceTables(EnergyPlusData &state);
 
+    void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx);
+
     void WriteVisualResilienceTables(EnergyPlusData &state);
+
+    void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx);
 
     void WriteResilienceBinsTable(EnergyPlusData &state,
                                   int const columnNum,

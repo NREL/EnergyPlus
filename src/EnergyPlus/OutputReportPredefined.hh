@@ -1208,6 +1208,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchCO2OccuHourSafe = 0;
     int pdchCO2OccuHourCaution = 0;
     int pdchCO2OccuHourHazard = 0;
+    int pdstCO2OccupiedHours = 0;
+    int pdchCO2OccupiedHourSafe = 0;
+    int pdchCO2OccupiedHourCaution = 0;
+    int pdchCO2OccupiedHourHazard = 0;
 
     int pdrVisualResilience = 0;
     int pdstIllumHours = 0;
@@ -1220,6 +1224,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIllumOccuHourDim = 0;
     int pdchIllumOccuHourAdequate = 0;
     int pdchIllumOccuHourBright = 0;
+    int pdstIllumOccupiedHours = 0;
+    int pdchIllumOccupiedHourDark = 0;
+    int pdchIllumOccupiedHourDim = 0;
+    int pdchIllumOccupiedHourAdequate = 0;
+    int pdchIllumOccupiedHourBright = 0;
 
     int sizeReportName = 0;
     int numReportName = 0;
@@ -2168,6 +2177,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchCO2OccuHourSafe = 0;
         this->pdchCO2OccuHourCaution = 0;
         this->pdchCO2OccuHourHazard = 0;
+        this->pdstCO2OccupiedHours = 0;
+        this->pdchCO2OccupiedHourSafe = 0;
+        this->pdchCO2OccupiedHourCaution = 0;
+        this->pdchCO2OccupiedHourHazard = 0;
         this->pdrVisualResilience = 0;
         this->pdstIllumHours = 0;
         this->pdchIllumHourDark = 0;
@@ -2179,6 +2192,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchIllumOccuHourDim = 0;
         this->pdchIllumOccuHourAdequate = 0;
         this->pdchIllumOccuHourBright = 0;
+        this->pdstIllumOccupiedHours = 0;
+        this->pdchIllumOccupiedHourDark = 0;
+        this->pdchIllumOccupiedHourDim = 0;
+        this->pdchIllumOccupiedHourAdequate = 0;
+        this->pdchIllumOccupiedHourBright = 0;
         this->sizeReportName = 0;
         this->numReportName = 0;
         this->sizeSubTable = 0;

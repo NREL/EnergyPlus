@@ -5335,6 +5335,8 @@ namespace WeatherManager {
             // Note JM 2018-11-20: IDD allows blank name, but input processor will create a name such as "ReportPeriod 1" anyways
             // which is fine for our reporting below
             state.dataWeatherManager->ReportPeriodInput(i).title = state.dataIPShortCut->cAlphaArgs(1);
+            // A2, \field Report Name
+            state.dataWeatherManager->ReportPeriodInput(i).reportName = state.dataIPShortCut->cAlphaArgs(2);
 
             // set the start and end day of month from user input
             // N1, \field Begin Year
