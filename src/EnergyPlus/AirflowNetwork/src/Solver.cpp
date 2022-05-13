@@ -361,9 +361,8 @@ namespace AirflowNetwork {
                         ShowContinueError(m_state, "...occurs in " + CurrentModuleObject + " = " + thisObjectName);
                     }
                     if (pressure <= 31000.0) {
-                        ShowSevereError(m_state,
-                                        format(RoutineName) + ": " + CurrentModuleObject + ": " + thisObjectName +
-                                            ". Reference Barometric Pressure must be greater than 31000 Pa.");
+                        ShowSevereError(m_state, format("{}: {}: {}. Reference Barometric Pressure must be greater than 31000 Pa.",
+                            RoutineName, CurrentModuleObject, thisObjectName));
                         success = false;
                     }
                 }
@@ -418,9 +417,11 @@ namespace AirflowNetwork {
                         auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(m_state,
-                                            format(RoutineName) + CurrentModuleObject + ": " + thisObjectName +
-                                                ". Cannot find reference crack conditions object \"" +
-                                                fields.at("reference_crack_conditions").get<std::string>() + "\".");
+                                            format("{}: {}: {}. Cannot find reference crack conditions object \"{}\".",
+                                                   RoutineName,
+                                                   CurrentModuleObject,
+                                                   thisObjectName,
+                                                   refCrackCondName));
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -472,8 +473,7 @@ namespace AirflowNetwork {
                 GetFanIndex(m_state, thisObjectName, fanIndex, fanErrorFound);
                 if (fanErrorFound) {
                     ShowSevereError(m_state,
-                                    format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName +
-                                        " is not found in Fan:ZoneExhaust objects.");
+                                    format("{}: {} = {} is not found in Fan:ZoneExhaust objects.", RoutineName, CurrentModuleObject, thisObjectName));
                     success = false;
                 }
                 Real64 flowRate;
@@ -490,8 +490,10 @@ namespace AirflowNetwork {
                 GetFanType(m_state, thisObjectName, fanType_Num, fanErrorFound);
                 if (fanType_Num != FanType_ZoneExhaust) {
                     ShowSevereError(m_state,
-                                    format(RoutineName) + CurrentModuleObject + " = " + thisObjectName + ". The specified " + "Name" +
-                                        " is not found as a valid Fan:ZoneExhaust object.");
+                                    format("{}: {} = {}. The specified Name is not found as a valid Fan:ZoneExhaust object.",
+                                           RoutineName,
+                                           CurrentModuleObject,
+                                           thisObjectName));
                     success = false;
                 }
 
@@ -504,9 +506,11 @@ namespace AirflowNetwork {
                         auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(m_state,
-                                            format(RoutineName) + CurrentModuleObject + ": " + thisObjectName +
-                                                ". Cannot find reference crack conditions object \"" +
-                                                fields.at("reference_crack_conditions").get<std::string>() + "\".");
+                                            format("{}: {}: {}. Cannot find reference crack conditions object \"{}\".",
+                                                   RoutineName,
+                                                   CurrentModuleObject,
+                                                   thisObjectName,
+                                                   fields.at("reference_crack_conditions").get<std::string>()));
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -534,7 +538,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneCompExhaustFanData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -566,8 +572,11 @@ namespace AirflowNetwork {
                 int OAMixerNum = MixedAir::GetOAMixerNumber(m_state, mixer_name);
                 if (OAMixerNum == 0) {
                     ShowSevereError(m_state,
-                                    format(RoutineName) + ": " + CurrentModuleObject + " object " + thisObjectName + ". Invalid " +
-                                        "Outdoor Air Mixer Name" + " \"" + mixer_name + "\" given.");
+                                    format("{}: {}: {}. Invalid Outdoor Air Mixer Name \"{}\" given.",
+                                           RoutineName,
+                                           CurrentModuleObject,
+                                           thisObjectName,
+                                           mixer_name));
                     success = false;
                 }
 
@@ -580,9 +589,11 @@ namespace AirflowNetwork {
                         auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(m_state,
-                                            format(RoutineName) + CurrentModuleObject + ": " + thisObjectName +
-                                                ". Cannot find reference crack conditions object \"" +
-                                                fields.at("reference_crack_conditions").get<std::string>() + "\".");
+                                            format("{}: {}: {}. Cannot find reference crack conditions object \"{}\".",
+                                                   RoutineName,
+                                                   CurrentModuleObject,
+                                                   thisObjectName,
+                                                   refCrackCondName));
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -608,7 +619,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompOutdoorAirData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -654,9 +667,11 @@ namespace AirflowNetwork {
                         auto result = referenceConditions.find(UtilityRoutines::MakeUPPERCase(refCrackCondName));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(m_state,
-                                            format(RoutineName) + CurrentModuleObject + ": " + thisObjectName +
-                                                ". Cannot find reference crack conditions object \"" +
-                                                fields.at("reference_crack_conditions").get<std::string>() + "\".");
+                                            format("{}: {}: {}. Cannot find reference crack conditions object \"{}\".",
+                                                   RoutineName,
+                                                   CurrentModuleObject,
+                                                   thisObjectName,
+                                                   refCrackCondName));
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -680,7 +695,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompReliefAirData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -718,6 +735,7 @@ namespace AirflowNetwork {
                     } else if (UtilityRoutines::SameString(LVOstring, "HorizontallyPivoted") || UtilityRoutines::SameString(LVOstring, "2")) {
                         LVOtype = 2; // Large vertical opening type number
                     } else {
+                        // Code will never be executed, validation will catch invalid input
                         ShowSevereError(m_state,
                                         format(RoutineName) + "Invalid Type of Rectangular Large Vertical Opening (LVO) = " + LVOstring + "in " +
                                             CurrentModuleObject + " = " + thisObjectName);
@@ -875,7 +893,7 @@ namespace AirflowNetwork {
                 MultizoneCompDetOpeningData(i).StartHFac4 = 0.0;  // Start height factor for opening factor #4
                 if (N == 2) {
                     if (factors[1] != 1.0) {
-                        ShowWarningError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                        ShowWarningError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                         ShowContinueError(
                             m_state,
                             "..This object specifies that only 3 opening factors will be used. So, the value of Opening Factor #2 is set to 1.0.");
@@ -891,7 +909,7 @@ namespace AirflowNetwork {
                     if (N >= 4) {
                         MultizoneCompDetOpeningData(i).OpenFac4 = factors[3]; // Opening factor #4
                         if (factors[3] != 1.0) {
-                            ShowWarningError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowWarningError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                             ShowContinueError(m_state,
                                               "..This object specifies that 4 opening factors will be used. So, the value of Opening Factor #4 "
                                               "is set to 1.0.");
@@ -904,7 +922,7 @@ namespace AirflowNetwork {
                         MultizoneCompDetOpeningData(i).StartHFac4 = start_height_factors[3]; // Start height factor for opening factor #4
                     } else {
                         if (factors[2] != 1.0) {
-                            ShowWarningError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowWarningError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                             ShowContinueError(m_state,
                                               "..This object specifies that only 3 opening factors will be used. So, the value of Opening Factor #3 "
                                               "is set to 1.0.");
@@ -916,25 +934,25 @@ namespace AirflowNetwork {
 
                 // Sanity checks, check sum of Height Factor and the Start Height Factor
                 if (MultizoneCompDetOpeningData(i).HeightFac1 + MultizoneCompDetOpeningData(i).StartHFac1 > 1.0) {
-                    ShowSevereError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                     ShowContinueError(
                         m_state, "..The sum of Height Factor for Opening Factor 1 and Start Height Factor for Opening Factor 1 is greater than 1.0");
                     success = false;
                 }
                 if (MultizoneCompDetOpeningData(i).HeightFac2 + MultizoneCompDetOpeningData(i).StartHFac2 > 1.0) {
-                    ShowSevereError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                     ShowContinueError(
                         m_state, "..The sum of Height Factor for Opening Factor 2 and Start Height Factor for Opening Factor 2 is greater than 1.0");
                     success = false;
                 }
                 if (MultizoneCompDetOpeningData(i).NumFac > 2) {
                     if (MultizoneCompDetOpeningData(i).OpenFac2 >= MultizoneCompDetOpeningData(i).OpenFac3) {
-                        ShowSevereError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                        ShowSevereError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                         ShowContinueError(m_state, "..The value of Opening Factor #2 >= the value of Opening Factor #3");
                         success = false;
                     }
                     if (MultizoneCompDetOpeningData(i).HeightFac3 + MultizoneCompDetOpeningData(i).StartHFac3 > 1.0) {
-                        ShowSevereError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                        ShowSevereError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                         ShowContinueError(
                             m_state,
                             "..The sum of Height Factor for Opening Factor 3 and Start Height Factor for Opening Factor 3 is greater than 1.0");
@@ -942,12 +960,12 @@ namespace AirflowNetwork {
                     }
                     if (MultizoneCompDetOpeningData(i).NumFac == 4) {
                         if (MultizoneCompDetOpeningData(i).OpenFac3 >= MultizoneCompDetOpeningData(i).OpenFac4) {
-                            ShowSevereError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowSevereError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                             ShowContinueError(m_state, "..The value of Opening Factor #3 >= the value of Opening Factor #4");
                             success = false;
                         }
                         if (MultizoneCompDetOpeningData(i).HeightFac4 + MultizoneCompDetOpeningData(i).StartHFac4 > 1.0) {
-                            ShowSevereError(m_state, format(RoutineName) + ": " + CurrentModuleObject + " = " + thisObjectName);
+                            ShowSevereError(m_state, format("{}: {} = {}", RoutineName, CurrentModuleObject, thisObjectName));
                             ShowContinueError(
                                 m_state,
                                 "..The sum of Height Factor for Opening Factor 4 and Start Height Factor for Opening Factor 4 is greater than 1.0");
@@ -960,7 +978,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneCompDetOpeningData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1001,7 +1019,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneCompSimpleOpeningData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1045,7 +1063,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneCompHorOpeningData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1094,7 +1112,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneSurfaceELAData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     success = false;
                 }
 
@@ -1128,7 +1146,7 @@ namespace AirflowNetwork {
 
                 // Check for name overlaps
                 if (elements.find(thisObjectName) != elements.end()) {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     success = false;
                 }
 
@@ -1175,7 +1193,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompLeakData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1215,7 +1233,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompELRData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1289,7 +1307,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompDuctData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1416,7 +1434,8 @@ namespace AirflowNetwork {
                 if (elements.find(fan_name) == elements.end()) {
                     elements[fan_name] = &DisSysCompCVFData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + fan_name);
+                    ShowSevereError(
+                        m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, fan_name));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1452,7 +1471,11 @@ namespace AirflowNetwork {
                 if (elements.find(DisSysCompCoilData(i).name) == elements.end()) {
                     elements[DisSysCompCoilData(i).name] = &DisSysCompCoilData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + DisSysCompCoilData(i).name);
+                    ShowSevereError(m_state,
+                                    format("{}: {}: Duplicated airflow element names are found = \"{}\".",
+                                           RoutineName,
+                                           CurrentModuleObject,
+                                           DisSysCompCoilData(i).name));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1489,7 +1512,11 @@ namespace AirflowNetwork {
                 if (elements.find(DisSysCompHXData(i).name) == elements.end()) {
                     elements[DisSysCompHXData(i).name] = &DisSysCompHXData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + DisSysCompHXData(i).name);
+                    ShowSevereError(m_state,
+                                    format("{}: {}: Duplicated airflow element names are found = \"{}\".",
+                                           RoutineName,
+                                           CurrentModuleObject,
+                                           DisSysCompHXData(i).name));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1524,7 +1551,11 @@ namespace AirflowNetwork {
                 if (elements.find(DisSysCompTermUnitData(i).name) == elements.end()) {
                     elements[DisSysCompTermUnitData(i).name] = &DisSysCompTermUnitData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + DisSysCompTermUnitData(i).name);
+                    ShowSevereError(m_state,
+                                    format("{}: {}: Duplicated airflow element names are found = \"{}\".",
+                                           RoutineName,
+                                           CurrentModuleObject,
+                                           DisSysCompTermUnitData(i).name));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1556,7 +1587,7 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompCPDData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format(RoutineName) + "Duplicated airflow element names are found = " + thisObjectName);
+                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1736,6 +1767,7 @@ namespace AirflowNetwork {
                 OccupantVentilationControl(i).Name = Alphas(1); // Name of object
                 OccupantVentilationControl(i).MinOpeningTime = Numbers(1);
                 if (OccupantVentilationControl(i).MinOpeningTime < 0.0) {
+                    // Code will never be executed, validation will catch invalid input
                     ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(1) + " < 0.0");
                     ShowContinueError(m_state,
                                       format("..Input value = {:.1R}, Value will be reset to 0.0", OccupantVentilationControl(i).MinOpeningTime));
@@ -1744,6 +1776,7 @@ namespace AirflowNetwork {
                 }
                 OccupantVentilationControl(i).MinClosingTime = Numbers(2);
                 if (OccupantVentilationControl(i).MinClosingTime < 0.0) {
+                    // Code will never be executed, validation will catch invalid input
                     ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(2) + " < 0.0");
                     ShowContinueError(m_state,
                                       format("..Input value = {:.1R}, Value will be reset to 0.0", OccupantVentilationControl(i).MinClosingTime));
@@ -1797,6 +1830,7 @@ namespace AirflowNetwork {
                 if (OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
                     OccupantVentilationControl(i).ComfortBouPoint = Numbers(3);
                     if (OccupantVentilationControl(i).ComfortBouPoint < 0.0) {
+                        // Code will never be executed, validation will catch invalid input
                         ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(3) + " < 0.0");
                         ShowContinueError(
                             m_state,
@@ -1821,6 +1855,7 @@ namespace AirflowNetwork {
                 if (!lNumericBlanks(4)) {
                     OccupantVentilationControl(i).MaxPPD = Numbers(4);
                     if (OccupantVentilationControl(i).MaxPPD < 0.0 || OccupantVentilationControl(i).MaxPPD > 100.0) {
+                        // Code will never be executed, validation will catch invalid input
                         ShowWarningError(m_state,
                                          format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(4) + " beyond 0.0 and 100.0");
                         ShowContinueError(
@@ -1835,6 +1870,7 @@ namespace AirflowNetwork {
                     } else if (UtilityRoutines::SameString(Alphas(4), "No")) {
                         OccupantVentilationControl(i).OccupancyCheck = false;
                     } else {
+                        // Code will never be executed, validation will catch invalid input
                         ShowSevereError(m_state,
                                         format(RoutineName) + CurrentModuleObject + "=\"" + Alphas(1) + "\" invalid " + cAlphaFields(2) + "=\"" +
                                             Alphas(2) + "\" illegal key.");
@@ -1868,7 +1904,7 @@ namespace AirflowNetwork {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+            ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
         }
 
         // *** Read AirflowNetwork simulation parameters
@@ -1897,7 +1933,7 @@ namespace AirflowNetwork {
                 SimulateAirflowNetwork = AirflowNetworkControlMultizone;
                 SimAirNetworkKey = "MultizoneWithoutDistribution";
                 AirflowNetworkSimu.InitFlag = 1;
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object is not found ");
+                ShowWarningError(m_state, format("{}{} object is not found ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state, "..The default behaviour values are assigned. Please see details in Input Output Reference.");
             } else {
                 SimulateAirflowNetwork = AirflowNetworkControlSimple;
@@ -1907,7 +1943,7 @@ namespace AirflowNetwork {
             }
         }
         if (NumAirflowNetwork > 1) {
-            ShowFatalError(m_state, format(RoutineName) + "Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
+            ShowFatalError(m_state, format("{}Only one (\"1\") {} object per simulation is allowed.", RoutineName, CurrentModuleObject));
         }
 
         SimObjectError = false;
@@ -1954,6 +1990,7 @@ namespace AirflowNetwork {
                     SimulateAirflowNetwork = AirflowNetworkControlMultiADS;
                     SimAirNetworkKey = "MultizoneWithDistribution";
                 } else { // Error
+                    // Code will never be executed, validation will catch invalid input
                     ShowSevereError(m_state,
                                     format(RoutineName) + CurrentModuleObject + " object, The entered choice for " + cAlphaFields(2) +
                                         " is not valid = \"" + AirflowNetworkSimu.Control + "\"");
@@ -1994,7 +2031,7 @@ namespace AirflowNetwork {
                     m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "ZoneThermalChimney") +
                     m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "ZoneCoolTower:Shower") ==
                 0) {
-                ShowWarningError(m_state, format(RoutineName) + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\".");
+                ShowWarningError(m_state, format("{}{} = \"{}\"" , RoutineName, cAlphaFields(2), SimAirNetworkKey));
                 ShowContinueError(
                     m_state,
                     "..but there are no Infiltration, Ventilation, Mixing, Cross Mixing or ZoneAirBalance objects. The simulation continues...");
@@ -2006,48 +2043,48 @@ namespace AirflowNetwork {
 
         if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
             if (m_state.dataHeatBal->TotInfiltration > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneInfiltration:* objects are present.");
                 ShowContinueError(m_state, "..ZoneInfiltration objects will not be simulated.");
             }
             if (m_state.dataHeatBal->TotVentilation > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneVentilation:* objects are present.");
                 ShowContinueError(m_state, "..ZoneVentilation objects will not be simulated.");
             }
             if (m_state.dataHeatBal->TotMixing > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneMixing objects are present.");
                 ShowContinueError(m_state, "..ZoneMixing objects will not be simulated.");
             }
             if (m_state.dataHeatBal->TotCrossMixing > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneCrossMixing objects are present.");
                 ShowContinueError(m_state, "..ZoneCrossMixing objects will not be simulated.");
             }
             if (m_state.dataHeatBal->TotZoneAirBalance > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(
                     m_state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneAirBalance:OutdoorAir objects are present.");
                 ShowContinueError(m_state, "..ZoneAirBalance:OutdoorAir objects will not be simulated.");
             }
             if (m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "ZoneEarthtube") > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneEarthtube objects are present.");
                 ShowContinueError(m_state, "..ZoneEarthtube objects will not be simulated.");
             }
             if (m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "ZoneThermalChimney") > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneThermalChimney objects are present.");
                 ShowContinueError(m_state, "..ZoneThermalChimney objects will not be simulated.");
             }
             if (m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "ZoneCoolTower:Shower") > 0) {
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state,
                                   "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneCoolTower:Shower objects are present.");
                 ShowContinueError(m_state, "..ZoneCoolTower:Shower objects will not be simulated.");
@@ -2120,6 +2157,7 @@ namespace AirflowNetwork {
             } else if (UtilityRoutines::SameString(AirflowNetworkSimu.InitType, "1")) {
                 AirflowNetworkSimu.InitFlag = 1;
             } else {
+                // Code will never be executed, validation will catch invalid input
                 ShowSevereError(m_state,
                                 format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(6) + " = " + Alphas(6) + " is invalid.");
                 ShowContinueError(m_state,
@@ -2139,15 +2177,14 @@ namespace AirflowNetwork {
                 AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::ConjugateGradient;
             } else {
                 AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::SkylineLU;
-                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state, "..Specified " + cAlphaFields(8) + " = \"" + Alphas(8) + "\" is unrecognized.");
                 ShowContinueError(m_state, "..Default value \"SkylineLU\" will be used.");
             }
 
             if (SimObjectError) {
                 ShowFatalError(m_state,
-                               format(RoutineName) + "Errors found getting " + CurrentModuleObject +
-                                   " object. Previous error(s) cause program termination.");
+                               format("{}Errors found getting {} object. Previous error(s) cause program termination.", RoutineName, CurrentModuleObject));
             }
 
             AirflowNetworkSimu.MaxIteration = Numbers(1);
@@ -2244,9 +2281,8 @@ namespace AirflowNetwork {
             ShowSevereError(m_state,
                             format(RoutineName) + "For an AirflowNetwork Simulation, at least one " + CurrentModuleObject +
                                 " object is required but none were found.");
-            ShowFatalError(m_state,
-                           format(RoutineName) + "Errors found getting " + CurrentModuleObject +
-                               " object. Previous error(s) cause program termination.");
+            ShowFatalError(
+                m_state, format("{}Errors found getting {} object. Previous error(s) cause program termination.", RoutineName, CurrentModuleObject));
         }
 
         // ==> Zone data validation
@@ -2308,6 +2344,7 @@ namespace AirflowNetwork {
                 }
             }
             if (MultizoneZoneData(i).OpenFactor > 1.0 || MultizoneZoneData(i).OpenFactor < 0.0) {
+                // Code will never be executed, validation will catch invalid input
                 ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(1) + " is out of range [0.0,1.0]");
                 ShowContinueError(m_state, format("..Input value = {:.2R}, Value will be set to 1.0", MultizoneZoneData(i).OpenFactor));
                 MultizoneZoneData(i).OpenFactor = 1.0;
@@ -2318,12 +2355,14 @@ namespace AirflowNetwork {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(MultizoneZoneData(i).VentControl));
                 if (SELECT_CASE_var == "TEMPERATURE") { // checks on Temperature control
                     if (MultizoneZoneData(i).LowValueTemp < 0.0) {
+                        // Code will never be executed, validation will catch invalid input
                         ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(2) + " < 0.0");
                         ShowContinueError(m_state, format("..Input value = {:.1R}, Value will be set to 0.0", MultizoneZoneData(i).LowValueTemp));
                         ShowContinueError(m_state, "..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName);
                         MultizoneZoneData(i).LowValueTemp = 0.0;
                     }
                     if (MultizoneZoneData(i).LowValueTemp >= 100.0) {
+                        // Code will never be executed, validation will catch invalid input
                         ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(2) + " >= 100.0");
                         ShowContinueError(m_state, format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneZoneData(i).LowValueTemp));
                         ShowContinueError(m_state, "..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName);
@@ -2342,12 +2381,14 @@ namespace AirflowNetwork {
 
                 } else if (SELECT_CASE_var == "ENTHALPY") { // checks for Enthalpy control
                     if (MultizoneZoneData(i).LowValueEnth < 0.0) {
+                        // Code will never be executed, validation will catch invalid input
                         ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(4) + " < 0.0");
                         ShowContinueError(m_state, format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneZoneData(i).LowValueEnth));
                         ShowContinueError(m_state, "..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName);
                         MultizoneZoneData(i).LowValueEnth = 0.0;
                     }
                     if (MultizoneZoneData(i).LowValueEnth >= 300000.0) {
+                        // Code will never be executed, validation will catch invalid input
                         ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(4) + " >= 300000.0");
                         ShowContinueError(m_state, format("..Input value = {:.1R}, Value will be reset to 0.0.", MultizoneZoneData(i).LowValueEnth));
                         ShowContinueError(m_state, "..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName);
@@ -2355,7 +2396,7 @@ namespace AirflowNetwork {
                     }
                     if (MultizoneZoneData(i).UpValueEnth <= MultizoneZoneData(i).LowValueEnth) {
                         ShowWarningError(m_state,
-                                         format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(5) + " <= " + cNumericFields(4));
+                                         format("{}{} object, {} <= {}", RoutineName, CurrentModuleObject, cNumericFields(5), cNumericFields(4)));
                         ShowContinueError(m_state,
                                           format("..Input value for {}= {:.1R}, Value will be reset to 300000.0",
                                                  cNumericFields(5),
@@ -2450,6 +2491,7 @@ namespace AirflowNetwork {
                         if (UtilityRoutines::SameString(Alphas(4), "Relative")) {
                             MultizoneExternalNodeData(i).useRelativeAngle = true;
                         } else if (!UtilityRoutines::SameString(Alphas(4), "Absolute")) {
+                            // Code will never be executed, validation will catch invalid input
                             ShowWarningError(
                                 m_state, format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(4) + " = " + Alphas(4));
                             ShowContinueError(m_state, "The default value is assigned as Absolute.");
@@ -2710,7 +2752,7 @@ namespace AirflowNetwork {
                 ShowSevereError(m_state,
                                 format(RoutineName) + CurrentModuleObject + " object, Invalid " + cAlphaFields(1) +
                                     " given = " + MultizoneSurfaceData(i).SurfName);
-                ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+                ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
             }
             if (!m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).HeatTransSurf &&
                 !m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) {
@@ -2764,7 +2806,7 @@ namespace AirflowNetwork {
                 ShowContinueError(m_state,
                                   "..Zone for inside surface must be defined in a AirflowNetwork:MultiZone:Zone object.  Could not find Zone = " +
                                       Zone(m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).Zone).Name);
-                ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+                ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
             }
 
             // Calculate equivalent width and height
@@ -3298,7 +3340,9 @@ namespace AirflowNetwork {
             }
         }
 
-        if (ErrorsFound) ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+        if (ErrorsFound) {
+            ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
+        }
 
         // Write wind pressure coefficients in the EIO file
         print(m_state.files.eio, "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)\n");
@@ -3348,15 +3392,15 @@ namespace AirflowNetwork {
 
         // If no zone object, exit
         if (AirflowNetworkNumOfZones == 0) {
-            ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+            ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
         }
         // If zone node number =0, exit.
         for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
             if (MultizoneSurfaceData(j).NodeNums[0] == 0 && ErrorsFound) {
-                ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+                ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
             }
             if (MultizoneSurfaceData(j).NodeNums[1] == 0 && ErrorsFound) {
-                ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+                ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
             }
         }
 
@@ -3515,10 +3559,9 @@ namespace AirflowNetwork {
                                     " model requires Simulation Control = MultizoneWithoutDistribution, while the input choice is " +
                                     SimAirNetworkKey + ".");
                 ErrorsFound = true;
-                ShowFatalError(m_state,
-                               format(RoutineName) + "Errors found getting " + CurrentModuleObject +
-                                   " object."
-                                   " Previous error(s) cause program termination.");
+                ShowFatalError(
+                    m_state,
+                    format("{}Errors found getting {} object. Previous error(s) cause program termination.", RoutineName, CurrentModuleObject));
             }
         }
 
@@ -3944,9 +3987,8 @@ namespace AirflowNetwork {
             ShowSevereError(m_state,
                             format(RoutineName) + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject +
                                 " object per simulation is allowed when using AirflowNetwork Distribution Systems.");
-            ShowFatalError(m_state,
-                           format(RoutineName) + "Errors found getting " + CurrentModuleObject +
-                               " object. Previous error(s) cause program termination.");
+            ShowFatalError(
+                m_state, format("{}Errors found getting {} object. Previous error(s) cause program termination.", RoutineName, CurrentModuleObject));
         }
 
         if (NumOfPressureControllers > 0) {
@@ -5108,7 +5150,7 @@ namespace AirflowNetwork {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(m_state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+            ShowFatalError(m_state, format("{}Errors found getting inputs. Previous error(s) cause program termination.", RoutineName));
         }
 
         Alphas.deallocate();
@@ -11077,7 +11119,7 @@ namespace AirflowNetwork {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(m_state, format(RoutineName) + "Program terminates for preceding reason(s).");
+            ShowFatalError(m_state, format("{}Program terminates for preceding reason(s).", RoutineName));
         }
     }
 
@@ -11144,9 +11186,11 @@ namespace AirflowNetwork {
             }
             // Ensure the number of exhaust fan defined in the AirflowNetwork model matches the number of Zone Exhaust Fan objects
             if (NumOfExhaustFans != AirflowNetworkNumOfExhFan) {
-                ShowSevereError(m_state,
-                                format(RoutineName) + "The number of " + CurrentModuleObject +
-                                    " is not equal to the number of Fan:ZoneExhaust fans defined in ZoneHVAC:EquipmentConnections");
+                ShowSevereError(
+                    m_state,
+                    format("{}The number of {} is not equal to the number of Fan:ZoneExhaust fans defined in ZoneHVAC:EquipmentConnections",
+                           RoutineName,
+                           CurrentModuleObject));
                 ShowContinueError(m_state, format("The number of {} is {}", CurrentModuleObject, AirflowNetworkNumOfExhFan));
                 ShowContinueError(m_state,
                                   format("The number of Zone exhaust fans defined in ZoneHVAC:EquipmentConnections is {}", NumOfExhaustFans));
@@ -11166,8 +11210,10 @@ namespace AirflowNetwork {
                 }
                 if (MultizoneCompExhaustFanData(i).EPlusZoneNum == 0) {
                     ShowSevereError(m_state,
-                                    format(RoutineName) + "Zone name in " + CurrentModuleObject + "  = " + MultizoneCompExhaustFanData(i).name +
-                                        " does not match the zone name in ZoneHVAC:EquipmentConnections");
+                                    format("{}Zone name in {} = {} does not match the zone name in ZoneHVAC:EquipmentConnections",
+                                           RoutineName,
+                                           CurrentModuleObject,
+                                           MultizoneCompExhaustFanData(i).name));
                     ErrorsFound = true;
                 }
                 // Ensure a surface using zone exhaust fan to expose to the same zone
@@ -11179,8 +11225,10 @@ namespace AirflowNetwork {
                             !(m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
                               m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtWind)) {
                             ShowSevereError(m_state,
-                                            format(RoutineName) + "The surface using " + CurrentModuleObject +
-                                                " is not an exterior surface: " + MultizoneSurfaceData(j).SurfName);
+                                            format("{}The surface using {} is not an exterior surface: {}",
+                                                   RoutineName,
+                                                   CurrentModuleObject,
+                                                   MultizoneSurfaceData(j).SurfName));
                             ErrorsFound = true;
                         }
                         break;
@@ -11192,8 +11240,10 @@ namespace AirflowNetwork {
                 } else {
                     if (MultizoneCompExhaustFanData(i).EPlusZoneNum != m_state.dataSurface->Surface(MultizoneSurfaceData(j).SurfNum).Zone) {
                         ShowSevereError(m_state,
-                                        format(RoutineName) + "Zone name in " + CurrentModuleObject + "  = " + MultizoneCompExhaustFanData(i).name +
-                                            " does not match the zone name");
+                                        format("{}Zone name in {} = {} does not match the zone name",
+                                               RoutineName,
+                                               CurrentModuleObject,
+                                               MultizoneCompExhaustFanData(i).name));
                         ShowContinueError(m_state, "the surface is exposed to " + m_state.dataSurface->Surface(MultizoneSurfaceData(j).SurfNum).Name);
                         ErrorsFound = true;
                     } else {
@@ -11216,7 +11266,7 @@ namespace AirflowNetwork {
                                 }
                             }
                             if (!found) {
-                                ShowSevereError(m_state, format(RoutineName) + "Fan:ZoneExhaust is not defined in " + CurrentModuleObject);
+                                ShowSevereError(m_state, format("{}Fan:ZoneExhaust is not defined in {}", RoutineName, CurrentModuleObject));
                                 ShowContinueError(m_state,
                                                   "Zone Air Exhaust Node in ZoneHVAC:EquipmentConnections =" +
                                                       m_state.dataLoopNodes->NodeID(m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k)));
@@ -11229,7 +11279,7 @@ namespace AirflowNetwork {
 
             ValidateExhaustFanInputOneTimeFlag = false;
             if (ErrorsFound) {
-                ShowFatalError(m_state, format(RoutineName) + "Program terminates for preceding reason(s).");
+                ShowFatalError(m_state, format("{}Program terminates for preceding reason(s).", RoutineName));
             }
         } // End if OneTimeFlag_FindFirstLastPtr
     }
@@ -11332,9 +11382,9 @@ namespace AirflowNetwork {
                 ++HybridGlobalErrCount;
                 if (HybridGlobalErrCount < 2) {
                     ShowWarningError(m_state,
-                                     format(RoutineName) +
-                                         "The hybrid ventilation control schedule value indicates global control in the controlled zone = " +
-                                         m_state.dataHeatBal->Zone(HybridVentSysAvailMaster(SysAvailNum)).Name);
+                                     format("{}The hybrid ventilation control schedule value indicates global control in the controlled zone = {}",
+                                            RoutineName,
+                                            m_state.dataHeatBal->Zone(HybridVentSysAvailMaster(SysAvailNum)).Name));
                     ShowContinueError(m_state,
                                       "The exterior surface containing an opening component in the controlled zone is not found.  No global control "
                                       "will not be modeled.");
@@ -11343,7 +11393,7 @@ namespace AirflowNetwork {
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         m_state,
-                        format(RoutineName) + "The hybrid ventilation control requires a global control. The individual control continues...",
+                        format("{}The hybrid ventilation control requires a global control. The individual control continues...", RoutineName),
                         HybridGlobalErrIndex,
                         double(ControlType),
                         double(ControlType));
@@ -12104,7 +12154,7 @@ namespace AirflowNetwork {
         Toperative = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
 
         if (Toperative > (Tcomfort + ComfortBand)) {
-            if (openingProbability(state, ZoneNum, TimeCloseDuration)) {
+            if (opening_probability(state, ZoneNum, TimeCloseDuration)) {
                 OpeningProbStatus = ProbabilityCheck::ForceChange;
                 ; // forced to open
             } else {
@@ -12115,7 +12165,7 @@ namespace AirflowNetwork {
         }
 
         if (Toperative < (Tcomfort - ComfortBand)) {
-            if (closingProbability(state, TimeOpenDuration)) {
+            if (closing_probability(state, TimeOpenDuration)) {
                 ClosingProbStatus = ProbabilityCheck::ForceChange; // forced to close
             } else {
                 ClosingProbStatus = ProbabilityCheck::KeepStatus; // Keep previous status
@@ -12125,7 +12175,7 @@ namespace AirflowNetwork {
         }
     }
 
-    bool OccupantVentilationControlProp::openingProbability(EnergyPlusData &state,
+    bool OccupantVentilationControlProp::opening_probability(EnergyPlusData &state,
                                                             int const ZoneNum,
                                                             Real64 const TimeCloseDuration) // function to perform calculations of opening probability
     {
@@ -12177,7 +12227,7 @@ namespace AirflowNetwork {
         }
     }
 
-    bool OccupantVentilationControlProp::closingProbability(EnergyPlusData &state,
+    bool OccupantVentilationControlProp::closing_probability(EnergyPlusData &state,
                                                             Real64 const TimeOpenDuration) // function to perform calculations of closing probability
     {
         Real64 SchValue;

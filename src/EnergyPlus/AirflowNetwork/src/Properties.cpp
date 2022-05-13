@@ -53,7 +53,7 @@ namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
-    AirState::AirState(double const density)
+    AirState::AirState(Real64 const density)
         : temperature(20.0), humidity_ratio(0.0), density(density), sqrt_density(sqrt(density)), viscosity(AIRDYNAMICVISCOSITY_CONSTEXPR(20.0))
     {
     }

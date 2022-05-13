@@ -141,11 +141,11 @@ namespace AirflowNetwork {
                   int &OpeningProbStatus,
                   int &ClosingProbStatus); // function to perform calculations
 
-        bool openingProbability(EnergyPlusData &state,
+        bool opening_probability(EnergyPlusData &state,
                                 int ZoneNum,
                                 Real64 TimeCloseDuration); // function to perform calculations of opening probability
 
-        bool closingProbability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
+        bool closing_probability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
     struct Solver : BaseGlobalStruct

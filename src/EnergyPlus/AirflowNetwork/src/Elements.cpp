@@ -72,27 +72,6 @@ namespace AirflowNetwork {
     // and moisture levels at each node, and airflow and sensible and latent energy losses
     // at each element
 
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Node simulation variable in air distribution system
-    // Link simulation variable in air distribution system
-    // Sensible and latent exchange variable in air distribution system
-
-    // Object Data
-    // Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
-    // Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
-    // Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
-    // Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
-    // Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
-    // Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
-
     static Real64 square(Real64 x)
     {
         return x * x;
@@ -122,12 +101,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a duct/pipe component using Colebrook equation for the
         // turbulent friction factor
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr C(0.868589);
@@ -274,12 +247,6 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a duct/pipe component using Colebrook equation for the
         // turbulent friction factor
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr C(0.868589);
         Real64 constexpr EPS(0.001);
@@ -414,12 +381,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a surface crack component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
         // Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
 
@@ -495,12 +456,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a surface crack component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
         // Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
 
@@ -573,12 +528,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a power law resistance airflow component
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -668,12 +617,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a power law resistance airflow component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
         Real64 FL;
@@ -753,20 +696,11 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
         auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr CycFanCycComp(1); // fan cycles with compressor operation
@@ -866,12 +800,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a detailed fan component -- using standard interface.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr TOL(0.00001);
@@ -994,12 +922,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a detailed fan component -- using standard interface.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr TOL(0.00001);
@@ -1126,12 +1048,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Controlled power law resistance airflow component (damper)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 C;
 
@@ -1186,12 +1102,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Controlled power law resistance airflow component (damper)
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 C;
@@ -1249,12 +1159,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Effective leakage ratio component
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -1335,12 +1239,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Effective leakage ratio component
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -1452,12 +1350,6 @@ namespace AirflowNetwork {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr RealMin(1e-37);
         static Real64 const sqrt_1_2(std::sqrt(1.2));
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 const sqrt_2(std::sqrt(2.0));
@@ -1882,12 +1774,6 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a Doorway airflow component using standard interface.
         // A doorway may have two-way airflows. Heights measured relative to the bottom of the door.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Replace this with the value from numbers when we have C++20
         Real64 constexpr SQRT2(1.414213562373095);
@@ -2028,12 +1914,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Constant pressure drop component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Co;
         int k;
@@ -2086,12 +1966,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Surface effective leakage area component
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 const sqrt_2(std::sqrt(2.0));
@@ -2176,12 +2050,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Surface effective leakage area component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 const sqrt_2(std::sqrt(2.0));
 
@@ -2257,12 +2125,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a coil component
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr C(0.868589);
@@ -2416,12 +2278,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a coil component
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr C(0.868589);
@@ -2727,12 +2583,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a heat exchanger component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr C(0.868589);
         Real64 constexpr EPS(0.001);
@@ -2874,12 +2724,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a heat exchanger component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr C(0.868589);
         Real64 constexpr EPS(0.001);
@@ -3010,12 +2854,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a surface crack component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::VerySmallMassFlow;
 
@@ -3137,12 +2975,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a surface crack component
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::VerySmallMassFlow;
 
@@ -3258,7 +3090,6 @@ namespace AirflowNetwork {
         // Cooper, L., 1989, "Calculation of the Flow Through a Horizontal Ceiling/Floor Vent,"
         // NISTIR 89-4052, National Institute of Standards and Technology, Gaithersburg, MD
 
-        // USE STATEMENTS:
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhozAver;
         Real64 expn;
@@ -3381,13 +3212,7 @@ namespace AirflowNetwork {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a specified mass flow element.
-
-        // METHODOLOGY EMPLOYED:
-        // Assignment
-
-        // REFERENCES:
-        // NA
+        // This subroutine computes airflow for a specified mass flow element.
 
         F[0] = mass_flow * control * multiplier;
         DF[0] = 0.0;
@@ -3417,13 +3242,7 @@ namespace AirflowNetwork {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a specified mass flow element.
-
-        // METHODOLOGY EMPLOYED:
-        // Assignment
-
-        // REFERENCES:
-        // NA
+        // This subroutine computes airflow for a specified volume flow element.
 
         Real64 flow = volume_flow * control * multiplier;
 
@@ -3706,9 +3525,6 @@ namespace AirflowNetwork {
         // METHODOLOGY EMPLOYED:
         // Using Q=C(dP)^n
 
-        // REFERENCES:
-        // na
-
         // FLOW:
         // Calculate normal density and viscocity at reference conditions
         constexpr Real64 reference_density = AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0);
@@ -3777,9 +3593,6 @@ namespace AirflowNetwork {
 
         // This subroutine solve air flow as a duct if fan has zero flow rate
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr C(0.868589);
         Real64 constexpr EPS(0.001);
@@ -3788,12 +3601,6 @@ namespace AirflowNetwork {
         Real64 constexpr LamDynCoef(64.0);
         Real64 constexpr LamFriCoef(0.0001);
         Real64 constexpr TurDynCoef(0.0001);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -3951,9 +3758,6 @@ namespace AirflowNetwork {
         // Helmut E. Feustel and Alison Rayner-Hooson, "COMIS Fundamentals," LBL-28560,
         // Lawrence Berkeley National Laboratory, Berkeley, CA, May 1990
 
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(DpF, 2);
         EP_SIZE_CHECK(DpT, 2);
@@ -3967,15 +3771,6 @@ namespace AirflowNetwork {
         // in the FROM zone (starting at linkheight) [Pa]
         // (starting at linkheight) [Kg/m3]
         // (starting at linkheight) [Kg/m3]
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> zF(2); // Startheights of layers in FROM-, TO-zone
@@ -4117,9 +3912,6 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the stack pressures for a link between two zones
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // Helmut E. Feustel and Alison Rayner-Hooson, "COMIS Fundamentals," LBL-28560,
         // Lawrence Berkeley National Laboratory, Berkeley, CA, May 1990
@@ -4131,12 +3923,6 @@ namespace AirflowNetwork {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr PSea(101325.0);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //      REAL(r64) RhoOut ! air density outside [kg/m3]
@@ -4434,39 +4220,13 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This function determines the pressure due to buoyancy in a stratified density environment
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 psz;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 dz;
         Real64 rho;
 
         dz = z - z0;
         rho = (Rho0 + beta * dz / 2.0);
-        psz = -Pz0 * (1.0 - std::exp(-dz * rho * g / Pz0)); // Differential pressure from z to z0 [Pa]
-
-        return psz;
+        return -Pz0 * (1.0 - std::exp(-dz * rho * g / Pz0)); // Differential pressure from z to z0 [Pa]
     }
 
     void DetailedOpeningSolver::lclimb(EnergyPlusData &state,
@@ -4491,28 +4251,6 @@ namespace AirflowNetwork {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This function the differential pressure from the reflevel in a zone To Z, the level of a link
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // for the concentration routine [kg/m3]
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 H;        // Start Height of the layer
