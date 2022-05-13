@@ -81,7 +81,7 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     // Allocate and set earth tube parameters necessary to run the tests
     state->dataEarthTube->EarthTubeSys.allocate(ETnum);
     state->dataEarthTube->EarthTubeSys(ETnum).InsideAirTemp = 21.0;
-    state->dataEarthTube->EarthTubeSys(ETnum).FanType = EarthTubeVentilation::Natural;
+    state->dataEarthTube->EarthTubeSys(ETnum).FanType = Ventilation::Natural;
     state->dataEarthTube->EarthTubeSys(ETnum).AirTemp = 20.0;
     state->dataEarthTube->EarthTubeSys(ETnum).FanPower = 0.05;
 
@@ -115,8 +115,8 @@ TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
     bool ErrorsFound = false;
 
     // Allocate and set earth tube parameters necessary to run the tests
-    state->dataEarthTube->TotEarthTube = 3;
-    state->dataEarthTube->EarthTubeSys.allocate(state->dataEarthTube->TotEarthTube);
+    int TotEarthTube = 3;
+    state->dataEarthTube->EarthTubeSys.allocate(TotEarthTube);
     state->dataEarthTube->EarthTubeSys(1).ZonePtr = 1;
     state->dataEarthTube->EarthTubeSys(2).ZonePtr = 2;
     state->dataEarthTube->EarthTubeSys(3).ZonePtr = 3;
@@ -129,9 +129,6 @@ TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
     state->dataEarthTube->EarthTubeSys(3).ZonePtr = 1;
     CheckEarthTubesInZones(*state, ZoneName, InputName, ErrorsFound);
     EXPECT_EQ(ErrorsFound, true);
-
-    state->dataEarthTube->EarthTubeSys.deallocate();
-    state->dataEarthTube->TotEarthTube = 0;
 }
 
 } // namespace EnergyPlus

@@ -64,7 +64,7 @@ struct EnergyPlusData;
 namespace EarthTube {
 
     // Parameters for Ventilation
-    enum class EarthTubeVentilation
+    enum class Ventilation
     {
         Invalid = -1,
         Natural,
@@ -85,48 +85,37 @@ namespace EarthTube {
 
     struct EarthTubeData
     {
-        // Members
-        int ZonePtr;
-        int SchedPtr;
+        int ZonePtr = 0;
+        int SchedPtr = 0;
         std::string SchedName;
-        Real64 DesignLevel;
-        Real64 MinTemperature;
-        Real64 MaxTemperature;
-        Real64 DelTemperature;
-        EarthTubeVentilation FanType;
-        Real64 FanPressure;
-        Real64 FanEfficiency;
-        Real64 FanPower;
-        Real64 GroundTempz1z2t; // ground temp between z1 and z2 at time t
-        Real64 InsideAirTemp;
-        Real64 AirTemp;
-        Real64 HumRat;          // Humidity ratio of air leaving EarthTube and entering zone
-        Real64 WetBulbTemp;     // Humidity ratio of air leaving EarthTube and entering zone
-        Real64 r1;              // Inner Pipe Radius (m)
-        Real64 r2;              // Pipe Thickness (m)
-        Real64 r3;              // Distance between Pipe Outer Surface and Undistubed Soil (m)
-        Real64 PipeLength;      // Entire Pipe Length
-        Real64 PipeThermCond;   // Pipe Thermal Conductivity
-        Real64 z;               // Depth under the Ground Surface (m)
-        Real64 SoilThermDiff;   // Soil Thermal Diffusivity
-        Real64 SoilThermCond;   // Soil Thermal Conductivity
-        Real64 AverSoilSurTemp; // Average Soil Surface Temperature
-        Real64 ApmlSoilSurTemp; // Amplitude of Soil Surface Temperature
-        int SoilSurPhaseConst;  // Phase constant of Soil Surface
-        Real64 ConstantTermCoef;
-        Real64 TemperatureTermCoef;
-        Real64 VelocityTermCoef;
-        Real64 VelocitySQTermCoef;
-
-        // Default Constructor
-        EarthTubeData()
-            : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), MinTemperature(0.0), MaxTemperature(0.0), DelTemperature(0.0),
-              FanType(EarthTubeVentilation::Invalid), FanPressure(0.0), FanEfficiency(0.0), FanPower(0.0), GroundTempz1z2t(0.0), InsideAirTemp(0.0),
-              AirTemp(0.0), HumRat(0.0), WetBulbTemp(0.0), r1(0.0), r2(0.0), r3(0.0), PipeLength(0.0), PipeThermCond(0.0), z(0.0), SoilThermDiff(0.0),
-              SoilThermCond(0.0), AverSoilSurTemp(0.0), ApmlSoilSurTemp(0.0), SoilSurPhaseConst(0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0),
-              VelocityTermCoef(0.0), VelocitySQTermCoef(0.0)
-        {
-        }
+        Real64 DesignLevel = 0.0;
+        Real64 MinTemperature = 0.0;
+        Real64 MaxTemperature = 0.0;
+        Real64 DelTemperature = 0.0;
+        Ventilation FanType = Ventilation::Invalid;
+        Real64 FanPressure = 0.0;
+        Real64 FanEfficiency = 0.0;
+        Real64 FanPower = 0.0;
+        Real64 GroundTempz1z2t = 0.0; // ground temp between z1 and z2 at time t
+        Real64 InsideAirTemp = 0.0;
+        Real64 AirTemp = 0.0;
+        Real64 HumRat = 0.0;          // Humidity ratio of air leaving EarthTube and entering zone
+        Real64 WetBulbTemp = 0.0;     // Humidity ratio of air leaving EarthTube and entering zone
+        Real64 r1 = 0.0;              // Inner Pipe Radius (m)
+        Real64 r2 = 0.0;              // Pipe Thickness (m)
+        Real64 r3 = 0.0;              // Distance between Pipe Outer Surface and Undistubed Soil (m)
+        Real64 PipeLength = 0.0;      // Entire Pipe Length
+        Real64 PipeThermCond = 0.0;   // Pipe Thermal Conductivity
+        Real64 z = 0.0;               // Depth under the Ground Surface (m)
+        Real64 SoilThermDiff = 0.0;   // Soil Thermal Diffusivity
+        Real64 SoilThermCond = 0.0;   // Soil Thermal Conductivity
+        Real64 AverSoilSurTemp = 0.0; // Average Soil Surface Temperature
+        Real64 ApmlSoilSurTemp = 0.0; // Amplitude of Soil Surface Temperature
+        int SoilSurPhaseConst = 0;    // Phase constant of Soil Surface
+        Real64 ConstantTermCoef = 0.0;
+        Real64 TemperatureTermCoef = 0.0;
+        Real64 VelocityTermCoef = 0.0;
+        Real64 VelocitySQTermCoef = 0.0;
     };
 
     struct EarthTubeZoneReportVars
@@ -183,17 +172,13 @@ namespace EarthTube {
 
 struct EarthTubeData : BaseGlobalStruct
 {
-    int TotEarthTube = 0; // Total EarthTube Statements in input
     bool GetInputFlag = true;
     EPVector<EarthTube::EarthTubeData> EarthTubeSys;
     EPVector<EarthTube::EarthTubeZoneReportVars> ZnRptET;
 
     void clear_state() override
     {
-        TotEarthTube = 0;
-        GetInputFlag = true;
-        EarthTubeSys.deallocate();
-        ZnRptET.deallocate();
+        *this = EarthTubeData();
     }
 };
 
