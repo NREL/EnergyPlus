@@ -2342,7 +2342,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == PTSCCtrlType::ScheduledOpModes) {
             tmpSchedValue = GetCurrentScheduleValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeSchedNum);
             // check if value is valid
-            if (tmpSchedValue > static_cast<int>(PTSCOperatingMode::Invalid) and tmpSchedValue < static_cast<int>(PTSCOperatingMode::Num)) {
+            if (tmpSchedValue > static_cast<int>(PTSCOperatingMode::Invalid) && tmpSchedValue < static_cast<int>(PTSCOperatingMode::Num)) {
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = static_cast<PTSCOperatingMode>(tmpSchedValue);
             } else {
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = PTSCOperatingMode::Off;
