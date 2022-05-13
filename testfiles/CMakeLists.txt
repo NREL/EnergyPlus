@@ -35,6 +35,7 @@ add_simulation_test(IDF_FILE 1ZoneUncontrolled_win_2.idf EPW_FILE USA_CO_Golden-
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_Win_ASH55_Thermal_Comfort.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_Win_ResilienceReports.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled_Win_ResilienceReports_ReportingPeriod.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+add_simulation_test(IDF_FILE 1ZoneUncontrolled_Win_ResilienceReports_ReportingPeriod_AllTable.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolledWithHysteresisPCM.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneWith14ControlledHeat-CoolPanels.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 4ZoneWithShading_Simple_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
