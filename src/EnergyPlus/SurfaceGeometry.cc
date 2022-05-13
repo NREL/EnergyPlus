@@ -10304,7 +10304,7 @@ namespace SurfaceGeometry {
             };
             constexpr std::array<int, 13> oneBasedDaysInMonth = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-            int &monthOn = state.dataSurface->StormWindow(StormWinNum).MonthOn;
+            int const monthOn = state.dataSurface->StormWindow(StormWinNum).MonthOn;
             if (monthOn >= January && monthOn <= December) {
                 if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn >
                     oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOn]) {
@@ -10325,7 +10325,7 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
 
-            int &monthOff = state.dataSurface->StormWindow(StormWinNum).MonthOff;
+            int const monthOff = state.dataSurface->StormWindow(StormWinNum).MonthOff;
             if (monthOff >= January && monthOff <= December) {
                 if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff >
                     oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOff]) {
