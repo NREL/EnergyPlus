@@ -1193,9 +1193,6 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         this->oneTimeInitFlag = false;
     }
 }
-} // namespace EnergyPlus::EIRPlantLoopHeatPumps
-
-namespace EnergyPlus::EIRFuelFiredHeatPumps {
 
 void EIRFuelFiredHeatPump::simulate(
     EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
@@ -1224,7 +1221,8 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
 }
 
-void EIRFuelFiredHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state){
+void EIRFuelFiredHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
+{
 }
 
 void EIRFuelFiredHeatPump::resetReportingVariables()
@@ -1234,7 +1232,7 @@ void EIRFuelFiredHeatPump::resetReportingVariables()
 PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name)
 {
     if (state.dataEIRFuelFiredHeatPump->getInputsFFHP) {
-        EIRFuelFiredHeatPump::processInputForEIRFFHP(state);
+        EIRFuelFiredHeatPump::processInputForEIRPLHP(state);
         EIRFuelFiredHeatPump::pairUpCompanionCoils(state);
         state.dataEIRFuelFiredHeatPump->getInputsFFHP = false;
     }
@@ -1253,7 +1251,7 @@ void EIRFuelFiredHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
 {
 }
 
-void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
+void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 {
     struct ClassType
     {
@@ -1276,14 +1274,14 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
     std::vector<ClassType> classesToInput = {
         ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating,
                   "Hot Water Nodes",
-                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
-                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
-                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract},
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::add,
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract,
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract},
         ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling,
                   "Chilled Water Nodes",
-                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::subtract,
-                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add,
-                  EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump::add},
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract,
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::add,
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::add},
     };
 
     bool errorsFound = false;
@@ -1317,14 +1315,17 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
                 std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_inlet_node_name").get<std::string>());
                 std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_outlet_node_name").get<std::string>());
                 std::string airSourceNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
-                // std::string condenserType = UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+                // Implicit
+                std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+
                 // A5
                 if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
                     thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_heat_pump_name").get<std::string>());
                 }
                 // std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name").get<std::string>());
-                // std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
-                
+                // std::string sourceSideOutletNodeName =
+                // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+
                 // A6 Fuel Type
                 // A7 End use category
 
@@ -1345,8 +1346,8 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
                 } else {
                     thisPLHP.loadSideDesignVolFlowRate = tmpFlowRate.get<Real64>();
                 }
-                //auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
-                //if (tmpSourceFlowRate == "Autosize") {
+                // auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
+                // if (tmpSourceFlowRate == "Autosize") {
                 //    thisPLHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
                 //    thisPLHP.sourceSideDesignVolFlowRateWasAutoSized = true;
                 //} else {
@@ -1375,8 +1376,7 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
 
                 // A8 flow mode
 
-
-                //if (fields.find("reference_coefficient_of_performance") != fields.end()) {
+                // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
                 //    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
                 //} else {
                 //    Real64 defaultVal = 0.0;
@@ -1496,16 +1496,16 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
                 DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
                 DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
                 DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
-                //if (condenserType == "WATERSOURCE") {
+                // if (condenserType == "WATERSOURCE") {
                 //    thisPLHP.waterSource = true;
                 //    condenserNodeType = DataLoopNode::NodeFluidType::Water;
                 //    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
                 //    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
                 //} else if (condenserType == "AIRSOURCE") {
-                    thisPLHP.airSource = true;
-                    condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+                thisPLHP.airSource = true;
+                condenserNodeType = DataLoopNode::NodeFluidType::Air;
+                condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
+                condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
                 //} else {
                 //    // Again, this should be protected by the input processor
                 //    ShowErrorMessage(state,
@@ -1513,7 +1513,7 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
                 //                         "; entered type: " + condenserType);                    // LCOV_EXCL_LINE
                 //    errorsFound = true;                                                          // LCOV_EXCL_LINE
                 //}
-                //thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
+                // thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                 //                                                                     sourceSideInletNodeName,
                 //                                                                     nodeErrorsFound,
                 //                                                                     objType,
@@ -1522,7 +1522,7 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
                 //                                                                     condenserNodeConnectionType_Inlet,
                 //                                                                     NodeInputManager::CompFluidStream::Secondary,
                 //                                                                     DataLoopNode::ObjectIsNotParent);
-                //thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
+                // thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                 //                                                                      sourceSideOutletNodeName,
                 //                                                                      nodeErrorsFound,
                 //                                                                      objType,
@@ -1535,7 +1535,7 @@ void EIRFuelFiredHeatPump::processInputForEIRFFHP(EnergyPlusData &state)
                 BranchNodeConnections::TestCompSet(
                     state, cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);
 
-                //if (thisPLHP.waterSource) {
+                // if (thisPLHP.waterSource) {
                 //    BranchNodeConnections::TestCompSet(
                 //        state, cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
                 //}
@@ -1563,4 +1563,4 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
 {
 }
 
-} // namespace EnergyPlus::EIRFuelFiredHeatPumps
+} // namespace EnergyPlus::EIRPlantLoopHeatPumps

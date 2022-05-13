@@ -192,6 +192,46 @@ namespace EIRPlantLoopHeatPumps {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
+    struct EIRFuelFiredHeatPump : public EIRPlantLoopHeatPump
+    {
+        // fixed configuration parameters
+
+        // reference data
+
+        // curve references
+
+        // flow rate terms
+
+        // simulation variables
+
+        // topology variables
+
+        // counters and indexes
+
+        // logic flags
+
+        // a couple worker functions to easily allow merging of cooling and heating operations
+
+        // Override parent methods to be declared
+        void simulate(EnergyPlusData &state,
+                      const EnergyPlus::PlantLocation &calledFromLocation,
+                      bool const FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool const RunFlag);
+        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
+        void setOperatingFlowRatesASHP(EnergyPlusData &state);
+        void resetReportingVariables();
+
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
+        static void pairUpCompanionCoils(EnergyPlusData &state);
+        static void processInputForEIRPLHP(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state);
+
+        virtual ~EIRFuelFiredHeatPump() = default;
+
+        EIRFuelFiredHeatPump() = default;
+    };
 } // namespace EIRPlantLoopHeatPumps
 
 struct EIRPlantLoopHeatPumpsData
@@ -205,117 +245,9 @@ struct EIRPlantLoopHeatPumpsData
     }
 };
 
-namespace EIRFuelFiredHeatPumps {
-
-    struct InOutNodePair
-    {
-        int inlet;
-        int outlet;
-
-        InOutNodePair() : inlet(0), outlet(0)
-        {
-        }
-    };
-
-    struct EIRFuelFiredHeatPump : public EnergyPlus::BasePlantLoopHeatPump
-    {
-        // fixed configuration parameters
-        std::string name;
-        DataPlant::PlantEquipmentType EIRHPType = DataPlant::PlantEquipmentType::Invalid;
-        std::string companionCoilName;
-        EIRFuelFiredHeatPump *companionHeatPumpCoil = nullptr;
-        Real64 sizingFactor = 1.0;
-        bool waterSource = false;
-        bool airSource = false;
-
-        // reference data
-        Real64 referenceCapacity = 0.0;
-        bool referenceCapacityWasAutoSized = false;
-        Real64 referenceCOP = 0.0;
-
-        // curve references
-        int capFuncTempCurveIndex = 0;
-        int powerRatioFuncTempCurveIndex = 0;
-        int powerRatioFuncPLRCurveIndex = 0;
-
-        // flow rate terms
-        Real64 loadSideDesignVolFlowRate = 0.0;
-        bool loadSideDesignVolFlowRateWasAutoSized = false;
-        Real64 sourceSideDesignVolFlowRate = 0.0;
-        bool sourceSideDesignVolFlowRateWasAutoSized = false;
-        Real64 loadSideDesignMassFlowRate = 0.0;
-        Real64 sourceSideDesignMassFlowRate = 0.0;
-        Real64 loadSideMassFlowRate = 0.0;
-        Real64 sourceSideMassFlowRate = 0.0;
-
-        // simulation variables
-        Real64 loadSideHeatTransfer = 0.0;
-        Real64 sourceSideHeatTransfer = 0.0;
-        Real64 loadSideInletTemp = 0.0;
-        Real64 loadSideOutletTemp = 0.0;
-        Real64 sourceSideInletTemp = 0.0;
-        Real64 sourceSideOutletTemp = 0.0;
-        Real64 powerUsage = 0.0;
-        Real64 loadSideEnergy = 0.0;
-        Real64 sourceSideEnergy = 0.0;
-        Real64 powerEnergy = 0.0;
-        bool running = false;
-
-        // topology variables
-        PlantLocation loadSidePlantLoc;
-        PlantLocation sourceSidePlantLoc;
-        InOutNodePair loadSideNodes;
-        InOutNodePair sourceSideNodes;
-
-        // counters and indexes
-        int condMassFlowRateTriggerIndex = 0;
-        int recurringConcurrentOperationWarningIndex = 0;
-
-        // logic flags
-        bool oneTimeInitFlag = true;
-        bool envrnInit = true;
-
-        // a couple worker functions to easily allow merging of cooling and heating operations
-        std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
-        std::function<Real64(Real64, Real64)> calcQsource;
-        std::function<Real64(Real64, Real64)> calcSourceOutletTemp;
-
-        virtual ~EIRFuelFiredHeatPump() = default;
-
-        EIRFuelFiredHeatPump() = default;
-
-        void
-        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
-
-        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
-
-        void setOperatingFlowRatesASHP(EnergyPlusData &state);
-
-        void resetReportingVariables();
-
-        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
-
-        static void pairUpCompanionCoils(EnergyPlusData &state);
-
-        static void processInputForEIRFFHP(EnergyPlusData &state);
-
-        static Real64 add(Real64 const a, Real64 const b)
-        {
-            return a + b;
-        }
-
-        static Real64 subtract(Real64 const a, Real64 const b)
-        {
-            return a - b;
-        }
-
-        void oneTimeInit(EnergyPlusData &state) override;
-    };
-} // namespace EIRFuelFiredHeatPumps
-
 struct EIRFuelFiredHeatPumpsData
 {
-    std::vector<EIRFuelFiredHeatPumps::EIRFuelFiredHeatPump> heatPumps;
+    std::vector<EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump> heatPumps;
     bool getInputsFFHP = true;
     void clear_state()
     {
