@@ -724,3 +724,51 @@
    7,                            !- End Month
    3,                            !- End Day of Month
    18;                           !- End Hour of Day
+
+  Output:Table:ReportPeriod,
+   CO2ResilienceReportTimeWinter,  !- field Name,
+   CO2ResilienceSummary,           !- field Report Name,
+   ,                               !- Begin Year
+   1,                              !- Begin Month
+   1,                              !- Begin Day of Month
+   8,                              !- Begin Hour of Day
+   ,                               !- End Year
+   1,                              !- End Month
+   3,                              !- End Day of Month
+   18;                             !- End Hour of Day
+
+  Output:Table:ReportPeriod,
+   CO2ResilienceReportTimeSummer,  !- field Name,
+   CO2ResilienceSummary,           !- field Report Name,
+   ,                               !- Begin Year
+   7,                              !- Begin Month
+   1,                              !- Begin Day of Month
+   8,                              !- Begin Hour of Day
+   ,                               !- End Year
+   7,                              !- End Month
+   3,                              !- End Day of Month
+   18;                             !- End Hour of Day
+   
+  Output:Table:ReportPeriod,
+   VisualResilienceReportTimeWinter,  !- field Name,
+   VisualResilienceSummary,           !- field Report Name,
+   ,                                  !- Begin Year
+   1,                                 !- Begin Month
+   1,                                 !- Begin Day of Month
+   8,                                 !- Begin Hour of Day
+   ,                                  !- End Year
+   1,                                 !- End Month
+   3,                                 !- End Day of Month
+   18;                                !- End Hour of Day
+
+  Output:Table:ReportPeriod,
+   VisualResilienceReportTimeSummer,  !- field Name,
+   VisualResilienceSummary,           !- field Report Name,
+   ,                                  !- Begin Year
+   7,                                 !- Begin Month
+   1,                                 !- Begin Day of Month
+   8,                                 !- Begin Hour of Day
+   ,                                  !- End Year
+   7,                                 !- End Month
+   3,                                 !- End Day of Month
+   18;                                !- End Hour of Day
