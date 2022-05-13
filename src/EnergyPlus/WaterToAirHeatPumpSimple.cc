@@ -1879,7 +1879,12 @@ namespace WaterToAirHeatPumpSimple {
                                     .RatioRefHeatRefTotCoolCap /
                                 RefTotCapTempModFac;
                             if (ReferenceCapCoolHeatDD > RefCapCoolTotalDesCDD) {
+                                // re-base the cooling capacity
                                 ReferenceCapCoolTotalDes = ReferenceCapCoolHeatDD;
+
+                                // adjust for system air flow -- capacity is based on heating design day calcs
+                                // adjust by ratio of system to heating air flow rate
+                                ReferenceCapCoolTotalDes *= ReferenceAirVolFlowRateDes / HeatingAirVolFlowRateDes;
 
                                 if (ReferenceCapCoolSensAutoSized) {
                                     // adjust sensible capacity assuming that the SHR is constant
@@ -1892,6 +1897,10 @@ namespace WaterToAirHeatPumpSimple {
                                                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
                                                                          "Heating");
                             } else {
+                                // adjust for system air flow -- capacity is based on cooling design day calcs
+                                // adjust by ratio of system to cooling air flow rate
+                                ReferenceCapCoolTotalDes *= ReferenceAirVolFlowRateDes / CoolingAirVolFlowRateDes;
+
                                 simpleWatertoAirHP.ReferenceCapCoolTotal = ReferenceCapCoolTotalDes;
                                 OutputReportPredefined::PreDefTableEntry(state,
                                                                          state.dataOutRptPredefined->pdchWAHPDD,
@@ -1908,16 +1917,26 @@ namespace WaterToAirHeatPumpSimple {
                             // we only pass the reference total cooling capacity determined
                             // based on cooling design day which is used to decide if the
                             // coil needs to be sized of the heating coil size
+                            //
+                            // no capcity adjustment based on system flow because the capacity could change
+                            // once the heating coil has been sized
                             state.dataSize->DXCoolCap = ReferenceCapCoolTotalDes;
                         } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).WAHPPlantType !=
                                    DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
                             // case 3: companion heating coil is not of the "equationfit" type and hence doesn't use the reference heating to cooling
                             // coil capacity ratio
+                            // adjust for system air flow -- capacity is based on cooling design day calcs
+                            // adjust by ratio of system to cooling air flow rate
+                            ReferenceCapCoolTotalDes *= ReferenceAirVolFlowRateDes / CoolingAirVolFlowRateDes;
                             simpleWatertoAirHP.ReferenceCapCoolTotal = ReferenceCapCoolTotalDes;
                             // Set the global DX cooling coil capacity variable for use by other objects
                             state.dataSize->DXCoolCap = simpleWatertoAirHP.ReferenceCapCoolTotal;
                         }
                     } else {
+                        // adjust for system air flow -- capacity is based on cooling design day calcs
+                        // adjust by ratio of system to cooling air flow rate
+                        ReferenceCapCoolTotalDes *= ReferenceAirVolFlowRateDes / CoolingAirVolFlowRateDes;
+
                         simpleWatertoAirHP.ReferenceCapCoolTotal = ReferenceCapCoolTotalDes;
                         state.dataSize->DXCoolCap = simpleWatertoAirHP.ReferenceCapCoolTotal;
                     }
@@ -2395,6 +2414,10 @@ namespace WaterToAirHeatPumpSimple {
                     if (ReferenceCapCoolHeatDD > ReferenceCapCoolTotalDes) {
                         // total cooling capacity
                         ReferenceCapCoolTotalDes = ReferenceCapCoolHeatDD;
+                        // adjust for system air flow -- capacity is based on heating design day calcs
+                        // adjust by ratio of system to heating air flow rate
+                        ReferenceCapCoolTotalDes *= ReferenceAirVolFlowRateDes / HeatingAirVolFlowRateDes;
+                        // calculate ajustment factor over previous capacity for sensible capacity adjustment
                         Real64 CapCoolAdjFac = ReferenceCapCoolTotalDes / state.dataSize->DXCoolCap;
                         // update cooling coil reference capacity after adjustments based on heating coil size
                         state.dataSize->DXCoolCap = ReferenceCapCoolTotalDes;
