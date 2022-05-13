@@ -144,6 +144,22 @@ This numeric input field specifies carbon dioxide generation rate per person wit
 
 Number of People * People Schedule * People Activity * Carbon Dioxide Generation Rate. The default value is 3.82E-8 m3/s-W (obtained from ASHRAE Standard 62.1-2007 value at 0.0084 cfm/met/person over the general adult population). The maximum value can be 10 times the default value.
 
+\paragraph{Field: Cold Stress Temperature Threshold}\label{cold-stress-temperature-threshold}
+
+This field is used in the calculation of hours of safety for cold events, which
+is defined as the longest duration (number of hours), starting from the
+beginning time of the risk period (e.g., the start time of a power outage), to
+not below a certain temperature threshold (specified in this field). If not
+specified, 60F (or 15.56C) will be used as the default temperature threshold. Other
+
+\paragraph{Field: Heat Stress Temperature Threshold}\label{heat-stress-temperature-threshold}
+
+This field is used in the calculation of hours of safety for hot events, which
+is defined as the longest duration (number of hours), starting from the
+beginning time of the risk period (e.g., the start time of a power outage), to
+not above a certain temperature threshold (specified in this field). If not
+specified, 86F (or 30C) will be used as the default temperature threshold.
+
 \paragraph{Field: Enable ASHRAE 55 comfort warnings}\label{field-enable-ashrae-55-comfort-warnings}
 
 This field accepts either ``Yes'' or ``No'' as values. When ``Yes'' is specified, warnings are generated when the space conditions are outside of the ASHRAE 55 comfort range as discussed in the sections that follow titled ``Simplified ASHRAE 55-2004 Graph Related Outputs'' and ``Simplified ASHRAE 55 Warnings.'' The default is not to provide these warnings so if you want to know if your space is outside this comfort range you must set this field to Yes.
