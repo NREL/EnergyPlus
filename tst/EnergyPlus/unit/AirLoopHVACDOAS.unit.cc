@@ -8419,7 +8419,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     PSZAC_OARelNode_2.Temp = 23.0;
     PSZAC_OARelNode_3.Temp = 23.0;
     PSZAC_OARelNode_4.Temp = 23.0;
-    PSZAC_OARelNode_5.Temp = 23.0;    
+    PSZAC_OARelNode_5.Temp = 23.0;
     PSZAC_OARelNode_1.HumRat = 0.001;
     PSZAC_OARelNode_2.HumRat = 0.001;
     PSZAC_OARelNode_3.HumRat = 0.001;
