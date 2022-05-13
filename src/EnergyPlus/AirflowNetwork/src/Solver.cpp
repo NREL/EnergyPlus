@@ -361,8 +361,11 @@ namespace AirflowNetwork {
                         ShowContinueError(m_state, "...occurs in " + CurrentModuleObject + " = " + thisObjectName);
                     }
                     if (pressure <= 31000.0) {
-                        ShowSevereError(m_state, format("{}: {}: {}. Reference Barometric Pressure must be greater than 31000 Pa.",
-                            RoutineName, CurrentModuleObject, thisObjectName));
+                        ShowSevereError(m_state,
+                                        format("{}: {}: {}. Reference Barometric Pressure must be greater than 31000 Pa.",
+                                               RoutineName,
+                                               CurrentModuleObject,
+                                               thisObjectName));
                         success = false;
                     }
                 }
@@ -978,7 +981,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneCompDetOpeningData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1019,7 +1024,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneCompSimpleOpeningData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1063,7 +1070,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneCompHorOpeningData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1112,7 +1121,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &MultizoneSurfaceELAData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     success = false;
                 }
 
@@ -1146,7 +1157,9 @@ namespace AirflowNetwork {
 
                 // Check for name overlaps
                 if (elements.find(thisObjectName) != elements.end()) {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     success = false;
                 }
 
@@ -1193,7 +1206,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompLeakData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1233,7 +1248,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompELRData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1307,7 +1324,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompDuctData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -1587,7 +1606,9 @@ namespace AirflowNetwork {
                 if (elements.find(thisObjectName) == elements.end()) {
                     elements[thisObjectName] = &DisSysCompCPDData(i); // Yet another workaround
                 } else {
-                    ShowSevereError(m_state, format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}: {}: Duplicated airflow element names are found = \"{}\".", RoutineName, CurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
@@ -2031,7 +2052,7 @@ namespace AirflowNetwork {
                     m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "ZoneThermalChimney") +
                     m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "ZoneCoolTower:Shower") ==
                 0) {
-                ShowWarningError(m_state, format("{}{} = \"{}\"" , RoutineName, cAlphaFields(2), SimAirNetworkKey));
+                ShowWarningError(m_state, format("{}{} = \"{}\"", RoutineName, cAlphaFields(2), SimAirNetworkKey));
                 ShowContinueError(
                     m_state,
                     "..but there are no Infiltration, Ventilation, Mixing, Cross Mixing or ZoneAirBalance objects. The simulation continues...");
@@ -2183,8 +2204,9 @@ namespace AirflowNetwork {
             }
 
             if (SimObjectError) {
-                ShowFatalError(m_state,
-                               format("{}Errors found getting {} object. Previous error(s) cause program termination.", RoutineName, CurrentModuleObject));
+                ShowFatalError(
+                    m_state,
+                    format("{}Errors found getting {} object. Previous error(s) cause program termination.", RoutineName, CurrentModuleObject));
             }
 
             AirflowNetworkSimu.MaxIteration = Numbers(1);
@@ -12175,9 +12197,10 @@ namespace AirflowNetwork {
         }
     }
 
-    bool OccupantVentilationControlProp::opening_probability(EnergyPlusData &state,
-                                                            int const ZoneNum,
-                                                            Real64 const TimeCloseDuration) // function to perform calculations of opening probability
+    bool
+    OccupantVentilationControlProp::opening_probability(EnergyPlusData &state,
+                                                        int const ZoneNum,
+                                                        Real64 const TimeCloseDuration) // function to perform calculations of opening probability
     {
         Real64 SchValue;
         Real64 RandomValue;
@@ -12228,7 +12251,7 @@ namespace AirflowNetwork {
     }
 
     bool OccupantVentilationControlProp::closing_probability(EnergyPlusData &state,
-                                                            Real64 const TimeOpenDuration) // function to perform calculations of closing probability
+                                                             Real64 const TimeOpenDuration) // function to perform calculations of closing probability
     {
         Real64 SchValue;
         Real64 RandomValue;

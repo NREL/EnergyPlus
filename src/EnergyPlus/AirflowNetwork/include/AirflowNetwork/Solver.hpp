@@ -142,8 +142,8 @@ namespace AirflowNetwork {
                   int &ClosingProbStatus); // function to perform calculations
 
         bool opening_probability(EnergyPlusData &state,
-                                int ZoneNum,
-                                Real64 TimeCloseDuration); // function to perform calculations of opening probability
+                                 int ZoneNum,
+                                 Real64 TimeCloseDuration); // function to perform calculations of opening probability
 
         bool closing_probability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
