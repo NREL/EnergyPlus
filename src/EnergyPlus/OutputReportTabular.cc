@@ -4492,10 +4492,10 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Packaged TES
     auto &TESCoil(state.dataPackagedThermalStorageCoil->TESCoil);
     for (int iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
-        if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+        if (TESCoil(iCoil).CondenserType == PackagedThermalStorageCoil::TESCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
                                                              TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
-        } else if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
+        } else if (TESCoil(iCoil).CondenserType == PackagedThermalStorageCoil::TESCondenserType::Evap) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption +
                                                              TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
                                                              TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
