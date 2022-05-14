@@ -1420,6 +1420,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTSurfaceList;                 // List of all heat transfer surfaces
     std::vector<int> AllExtSolarSurfaceList;           // List of all exterior solar surfaces, all are heat transfer surfaces
     std::vector<int> AllExtSolAndShadingSurfaceList;   // List of all exterior solar surfaces plus all shading surfaces
+    std::vector<int> AllShadowPossObstrSurfaceList;    // List of all IsShadoPossibleObstuction surfaces
     std::vector<int> AllIZSurfaceList;                 // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList;        // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;           // List of all window surfaces
@@ -1823,6 +1824,7 @@ struct SurfacesData : BaseGlobalStruct
         this->AllHTSurfaceList.clear();
         this->AllExtSolarSurfaceList.clear();
         this->AllExtSolAndShadingSurfaceList.clear();
+        this->AllShadowPossObstrSurfaceList.clear();
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();

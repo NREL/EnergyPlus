@@ -2685,7 +2685,8 @@ namespace SurfaceGeometry {
                 // This may include some attached shading surfaces
                 state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
             }
-            if ((state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtSolar) || state.dataSurface->Surface(SurfNum).IsShadowing) {
+            if ((state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtSolar) ||
+                state.dataSurface->Surface(SurfNum).IsShadowing) {
                 // Some attached shading surfaces may be true for both
                 state.dataSurface->AllExtSolAndShadingSurfaceList.push_back(SurfNum);
             }
@@ -2747,6 +2748,7 @@ namespace SurfaceGeometry {
             if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
 
             state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = true;
+            state.dataSurface->AllShadowPossObstrSurfaceList.push_back(SurfNum);
         }
 
         // Check for IRT surfaces in invalid places.
