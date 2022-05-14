@@ -5017,8 +5017,7 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
                 state.dataSolarShading->SUNCOS(1) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
                 state.dataSolarShading->SUNCOS(2) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
 
-                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                    if (!state.dataSurface->Surface(SurfNum).IsShadowing && !state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+                for (int SurfNum : state.dataSurface->AllExtSolAndShadingSurfaceList) {
                     state.dataSolarShading->SurfSunCosTheta(SurfNum) =
                         state.dataSolarShading->SUNCOS(1) * state.dataSurface->Surface(SurfNum).OutNormVec(1) +
                         state.dataSolarShading->SUNCOS(2) * state.dataSurface->Surface(SurfNum).OutNormVec(2) +
@@ -5027,11 +5026,7 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
 
                 SHADOW(state, iHour, iTimeStep); // Determine sunlit areas and solar multipliers for all surfaces.
 
-                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-
-                    if (!state.dataSurface->Surface(SurfNum).IsShadowing &&
-                        (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar))
-                        continue;
+                for (int SurfNum : state.dataSurface->AllExtSolAndShadingSurfaceList) {
 
                     if (state.dataSolarShading->SurfSunCosTheta(SurfNum) < 0.0) continue;
 
@@ -10356,12 +10351,8 @@ void SkyDifSolarShading(EnergyPlusData &state)
             state.dataSolarShading->SUNCOS(1) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
             state.dataSolarShading->SUNCOS(2) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
 
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Cosine of angle of incidence on surface of solar
-                // radiation from patch
-                ShadowingSurf = state.dataSurface->Surface(SurfNum).IsShadowing;
-
-                if (!ShadowingSurf && !state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
-
+            for (int SurfNum : state.dataSurface->AllExtSolAndShadingSurfaceList) {
+                // Cosine of angle of incidence on surface of solar radiation from patch
                 state.dataSolarShading->SurfSunCosTheta(SurfNum) =
                     state.dataSolarShading->SUNCOS(1) * state.dataSurface->Surface(SurfNum).OutNormVec(1) +
                     state.dataSolarShading->SUNCOS(2) * state.dataSurface->Surface(SurfNum).OutNormVec(2) +
@@ -10370,10 +10361,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
 
             SHADOW(state, 24, 0);
 
-            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                ShadowingSurf = state.dataSurface->Surface(SurfNum).IsShadowing;
-
-                if (!ShadowingSurf && (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar)) continue;
+            for (int SurfNum : state.dataSurface->AllExtSolAndShadingSurfaceList) {
 
                 if (state.dataSolarShading->SurfSunCosTheta(SurfNum) < 0.0) continue;
 
@@ -10397,10 +10385,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
         }     // End of Theta loop
     }         // End of Phi loop
 
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        ShadowingSurf = state.dataSurface->Surface(SurfNum).IsShadowing;
-
-        if (!ShadowingSurf && (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar)) continue;
+    for (int SurfNum : state.dataSurface->AllExtSolAndShadingSurfaceList) {
 
         if (std::abs(state.dataSolarShading->SurfWoShdgIsoSky(SurfNum)) > Eps) {
             state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum) =
