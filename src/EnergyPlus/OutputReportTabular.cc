@@ -12607,17 +12607,6 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 rowHead,
                                                 tableBody);
 
-        tableName = "Heat Index OccupiedHours";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                columnNum,
-                                                periodIdx,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
-
         tableName = "Heat Index OccupantHours";
         WriteResilienceBinsTableReportingPeriod(state,
                                                 columnNum,
@@ -12626,6 +12615,17 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 columnHead,
                                                 columnWidth,
                                                 state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
+
+        tableName = "Heat Index OccupiedHours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod,
                                                 rowHead,
                                                 tableBody);
 
@@ -12640,17 +12640,6 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 rowHead,
                                                 tableBody);
 
-        tableName = "Humidex OccupiedHours";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                columnNum,
-                                                periodIdx,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
-
         tableName = "Humidex OccupantHours";
         WriteResilienceBinsTableReportingPeriod(state,
                                                 columnNum,
@@ -12659,6 +12648,17 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 columnHead,
                                                 columnWidth,
                                                 state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod,
+                                                rowHead,
+                                                tableBody);
+
+        tableName = "Humidex OccupiedHours";
+        WriteResilienceBinsTableReportingPeriod(state,
+                                                columnNum,
+                                                periodIdx,
+                                                tableName,
+                                                columnHead,
+                                                columnWidth,
+                                                state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod,
                                                 rowHead,
                                                 tableBody);
 
