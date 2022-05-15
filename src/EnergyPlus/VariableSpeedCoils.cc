@@ -4562,7 +4562,6 @@ namespace VariableSpeedCoils {
         Real64 RatedWaterVolFlowRateDes = 0.0;
         Real64 RatedWaterVolFlowRateUser = 0.0;
         Real64 RatedCapCoolSensDes = 0.0;
-        Real64 RatedCapCoolSensUser = 0.0;
         Real64 EvapCondPumpElecNomPowerDes = 0.0;
         Real64 EvapCondPumpElecNomPowerUser = 0.0;
         Real64 DefrostCapacityDes = 0.0;
@@ -4711,7 +4710,7 @@ namespace VariableSpeedCoils {
                                DataAirSystems::FanPlacement::DrawThru) {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
-                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
                     if (varSpeedCoils.CondenserInletNodeNum != 0) {
                         RatedSourceTempCool = RatedInletWaterTemp;
@@ -4788,7 +4787,7 @@ namespace VariableSpeedCoils {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
 
-                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
                     if (varSpeedCoils.CondenserInletNodeNum != 0) {
                         RatedSourceTempCool = RatedInletWaterTemp;
@@ -5341,7 +5340,7 @@ namespace VariableSpeedCoils {
         }
 
         // Ensure air flow rate at lower speed must be lower or
-        // equal to the flow rate at higher speed. Otherwise, a severe error is isssued.
+        // equal to the flow rate at higher speed. Otherwise, a severe error is issued.
         for (Mode = 1; Mode <= varSpeedCoils.NumOfSpeeds - 1; ++Mode) {
             if (varSpeedCoils.MSRatedAirVolFlowRate(Mode) > varSpeedCoils.MSRatedAirVolFlowRate(Mode + 1)) {
                 ShowWarningError(state,
