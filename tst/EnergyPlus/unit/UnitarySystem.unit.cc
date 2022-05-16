@@ -459,7 +459,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     WaterCoils::SizeWaterCoil(*state, CoilNum);
 
     EXPECT_NEAR(FanCoolLoad, 106.0, 1.0); // make sure there is enough fan heat to change results
-    EXPECT_NEAR(6779.0 + FanCoolLoad, state->dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_NEAR(6779.4 + FanCoolLoad, state->dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate, 1.0);
     EXPECT_NEAR(20.541, state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, 0.001); // coil inlet does include fan heat
 
     // reset coil sizing for next test
@@ -503,7 +503,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // Show coil sizes in UnitarySystem, cooling coil does not include fan heat
     // Same sizes as coil on branch without fan heat
-    EXPECT_NEAR(6672.0, state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_NEAR(6779.4, state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
     EXPECT_EQ(20.0, state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp); // coil inlet does not include fan heat
     // heating coil in UnitarySystem sized at higher air flow rate, i.e., not using SysAirMinFlowRat
     EXPECT_NEAR(3848.0, state->dataWaterCoils->WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
@@ -516,12 +516,9 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // water coils use StdRhoAir and UnitarySystem coils use actual air density
     Real64 CoilInTemp = state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak;
     Real64 CoilInHumRat = state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak;
-    Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat);
-    // this is the ratio of UnitarySystem cooling coil size to coil-on-branch water cooling coil size
-    Real64 rhoRatio = state->dataEnvrn->StdRhoAir / rhoair;
 
-    EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
-    EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * mySys->m_DesignCoolingCapacity, 1.0);
+    EXPECT_NEAR(coil1CoolingCoilRate, state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_NEAR(coil1CoolingCoilRate, mySys->m_DesignCoolingCapacity, 1.0);
     // the heating coils are sized differently since SysAirMinFlowRat is not accounted for
     EXPECT_LT(coil2HeatingCoilRate, state->dataWaterCoils->WaterCoil(2).DesWaterHeatingCoilRate);
     EXPECT_LT(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity);
@@ -564,8 +561,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // Show coil sizes in UnitarySystem, cooling coil now includes fan heat
     // Same sizes as coil on branch with fan heat
-    EXPECT_NEAR(6672.0 + FanCoolLoad, state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
-    EXPECT_NEAR(6672.0 + FanCoolLoad, mySys->m_DesignCoolingCapacity, 1.0);
+    EXPECT_NEAR(6779.4 + FanCoolLoad, state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_NEAR(6779.4 + FanCoolLoad, mySys->m_DesignCoolingCapacity, 1.0);
     EXPECT_NEAR(20.541, state->dataWaterCoils->WaterCoil(1).DesInletAirTemp, 0.001); // coil inlet does include fan heat
     // the heating coils are sized differently since SysAirMinFlowRat is not accounted for
     EXPECT_NEAR(3848.0, state->dataWaterCoils->WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
@@ -834,12 +831,12 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_EQ(compName, thisSys->Name);
     EXPECT_NEAR(100.0, thisSys->m_AncillaryOnPower, 0.00000001);
     EXPECT_NEAR(50.0, thisSys->m_AncillaryOffPower, 0.00000001);
-    EXPECT_NEAR(0.488072083, thisSys->m_PartLoadFrac, 0.000001);
+    EXPECT_NEAR(0.4792003, thisSys->m_PartLoadFrac, 0.000001);
     Real64 totalAncillaryPower =
         thisSys->m_AncillaryOnPower * thisSys->m_PartLoadFrac + thisSys->m_AncillaryOffPower * (1.0 - thisSys->m_PartLoadFrac);
     EXPECT_NEAR(totalAncillaryPower, thisSys->m_TotalAuxElecPower, 0.00000001);
     // at PLR very near 0.5, m_TotalAuxElecPower should be very near 75 W.
-    EXPECT_NEAR(74.4036, thisSys->m_TotalAuxElecPower, 0.0001);
+    EXPECT_NEAR(73.96002, thisSys->m_TotalAuxElecPower, 0.0001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
@@ -1347,13 +1344,13 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
-    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.708728, 0.001);
+    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.690072, 0.001);
     EXPECT_EQ(thisSys->m_CoolingSpeedRatio, 0);
     EXPECT_EQ(thisSys->m_CoolingSpeedNum, 1);
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
     thisSys->m_EMSOverrideCoilSpeedNumOn = true;
-    thisSys->m_EMSOverrideCoilSpeedNumValue = 0.708728;
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 0.690072;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -1367,7 +1364,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
                       sensOut,
                       latOut);
     // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
-    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.708728, 0.001);
+    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.690072, 0.001);
     EXPECT_EQ(thisSys->m_CoolingSpeedRatio, 0); // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
     EXPECT_EQ(thisSys->m_CoolingSpeedNum, 1);   // ceiling of override value
 
@@ -4064,6 +4061,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurZoneEqNum = 1;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in Sizer
 
     UnitarySys thisSys;
@@ -4110,7 +4108,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
             state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.005;
         if (iSizingType == DataSizing::FractionOfAutosizedCoolingAirflow) thisSys.m_MaxCoolAirVolFlow = 1.0;
         // for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
-        if (iSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+        if (iSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 16192.574019749998;
 
         mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
@@ -4118,7 +4116,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         EXPECT_EQ(1.005, thisSys.m_MaxCoolAirVolFlow);
         EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
         EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
-        EXPECT_NEAR(18827.6, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 1.0);
+        EXPECT_NEAR(16192.5, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 1.0);
     }
 
     // #6200 defect file shows fan flow rate when cooling coil is off and no cooling coil exists. Allow user to set flow rate = 0 when coil does not
@@ -4137,7 +4135,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     EXPECT_EQ(1.005, thisSys.m_MaxCoolAirVolFlow);
     EXPECT_EQ(0.0, thisSys.m_MaxHeatAirVolFlow);
     EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
-    EXPECT_EQ(18827.616766698276, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad);
+    EXPECT_EQ(16192.574019749998, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad);
 
     // continue with unit testing of heating only system
     thisSys.m_CoolCoilExists = false;
@@ -4241,7 +4239,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
             state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.005;
         if (iCoolingSizingType == DataSizing::FractionOfAutosizedCoolingAirflow) thisSys.m_MaxCoolAirVolFlow = 1.0;
         // for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
-        if (iCoolingSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
+        if (iCoolingSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 16192.574019750005;
         // for FractionOfAutosizedHeatingAirflow, set sizing data to 1.005 and UnitarySystem MaxHeatAirVolFlow to 1, they will multiply and
         // yield 1.005
         if (iHeatingSizingType == DataSizing::FractionOfAutosizedHeatingAirflow) {
@@ -4257,7 +4255,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         EXPECT_NEAR(1.005, thisSys.m_MaxCoolAirVolFlow, 0.0000000001);
         EXPECT_NEAR(1.005, thisSys.m_MaxHeatAirVolFlow, 0.0000000001);
         EXPECT_NEAR(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow, 0.0000000001);
-        EXPECT_NEAR(18827.6, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 0.1);
+        EXPECT_NEAR(16192.5, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 0.1);
         EXPECT_NEAR(1431.9, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.1);
     }
 }
@@ -7872,11 +7870,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
                 0.001);
 
     // 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.032774, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.03392, 0.000001);
     EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_CoolVolumeFlowRate[1], 0.000001);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.065549, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.06784, 0.000001);
     EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_CoolVolumeFlowRate[2], 0.000001);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.098323, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.10176, 0.000001);
     EXPECT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_CoolVolumeFlowRate[3], 0.000001);
 
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[0], 0.333333, 0.000001);
@@ -7894,25 +7892,25 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
                 0.000001);
 
     // 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.008237, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.008524, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_HeatVolumeFlowRate[1]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.016473, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.017048, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_HeatVolumeFlowRate[2]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.024710, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.025573, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_HeatVolumeFlowRate[3]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[4], 0.032946, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[4], 0.034098, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(4), thisSys->m_HeatVolumeFlowRate[4]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[5], 0.041183, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[5], 0.042622, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(5), thisSys->m_HeatVolumeFlowRate[5]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[6], 0.049420, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[6], 0.051147, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(6), thisSys->m_HeatVolumeFlowRate[6]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[7], 0.057656, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[7], 0.059671, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(7), thisSys->m_HeatVolumeFlowRate[7]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[8], 0.065892, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[8], 0.068196, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(8), thisSys->m_HeatVolumeFlowRate[8]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[9], 0.074129, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[9], 0.076720, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(9), thisSys->m_HeatVolumeFlowRate[9]);
-    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[10], 0.082366, 0.000001);
+    EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[10], 0.085245, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(10), thisSys->m_HeatVolumeFlowRate[10]);
 }
 
@@ -11786,7 +11784,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in Sizer)
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
     thisSys.m_FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
-    Real64 expectedSize = 18976.394 + locDesignHeatGain3;
+    Real64 expectedSize = 19658.4199 + locDesignHeatGain3;
 
     mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
@@ -11803,7 +11801,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     // With Test Fan 4 fan heat
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     thisSys.m_FanIndex = 1; // Fan:ConstantVolume is one-based subscripts, so 1 is 1
-    expectedSize = 18976.394 + locDesignHeatGain4;
+    expectedSize = 19658.4199 + locDesignHeatGain4;
 
     mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
@@ -13358,7 +13356,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     // check autosized flows and capacity
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.005);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.005);
-    EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 20155.3, 0.1);
+    EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 20844.4, 0.1);
     EXPECT_NEAR(thisSys->m_DesignHeatingCapacity, 12319.4, 0.1);
 }
 
@@ -16063,8 +16061,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       ZoneEquipment,
                       sensOut,
                       latOut);
-    // EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
-    EXPECT_NEAR(thisSys->m_CycRatio, 0.02125, 0.001);
+    EXPECT_NEAR(thisSys->m_CycRatio, 0.02063, 0.001);
     EXPECT_NEAR(sensOut, -227.705, 0.1);
     state->dataGlobal->DoCoilDirectSolutions = true;
     thisSys->FullOutput.resize(3);
@@ -16080,8 +16077,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       ZoneEquipment,
                       sensOut,
                       latOut);
-    // EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
-    EXPECT_NEAR(thisSys->m_CycRatio, 0.02125, 0.001);
+    EXPECT_NEAR(thisSys->m_CycRatio, 0.02063, 0.001);
     EXPECT_NEAR(sensOut, -227.705, 0.1);
     // speed 2
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -12000.0;
@@ -16101,8 +16097,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       sensOut,
                       latOut);
     EXPECT_NEAR(thisSys->m_CycRatio, 1.000, 0.001);
-    // EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
-    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
+    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.087, 0.001);
     EXPECT_NEAR(sensOut, -11998.0, 3.0);
 
     state->dataGlobal->DoCoilDirectSolutions = true;
@@ -16119,17 +16114,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       sensOut,
                       latOut);
     EXPECT_NEAR(thisSys->m_CycRatio, 1.000, 0.001);
-    // EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
-    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
-    EXPECT_NEAR(sensOut, -11998.0, 210.0);
+    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.087, 0.001);
+    EXPECT_NEAR(sensOut, -11998.0, 3.0);
 
     // test EMS override
-    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.12, 0.01);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.087, 0.01);
     EXPECT_EQ(thisSys->m_NumOfSpeedCooling, 2);
     EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
 
     thisSys->m_EMSOverrideCoilSpeedNumOn = true;
-    thisSys->m_EMSOverrideCoilSpeedNumValue = 1.12;
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 1.087;
     state->dataGlobal->DoCoilDirectSolutions = false;
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -16144,10 +16138,10 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       sensOut,
                       latOut);
     EXPECT_NEAR(thisSys->m_CycRatio, 1.00, 0.01);
-    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.01);
-    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.12, 0.01);
+    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.087, 0.01);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.087, 0.01);
     EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
-    EXPECT_NEAR(sensOut, -11998.0, 210.0);
+    EXPECT_NEAR(sensOut, -11998.0, 3.0);
 
     // coil cost estimates
     CostEstimateManager::GetCostEstimateInput(*state);
@@ -16161,17 +16155,17 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     // Cost Per Each Wildcard: Qty = 1; $/Ea = 1; Total = 1 * 1 = 1
     EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(2).LineSubTotal, 1.0, 0.01);
 
-    // Cost Per Output Capacity: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(3).LineSubTotal, 347.72, 0.01);
+    // Cost Per Output Capacity: Qty = 1; $/kW = 10; RatedCap = 35.832 kW; Total = 1 * 10 * 35.832 = 358.32
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(3).LineSubTotal, 358.32, 0.01);
 
-    // Cost Per Output Capacity Wildcard: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(4).LineSubTotal, 347.72, 0.01);
+    // Cost Per Output Capacity Wildcard: Qty = 1; $/kW = 10; RatedCap = 35.832 kW; Total = 1 * 10 * 35.832 = 358.32
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(4).LineSubTotal, 358.32, 0.01);
 
-    // Cost Per Output Capacity per COP: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(5).LineSubTotal, 10431.64, 0.01);
+    // Cost Per Output Capacity per COP: Qty = 1; $/kW = 100 ; RatedCap = 35.832 kW; COP = 3; Total = 1 * 100 * 35.832 * 3 = 10749.79
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(5).LineSubTotal, 10749.79, 0.01);
 
-    // Cost Per Output Capacity per COP Wildcard: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(6).LineSubTotal, 10431.64, 0.01);
+    // Cost Per Output Capacity per COP Wildcard: Qty = 1; $/kW = 100 ; RatedCap = 35.832 kW; COP = 3; Total = 1 * 100 * 35.832 * 3 = 10749.79
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(6).LineSubTotal, 10749.79, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest)
