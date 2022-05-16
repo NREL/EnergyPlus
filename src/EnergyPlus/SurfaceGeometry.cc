@@ -974,8 +974,10 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfICSPtr.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfHasGndSurfPropertyDefined.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfGndSurfPropertyNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->IsSurfPropertyGndSurfacesDefined.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->GroundSurfsPropertyNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->UseSurfPropertyGndSurfTemp.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->UseSurfPropertyGndSurfRefl.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
             state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
@@ -992,8 +994,10 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfICSPtr(SurfNum) = 0;
             state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfNum) = false;
             state.dataSurface->SurfDaylightingShelfInd(SurfNum) = 0;
-            state.dataSurface->SurfHasGndSurfPropertyDefined.allocate(SurfNum) = false;
-            state.dataSurface->SurfGndSurfPropertyNum.allocate(SurfNum) = 0;
+            state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum) = false;
+            state.dataSurface->GroundSurfsPropertyNum(SurfNum) = 0;
+            state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
+            state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
@@ -8099,9 +8103,9 @@ namespace SurfaceGeometry {
 
                 // Assign surrounding surfaces object number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    SurroundingSurfsNum =
+                    int GroundSurfacesNum =
                         UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataSurface->GroundSurfsProperty);
-                    if (SurroundingSurfsNum == 0) {
+                    if (GroundSurfacesNum == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(6) + " has been found.");
@@ -8110,7 +8114,7 @@ namespace SurfaceGeometry {
                                               "\" no corresponding ground surfaces properties has been found in the input file.");
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).GndSurfsPtr = SurroundingSurfsNum;
+                        state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum = GroundSurfacesNum;
                     }
                 }
 
@@ -8132,9 +8136,11 @@ namespace SurfaceGeometry {
                         state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
                         state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr;
                     }
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).GndSurfsPtr != 0) {
-                        state.dataSurface->SurfHasGndSurfPropertyDefined(SurfLoop) = true;
-                        state.dataSurface->SurfGndSurfPropertyNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).GndSurfsPtr;
+                    if (state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum != 0) {
+                        state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfLoop) = true;
+                        state.dataSurface->UseSurfPropertyGndSurfTemp(SurfLoop) = true;
+                        state.dataSurface->UseSurfPropertyGndSurfRefl(SurfLoop) = true;
+                        state.dataSurface->GroundSurfsPropertyNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum;
                     }
                 }
             }
@@ -8266,32 +8272,31 @@ namespace SurfaceGeometry {
         using namespace DataErrorTracking;
         using ScheduleManager::GetScheduleIndex;
 
-        // LOCAL VARIABLE DECLARATIONS:
+        // subroutine parameter definition:
+        static constexpr std::string_view RoutineName("GetSurfaceGroundSurfsData: ");
+
+        // local variables:
         int NumAlpha;
         int NumNumeric;
         int Loop;
         int IOStat;
         int TotGndSurfsProperty;
-        int TotGndSurfs;
-        int vfLoop;
 
-        //-----------------------------------------------------------------------
-        //                SurfaceProperty:GroundSurfaces
-        //-----------------------------------------------------------------------
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
         TotGndSurfsProperty = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (TotGndSurfsProperty > 0) {
-
-            if (!allocated(state.dataSurface->GroundSurfsProperty)) {
-                state.dataSurface->GroundSurfsProperty.allocate(TotGndSurfsProperty);
-            }
-
-            for (Loop = 1; Loop <= TotGndSurfsProperty; ++Loop) {
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            //ErrorsFound = true;
+            return;
+        } else {
+            int Loop = 0;
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
-                                                                         Loop,
+                                                                         ++Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
                                                                          NumAlpha,
                                                                          state.dataIPShortCut->rNumericArgs,
@@ -8303,74 +8308,68 @@ namespace SurfaceGeometry {
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                // A1: Name
-                state.dataSurface->GroundSurfsProperty(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
-
-                // read ground surfaces properties
-                TotGndSurfs = NumNumeric;
-                state.dataSurface->GroundSurfsProperty(Loop).NumGndSurfs = TotGndSurfs;
-                state.dataSurface->GroundSurfsProperty(Loop).GndSurfs.allocate( TotGndSurfs);
-                
-
-
-                //state.dataSurface->GroundSurfsProperty(Loop).SurfName.allocate(TotGndSurfs);
-                //state.dataSurface->GroundSurfsProperty(Loop).ViewFactor.allocate(TotGndSurfs);
-                //state.dataSurface->GroundSurfsProperty(Loop).TempSchPtr.allocate(TotGndSurfs);
-                //state.dataSurface->GroundSurfsProperty(Loop).ReflSchPtr.allocate(TotGndSurfs);
-
-                // A2: ground surface name
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(1).Name = state.dataIPShortCut->cAlphaArgs(2);
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                GroundSurfacesProperty thisGndSurfsProp;
+                thisGndSurfsProp.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                int numGndSurfs;
+                auto groundSurfaces = fields.find("ground_surfaces");
+                if (groundSurfaces != fields.end()) {
+                    auto groundSurfacesArray = groundSurfaces.value();
+                    numGndSurfs = groundSurfacesArray.size();
+                    thisGndSurfsProp.GndSurfs.allocate(numGndSurfs);
+                    thisGndSurfsProp.NumGndSurfs = numGndSurfs;
+                    int surfNum = -1;
+                    for (auto groundSurface : groundSurfacesArray) {
+                        surfNum += 1;
+                        auto ground_surf_name = groundSurface.at("ground_surface_name");
+                        if (!ground_surf_name.empty()) {
+                            thisGndSurfsProp.GndSurfs[surfNum].Name = ground_surf_name.get<std::string>();
+                        }
+                        auto ground_surf_viewfactor = groundSurface.at("ground_surface_view_factor");
+                        if (!ground_surf_viewfactor.empty()) {
+                            thisGndSurfsProp.GndSurfs[surfNum].ViewFactor = ground_surf_viewfactor.get<Real64>();
+                        } else {
+                            if (surfNum == 0) {
+                                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cNumericFieldNames(1) + ".");
+                                ShowContinueError(state, "At lease one ground surface view factor should be specified.");
+                            }
+                        }
+                        auto ground_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
+                        if (!ground_surf_TempSchName.empty()) {
+                            thisGndSurfsProp.GndSurfs[surfNum].TempSchPtr = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_TempSchName));
+                        } else {
+                            if (surfNum == 0) {
+                                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + ".");
+                                ShowContinueError(state, "Ground surface temperature schedule is not specified.");
+                                ShowContinueError(state, "Simulation continues with surface outside face outdoor air drybulb temperature.");
+                            }
+                        }
+                        auto ground_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
+                        if (!ground_surf_ReflSchName.empty()) {
+                            thisGndSurfsProp.GndSurfs[surfNum].ReflSchPtr = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_ReflSchName));
+                        } else {
+                            if (surfNum == 0) {
+                                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + ".");
+                                ShowContinueError(state, "At lease one ground surface reflectance schedule should be specified.");
+                                ShowContinueError(state, "Simulation continues with global reflectance value of 0.2.");
+                            }
+                        }
+                    }
                 }
-
-                // N1: ground view factor
-                if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(1).ViewFactor = state.dataIPShortCut->rNumericArgs(1);
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cNumericFieldNames(1) + "\" is invalid.");
-                    ShowContinueError(state, "At lease one ground surface view factor must be specified.");
-                    ErrorsFound = true;
+                // calculate ground surfaces view factor sum once for later use
+                for (int gSurfNum = 1; gSurfNum <= thisGndSurfsProp.NumGndSurfs; gSurfNum++) {
+                    thisGndSurfsProp.SurfsViewFactorSum += thisGndSurfsProp.GndSurfs(gSurfNum).ViewFactor;
                 }
-
-                // A3: ground surface temp sch name
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(1).TempSchPtr =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\" is invalid.");
-                    ShowContinueError(state, "At lease one ground surface temperature schedule must be defined.");
-                    ErrorsFound = true;
+                if (thisGndSurfsProp.SurfsViewFactorSum == 0.0) {
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + "sum of ground surfaces view factor is zero.");
+                    ShowContinueError(state, "At least one ground surface view factor should be specified.");
                 }
-
-                // A4: ground surface reflectance sch name
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(1).ReflSchPtr =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" is invalid.");
-                    ShowContinueError(state, "At lease one ground surface reflectance schedule must be defined.");
-                    ErrorsFound = true;
-                }
-
-                // get extensible fields
-                for (vfLoop = 2; vfLoop <= TotGndSurfs; ++vfLoop) {
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(vfLoop).Name = state.dataIPShortCut->cAlphaArgs(vfLoop * 3 - 1);
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(vfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(vfLoop);
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(vfLoop).TempSchPtr =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(vfLoop * 3));
-                    state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(vfLoop).ReflSchPtr =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(vfLoop * 3 + 1));
-                }
-                // calculate ground surfaces view factors sum, used elsewhere
-                for (int gSurfNum = 1; gSurfNum <= TotGndSurfs; gSurfNum++) {
-                    state.dataSurface->GroundSurfsProperty(Loop).SurfsViewFactorSum +=
-                        state.dataSurface->GroundSurfsProperty(Loop).GndSurfs(gSurfNum).ViewFactor;
-                }
-                if (state.dataSurface->GroundSurfsProperty(Loop).SurfsViewFactorSum == 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + "ground surfaces sum of view factors is zero.");
-                    ShowContinueError(state, "At lease one ground surface view factor must be specified.");
-                    ErrorsFound = true;
-                }
+                //if (ErrorsFound) {
+                //    ShowFatalError(state, format(RoutineName) + "Errors found getting for object name = " + thisGndSurfsProp.Name);
+                //    ShowContinueError(state, "Previous error(s) cause program termination.");
+                //}
+                state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsProp);
             }
         }
     }

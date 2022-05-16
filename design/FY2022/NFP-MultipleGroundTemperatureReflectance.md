@@ -7,7 +7,7 @@ Allow Multiple Ground Surface Temperature and Reflectance Objects
 
  - First draft: April 26, 2022
  - Modified Date: May 6, 2022
- - Added Design Document, May 12, 2022
+ - Added Design Document, May 16, 2022
  
 
 ## Justification for New Feature ##
@@ -325,6 +325,7 @@ Long-wave radiation exchange of a building exterior surface with multiple ground
 {q''_{gnd}} = \varepsilon \sigma \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {F_{gnd,j}} \left(T_{gnd,j}^4 - T_{surf}^4 \right)
 \end{equation}
 
+where
 
 $\varepsilon$ = long-wave emittance of a building exterior surface
 
@@ -339,6 +340,27 @@ T\(_{surf}\) = building outside surface temperature
 N\(_{gnd_surfaces}\) = Number ground surfaces seen by a building exterior surface
 
 
+The above equation can be recast using multiple ground surfaces average temperature seen by an exterior surface as follows:
+
+\begin{equation}
+{q''_{gnd}} = \varepsilon \sigma \{F_{gnd, sum}} \left(T_{gnd,avg}^4 - T_{surf}^4 \right)
+\end{equation}
+
+\begin{equation}
+{F_{gnd,sum}} = \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {F_{gnd,j}}
+\end{equation}
+
+\begin{equation}
+{T_{gnd,avg}} = ((\sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {F_{gnd,j}} \left(T_{gnd,j}^4)) / \{F_{gnd,sum}})^{{1/4}}
+\end{equation}
+
+where
+
+T\(_{gnd,avg}\) = view factor weighted average surface temperature of multiple ground surfaces seen by an exterior surface
+
+F\(_{gnd,sum}\) = sum of the view factors of an exterior surfaces to multiple ground surfaces 
+
+
 ### Ground Surfaces Solar Reflectance ###
 
 Ground reflected solar radiation is calculated for beam and diffuse components separately.
@@ -349,29 +371,32 @@ The diffuse irradiance received on a building exterior surface due to sky solar 
 
 \begin{equation}
 \begin{array}{l}
-{QRadSWOutIncSkyDiffReflGnd(RecSurfNum)} = \\{DifSolarRad * {\rho_{gnd}} * SurfReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})}
+{QRadSWOutIncSkyDiffReflGnd(RecSurfNum)} = \\{DifSolarRad * {\rho_{gnd,avg}} * SurfReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})}
 \end{array}
 \end{equation}
 
-rho\(_{gnd}\) = view factor weighed ground solar reflectance of multiple ground surfaces seen by an exterior surface for each time step.
+where
+rho\(_{gnd,avg}\) = view factor weighed ground solar reflectance of multiple ground surfaces seen by an exterior surface
 
-The view factor weighed ground reflectance of multiple ground surfaces is calculated from the ground refelctances and view factors of the ground surfaces seen by the exterior surface and is given by:
+The view factor weighted average reflectance of multiple ground surfaces is calculated from the ground refelctances and view factors of the ground surfaces seen by the exterior surface and is given by:
 
 \begin{equation}
-{\rho_{gnd}} = \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {\rho_{gnd}, j} * {F_{gnd,j}} / \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {F_{gnd,j}}
+{\rho_{gnd,avg}} = \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {\rho_{gnd,j}} * {F_{gnd,j}} / \sum\limits_{j = 1}^{{N_{gnd_surfaces}}} {F_{gnd,j}}
 \end{equation}
 
-rho\(_{gnd, j}\) = reflectance of the jth ground surface seen by a building exterior surface specified by the user for each time step
+where
+
+rho\(_{gnd, j}\) = reflectance of the jth ground surface seen by an exterior surface
 
 
-\subsection{Beam Solar Radiation Diffusely Reflected from Obstructions}\label{beam-solar-radiation-diffusely-reflected-from-ground}
+\subsection{Beam Solar Radiation Diffusely Reflected from the Ground}\label{beam-solar-radiation-diffusely-reflected-from-the-ground}
 
 The beam radiation is assumed to be reflected uniformaly to all directions. The diffuse irradiance received by a building exterior surface due to beam solar diffusely reflected from multiple ground surfaces is given by:
 
 \begin{equation}
 \begin{split}
 QRadSWOutIncBmToDiffReflGnd(RecSurfNum) =
-\\BeamSolarRad * {\rho_{gnd}} * (WeightNow * SurfReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay)
+\\BeamSolarRad * {\rho_{gnd, avg}} * (WeightNow * SurfReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay)
 \\+ WeightPreviousHour * SurfReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
 \end{split}
 \end{equation}
@@ -400,19 +425,30 @@ N/A
 
 ## Design Documentation ##
 
-The new feature will modify modules: DataSurfaces, SurfaceGeomtery, HeatBalanceSurfaceManager, HeatBalFinieDiffMamanger and ConvectionCoefficients. Some functions will be modified and new functions will be added for getinput, average ground temperature and ground reflectance calculations.
+The new feature will modify modules: 
+
+   DataSurfaces, 
+   
+   SurfaceGeomtery, 
+   
+   HeatBalanceSurfaceManager, 
+   
+   HeatBalFinieDiffMamanger; and
+   
+   ConvectionCoefficients. 
+   
+   Some existing functions will be modified and new functions will be added for getinput, average ground temperature and ground reflectance calculations.
 
 
 ### Design GroundSurfaces Temperature ###
 
-Adds new function calculates ground surfaces average temperature for each SurfaceProperty:GroundSurfaces object.
+Adds new function that calculates ground surfaces average temperature for each SurfaceProperty:GroundSurfaces object.
 
 #### DataSurfaces.hh ####
 
-	*// adds module level new member vectors*
-	              SurfHasGndSurfPropertyDefined
-    Array1D<bool> SurfHasGroundSurfProperties;      // true if ground surfaces properties are listed for an external surface
-    Array1D<int> SurfGroundSurfacesNum;             // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+	*// adds module level two new member vectors*
+    Array1D<bool> IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
+    Array1D<int> GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
 	
     *Adds new struct for ground surfaces data:*
 
@@ -509,7 +545,7 @@ Adds new function calculates ground surfaces average temperature for each Surfac
 
     ...
     *// set average ground surfaces temperature for use with exterior surfaces*
-    if (IsSurfacePropertyGroundSurfacesDefined(SurfNum)) {
+    if (IsSurfPropertyGndSurfacesDefined(SurfNum)) {
         *TGround = set to ground surfaces average temperature*
     }
 
@@ -522,7 +558,7 @@ Adds new function calculates ground surfaces average temperature for each Surfac
 	{
 
     *// Set ground surfaces temperature for use with outside surface heat balance (Finite Diff Method)*
-    if (IsSurfacePropertyGroundSurfacesDefined(SurfNum)) {
+    if (IsSurfPropertyGndSurfacesDefined(SurfNum)) {
         *TGround = set to ground surfaces average temperature*
     }
 
@@ -535,7 +571,7 @@ Adds new function calculates ground surfaces average temperature for each Surfac
 
     ...
     // set average ground surfaces temperature for use with exterior surfaces
-    if (IsSurfacePropertyGroundSurfacesDefined(SurfNum)) {
+    if (IsSurfPropertyGndSurfacesDefined(SurfNum)) {
        *TGround = set to ground surfaces average temperature*
     }
 

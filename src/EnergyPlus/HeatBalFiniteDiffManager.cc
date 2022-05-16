@@ -1574,7 +1574,7 @@ namespace HeatBalFiniteDiffManager {
             auto const TDT_p(TDT(i + 1));
 
             Real64 Tgndsurface = 0.0;
-            if (state.dataSurface->SurfHasGndSurfPropertyDefined(Surf)) {
+            if (state.dataSurface->UseSurfPropertyGndSurfTemp(Surf)) {
                 Tgndsurface = state.dataSurface->GroundSurfsProperty(Surf).SurfsTempAvg;
             } else {
                 Tgndsurface = state.dataMstBal->TempOutsideAirFD(Surf);

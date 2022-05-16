@@ -1322,10 +1322,10 @@ namespace DataSurfaces {
         int ExtShadingSchedPtr;  // schedule pointer
         int SurroundingSurfsPtr; // schedule pointer
         int OutdoorAirNodePtr;   // schedule pointer
-        int GndSurfsPtr;         // pointer to multiple ground surfaces object
+        int GroundSurfsNum;         // pointer to multiple ground surfaces object
 
         // Default Constructor
-        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0), GndSurfsPtr(0)
+        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0), GroundSurfsNum(0)
         {
         }
     };
@@ -1540,9 +1540,11 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsPool;                       // true if this is a pool
     Array1D<int> SurfICSPtr;                        // Index to ICS collector
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
-    Array1D<bool> SurfHasGndSurfPropertyDefined;      // true if ground surfaces properties are listed for an external surface
-    Array1D<int> SurfGndSurfPropertyNum;             // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
-
+    Array1D<bool> IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
+    Array1D<int> GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+    Array1D<bool> UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
+    Array1D<bool> UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
+                  
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
     Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
@@ -1947,8 +1949,11 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIntConvWindowLocation.deallocate();
         this->SurfIntConvSurfGetsRadiantHeat.deallocate();
         this->SurfIntConvSurfHasActiveInIt.deallocate();
-        this->SurfHasGndSurfPropertyDefined.deallocate();
-        this->SurfGndSurfPropertyNum.deallocate();
+        this->IsSurfPropertyGndSurfacesDefined.deallocate();
+        this->GroundSurfsPropertyNum.deallocate();
+        this->UseSurfPropertyGndSurfTemp.deallocate();
+        this->UseSurfPropertyGndSurfRefl.deallocate();
+
 
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
