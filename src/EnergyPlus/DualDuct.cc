@@ -504,7 +504,7 @@ namespace DualDuct {
                     ShowSevereError(state,
                                     format("{}No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [{},{}].", RoutineName, CurrentModuleObject, state.dataDualDuct->dd_airterminal(DDNum).Name));
                     ShowContinueError(
-                        state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
+                        state, format("...should have outlet node={}", state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum)));
                     ErrorsFound = true;
                 } else {
 
@@ -540,7 +540,7 @@ namespace DualDuct {
                     if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                         ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                         ShowContinueError(
-                            state, "Occurs in " + std::string(cCMO_DDVariableVolume) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                            state, format("Occurs in {} = {}", cCMO_DDVariableVolume, state.dataDualDuct->dd_airterminal(DDNum).Name));
                         ErrorsFound = true;
                     } else {
                         state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
@@ -553,9 +553,9 @@ namespace DualDuct {
                 } else {
                     state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(state, AlphArray(7));
                     if (state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr == 0) {
-                        ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not found.");
+                        ShowSevereError(state, format("{} = {} not found.", cAlphaFields(7), AlphArray(7)));
                         ShowContinueError(
-                            state, "Occurs in " + std::string(cCMO_DDVariableVolume) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                            state, format("Occurs in {} = {}", cCMO_DDVariableVolume, state.dataDualDuct->dd_airterminal(DDNum).Name));
                         ErrorsFound = true;
                     }
                     state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist = true;
@@ -618,8 +618,7 @@ namespace DualDuct {
                     state.dataDualDuct->dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (state.dataDualDuct->dd_airterminal(DDNum).SchedPtr == 0) {
                         ShowSevereError(state,
-                                        CurrentModuleObject + ", \"" + state.dataDualDuct->dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) +
-                                            " = " + AlphArray(2) + " not found.");
+                                        format("{}, \"{}\" {} = {} not found.", CurrentModuleObject, state.dataDualDuct->dd_airterminal(DDNum).Name, cAlphaFields(2), AlphArray(2)));
                         ErrorsFound = true;
                     }
                 }
@@ -715,10 +714,9 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
-                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                                    format("{}No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [{},{}].", RoutineName, CurrentModuleObject, state.dataDualDuct->dd_airterminal(DDNum).Name));
                     ShowContinueError(
-                        state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
+                        state, format("...should have outlet node={}", state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum)));
                     ErrorsFound = true;
                 } else {
 
@@ -756,9 +754,8 @@ namespace DualDuct {
                 state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr =
                     UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
                 if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
-                    ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
-                    ShowContinueError(state,
-                                      "Occurs in " + std::string(cCMO_DDVarVolOA) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                    ShowSevereError(state, format("{} = {} not found.", cAlphaFields(6), AlphArray(6)));
+                    ShowContinueError(state,format("Occurs in {} = {}", cCMO_DDVarVolOA, state.dataDualDuct->dd_airterminal(DDNum).Name));
                     ErrorsFound = true;
                 } else {
                     state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
