@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -10127,4 +10128,54 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
     }
+}
+
+TEST_F(SQLiteFixture, StatFile_TMYx)
+{
+    // Test for #9400 and #9420
+    state->files.inStatFilePath.filePath =
+        configured_source_directory() / "tst/EnergyPlus/unit/Resources/USA_IL_Chicago.OHare.Intl.AP.725300_TMYx.stat";
+
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
+
+    SetPredefinedTables(*state);
+
+    FillWeatherPredefinedEntries(*state);
+
+    // Enable the ClimaticDataSummary report, in a future-proof way
+    auto &predefReports = state->dataOutRptPredefined->reportName;
+    auto it = std::find_if(predefReports.begin(), predefReports.end(), [](const auto &s) { return s.name == "ClimaticDataSummary"; });
+    ASSERT_NE(it, predefReports.end());
+    it->show = true;
+    // EXPECT_EQ("ClimaticDataSummary", state->dataOutRptPredefined->reportName(1).name);
+    // EXPECT_TRUE(state->dataOutRptPredefined->reportName(1).show);
+
+    WritePredefinedTables(*state);
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // - Monthly Statistics for Liquid Precipitation [mm]
+    //              Jan     Feb     Mar     Apr     May     Jun     Jul     Aug     Sep     Oct     Nov     Dec
+    //    Total     41      18      65      48      110     106     75      53      24      143     63      61
+    //  Max Hourly  5       5       7       6       7       7       5       6       5       7       6       6
+    //  => Total: 807
+    //     Max hourly: 7, occurs in Mar
+
+    constexpr static auto queryStr = R"sqlite(SELECT Value FROM TabularDataWithStrings
+        WHERE ReportName = "ClimaticDataSummary"
+          AND TableName = "Weather Statistics File"
+          AND RowName = "{}";
+    )sqlite";
+    EXPECT_EQ(807.0, execAndReturnFirstDouble(fmt::format(queryStr, "Annual Total Precipitation")));
+    EXPECT_EQ(7.0, execAndReturnFirstDouble(fmt::format(queryStr, "Max Hourly Precipitation")));
+    auto result = queryResult(fmt::format(queryStr, "Max Hourly Precipitation Occurs in"), "TabularDataWithStrings");
+    ASSERT_EQ(1, result.size());
+    ASSERT_FALSE(result[0].empty());
+    EXPECT_EQ("Mar", result[0][0]);
 }
