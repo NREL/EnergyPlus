@@ -388,6 +388,11 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->ShadingSurfaceFirst == -1) state.dataSurface->ShadingSurfaceFirst = SurfNum;
                 state.dataSurface->ShadingSurfaceLast = SurfNum;
             }
+            if ((state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtSolar) ||
+                state.dataSurface->Surface(SurfNum).IsShadowing) {
+                // Some attached shading surfaces may be true for both
+                state.dataSurface->AllExtSolAndShadingSurfaceList.push_back(SurfNum);
+            }
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Shading) ++state.dataSurface->AttachedShadingCount;
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_F) ++state.dataSurface->FixedShadingCount;
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_B) ++state.dataSurface->BuildingShadingCount;
@@ -2684,11 +2689,6 @@ namespace SurfaceGeometry {
             if (state.dataSurface->Surface(SurfNum).ExtSolar) {
                 // This may include some attached shading surfaces
                 state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
-            }
-            if ((state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtSolar) ||
-                state.dataSurface->Surface(SurfNum).IsShadowing) {
-                // Some attached shading surfaces may be true for both
-                state.dataSurface->AllExtSolAndShadingSurfaceList.push_back(SurfNum);
             }
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf) {
                 // Outside light shelves get tagged later as HeatTransSurf=true but they haven't been processed yet
