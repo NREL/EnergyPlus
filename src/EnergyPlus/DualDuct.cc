@@ -103,12 +103,6 @@ namespace DualDuct {
     using namespace DataSizing;
     using namespace ScheduleManager;
 
-    constexpr Real64 DualDuctMassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
-    constexpr std::string_view cCMO_DDConstantVolume = "AirTerminal:DualDuct:ConstantVolume";
-    constexpr std::string_view cCMO_DDVariableVolume = "AirTerminal:DualDuct:VAV";
-    constexpr std::string_view cCMO_DDVarVolOA = "AirTerminal:DualDuct:VAV:OutdoorAir";
-    std::array<std::string_view, static_cast<int>(PerPersonMode::Num)> perPersonModesUC = {"NOTSET", "CURRENTOCCUPANCY", "DESIGNOCCUPANCY"};
-
     void SimulateDualDuct(
         EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
@@ -151,7 +145,7 @@ namespace DualDuct {
                                       state.dataDualDuct->NumDDAirTerminal,
                                       CompName));
             }
-            if (state.dataDualDuct->dd_airterminal(DDNum).CheckEquipName) {
+            if (state.dataDualDuct->CheckEquipName(DDNum)) {
                 if (CompName != state.dataDualDuct->dd_airterminal(DDNum).Name) {
                     ShowFatalError(state,
                                    format("SimulateDualDuct: Invalid CompIndex passed={}, Damper name={}, stored Damper Name for that index={}",
@@ -159,7 +153,7 @@ namespace DualDuct {
                                           CompName,
                                           state.dataDualDuct->dd_airterminal(DDNum).Name));
                 }
-                state.dataDualDuct->dd_airterminal(DDNum).CheckEquipName = false;
+                state.dataDualDuct->CheckEquipName(DDNum) = false;
             }
         }
 
@@ -240,21 +234,25 @@ namespace DualDuct {
         int SupAirIn;                         // controlled zone supply air inlet index
         int ADUNum;                           // loop control to search Air Distribution Units
         Real64 DummyOAFlow(0.0);
-        int NumDualDuctConstVolDampers = 0;
-        int NumDualDuctVarVolDampers = 0;
 
-        NumDualDuctConstVolDampers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
-        NumDualDuctVarVolDampers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
-        state.dataDualDuct->NumDualDuctVarVolOA = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
-        state.dataDualDuct->NumDDAirTerminal = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
+        state.dataDualDuct->NumDualDuctConstVolDampers =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
+        state.dataDualDuct->NumDualDuctVarVolDampers =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);
+        state.dataDualDuct->NumDualDuctVarVolOA =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+        state.dataDualDuct->NumDDAirTerminal =
+            state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
         state.dataDualDuct->dd_airterminal.allocate(state.dataDualDuct->NumDDAirTerminal);
         state.dataDualDuct->UniqueDualDuctAirTerminalNames.reserve(state.dataDualDuct->NumDDAirTerminal);
+        state.dataDualDuct->CheckEquipName.dimension(state.dataDualDuct->NumDDAirTerminal, true);
 
-        if (NumDualDuctConstVolDampers > 0) {
-            // Load the info from the damper, do this conversion once.  Ideally we'd just operate on the string_view,
-            // but it feels like there's a lot of APIs that would need to change
-            CurrentModuleObject = cCMO_DDConstantVolume;
-            for (DamperIndex = 1; DamperIndex <= NumDualDuctConstVolDampers; ++DamperIndex) {
+        if (state.dataDualDuct->NumDualDuctConstVolDampers > 0) {
+            for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctConstVolDampers; ++DamperIndex) {
+
+                // Load the info from the damper
+                CurrentModuleObject = state.dataDualDuct->cCMO_DDConstantVolume;
+
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          DamperIndex,
@@ -413,9 +411,12 @@ namespace DualDuct {
             } // end Number of Damper Loop
         }
 
-        if (NumDualDuctVarVolDampers > 0) {
-            CurrentModuleObject = cCMO_DDVariableVolume;
-            for (DamperIndex = 1; DamperIndex <= NumDualDuctVarVolDampers; ++DamperIndex) {
+        if (state.dataDualDuct->NumDualDuctVarVolDampers > 0) {
+            for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolDampers; ++DamperIndex) {
+
+                // Load the info from the damper
+                CurrentModuleObject = state.dataDualDuct->cCMO_DDVariableVolume;
+
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          DamperIndex,
@@ -430,7 +431,7 @@ namespace DualDuct {
                                                                          cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
-                DDNum = DamperIndex + NumDualDuctConstVolDampers;
+                DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers;
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataDualDuct->UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 state.dataDualDuct->dd_airterminal(DDNum).Name = AlphArray(1);
@@ -548,7 +549,8 @@ namespace DualDuct {
                         UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
                     if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                         ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
-                        ShowContinueError(state, format("Occurs in {} = {}", cCMO_DDVariableVolume, state.dataDualDuct->dd_airterminal(DDNum).Name));
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVariableVolume + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     } else {
                         state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
@@ -562,7 +564,8 @@ namespace DualDuct {
                     state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(state, AlphArray(7));
                     if (state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr == 0) {
                         ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not found.");
-                        ShowContinueError(state, format("Occurs in {} = {}", cCMO_DDVariableVolume, state.dataDualDuct->dd_airterminal(DDNum).Name));
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVariableVolume + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     }
                     state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist = true;
@@ -595,8 +598,11 @@ namespace DualDuct {
         }
 
         if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
-            CurrentModuleObject = cCMO_DDVarVolOA;
             for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
+
+                // Load the info from the damper
+                CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
+
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          DamperIndex,
@@ -611,7 +617,7 @@ namespace DualDuct {
                                                                          cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
-                DDNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
+                DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers;
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataDualDuct->UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 state.dataDualDuct->dd_airterminal(DDNum).Name = AlphArray(1);
@@ -688,9 +694,15 @@ namespace DualDuct {
                                 "Air Nodes");
                 }
 
-                // AlphArray 7 can be blank, but if it is, we just don't do anything with it, we leave the member variable as PerPersonMode::NotSet
-                state.dataDualDuct->dd_airterminal(DDNum).OAPerPersonMode =
-                    static_cast<PerPersonMode>(getEnumerationValue(perPersonModesUC, AlphArray(7)));
+                {
+                    auto const SELECT_CASE_var(AlphArray(7));
+                    if (SELECT_CASE_var == "CURRENTOCCUPANCY") {
+                        state.dataDualDuct->dd_airterminal(DDNum).OAPerPersonMode = PerPersonMode::DCVByCurrentLevel;
+
+                    } else if (SELECT_CASE_var == "DESIGNOCCUPANCY") {
+                        state.dataDualDuct->dd_airterminal(DDNum).OAPerPersonMode = PerPersonMode::ByDesignLevel;
+                    }
+                }
                 // checks on this are done later
 
                 for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
@@ -756,7 +768,8 @@ namespace DualDuct {
                     UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
                 if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
-                    ShowContinueError(state, format("Occurs in {} = {}", cCMO_DDVarVolOA, state.dataDualDuct->dd_airterminal(DDNum).Name));
+                    ShowContinueError(state,
+                                      "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                     ErrorsFound = true;
                 } else {
                     state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
@@ -791,7 +804,8 @@ namespace DualDuct {
                                                        state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate,
                                                        cNumericFields(1)));
                                 ShowContinueError(state,
-                                                  format("Occurs in {} = {}", cCMO_DDVarVolOA, state.dataDualDuct->dd_airterminal(DDNum).Name));
+                                                  "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " +
+                                                      state.dataDualDuct->dd_airterminal(DDNum).Name);
                                 ShowContinueError(state,
                                                   format("The design outdoor air requirement is {:.5R}",
                                                          state.dataDualDuct->dd_airterminal(DDNum).DesignOAFlowRate));
@@ -807,13 +821,15 @@ namespace DualDuct {
                                                                            // do nothing, okay since no per person requirement involved
                     } else if ((DummyOAFlow > 0.0) && (lAlphaBlanks(7))) { // missing input
                         ShowSevereError(state, cAlphaFields(7) + " was blank.");
-                        ShowContinueError(state, format("Occurs in {} = {}", cCMO_DDVarVolOA, state.dataDualDuct->dd_airterminal(DDNum).Name));
-                        ShowContinueError(state, R"(Valid choices are "CurrentOccupancy" or "DesignOccupancy")");
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                        ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
                     } else if ((DummyOAFlow > 0.0) && !(lAlphaBlanks(7))) { // incorrect input
                         ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not a valid key choice.");
-                        ShowContinueError(state, format("Occurs in {} = {}", cCMO_DDVarVolOA, state.dataDualDuct->dd_airterminal(DDNum).Name));
-                        ShowContinueError(state, R"(Valid choices are "CurrentOccupancy" or "DesignOccupancy")");
+                        ShowContinueError(
+                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                        ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
                     }
                 }
@@ -880,8 +896,24 @@ namespace DualDuct {
         int OAInNode; // Outdoor Air Inlet Node for VAV:OutdoorAir units
         int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
         int OutNode;
+        // static Array1D_bool MyEnvrnFlag;
+        // static Array1D_bool MySizeFlag;
+        // static Array1D_bool MyAirLoopFlag;
         int Loop;          // Loop checking control variable
         Real64 PeopleFlow; // local sum variable, m3/s
+
+        // Do the Begin Simulation initializations
+        if (state.dataDualDuct->InitDualDuctMyOneTimeFlag) {
+
+            // MyEnvrnFlag.allocate(NumDDAirTerminal);
+            // MySizeFlag.allocate(NumDDAirTerminal);
+            // MyAirLoopFlag.dimension(NumDDAirTerminal, true);
+            // MyEnvrnFlag = true;
+            // MySizeFlag = true;
+            state.dataDualDuct->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
+
+            state.dataDualDuct->InitDualDuctMyOneTimeFlag = false;
+        }
 
         if (!state.dataDualDuct->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataDualDuct->ZoneEquipmentListChecked = true;
@@ -894,11 +926,14 @@ namespace DualDuct {
                                 "InitDualDuct: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(this->ADUNum).Name +
                                     "] is not on any ZoneHVAC:EquipmentList.");
                 if (this->DamperType == DualDuctDamper::ConstantVolume) {
-                    ShowContinueError(state, format("...Dual Duct Damper=[{},{}] will not be simulated.", cCMO_DDConstantVolume, this->Name));
+                    ShowContinueError(
+                        state, "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDConstantVolume + ',' + this->Name + "] will not be simulated.");
                 } else if (this->DamperType == DualDuctDamper::VariableVolume) {
-                    ShowContinueError(state, format("...Dual Duct Damper=[{},{}] will not be simulated.", cCMO_DDVariableVolume, this->Name));
+                    ShowContinueError(
+                        state, "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDVariableVolume + ',' + this->Name + "] will not be simulated.");
                 } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
-                    ShowContinueError(state, format("...Dual Duct Damper=[{},{}] will not be simulated.", cCMO_DDVarVolOA, this->Name));
+                    ShowContinueError(state,
+                                      "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDVarVolOA + ',' + this->Name + "] will not be simulated.");
                 } else {
                     ShowContinueError(state, "...Dual Duct Damper=[unknown/invalid," + this->Name + "] will not be simulated.");
                 }
@@ -968,6 +1003,7 @@ namespace DualDuct {
                             state.dataHeatBal->People(Loop).NumberOfPeople * state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
                     }
                 }
+                this->OAPerPersonByDesignLevel = PeopleFlow;
 
                 this->MyEnvrnFlag = false;
             }
@@ -1159,11 +1195,11 @@ namespace DualDuct {
 
             if ((state.dataSize->CurZoneEqNum > 0) && (state.dataSize->CurTermUnitSizingNum > 0)) {
                 if (this->DamperType == DualDuctDamper::ConstantVolume) {
-                    DamperType = cCMO_DDConstantVolume;
+                    DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
                 } else if (this->DamperType == DualDuctDamper::VariableVolume) {
-                    DamperType = cCMO_DDVariableVolume;
+                    DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
                 } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
-                    DamperType = cCMO_DDVarVolOA;
+                    DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
                 } else {
                     DamperType = "Invalid/Unknown";
                 }
@@ -1523,10 +1559,10 @@ namespace DualDuct {
             // Using Mass Continuity to determine the other duct flow quantity
             this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow - this->dd_airterminalColdAirInlet.AirMassFlowRate;
 
-            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < DualDuctMassFlowSetToler) {
+            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = MassFlow;
-            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < DualDuctMassFlowSetToler) {
+            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow;
             }
@@ -1945,7 +1981,7 @@ namespace DualDuct {
         } else {
             UseOccSchFlag = false;
             PerPersonNotSet = false;
-            PerPersonNotSet = this->OAPerPersonMode == PerPersonMode::ModeNotSet;
+            if (this->OAPerPersonMode == PerPersonMode::ModeNotSet) PerPersonNotSet = true;
         }
 
         OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
@@ -2222,11 +2258,11 @@ namespace DualDuct {
 
             std::string DamperType;
             if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::ConstantVolume) {
-                DamperType = cCMO_DDConstantVolume;
+                DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
             } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::VariableVolume) {
-                DamperType = cCMO_DDVariableVolume;
+                DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
             } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::OutdoorAir) {
-                DamperType = cCMO_DDVarVolOA;
+                DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
             } else {
                 DamperType = "Invalid/Unknown";
             }
@@ -2304,7 +2340,8 @@ namespace DualDuct {
         //  END IF
 
         if (state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
-            state.dataDualDuct->NumDualDuctVarVolOA = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
+            state.dataDualDuct->NumDualDuctVarVolOA =
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
             state.dataDualDuct->RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             state.dataDualDuct->DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
@@ -2314,8 +2351,10 @@ namespace DualDuct {
                 Array1D_string cNumericFields(2);     // Numeric field names
                 Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
                 Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
-                CurrentModuleObject = cCMO_DDVarVolOA;
                 for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
+
+                    CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
+
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              CurrentModuleObject,
                                                                              DamperIndex,
