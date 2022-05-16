@@ -2221,32 +2221,32 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  DOAS DX Cooling Coil;    !- Cooling Coil Name",
 
         "Coil:Cooling:DX:SingleSpeed,",
-        "	DOAS DX Cooling Coil,   !- Name",
-        " 	AvailSched,            !- Availability Schedule Name",
-        "	autosize,              !- Gross Rated Total Cooling Capacity { W }",
-        "	autosize,              !- Gross Rated Sensible Heat Ratio",
-        "	4.40,                  !- Gross Rated Cooling COP { W / W }",
-        "	autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
-        "	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
-        "	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
-        "	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
-        "	Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
-        "	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
-        "	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
-        "	Cubic,                 !- Part Load Fraction Correlation Curve Name",
-        "	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
-        "	0.0,                   !- Nominal Time for Condensate Removal to Begin",
-        "	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
-        "	0.0,                   !- Maximum Cycling Rate",
-        "	0.0,                   !- Latent Capacity Time Constant",
-        "	Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
-        "	EvaporativelyCooled,   !- Condenser Type",
-        "	0.0,                   !- Evaporative Condenser Effectiveness",
-        "	,                      !- Evaporative Condenser Air Flow Rate",
-        "	autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
-        "	0.0,                   !- Crankcase Heater Capacity",
-        "	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+        "   DOAS DX Cooling Coil,   !- Name",
+        "   AvailSched,            !- Availability Schedule Name",
+        "   autosize,              !- Gross Rated Total Cooling Capacity { W }",
+        "   autosize,              !- Gross Rated Sensible Heat Ratio",
+        "   4.40,                  !- Gross Rated Cooling COP { W / W }",
+        "   autosize,              !- Rated Air Flow Rate { m3 / s }",
+        "   ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "   DOAS Mixed Air Outlet, !- Air Inlet Node Name",
+        "   DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
+        "   Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+        "   Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "   Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+        "   Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "   Cubic,                 !- Part Load Fraction Correlation Curve Name",
+        "   ,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "   0.0,                   !- Nominal Time for Condensate Removal to Begin",
+        "   0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+        "   0.0,                   !- Maximum Cycling Rate",
+        "   0.0,                   !- Latent Capacity Time Constant",
+        "   Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+        "   EvaporativelyCooled,   !- Condenser Type",
+        "   0.0,                   !- Evaporative Condenser Effectiveness",
+        "   ,                      !- Evaporative Condenser Air Flow Rate",
+        "   autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
+        "   0.0,                   !- Crankcase Heater Capacity",
+        "   10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "Coil:Heating:Fuel,",
         "  DOAS Heating Coil,       !- Name",
@@ -3196,32 +3196,32 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"  DOAS DX Cooling Coil;    !- Cooling Coil Name",
 
 //"Coil:Cooling:DX:SingleSpeed,",
-//"	DOAS DX Cooling Coil,   !- Name",
-//" 	AvailSched,            !- Availability Schedule Name",
-//"	autosize,              !- Gross Rated Total Cooling Capacity { W }",
-//"	autosize,              !- Gross Rated Sensible Heat Ratio",
-//"	4.40,                  !- Gross Rated Cooling COP { W / W }",
-//"	autosize,              !- Rated Air Flow Rate { m3 / s }",
-//"	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
-//"	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
-//"	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
-//"	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
-//"	Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
-//"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
-//"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
-//"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
-//"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
-//"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
-//"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
-//"	0.0,                   !- Maximum Cycling Rate",
-//"	0.0,                   !- Latent Capacity Time Constant",
-//"	Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
-//"	EvaporativelyCooled,   !- Condenser Type",
-//"	0.0,                   !- Evaporative Condenser Effectiveness",
-//"	,                      !- Evaporative Condenser Air Flow Rate",
-//"	autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
-//"	0.0,                   !- Crankcase Heater Capacity",
-//"	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+//" DOAS DX Cooling Coil,   !- Name",
+//"     AvailSched,            !- Availability Schedule Name",
+//" autosize,              !- Gross Rated Total Cooling Capacity { W }",
+//" autosize,              !- Gross Rated Sensible Heat Ratio",
+//" 4.40,                  !- Gross Rated Cooling COP { W / W }",
+//" autosize,              !- Rated Air Flow Rate { m3 / s }",
+//" ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+//" DOAS Mixed Air Outlet, !- Air Inlet Node Name",
+//" DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
+//" Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+//" Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+//" Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+//" Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+//" Cubic,                 !- Part Load Fraction Correlation Curve Name",
+//" ,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+//" 0.0,                   !- Nominal Time for Condensate Removal to Begin",
+//" 0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+//" 0.0,                   !- Maximum Cycling Rate",
+//" 0.0,                   !- Latent Capacity Time Constant",
+//" Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+//" EvaporativelyCooled,   !- Condenser Type",
+//" 0.0,                   !- Evaporative Condenser Effectiveness",
+//" ,                      !- Evaporative Condenser Air Flow Rate",
+//" autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
+//" 0.0,                   !- Crankcase Heater Capacity",
+//" 10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
 //"Coil:Heating:Fuel,",
 //"  DOAS Heating Coil,       !- Name",
@@ -4967,7 +4967,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 ////state->dataGlobal->DDOnlySimulation = true;
 
 // ManageSimulation();
-////	compare_err_stream( "" );
+////    compare_err_stream( "" );
 
 // EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntTot, "Overhang" ) );
 // EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntExt, "Overhang" ) );
@@ -8230,41 +8230,29 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
 TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
 {
-    StatLineType lineTypeReturn = StatLineType::Initialized;
-    bool desCondLinePassed = false;
-    bool htgDesignLinePassed = false;
-    bool clgDesignLinePassed = false;
-    bool isKoppen = false;
+
+    auto getLineType = [](const std::string statLine) -> StatLineType {
+        StatLineType lineTypeReturn = StatLineType::Initialized;
+        bool desCondLinePassed = false;
+        bool htgDesignLinePassed = false;
+        bool clgDesignLinePassed = false;
+        bool isKoppen = false;
+        bool insideLiquidPrecipitation = false;
+        parseStatLine(statLine, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen, insideLiquidPrecipitation);
+        return lineTypeReturn;
+    };
+
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
-    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
-    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
-    parseStatLine(koppenLineWithDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineWithDots)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
-    parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineNoDots)));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
