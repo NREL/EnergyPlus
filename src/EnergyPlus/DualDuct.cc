@@ -103,6 +103,10 @@ namespace DualDuct {
     using namespace DataSizing;
     using namespace ScheduleManager;
 
+    constexpr std::string_view cCMO_DDConstantVolume = "AirTerminal:DualDuct:ConstantVolume";
+    constexpr std::string_view cCMO_DDVariableVolume = "AirTerminal:DualDuct:VAV";
+    constexpr std::string_view cCMO_DDVarVolOA = "AirTerminal:DualDuct:VAV:OutdoorAir";
+
     void SimulateDualDuct(
         EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
@@ -117,8 +121,6 @@ namespace DualDuct {
         // This subroutine manages Damper component simulation.
         // It is called from the SimAirLoopComponent
         // at the system time step.
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DDNum; // The Damper that you are currently loading input into
@@ -181,16 +183,10 @@ namespace DualDuct {
 
             // Update the current Damper to the outlet nodes
             thisDualDuct.UpdateDualDuct(state);
-
-            // Report the current Damper
-            thisDualDuct.ReportDualDuct();
         } else {
             ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
         }
     }
-
-    // Get Input Section of the Module
-    //******************************************************************************
 
     void GetDualDuctInput(EnergyPlusData &state)
     {
@@ -216,7 +212,6 @@ namespace DualDuct {
         static constexpr std::string_view RoutineName("GetDualDuctInput: "); // include trailing bla
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int DDNum;       // The Damper that you are currently loading input into
         int DamperIndex; // Loop index to Damper that you are currently loading input into
         int NumAlphas;
@@ -236,11 +231,11 @@ namespace DualDuct {
         Real64 DummyOAFlow(0.0);
 
         state.dataDualDuct->NumDualDuctConstVolDampers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDConstantVolume);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
         state.dataDualDuct->NumDualDuctVarVolDampers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVariableVolume);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
         state.dataDualDuct->NumDualDuctVarVolOA =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
         state.dataDualDuct->NumDDAirTerminal =
             state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
         state.dataDualDuct->dd_airterminal.allocate(state.dataDualDuct->NumDDAirTerminal);
@@ -251,7 +246,7 @@ namespace DualDuct {
             for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctConstVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = state.dataDualDuct->cCMO_DDConstantVolume;
+                CurrentModuleObject = cCMO_DDConstantVolume;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
@@ -415,7 +410,7 @@ namespace DualDuct {
             for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = state.dataDualDuct->cCMO_DDVariableVolume;
+                CurrentModuleObject = cCMO_DDVariableVolume;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
@@ -550,7 +545,7 @@ namespace DualDuct {
                     if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                         ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                         ShowContinueError(
-                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVariableVolume + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                            state, "Occurs in " + std::string(cCMO_DDVariableVolume) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     } else {
                         state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
@@ -565,7 +560,7 @@ namespace DualDuct {
                     if (state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr == 0) {
                         ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not found.");
                         ShowContinueError(
-                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVariableVolume + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                            state, "Occurs in " + std::string(cCMO_DDVariableVolume) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     }
                     state.dataDualDuct->dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist = true;
@@ -601,7 +596,7 @@ namespace DualDuct {
             for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
+                CurrentModuleObject = cCMO_DDVarVolOA;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
@@ -769,7 +764,7 @@ namespace DualDuct {
                 if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                     ShowContinueError(state,
-                                      "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                                      "Occurs in " + std::string(cCMO_DDVarVolOA) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                     ErrorsFound = true;
                 } else {
                     state.dataDualDuct->dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
@@ -804,7 +799,7 @@ namespace DualDuct {
                                                        state.dataDualDuct->dd_airterminal(DDNum).MaxAirVolFlowRate,
                                                        cNumericFields(1)));
                                 ShowContinueError(state,
-                                                  "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " +
+                                                  "Occurs in " + std::string(cCMO_DDVarVolOA) + " = " +
                                                       state.dataDualDuct->dd_airterminal(DDNum).Name);
                                 ShowContinueError(state,
                                                   format("The design outdoor air requirement is {:.5R}",
@@ -822,13 +817,13 @@ namespace DualDuct {
                     } else if ((DummyOAFlow > 0.0) && (lAlphaBlanks(7))) { // missing input
                         ShowSevereError(state, cAlphaFields(7) + " was blank.");
                         ShowContinueError(
-                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                            state, "Occurs in " + std::string(cCMO_DDVarVolOA) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
                     } else if ((DummyOAFlow > 0.0) && !(lAlphaBlanks(7))) { // incorrect input
                         ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not a valid key choice.");
                         ShowContinueError(
-                            state, "Occurs in " + state.dataDualDuct->cCMO_DDVarVolOA + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
+                            state, "Occurs in " + std::string(cCMO_DDVarVolOA) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
                         ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
                     }
@@ -865,12 +860,6 @@ namespace DualDuct {
         }
     }
 
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void DualDuctAirTerminal::InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
@@ -896,22 +885,12 @@ namespace DualDuct {
         int OAInNode; // Outdoor Air Inlet Node for VAV:OutdoorAir units
         int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
         int OutNode;
-        // static Array1D_bool MyEnvrnFlag;
-        // static Array1D_bool MySizeFlag;
-        // static Array1D_bool MyAirLoopFlag;
         int Loop;          // Loop checking control variable
         Real64 PeopleFlow; // local sum variable, m3/s
 
         // Do the Begin Simulation initializations
         if (state.dataDualDuct->InitDualDuctMyOneTimeFlag) {
-
-            // MyEnvrnFlag.allocate(NumDDAirTerminal);
-            // MySizeFlag.allocate(NumDDAirTerminal);
-            // MyAirLoopFlag.dimension(NumDDAirTerminal, true);
-            // MyEnvrnFlag = true;
-            // MySizeFlag = true;
             state.dataDualDuct->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
-
             state.dataDualDuct->InitDualDuctMyOneTimeFlag = false;
         }
 
@@ -927,13 +906,13 @@ namespace DualDuct {
                                     "] is not on any ZoneHVAC:EquipmentList.");
                 if (this->DamperType == DualDuctDamper::ConstantVolume) {
                     ShowContinueError(
-                        state, "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDConstantVolume + ',' + this->Name + "] will not be simulated.");
+                        state, "...Dual Duct Damper=[" + std::string(cCMO_DDConstantVolume) + ',' + this->Name + "] will not be simulated.");
                 } else if (this->DamperType == DualDuctDamper::VariableVolume) {
                     ShowContinueError(
-                        state, "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDVariableVolume + ',' + this->Name + "] will not be simulated.");
+                        state, "...Dual Duct Damper=[" + std::string(cCMO_DDVariableVolume) + ',' + this->Name + "] will not be simulated.");
                 } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
                     ShowContinueError(state,
-                                      "...Dual Duct Damper=[" + state.dataDualDuct->cCMO_DDVarVolOA + ',' + this->Name + "] will not be simulated.");
+                                      "...Dual Duct Damper=[" + std::string(cCMO_DDVarVolOA) + ',' + this->Name + "] will not be simulated.");
                 } else {
                     ShowContinueError(state, "...Dual Duct Damper=[unknown/invalid," + this->Name + "] will not be simulated.");
                 }
@@ -941,9 +920,7 @@ namespace DualDuct {
         }
 
         if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag) {
-
             this->SizeDualDuct(state);
-
             this->MySizeFlag = false;
         }
 
@@ -1195,11 +1172,11 @@ namespace DualDuct {
 
             if ((state.dataSize->CurZoneEqNum > 0) && (state.dataSize->CurTermUnitSizingNum > 0)) {
                 if (this->DamperType == DualDuctDamper::ConstantVolume) {
-                    DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
+                    DamperType = cCMO_DDConstantVolume;
                 } else if (this->DamperType == DualDuctDamper::VariableVolume) {
-                    DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
+                    DamperType = cCMO_DDVariableVolume;
                 } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
-                    DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
+                    DamperType = cCMO_DDVarVolOA;
                 } else {
                     DamperType = "Invalid/Unknown";
                 }
@@ -1237,12 +1214,6 @@ namespace DualDuct {
         }
     }
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void DualDuctAirTerminal::SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum)
     {
 
@@ -1258,27 +1229,11 @@ namespace DualDuct {
         // METHODOLOGY EMPLOYED:
         // There is method to this madness.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        // unused0909   USE DataHeatBalFanSys, ONLY: Mat
         using DataHVACGlobals::SmallTempDiff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MassFlow;    // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
@@ -1393,27 +1348,12 @@ namespace DualDuct {
         // METHODOLOGY EMPLOYED:
         // There is method to this madness.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         // unused0909   USE DataHeatBalFanSys, ONLY: Mat
         using DataHVACGlobals::SmallTempDiff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MassFlow;    // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
@@ -1622,26 +1562,11 @@ namespace DualDuct {
         // if the zone calls for heating and the inlet air is warm enough, modulate damper to meet load
         // if the zone calls for heating and the inlet air is too cold, zero flow (will not control sans reheat)
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::SmallTempDiff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MassFlowMax;     // [kg/sec]   Maximum Mass Flow Rate from OA and Recirc Inlets
@@ -1724,18 +1649,6 @@ namespace DualDuct {
                 QRALoad = 0.0;
             }
 
-            //  IF (QTotLoadRemain == 0.0d0) THEN  ! floating in deadband
-            //    IF ((QTotRemainAdjust < 0.0d0) .AND. (QtoCoolSPRemainAdjust < 0.0d0)) THEN !really need cooling
-            //      QRALoad = QtoCoolSPRemainAdjust
-            //    ELSEIF ((QTotRemainAdjust > 0.0d0) .AND. (QtoHeatSPRemainAdjust > 0.0d0)) THEN ! really need heating
-            //      QRALoad = QtoHeatSPRemainAdjust
-            //    ELSE
-            //      QRALoad = 0.0 ! still floating in deadband even with impact of OA side
-            //    ENDIF
-            //  ELSE
-            //    QRALoad = QTotRemainAdjust
-            //  ENDIF
-
             if (QRALoad < 0.0) {                                                                                         // cooling
                 if ((this->dd_airterminalRecircAirInlet.AirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp) < -0.5) { // can cool
                     //  Find the Mass Flow Rate of the RA Stream needed to meet the zone cooling load
@@ -1751,13 +1664,7 @@ namespace DualDuct {
                 }
 
             } else if (QRALoad > 0.0) { // heating
-                //    IF ((dd_airterminalRecircAirInlet(DDNum)%AirTemp - Node(ZoneNodeNum)%Temp) > 2.0d0)  THEN ! can heat
-                //      dd_airterminalRecircAirInlet(DDNum)%AirMassFlowRate = QRALoad / &
-                //                         (CpAirSysRA*dd_airterminalRecircAirInlet(DDNum)%AirTemp - CpAirZn*Node(ZoneNodeNum)%Temp)
-                //    ELSE
                 this->dd_airterminalRecircAirInlet.AirMassFlowRate = 0.0;
-                //    ENDIF
-
             } else { // none needed.
                 this->dd_airterminalRecircAirInlet.AirMassFlowRate = 0.0;
             }
@@ -1941,24 +1848,11 @@ namespace DualDuct {
         // METHODOLOGY EMPLOYED:
         // User input defines method used to calculate OA.
 
-        // REFERENCES:
-
         // Using/Aliasing
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
         bool UseOccSchFlag;      // TRUE = use actual occupancy, FALSE = use total zone people
@@ -1995,12 +1889,6 @@ namespace DualDuct {
             MaxOAVolFlow = OAVolumeFlowRate;
         }
     }
-
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the Damper Module
-    // *****************************************************************************
 
     void DualDuctAirTerminal::UpdateDualDuct(EnergyPlusData &state)
     {
@@ -2126,50 +2014,6 @@ namespace DualDuct {
         }
     }
 
-    //        End of Update subroutines for the Damper Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Damper Module
-    // *****************************************************************************
-
-    void DualDuctAirTerminal::ReportDualDuct() // unused1208
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Unknown
-        //       DATE WRITTEN   Unknown
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine updates the damper report variables.
-
-        // METHODOLOGY EMPLOYED:
-        // There is method to this madness.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // Still needs to report the Damper power from this component
-    }
-
     void ReportDualDuctConnections(EnergyPlusData &state)
     {
 
@@ -2258,11 +2102,11 @@ namespace DualDuct {
 
             std::string DamperType;
             if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::ConstantVolume) {
-                DamperType = state.dataDualDuct->cCMO_DDConstantVolume;
+                DamperType = cCMO_DDConstantVolume;
             } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::VariableVolume) {
-                DamperType = state.dataDualDuct->cCMO_DDVariableVolume;
+                DamperType = cCMO_DDVariableVolume;
             } else if (state.dataDualDuct->dd_airterminal(Count1).DamperType == DualDuctDamper::OutdoorAir) {
-                DamperType = state.dataDualDuct->cCMO_DDVarVolOA;
+                DamperType = cCMO_DDVarVolOA;
             } else {
                 DamperType = "Invalid/Unknown";
             }
@@ -2333,15 +2177,9 @@ namespace DualDuct {
 
         RecircIsUsed = true;
 
-        // this doesn't work because it fires code that depends on things being further along
-        //  IF (GetDualDuctInputFlag) THEN  !First time subroutine has been entered
-        //    CALL GetDualDuctInput
-        //    GetDualDuctInputFlag=.FALSE.
-        //  END IF
-
         if (state.dataDualDuct->GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
             state.dataDualDuct->NumDualDuctVarVolOA =
-                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataDualDuct->cCMO_DDVarVolOA);
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
             state.dataDualDuct->RecircIsUsedARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             state.dataDualDuct->DamperNamesARR.allocate(state.dataDualDuct->NumDualDuctVarVolOA);
             if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
@@ -2353,7 +2191,7 @@ namespace DualDuct {
                 Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
                 for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
 
-                    CurrentModuleObject = state.dataDualDuct->cCMO_DDVarVolOA;
+                    CurrentModuleObject = cCMO_DDVarVolOA;
 
                     state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                              CurrentModuleObject,
@@ -2394,9 +2232,6 @@ namespace DualDuct {
             // do nothing for now
         }
     }
-
-    //        End of Reporting subroutines for the Damper Module
-    // *****************************************************************************
 
 } // namespace DualDuct
 

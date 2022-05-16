@@ -64,10 +64,6 @@ struct EnergyPlusData;
 
 namespace DualDuct {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     enum class DualDuctDamper
     {
         Invalid = -1,
@@ -94,10 +90,6 @@ namespace DualDuct {
         ByDesignLevel = 22,
         Num
     };
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
 
     struct DualDuctAirTerminalFlowConditions
     {
@@ -181,21 +173,15 @@ namespace DualDuct {
         {
         }
 
-        void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
+        void InitDualDuct(EnergyPlusData &state, bool FirstHVACIteration);
 
         void SizeDualDuct(EnergyPlusData &state);
 
-        // End Initialization Section of the Module
-        //******************************************************************************
+        void SimDualDuctConstVol(EnergyPlusData &state, int ZoneNum, int ZoneNodeNum);
 
-        // Begin Algorithm Section of the Module
-        //******************************************************************************
+        void SimDualDuctVarVol(EnergyPlusData &state, int ZoneNum, int ZoneNodeNum);
 
-        void SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
-
-        void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
-
-        void SimDualDuctVAVOutdoorAir(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(EnergyPlusData &state, int ZoneNum, int ZoneNodeNum);
 
         void CalcOAMassFlow(EnergyPlusData &state,
                             Real64 &SAMassFlow,   // outside air based on optional user input
@@ -207,47 +193,20 @@ namespace DualDuct {
                                 Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
-        // End Algorithm Section of the Module
-        // *****************************************************************************
-
-        // Beginning of Update subroutines for the Damper Module
-        // *****************************************************************************
-
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
         void UpdateDualDuct(EnergyPlusData &state);
 
-        //        End of Update subroutines for the Damper Module
-        // *****************************************************************************
-
-        // Beginning of Reporting subroutines for the Damper Module
-        // *****************************************************************************
-
-        void ReportDualDuct(); // unused1208
     };
 
-    // Functions
-
     void SimulateDualDuct(
-        EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
-
-    // Get Input Section of the Module
-    //******************************************************************************
+        EnergyPlusData &state, std::string_view CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
     void GetDualDuctInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
 
     void ReportDualDuctConnections(EnergyPlusData &state);
 
     void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string_view CompName, bool &RecircIsUsed);
-
-    //        End of Reporting subroutines for the Damper Module
-    // *****************************************************************************
-
-    // Clears the global data in DualDuct.
-    // Needed for unit tests, should not be normally called.
 
 } // namespace DualDuct
 
@@ -266,10 +225,6 @@ struct DualDuctData : BaseGlobalStruct
     bool InitDualDuctMyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     bool GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
-
-    std::string const cCMO_DDConstantVolume = "AirTerminal:DualDuct:ConstantVolume";
-    std::string const cCMO_DDVariableVolume = "AirTerminal:DualDuct:VAV";
-    std::string const cCMO_DDVarVolOA = "AirTerminal:DualDuct:VAV:OutdoorAir";
 
     Array1D_bool RecircIsUsedARR;
     Array1D_string DamperNamesARR;
