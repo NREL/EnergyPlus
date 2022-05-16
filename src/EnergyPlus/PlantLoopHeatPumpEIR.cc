@@ -1310,24 +1310,31 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 EIRFuelFiredHeatPump thisPLHP;
                 thisPLHP.EIRHPType = classToInput.thisType;
-                // A1-A4
+                // A1-A3
                 thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_inlet_node_name").get<std::string>());
                 std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("water_outlet_node_name").get<std::string>());
-                std::string airSourceNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
                 // Implicit
                 std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+                // A4
+                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
+                // std::string sourceSideOutletNodeName =
+                // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
 
                 // A5
                 if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
                     thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_heat_pump_name").get<std::string>());
                 }
-                // std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name").get<std::string>());
-                // std::string sourceSideOutletNodeName =
-                // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
 
                 // A6 Fuel Type
+                std::string fuelType = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
+                // 2022-05-13: Need to add a member for fuel type
+                // 2022-05-13: Consider some default about empty value?
+
                 // A7 End use category
+                std::string endUseCat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
+                // 2022-05-13: Need to add a member for end use sub
+                // 2022-05-13: default: empty?
 
                 // N1 Nominal heating capacity
                 auto tmpRefCapacity = fields.at("nominal_heating_capacity");
@@ -1355,9 +1362,25 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 //}
 
                 // N3 Design supply temperature
+                auto tmpDesSupTemp = fields.at("design_supply_temperature");
+                if (tmpDesSupTemp == "Autosize") {
+                    //
+                } else {
+                    // 2022-05-13: Add new member for Design Supply Temperature
+                    thisPLHP.loadSideDesignVolFlowRate = tmpDesSupTemp.get<Real64>();
+                }
+
                 // N4 Design temperature lift
+                auto tmpDesTempLift = fields.at("design_temperature_lift");
+                if (tmpDesTempLift == "Autosize") {
+                    //
+                } else {
+                    // 2022-05-13: Add new member for Design Temperature Lift
+                    thisPLHP.loadSideDesignVolFlowRate = tmpDesTempLift.get<Real64>();
+                }
 
                 // N5 Sizing factor
+                // 2022-05-13: check the following line, why need to check if it is the last one?
                 if (fields.find("sizing_factor") != fields.end()) {
                     thisPLHP.sizingFactor = fields.at("sizing_factor").get<Real64>();
                 } else {
@@ -1375,6 +1398,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A8 flow mode
+                std::string flowMode = UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>());
 
                 // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
                 //    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
@@ -1394,7 +1418,12 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 //}
 
                 // A9 outdoor_air_temperature_curve_input_variable
+                std::string oaTempCurveInputVar =
+                    UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
+
                 // A10 water_temperature_curve_input_variable
+                std::string waterTempCurveInputVar =
+                    UtilityRoutines::MakeUPPERCase(fields.at("water_temperature_curve_input_variable").get<std::string>());
 
                 // A11 normalized_capacity_function_of_temperature_curve_name
                 auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
@@ -1426,6 +1455,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // N6 min PLR
                 auto tmpMinPLR = fields.at("minimum_part_load_ratio");
+                // 2022-05-13: Need revise the following: this field is not autosizable
                 if (tmpMinPLR == "Autosize") {
                     thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
                     thisPLHP.referenceCapacityWasAutoSized = true;
@@ -1434,6 +1464,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
                 // N7 max PLR
                 auto tmpMaxPLR = fields.at("maximum_part_load_ratio");
+                // 2022-05-13: Need revise the following: this field is not autosizable
                 if (tmpMaxPLR == "Autosize") {
                     thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
                     thisPLHP.referenceCapacityWasAutoSized = true;
@@ -1452,10 +1483,27 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A15 defrost_control_type
+                std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
 
                 // N8 defrost_operation_time_fraction
+                auto defrostOpTimeFrac = fields.at("defrost_operation_time_fraction");
+                // 2022-05-14: Need revise the following: this field is not autosizable
+                if (defrostOpTimeFrac == "Autosize") {
+                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
+                    thisPLHP.referenceCapacityWasAutoSized = true;
+                } else {
+                    thisPLHP.referenceCapacity = defrostOpTimeFrac.get<Real64>();
+                }
 
                 // N9 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
+                auto maxOADBTforDefrostOp = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation");
+                // 2022-05-14: Need revise the following: this field is not autosizable
+                if (maxOADBTforDefrostOp == "Autosize") {
+                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
+                    thisPLHP.referenceCapacityWasAutoSized = true;
+                } else {
+                    thisPLHP.referenceCapacity = maxOADBTforDefrostOp.get<Real64>();
+                }
 
                 // A16 cycling_ratio_factor_curve_name
                 auto &capFtName3 = fields.at("cycling_ratio_factor_curve_name");
@@ -1468,11 +1516,46 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // N10 nominal_auxiliary_electric_power
+                auto nominalAuxElecPower = fields.at("nominal_auxiliary_electric_power");
+                // 2022-05-14: Need revise the following: this field is not autosizable
+                if (nominalAuxElecPower == "Autosize") {
+                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
+                    thisPLHP.referenceCapacityWasAutoSized = true;
+                } else {
+                    thisPLHP.referenceCapacity = nominalAuxElecPower.get<Real64>();
+                }
 
                 // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
+                auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
+                thisPLHP.powerRatioFuncPLRCurveIndex =
+                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
+                if (thisPLHP.capFuncTempCurveIndex == 0) {
+                    ShowSevereError(
+                        state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + auxEIRFTName.get<std::string>());
+                    errorsFound = true;
+                }
+
                 // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
+                auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
+                thisPLHP.powerRatioFuncPLRCurveIndex =
+                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
+                if (thisPLHP.capFuncTempCurveIndex == 0) {
+                    ShowSevereError(state,
+                                    "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                        "; entered curve name: " + auxEIRFPLRName.get<std::string>());
+                    errorsFound = true;
+                }
 
                 // N11 standby_electric_power
+                auto standbyElecPower = fields.at("standby_electric_power");
+                // 2022-05-14: Need revise the following: this field is not autosizable
+                if (standbyElecPower == "Autosize") {
+                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
+                    thisPLHP.referenceCapacityWasAutoSized = true;
+                } else {
+                    thisPLHP.referenceCapacity = standbyElecPower.get<Real64>();
+                }
+
 
                 bool nodeErrorsFound = false;
                 thisPLHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
