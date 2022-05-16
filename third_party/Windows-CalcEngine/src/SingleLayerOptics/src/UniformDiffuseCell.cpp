@@ -10,8 +10,9 @@ namespace SingleLayerOptics
 {
     CUniformDiffuseCell::CUniformDiffuseCell(
       const std::shared_ptr<CMaterial> & t_MaterialProperties,
-      const std::shared_ptr<ICellDescription> & t_Cell) :
-        CBaseCell(t_MaterialProperties, t_Cell)
+      const std::shared_ptr<ICellDescription> & t_Cell,
+      double rotation) :
+        CBaseCell(t_MaterialProperties, t_Cell, rotation)
     {}
 
     double CUniformDiffuseCell::T_dir_dif(const Side t_Side, const CBeamDirection & t_Direction)
@@ -48,11 +49,12 @@ namespace SingleLayerOptics
       const Property t_Property, const Side t_Side, const CBeamDirection & t_Direction)
     {
         double materialCoverFraction = 1 - T_dir_dir(t_Side, t_Direction);
-        std::vector<double> aMaterialProperty = m_Material->getBandProperties(t_Property, t_Side);
+        std::vector<double> aMaterialProperties = m_Material->getBandProperties(t_Property, t_Side);
         std::vector<double> aProperty;
-        for(size_t i = 0; i < aMaterialProperty.size(); ++i)
+        aProperty.reserve(aMaterialProperties.size());
+        for(const auto & materialProperty: aMaterialProperties)
         {
-            aProperty.push_back(materialCoverFraction * aMaterialProperty[i]);
+            aProperty.push_back(materialCoverFraction * materialProperty);
         }
         return aProperty;
     }

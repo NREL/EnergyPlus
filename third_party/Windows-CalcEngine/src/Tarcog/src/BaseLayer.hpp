@@ -34,6 +34,10 @@ namespace Tarcog
 
             virtual double getThickness() const;
 
+            // This is to determine if layer is porous and leaking air from gap to the surrounding
+            // environment. Layer are non-porous by default.
+            virtual bool isPermeable() const;
+
             virtual std::shared_ptr<CBaseLayer> clone() const = 0;
 
         protected:

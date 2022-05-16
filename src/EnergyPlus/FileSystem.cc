@@ -103,8 +103,10 @@ namespace FileSystem {
     {
         // Note: this is needed because "/a/b/c".parent_path() = "/a/b/c/"
         std::string pathStr = path.string();
-        while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
-            pathStr.erase(pathStr.size() - 1);
+        if (!pathStr.empty()) {
+            while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
+                pathStr.erase(pathStr.size() - 1);
+            }
         }
 
         // If empty, return "./" instead

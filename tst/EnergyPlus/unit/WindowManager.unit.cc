@@ -571,9 +571,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfWinInsideFrameCondensationFlag.allocate(3);
     state->dataSurface->SurfWinInsideDividerCondensationFlag.allocate(3);
 
-    state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
-    state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
 
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0;
@@ -619,7 +619,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     state->dataSurface->Surface(1).ExtBoundCond = 2;
     state->dataSurface->Surface(2).ExtBoundCond = 1;
-    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(25.0, state->dataHeatBal->SurfTempEffBulkAir(surfNum2), 0.0001);
 }
@@ -2819,9 +2819,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->MAT.allocate(1);
 
     state->dataHeatBalFanSys->MAT(1) = 25.0;
-    state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
-    state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
@@ -2844,7 +2844,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 *
-                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))),
+                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas[0])),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->SurfQHeatEmiReport(surfNum2), 3);
 }
@@ -3028,8 +3028,11 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
 
     bool ErrorsFound(false);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(34, 1.0);
     WindowManager::InitGlassOpticalCalculations(*state);
 
     Real64 SHGC;         // Center-of-glass solar heat gain coefficient for ASHRAE
@@ -3053,7 +3056,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     for (auto varyInputU : legalInputUs) {
         state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
-        state->dataWindowManager->scon(1) = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
+        state->dataWindowManager->scon[0] = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.01);
     }

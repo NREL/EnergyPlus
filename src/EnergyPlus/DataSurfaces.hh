@@ -178,6 +178,17 @@ namespace DataSurfaces {
         Num
     };
 
+    enum RefAirTemp // Parameters to indicate reference air temperatures for inside surface temperature calculations
+    {
+        Invalid = -1,
+        ZoneMeanAirTemp,   // mean air temperature of the zone => MAT
+        AdjacentAirTemp,   // air temperature adjacent to surface => TempEffBulkAir
+        ZoneSupplyAirTemp, // supply air temperature of the zone
+        Num
+    };
+
+    constexpr std::array<int, static_cast<int>(DataSurfaces::RefAirTemp::Num)> SurfTAirRefReportVals = {1, 2, 3};
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -198,11 +209,6 @@ namespace DataSurfaces {
     constexpr int LowerLeftCorner(2);
     constexpr int LowerRightCorner(3);
     constexpr int UpperRightCorner(4);
-
-    // Parameters to indicate reference air temperatures for inside surface temperature calculations
-    constexpr int ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
-    constexpr int AdjacentAirTemp(2);   // air temperature adjacent ot surface => TempEffBulkAir
-    constexpr int ZoneSupplyAirTemp(3); // supply air temperature of the zone
 
     constexpr int AltAngStepsForSolReflCalc(10); // Number of steps in altitude angle for solar reflection calc
     constexpr int AzimAngStepsForSolReflCalc(9); // Number of steps in azimuth angle of solar reflection calc
@@ -823,6 +829,118 @@ namespace DataSurfaces {
         }
     };
 
+    enum class NfrcProductOptions : int
+    {
+        Invalid = -1,
+        CasementDouble,
+        CasementSingle,
+        DualAction,
+        Fixed,
+        Garage,
+        Greenhouse,
+        HingedEscape,
+        HorizontalSlider,
+        Jal,
+        Pivoted,
+        ProjectingSingle,
+        ProjectingDual,
+        DoorSidelite,
+        Skylight,
+        SlidingPatioDoor,
+        CurtainWall,
+        SpandrelPanel,
+        SideHingedDoor,
+        DoorTransom,
+        TropicalAwning,
+        TubularDaylightingDevice,
+        VerticalSlider,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNames = {
+        "CasementDouble", "CasementSingle",   "DualAction",
+        "Fixed",          "Garage",           "Greenhouse",
+        "HingedEscape",   "HorizontalSlider", "Jal",
+        "Pivoted",        "ProjectingSingle", "ProjectingDual",
+        "DoorSidelite",   "Skylight",         "SlidingPatioDoor",
+        "CurtainWall",    "SpandrelPanel",    "SideHingedDoor",
+        "DoorTransom",    "TropicalAwning",   "TubularDaylightingDevice",
+        "VerticalSlider"};
+
+    constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNamesUC = {
+        "CASEMENTDOUBLE", "CASEMENTSINGLE",   "DUALACTION",
+        "FIXED",          "GARAGE",           "GREENHOUSE",
+        "HINGEDESCAPE",   "HORIZONTALSLIDER", "JAL",
+        "PIVOTED",        "PROJECTINGSINGLE", "PROJECTINGDUAL",
+        "DOORSIDELITE",   "SKYLIGHT",         "SLIDINGPATIODOOR",
+        "CURTAINWALL",    "SPANDRELPANEL",    "SIDEHINGEDDOOR",
+        "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
+        "VERTICALSLIDER"};
+
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
+        // width in meters from Table 4-3 of NFRC 100-2020
+        1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
+        1.200, 2.134, 1.500, //  Fixed,           Garage,            Greenhouse,
+        1.500, 1.500, 1.200, //  HingedEscape,    HorizontalSlider,  Jal,
+        1.200, 1.500, 1.500, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        0.600, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        2.000, 2.000, 1.920, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        2.000, 1.500, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        1.200                //  VerticalSlider,
+    };
+
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
+        // height in meters from Table 4-3 of NFRC 100-2020
+        1.500, 1.500, 1.500, //  CasementDouble,  CasementSingle,    DualAction,
+        1.500, 2.134, 1.200, //  Fixed,           Garage,            Greenhouse,
+        1.200, 1.200, 1.500, //  HingedEscape,    HorizontalSlider,  Jal,
+        1.500, 1.200, 0.600, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        2.090, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        2.000, 1.200, 2.090, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        0.600, 1.200, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        1.500                //  VerticalSlider,
+    };
+
+    enum class NfrcVisionType : int
+    {
+        Invalid = -1,
+        Single,
+        DualVertical,
+        DualHorizontal,
+        Num
+    };
+
+    constexpr std::array<NfrcVisionType, static_cast<int>(NfrcProductOptions::Num)> NfrcVision = {
+        NfrcVisionType::DualHorizontal, NfrcVisionType::Single,
+        NfrcVisionType::DualVertical, //  CasementDouble,  CasementSingle,    DualAction,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single, //  Fixed,           Garage,            Greenhouse,
+        NfrcVisionType::Single,         NfrcVisionType::DualHorizontal,
+        NfrcVisionType::Single, //  HingedEscape,    HorizontalSlider,  Jal,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::DualHorizontal, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::DualHorizontal, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single,      //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        NfrcVisionType::DualVertical //  VerticalSlider
+    };
+
+    enum class FrameDividerType : int
+    {
+        Invalid = -1,
+        DividedLite = 0,
+        Suspended = 1,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(FrameDividerType::Num)> FrameDividerTypeNamesUC = {
+        "DIVIDEDLITE", // 0
+        "SUSPENDED"    // 1
+    };
+
     struct FrameDividerProperties
     {
         // Members
@@ -836,14 +954,14 @@ namespace DataSurfaces {
         Real64 FrameEdgeWidth;            // default 2.5 in ! Width of glass edge region near frame {m}
         Real64 FrEdgeToCenterGlCondRatio; // Ratio of frame edge of glass conductance (without air films) to
         // center of glass conductance (without air films)
-        Real64 FrameSolAbsorp;       // Solar absorptance of frame corrected for self-shading
-        Real64 FrameVisAbsorp;       // Visible absorptance of frame corrected for self-shading
-        Real64 FrameEmis;            // Thermal emissivity of frame
-        int DividerType;             // Type of divider {DividedLite or Suspended (between-glass}
-        Real64 DividerWidth;         // Average width of divider in plane of window {m}
-        int HorDividers;             // Number of horizontal dividers
-        int VertDividers;            // Number of vertical dividers
-        Real64 DividerProjectionOut; // Distance normal to window between outside face of outer pane
+        Real64 FrameSolAbsorp;        // Solar absorptance of frame corrected for self-shading
+        Real64 FrameVisAbsorp;        // Visible absorptance of frame corrected for self-shading
+        Real64 FrameEmis;             // Thermal emissivity of frame
+        FrameDividerType DividerType; // Type of divider {DividedLite or Suspended (between-glass}
+        Real64 DividerWidth;          // Average width of divider in plane of window {m}
+        int HorDividers;              // Number of horizontal dividers
+        int VertDividers;             // Number of vertical dividers
+        Real64 DividerProjectionOut;  // Distance normal to window between outside face of outer pane
         //  and outside of divider {m}
         Real64 DividerProjectionIn; // Distance normal to window between inside face of inner pane
         //  and inside of divider {m}
@@ -856,20 +974,21 @@ namespace DataSurfaces {
         Real64 DividerEmis;                                        // Thermal emissivity of divider
         DataWindowEquivalentLayer::Orientation MullionOrientation; // Horizontal or Vertical; used only for windows with two glazing systems
         //  divided by a mullion; obtained from Window5 data file.
-        Real64 OutsideRevealSolAbs; // Solar absorptance of outside reveal
-        Real64 InsideSillDepth;     // Inside sill depth (m)
-        Real64 InsideReveal;        // Inside reveal (m)
-        Real64 InsideSillSolAbs;    // Solar absorptance of inside sill
-        Real64 InsideRevealSolAbs;  // Solar absorptance of inside reveal
+        NfrcProductOptions NfrcProductType; // NFRC Product Type for Assembly Calculations
+        Real64 OutsideRevealSolAbs;         // Solar absorptance of outside reveal
+        Real64 InsideSillDepth;             // Inside sill depth (m)
+        Real64 InsideReveal;                // Inside reveal (m)
+        Real64 InsideSillSolAbs;            // Solar absorptance of inside sill
+        Real64 InsideRevealSolAbs;          // Solar absorptance of inside reveal
 
         // Default Constructor
         FrameDividerProperties()
             : FrameWidth(0.0), FrameProjectionOut(0.0), FrameProjectionIn(0.0), FrameConductance(0.0), FrameEdgeWidth(0.06355),
-              FrEdgeToCenterGlCondRatio(1.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.9), DividerType(0), DividerWidth(0.0),
-              HorDividers(0), VertDividers(0), DividerProjectionOut(0.0), DividerProjectionIn(0.0), DividerEdgeWidth(0.06355),
+              FrEdgeToCenterGlCondRatio(1.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.9), DividerType(FrameDividerType::DividedLite),
+              DividerWidth(0.0), HorDividers(0), VertDividers(0), DividerProjectionOut(0.0), DividerProjectionIn(0.0), DividerEdgeWidth(0.06355),
               DividerConductance(0.0), DivEdgeToCenterGlCondRatio(1.0), DividerSolAbsorp(0.0), DividerVisAbsorp(0.0), DividerEmis(0.9),
-              MullionOrientation(DataWindowEquivalentLayer::Orientation::Invalid), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0), InsideReveal(0.0),
-              InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
+              MullionOrientation(DataWindowEquivalentLayer::Orientation::Invalid), NfrcProductType(NfrcProductOptions::CurtainWall),
+              OutsideRevealSolAbs(0.0), InsideSillDepth(0.0), InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
         {
         }
     };
@@ -1302,6 +1421,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     // Surface HB arrays
@@ -1392,6 +1512,7 @@ struct SurfacesData : BaseGlobalStruct
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
+    Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
     Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<ConvectionConstants::InConvClass>
@@ -1545,30 +1666,30 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrameSolAbsorp;   // Frame solar absorptance (assumed same inside and outside)
     Array1D<Real64> SurfWinFrameVisAbsorp;   // Frame visible absorptance (assumed same inside and outside)
     Array1D<Real64> SurfWinFrameEmis;        // Frame thermal emissivity (thermal absorptance) (assumed same inside and outside)
-    Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
-                                                       // (without air films)
-    Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
-    Array1D<Real64> SurfWinFrameTempIn;                // Frame inside surface temperature (C)
-    Array1D<Real64> SurfWinFrameTempInOld;             // Previous value of frame inside surface temperature (C)
-    Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
-    Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
-    Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
-    Array1D<int> SurfWinDividerType;                   // Divider type (1=DividedLite, 2=Suspended (between-pane))
-    Array1D<Real64> SurfWinDividerArea;                // Divider projected area (m2)
-    Array1D<Real64> SurfWinDividerConductance;         // Divider conductance [no air films] (W/m2-K)
-    Array1D<Real64> SurfWinDividerSolAbsorp;           // Divider solar absorptance (assumed same inside and outside)
-    Array1D<Real64> SurfWinDividerVisAbsorp;           // Divider visible absorptance (assumed same inside and outside)
-    Array1D<Real64> SurfWinDividerEmis;                // Divider thermal emissivity (thermal absorptance) (assumed same inside and outside)
-    Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to center of glass
-                                                       // conductance (without air films)
-    Array1D<Real64> SurfWinDividerEdgeArea;            // Area of glass near dividers (m2)
-    Array1D<Real64> SurfWinDividerTempIn;              // Divider inside surface temperature (C)
-    Array1D<Real64> SurfWinDividerTempInOld;           // Previous value of divider inside surface temperature (C)
-    Array1D<Real64> SurfWinDividerTempSurfOut;         // Divider outside surface temperature (C)
-    Array1D<Real64> SurfWinProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
-    Array1D<Real64> SurfWinProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
-    Array1D<Real64> SurfWinGlazedFrac;                 // (Glazed area)/(Glazed area + divider area)
-    Array1D<Real64> SurfWinCenterGlArea;               // Center of glass area (m2); area of glass where 1-D conduction dominates
+    Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio; // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
+                                                      // (without air films)
+    Array1D<Real64> SurfWinFrameEdgeArea;             // Area of glass near frame (m2)
+    Array1D<Real64> SurfWinFrameTempIn;               // Frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempInOld;            // Previous value of frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempSurfOut;          // Frame outside surface temperature (C)
+    Array1D<Real64> SurfWinProjCorrFrOut;             // Correction factor to absorbed radiation due to frame outside projection
+    Array1D<Real64> SurfWinProjCorrFrIn;              // Correction factor to absorbed radiation due to frame inside projection
+    Array1D<DataSurfaces::FrameDividerType> SurfWinDividerType; // Divider type (1=DividedLite, 2=Suspended (between-pane))
+    Array1D<Real64> SurfWinDividerArea;                         // Divider projected area (m2)
+    Array1D<Real64> SurfWinDividerConductance;                  // Divider conductance [no air films] (W/m2-K)
+    Array1D<Real64> SurfWinDividerSolAbsorp;                    // Divider solar absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinDividerVisAbsorp;                    // Divider visible absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinDividerEmis;                         // Divider thermal emissivity (thermal absorptance) (assumed same inside and outside)
+    Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio;          // Ratio of divider edge of glass conductance (without air films) to center of glass
+                                                                // conductance (without air films)
+    Array1D<Real64> SurfWinDividerEdgeArea;                     // Area of glass near dividers (m2)
+    Array1D<Real64> SurfWinDividerTempIn;                       // Divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempInOld;                    // Previous value of divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempSurfOut;                  // Divider outside surface temperature (C)
+    Array1D<Real64> SurfWinProjCorrDivOut;                      // Correction factor to absorbed radiation due to divider outside projection
+    Array1D<Real64> SurfWinProjCorrDivIn;                       // Correction factor to absorbed radiation due to divider inside projection
+    Array1D<Real64> SurfWinGlazedFrac;                          // (Glazed area)/(Glazed area + divider area)
+    Array1D<Real64> SurfWinCenterGlArea;                        // Center of glass area (m2); area of glass where 1-D conduction dominates
     Array1D<Real64> SurfWinEdgeGlCorrFac; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
                                           // effects near frame and divider
     EPVector<DataSurfaces::SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
@@ -1699,6 +1820,7 @@ struct SurfacesData : BaseGlobalStruct
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
+        this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
 
         this->SurfOutDryBulbTemp.deallocate();
@@ -1769,6 +1891,7 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfICSPtr.deallocate();
         this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
         this->SurfTAirRef.deallocate();
+        this->SurfTAirRefRpt.deallocate();
         this->SurfIntConvCoeffIndex.deallocate();
         this->SurfExtConvCoeffIndex.deallocate();
         this->SurfIntConvClassification.deallocate();

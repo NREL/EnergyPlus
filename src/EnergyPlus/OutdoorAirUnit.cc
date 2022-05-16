@@ -229,7 +229,6 @@ namespace OutdoorAirUnit {
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetCoilSteamOutletNode;
         using SteamCoils::GetSteamCoilIndex;
-        using WaterCoils::CheckWaterCoilSchedule;
         using namespace DataLoopNode;
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
         using WaterCoils::GetCoilWaterInletNode;
@@ -1727,8 +1726,6 @@ namespace OutdoorAirUnit {
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
         using ScheduleManager::GetCurrentScheduleValue;
-        using SteamCoils::CheckSteamCoilSchedule;
-        using WaterCoils::CheckWaterCoilSchedule;
 
         // Locals
 

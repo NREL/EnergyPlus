@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <iomanip>
@@ -124,6 +125,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
@@ -4331,8 +4333,13 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
         state.dataHeatBal->SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
     }
 
+    // Airloop HVAC Exhaust System
+    for (int iExhSys = 1; iExhSys < state.dataZoneEquip->NumExhaustAirSystems; ++iExhSys) {
+        state.dataHeatBal->SysTotalHVACReliefHeatLoss += state.dataZoneEquip->ExhaustAirSystem(iExhSys).exhTotalHVACReliefHeatLoss;
+    }
+
     // Condenser water loop
-    for (int iCooler = 1; iCooler <= state.dataCondenserLoopTowers->NumSimpleTowers; ++iCooler) {
+    for (int iCooler = 1; iCooler <= (int)state.dataCondenserLoopTowers->towers.size(); ++iCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec +
                                                          state.dataCondenserLoopTowers->towers(iCooler).FanEnergy +
                                                          state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
@@ -4371,20 +4378,20 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
         }
     }
     auto &ElectricEIRChiller(state.dataChillerElectricEIR->ElectricEIRChiller);
-    for (int iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
+    for (int iChiller = 1; iChiller <= (int)state.dataChillerElectricEIR->ElectricEIRChiller.size(); ++iChiller) {
         if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
         }
     }
     auto &ElecReformEIRChiller(state.dataChillerReformulatedEIR->ElecReformEIRChiller);
-    for (int iChiller = 1; iChiller <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++iChiller) {
+    for (int iChiller = 1; iChiller <= (int)state.dataChillerReformulatedEIR->ElecReformEIRChiller.size(); ++iChiller) {
         if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
         }
     }
 
     // Water / steam boiler
-    for (int iBoiler = 1; iBoiler <= state.dataBoilers->numBoilers; ++iBoiler) {
+    for (int iBoiler = 1; iBoiler <= (int)state.dataBoilers->Boiler.size(); ++iBoiler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed +
                                                          state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption -
                                                          state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
@@ -4445,10 +4452,10 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Packaged TES
     auto &TESCoil(state.dataPackagedThermalStorageCoil->TESCoil);
     for (int iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
-        if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+        if (TESCoil(iCoil).CondenserType == PackagedThermalStorageCoil::TESCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
                                                              TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
-        } else if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
+        } else if (TESCoil(iCoil).CondenserType == PackagedThermalStorageCoil::TESCondenserType::Evap) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption +
                                                              TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
                                                              TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
@@ -4604,7 +4611,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     //--------------------
     // HVAC annual heating by ATU
     // HVAC annual cooling by ATU
-    for (state.dataOutRptTab->iunitGHGR = 1; state.dataOutRptTab->iunitGHGR <= state.dataDefineEquipment->NumAirDistUnits;
+    for (state.dataOutRptTab->iunitGHGR = 1; state.dataOutRptTab->iunitGHGR <= (int)state.dataDefineEquipment->AirDistUnit.size();
          ++state.dataOutRptTab->iunitGHGR) {
         // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
         state.dataOutRptTab->curZoneGHGR = state.dataDefineEquipment->AirDistUnit(state.dataOutRptTab->iunitGHGR).ZoneNum;
@@ -5250,6 +5257,7 @@ void WriteTabularReports(EnergyPlusData &state)
 
     FillWeatherPredefinedEntries(state);
     FillRemainingPredefinedEntries(state);
+    WaterManager::ReportRainfall(state);
     auto &ort(state.dataOutRptTab);
 
     // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
@@ -5404,6 +5412,12 @@ void parseStatLine(const std::string &lineIn,
         lineType = StatLineType::WithHDDLine;
     } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
         lineType = StatLineType::WithCDDLine;
+    } else if (has(lineIn, "Max Hourly")) {
+        lineType = StatLineType::MaxHourlyPrec;
+    } else if (has(lineIn, "Total")) {
+        if (!has(lineIn, "Statistics for Total Sky Cover")) {
+            lineType = StatLineType::MonthlyPrec;
+        }
     }
     // these not part of big if/else because sequential
     if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
@@ -5910,6 +5924,49 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
                 }
+            } break;
+            case StatLineType::MonthlyPrec: { //   - Monthly precipitation mm
+                std::stringstream ss(lineIn);
+                std::vector<std::string> result;
+                while (ss.good()) {
+                    std::string substr;
+                    getline(ss, substr, '\t');
+                    substr.erase(remove_if(substr.begin(), substr.end(), isspace), substr.end());
+                    result.push_back(substr);
+                }
+                int monthlyTotalPrecFromStat[12];
+                int annualTotalPrecFromStat = 0;
+                for (int i = 0; i < 12; i++) {
+                    monthlyTotalPrecFromStat[i] = std::stoi(result[i + 2]);
+                    // fixme: add to monthly data structure
+                    annualTotalPrecFromStat += monthlyTotalPrecFromStat[i];
+                }
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Annual Total Precipitation [mm]", annualTotalPrecFromStat);
+                // fixme: store the monthly data in some data structure
+            } break;
+            case StatLineType::MaxHourlyPrec: { //   - Highest hourly precipitation in each month
+                // Split string by \t into substrings and remove the space in each substring
+                std::stringstream ss(lineIn);
+                std::vector<std::string> result;
+                while (ss.good()) {
+                    std::string substr;
+                    getline(ss, substr, '\t');
+                    substr.erase(remove_if(substr.begin(), substr.end(), isspace), substr.end());
+                    result.push_back(substr);
+                }
+                int MaxHourlyPrecEachMonth[12];
+                int MaxHourlyPrec = 0;
+                int MaxHourlyPrecIdx = 0;
+                for (int i = 0; i < 12; i++) {
+                    MaxHourlyPrecEachMonth[i] = std::stoi(result[i + 2]);
+                    if (MaxHourlyPrecEachMonth[i] > MaxHourlyPrec) {
+                        MaxHourlyPrec = MaxHourlyPrecEachMonth[i];
+                        MaxHourlyPrecIdx = i;
+                    }
+                }
+                constexpr std::array<std::string_view, 12> Months{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation [mm]", MaxHourlyPrec);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation Occurs in", Months[MaxHourlyPrecIdx]);
             } break;
             case StatLineType::WithHDDLine: { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
                 if (storeASHRAEHDD != "") {
@@ -10976,8 +11033,8 @@ void WriteCompCostTable(EnergyPlusData &state)
             }
         }
 
-        NumRows = state.dataCostEstimateManager->NumLineItems + 1; // body will have the total and line items
-        NumCols = 6;                                               // Line no., Line name, Qty, Units, ValperQty, Subtotal
+        NumRows = (int)state.dataCostEstimateManager->CostLineItem.size() + 1; // body will have the total and line items
+        NumCols = 6;                                                           // Line no., Line name, Qty, Units, ValperQty, Subtotal
         rowHead.allocate(NumRows);
         columnHead.allocate(NumCols);
         columnWidth.dimension(NumCols, 14); // array assignment - same for all columns
@@ -10995,7 +11052,7 @@ void WriteCompCostTable(EnergyPlusData &state)
 
         columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
-        for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
+        for (item = 1; item <= (int)state.dataCostEstimateManager->CostLineItem.size(); ++item) {
             tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
             if (unitsStyle_cur == UnitsStyle::InchPound) {
@@ -17460,7 +17517,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     //    na
     auto &ort(state.dataOutRptTab);
 
-    ort->UnitConvSize = 115;
+    ort->UnitConvSize = 117;
     ort->UnitConv.allocate(ort->UnitConvSize);
     ort->UnitConv(1).siName = "%";
     ort->UnitConv(2).siName = "°C";
@@ -17577,6 +17634,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).siName = "NM";
     ort->UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
     ort->UnitConv(115).siName = "PERSON/M2";
+    ort->UnitConv(116).siName = "MM";
+    ort->UnitConv(117).siName = "MM";
 
     ort->UnitConv(1).ipName = "%";
     ort->UnitConv(2).ipName = "F";
@@ -17693,6 +17752,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).ipName = "lbf-ft";
     ort->UnitConv(114).ipName = "Btu/W-h";
     ort->UnitConv(115).ipName = "person/ft2";
+    ort->UnitConv(116).ipName = "in";
+    ort->UnitConv(117).ipName = "ft";
 
     ort->UnitConv(1).mult = 1.0;
     ort->UnitConv(2).mult = 1.8;
@@ -17809,6 +17870,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).mult = 0.737562149277;
     ort->UnitConv(114).mult = 1.0;
     ort->UnitConv(115).mult = 0.09290304;
+    ort->UnitConv(116).mult = 0.03937;
+    ort->UnitConv(117).mult = 0.003281;
 
     ort->UnitConv(2).offset = 32.0;
     ort->UnitConv(11).offset = 32.0;
@@ -17881,6 +17944,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(93).several = true;
     ort->UnitConv(94).several = true;
     ort->UnitConv(95).several = true;
+    ort->UnitConv(116).several = true;
+    ort->UnitConv(117).several = true;
 }
 
 std::string GetUnitSubString(std::string const &inString) // Input String

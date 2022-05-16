@@ -201,7 +201,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinFrameTempSurfOut.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinProjCorrFrOut.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProjCorrFrIn.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinDividerType.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerType.dimension(NumSurfaces, DataSurfaces::FrameDividerType::DividedLite);
         state.dataSurface->SurfWinDividerArea.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDividerConductance.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDividerSolAbsorp.dimension(NumSurfaces, 0);
@@ -996,6 +996,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfIntConvCoeffIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtConvCoeffIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfTAirRef.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfTAirRefRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvClassification.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvClassificationRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvHcModelEq.allocate(state.dataSurface->TotSurfaces);
@@ -1021,7 +1022,8 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfHighTempErrCount(SurfNum) = 0;
             state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = ConvectionConstants::HcInt_SetByZone;
             state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
-            state.dataSurface->SurfTAirRef(SurfNum) = 0;
+            state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::Invalid;
+            state.dataSurface->SurfTAirRefRpt(SurfNum) = static_cast<int>(DataSurfaces::RefAirTemp::Invalid);
             state.dataSurface->SurfIntConvClassification(SurfNum) = ConvectionConstants::InConvClass::Invalid;
             state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(ConvectionConstants::InConvClass::Invalid);
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) = 0;
@@ -1222,7 +1224,6 @@ namespace SurfaceGeometry {
         int BlNumNew;
         int WinShadingControlPtr(0);
         int ErrCount;
-        Real64 diffp;
         bool izConstDiff;    // differences in construction for IZ surfaces
         bool izConstDiffMsg; // display message about hb diffs only once.
 
@@ -2384,15 +2385,16 @@ namespace SurfaceGeometry {
         }
 
         // Set up Floor Areas for Zones and Spaces
+        Real64 constexpr floorAreaTolerance(0.05);
+        Real64 constexpr floorAreaPercentTolerance(floorAreaTolerance * 100.0);
         if (!SurfError) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                      ++SurfNum) {
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea += state.dataSurface->Surface(SurfNum).Area;
                         state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
                         int spaceNum = state.dataSurface->Surface(SurfNum).spaceNum;
-                        state.dataHeatBal->space(spaceNum).floorArea += state.dataSurface->Surface(SurfNum).Area;
+                        state.dataHeatBal->space(spaceNum).calcFloorArea += state.dataSurface->Surface(SurfNum).Area;
                     }
                     if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                         state.dataHeatBal->Zone(ZoneNum).CeilingArea += state.dataSurface->Surface(SurfNum).Area;
@@ -2401,75 +2403,40 @@ namespace SurfaceGeometry {
                 }
             }
             ErrCount = 0;
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                state.dataHeatBal->Zone(ZoneNum).CalcFloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
-                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
-                    // Check entered vs calculated
-                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
-                        // produce message if not near calculated
-                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
-                            diffp = std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
-                                    state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                            if (diffp > 0.05) {
-                                ++ErrCount;
-                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(
-                                        state, std::string{RoutineName} + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s).");
-                                    ShowContinueError(state,
-                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
-                                }
-                                if (state.dataGlobal->DisplayExtraWarnings) {
-                                    // Warn user of using specified Zone Floor Area
-                                    ShowWarningError(state,
-                                                     std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
-                                                         state.dataHeatBal->Zone(ZoneNum).Name +
-                                                         "\" significantly different from calculated Floor Area");
-                                    ShowContinueError(state,
-                                                      format("Entered Zone Floor Area value={:.2R}, Calculated Zone Floor Area value={:.2R}, entered "
-                                                             "Floor Area will be used in calculations.",
-                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
-                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
-                                }
-                            }
-                        }
-                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
-                    }
-                } else {
-                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea; // redundant, already done.
-                }
-            }
-
             for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                state.dataHeatBal->space(spaceNum).calcFloorArea = state.dataHeatBal->space(spaceNum).floorArea;
                 if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
                     // Check entered vs calculated
                     if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea > 0.0) { // User entered Space floor area,
                         // produce message if not near calculated
                         if (state.dataHeatBal->space(spaceNum).calcFloorArea > 0.0) {
-                            diffp =
+                            Real64 diffp =
                                 std::abs(state.dataHeatBal->space(spaceNum).calcFloorArea - state.dataHeatBal->space(spaceNum).userEnteredFloorArea) /
                                 state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
-                            if (diffp > 0.05) {
+                            if (diffp > floorAreaTolerance) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(
-                                        state, std::string(RoutineName) + "Entered Space Floor Areas differ from calculated Space Floor Area(s).");
+                                        state,
+                                        format("{}Entered Space Floor Area(s) differ more than {:.0R}% from calculated Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               floorAreaPercentTolerance));
                                     ShowContinueError(state,
                                                       "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.");
                                 }
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     // Warn user of using specified Space Floor Area
-                                    ShowWarningError(state,
-                                                     std::string(RoutineName) + "Entered Floor Area entered for Space=\"" +
-                                                         state.dataHeatBal->space(spaceNum).Name +
-                                                         "\" significantly different from calculated Floor Area");
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Floor Area for Space=\"{}\" is {:.1R}% different from the calculated Floor Area.",
+                                               std::string(RoutineName),
+                                               state.dataHeatBal->space(spaceNum).Name,
+                                               diffp * 100.0));
                                     ShowContinueError(
                                         state,
-                                        format("Entered Space Floor Area value={:.2R}, Calculated Space Floor Area value={:.2R}, entered "
-                                               "Floor Area will be used in calculations.",
-                                               state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
-                                               state.dataHeatBal->space(spaceNum).calcFloorArea));
+                                        format(
+                                            "Entered Space Floor Area={:.2R}, Calculated Space Floor Area={:.2R}, entered Floor Area will be used.",
+                                            state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
+                                            state.dataHeatBal->space(spaceNum).calcFloorArea));
                                 }
                             }
                         }
@@ -2477,7 +2444,80 @@ namespace SurfaceGeometry {
                         state.dataHeatBal->space(spaceNum).hasFloor = true;
                     }
                 } else {
-                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea; // redundant, already done.
+                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea;
+                }
+            }
+            ErrCount = 0;
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                // Calculate zone floor area as sum of space floor areas
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    state.dataHeatBal->Zone(ZoneNum).CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                }
+                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                    // Check entered vs calculated
+                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
+                        // produce message if not near calculated
+                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            Real64 diffp =
+                                std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
+                                state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                            if (diffp > 0.05) {
+                                ++ErrCount;
+                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Zone Floor Area(s) differ more than {:.0R}% from the sum of the Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               floorAreaPercentTolerance));
+                                    ShowContinueError(state,
+                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
+                                }
+                                if (state.dataGlobal->DisplayExtraWarnings) {
+                                    // Warn user of using specified Zone Floor Area
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Floor Area for Zone=\"{}\" is {:.1R}% different from the sum of the Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               state.dataHeatBal->Zone(ZoneNum).Name,
+                                               diffp * 100.0));
+                                    ShowContinueError(state,
+                                                      format("Entered Zone Floor Area={:.2R}, Sum of Space Floor Area(s)={:.2R}",
+                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
+                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
+                                    ShowContinueError(
+                                        state, "Entered Zone Floor Area will be used and Space Floor Area(s) will be adjusted proportionately.");
+                                }
+                            }
+                        }
+                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
+
+                        // Adjust space floor areas to match zone floor area
+                        if (state.dataHeatBal->Zone(ZoneNum).numSpaces == 1) {
+                            // If the zone contains only one space, then set the Space area to the Zone area
+                            int spaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
+                            state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
+                        } else if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            // Adjust space areas proportionately
+                            Real64 areaRatio = state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                                state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
+                            }
+                        } else {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
+                                // Warn if calculated floor area was zero and there is more than one Space
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
+                                                     state.dataHeatBal->Zone(ZoneNum).Name +
+                                                     "\" significantly different from sum of Space Floor Areas");
+                                ShowContinueError(state,
+                                                  "But the sum of the Space Floor Areas is zero and there is more than one Space in the zone."
+                                                  "Unable to apportion the zone floor area. Space Floor Areas are zero.");
+                            }
+                        }
+                    }
+                } else {
+                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
                 }
             }
         }
@@ -2677,6 +2717,7 @@ namespace SurfaceGeometry {
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) continue;
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == Ground) continue;
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == KivaFoundation) {
+                state.dataSurface->AllHTKivaSurfaceList.push_back(SurfNum);
                 if (!ErrorsFound)
                     state.dataSurfaceGeometry->kivaManager.foundationInputs[state.dataSurface->Surface(SurfNum).OSCPtr].surfaces.push_back(SurfNum);
                 continue;
@@ -4013,11 +4054,8 @@ namespace SurfaceGeometry {
                     // Find foundation object, if blank use default
                     if (state.dataIPShortCut->lAlphaFieldBlanks(ArgPointer + 1)) {
 
-                        if (!state.dataSurfaceGeometry->kivaManager.defaultSet) {
-                            // Apply default foundation if no other foundation object specified
-                            if (state.dataSurfaceGeometry->kivaManager.foundationInputs.size() == 0) {
-                                state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
-                            }
+                        if (!state.dataSurfaceGeometry->kivaManager.defaultAdded) {
+                            // Add default foundation if no other foundation object specified
                             state.dataSurfaceGeometry->kivaManager.addDefaultFoundation();
                         }
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OSCPtr =
@@ -10249,85 +10287,63 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
 
+            enum Month
             {
-                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOn);
+                January = 1,
+                February,
+                March,
+                April,
+                May,
+                June,
+                July,
+                August,
+                September,
+                October,
+                November,
+                December
+            };
+            constexpr std::array<int, 13> oneBasedDaysInMonth = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 31) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 30) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 29) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else {
+            int const monthOn = state.dataSurface->StormWindow(StormWinNum).MonthOn;
+            if (monthOn >= January && monthOn <= December) {
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn >
+                    oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOn]) {
                     ShowSevereError(state,
-                                    format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                    format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->StormWindow(StormWinNum).MonthOn,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
+                break;
+            } else {
+                ShowSevereError(state,
+                                format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                       cCurrentModuleObject,
+                                       state.dataSurface->StormWindow(StormWinNum).MonthOn,
+                                       StormWinNum));
+                ErrorsFound = true;
             }
-            {
-                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOff);
 
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 31) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 30) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 29) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else {
+            int const monthOff = state.dataSurface->StormWindow(StormWinNum).MonthOff;
+            if (monthOff >= January && monthOff <= December) {
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff >
+                    oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOff]) {
                     ShowSevereError(state,
-                                    format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                    format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->StormWindow(StormWinNum).MonthOff,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
+                break;
+            } else {
+                ShowSevereError(state,
+                                format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                       cCurrentModuleObject,
+                                       state.dataSurface->StormWindow(StormWinNum).MonthOff,
+                                       StormWinNum));
+                ErrorsFound = true;
             }
         }
 
@@ -10737,16 +10753,29 @@ namespace SurfaceGeometry {
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
-                                    "Foundation:Kiva:Settings, " + state.dataIPShortCut->cAlphaArgs(alpF) + " is not a valid choice for " +
-                                        state.dataIPShortCut->cAlphaFieldNames(alpF));
+                                    format("{}, {} is not a valid choice for {}",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(alpF),
+                                           state.dataIPShortCut->cAlphaFieldNames(alpF)));
                 }
             }
             alpF++;
 
             if (state.dataIPShortCut->lNumericFieldBlanks(numF) || state.dataIPShortCut->rNumericArgs(numF) == DataGlobalConstants::AutoCalculate) {
+                // Autocalculate deep-ground depth (see KivaManager::defineDefaultFoundation() for actual calculation)
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = 40.0;
+                state.dataSurfaceGeometry->kivaManager.settings.autocalculateDeepGroundDepth = true;
+                if (state.dataSurfaceGeometry->kivaManager.settings.deepGroundBoundary != HeatBalanceKivaManager::KivaManager::Settings::AUTO) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    format("{}, {} should not be set to Autocalculate unless {} is set to Autoselect",
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cNumericFieldNames(numF),
+                                           state.dataIPShortCut->cAlphaFieldNames(alpF - 1)));
+                }
             } else {
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = state.dataIPShortCut->rNumericArgs(numF);
+                state.dataSurfaceGeometry->kivaManager.settings.autocalculateDeepGroundDepth = false;
             }
             numF++;
             if (!state.dataIPShortCut->lNumericFieldBlanks(numF)) {
@@ -10770,17 +10799,18 @@ namespace SurfaceGeometry {
             alpF++;
         }
 
+        // Set default foundation (probably doesn't need to be called if there are no Kiva
+        // surfaces, but we don't know that yet). We call this here so that the default
+        // foundation is available for 1) the starting copy for user-defined Foundation:Kiva
+        // object default inputs, and 2) the actual default Foundation object if a
+        // user-defined Foundation:Kiva name is not referenced by a surface.
+        state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
+
         // Read Foundation objects
         cCurrentModuleObject = "Foundation:Kiva";
         int TotKivaFnds = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaFnds > 0) {
-            state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
-
-            Array1D_string fndNames;
-            fndNames.allocate(TotKivaFnds + 1);
-            fndNames(1) = "<Default Foundation>";
-
             for (int Loop = 1; Loop <= TotKivaFnds; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
@@ -10808,8 +10838,6 @@ namespace SurfaceGeometry {
                 if (ErrorInName) {
                     ErrorsFound = true;
                     continue;
-                } else {
-                    fndNames(Loop) = fndInput.name;
                 }
 
                 // Start with copy of default
@@ -11641,7 +11669,16 @@ namespace SurfaceGeometry {
         int SurfNum;
         int MaterNum;
         int SchNum;
-        int InslType;
+
+        enum class InsulationType
+        {
+            Invalid = -1,
+            Outside,
+            Inside,
+            Num
+        };
+        constexpr std::array<std::string_view, static_cast<int>(InsulationType::Num)> insulationTypeNamesUC = {"OUTSIDE", "INSIDE"};
+
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceControl:MovableInsulation";
         NMatInsul = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -11663,12 +11700,9 @@ namespace SurfaceGeometry {
             MaterNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "Outside")) {
-                InslType = 1;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "Inside")) {
-                InslType = 2;
-            } else {
-                InslType = 0;
+            InsulationType insulationType =
+                static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
+            if (insulationType == InsulationType::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(2) + "\", invalid data.");
@@ -11740,8 +11774,8 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     } else {
                         {
-                            auto const SELECT_CASE_var(InslType);
-                            if (SELECT_CASE_var == 1) {
+                            switch (insulationType) {
+                            case InsulationType::Outside:
                                 if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0) {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -11787,7 +11821,8 @@ namespace SurfaceGeometry {
                                         ErrorsFound = true;
                                     }
                                 }
-                            } else if (SELECT_CASE_var == 2) {
+                                break;
+                            case InsulationType::Inside:
                                 if (state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -11820,7 +11855,9 @@ namespace SurfaceGeometry {
                                             state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
                                     }
                                 }
-                            } else {
+                                break;
+                            default:
+                                assert(false);
                             }
                         }
                         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
@@ -14463,102 +14500,98 @@ namespace SurfaceGeometry {
 
             auto const &vertex(surface.Vertex);
 
-            {
-                auto const SELECT_CASE_var(surface.Sides); // is this a 3- or 4-sided surface
+            if (surface.Sides == 3) { // 3-sided polygon
 
-                if (SELECT_CASE_var == 3) { // 3-sided polygon
+                centroid = cen(vertex(1), vertex(2), vertex(3));
 
-                    centroid = cen(vertex(1), vertex(2), vertex(3));
+            } else if (surface.Sides == 4) { // 4-sided polygon
 
-                } else if (SELECT_CASE_var == 4) { // 4-sided polygon
+                // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                Triangle1(1) = vertex(1);
+                Triangle1(2) = vertex(2);
+                Triangle1(3) = vertex(3);
+                Triangle2(1) = vertex(1);
+                Triangle2(2) = vertex(3);
+                Triangle2(3) = vertex(4);
 
-                    // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                // get total Area of quad.
+                Real64 TotalArea(surface.GrossArea);
+                if (TotalArea <= 0.0) {
+                    // catch a problem....
+                    ShowWarningError(state, "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name);
+                    continue;
+                }
+
+                // get area fraction of triangles.
+                Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
+                Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
+
+                // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
+                // quadralateral using the wrong two triangles
+                if ((Tri1Area + Tri2Area) > 1.05) {
+
+                    // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
+                    // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
                     Triangle1(1) = vertex(1);
                     Triangle1(2) = vertex(2);
-                    Triangle1(3) = vertex(3);
-                    Triangle2(1) = vertex(1);
+                    Triangle1(3) = vertex(4);
+                    Triangle2(1) = vertex(2);
                     Triangle2(2) = vertex(3);
                     Triangle2(3) = vertex(4);
 
-                    // get total Area of quad.
-                    Real64 TotalArea(surface.GrossArea);
-                    if (TotalArea <= 0.0) {
-                        // catch a problem....
-                        ShowWarningError(state, "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name);
-                        continue;
-                    }
-
                     // get area fraction of triangles.
-                    Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
-                    Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
-
-                    // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
-                    // quadralateral using the wrong two triangles
-                    if ((Tri1Area + Tri2Area) > 1.05) {
-
-                        // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
-                        // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
-                        Triangle1(1) = vertex(1);
-                        Triangle1(2) = vertex(2);
-                        Triangle1(3) = vertex(4);
-                        Triangle2(1) = vertex(2);
-                        Triangle2(2) = vertex(3);
-                        Triangle2(3) = vertex(4);
-
-                        // get area fraction of triangles.
-                        Real64 AreaTriangle1 = AreaPolygon(3, Triangle1);
-                        Real64 AreaTriangle2 = AreaPolygon(3, Triangle2);
-                        TotalArea = AreaTriangle1 + AreaTriangle2;
-                        Tri1Area = AreaTriangle1 / TotalArea;
-                        Tri2Area = AreaTriangle2 / TotalArea;
-                    }
-
-                    // get centroid of Triangle 1
-                    Vector cen1(cen(Triangle1(1), Triangle1(2), Triangle1(3)));
-
-                    // get centroid of Triangle 2
-                    Vector cen2(cen(Triangle2(1), Triangle2(2), Triangle2(3)));
-
-                    // find area weighted combination of the two centroids (coded to avoid temporary Vectors)
-                    cen1 *= Tri1Area;
-                    cen2 *= Tri2Area;
-                    centroid = cen1;
-                    centroid += cen2;
-
-                } else if ((SELECT_CASE_var >= 5)) { // multi-sided polygon
-                    // (Maybe triangulate?  For now, use old "z" average method")
-                    // and X and Y -- straight average
-
-                    //        X1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
-                    //        X2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
-                    //        Y1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
-                    //        Y2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
-                    //        Z1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
-                    //        Z2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
-                    //        Xcm=(X1+X2)/2.0d0
-                    //        Ycm=(Y1+Y2)/2.0d0
-                    //        Zcm=(Z1+Z2)/2.0d0
-
-                    // Calc centroid as average of surfaces
-                    centroid = 0.0;
-                    for (int vert = 1; vert <= surface.Sides; ++vert) {
-                        centroid += vertex(vert);
-                    }
-                    centroid /= double(surface.Sides);
-
-                } else {
-
-                    if (!surface.Name.empty()) {
-                        ShowWarningError(state, "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + surface.Name);
-                        ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
-                    } else {
-                        ShowWarningError(state, format("CalcSurfaceCentroid: caught problem with # of sides, for surface=#{}", ThisSurf));
-                        ShowContinueError(state,
-                                          "...surface name is blank. Examine surfaces -- this may be a problem with ill-formed interzone surfaces.");
-                        ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
-                    }
-                    centroid = 0.0;
+                    Real64 AreaTriangle1 = AreaPolygon(3, Triangle1);
+                    Real64 AreaTriangle2 = AreaPolygon(3, Triangle2);
+                    TotalArea = AreaTriangle1 + AreaTriangle2;
+                    Tri1Area = AreaTriangle1 / TotalArea;
+                    Tri2Area = AreaTriangle2 / TotalArea;
                 }
+
+                // get centroid of Triangle 1
+                Vector cen1(cen(Triangle1(1), Triangle1(2), Triangle1(3)));
+
+                // get centroid of Triangle 2
+                Vector cen2(cen(Triangle2(1), Triangle2(2), Triangle2(3)));
+
+                // find area weighted combination of the two centroids (coded to avoid temporary Vectors)
+                cen1 *= Tri1Area;
+                cen2 *= Tri2Area;
+                centroid = cen1;
+                centroid += cen2;
+
+            } else if (surface.Sides >= 5) { // multi-sided polygon
+                // (Maybe triangulate?  For now, use old "z" average method")
+                // and X and Y -- straight average
+
+                //        X1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
+                //        X2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
+                //        Y1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
+                //        Y2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
+                //        Z1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
+                //        Z2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
+                //        Xcm=(X1+X2)/2.0d0
+                //        Ycm=(Y1+Y2)/2.0d0
+                //        Zcm=(Z1+Z2)/2.0d0
+
+                // Calc centroid as average of surfaces
+                centroid = 0.0;
+                for (int vert = 1; vert <= surface.Sides; ++vert) {
+                    centroid += vertex(vert);
+                }
+                centroid /= double(surface.Sides);
+
+            } else {
+
+                if (!surface.Name.empty()) {
+                    ShowWarningError(state, "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + surface.Name);
+                    ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
+                } else {
+                    ShowWarningError(state, format("CalcSurfaceCentroid: caught problem with # of sides, for surface=#{}", ThisSurf));
+                    ShowContinueError(state,
+                                      "...surface name is blank. Examine surfaces -- this may be a problem with ill-formed interzone surfaces.");
+                    ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
+                }
+                centroid = 0.0;
             }
 
             // store result in the surface structure in DataSurfaces

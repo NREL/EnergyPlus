@@ -1,5 +1,4 @@
-#ifndef BSDFDIRECTIONS_H
-#define BSDFDIRECTIONS_H
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -16,8 +15,8 @@ namespace SingleLayerOptics
     {
     public:
         CBSDFDefinition(double t_Theta, size_t t_NumOfPhis);
-        double theta() const;
-        size_t numOfPhis() const;
+        [[nodiscard]] double theta() const;
+        [[nodiscard]] size_t numOfPhis() const;
 
     private:
         double m_Theta;
@@ -34,16 +33,16 @@ namespace SingleLayerOptics
     {
     public:
         CBSDFDirections(const std::vector<CBSDFDefinition> & t_Definitions, BSDFDirection t_Side);
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
         const CBSDFPatch & operator[](size_t Index) const;
         std::vector<CBSDFPatch>::iterator begin();
         std::vector<CBSDFPatch>::iterator end();
 
-        std::vector<double> lambdaVector() const;
-        const FenestrationCommon::SquareMatrix & lambdaMatrix() const;
+        [[nodiscard]] std::vector<double> lambdaVector() const;
+        [[nodiscard]] const FenestrationCommon::SquareMatrix & lambdaMatrix() const;
 
         // returns index of element that is closest to given Theta and Phi angles
-        size_t getNearestBeamIndex(double t_Theta, double t_Phi) const;
+        [[nodiscard]] size_t getNearestBeamIndex(double t_Theta, double t_Phi) const;
 
     private:
         std::vector<CBSDFPatch> m_Patches;
@@ -65,7 +64,7 @@ namespace SingleLayerOptics
         static CBSDFHemisphere create(BSDFBasis t_Basis);
         static CBSDFHemisphere create(const std::vector<CBSDFDefinition> & t_Definitions);
 
-        const CBSDFDirections & getDirections(BSDFDirection t_Side) const;
+        [[nodiscard]] const CBSDFDirections & getDirections(BSDFDirection t_Side) const;
 
     private:
         // Construction for pre-defined basis
@@ -77,5 +76,3 @@ namespace SingleLayerOptics
     };
 
 }   // namespace SingleLayerOptics
-
-#endif
