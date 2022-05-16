@@ -171,6 +171,7 @@ def process_all_format_lines(f_path: Path, lines: list, fmt_line_nos: list) -> i
                 f"placeholders and args {args} are not matched.")
             num_errors += 1
 
+        # check for when no args are parsed
         if len(args) == 0:
             print(
                 f"File: {str(f_path)}, line: {line_no + 1}, Format string '{fmt_str}' "
