@@ -237,6 +237,9 @@ namespace EIRPlantLoopHeatPumps {
         int auxElecEIFFoPLRCurveIndex = 0;
         Real64 standbyElecPower = 0.0;
 
+        // new output variables for derived class only
+        Real64 loadSideVolumeFlowRate = 0.0;
+
         // Override parent methods to be declared
         void simulate(EnergyPlusData &state,
                       const EnergyPlus::PlantLocation &calledFromLocation,
