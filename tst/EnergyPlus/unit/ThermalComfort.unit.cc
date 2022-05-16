@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // SingleHeatingSetPoint thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = SingleHeatingSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // SingleCoolingSetPoint thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = SingleCoolingSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // SingleHeatCoolSetPoint thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = SingleHeatCoolSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeatCool;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 
     // DualSetPointWithDeadBand thermostat
 
-    state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -929,7 +929,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
-    state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     // heating
     state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
@@ -1002,7 +1002,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).Pierce = true;
     state->dataHeatBal->People(1).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
     state->dataHeatBal->People(1).WorkEffPtr = 0;
-    state->dataHeatBal->People(1).ClothingType = 1;
+    state->dataHeatBal->People(1).clothingType = ClothingType::InsulationSchedule;
 
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
     state->dataHeatBalFanSys->ZoneQHTRadSysToPerson(1) = 0.0;
