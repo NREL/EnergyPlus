@@ -1328,25 +1328,31 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // A6 Fuel Type
                 std::string fuelType = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
-                if (fuelType == "NATRUALGAS") {
-                    thisPLHP.fuelType = 0;
-                } else if (fuelType == "PROPANE") {
-                    thisPLHP.fuelType = 1;
-                } // 2022-05-15: Add more fuel types here
-                else {
-                    // default natural gas?
+                // Validate fuel type input
+                // Locals
+                static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
+                bool FuelTypeError(false);
+                UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
+                    fuelType, thisPLHP.GAHPFuelTypeForOutputVariable, thisPLHP.fuelType, FuelTypeError);
+                if (FuelTypeError) {
+                    ShowSevereError(state, fmt::format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
+                    // ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+                    ShowContinueError(state, "Invalid Fuel Type = " + fuelType);
+                    // Set to Electric to avoid errors when setting up output variables
+                    thisPLHP.GAHPFuelTypeForOutputVariable = "NaturalGas";
+                    thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
+                    errorsFound = true;
+                    FuelTypeError = false;
                 }
 
                 // A7 End use category
                 std::string endUseCat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
                 // 2022-05-13: default: empty?
-                // 2022-05-14: convert to an int index
-                if (endUseCat == "HEATING") {
-                    thisPLHP.endUseCat = 0;
-                } else if (endUseCat == "DHW") {
-                    thisPLHP.endUseCat = 1; // 2022-05-14 need more categories
+                if (endUseCat != "") {
+                    thisPLHP.endUseSubcat = endUseCat;
                 } else {
-                    // default value?
+                    thisPLHP.endUseSubcat = "General"; // leave this as "GAHP" instead of "general" like other end use subcategories since
+                                                       // it appears this way in existing output files?
                 }
 
                 // N1 Nominal heating capacity
@@ -1394,6 +1400,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // 2022-05-13: check the following line, why need to check if it is the last one?
                 if (fields.find("sizing_factor") != fields.end()) {
                     thisPLHP.sizingFactor = fields.at("sizing_factor").get<Real64>();
+                    if (thisPLHP.sizingFactor <= 0.0) thisPLHP.sizingFactor = 1.0;
                 } else {
                     Real64 defaultVal = 0.0;
                     if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "sizing_factor", defaultVal)) {
@@ -1411,13 +1418,18 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // A8 flow mode
                 std::string flowMode = UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>());
                 if (flowMode == "NOTMODULATED") {
-                    thisPLHP.flowMode = 0;
+                    thisPLHP.flowMode = DataPlant::FlowMode::NotModulated;
                 } else if (flowMode == "CONSTANTFLOW") {
-                    thisPLHP.flowMode = 1;
+                    thisPLHP.flowMode = DataPlant::FlowMode::Constant;
                 } else if (flowMode == "LEAVINGSETPOINTMODULATED") {
-                    thisPLHP.flowMode = 2;
+                    thisPLHP.flowMode = DataPlant::FlowMode::LeavingSetpointModulated;
                 } else {
-                    thisPLHP.fuelType = 0; // default natural gas?
+                    ShowSevereError(state, fmt::format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, thisPLHP.name));
+                    ShowContinueError(state, "Invalid Flow Mode =" + flowMode);
+                    ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
+                    ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
+                    // assume variable flow if not specified
+                    thisPLHP.flowMode = DataPlant::FlowMode::NotModulated; // default NotModulated
                 }
 
                 // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
