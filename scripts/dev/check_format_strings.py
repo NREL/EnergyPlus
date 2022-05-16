@@ -80,7 +80,7 @@ def process_all_format_lines(f_path: Path, lines: list, fmt_line_nos: list) -> i
         line = line.replace("\"\"", "")
 
         # throw away front
-        tokens = line.split("format")
+        tokens = line.split("format", 1)
         line = tokens[1]
 
         # process the rest
@@ -171,7 +171,16 @@ def process_all_format_lines(f_path: Path, lines: list, fmt_line_nos: list) -> i
                 f"placeholders and args {args} are not matched.")
             num_errors += 1
 
+        if len(args) == 0:
+            print(
+                f"File: {str(f_path)}, line: {line_no + 1}, Format string '{fmt_str}' "
+                f"has no arguments. Remove format."
+            )
+
+            num_errors += 1
+
     return num_errors
+
 
 
 def check_format_strings(search_path: Path) -> int:

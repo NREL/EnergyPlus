@@ -3763,7 +3763,7 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
         if (userInputValue < minChargeEfficiency) {
             ShowSevereError(state,
                             format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named {}", deviceName));
-            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the charge efficiency."));
+            ShowContinueError(state, "Please check your input value  for this electric storage unit and fix the charge efficiency.");
             errorsFound = true;
             return minChargeEfficiency;
         } else {
@@ -3773,7 +3773,7 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
         if (userInputValue < minDischargeEfficiency) {
             ShowSevereError(
                 state, format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named {}", deviceName));
-            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the discharge efficiency."));
+            ShowContinueError(state, "Please check your input value  for this electric storage unit and fix the discharge efficiency.");
             errorsFound = true;
             return minDischargeEfficiency;
         } else {
