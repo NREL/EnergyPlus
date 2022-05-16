@@ -3771,8 +3771,8 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
         }
     } else if (UtilityRoutines::SameString(whichType, "DISCHARGING")) {
         if (userInputValue < minDischargeEfficiency) {
-            ShowSevereError(state,
-                            format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named {}" + deviceName));
+            ShowSevereError(
+                state, format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named {}" + deviceName));
             ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the discharge efficiency."));
             errorsFound = true;
             return minDischargeEfficiency;

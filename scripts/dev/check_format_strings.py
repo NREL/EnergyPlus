@@ -57,19 +57,130 @@ import os
 import sys
 from pathlib import Path
 
-cpp_str = """
 
+def process_all_format_lines(f_path: Path, lines: list, fmt_line_nos: list) -> int:
+    num_errors = 0
 
+    # process format lines
+    for line_no in fmt_line_nos:
+        line = ""
+        line_no_counter = line_no
 
-"""
+        # collect multiline statements
+        while True:
+            line += lines[line_no_counter]
+            # get rid of escaped parentheses
+            line = line.replace("\\\"", "")
+            if line[-1] != ";":
+                line_no_counter += 1
+            else:
+                break
+
+        # replace parens '""' next to each other in case of wrapped lines
+        line = line.replace("\"\"", "")
+
+        # throw away front
+        tokens = line.split("format")
+        line = tokens[1]
+
+        # process the rest
+        num_open_paren = 0
+        num_close_paren = 0
+        num_quote = 0
+        start_fmt = 0
+        end_fmt = 0
+        fmt_str = ""
+        args = ""
+        for idx_fmt, c in enumerate(line):
+
+            # get fmt string
+            if c == "\"":
+                num_quote += 1
+                if num_quote == 1:
+                    start_fmt = idx_fmt + 1
+                    continue
+                elif num_quote == 2:
+                    end_fmt = idx_fmt
+                    fmt_str = line[start_fmt:end_fmt]
+                    continue
+
+            # skip if we're inside the fmt string
+            if 0 < num_quote < 2:
+                continue
+
+            # find the end of the args
+            if c == "(":
+                num_open_paren += 1
+            elif c == ")":
+                num_close_paren += 1
+
+            # found full args string
+            if (num_open_paren - num_close_paren) == 0:
+                args_str = line[end_fmt + 2:idx_fmt]
+                args_str = args_str.strip()
+                num_quote = 0
+                args = []
+                args_idx = 0
+
+                # partiall process args
+                for a in args_str:
+                    if (a == "\"") and (num_quote > 0):
+                        num_quote -= 1
+                        continue
+                    elif (a == "\"") and (num_quote == 0):
+                        num_quote += 1
+
+                    if (a == ",") and (num_quote == 0):
+                        args_idx += 1
+                        continue
+
+                    try:
+                        args[args_idx] += a
+                    except IndexError:
+                        args.append(a)
+
+                break
+
+        # fmt strings need further processing for escaped curly braces
+        fmt_str = fmt_str.replace("{{", "")
+        fmt_str = fmt_str.replace("}}", "")
+
+        # args need further processing to recombine things that shouldn't have been separated
+        while True:
+            args_copy = args
+            for idx_args, a in enumerate(args):
+                if a.count("(") != a.count(")"):
+                    args_copy[idx_args:idx_args +
+                              2] = [','.join(args[idx_args:idx_args + 2])]
+                    break
+            args = args_copy
+            if all([y == 0 for y in [x.count("(") - x.count(")") for x in args]]):
+                break
+
+        # finally, we can do some error checking
+        # check for unbalanced curly braces
+        if fmt_str.count("{") != fmt_str.count("}"):
+            print(
+                f"File: {str(f_path)}, line: {line_no + 1}, Format string '{fmt_str}' has unbalanced curly braces.")
+            num_errors += 1
+
+        # check for unbalanced curly braces placeholders and arguments
+        if fmt_str.count("{") != len(args):
+            print(
+                f"File: {str(f_path)}, line: {line_no + 1}, Format string '{fmt_str}' "
+                f"placeholders and args {args} are not matched.")
+            num_errors += 1
+
+    return num_errors
 
 
 def check_format_strings(search_path: Path) -> int:
+
     num_errors = 0
 
     files_to_search = []
     for p in [search_path]:
-        for root, dirs, files in os.walk(p):
+        for root, _, files in os.walk(p):
             for file in files:
                 f_path = Path(root) / Path(file)
                 f_extension = f_path.suffix
@@ -80,11 +191,11 @@ def check_format_strings(search_path: Path) -> int:
 
     files_to_search.sort()
 
-    for file in files_to_search:
+    for f_path in files_to_search:
 
         format_line_nos = []
 
-        with open(file, "r") as f:
+        with open(f_path, "r") as f:
             lines = f.readlines()
 
         lines = [x.strip() for x in lines]
@@ -108,123 +219,25 @@ def check_format_strings(search_path: Path) -> int:
             if "format(\"" in line:
                 format_line_nos.append(idx)
 
-        # process format lines
-        for line_no in format_line_nos:
-            line = ""
-            line_no_counter = line_no
-
-            # collect multiline statements
-            while True:
-                line += lines[line_no_counter]
-                # get rid of escaped parentheses
-                line = line.replace("\\\"", "")
-                if line[-1] != ";":
-                    line_no_counter += 1
-                else:
-                    break
-
-            # replace parens '""' next to each other in case of wrapped lines
-            line = line.replace("\"\"", "")
-
-            # throw away front
-            tokens = line.split("format")
-            line = tokens[1]
-
-            # process the rest
-            num_open_paren = 0
-            num_close_paren = 0
-            num_quote = 0
-            start_fmt = 0
-            end_fmt = 0
-            fmt_str = ""
-            args = ""
-            for idx_fmt, c in enumerate(line):
-
-                # get fmt string
-                if c == "\"":
-                    num_quote += 1
-                    if num_quote == 1:
-                        start_fmt = idx_fmt + 1
-                        continue
-                    elif num_quote == 2:
-                        end_fmt = idx_fmt
-                        fmt_str = line[start_fmt:end_fmt]
-                        continue
-
-                # skip if we're inside the fmt string
-                if 0 < num_quote < 2:
-                    continue
-
-                # find the end of the args
-                if c == "(":
-                    num_open_paren += 1
-                elif c == ")":
-                    num_close_paren += 1
-
-                # found full args string
-                if (num_open_paren - num_close_paren) == 0:
-                    args_str = line[end_fmt + 2:idx_fmt]
-                    args_str = args_str.strip()
-                    num_quote = 0
-                    args = []
-                    args_idx = 0
-
-                    # partiall process args
-                    for a in args_str:
-                        if (a == "\"") and (num_quote > 0):
-                            num_quote -= 1
-                            continue
-                        elif (a == "\"") and (num_quote == 0):
-                            num_quote += 1
-
-                        if (a == ",") and (num_quote == 0):
-                            args_idx += 1
-                            continue
-
-                        try:
-                            args[args_idx] += a
-                        except IndexError:
-                            args.append(a)
-
-                    break
-
-            # fmt strings need further processing for escaped curly braces
-            fmt_str = fmt_str.replace("{{", "")
-            fmt_str = fmt_str.replace("}}", "")
-
-            # args need further processing to recombine things that shouldn't have been separated
-            while True:
-                args_copy = args
-                for idx_args, a in enumerate(args):
-                    if a.count("(") != a.count(")"):
-                        args_copy[idx_args:idx_args + 2] = [','.join(args[idx_args:idx_args + 2])]
-                        break
-                args = args_copy
-                if all([y == 0 for y in [x.count("(") - x.count(")") for x in args]]):
-                    break
-
-            # finally, we can do some error checking
-            # check for unbalanced curly braces
-            if fmt_str.count("{") != fmt_str.count("}"):
-                print(f"File: {str(file)}, line: {line_no + 1}, Format string '{fmt_str}' has unbalanced curly braces.")
-                num_errors += 1
-
-            # check for unbalanced curly braces placeholders and arguments
-            if fmt_str.count("{") != len(args):
-                print(
-                    f"File: {str(file)}, line: {line_no + 1}, Format string '{fmt_str}' "
-                    f"placeholders and args {args} are not matched.")
+        num_errors += process_all_format_lines(f_path, lines, format_line_nos)
 
     return num_errors
 
 
 if __name__ == "__main__":
-    # root_path = Path(__file__).parent.parent.parent
-    root_path = Path("/Users/mmitchel/Projects/EnergyPlus/dev/develop")
+
+    root_path = Path(__file__).parent.parent.parent
     src_path = root_path / "src" / "EnergyPlus"
     tst_path = root_path / "tst" / "EnergyPlus"
 
+    print("**** Checking EnergyPlus code for malformed fmt strings ****")
     errors_found = check_format_strings(src_path)
+    print("**** DONE ****")
+    print("")
+
+    print("**** Checking EnergyPlus unit test code for malformed fmt strings ****")
     errors_found += check_format_strings(tst_path)
+    print("**** DONE ****")
+
     if errors_found > 0:
         raise sys.exit(1)
