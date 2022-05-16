@@ -10269,7 +10269,6 @@ void SkyDifSolarShading(EnergyPlusData &state)
     Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
     Real64 Fac1WithShdg;    // Intermediate calculation factor, with shading
     Real64 SurfArea;        // Surface area (m2)
-    bool ShadowingSurf;     // True if surface is a shadowing surface
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: WithShdgIsoSky     ! Diffuse solar irradiance from isotropic
     //                                                          ! sky on surface, with shading
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: WoShdgIsoSky       ! Diffuse solar from isotropic

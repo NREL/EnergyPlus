@@ -7677,7 +7677,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 Alfa;               // Direction angles for ray heading towards the ground (radians)
     Real64 Beta;
     Real64 HorDis;        // Distance between ground hit point and proj'n of window center onto ground (m)
-    int ObsSurfNum;       // Obstruction surface number
     bool hitObs;          // True iff obstruction is hit
     Real64 ObsVisRefl;    // Visible reflectance of obstruction
     Real64 SkyReflVisLum; // Reflected sky luminance at hit point divided by unobstructed sky
@@ -8512,7 +8511,6 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
     Real64 ObstrTrans;         // product of all surface transmittances intersecting incoming beam
 
     Real64 BeamObstrMultiplier; // beam obstruction multiplier in case incoming beam is from the ground
-    int ObsSurfNum;             // Obstruction surface number
     bool hitObs;                // True iff obstruction is hit
     auto &ComplexFenestrationLuminancesObsHitPt =
         state.dataDaylightingManager->ComplexFenestrationLuminancesObsHitPt; // Coordinates of hit point on an obstruction (m)
@@ -9320,7 +9318,6 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &DayltgSurfaceLumFromSunReflNorm = state.dataDaylightingManager->DayltgSurfaceLumFromSunReflNorm; // Unit normal to reflecting surface (m)
     auto &DayltgSurfaceLumFromSunObsHitPt = state.dataDaylightingManager->DayltgSurfaceLumFromSunObsHitPt; // Hit point on obstruction (m)
-    int ObsSurfNum;                                                                                        // Obstruction surface number
     bool hitObs;                                                                                           // True iff obstruction is hit
     Real64 CosIncAngAtHitPt; // Cosine of angle of incidence of sun at HitPt
     Real64 DiffVisRefl;      // Diffuse visible reflectance of ReflSurfNum
